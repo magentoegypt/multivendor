@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Currency switcher
+ *
+ * @see \Magento\Directory\Block\Currency
+ */
+?>
+<?php if ($block->getCurrencyCount() > 1): ?>
+	<?php $currencies = $block->getCurrencies(); ?>
+	<?php $currentCurrencyCode = $block->escapeHtml($block->getCurrentCurrencyCode()); ?>
+
+	<ul class="switcher currency switcher-currency">
+		 <li class="currency-<?= $currentCurrencyCode ?> switcher-option">
+			<span><?= $currentCurrencyCode ?> - <?= $currencies[$currentCurrencyCode] ?></span>
+		 </li>
+		<?php foreach ($currencies as $_code => $_name): ?>
+			<?php if ($_code != $currentCurrencyCode): ?>
+				<li class="currency-<?= $_code ?> switcher-option">
+					<a href="#" data-post='<?= $block->getSwitchCurrencyPostData($_code); ?>'><?= $_code ?> - <?= $_name ?></a>
+				</li>
+			<?php endif; ?>
+		<?php endforeach; ?>
+	</ul>
+<?php endif; ?>

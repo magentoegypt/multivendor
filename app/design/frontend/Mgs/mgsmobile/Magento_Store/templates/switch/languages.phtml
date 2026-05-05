@@ -1,0 +1,30 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Language switcher template
+ */
+?>
+<?php if (count($block->getStores())>1): ?>
+	<ul class="switcher language switcher-language">
+		<li class="view-<?= $block->escapeHtml($block->getCurrentStoreCode()) ?> switcher-option">
+			<span><?= $block->escapeHtml($block->getStoreName()) ?></span>
+		</li>
+		<?php foreach ($block->getStores() as $_lang): ?>
+			<?php if ($_lang->getId() != $block->getCurrentStoreId()): ?>
+				<li class="view-<?= $block->escapeHtml($_lang->getCode()); ?> switcher-option">
+					<a href="#" data-post='<?= $block->getTargetStorePostData($_lang); ?>'>
+						<?= $block->escapeHtml($_lang->getName()) ?>
+					</a>
+				</li>
+			<?php endif; ?>
+		<?php endforeach; ?>
+	</ul>
+<?php endif; ?>

@@ -1,0 +1,30 @@
+<?php $_configHelper = $this->helper('MGS\Amp\Helper\Config'); ?>
+<?php
+	if($_configHelper->getStoreConfig('themesettings/footer/footer_bottom_custom_copyright')){
+		$copyright = $_configHelper->getStoreConfig('themesettings/footer/footer_bottom_copyright');
+	}else {
+		$copyright = $block->getChildHtml('amp.copyright');
+	}
+?>
+<footer>
+	<div class="middle-footer">
+		<div class="footer-block">
+			<?= $_configHelper->convertHtmlForAmp($this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_amp_footer_middle_block_1')->toHtml()); ?>
+		</div>
+		<amp-accordion disable-session-states animate>
+			<section>
+				<?= $_configHelper->convertHtmlForAmp($this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_amp_footer_middle_block_2')->toHtml()); ?>
+			</section>
+			<section>
+				<?= $_configHelper->convertHtmlForAmp($this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_amp_footer_middle_block_3')->toHtml()); ?>
+			</section>
+			<section>
+				<?= $_configHelper->convertHtmlForAmp($this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_amp_footer_middle_block_4')->toHtml()); ?>
+			</section>
+		</amp-accordion>
+	</div>
+	<div class="bottom-footer">
+		<?= $copyright ?>
+		<?= $_configHelper->convertHtmlForAmp($this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_amp_footer_bottom_block')->toHtml()); ?>
+	</div>
+</footer>

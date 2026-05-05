@@ -1,0 +1,32 @@
+<?php 
+/* 	
+* 	Block Guide
+*	Magento menu: $block->getChildHtml('store.menu');
+*	Language: $block->getChildHtml('store_language');
+*	Currency: $block->getChildHtml('currency');
+*	Top Links: $block->getChildHtml('top.links');
+*	Skip Content Block: $block->getChildHtml('skip_to_content');
+*	Logo: $block->getChildHtml('logo');
+*	Mini Cart: $block->getChildHtml('minicart');
+*	Search: $block->getChildHtml('topSearch');
+*	Static block: $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('your_block_identifier')->toHtml();
+*/
+?>
+
+<?php
+	$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+	
+	$blockEnable = explode(",",$themeSettingConfig->getStoreConfig('themesettings/header/elements'));
+	$settingContentCondition =  false;
+	if((in_array('store', $blockEnable) && trim(preg_replace('/\s+/', ' ', $block->getChildHtml('store_language')))) || (in_array('curency', $blockEnable) && trim(preg_replace('/\s+/', ' ', $block->getChildHtml('currency')))) || (in_array('static1', $blockEnable) && trim(preg_replace('/\s+/', ' ', $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_1')->toHtml()))) || (in_array('static2', $blockEnable) && trim(preg_replace('/\s+/', ' ', $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_2')->toHtml())))){
+		$settingContentCondition = true;
+	}
+?>
+
+<div class="megamenu_action mobile">
+	<button class="megamenu_action_mb" on="tap:site_menu.open" type="button"><span class="icon-menu"></span></button>
+</div>
+<?= $block->getChildHtml('amp.logo') ?>
+<?php if(in_array('search', $blockEnable)): ?>
+	<?= $block->getChildHtml('amp.top.search') ?>
+<?php endif ?>

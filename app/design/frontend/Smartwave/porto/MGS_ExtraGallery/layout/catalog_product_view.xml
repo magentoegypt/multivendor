@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="empty" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.extra.media.image" remove="true" />
+        <referenceBlock name="product.info.extra.media.image.config" remove="true" />
+        <referenceBlock name="product.info.extra.media.image.type" remove="true" />
+        <referenceBlock name="script.sharethis" remove="true" />
+
+        <referenceContainer name="product.info.media">
+            <block class="Magento\Catalog\Block\Product\View\Gallery" name="product.info.media.image.porto" template="Magento_Catalog::product/view/gallery.phtml">
+                <arguments>
+                    <argument name="gallery_options" xsi:type="object">Magento\Catalog\Block\Product\View\GalleryOptions</argument>
+                    <argument name="imageHelper" xsi:type="object">Magento\Catalog\Helper\Image</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,371 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  _____________________________________________
+
+@review-ratings-left: 280px;
+@reviews-indent-desktop: 30px;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .product-reviews-summary {
+		.rating-summary {
+			left: 0;
+			display: block;
+		}
+		&.short.empty,
+		&.short .reviews-actions {
+			display: none;
+		}
+	}
+	.rating-summary .rating-result {
+		margin-left: 0;
+		width: 70px;
+		position: relative;
+		> span:before,
+		&:before {
+			font-family: inherit;
+			content: "\2605" "\2605" "\2605" "\2605" "\2605";
+			font-size: 16px;
+			letter-spacing: 1px;
+		}
+		> span {
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 2;
+			overflow: hidden;
+			&:before {
+				color: @theme-primary-color;
+			}
+			span {
+				.lib-visually-hidden();
+			}
+		}
+	}
+	.block-reviews-dashboard {
+		.block-content {
+			.item {
+				+ .item {
+					margin-top: 15px;
+					border-top: 1px solid #eaeaea;
+					padding-top: 15px;
+				}
+				.rating-summary {
+					.label {
+						display:none;
+					}
+				}
+			}
+		}
+	}
+	.products-reviews-toolbar,.downloadable-products-toolbar {
+		.limiter {
+			display:none;
+		}
+	}
+	.customer-review.view {
+		.product-details {
+			.product-info {
+				.product-name {
+					font-size: 1.5rem;
+					color: #000;
+					font-weight: 700;
+				}
+				.rating-average-label {
+					display: block;
+					margin: 15px 0 10px;
+					color: #333333;
+					font-size: 1.25rem;
+				}
+			}
+			.product-media {
+				.product-image-photo {
+					min-width: 100%;
+				}
+			}
+		}
+		.review-details {
+			margin-top: 2rem;
+			overflow:hidden;
+			.title {
+				strong {
+					display: block;
+					font-size: 1.25rem;
+					font-weight: 500;
+					color: #333;
+				}
+			}
+			.customer-review-rating {
+				margin: 10px 0 20px;
+				.rating-summary {
+					&.item {
+						margin: 0 0 10px;
+						.rating-label {
+							font-size: 0.875rem;
+							padding: 0;
+							margin-bottom: 0;
+							border-radius: 0;
+							color: #222;
+							font-weight: 500;
+						}
+					}
+				}
+			}
+			> .review-title {
+				font-size: 1rem;
+				font-weight: 500;
+				color: #222;
+				margin:0;
+			}
+			> .review-content {
+				font-size: 15px;
+				line-height: 2;
+				color:#999;
+			}
+			> .review-date {
+				font-style: italic;
+				margin: 10px 0;
+				color:#999;
+			}
+		}
+		.product-reviews-summary .reviews-actions {
+			display: none;
+		}
+		+ .actions-toolbar {
+			margin-top: 2rem;
+			.action.back {
+				.lib-link-myaccount()
+			}
+		}
+	}
+	
+	.block {
+		&.review-list {
+			.block-title strong {
+				display: block;
+				font-weight: 700;
+				color: #222222;
+				font-size: 1.875rem;
+				line-height: inherit;
+				margin: 0 0 15px;
+			}
+			.review-content {
+				line-height: 1.9;
+				margin-bottom: 12px !important;
+			}
+			.review-toolbar {
+				margin: 0;
+				border: none;
+			}
+			.review-details {
+				.review-author,
+				.review-date {
+					display: inline-block;
+					font-style: italic;
+					color: #777777;
+					margin: 0;
+				}
+				.review-author:after {
+					content: "-";
+				}
+			}
+			.review-item .rating-label {
+				font-weight: 500;
+				color: #222;
+				&:after {
+					content: ":";
+				}
+			}
+			.review-ratings {
+				float: none;
+				margin-bottom: 10px;
+			}
+			.review-legend {
+				display: block;
+				font-weight: 700;
+				color: #222222;
+				font-size: 1.25rem;
+				line-height: inherit;
+				margin: 0 0 15px;
+			}
+			.review-items {
+				.review-item {
+					border: 1px solid #eaeaea;
+					border-radius: 4px;
+					padding: 15px;
+					margin-bottom: 30px;
+					.review-title {
+						font-size: 1rem;
+						color: #222;
+						margin-bottom: 10px;
+						font-weight: 700;
+					}
+				}
+			}
+			.review-ratings {
+				~ .review-content, 
+				~ .review-details {
+					margin: 0;
+				}
+			}
+		}
+		&.review-add {
+			.review-form-actions {
+				margin-left: 0;
+			}
+			.review-form {
+				max-width: 100%;
+				.action.submit.primary {
+					margin: 0;
+					background: #000000;
+					border: 2px solid #000000;
+					color: #ffffff;
+					&:hover {
+						background: #f68872;
+						border: 2px solid #f68872;
+						color: #ffffff;
+					}
+				}
+			}
+			.review-legend {
+				font-size: 1.325rem;
+				color: #222;
+				span,
+				strong {
+					display: inline;
+				}
+			}
+			.review-field-nickname,
+			.review-field-summary {
+				width: 50%;
+				float: left;
+			}
+			.review-field-nickname {
+				padding-right: 15px;
+			}
+			.review-field-summary {
+				padding-left: 15px;
+			}
+			.review-field-text {
+				clear: left;
+			}
+		}
+	}
+	
+	.table-reviews .action.more {
+		.lib-link-myaccount();
+	}
+	
+	.review-field-rating .review-control-vote {
+		overflow: hidden;
+		height: 28px;
+		&:before {
+			color: #c7c7c7;
+			height: 28px;
+			line-height: 28px;
+			font-style: normal;
+			font-weight: normal;
+			speak: none;
+			vertical-align: top;
+			-webkit-font-smoothing: antialiased;
+			display: block;
+			position: absolute;
+			z-index: 1;
+			content: '\2605' '\2605' '\2605' '\2605' '\2605';
+			font-size: 20px;
+			letter-spacing: 2px;
+		}
+		input[type="radio"] {
+			border: 0;
+			clip: rect(0, 0, 0, 0);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute;
+			width: 1px;
+			&:hover + label:before,
+			&:checked + label:before {
+				opacity: 1;
+			}
+		}
+		label {
+			cursor: pointer;
+			display: block;
+			position: absolute;
+			span {
+				border: 0;
+				clip: rect(0, 0, 0, 0);
+				height: 1px;
+				margin: -1px;
+				overflow: hidden;
+				padding: 0;
+				position: absolute;
+				width: 1px;
+			}
+			&:before {
+				color: #ff5501;
+				font-style: normal;
+				font-weight: normal;
+				speak: none;
+				vertical-align: top;
+				-webkit-font-smoothing: antialiased;
+				opacity: 0;
+				font-size: 20px;
+				letter-spacing: 2px;
+				color: #f68872;
+				display: block;
+				line-height: 28px;
+				height: 28px;
+			}
+			&:hover {
+				&:before {
+					opacity: 1;
+				}
+				~ label:before {
+					opacity: 0;
+				}
+			}
+		}
+		.rating {
+			&-1 {
+				z-index: 6;
+				&:before {
+					content: '\2605';
+				}
+			}
+			&-2 {
+				z-index: 5;
+				&:before {
+					content: '\2605' '\2605';
+				}
+			}
+			&-3 {
+				z-index: 4;
+				&:before {
+					content: '\2605' '\2605' '\2605';
+				}
+			}
+			&-4 {
+				z-index: 3;
+				&:before {
+					content: '\2605' '\2605' '\2605' '\2605';
+				}
+			}
+			&-5 {
+				z-index: 2;
+				&:before {
+					content: '\2605' '\2605' '\2605' '\2605' '\2605';
+				}
+			}
+		}
+	}
+}

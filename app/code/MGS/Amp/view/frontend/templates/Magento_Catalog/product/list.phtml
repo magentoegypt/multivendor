@@ -1,0 +1,55 @@
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php
+    $_productCollection = $block->getLoadedProductCollection();
+    $_helper = $this->helper('Magento\Catalog\Helper\Output');
+    $image = 'amp_category_page_grid';
+    $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+?>
+<?php if (!$_productCollection->count()): ?>
+    <div class="message info empty"><div><?= __('We can\'t find products matching the selection.') ?></div></div>
+<?php else: ?>
+    <div class="catalog-top-toolbar">
+        <?= $block->getToolbarHtml() ?>
+        <?= $block->getAdditionalHtml() ?>        
+    </div>
+
+    <div class="products wrapper grid products-grid">
+        <ol class="products list items product-items">
+            <?php foreach ($_productCollection as $_product): ?>
+                <li class="item product product-item">
+					<div class="product-item-info">
+						<a href="<?= $_product->getProductUrl() ?>?amp=1" class="product photo product-item-photo">
+							<?= $block->getImage($_product, $image)->setCustomAttributes('layout="responsive"')->setTemplate('MGS_Amp::Magento_Catalog/product/image.phtml')->toHtml(); ?>
+						</a>
+						<div class="product details product-item-details">
+							<?php $_productNameStripped = $block->stripTags($_product->getName(), null, true); ?>
+							<strong class="product name product-item-name">
+								<a class="product-item-link"
+								   href="<?= $_product->getProductUrl() ?>?amp=1">
+									<?= $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
+								</a>
+							</strong>
+							
+							<?= $block->getReviewsSummaryHtml($_product, $templateType); ?>
+							
+							<?= $block->getProductPrice($_product) ?>
+							
+							<div class="product actions product-item-actions">
+								<a href="<?= $_product->getProductUrl() ?>?amp=1" class="action tocart"><span><?= __('View Detail') ?></span></a>
+							</div>
+						</div>
+					</div>
+               </li>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+    <div class="bottom-toolbar">
+        <?= $block->getToolbarHtml() ?>
+    </div>
+<?php endif; ?>

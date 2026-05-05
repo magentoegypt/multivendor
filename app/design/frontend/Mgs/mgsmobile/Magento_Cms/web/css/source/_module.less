@@ -1,0 +1,23 @@
+& when (@media-common = true) {
+	.cms-noroute-index .column.main {
+		padding-top: 60px;
+		min-height: unset;
+		.error-icon {
+			font-size: 72px;
+			color: @theme-primary-color;
+		}
+		.title {
+			font-weight: 600;
+		}
+		.sub-title {	
+			color: #a1a1a1;
+			a {
+				text-decoration: underline;
+				color: @theme-primary-color;
+				&:hover {
+					color: #222;
+				}
+			}
+		}
+	}
+}

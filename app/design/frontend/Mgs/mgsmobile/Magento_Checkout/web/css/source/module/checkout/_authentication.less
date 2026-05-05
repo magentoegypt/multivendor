@@ -1,0 +1,130 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  _____________________________________________
+
+@block-auth__dropdown__padding: @indent__m;
+@block-auth__dropdown__background-color: @color-white;
+@block-auth__or-label__size: 36px;
+@block-auth__width: 0;
+@block-auth__border: 1px solid @color-gray-light3;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+	.popup-authentication.modal-popup.modal-slide {
+		z-index: 9999 !important;
+		.modal-header {
+			padding: 10px;
+			border: none;
+			.action-close:before {
+				font-family: @theme-icon-font-family-name;
+				content: @theme-icon-content_close;
+				font-size: 20px;
+			}
+		}
+		.modal-content {
+			padding: 15px;
+		}
+	}
+	
+    .authentication-dropdown {
+        box-sizing: border-box;
+    }
+	
+    .authentication-wrapper {
+        float: right;
+        margin-top: -1.5*@indent__xl;
+        max-width: 50%;
+        position: relative;
+        z-index: 1;
+
+        ._has-auth-shown & {
+            z-index: @modal__z-index;
+        }
+    }
+
+    .action-auth-toggle {
+        &:extend(.abs-action-button-as-link all);
+    }
+
+    .block-authentication {
+        .block-title {
+            font-size: 1.2rem;
+            border-bottom: 0;
+            margin-bottom: 20px;
+			color: #222;
+            strong {
+                font-weight: 600;
+            }
+        }
+
+        .field {
+            .label {
+                font-weight: @font-weight__regular;
+            }
+        }
+
+        .actions-toolbar {
+            margin-bottom: @indent__xs;
+
+            > .secondary {
+                padding-top: @indent__m;
+                text-align: left;
+            }
+        }
+
+        .block[class] {
+            margin: 0;
+            ul {
+                list-style: disc;
+				padding-left: 17px;
+				margin-bottom: 20px;
+            }
+
+            .field {
+                .control,
+                .label {
+                    float: none;
+                    width: auto;
+                }
+            }
+
+            & + .block {
+                border-top: 1px solid @color-gray-light5;
+                margin-top: @indent__xl;
+                padding-top: @indent__xl;
+                position: relative;
+
+                &::before {
+                    .lib-css(height, @block-auth__or-label__size);
+                    .lib-css(line-height, @block-auth__or-label__size - 2px);
+                    .lib-css(margin, -(@block-auth__or-label__size/2 + 1px) 0 0 -(@block-auth__or-label__size / 2));
+                    .lib-css(min-width, @block-auth__or-label__size);
+                    background: @color-white;
+                    border: 1px solid @color-gray-light5;
+                    border-radius: 50%;
+                    box-sizing: border-box;
+                    color: #222;
+                    content: attr(data-label);
+                    display: inline-block;
+                    left: 50%;
+                    letter-spacing: normal;
+                    padding: 0 .2rem;
+                    position: absolute;
+                    text-align: center;
+                    text-transform: uppercase;
+                    top: 0;
+					font-weight: 600;
+					font-size: 12px;
+                }
+            }
+        }
+    }
+}

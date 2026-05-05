@@ -1,0 +1,1044 @@
+<settings>
+	<section>
+		<name>themesettings</name>
+		<group>
+			<name>general</name>
+			<title>General</title>
+			<icon>pe-7s-tools</icon>
+			<fields>
+				<item>
+					<name>width</name>
+					<label>Width</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Width</option>
+					<load_style>1</load_style>
+				</item>
+				<item>
+					<name>custom_width</name>
+					<type>number</type>
+					<label>Custom Width</label>
+					<depends>
+						<condition><![CDATA[themesettings_general_width=="custom"]]></condition>
+					</depends>
+					<load_style>1</load_style>
+				</item>
+				<item>
+					<name>layout</name>
+					<label>Layout</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Htmllayout</option>
+				</item>
+				<item>
+					<name>back_to_top</name>
+					<type>boolean</type>
+					<label>Display back to top icon</label>
+				</item>
+				<item>
+					<name>lazy_load</name>
+					<type>boolean</type>
+					<label>Enable lazy load</label>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>lazy_img</name>
+					<label>Lazy load image</label>
+					<type>image</type>
+					<path>mgs/setting</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+					<load_style>1</load_style>
+					<depends>
+						<condition><![CDATA[themesettings_general_lazy_load=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Background</label>
+				<item>
+					<name>custom_background</name>
+					<label>Custom</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+				</item>
+				<item>
+					<name>background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_general_custom_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_image</name>
+					<label>Background image</label>
+					<type>image</type>
+					<path>mgs/background</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_general_custom_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_cover</name>
+					<label>Background cover</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_general_custom_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_repeat</name>
+					<label>Background repeat</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Repeat</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_general_custom_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_position_x</name>
+					<label>Background Position (x)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positionx</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_general_custom_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_position_y</name>
+					<label>Background Position (y)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positiony</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_general_custom_background=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+		</group>
+		<group>
+			<name>header</name>
+			<title>Header</title>
+			<icon>pe-7s-browser</icon>
+			<fields>
+				<item>
+					<name>header_version</name>
+					<label>Header version</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Header</option>
+				</item>
+				<item>
+					<name>header_absolute</name>
+					<type>boolean</type>
+					<label>Header absolute</label>
+				</item>
+				<item>
+					<name>img_language</name>
+					<type>boolean</type>
+					<label>Display store language image</label>
+				</item>
+				<item>
+					<name>mobile_logo</name>
+					<label>Mobile logo</label>
+					<type>image</type>
+					<path>mgs/setting</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+				</item>
+				<item>
+					<name>elements</name>
+					<type>multiselect</type>
+					<label>Elements</label>
+					<option>MGS\ThemeSettings\Model\Config\Source\Elements</option>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Header Background</label>
+				<item>
+					<name>custom_header_background</name>
+					<label>Custom</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+				</item>
+				<item>
+					<name>background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_image</name>
+					<label>Background image</label>
+					<type>image</type>
+					<path>mgs/background</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_cover</name>
+					<label>Background cover</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_repeat</name>
+					<label>Background repeat</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Repeat</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_position_x</name>
+					<label>Background Position (x)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positionx</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_background=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>background_position_y</name>
+					<label>Background Position (y)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positiony</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_background=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Header Border</label>
+				<item>
+					<name>custom_header_border</name>
+					<label>Custom</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+				</item>
+				<item>
+					<name>border_top_size</name>
+					<label>Border top size</label>
+					<type>range</type>
+					<min_max>0-20</min_max>
+					<step>1</step>
+					<unit>px</unit>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_border=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>border_bottom_size</name>
+					<label>Border bottom size</label>
+					<type>range</type>
+					<min_max>0-20</min_max>
+					<step>1</step>
+					<unit>px</unit>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_border=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>border_top_color</name>
+					<label>Border top color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_border=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>border_bottom_color</name>
+					<label>Border bottom color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_header_border=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Top Header</label>
+				<item>
+					<name>display_top_header</name>
+					<label>Display top header</label>
+					<type>boolean</type>
+				</item>
+				
+				<item>
+					<name>top_header_background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>top_header_background_image</name>
+					<label>Background image</label>
+					<type>image</type>
+					<path>mgs/background</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>top_header_background_cover</name>
+					<label>Background cover</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>top_header_background_repeat</name>
+					<label>Background repeat</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Repeat</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>top_header_background_position_x</name>
+					<label>Background Position (x)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positionx</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>top_header_background_position_y</name>
+					<label>Background Position (y)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positiony</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>top_header_text_color</name>
+					<label>Text color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>top_header_link_color</name>
+					<label>Link color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>top_header_link_hover_color</name>
+					<label>Link hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_display_top_header=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Middle Header</label>
+				<item>
+					<name>custom_middle_header</name>
+					<label>Custom</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+				</item>
+				
+				<item>
+					<name>middle_header_background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_background_image</name>
+					<label>Background image</label>
+					<type>image</type>
+					<path>mgs/background</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_background_cover</name>
+					<label>Background cover</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_background_repeat</name>
+					<label>Background repeat</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Repeat</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_background_position_x</name>
+					<label>Background Position (x)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positionx</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_background_position_y</name>
+					<label>Background Position (y)</label>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Positiony</option>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>middle_header_text_color</name>
+					<label>Text color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>middle_header_link_color</name>
+					<label>Link color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_link_hover_color</name>
+					<label>Link hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_icon_color</name>
+					<label>Icon color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>middle_header_icon_hover_color</name>
+					<label>Icon hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_custom_middle_header=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Bottom Header</label>
+				<item>
+					<name>bottom_header_custom</name>
+					<label>Custom color</label>
+					<type>boolean</type>
+					<noreload>1</noreload>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>bottom_header_background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_bottom_header_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>bottom_header_text_color</name>
+					<label>Text color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_bottom_header_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>bottom_header_link_color</name>
+					<label>Link color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_bottom_header_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>bottom_header_link_hover_color</name>
+					<label>Link hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_bottom_header_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>bottom_header_icon_color</name>
+					<label>Icon color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_bottom_header_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>bottom_header_icon_hover_color</name>
+					<label>Icon hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_bottom_header_custom=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Mini Cart</label>
+				<item>
+					<name>mini_cart_type</name>
+					<label>Mini cart type</label>
+					<load_style>1</load_style>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\MiniCart</option>
+				</item>
+				
+				<item>
+					<name>mini_cart_custom</name>
+					<label>Custom color</label>
+					<type>boolean</type>
+					<noreload>1</noreload>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>cart_icon_color</name>
+					<label>Icon color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_icon_hover_color</name>
+					<label>Icon hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_number_color</name>
+					<label>Number color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_number_background_color</name>
+					<label>Number background</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_text_color</name>
+					<label>Text color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_heading_color</name>
+					<label>Heading color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_close_icon_color</name>
+					<label>Close icon color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>cart_divide_border_color</name>
+					<label>Divide border color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_mini_cart_custom=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Header Search</label>
+				<item>
+					<name>search_type</name>
+					<label>Search type</label>
+					<load_style>1</load_style>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\Search</option>
+				</item>
+				
+				<item>
+					<name>search_custom</name>
+					<label>Custom color</label>
+					<type>boolean</type>
+					<noreload>1</noreload>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>search_text_color</name>
+					<label>Text color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_search_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>search_background_color</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_search_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>search_border_color</name>
+					<label>Border color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_search_custom=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>Menu</label>
+				<item>
+					<name>sticky_menu</name>
+					<label>Sticky Menu</label>
+					<type>boolean</type>
+				</item>
+				
+				<item>
+					<name>sticky_logo</name>
+					<label>Sticky Logo</label>
+					<type>image</type>
+					<path>mgs/setting</path>
+					<allow_extensions>jpg,jpeg,gif,png,svg</allow_extensions>
+					<depends>
+						<condition><![CDATA[themesettings_header_sticky_menu=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>sticky_menu_mobile</name>
+					<label>Sticky menu on mobile</label>
+					<type>boolean</type>
+				</item>
+				
+				<item>
+					<name>menu_custom</name>
+					<label>Custom color</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>menu_main_color</name>
+					<label>Level 1 color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				<item>
+					<name>menu_main_hover_color</name>
+					<label>Level 1 hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>menu_dropdown_background</name>
+					<label>Dropdown background</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>menu_dropdown_opacity</name>
+					<label>Dropdown background opacity</label>
+					<type>range</type>
+					<min_max>0-1</min_max>
+					<step>0.1</step>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>menu_dropdown_heading_color</name>
+					<label>Dropdown Heading</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>menu_dropdown_link_color</name>
+					<label>Dropdown Link</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>menu_dropdown_link_hover_color</name>
+					<label>Dropdown Link hover</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>menu_dropdown_divide_color</name>
+					<label>Dropdown border</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_menu_custom=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label>My Account</label>
+				<item>
+					<name>my_account_type</name>
+					<label>My Account type</label>
+					<load_style>1</load_style>
+					<type>select</type>
+					<option>MGS\ThemeSettings\Model\Config\Source\MiniCart</option>
+				</item>
+				
+				<item>
+					<name>my_account_form</name>
+					<label>Display Login Form</label>
+					<type>boolean</type>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>my_account_custom</name>
+					<label>Custom color</label>
+					<type>boolean</type>
+					<noreload>1</noreload>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>my_account_background</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_my_account_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>my_account_text_color</name>
+					<label>Text color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_my_account_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>my_account_link_color</name>
+					<label>Link color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_my_account_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>my_account_link_hover_color</name>
+					<label>Link hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_my_account_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>my_account_divide_color</name>
+					<label>Divide border color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_my_account_custom=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+			
+			<fields>
+				<label><![CDATA[Dropdown<br><span style="font-weight:normal; font-size:14px">Store View, Curency</span>]]></label>
+				<item>
+					<name>dropdown_custom</name>
+					<label>Custom color</label>
+					<type>boolean</type>
+					<noreload>1</noreload>
+					<load_style>1</load_style>
+				</item>
+				
+				<item>
+					<name>dropdown_background</name>
+					<label>Background color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_dropdown_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>dropdown_opacity</name>
+					<label>Background opacity</label>
+					<type>range</type>
+					<min_max>0-1</min_max>
+					<step>0.1</step>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_dropdown_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>dropdown_link_color</name>
+					<label>Link color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_dropdown_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>dropdown_link_hover_color</name>
+					<label>Link hover color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_dropdown_custom=="1"]]></condition>
+					</depends>
+				</item>
+				
+				<item>
+					<name>dropdown_divide_color</name>
+					<label>Divide border color</label>
+					<type>color</type>
+					<load_style>1</load_style>
+					<noreload>1</noreload>
+					<depends>
+						<condition><![CDATA[themesettings_header_dropdown_custom=="1"]]></condition>
+					</depends>
+				</item>
+			</fields>
+		</group>
+	</section>
+</settings>

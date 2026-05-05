@@ -1,0 +1,122 @@
+<?php 
+/* 	
+* 	Block Guide
+*	Magento menu: $block->getChildHtml('store.menu');
+*	Language: $block->getChildHtml('store_language');
+*	Currency: $block->getChildHtml('currency');
+*	Top Links: $block->getChildHtml('top.links');
+*	Skip Content Block: $block->getChildHtml('skip_to_content');
+*	Logo: $block->getChildHtml('logo');
+*	Mini Cart: $block->getChildHtml('minicart');
+*	Search: $block->getChildHtml('topSearch');
+*	Static block: $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('your_block_identifier')->toHtml();
+*/
+?>
+
+<?php
+	$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+	$stickyMenuMobile = $themeSettingConfig->getStoreConfig('themesettings/header/sticky_menu_mobile');
+	$stickyMenu = $themeSettingConfig->getStoreConfig('themesettings/header/sticky_menu');
+	
+	$blockEnable = explode(",",$themeSettingConfig->getStoreConfig('themesettings/header/elements'));
+	$settingContentCondition =  false;
+	if((in_array('store', $blockEnable) && trim(preg_replace('/\s+/', ' ', $block->getChildHtml('store_language')))) || (in_array('curency', $blockEnable) && trim(preg_replace('/\s+/', ' ', $block->getChildHtml('currency')))) || (in_array('static1', $blockEnable) && trim(preg_replace('/\s+/', ' ', $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_1')->toHtml()))) || (in_array('static2', $blockEnable) && trim(preg_replace('/\s+/', ' ', $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_2')->toHtml())))){
+		$settingContentCondition = true;
+	}
+?>
+<?php if(in_array('search', $blockEnable)): ?>
+	<div class="header-content-search<?php if($stickyMenu && $stickyMenuMobile): ?> sticky-menu<?php endif ?>">
+		<div class="megamenu_action mobile">
+			<button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button>
+		</div>
+		<?= $block->getChildHtml('logo') ?>
+		<?= $block->getChildHtml('topSearch') ?>
+	</div>
+<?php else: ?>
+	<div class="header-content-nosearch<?php if($stickyMenu && $stickyMenuMobile): ?> sticky-menu<?php endif ?>">
+		<div class="megamenu_action mobile">
+			<button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button>
+		</div>
+		<?= $block->getChildHtml('logo') ?>
+		<?= $block->getChildHtml('topSearch') ?>
+	</div>
+<?php endif ?>
+<?php if(in_array('account', $blockEnable)): ?>
+	<?= $block->getChildHtml('login.form.header'); ?>
+<?php endif ?>
+
+<?php if(in_array('wishlist', $blockEnable)): ?>
+	<?= $block->getChildHtml('wishlist-link-header') ?>
+<?php endif ?>
+
+<?php if(in_array('minicart', $blockEnable)): ?>
+	<?= $block->getChildHtml('minicart') ?>
+<?php endif ?>
+<?php if(in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
+	<?php if($settingContentCondition): ?>
+		<div class="setting-site-content">
+			<div class="customer-web-config">
+				<?php if(in_array('store', $blockEnable)): ?>
+					<?= $block->getChildHtml('store_language'); ?>
+				<?php endif ?>
+				<?php if(in_array('curency', $blockEnable)): ?>
+					<?= $block->getChildHtml('currency'); ?>
+				<?php endif ?>
+			</div>
+			<?php if(in_array('static1', $blockEnable)): ?>
+				<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_1')->toHtml(); ?>
+			<?php endif ?>
+		</div>
+	<?php endif ?>
+<?php endif ?>
+<div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
+	<button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
+	<?php if($block->getChildHtml('megamenu')): ?>
+		<?= $block->getChildHtml('megamenu') ?>
+	<?php else: ?>
+		<?= $block->getChildHtml('store.menu') ?>
+	<?php endif ?>
+</div>
+<?php /* Bottom Tabs Mobile */ ?>
+<ul id="js_mobile_tabs" class="header-mobile-tabs--bottom">
+	<li>
+		<button class="action-mb-tabs" id="back-home-action" type="button">
+			<span class="icon-building"></span>
+		</button>
+	</li>
+	<?php if(in_array('account', $blockEnable)): ?>
+	<li>
+		<button class="action-mb-tabs" id="my-account-action" type="button">
+			<span class="icon-my-account"></span>
+		</button>
+	</li>
+	<?php endif ?>
+	<?php if(in_array('wishlist', $blockEnable)): ?>
+	<li>
+		<button class="action-mb-tabs" data-bind="scope: 'wishlist'" id="wishlist-link-action" type="button">
+			<span class="icon-wishlist"></span>
+			<!-- ko if: wishlist().counter -->
+			<span data-bind="text: wishlist().counter" class="counter qty"></span>
+			<!-- /ko -->
+		</button>
+	</li>
+	<?php endif ?>
+	<?php if(in_array('minicart', $blockEnable)): ?>
+	<li>
+		<button class="action-mb-tabs" data-bind="scope: 'minicart_content'" id="cart-top-action" type="button">
+			<span class="icon-cart-top"></span>
+			<span class="counter qty empty"
+				  data-bind="css: { empty: !!getCartParam('summary_count') == false }, blockLoader: isLoading">
+				<span class="counter-number"><!-- ko text: getCartParam('summary_count') --><!-- /ko --></span>
+			</span>
+		</button>
+	</li>
+	<?php endif ?>
+	<?php if($settingContentCondition): ?>
+	<li>
+		<button id="setting-web-action" type="button">
+			<span class="icon-setting-web"></span>
+		</button>
+	</li>
+	<?php endif ?>
+</ul>

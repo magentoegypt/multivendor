@@ -1,0 +1,121 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+
+@toolbar-mode-icon-font-size: 24px;
+@toolbar-element-background: @panel__background-color;
+
+& when (@media-common = true) {
+	.toolbar {
+		.lib-flex();
+		.lib-align-items-center();
+		.limiter {
+			border: 1px solid #eaeaea;
+			border-radius: 30px;
+			padding: 7px 10px;
+			white-space: nowrap;
+			margin-left: auto;
+			.label {
+				font-size: 12px;
+			}
+			.limiter-text {
+				display: none;
+			}
+			.control {
+				display: inline-block;
+			}
+		}
+		.toolbar-sorter {
+			border: 1px solid #eaeaea;
+			border-radius: 30px;
+			padding: 7px 15px;
+			white-space: nowrap;
+			margin-left: auto;
+			.sorter-label {
+				font-size: 12px;
+			}
+			select {
+				width: auto;
+				margin-right: 10px;
+				max-width: 100px;
+			}
+		}
+		.action-filter {
+			margin-right: 10px;
+		    text-transform: uppercase;
+			font-weight: 700;
+			text-decoration: underline;
+			&:after {
+				content: "+";
+			}
+		}
+		select {
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			border: none;
+			background-color: transparent;
+			padding: 0;
+			height: 24px;
+			color: #999;
+			font-size: 1rem;
+			font-weight: 400;
+			padding-right: 20px;
+			background-image: url('../images/bg-select-toolbar.png');
+			background-repeat: no-repeat;
+			background-position: right center;
+			background-size: 10px;
+			display: inline-block;
+			vertical-align: top;
+		}
+		.sorter-action {
+			&:before {
+				content: '\e942';
+				font-family: @theme-icon-font-family-name;
+				font-size: 1rem;
+				vertical-align: text-bottom;
+				line-height: 1;
+			}
+			&.sort-desc:before {
+				content: '\e941';
+			}
+			span {
+				.lib-visually-hidden();
+			}
+		}
+		.toolbar-amount,
+		.modes {
+			display: none;
+		}
+	}
+	.bottom-toolbar {
+		margin-top: 30px;
+		.filter-placeholder,
+		.toolbar-sorter {
+			display: none;
+		}
+		.pages .pages-items {
+			text-align: left;
+			.item {
+				padding: 0 7px;
+				&:first-child {
+					padding-left: 0;
+				}
+				&:last-child {
+					padding-right: 0;
+				}
+			}
+		}
+	}
+	
+	.top-toolbar {
+		.pages,
+		.field.limiter {
+			display: none;
+		}
+	}
+}

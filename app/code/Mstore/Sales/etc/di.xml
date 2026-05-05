@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Mstore\Sales\Model\OrderAuthorizationInterface" type="Mstore\Sales\Model\OrderAuthorization"/>
+    <preference for="Mstore\Sales\Api\OrderManagementInterface" type="Mstore\Sales\Model\OrderManagement"/>
+    <preference for="Mstore\Sales\Api\OrderRepositoryInterface" type="Mstore\Sales\Model\OrderRepository"/>
+    <preference for="Mstore\Sales\Api\InvoiceRepositoryInterface" type="Mstore\Sales\Model\InvoiceRepository"/>
+    <preference for="Mstore\Sales\Api\ShipmentRepositoryInterface" type="Mstore\Sales\Model\ShipmentRepository"/>
+    <preference for="Mstore\Sales\Api\CreditmemoRepositoryInterface" type="Mstore\Sales\Model\CreditmemoRepository"/>
+    <preference for="Mstore\Sales\Api\OrderAddressRepositoryInterface" type="Mstore\Sales\Model\OrderAddressRepository"/>
+    <preference for="Mstore\Sales\Api\OrderPaymentRepositoryInterface" type="Mstore\Sales\Model\OrderPaymentRepository" />
+</config>

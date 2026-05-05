@@ -1,0 +1,79 @@
+<?php
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $locale = $objectManager->get('Magento\Framework\Locale\Resolver')->getLocale();
+?>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    window.READY_FOR_DRAWING = false;
+    google.charts.load('current', {'packages':['corechart','table'], 'language': '<?= $locale ?>'});
+
+    google.charts.setOnLoadCallback(setReadyForDrawChart);
+    function setReadyForDrawChart(){
+        window.READY_FOR_DRAWING = true;
+    }
+</script>
+<div class="row row-grap reports-container" id="reports-container">
+    <div class="col-md-12" data-bind="scope: 'reports'">
+        <div id="calendar-controller" class="dropdown calendar-controller" data-bind="css:{open: showDateSelectorMenu()}">
+            <div id="calendar-title" class="calendar-title" data-bind="click: calendarTitleClick">
+                <span data-bind="html:selectedDateRangeTitle"></span>
+                <i class="fa fa-calendar pull-right"></i>
+            </div>
+            <ul id="calendar-container" class="dropdown-menu calendar-container">
+                <?php /*
+                <li>
+                    <a class="custom-date" data-period="custom" data-bind="click: customDateClick;, css:{_hide: showCustomDate()}"><?php echo __("Custom")?></a>
+                    <div class="custom-date-range" data-bind="css:{_show: showCustomDate()}">
+                        <span class="title"><?php echo __("Custom")?></span>
+                        <input name="date-from" class="form-control" type="text" data-bind="value:dateRangeFrom, datepicker:{storage:dateRangeFrom, options: {dateFormat: 'yyyy-mm-dd'}}" /> -
+                        <input name="date-to" class="form-control" type="text"  data-bind="value:dateRangeTo, datepicker:{storage:dateRangeTo, options: {dateFormat: 'yyyy-mm-dd'}}"/>
+                    </div>
+                </li> */ ?>
+                <?php foreach($block->getDateRanges() as $key => $range):?>
+                <li><a data-bind="click: changeDateRange;" data-date-type="<?php echo $key?>" data-date-title="<?php echo $range['title']?>" data-date-value="<?php echo $range['value']?>"><?php echo $range['label']?></a></li>
+                <?php endforeach;?>
+                <!-- ko if: showCustomDate() -->
+                <li class="calendar-footer">
+                    <button class="btn-sm btn-primary btn-apply" data-bind="click: applyCustomDate" data-date-title="<?php echo __("Custom: %1 - %2")?>"><span><?php echo __("Apply")?></span></button>
+                </li>
+                <!--/ko-->
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <?php echo $this->getChildHtml("reports_graph")?>
+    </div>
+
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-body">
+                <div id="toolbar_div" style="margin-bottom: 10px">
+                    <button class="csv-button ui-button ui-widget ui-corner-all">
+                        <span class="ui-icon ui-icon-circle-triangle-s"></span><span><?php echo __("Download CSV") ?></span>
+                    </button>
+                </div>
+                <div id="report-data-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <?php if($this->getJsLayout()):?>
+        <script type="text/x-magento-init">
+        {
+            "#calendar-controller": {
+                "Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+            }
+        }
+    </script>
+    <?php endif;?>
+</div>
+<script type="text/javascript">
+require(['jquery'], function($){
+    $('#vendor_report_graph').on("tabsactivate", function(event, ui) {
+    	if(typeof(vnecoms_reports) != 'undefined'){
+        	var graphType = $(ui.newPanel).children('div').attr('id');
+    		vnecoms_reports.drawGraph(graphType);
+    	}
+    });
+});
+</script>

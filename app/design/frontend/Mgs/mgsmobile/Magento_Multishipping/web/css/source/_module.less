@@ -1,0 +1,133 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+	.multicheckout {
+		> .title {
+			margin-bottom: 30px;
+			color: #222;
+			strong {
+				font-weight: 600;
+			}
+		}
+		td {
+			+ td {
+				padding-top: 10px;
+			}
+			.action.delete {
+				font-weight: 600;
+				text-decoration: underline;
+				color: #0771ff;
+			}
+		}
+		.col.address .label,
+		.col.qty .label {
+			display: none;
+		}
+		.actions-toolbar {
+			margin-top: 40px;
+			.action.update,
+			.action.add {
+				display: inline-block;
+				font-size: 1rem;
+				padding: 0.5rem 2.375rem;
+				font-family: inherit;
+				font-weight: 700;
+				text-transform: uppercase;
+				border-radius: 0;
+				border: 2px solid #222;
+				background-color: #fff;
+			}
+		}
+		.block-billing .block-title strong,
+		.block-shipping .block-title strong {
+			display: block;
+			font-size: 1.3rem;
+			font-weight: 600;
+			color: #222;
+			text-transform: uppercase;
+			margin: 0 0 1rem;
+		}
+		.block-shipping + .block-shipping {
+			margin-top: 30px;
+		}
+		.methods-shipping {
+			margin: 0;
+			dd.item-content {
+				margin: 0;
+			}
+			.field.choice {
+				margin-bottom: 10px;
+			}
+			dt.item-title {
+				margin-bottom: 5px;
+				color: #222;
+				font-weight: 500;
+			}
+			.legend {
+				display: none;
+				+ br {
+					display: none;
+				}
+			}
+		}
+		.block-content .box {
+			+ .box {
+				margin-top: 1.2rem;
+			}
+			.box-title .action {
+				font-weight: 600;
+				text-decoration: underline;
+				color: #0771ff;
+			}
+		}
+	}
+	.multicheckout .box-billing-method .legend + br {
+		display: none;
+	}
+	.multicheckout .methods-payment {
+		margin: 0;
+	}
+	.multicheckout.order-review {
+		> .block {
+			margin-bottom: 50px;
+		}
+		.block-shipping .block-content {
+			+ .block-content {
+				margin-top: 30px;
+			}
+			> .title {
+				margin-bottom: 10px;
+				strong {
+					font-weight: 600;
+					color: #222;
+					font-size: 1.2rem;
+					text-transform: uppercase;
+				}
+			}
+		}
+		.table-order-review {
+			.price {
+				font-size: 1rem;
+				color: #d43333;
+				font-weight: 600;
+			}
+			th {
+				display: none;
+			}
+		}
+		.checkout-review .grand.totals {
+			color: #222;
+			font-size: 1.8rem;
+		}
+		.load.indicator {
+			position: fixed;
+		}
+	}
+}

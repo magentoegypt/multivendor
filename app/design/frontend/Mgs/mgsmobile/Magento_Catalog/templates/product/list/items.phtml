@@ -1,0 +1,217 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/* @var $block \Magento\Catalog\Block\Product\AbstractProduct */
+?>
+
+<?php
+$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+$rtl = $themeSettingConfig->getStoreConfig('themesettings/general/rtl_theme') ? 'true' : 'false';
+
+switch ($type = $block->getType()) {
+
+    case 'related-rule':
+        if ($exist = $block->hasItems()) {
+            $type = 'related';
+            $class = $type;
+			
+			$show = $themeSettingConfig->getStoreConfig('themesettings/product_details/related_products');
+
+            $image = 'related_products_list';
+			$titleConfig = $themeSettingConfig->getStoreConfig('themesettings/product_details/related_title');
+            $title = $titleConfig ? __($titleConfig) : __('Related Products');
+            $items = $block->getAllItems();
+            $limit = $block->getPositionLimit();
+            $shuffle = (int) $block->isShuffled();
+            $canItemsAddToCart = $block->canItemsAddToCart();
+
+            $showAddTo = true;
+            $showCart = false;
+            $templateType = null;
+            $description = false;
+        }
+    break;
+
+    case 'related':
+        /** @var \Magento\Catalog\Block\Product\ProductList\Related $block */
+        if ($exist = $block->getItems()->getSize()) {
+            $type = 'related';
+            $class = $type;
+			$show = $themeSettingConfig->getStoreConfig('themesettings/product_details/related_products');
+
+            $image = 'related_products_list';
+			$titleConfig = $themeSettingConfig->getStoreConfig('themesettings/product_details/related_title');
+            $title = $titleConfig ? __($titleConfig) : __('Related Products');
+            $items = $block->getItems();
+            $limit = 0;
+            $shuffle = 0;
+            $canItemsAddToCart = $block->canItemsAddToCart();
+
+            $showAddTo = true;
+            $showCart = false;
+            $templateType = null;
+            $description = false;
+        }
+    break;
+
+    case 'upsell-rule':
+        if ($exist = $block->hasItems()) {
+            $type = 'upsell';
+            $class = $type;
+			$show = $themeSettingConfig->getStoreConfig('themesettings/product_details/upsell_products');
+
+            $image = 'upsell_products_list';
+			$titleConfig = $themeSettingConfig->getStoreConfig('themesettings/product_details/upsell_title');
+            $title = $titleConfig ? __($titleConfig) : __('Upsell Products');
+            $items = $block->getAllItems();
+            $limit = $block->getPositionLimit();
+            $shuffle = (int) $block->isShuffled();
+
+            $showAddTo = false;
+            $showCart = false;
+            $templateType = null;
+            $description = false;
+            $canItemsAddToCart = false;
+        }
+    break;
+
+    case 'upsell':
+        /** @var \Magento\Catalog\Block\Product\ProductList\Upsell $block */
+        if ($exist = count($block->getItemCollection()->getItems())) {
+            $type = 'upsell';
+            $class = $type;
+			$show = $themeSettingConfig->getStoreConfig('themesettings/product_details/upsell_products');
+			
+            $image = 'upsell_products_list';
+			$titleConfig = $themeSettingConfig->getStoreConfig('themesettings/product_details/upsell_title');
+            $title = $titleConfig ? __($titleConfig) : __('Upsell Products');
+            $items = $block->getItemCollection()->getItems();
+            $limit = $block->getItemLimit('upsell');
+            $shuffle = 0;
+
+            $showAddTo = false;
+            $showCart = false;
+            $templateType = null;
+            $description = false;
+            $canItemsAddToCart = false;
+        }
+    break;
+
+    case 'crosssell-rule':
+        /** @var \Magento\Catalog\Block\Product\ProductList\Crosssell $block */
+        if ($exist = $block->hasItems()) {
+            $type = 'crosssell';
+            $class = $type;
+			$show = $themeSettingConfig->getStoreConfig('themesettings/shopping_cart/show_crosssell');
+
+            $image = 'cart_cross_sell_products';
+			$titleConfig = $themeSettingConfig->getStoreConfig('themesettings/shopping_cart/crosssell_title');
+            $title = $titleConfig ? __($titleConfig) : __('More Choices:');
+            $title = '';
+            $items = $block->getItemCollection();
+
+            $showAddTo = true;
+            $showCart = true;
+            $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+            $description = false;
+            $canItemsAddToCart = false;
+        }
+    break;
+
+    case 'crosssell':
+        /** @var \Magento\Catalog\Block\Product\ProductList\Crosssell $block */
+        if ($exist = $block->getItemCount()) {
+            $type = 'crosssell';
+            $class = $type;
+			$show = $themeSettingConfig->getStoreConfig('themesettings/shopping_cart/show_crosssell');
+			
+            $image = 'cart_cross_sell_products';
+			$titleConfig = $themeSettingConfig->getStoreConfig('themesettings/shopping_cart/crosssell_title');
+            $title = $titleConfig ? __($titleConfig) : __('More Choices:');
+            $items = $block->getItems();
+
+            $showAddTo = true;
+            $showCart = true;
+            $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+            $description = false;
+            $canItemsAddToCart = false;
+        }
+    break;
+
+    case 'new':
+        if ($exist = $block->getProductCollection()) {
+            $type = 'new';
+            $mode = 'grid';
+            $type = $type . ' ' . $mode;
+
+			$useSlider = false;
+            $class = 'widget' . ' ' . $type;
+			$classCol = "";
+			
+            $image = 'new_products_content_widget_grid';
+            $title = __('New Products');
+            $items = $exist;
+
+            $showAddTo = true;
+            $showCart = true;
+            $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+            $description = ($mode == 'list') ? true : false;
+            $canItemsAddToCart = false;
+        }
+    break;
+
+    case 'other':
+    break;
+}
+?>
+
+<?php if ($exist && $show):?>
+<div class="block <?= $class; ?>">
+    <div class="block-title title">
+        <strong id="block-<?= $class?>-heading" role="heading" aria-level="2"><?= $title; ?></strong>
+    </div>
+    <div class="block-content content" aria-labelledby="block-<?= $class?>-heading">
+        <div class="products wrapper grid products-grid active-slider products-<?= $type; ?>">
+            <ol id="product-slider-<?= $type ?>" class="products list items product-items owl-carousel js-owl-carousel-product">
+                <?php $iterator = 1; ?>
+                <?php foreach ($items as $_item): ?>
+					<li class="item product product-item">
+						<div class="product-item-info">
+							<div class="product-top">
+								<a href="<?= $block->getProductUrl($_item) ?>" class="product photo product-item-photo">
+									<?= $block->getImage($_item, $image)->toHtml(); ?>
+								</a>
+							</div>
+							<div class="product details product-item-details">
+								<strong class="product name product-item-name">
+									<a class="product-item-link" title="<?= $block->escapeHtml($_item->getName()) ?>" href="<?= $block->getProductUrl($_item) ?>"><?= $block->escapeHtml($_item->getName()) ?></a>
+								</strong>
+								
+								<?php if ($templateType): ?>
+									<?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
+								<?php endif; ?>
+
+								<?= $block->getProductPrice($_item); ?>
+								
+								<div class="product actions product-item-actions">
+									<a href="<?= $_item->getProductUrl() ?>" class="action primary"><?= __('View Detail') ?></a>
+									<?php if ($this->helper('Magento\Wishlist\Helper\Data')->isAllow()): ?>
+										<div data-role="add-to-links" class="actions-secondary">
+											<a href="#" class="action towishlist" title="<?= __('Add to Wish List') ?>" aria-label="<?= __('Save') ?>" data-post='<?= $block->getAddToWishlistParams($_item) ?>' data-action="add-to-wishlist" role="button"></a>
+										</div>
+									<?php endif; ?>
+								</div>
+							</div>
+						</div>
+					</li>
+                <?php endforeach ?>
+            </ol>
+        </div>
+    </div>
+</div>
+<?php endif;?>

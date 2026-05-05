@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="customer_delete_after">
+        <observer name="send_wapp_msg_on_customer_delete" instance="MagentoEgypt\SmsExtend\Observer\SendSmsOnCustomerDelete" />
+    </event>
+    <event name="customer_account_edited">
+        <observer name="send_wapp_msg_on_customer_edit" instance="MagentoEgypt\SmsExtend\Observer\SendSmsOnCustomerEdit" />
+    </event>
+    <!-- Vendor related -->
+    <event name="vendoe_delete_after">
+        <observer name="send_wapp_msg_on_vendoe_delete" instance="MagentoEgypt\SmsExtend\Observer\SendSmsOnVendorDelete" />
+    </event>
+	<event name="vendor_account_save_after">
+        <observer name="send_wapp_msg_after_vendor_edit" instance="MagentoEgypt\SmsExtend\Observer\SendSmsOnVendorUpdate" />
+    </event>
+	<event name="vendor_save_before">
+		<observer name="vnecoms_vendorssms_vendor_save_before" disabled="true" />
+		<observer name="send_wapp_msg_after_vendor_save" instance="MagentoEgypt\SmsExtend\Observer\SendSmsOnVendorSave" />
+	</event>
+    <event name="customer_save_before">
+        <observer name="add_mobile_number_validation" instance="MagentoEgypt\SmsExtend\Observer\SendSmsOnCustomerSaveBefore" />
+    </event>
+</config>

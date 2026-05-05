@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<body>
+		<referenceContainer name="content">
+			<block class="Magento\Catalog\Block\Product\View" name="product.info.content.wrapper" template="product/view/content-wrapper.phtml" before="-">
+				<container name="product.info.main.clearfix" htmlTag="div" htmlClass="product-info-clearfix"/>
+			</block>
+		</referenceContainer>
+		
+		<referenceBlock name="services_sidebar" remove="true"/>
+		
+		<move element="product.info.media" destination="product.info.main.clearfix" before="-"/>
+		
+		<move element="product.info.main" destination="product.info.main.clearfix" after="product.info.media"/>
+		
+		<move element="page.main.title" destination="page.top" before="product.info.mailto"/>
+		
+		<move element="product.info.review" destination="product.info.main" before="-"/>
+		
+		<move element="product.info.sku" destination="product.info.main" before="-"/>
+		
+		<move element="product.info.overview" destination="product.info.main" after="product.info.price"/>
+		
+		<move element="product.info.addto" destination="product.info.addtocart" before="-"/>
+		
+		<move element="product.info.overview.copy" destination="product.info.main" before="product.info.price"/>
+		
+	</body>
+</page>

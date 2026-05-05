@@ -1,0 +1,326 @@
+<style>
+    .columns .column.main {
+        padding-bottom: 0;
+    }
+    .coupon-sale-text {
+        display: inline-block;
+        position: relative;
+        padding-left: 0.265em;
+        transform: none;
+        letter-spacing: 0;
+    }
+    .coupon-sale-text i {
+        font-style: normal;
+        font-size: 0.265em;
+        font-weight: 500;
+        transform: translateY(-50%) rotate(-90deg);
+        position: absolute;
+        top: 50%;
+        left: -1em;
+    }
+    .vc_custom_heading strong {
+        font-size: 2em;
+        vertical-align: text-top;
+    }
+    .m-r-n-xs {
+        margin-right: -5px !important;
+    }
+    .porto-ibanner-layer .btn-modern.btn-xl {
+        font-size: 1.0625em;
+    }
+    .porto-ibanner-layer .btn-modern.btn-lg {
+        font-size: 0.9em;
+    }
+</style>
+<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block50')->toHtml() ?>
+<div
+    class="bg-attach-fixed porto-ibanner-layer position-static no-padding mt-0 mb-0 dark-layout"
+    style="padding-top: 5em;
+            padding-bottom: 4.75em;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-color: #222529;
+            background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/16/shop16_home_banner5.jpg}}');"
+>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="overflow-hidden mb-1">
+                        <h2 style="font-size: 3em; line-height: 1.2; text-align: center; font-weight: 700;" class="vc_custom_heading mb-0 custom-font4 heading-light">
+                        <?= __('Styled Outfits')?>
+                        </h2>
+                    </div>
+                    <div id="outfits-products" class="porto-products wpb_content_element mb-0">
+                        <div class="slider-wrapper">
+                            {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" extra_class="nav-center-images-only nav-pos-outside nav-style-2 show-nav-hover dots-style-1" product_count="6"
+                            aspect_ratio="0" image_width="400" image_height="460" template="owl_list.phtml"}}
+                            <script type="text/javascript">
+                                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                                    $("#outfits-products .owl-carousel").owlCarousel({
+                                        autoplay: false,
+                                        autoplayTimeout: 5000,
+                                        autoplayHoverPause: true,
+                                        loop: true,
+                                        navRewind: true,
+                                        lazyLoad: true,
+                                        margin: 0,
+                                        nav: true,
+                                        dots: false,
+                                        responsive: {
+                                            0: {
+                                                items: 2,
+                                            },
+                                            640: {
+                                                items: 2,
+                                            },
+                                            768: {
+                                                items: 3,
+                                            },
+                                            992: {
+                                                items: 3,
+                                            },
+                                            1200: {
+                                                items: 4,
+                                            },
+                                        },
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row porto-ibanner-layer position-static no-padding">
+<div class="order-md-2 col-md-6 d-flex align-items-center" style="padding-top: 4.375em;
+              padding-bottom: 4.375em;
+              padding-left: 6%;
+              background-color: #dbdad5;
+              background-position: center;
+              background-repeat: no-repeat;
+              background-size: cover;
+              background-attachment: fixed;
+              background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/16/shop16_home_banner6.jpg}}');"
+    >
+        <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block51')->toHtml() ?>
+    </div>
+    <div class="col-md-6" style="padding-top: 4.375em; padding-right: 6%; padding-bottom: 4.25em; padding-left: 6%; background-color: #e6e5e2;">
+        <div class="wpb_wrapper vc_column-inner">
+            <div id="porto1-products" class="porto-products wpb_content_element mb-0">
+                <div class="slider-wrapper">
+                    {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="latest_product" extra_class="nav-center-images-only nav-pos-outside nav-style-4 show-nav-hover dots-style-1" product_count="3" aspect_ratio="0"
+                    image_width="350" image_height="350" template="owl_list.phtml"}}
+                    <script type="text/javascript">
+                        require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                            $("#porto1-products .owl-carousel").owlCarousel({
+                                autoplay: false,
+                                autoplayTimeout: 5000,
+                                autoplayHoverPause: true,
+                                loop: true,
+                                navRewind: true,
+                                lazyLoad: true,
+                                margin: 0,
+                                nav: true,
+                                dots: false,
+                                responsive: {
+                                    0: {
+                                        items: 2,
+                                    },
+                                    640: {
+                                        items: 2,
+                                    },
+                                    768: {
+                                        items: 2,
+                                    },
+                                    992: {
+                                        items: 2,
+                                    },
+                                    1200: {
+                                        items: 2,
+                                    },
+                                },
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row porto-ibanner-layer position-static no-padding">
+<div
+        class="col-md-6 d-flex align-items-center"
+        style="padding-top: 4.375em;
+              padding-right: 6%;
+              padding-bottom: 4.375em;
+              background-color: #dbdad5;
+              background-position: center;
+              background-repeat: no-repeat;
+              background-size: cover;
+              background-attachment: fixed;
+              background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/16/shop16_home_banner7.jpg}}');
+              "
+    >
+        <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block52')->toHtml() ?>
+    </div>
+    <div class="col-md-6" style="padding-top: 4.375em; padding-right: 6%; padding-bottom: 4.25em; padding-left: 6%; background-color: #e6e5e2;">
+        <div class="wpb_wrapper vc_column-inner">
+            <div id="porto2-products" class="porto-products wpb_content_element mb-0">
+                <div class="slider-wrapper">
+                    {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="latest_product" extra_class="nav-center-images-only nav-pos-outside nav-style-4 show-nav-hover dots-style-1" product_count="3" aspect_ratio="0"
+                    image_width="350" image_height="350" template="owl_list.phtml"}}
+                    <script type="text/javascript">
+                        require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                            $("#porto2-products .owl-carousel").owlCarousel({
+                                autoplay: false,
+                                autoplayTimeout: 5000,
+                                autoplayHoverPause: true,
+                                loop: true,
+                                navRewind: true,
+                                lazyLoad: true,
+                                margin: 0,
+                                nav: true,
+                                dots: false,
+                                responsive: {
+                                    0: {
+                                        items: 2,
+                                    },
+                                    640: {
+                                        items: 2,
+                                    },
+                                    768: {
+                                        items: 2,
+                                    },
+                                    992: {
+                                        items: 2,
+                                    },
+                                    1200: {
+                                        items: 2,
+                                    },
+                                },
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div
+    class="bg-attach-fixed porto-ibanner-layer position-static mt-0 mb-0"
+    style="
+            padding-top: 12.5em;
+            padding-bottom: 12.5em;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/16/shop16_home_banner8.jpg}}');
+            "
+>
+    <div class="container">
+        <div class="row">
+            <div class="mx-auto col-md-10 col-xl-7 col-lg-8">
+                <div class="wpb_wrapper vc_column-inner">
+                    <h2 style="font-size: 2.5em; line-height: 1.2; text-align: center; color: #fff; letter-spacing: -0.02em;" class="vc_custom_heading custom-font4 mb-2">
+                    <?= __('Subscribe to Our Newsletter')?>
+                    </h2>
+                    <h5 style="font-size: 1em; color: rgb(119, 119, 119); line-height: 1.5; text-align: center; font-weight: 400;" class="vc_custom_heading mb-4">
+                    <?= __('Get all the latest information on events, sales and offers. Sign up for newsletter')?>:
+                    </h5>
+                    {{block class="Magento\Newsletter\Block\Subscribe" name="home.newsletter" template="subscribe_form.phtml"}}
+                    <style>
+                        .single-subscribe .newsletter .control {
+                            justify-content: center;
+                            margin-bottom: 10px;
+                        }
+                        .single-subscribe .newsletter input {
+                            height: 3.375rem;
+                            padding-left: 1.5em;
+                            padding-right: 15px;
+                            border-radius: 2rem 0 0 2rem;
+                            font-size: 0.875rem;
+                            color: #777;
+                            border: none;
+                            margin: 0;
+                        }
+                        .single-subscribe .newsletter .action {
+                            display: table-cell;
+                            vertical-align: top;
+                            height: 3.375rem;
+                            padding-left: 2.5rem;
+                            padding-right: 2.5rem;
+                            text-transform: uppercase;
+                            font-weight: 700;
+                            font-size: 0.875rem;
+                            border-radius: 0 2rem 2rem 0;
+                        }
+                    </style>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block53')->toHtml() ?>
+<div
+    class="mt-0 mb-0 dark-layout"
+    style="padding-top: 5rem;
+            padding-bottom: 5rem;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/16/shop16_home_banner10.jpg}}');"
+>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="wpb_wrapper vc_column-inner">
+                    <h2 style="font-size: 3rem; line-height: 1.2; text-align: center; color: #fff;" class="vc_custom_heading mb-0 custom-font4"><?= __('Products On Sale')?></h2>
+                    <div id="porto3-products" class="porto-products wpb_content_element mb-0">
+                        <div class="slider-wrapper">
+                            {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="featured_product" extra_class="nav-center-images-only nav-pos-outside nav-style-2 show-nav-hover dots-style-1" product_count="6"
+                            aspect_ratio="0" image_width="400" image_height="460" template="owl_list.phtml"}}
+                            <script type="text/javascript">
+                                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                                    $("#porto3-products .owl-carousel").owlCarousel({
+                                        autoplay: false,
+                                        autoplayTimeout: 5000,
+                                        autoplayHoverPause: true,
+                                        loop: true,
+                                        navRewind: true,
+                                        lazyLoad: true,
+                                        margin: 0,
+                                        nav: true,
+                                        dots: false,
+                                        responsive: {
+                                            0: {
+                                                items: 2,
+                                            },
+                                            640: {
+                                                items: 2,
+                                            },
+                                            768: {
+                                                items: 3,
+                                            },
+                                            992: {
+                                                items: 4,
+                                            },
+                                            1200: {
+                                                items: 4,
+                                            },
+                                        },
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

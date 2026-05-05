@@ -1,0 +1,44 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+	.block.newsletter {
+		position: relative;
+		.field.newsletter .label,
+		.title {
+			display: none;
+		}
+		.control input {
+			padding-right: 40px;
+		}
+		.actions {
+			position: absolute;
+			right: 0;
+			top: 0;
+			.action {
+				background: none;
+				border: none;
+				box-shadow: none;
+				height: 46px;
+				width: 40px;
+				color: #8b8b8b;
+				padding: 0;
+				font-size: 20px;
+				&:after {
+					content: @theme-icon-content_email;
+					font-family: @theme-icon-font-family-name;
+				}
+				span {
+					.lib-visually-hidden();
+				}
+			}
+		}
+	}
+    
+}

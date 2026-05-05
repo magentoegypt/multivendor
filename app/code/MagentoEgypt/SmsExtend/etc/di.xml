@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Vnecoms\Sms\Helper\Data">
+        <arguments>
+            <argument name="smsGateways" xsi:type="array">
+                <item name="smsextend" xsi:type="string">MagentoEgypt\SmsExtend\Model\SmsExtend</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Email\Model\Template\Filter">
+        <plugin name="whatsapp_vars" type="MagentoEgypt\SmsExtend\Plugin\Filter"/>
+    </type>
+    <type name="Magento\Customer\Model\EmailNotification">
+        <plugin name="whatsapp_vars" type="MagentoEgypt\SmsExtend\Plugin\CustomerEmailNotification"/>
+    </type>
+    <type name="Vnecoms\VendorsApi\Model\Data\Vendor\ToModel">
+        <plugin name="whatsapp_vars" type="MagentoEgypt\SmsExtend\Plugin\VendorToModel"/>
+    </type>
+
+    <preference for="Vnecoms\Sms\Block\Adminhtml\System\Config\NewOrderByShipping" type="MagentoEgypt\SmsExtend\Block\Adminhtml\System\Config\NewOrderByShipping" />
+    <preference for="Vnecoms\Sms\Block\Adminhtml\System\Config\NewOrderByPayment" type="MagentoEgypt\SmsExtend\Block\Adminhtml\System\Config\NewOrderByPayment" />
+    <preference for="Vnecoms\Sms\Block\Adminhtml\System\Config\MessageOrderStatus" type="MagentoEgypt\SmsExtend\Block\Adminhtml\System\Config\MessageOrderStatus" />
+
+    <preference for="MagentoEgypt\SmsExtend\Api\WhatsAppInterface" type="MagentoEgypt\SmsExtend\Model\WhatsAppManagement" />
+    <preference for="MagentoEgypt\SmsExtend\Api\Data\MessageInterface" type="MagentoEgypt\SmsExtend\Model\Message" />
+    <preference for="Vnecoms\Sms\Helper\Data" type="MagentoEgypt\SmsExtend\Helper\SmsData" />
+    <preference for="Vnecoms\VendorsSms\Helper\Data" type="MagentoEgypt\SmsExtend\Helper\VendorsSmsData" />
+
+</config>

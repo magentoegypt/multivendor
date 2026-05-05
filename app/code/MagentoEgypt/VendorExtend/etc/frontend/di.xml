@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Link\Product\Collection">
+        <plugin name="add_vendor_condition" type="MagentoEgypt\VendorExtend\Plugin\Model\ResourceModel\Product\Link\Product\Collection"/>
+    </type>
+    <type name="Magento\Catalog\Helper\Product\View">
+        <plugin name="add_three_column" type="MagentoEgypt\VendorExtend\Plugin\Helper\Product\View"/>
+    </type>
+    <type name="Lof\ProductReviews\Model\Sender">
+        <plugin name="fix_issue_guest" type="MagentoEgypt\VendorExtend\Plugin\Model\ProductReviews\Sender"/>
+    </type>
+    <preference for="MGS\Brand\Block\Product\ProductList\Related" type="MagentoEgypt\VendorExtend\Block\Brand\Product\ProductList\Related"/>
+
+    <type name="Vnecoms\VendorsProduct\Helper\Data">
+        <plugin name="only_approve_show" type="MagentoEgypt\VendorExtend\Plugin\Helper\VendorsProduct\Data"/>
+    </type>
+    <virtualType name="Vnecoms\VendorsCategory\Model\Layer\Category\Context" type="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\Context">
+        <arguments>
+            <argument name="collectionFilter" xsi:type="object">MagentoEgypt\VendorExtend\Model\Layer\Category\CollectionFilter</argument>
+        </arguments>
+    </virtualType>
+    <type name="Vnecoms\VendorsCategory\Block\Product\ListProduct">
+        <plugin name="only_approve_show" type="MagentoEgypt\VendorExtend\Plugin\Block\VendorsCategory\ListProduct"/>
+    </type>
+    <type name="Vnecoms\VendorsPriceComparison\Observer\ProductViewPredispatch">
+        <plugin name="select_sale_product_view" type="MagentoEgypt\VendorExtend\Plugin\SelectSaleProductView"/>
+    </type>
+    <type name="Vnecoms\VendorsPriceComparison\Model\LoadProduct">
+        <plugin name="select_sale_product_view" type="MagentoEgypt\VendorExtend\Plugin\PriceComparisonLoadProduct"/>
+    </type>
+    <preference for="Vnecoms\Quotation\Model\Quote" type="MagentoEgypt\VendorExtend\Model\Quote"/>
+    <preference for="Vnecoms\VendorsRMA\Block\Frontend\Customer\NewRequest\Info" type="MagentoEgypt\VendorExtend\Block\RMA\CustomerInfo"/>
+    <preference for="Vnecoms\VendorsRMA\Block\Frontend\Guest\NewRequest\Info" type="MagentoEgypt\VendorExtend\Block\RMA\GuestInfo"/>
+
+    <type name="Vnecoms\VendorsRMA\Block\Frontend\PrintRma">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Frontend\View">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Frontend\View\Message">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\RMA\Block\Frontend\Customer\ListRma">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\RMA\Block\Frontend\Guest\ListRma">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+
+    <preference for="Vnecoms\VendorsPage\Block\Home\ProductList\Toolbar" type="MagentoEgypt\VendorExtend\Block\VendorsPage\Home\ProductList\Toolbar"/>
+    <type name="MagentoEgypt\VendorExtend\Block\VendorsPage\Home\ProductList\Toolbar">
+        <plugin name="customCountProductItems" disabled="true" />
+    </type>
+</config>

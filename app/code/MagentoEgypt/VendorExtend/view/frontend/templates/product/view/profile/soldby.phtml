@@ -1,0 +1,51 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Profile\Content
+ */
+$vendor = $block->getVendor();
+$pageHelper = $this->helper(\Vnecoms\VendorsPage\Helper\Data::class);
+$vendorName = empty($block->getStoreName()) ? $vendor->getVendorId() : $block->getStoreName();
+$vendorUrl = $pageHelper->getUrl($vendor->getVendorId());
+?>
+<table class="data table soldby">
+    <tr>
+        <th><?= __('Paying off') ?></th>
+        <td><a class="secure_transaction" href="#" data-toggle="modal" data-target="#secure_transaction"><?= __('Your transaction is secure') ?></a></td>
+    </tr>
+    <tr>
+        <th><?= __('Delivery by') ?></th>
+        <td><?= __('MagentoEgypt') ?></td>
+    </tr>
+    <tr>
+        <th><?= __('Sold by') ?></th>
+        <td>
+            <?php if(!empty($vendorUrl)):?>
+                <a href="<?php echo $vendorUrl;?>" title="<?php echo $block->escapeHtml($vendorName)?>"><?php echo $block->escapeHtml($vendorName)?></a>
+            <?php else:?>
+                <?php echo $block->escapeHtml($vendorName)?>
+            <?php endif;?>            
+        </td>
+    </tr>
+</table>
+<div style="display:none;">
+    <div id="secure_transaction" class="modal fade">
+        <?= $block->getChildHtml('secure_transaction') ?>
+    </div>
+</div>
+<script type="text/javascript">
+require( ['jquery', 'Magento_Ui/js/modal/modal'], function($, modal) {
+    var options = {
+        type: 'popup',
+        responsive: true,
+        innerScroll: true,
+        modalClass: 'popup-delivery'
+    };
+    var popup = modal(options, $('#secure_transaction'));
+    $(".secure_transaction").on('click', function(e){
+        e.preventDefault();
+        $('#secure_transaction').modal('openModal');
+    });
+});
+</script>

@@ -1,0 +1,47 @@
+<?php
+    /** @var $block \Magento\Catalog\Block\Product\View */
+    $_product = $block->getProduct();
+?>
+<div class="form-productAddToCart-success-message snackbar-msg">
+	<div submit-success="">
+		<template type="amp-mustache">
+			<p class="msg success">{{success}}</p>
+		</template>
+	</div>
+</div>
+<amp-animation id="successMessage-productAddToCart" layout="nodisplay">
+	<script type="application/json">
+		[{ "duration": "8s", "fill": "both", "easing": "ease-out", "iterations": "1", "selector": ".form-productAddToCart-success-message", "keyframes": [{ "transform": "translateY(100%)" }, { "transform": "translateY(0)", "offset": 0.07 }, { "transform": "translateY(0)", "offset": 0.93 }, { "transform": "translateY(100%)" }] }]
+	</script>
+</amp-animation>
+<div class="form-productAddToCart-error-message snackbar-msg">
+	<div submit-error="">
+		<template type="amp-mustache">
+			<p class="msg error">{{error}}</p>
+			<p class="msg notice">{{notice}}</p>
+		</template>
+	</div>
+</div>
+<amp-animation id="errorMessage-productAddToCart" layout="nodisplay">
+	<script type="application/json">
+		[{ "duration": "8s", "fill": "both", "easing": "ease-out", "iterations": "1", "selector": ".form-productAddToCart-error-message", "keyframes": [{ "transform": "translateY(100%)" }, { "transform": "translateY(0)", "offset": 0.07 }, { "transform": "translateY(0)", "offset": 0.93 }, { "transform": "translateY(100%)" }] }]
+	</script>
+</amp-animation>
+<?php if ($_product->isSaleable()): ?>
+	<div class="box-tocart">
+		<?php if ($block->shouldRenderQuantity()): ?>
+			<input type="number"
+				   name="qty"
+				   id="qty"
+				   maxlength="12"
+				   value="<?= $block->getProductDefaultQty() * 1 ?>"
+				   title="<?= __('Qty') ?>" class="input-text qty"
+				   />
+		<?php endif; ?>
+		<button on="tap:AMP.setState({prampGlobal: {form: {productId: '<?= $_product->getId() ?>'}}}),product_addtocart_form.submit" 
+				class="button btn-cart" 
+				[class]="(prampGlobal.form.productId == <?= $_product->getId() ?>) ? 'button btn-cart loading' : 'button btn-cart'">
+					<?= __('Add to Cart') ?>
+		</button>
+	</div>
+<?php endif; ?>

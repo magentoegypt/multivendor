@@ -1,0 +1,339 @@
+<style>
+    .vendorspage-themepage-view .page-main {
+        max-width: 100%;
+        padding: 0;
+    }
+    .columns .column.main {
+        padding-bottom: 28px;
+    }
+    .coupon-sale-text b {
+        display: inline-block;
+        font-size: 1.6em;
+        font-weight: 700;
+        padding: 4px 7px;
+        background-color: #ff7272;
+        color: #fff;
+    }
+    .coupon-sale-text sup {
+        font-size: 50%;
+        top: -0.5em;
+    }
+    .text-sale sup {
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+    .text-sale del {
+        color: #222529;
+    }
+    .sale-label:not(.product-label) {
+        border-radius: 50%;
+        width: 2.25em;
+        height: 2.25em;
+        padding-top: calc(1.125em - 0.5em);
+        letter-spacing: -0.08em;
+        line-height: 1;
+        text-align: center;
+    }
+    .sale-label small {
+        letter-spacing: -0.025em;
+        font-size: 70%;
+        display: inline-block;
+        font-weight: inherit;
+    }
+    sup {
+        font-size: 70%;
+        top: -0.3em;
+    }
+    .sale-label sup {
+        position: static;
+        font-size: 75%;
+    }
+    .sale-label sub {
+        display: block;
+        font-size: 36%;
+        line-height: 1;
+        position: static;
+        font-weight: 400;
+        letter-spacing: 0;
+        padding-left: 0.1em;
+        letter-spacing: -0.025em;
+        opacity: 0.5;
+    }
+    .coupon-sale-text i {
+        font-style: normal;
+        position: absolute;
+        left: -2.25em;
+        top: 50%;
+        transform: translateY(-50%) rotate(-90deg);
+        font-size: 0.65em;
+        opacity: 0.6;
+        letter-spacing: 0;
+    }
+    .porto-just-arrived-products .product-item-inner {
+        display: none;
+    }
+</style>
+<div class="container">
+    <div class="porto-grid-container">
+        <div id="banner-masonry-demo-7" class="porto-banner-layout mb-4 pb-2 porto-preset-layout">
+            <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block28')->toHtml() ?>
+            <div class="grid-col-sizer"></div>
+        </div>
+        <style scope="scope">
+            .porto-banner-layout {
+                opacity: 0;
+            }
+            .porto-ibanner-layer {
+                position: absolute;
+                z-index: 10;
+            }
+            .porto-preset-layout .porto-grid-item > *,
+            .porto-preset-layout .porto-ibanner,
+            .porto-preset-layout .porto-ibanner > img {
+                height: 100%;
+                margin-bottom: 0;
+            }
+            .porto-banner-layout .porto-grid-item {
+                padding: 10px;
+            }
+            .porto-banner-layout {
+                margin: -10px -10px 10px;
+            }
+            .porto-banner-layout .grid-col-1-2 {
+                flex: 0 0 50%;
+                width: 50%;
+            }
+            .porto-banner-layout .grid-col-1-4 {
+                flex: 0 0 25%;
+                width: 25%;
+            }
+            .porto-banner-layout .grid-col-sizer {
+                flex: 0 0 25%;
+                width: 25%;
+            }
+            .porto-banner-layout .grid-height-1 {
+                height: 520px;
+            }
+            .porto-banner-layout .grid-height-1-2 {
+                height: 260px;
+            }
+            @media (max-width: 767px) {
+                .porto-banner-layout .grid-col-md-1 {
+                    flex: 0 0 100%;
+                    width: 100%;
+                }
+                .porto-banner-layout .grid-col-md-1-2 {
+                    flex: 0 0 50%;
+                    width: 50%;
+                }
+                .porto-banner-layout .grid-col-sizer {
+                    flex: 0 0 50%;
+                    width: 50%;
+                }
+                .porto-banner-layout .grid-height-1 {
+                    height: 347px;
+                }
+                .porto-banner-layout .grid-height-1-2 {
+                    height: 173px;
+                }
+            }
+            @media (max-width: 480px) {
+                .porto-banner-layout .porto-grid-item {
+                    flex: 0 0 100%;
+                    width: 100%;
+                }
+            }
+        </style>
+        <script type="text/javascript">
+            require(["jquery", "imagesloaded", "packery"], function ($, imagesLoaded, Packery) {
+                $.bridget("packery", Packery);
+                var $container = $("#banner-masonry-demo-7");
+                $container.css("opacity", 0);
+                if ($container.length > 0) {
+                    $container.imagesLoaded(function () {
+                        $container.packery({
+                            itemSelector: ".porto-grid-item",
+                            columnWidth: ".grid-col-sizer",
+                            percentPosition: true,
+                        });
+                    });
+                    setTimeout(function () {
+                        $container.animate(
+                            {
+                                opacity: 1,
+                            },
+                            200
+                        );
+                    }, 100);
+                }
+            });
+        </script>
+    </div>
+    <div id="featured-products" class="porto-products wpb_content_element title-border-bottom">
+        <h2 class="section-title slider-title"><span class="inline-title"><?= __('Featured Products') ?></span><span class="line"></span></h2>
+        <div class="slider-wrapper">
+            {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" extra_class="show-dots-title-right dots-style-1" product_count="8" product_type="4" aspect_ratio="0" image_width="350" image_height="350"
+            template="owl_list.phtml"}}
+            <script type="text/javascript">
+                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                    $("#featured-products .owl-carousel").owlCarousel({
+                        autoplay: false,
+                        autoplayTimeout: 5000,
+                        autoplayHoverPause: true,
+                        loop: true,
+                        navRewind: true,
+                        lazyLoad: true,
+                        margin: 0,
+                        nav: false,
+                        dots: true,
+                        responsive: {
+                            0: {
+                                items: 2,
+                            },
+                            640: {
+                                items: 3,
+                            },
+                            768: {
+                                items: 3,
+                            },
+                            992: {
+                                items: 4,
+                            },
+                            1200: {
+                                items: 4,
+                            },
+                        },
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>
+<div id="category-products" class="home-categories mb-3" style="padding-top: 52px; background-color: #65829d;">
+    <div class="container d-flex">
+        <div class="contaier-inner w-100">
+            <style>
+                .heading239742087 .heading-tag:before,
+                .heading239742087 .heading-tag:after {
+                    border-top-color: #7e98b1 !important;
+                }
+                .home-categories ul li.product-category .thumb-info-wrapper:after {
+                    background-color: rgba(27, 27, 23, 0);
+                }
+                .home-categories ul li.product-category:hover .thumb-info-wrapper:after {
+                    background-color: rgba(27, 27, 23, 0.15);
+                }
+                ul.products li.product-col {
+                    margin-bottom: 1.4286em;
+                }
+                .home-categories .owl-carousel.nav-style-4 .owl-nav [class*="owl-"] {
+                    color: #fff;
+                }
+            </style>
+            <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block27')->toHtml() ?>
+            <script type="text/javascript">
+                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                    $("#category-products .owl-carousel").owlCarousel({
+                        autoplay: false,
+                        autoplayTimeout: 5000,
+                        autoplayHoverPause: true,
+                        loop: false,
+                        navRewind: true,
+                        lazyLoad: true,
+                        margin: 0,
+                        nav: true,
+                        dots: false,
+                        responsive: {
+                            0: {
+                                items: 2,
+                            },
+                            640: {
+                                items: 3,
+                            },
+                            768: {
+                                items: 3,
+                            },
+                            992: {
+                                items: 4,
+                            },
+                            1200: {
+                                items: 4,
+                            },
+                        },
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div id="featured-products" class="porto-products wpb_content_element title-border-bottom porto-just-arrived-products mb-3" style="padding-top: 35px;">
+        <h2 class="section-title slider-title mb-3" style="line-height: 1;"><span class="inline-title"><?= __('Just Arrived') ?></span><span class="line"></span></h2>
+        {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="featured_product" product_count="10" product_type="4" column_count="5" aspect_ratio="0" image_width="350" image_height="350" template="grid.phtml"}}
+    </div>
+    <div class="porto-separator mb-5"><hr class="separator-line align_center solid" /></div>
+    <div class="row">
+        <style>
+            .product-item-info.type12 {
+                padding: 0;
+                border: none;
+            }
+        </style>
+        <div class="col-sm-6 col-md-4">
+            <div class="wpb_wrapper vc_column-inner">
+                <div class="porto-products wpb_content_element">
+                    <h2 class="section-title"><span class="inline-title"><?= __('Best Selling Products') ?></span><span class="line"></span></h2>
+                    {{block class="Smartwave\Filterproducts\Block\Home\BestsellersList" name="featured_product" product_count="3" product_type="12" column_count="1" aspect_ratio="0" image_width="250" image_height="250"
+                    template="grid.phtml"}}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="wpb_wrapper vc_column-inner">
+                <div class="porto-products wpb_content_element">
+                    <h2 class="section-title"><span class="inline-title"><?= __('Top Rated Products') ?></span><span class="line"></span></h2>
+                    {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="featured_product" product_count="3" product_type="12" column_count="1" aspect_ratio="0" image_width="250" image_height="250" template="grid.phtml"}}
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-md-4">
+            <div class="wpb_wrapper vc_column-inner">
+                <div class="porto-products wpb_content_element">
+                    <h2 class="section-title"><span class="inline-title"><?= __('Featured Products') ?></span><span class="line"></span></h2>
+                    {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" product_count="3" product_type="12" column_count="1" aspect_ratio="0" image_width="250" image_height="250" template="grid.phtml"}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="porto-separator m-b-xl"><hr class="separator-line align_center solid" /></div>
+    <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block10')->toHtml() ?>
+    <script type="text/javascript">
+        require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+            $(".brand-carousel.owl-carousel").owlCarousel({
+                autoplay: false,
+                autoplayTimeout: 5000,
+                autoplayHoverPause: true,
+                nav: false,
+                dots: false,
+                loop: false,
+                responsive: {
+                    0: {
+                        items: 2,
+                    },
+                    640: {
+                        items: 3,
+                    },
+                    768: {
+                        items: 4,
+                    },
+                    992: {
+                        items: 5,
+                    },
+                    1200: {
+                        items: 6,
+                    },
+                },
+            });
+        });
+    </script>
+</div>

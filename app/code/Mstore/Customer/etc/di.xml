@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Mstore\Customer\Api\AddressRepositoryInterface" type="Mstore\Customer\Model\ResourceModel\AddressRepository"/>
+    <preference for="Mstore\Customer\Api\AccountManagementInterface" type="Mstore\Customer\Model\AccountManagement"/>
+    <virtualType name="Mstore\Customer\Model\Api\Address\SearchCriteria\CollectionProcessor\CustomerSortingProcessor" type="Magento\Framework\Api\SearchCriteria\CollectionProcessor\SortingProcessor">
+        <arguments>
+            <argument name="fieldMapping" xsi:type="array">
+                <item name="id" xsi:type="string">entity_id</item>
+            </argument>
+            <argument name="defaultOrders" xsi:type="array">
+                <item name="id" xsi:type="string">DESC</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Mstore\Customer\Model\Api\Address\SearchCriteria\CustomerCollectionProcessor" type="Magento\Eav\Model\Api\SearchCriteria\CollectionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="sorting" xsi:type="object">Mstore\Customer\Model\Api\Address\SearchCriteria\CollectionProcessor\CustomerSortingProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Mstore\Customer\Model\ResourceModel\AddressRepository">
+        <arguments>
+            <argument name="collectionProcessor" xsi:type="object">Mstore\Customer\Model\Api\Address\SearchCriteria\CustomerCollectionProcessor</argument>
+        </arguments>
+    </type>
+</config>

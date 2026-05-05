@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="MagentoEgypt_VendorExtend::css/product.css"/>
+    </head>
+    <body>
+        <attribute name="class" value="amzthree"/>
+        <!-- <referenceBlock name="product.info.sku" remove="true" /> -->
+        <referenceBlock name="vendor.profile.container" remove="true" />
+
+        <referenceContainer  name="product.info.main.content">
+            <block class="Vnecoms\Vendors\Block\Profile\Title" name="product.info.vendor.profile.title" template="MagentoEgypt_VendorExtend::product/view/profile/title.phtml" after="product.info.price" />
+        </referenceContainer>
+        <referenceContainer  name="product.info.form.options">
+            <block class="Magento\Catalog\Block\Product\View\Attributes" name="product.info.attribute" template="Magento_Catalog::product/view/attributes.phtml" before="product.info.overview">
+                <arguments>
+                    <argument name="sort_order" xsi:type="string">0</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer  name="product.info.main.last">
+            <block class="Magento\Catalog\Pricing\Render" name="product.price.last">
+                <arguments>
+                    <argument name="price_render" xsi:type="string">product.price.render.default</argument>
+                    <argument name="price_type_code" xsi:type="string">final_price</argument>
+                    <argument name="zone" xsi:type="string">item_view</argument>
+                </arguments>
+            </block>
+            <block class="Magento\Cms\Block\Block" name="custom.product.detail.after.price">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">mpanel_product_detail_after_price</argument>
+                    <argument name="enabled_builder" xsi:type="string">1</argument>
+                </arguments>
+            </block>
+            <block class="Vnecoms\Vendors\Block\Profile\Title" name="product.info.vendor.profile.soldby" template="MagentoEgypt_VendorExtend::product/view/profile/soldby.phtml">
+                <block class="Magento\Cms\Block\Block" name="custom.product.detail.secure.transaction" as="secure_transaction">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">mpanel_product_detail_secure_transaction</argument>
+                        <argument name="enabled_builder" xsi:type="string">1</argument>
+                    </arguments>
+                </block>
+            </block>
+            <container name="product.info.main.last.installment" htmlTag="div" htmlClass="product-info-installment">
+                <block class="Magento\Cms\Block\Block" name="custom.product.detail.installment">
+                    <arguments>
+                        <argument name="block_id" xsi:type="string">mpanel_product_detail_installment</argument>
+                        <argument name="enabled_builder" xsi:type="string">1</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Catalog\Block\Product\View" name="product.info.installment.popup" template="MagentoEgypt_VendorExtend::product/view/installment/popup.phtml" />
+            </container>
+        </referenceContainer>
+        <referenceBlock name="product.info.overview">
+            <arguments>
+                <argument name="at_label" translate="true" xsi:type="string">About this item</argument>
+            </arguments>
+        </referenceBlock>
+
+        <referenceBlock name="product.info.addtocart">
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="product.buynow"
+                   template="Mageprince_BuyNow::buynow-view.phtml"
+                   before="-"/>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional">
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="product.buynow.config"
+                   template="Mageprince_BuyNow::buynow-view.phtml"
+                   before="-"/>
+        </referenceBlock>
+
+        <move element="page.main.title" destination="product.info.main.content" before="-"/>
+        <move element="product.info.sku" destination="page.main.title" />
+        <move element="product.info.price" destination="product.info.main.content" after="page.main.title" />
+        <move element="product.info.review" destination="product.info.main.content" after="page.main.title" />
+        <move element="product.brand.name" destination="product.info.main.content" after="page.main.title" />
+        <move element="product.info.overview.add" destination="product.info.main.content" after="product.info.attributes"/>
+        <move element="product.info" destination="product.info.main.content" />
+        <move element="alert.urls" destination="product.info.main.content" after="-"/>
+
+
+        <move element="product.price.tier" destination="product.info.main.last" after="product.price.last" />
+        <move element="product.info.stock.sku" destination="product.info.main.last" after="custom.product.detail.after.price" />
+        <move element="product.info.options.wrapper.bottom" destination="product.info.main.last" before="product.info.vendor.profile.soldby" />
+        <move element="product.info.addto" destination="product.info.main.last" />
+        <move element="custom.product.detail.top.static.block" destination="product.info.main.last" />
+        <move element="product.info.extrahint" destination="product.info.main.last" after="-" />
+        
+    </body>
+</page>

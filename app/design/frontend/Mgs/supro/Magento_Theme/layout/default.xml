@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page layout="3columns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+		<remove src="Magento_Swatches::css/swatches.css"/>
+	</head>
+	<body>
+		<move element="breadcrumbs" destination="page.main.title"/>
+		<referenceBlock name="theme.headers">
+			<block class="Magento\Store\Block\Switcher" name="store_language_copy" template="Magento_Store::switch/languages_copy.phtml"/>
+			<block class="Magento\Directory\Block\Currency" name="currency_copy" template="Magento_Directory::currency_copy.phtml"/>
+		</referenceBlock>
+		<referenceBlock name="root">
+			<block class="Magento\Cms\Block\Block" name="whatsapp.widget.static.block">
+				<arguments>
+					<argument name="block_id" xsi:type="string">whatsapp_widget</argument>
+					<argument name="enabled_builder" xsi:type="string">1</argument>
+				</arguments>
+			</block>
+		</referenceBlock>
+	</body>
+</page>

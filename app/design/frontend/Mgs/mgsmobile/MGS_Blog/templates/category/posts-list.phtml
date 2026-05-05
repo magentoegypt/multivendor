@@ -1,0 +1,110 @@
+<?php $categories = $block->getCategories(); ?>
+<?php $_allCategoryLinks = __('All Categories'); ?>
+<?php $categoryId = (int)$this->getRequest()->getParam('category_id', false); ?>
+
+<?php if (count($categories)): ?>
+	<div class="all-category">
+		<ul class="all-category-links">
+			<li><a href="<?= $block->getUrl('blog'); ?>"><?= $_allCategoryLinks ?></a></li>
+			<?php foreach ($categories as $category): ?>
+				<li><a<?php if($categoryId == $category->getId()): ?> class="active"<?php endif ?> title="<?= $category->getTitle(); ?>" href="<?= $category->getCategoryUrl(); ?>"><?= $category->getTitle(); ?></a></li>
+			<?php endforeach ?>
+		</ul>
+	</div>
+<?php endif ?>
+
+<?php $_postCollection = $block->getCollection(); ?>
+<?php if ($_postCollection): ?>
+	<?php $_postHelper = $this->helper('MGS\Blog\Helper\Data'); ?>
+    <div class="blog-grid blog-post-item">
+		<?php foreach ($_postCollection as $post):?>
+			<div class="item">
+				<div class="post-images">
+					<?php if($_postHelper->getImageThumbnailPost($post) != ""): ?>
+						<div class="post-thumbnail">
+							<?php
+							$_imgLink = $post->getPostUrlWithNoCategory(); 
+							$class = "post-thumbnail--image";
+							?>
+							<?php if($post->getThumbType() == "video" && $post->getVideoThumbId() != ""): ?>
+								<?php 
+									$_imgLink = $_postHelper->getVideoThumbUrl($post); 
+									$class .= " popup-video";
+								?>
+							<?php endif ?>
+							<a class="<?= $class ?>" href="$_imgLink" title="<?= $post->getTitle(); ?>">
+								<img class="img-fluid" src="<?= $_postHelper->getImageThumbnailPost($post); ?>" alt="<?= $post->getTitle(); ?>"/>
+							</a>
+						</div>
+					<?php endif ?>
+				</div>
+				<div class="post-metas">
+					<a class="link-item" href="<?= $post->getPostUrlWithNoCategory(); ?>" title="<?= $post->getTitle(); ?>"><?= $post->getTitle() ?></a>
+					<div class="meta-date">
+						<span class="color-theme"><?= $post->getUser(); ?></span>
+						<span class="color-date">
+							<?= $block->formatDate($post->getCreatedAt(), \IntlDateFormatter::MEDIUM, false); ?>
+						</span>
+					</div>
+				</div>	
+			</div>
+		<?php endforeach; ?>
+	</div>
+	
+	<div class="bottom-pagination">
+		<div class="toolbar"><?= $block->getPagerHtml(); ?></div>
+	</div>
+	
+	<script type="text/javascript">
+		require([
+			'jquery',
+			'magnificPopup',
+			'mgsowlcarousel'
+		], function($){
+			$(document).ready(function() {
+				$('.popup-video').magnificPopup({
+					disableOn: 0,
+					type: 'iframe',
+					mainClass: 'mfp-img-gallery',
+					removalDelay: 160,
+					preloader: false,
+					fixedContentPos: false
+				});
+				$(".gallery-image-carousel").owlCarousel({
+					items: 1,
+					loop: true,
+					nav: false,
+					dots: false,
+					autoplayTimeout: 5000,
+					rtl: $_rtlConfig,
+					autoplay: true,
+					autoplayHoverPause: true,
+					margin: 0,
+					autoHeight:true
+				});
+				$('.gallery-image-carousel').magnificPopup({
+					delegate: '.owl-item:not(.cloned) a',
+					type: 'image',
+					tLoading: 'Loading image #%curr%...',
+					mainClass: 'mfp-img-gallery',
+					fixedContentPos: true,
+					gallery: {
+						enabled: true,
+						navigateByImgClick: true,
+						preload: [0,1]
+					},
+					image: {
+						tError: '<a href="%url%">The image #%curr%</a> could not be loaded.',
+						titleSrc: function(item) {
+						return item.el.attr('title');
+						}
+					}
+				});
+			});
+		});
+	</script>
+<?php else: ?>
+    <div class="message empty">
+        <div><?= __('Have no posts.') ?></div>
+    </div>
+<?php endif; ?>

@@ -1,0 +1,94 @@
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
+        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+    </div>
+    <div class="payment-method-content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <!-- ACCEPT -->
+        <style>
+            #wallet-container{
+                background: rgba(0, 0, 0, 0.35);
+                position: fixed;
+                display: none;
+                top: 0;
+                left: 0;
+                width: 100%;
+                min-height: 100%;
+                overflow: auto;
+                z-index: 99;
+                color: #ffffff;
+            }
+            #wallet-container .inner-page div{display: none;}
+            #wallet-container svg{ display:block; height:auto; width:250px; max-width:90%; margin:0 auto; background: #ffffff; border-radius: 50%;}
+            #wallet-container .inner-page{
+                background: rgba(0, 0, 0, 0.85);
+                height: 100%;
+                width: 100%;
+                text-align: center;
+                position: fixed;
+                top: 0; left: 0;
+                z-index: 999;
+                overflow: auto;
+            }
+        </style>
+        <div id="wallet-container">
+                <div class="inner-page">
+                    <div id="wallet-errors">
+                        <svg style="fill:#e91e63;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <br>
+                        <span class="errors">UKNOWN ERROR</span>
+                    </div>
+                </div>
+            </div>
+        <!-- /ACCEPT -->
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <!-- Wallet Input -->
+        <div style="margin:1.75rem auto;">
+            <label for="wallet-phone-input">Wallet Phone Number <small style="color: #e91e63;">(this feild is required)</small></label>
+            <input class="input-text" type="number" id="wallet-phone-input">
+        </div>
+        <!-- // Wallet Input -->
+
+        <div class="actions-toolbar">
+            
+            <div class="primary">
+                <button class="action primary checkout" 
+                        type="submit"
+                        data-bind="
+                        click: placeOrder,
+                        attr: {title: $t('Next')},
+                        css: {disabled: !isPlaceOrderActionAllowed()},
+                        enable: (getCode() == isChecked())
+                        "
+                        disabled>
+                    <span data-bind="i18n: 'Next'"></span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>

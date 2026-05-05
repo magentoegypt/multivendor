@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<body>
+		<referenceBlock name="vendor.profile.top.logo" remove="true" />
+		<referenceBlock name="footer_block" remove="true" />
+		<referenceBlock name="themesetting_config" remove="true" />
+		<referenceBlock name="megamenu" remove="true" />
+		<referenceBlock name="sw.topnav" remove="true" />
+		<referenceContainer name="page.wrapper">
+			<container name="vendor.page.footer" htmlTag="footer" htmlClass="page-footer">
+				<container name="vendor.footers">
+					<block class="Smartwave\Porto\Block\Template" name="domain.footers" template="Smartwave_Porto::html/footer.phtml">
+						<block class="Magento\Store\Block\Switcher" name="footer.store_switcher" template="switch/stores.phtml"/>
+						<block class="Magento\Newsletter\Block\Subscribe" name="footer.newsletter" template="subscribe_footer.phtml"/>
+					</block>
+				</container>
+			</container>
+		</referenceContainer>
+        <referenceBlock class="Vnecoms\VendorsDomain\Block\Html\Header\Logo" name="logo" remove="false" template="Vnecoms_VendorsDomain::html/header/logo.phtml" />
+		<referenceContainer name="store.menu">
+            <block class="MagentoEgypt\PortoExtend\Block\Megamenu" name="vendor.topnav" template="Vnecoms_VendorsDomain::topmenu.phtml" before="-"/>
+        </referenceContainer>
+        <referenceBlock class="MagentoEgypt\PortoExtend\Block\Megamenu" name="sidebar.menu" template="Vnecoms_VendorsDomain::sidebar_menu.phtml" />
+	</body>
+</page>

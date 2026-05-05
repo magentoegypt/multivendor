@@ -1,0 +1,131 @@
+<?php
+$helper = $this->helper('MGS\Blog\Helper\Data');
+$post = $block->getCurrentPost();
+$showAction = $this->getConfig('general_settings/show_action');
+?>
+<div class="blog-post blog-main-info">
+    <?php if($helper->getImagePost($post) != ""): ?>
+        <div class="post-thumbnail">
+            <?php if($post->getImageType() == "video" && $post->getVideoBigId() != ""): ?>
+                <a class="popup-video" href="<?php echo $helper->getVideoThumbUrl($post); ?>" title="<?php echo $post->getTitle(); ?>">
+            <?php endif ?>
+                    <img class="img-fluid" src="<?php echo $helper->getImagePost($post); ?>" alt="<?php echo $post->getTitle(); ?>"/>
+            <?php if($post->getImageType() == "video" && $post->getVideoBigId() != ""): ?>
+                </a>
+            <?php endif ?>
+        </div>
+    <?php endif ?>
+
+    <?php if ($post->getContent()): ?>
+        <div class="post-content">
+			<div class="post-metas">
+				<div class="meta-date">
+					<i class="ion-ios-calendar-outline"></i>
+					<span>
+						<?php echo __('%1', $block->formatDate($post->getUpdatedAt(), \IntlDateFormatter::MEDIUM, false)); ?>
+					</span>
+				</div>
+				<div class="meta-author ">
+					<span>By</span>
+					<span class="color-theme">
+						<?php echo __('%1', $post->getUser()); ?>
+					</span>
+				</div>
+			</div>
+            <div class="post-short-description">
+                <?php $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); ?>
+                <?php echo $objectManager->get('\Magento\Cms\Model\Template\FilterProvider')->getBlockFilter()->filter($post->getContent()); ?>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?php if ($block->getGalleryImage($post)): ?>
+        <div class="gallery-image-carousel owl-carousel margin-top70">
+            <?php foreach($block->getGalleryImage($post) as $_img): ?>
+                <a class="gallery_image" href="<?php echo $_img; ?>">
+                    <img src="<?php echo $_img; ?>" alt="" class="img-fluid"/>
+                </a>
+            <?php endforeach ?>
+        </div>
+        <script>
+            require([
+                'jquery',
+                'mgs/owlcarousel'
+            ], function(jQuery){
+                (function($) {
+                    $(".gallery-image-carousel").owlCarousel({
+                        items: 1,
+                        loop: true,
+                        nav: true,
+                        dots: false,
+                        autoHeight: true,
+                        autoplay: false,
+                        autoplayHoverPause: false,
+                        rtl: RTL,
+                        navText: ["<i class='pe-7s-angle-left'></i>","<i class='pe-7s-angle-right'></i>"],
+                        responsive:{
+                            0:{
+                                nav: false,
+                                dots: true
+                            },
+                            768:{
+                                nav: true,
+                                dots: false
+                            }
+                        },
+                    });
+                })(jQuery);
+            });
+
+            require([
+                'jquery',
+                'magnificPopup'
+            ], function(jQuery){
+                (function($) {
+                    $('.gallery-image-carousel').magnificPopup({
+                        delegate: '.owl-item:not(.cloned) a',
+                        type: 'image',
+                        tLoading: 'Loading image #%curr%...',
+                        mainClass: 'mfp-img-gallery',
+                        fixedContentPos: true,
+                        gallery: {
+                            enabled: true,
+                            navigateByImgClick: true,
+                            preload: [0,1]
+                        },
+                        image: {
+                            tError: '<a href="%url%">The image #%curr%</a> could not be loaded.',
+                            titleSrc: function(item) {
+                            return item.el.attr('title');
+                            }
+                        }
+                    });
+                })(jQuery);
+            });
+        </script>
+    <?php endif ?>
+
+	<?php if($helper->getStoreConfig('mpanel/share_config/enabel_share') && $helper->getStoreConfig('mpanel/share_config/share_blog_detail')): ?>
+		<div class="margin-top25">
+			<?php echo $block->getChildHtml('blog.detail.sharethis'); ?>
+		</div>
+	<?php endif ?>
+
+	<?php if($showAction): ?>
+		<div class="post-actions">
+			<?php $prevPost = $this->getPrevPost($post->getId()); ?>
+			<?php if($post->getId() != $prevPost['id']): ?>
+				<div class="prev-action action"><a href="<?php echo $prevPost['url']; ?>"><?php echo __('Previous'); ?></a></div>
+			<?php endif ?>
+			<?php $nextPost = $this->getNextPost($post->getId()); ?>
+				<?php if($post->getId() != $nextPost['id']): ?>
+				<div class="next-action action"><a href="<?php echo $nextPost['url']; ?>"><?php echo __('Next'); ?></a></h4></div>
+			<?php endif ?>
+		</div>
+	<?php endif ?>
+
+    <div class="row">
+        <div class="col-md-8 col-md-push-2 col-sm-12 col-12">
+            <?php echo $block->getChildHtml('post_view_comment'); ?>
+        </div>
+    </div>
+</div>

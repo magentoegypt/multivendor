@@ -1,0 +1,51 @@
+<?php 
+	use Magento\Framework\App\Action\Action;
+	
+	$image = 'category_page_grid';
+	$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+	$_product = $this->getLoadedProduct();
+	$productImage = $block->getImage($_product, $image);
+	$_helper = $this->helper('Magento\Catalog\Helper\Output');
+	$hideName = $this->getBlockData('hide_name');
+	$hideReview = $this->getBlockData('hide_review');
+	$hidePrice = $this->getBlockData('hide_price');
+	$hideAddWishlist = $this->getBlockData('hide_addwishlist');
+?>
+
+	<div class="product-item-info" data-container="product-grid">
+		<div class="product-top">
+			<a href="<?= /* @escapeNotVerified */ $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
+				<?= $productImage->toHtml() ?>
+			</a>
+		</div>
+		<div class="product details product-item-details">
+			<?php if($hideName!=1): ?>
+				<strong class="product name product-item-name">
+					<a class="product-item-link"
+					   href="<?= $_product->getProductUrl() ?>">
+						<?= $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
+					</a>
+				</strong>
+			<?php endif ?>
+			<?php if($hideReview!=1): ?>
+				<?= $block->getReviewsSummaryHtml($_product, $templateType, true) ?>
+			<?php endif ?>
+			
+			<?php if($hidePrice!=1): ?>
+				<?= $block->getProductPrice($_product) ?>
+			<?php endif ?>
+			
+			<?= $this->getLayout()->createBlock('Magento\Swatches\Block\Product\Renderer\Listing\Configurable')->setProduct($_product)->setTemplate('Magento_Swatches::product/listing/renderer.phtml')->toHtml() ?>
+			
+			<div class="product actions product-item-actions">
+				<a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>" class="action primary"><?= __('View Detail') ?></a>
+				<?php if(($hideAddWishlist!=1)): ?>
+					<div data-role="add-to-links" class="actions-secondary">
+						<?php if ($this->helper('Magento\Wishlist\Helper\Data')->isAllow() && ($hideAddWishlist!=1)): ?>
+							<a href="#" class="action towishlist" title="<?= __('Add to Wish List') ?>" aria-label="<?= __('Save') ?>" data-post='<?= /* @noEscape */ $block->getAddToWishlistParams($_product) ?>' data-action="add-to-wishlist" role="button"></a>
+						<?php endif; ?>
+					</div>
+				<?php endif ?>
+			</div>
+		</div>
+	</div>

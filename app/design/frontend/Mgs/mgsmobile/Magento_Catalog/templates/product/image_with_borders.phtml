@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /** @var $block \Magento\Catalog\Block\Product\Image */ ?>
+
+<?php $themeHelperImage = $this->helper('MGS\ThemeSettings\Helper\Image'); ?>
+
+<span class="product-image-container">
+	<span class="product-image-wrapper"
+		  style="padding-bottom: <?= $block->getHeight() / $block->getWidth() * 100; ?>%;">
+		<img class="product-image-photo"
+			 <?= $block->getCustomAttributes(); ?>
+			 src="<?= $block->getImageUrl(); ?>"
+			 alt="<?= $block->stripTags($block->getLabel(), null, true); ?>"/></span>
+</span>
+

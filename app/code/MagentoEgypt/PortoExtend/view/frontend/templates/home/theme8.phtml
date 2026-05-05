@@ -1,0 +1,271 @@
+<div class="container">
+    <style>
+        .columns .column.main {
+            padding-bottom: 10px;
+        }
+        .porto-ibanner-layer {
+            position: absolute;
+            z-index: 10;
+            text-align: left;
+        }
+        .ls-160 {
+            letter-spacing: 0.16em;
+        }
+        .ls-25 {
+            letter-spacing: 0.025em;
+        }
+        .ls-220 {
+            letter-spacing: 0.22em;
+        }
+        .big-number {
+            top: 0.0125em;
+            letter-spacing: -0.025em;
+        }
+        .big-number small {
+            font-size: 0.1413em !important;
+            font-weight: inherit;
+            letter-spacing: 0;
+            line-height: 1;
+            position: absolute;
+            top: 50%;
+            right: 1.62em;
+            text-align: center;
+            transform: translateY(-54%);
+        }
+        .big-number ins {
+            display: block;
+            text-decoration: none;
+            font-size: 50%;
+            text-transform: uppercase;
+        }
+        .overflow-hidden {
+            overflow: hidden;
+        }
+        .position-relative {
+            position: relative;
+        }
+        @media (max-width: 480px) {
+            .home-banner .porto-ibanner-layer {
+                font-size: 7px;
+            }
+        }
+    </style>
+    <div id="home-banner-demo8" class="porto-carousel owl-carousel home-banner-slider home-banner porto-standable-carousel nav-pos-outside nav-style-4 show-nav-hover">
+        <div class="porto-ibanner mb-0" style="min-height: 300px;">
+            <img src="{{media url=wysiwyg/smartwave/porto/homepage/08/shop8_home_slide1.jpg}}" />
+            <div class="porto-ibanner-desc no-padding d-flex">
+                <div class="porto-ibanner-layer" style="right: 0%; bottom: 0%; margin-right: 1.25rem; margin-bottom: 1.25rem;">
+                    <div class="row background-color-primary no-padding overflow-hidden" style="margin-bottom: 1.5rem;">
+                        <div class="col-auto mr-3 pl-3 pl-sm-4 ml-lg-2 col-md-6 d-flex align-items-center">
+                            <div class="wpb_wrapper vc_column-inner">
+                                <h4 style="font-size: 1.125em; color: rgba(255, 255, 255, 0.5); line-height: 1; font-weight: 300;" class="vc_custom_heading mb-0 ls-160 align-left text-uppercase">Furniture & Garden</h4>
+                                <h3 style="font-size: 2.6875em; line-height: 1;" class="vc_custom_heading ls-25 mb-0 align-left text-uppercase heading-light">Huge Sale</h3>
+                            </div>
+                        </div>
+                        <div class="col-auto pr-3 pr-sm-4 mr-lg-2 col-md-6">
+                            <div class="wpb_wrapper vc_column-inner">
+                                <h3 style="font-size: 11.5em; line-height: 0.7;" class="vc_custom_heading mb-0 position-relative big-number align-left heading-light">
+                                    50<small>%<ins>OFF</ins></small>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-container mb-0 text-right"><button class="btn btn-modern btn-lg btn-dark">Shop Now!</button></div>
+                </div>
+            </div>
+        </div>
+        <div class="porto-ibanner mb-0" style="min-height: 300px;">
+            <img src="{{media url=wysiwyg/smartwave/porto/homepage/08/shop8_home_slide2.jpg}}" />
+            <div class="porto-ibanner-desc no-padding d-flex">
+                <div class="porto-ibanner-layer" style="left: 0%; bottom: 0%; margin-left: 1.25rem; margin-bottom: 1.25rem;">
+                    <div class="row background-color-dark no-padding overflow-hidden" style="margin-bottom: 1.5rem;">
+                        <div class="col-auto mr-3 pl-3 pl-sm-4 ml-lg-2 col-md-6 d-flex align-items-center">
+                            <div class="wpb_wrapper vc_column-inner">
+                                <h4 style="font-size: 1.125em; color: rgba(255, 255, 255, 0.5); line-height: 1; font-weight: 300;" class="vc_custom_heading mb-0 ls-220 align-left text-uppercase">Home Office Sale</h4>
+                                <h3 style="font-size: 2.6875em; line-height: 1;" class="vc_custom_heading mb-0 align-left text-uppercase heading-light">mega off</h3>
+                            </div>
+                        </div>
+                        <div class="col-auto pr-3 pr-sm-4 mr-lg-2 col-md-6">
+                            <div class="wpb_wrapper vc_column-inner">
+                                <h3 style="font-size: 11.5em; line-height: 0.7;" class="vc_custom_heading mb-0 position-relative big-number align-left heading-light">
+                                    50<small>%<ins>OFF</ins></small>
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-container mb-0 d-inline-block"><button class="btn btn-modern btn-lg btn-primary">Shop Now!</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+            var banner_owl = $("#home-banner-demo8.owl-carousel");
+            banner_owl.owlCarousel({
+                items: 1,
+                autoplay: false,
+                autoplayTimeout: 5000,
+                autoplayHoverPause: true,
+                dots: false,
+                nav: true,
+                navRewind: true,
+                animateIn: "fadeIn",
+                animateOut: "fadeOut",
+                loop: true,
+                lazyLoad: true,
+            });
+        });
+    </script>
+    <div class="home-rooms mb-5" style="margin-top: 45px;">
+        <style>
+            .porto-u-heading {
+                text-align: center;
+                margin-bottom: 17px;
+            }
+            .ls-100,
+            .porto-u-main-heading h3 {
+                letter-spacing: 0.1em;
+            }
+            .porto-u-heading-spacer {
+                margin: 0 auto;
+                padding: 0;
+                position: relative;
+                overflow: hidden;
+            }
+            .porto-u-headings-line {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .home-rooms .vc_single_image-wrapper {
+                display: block;
+            }
+            .home-rooms .vc_single_image-wrapper img {
+                width: 100%;
+                height: auto;
+            }
+            .flex-1 {
+                flex: 1;
+            }
+        </style>
+        <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block29')->toHtml() ?>
+    </div>
+    <div class="porto-u-heading" style="text-align: center;">
+        <div class="porto-u-main-heading"><h3 style="margin-bottom: 8px; font-size: 1rem; line-height: 1;"><?= __('FEATURED PRODUCTS')?></h3></div>
+        <div class="porto-u-heading-spacer line_only" style="height: 2px;">
+            <span class="porto-u-headings-line" style="border-style: solid; border-bottom-width: 2px; border-color: rgb(225, 59, 63); width: 10px; margin: 0px auto;"></span>
+        </div>
+    </div>
+    <div class="mb-4">
+        {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" product_type="3" product_count="8" column_count="4" aspect_ratio="0" image_width="250" image_height="250" template="grid.phtml"}}
+    </div>
+    <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block30')->toHtml() ?>
+    <style>
+        .home-mid-banner {
+            font-size: 1rem;
+        }
+        @media (max-width: 991px) {
+            .home-mid-banner {
+                font-size: 1.5vw;
+            }
+            .home-mid-banner .btn-modern.btn-lg {
+                font-size: 0.75rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .home-mid-banner .btn-modern.btn-lg {
+                font-size: 8px;
+            }
+        }
+        .home-mid-banner .flex-1:first-child .vc_column-inner {
+            width: auto;
+            align-items: flex-end;
+        }
+    </style>
+    <div class="row pt-5 pb-4">
+        <style>
+            .product-item-info.type12 {
+                padding: 0;
+                border: none;
+            }
+        </style>
+        <div class="col-md-4">
+            <div class="wpb_wrapper vc_column-inner">
+                <div class="porto-u-heading" data-hspacer="line_only" data-halign="left" style="text-align: left;">
+                    <div class="porto-u-main-heading"><h3 style="margin-bottom: 8px; font-size: 1rem; line-height: 1;"><?= __('TOP RATED PRODUCTS') ?></h3></div>
+                    <div class="porto-u-heading-spacer line_only" style="height: 2px;">
+                        <span class="porto-u-headings-line" style="border-style: solid; border-bottom-width: 2px; border-color: rgb(225, 59, 63); width: 10px; margin-left: 0px; float: left;"></span>
+                    </div>
+                </div>
+                <div class="wpb_content_element">
+                    {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" product_count="3" product_type="12" column_count="1" aspect_ratio="0" image_width="250" image_height="250" template="grid.phtml"}}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="wpb_wrapper vc_column-inner">
+                <div class="porto-u-heading" data-hspacer="line_only" data-halign="left" style="text-align: left;">
+                    <div class="porto-u-main-heading"><h3 style="margin-bottom: 8px; font-size: 1rem; line-height: 1;"><?= __('BEST SELLING PRODUCTS') ?></h3></div>
+                    <div class="porto-u-heading-spacer line_only" style="height: 2px;">
+                        <span class="porto-u-headings-line" style="border-style: solid; border-bottom-width: 2px; border-color: rgb(225, 59, 63); width: 10px; margin-left: 0px; float: left;"></span>
+                    </div>
+                </div>
+                <div class="wpb_content_element">
+                    {{block class="Smartwave\Filterproducts\Block\Home\BestsellersList" name="featured_product" product_count="3" product_type="12" column_count="1" aspect_ratio="0" image_width="250" image_height="250"
+                    template="grid.phtml"}}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="wpb_wrapper vc_column-inner">
+                <div class="porto-u-heading" data-hspacer="line_only" data-halign="left" style="text-align: left;">
+                    <div class="porto-u-main-heading"><h3 style="margin-bottom: 8px; font-size: 1rem; line-height: 1;"><?= __('LATEST PRODUCTS') ?></h3></div>
+                    <div class="porto-u-heading-spacer line_only" style="height: 2px;">
+                        <span class="porto-u-headings-line" style="border-style: solid; border-bottom-width: 2px; border-color: rgb(225, 59, 63); width: 10px; margin-left: 0px; float: left;"></span>
+                    </div>
+                </div>
+                <div class="wpb_content_element">
+                    {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="featured_product" product_count="3" product_type="12" column_count="1" aspect_ratio="0" image_width="250" image_height="250" template="grid.phtml"}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="vc_row wpb_row row no-padding">
+        <div class="py-5 col-md-12" style="border-top: 1px solid #e7e7e7; border-bottom: 1px solid #e7e7e7;">
+            <div class="wpb_wrapper vc_column-inner">
+                <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block10')->toHtml() ?>
+                <script type="text/javascript">
+                    require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                        $(".brand-carousel.owl-carousel").owlCarousel({
+                            autoplay: false,
+                            autoplayTimeout: 5000,
+                            autoplayHoverPause: true,
+                            nav: false,
+                            dots: false,
+                            loop: false,
+                            responsive: {
+                                0: {
+                                    items: 2,
+                                },
+                                640: {
+                                    items: 3,
+                                },
+                                768: {
+                                    items: 4,
+                                },
+                                992: {
+                                    items: 5,
+                                },
+                                1200: {
+                                    items: 6,
+                                },
+                            },
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

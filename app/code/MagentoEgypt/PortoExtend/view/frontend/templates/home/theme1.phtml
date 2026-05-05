@@ -1,0 +1,439 @@
+<div class="porto-block">
+    <style>
+        @media (min-width: 992px) {
+			.page-header .nav-sections {
+				display: none;
+			}
+		}
+		.vc_custom_1569859408078 {
+			border: 1px solid #e7e7e7;
+		}
+		.header-top-ads .porto-sicon-default .porto-icon {
+			margin-right: 0.5rem;
+		}
+		.header-top-ads .porto-sicon-box {
+			justify-content: center;
+			padding-top: 0.75rem;
+			padding-bottom: 0.75rem;
+			margin: 0.75rem 0;
+			border-right: 1px solid #e7e7e7;
+		}
+		.header-top-ads .col-lg-4:last-child .porto-sicon-box {
+			border: none;
+		}
+		@media (max-width: 991px) {
+			.header-top-ads .porto-sicon-box {
+				border-right: none;
+				justify-content: flex-start;
+				padding: 0.75rem 1.5rem;
+			}
+			.header-top-ads .col-lg-4:not(:last-child) {
+				border-bottom: 1px solid #e7e7e7;
+			}
+		}
+    </style>
+    <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block1')->toHtml() ?>
+</div>
+<div class="main-content-wrapper">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 porto-home-sidebar" style="margin-top: 20px;margin-bottom:10px;">
+                <div class="sidebar-content">
+                    <div class="widget_sidebar_menu main-sidebar-menu">
+                        <div class="widget-title">Browse Categories</div>
+                        <div class="sidebar-menu-wrap" style="margin-bottom: -1px;">
+							<?= $this->getLayout()->createBlock('MagentoEgypt\PortoExtend\Block\Megamenu')->setTemplate('Vnecoms_VendorsDomain::sidemenu.phtml')->toHtml() ?>
+                        </div>
+                    </div>
+                    <div class="widget widget-block" style="margin-top: 20px;">
+                        <div class="porto-block">
+                            <style>
+                                .info-box-small-wrap {
+									padding: 0 30px 10px;
+								}
+								.info-box-small-wrap .porto-sicon-top {
+									position: relative;
+									padding-top: 25px;
+								}
+								.info-box-small-wrap .custom-info-1 .porto-sicon-top:before {
+									content: "";
+									position: absolute;
+									top: 0;
+									height: 25px;
+									left: 50%;
+									border-left: 1px solid #e7e7e7;
+								}
+								.info-box-small-wrap .porto-sicon-header .porto-sicon-title {
+									font-family: "Poppins";
+									position: relative;
+									display: inline-block;
+								}
+								.info-box-small-wrap .porto-sicon-description {
+									font-family: "Poppins";
+									position: relative;
+								}
+								.info-box-small-wrap .porto-sicon-title sup {
+									font-weight: 700;
+									font-size: 60%;
+									letter-spacing: normal;
+								}
+								.info-box-small-wrap .porto-sicon-title sub {
+									font-family: "Poppins";
+									font-size: 16px;
+									text-transform: uppercase;
+									font-weight: 700;
+									position: absolute;
+									right: 0;
+									bottom: 7px;
+									line-height: 1.4em;
+									letter-spacing: normal;
+								}
+								.info-box-small-wrap .porto-sicon-title small, .info-box-small-wrap .porto-sicon-description small {
+									position: absolute;
+									left: -21px;
+									bottom: 32px;
+									font-size: 10px;
+									font-family: "Open Sans";
+									font-weight: 700;
+									color: #777;
+									opacity: 0.6;
+									transform: rotateZ(-90deg);
+									letter-spacing: normal;
+								}
+								.info-box-small-wrap .porto-sicon-description small {
+									left: 26px;
+									top: 2px;
+									height: 25px;
+								}
+								.porto-sicon-read span {
+									display: none;
+								}
+								.porto-sicon-box .porto-sicon-read {
+									display: inline-block;
+									text-decoration: none !important;
+									font-size: 0.8125rem;
+									font-weight: 700;
+									color: #fff !important;
+									background: #222529;
+									padding: 0.75em 2.25em;
+									margin-top: 1rem;
+									letter-spacing: 0;
+								}
+								.info-box-small-wrap .porto-sicon-box {
+									margin-bottom: 0.5rem;
+								}
+								.custom-rotate-1 {
+									display: inline-block;
+									transform: rotate(-2deg);
+								}
+								.custom-info-2 .porto-sicon-top {
+									margin-top: 35px;
+								}
+								.custom-info-2 .porto-sicon-header {
+									position: absolute;
+									top: 16px;
+									white-space: nowrap;
+								}
+								.custom-info-2 .porto-sicon-description small {
+									left: 33px;
+								}
+								.custom-info-2 .coupon-sale-text b, .custom-open-sans .coupon-sale-text b {
+									font-weight: 700;
+								}
+								.custom-info-2 h4, .custom-info-2 strong, .custom-open-sans h4, .custom-open-sans strong {
+									font-family: "Open Sans";
+								}
+
+                            </style>
+                            <div class="info-box-small-wrap" style="border: 1px solid #e7e7e7; border-radius: 2px;">
+								<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block2')->toHtml() ?>
+                                <script type="text/javascript">
+                                    require([
+										'jquery',
+										'owl.carousel/owl.carousel.min'
+									], function($) {
+										$(".info-box-small-wrap .owl-carousel").owlCarousel({
+											items: 1,
+											autoplay: false,
+											autoplayTimeout: 5000,
+											autoplayHoverPause: true,
+											dots: true,
+											nav: false,
+											loop: false,
+											navRewind: true,
+											margin: 1
+										});
+									});
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="widget widget_text">
+						<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block3')->toHtml() ?>
+                    </div>
+                    <div class="widget widget-block">
+                        <div class="sidebar-testimonials" style="border: 3px solid #0188cc;border-radius: 2px;">
+							<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block4')->toHtml() ?>
+                            <script type="text/javascript">
+                                require([
+									'jquery',
+									'owl.carousel/owl.carousel.min'
+								], function($) {
+									$(".sidebar-testimonials .owl-carousel").owlCarousel({
+										items: 1,
+										autoplay: false,
+										autoplayTimeout: 5000,
+										autoplayHoverPause: true,
+										dots: true,
+										nav: false,
+										loop: false,
+										navRewind: true,
+										margin: 1
+									});
+								});
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="main-content col-lg-9" style="margin-top:20px;">
+                <div class="home-banner-slider" style="margin-bottom: 20px;">
+                    <div class="porto-carousel home-banner-slider owl-carousel dots-style-1 mb-0 nav-inside nav-inside-left">
+                        <div class="porto-ultimate-content-box-container">
+                            <div class="porto-ultimate-content-box has-content-pos justify-content-center" style="background-size: cover; background-repeat: no-repeat; background-position: center center; background-color: rgba(0, 0, 0, 0); min-height: 428px; background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/01/shop1_home_slider1.png}}');padding-top: 20px;padding-bottom: 20px;padding-left: 5.5%;background-color: #0088cc;">
+                                <h4 style="font-size: 1.54em; color: rgba(255, 255, 255, 0.7); line-height: 1; font-weight: 500;" class="vc_custom_heading ls-80 align-left">Find the Boundaries. Push Through!</h4>
+                                <h2 style="font-size: 4.375em; line-height: 1; font-weight: 700; letter-spacing: 0.1px;" class="vc_custom_heading mb-0 align-left heading-light">Summer Sale</h2>
+                                <h3 style="font-size: 7.6em; line-height: 1; font-weight: 700;" class="vc_custom_heading mb-3 align-left heading-light">70% OFF</h3>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="wpb_wrapper vc_column-inner">
+                                            <h4 style="font-size: 1.1em; line-height: 1; font-weight: 600;" class="vc_custom_heading mr-3 pull-left p-t-sm ls-n-20 align-left text-uppercase heading-light">Starting At</h4>
+                                            <h4 style="font-size: 1.5em; line-height: 1;" class="vc_custom_heading coupon-sale-text d-inline-block mr-2 background-color-secondary align-left heading-light">
+                                                <b><sup>$</sup>199<sup>99</sup></b>
+                                            </h4>
+                                            <div class="btn-container mb-0 d-inline-block" style="margin-left: -3px;"><button class="btn btn-modern btn-md btn-dark">Shop Now!</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="porto-ultimate-content-box-container">
+                            <div class="porto-ultimate-content-box has-content-pos justify-content-center" style="background-size: cover; background-repeat: no-repeat; background-position: center center; background-color: rgba(0, 0, 0, 0); min-height: 428px; background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/01/shop1_home_slider2.jpg}}');padding-top: 20px;padding-bottom: 20px;padding-left: 5.5%;background-color: #dadada;">
+                                <h4 style="font-size: 1.6em; color: rgba(119, 119, 119, 0.7); line-height: 1; font-weight: 500;" class="vc_custom_heading ls-80 mb-2 align-left">OVER 200 PRODUCTS WITH DISCOUNTS</h4>
+                                <h3 style="font-size: 5.5em; line-height: 1; font-weight: 700;" class="vc_custom_heading mb-3 align-left heading-dark">GREAT DEALS</h3>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="wpb_wrapper vc_column-inner">
+                                            <h4 style="font-size: 1.4em; line-height: 1.5; font-weight: 700;" class="vc_custom_heading mr-2 pull-left align-left text-uppercase heading-dark">Starting At</h4>
+                                            <h4 style="font-size: 2.6em; line-height: 1;" class="vc_custom_heading pull-left m-r-lg align-left heading-dark">
+                                                <b><sup>$</sup>299<sup>99</sup></b>
+                                            </h4>
+                                            <div class="btn-container mb-0 d-inline-block" style="margin-left:-3px;"><button class="btn btn-modern btn-md btn-dark">Get Yours!</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="porto-ultimate-content-box-container">
+                            <div class="porto-ultimate-content-box has-content-pos justify-content-center" style="background-size: cover; background-repeat: no-repeat; background-position: center center; background-color: rgba(0, 0, 0, 0); min-height: 428px; background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/01/shop1_home_slider3.jpg}}');padding-top: 20px;padding-bottom: 20px;padding-left: 5.5%;background-color: #e6e3e2;">
+                                <h4 style="font-size: 1.6em; color: rgba(119, 119, 119, 0.7); line-height: 1; font-weight: 500;" class="vc_custom_heading ls-80 mb-2 align-left">UP TO 70% OFF</h4>
+                                <h3 style="font-size: 4.8em; line-height: 1; font-weight: 700;" class="vc_custom_heading mb-3 align-left heading-dark">NEW ARRIVALS</h3>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="wpb_wrapper vc_column-inner">
+                                            <h4 style="font-size: 1.4em; line-height: 1.5; font-weight: 700;" class="vc_custom_heading mr-2 pull-left ls-n-20 align-left text-uppercase heading-dark">Starting At</h4>
+                                            <h4 style="font-size: 2.6em; line-height: 1;" class="vc_custom_heading pull-left m-r-lg align-left heading-dark">
+                                                <b><sup>$</sup>299<sup>99</sup></b>
+                                            </h4>
+                                            <div class="btn-container mb-0 d-inline-block" style="margin-left:-3px;"><button class="btn btn-modern btn-md btn-dark">Get Yours!</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        require([
+                          	'jquery',
+                          	'owl.carousel/owl.carousel.min'
+                        ], function ($) {
+							var banner_owl = $(".home-banner-slider .owl-carousel");
+							banner_owl.owlCarousel({
+								items: 1,
+								autoplay: false,
+								autoplayTimeout: 5000,
+								autoplayHoverPause: true,
+								dots: true,
+								nav: false,
+								navRewind: true,
+								animateIn: 'fadeIn',
+								animateOut: 'fadeOut',
+								loop: true,
+								lazyLoad: true
+							});
+                        });
+                    </script>
+                    <style>
+                        .owl-carousel.nav-inside-left .owl-dots {
+							left: 5.5%;
+							bottom: 2rem;
+                        }
+                        .home-banner-slider .owl-carousel .owl-dots .owl-dot span {
+							color: #222529!important;
+							border-color: #222529;
+                        }
+                    </style>
+                </div>
+                <div class="home-ads mb-2">
+					<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block5')->toHtml() ?>
+                    <style>
+						.vc_custom_1595216969075 {
+							margin-bottom: 20px;
+							padding-top: 1.25rem;
+							padding-bottom: 1.25rem;
+							padding-left: 1.25rem;
+							background-color: #f4f4f4;
+						}
+						.vc_custom_1595216625670 {
+							margin-bottom: 20px;
+							border: 0.875rem solid #e7e7e7;
+							padding-top: 1rem;
+							padding-bottom: .5rem;
+							background-color: #f4f4f4;
+						}
+						.vc_custom_1595216973929 {
+							margin-bottom: 20px;
+							padding-top: 1.6rem;
+							padding-right: 1rem;
+							padding-bottom: 1.6rem;
+							background-color: #f4f4f4;
+						}
+                        .home-ads sup {
+							font-size: 70%;
+							top: -.3em;
+							font-weight: 700;
+							margin-right: 2px;
+                        }
+                    </style>
+                </div>
+                <div id="featured-products" class="porto-products title-border-bottom mb-4">
+                    <h2 class="section-title slider-title"><span class="inline-title"><?= __('Featured Products') ?></span><span class="line"></span></h2>
+                    <div class="slider-wrapper">
+                        {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" extra_class="show-dots-title-right dots-style-1" product_count="8" aspect_ratio="0" image_width="350" image_height="350" template="owl_list.phtml"}}
+                        <script type="text/javascript">
+                            require([
+								'jquery',
+								'owl.carousel/owl.carousel.min'
+                            ], function ($) {
+								$("#featured-products .owl-carousel").owlCarousel({
+									autoplay: false,
+									autoplayTimeout: 5000,
+									autoplayHoverPause: true,
+									loop: true,
+									navRewind: true,
+									lazyLoad:true,
+									margin: 0,
+									nav: false,
+									dots: true,
+									responsive: {
+									0: {
+										items:2
+									},
+									640: {
+										items:3
+									},
+									768: {
+										items:3
+									},
+									992: {
+										items:4
+									},
+									1200: {
+										items:4
+									}
+									}
+								});
+                            });
+                        </script>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="porto-brand mb-4" style="border-top: 1px solid #e7e7e7;border-bottom: 1px solid #e7e7e7;padding-top: 2rem;padding-bottom:2rem;">
+							<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block10')->toHtml() ?>
+                            <script type="text/javascript">
+                                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+									$(".brand-carousel.owl-carousel").owlCarousel({
+										autoplay: true,
+										autoplayTimeout: 5000,
+										autoplayHoverPause: true,
+										nav: false,
+										dots: false,
+										loop: true,
+										responsive: {
+										0: {
+											items: 2,
+										},
+										640: {
+											items: 3,
+										},
+										768: {
+											items: 4,
+										},
+										992: {
+											items: 5,
+										},
+										1200: {
+											items: 5,
+										},
+										},
+									});
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2 mb-1">
+                    <div class="col-sm-6 col-md-4">
+                        <div class="mgt_content_element">
+                            <div class="widget widget_products">
+                                <h2 class="widgettitle"><?= __('Top Rated Products') ?></h2>
+                                {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" product_count="3" aspect_ratio="0" image_width="150" image_height="150" template="small_list.phtml"}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 vc_column_container col-md-4">
+                        <div class="mgt_content_element">
+                            <div class="widget widget_products">
+                                <h2 class="widgettitle"><?= __('Best Selling Products') ?></h2>
+                                {{block class="Smartwave\Filterproducts\Block\Home\BestsellersList" name="featured_product" product_count="3" aspect_ratio="0" image_width="150" image_height="150" template="small_list.phtml"}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 vc_column_container col-md-4">
+                        <div class="mgt_content_element">
+                            <div class="widget widget_products">
+                                <h2 class="widgettitle"><?= __('Latest Products') ?></h2>
+                                {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="featured_product" product_count="3" aspect_ratio="0" image_width="150" image_height="150" template="small_list.phtml"}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="porto-separator">
+                            <hr class="separator-line align_center solid" style="background-color: #e7e7e7;" />
+                        </div>
+                    </div>
+                </div>
+                <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('vendor_theme_block6')->toHtml() ?>
+            </div>
+            <style>
+                @media(max-width:991px){
+					.porto-home-sidebar {order:2;}
+					.main-content {order:1;}
+                }
+            </style>
+        </div>
+    </div>
+</div>

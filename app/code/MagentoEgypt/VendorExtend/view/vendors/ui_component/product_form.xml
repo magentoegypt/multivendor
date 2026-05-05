@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <modal name="advanced_inventory_modal">
+        <settings>
+            <options>
+                <option name="buttons" xsi:type="array">
+                    <item name="0" xsi:type="array">
+                        <item name="text" xsi:type="string" translate="true">Done</item>
+                    </item>
+                </option>
+                <option name="title" xsi:type="string" translate="true">Advanced Inventory</option>
+            </options>
+        </settings>
+        <fieldset name="stock_data">
+            <container name="container_manage_stock">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="manage_stock">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <field name="qty">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+            </field>
+            <container name="container_min_qty">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="min_qty">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <fieldset name="container_min_sale_qty">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="min_sale_qty">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </fieldset>
+            <container name="container_max_sale_qty">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="max_sale_qty">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <field name="is_qty_decimal">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="is_decimal_divided">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+            </field>
+            <container name="container_backorders">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="backorders">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <container name="container_notify_stock_qty">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="notify_stock_qty">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <container name="container_enable_qty_increments">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="enable_qty_increments">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <container name="container_qty_increments">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="qty_increments">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+            <container name="container_is_in_stock">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                    </item>
+                </argument>
+                <field name="is_in_stock">
+                    <argument name="data" xsi:type="array">
+                        <item name="config" xsi:type="array">
+                            <item name="scopeLabel" xsi:type="string" translate="true">[GLOBAL]</item>
+                        </item>
+                    </argument>
+                </field>
+            </container>
+        </fieldset>
+    </modal>
+</form>

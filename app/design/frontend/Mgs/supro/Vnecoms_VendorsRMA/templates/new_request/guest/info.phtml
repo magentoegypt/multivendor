@@ -1,0 +1,128 @@
+<?php $requestData =  $block->getRequestData(); ?>
+<h2 class="legend"><?php echo __('Request Information'); ?></h2>
+<ul class="form-list">
+    <li class="wide">
+        <label for="content_message" class="required"><em>*</em><?php echo __('Order') ?></label>
+        <div class="input-box">
+            <select  class="validate-select" name="order_incremental_id" id="order_incremental_id">
+                <?php foreach($block->getOrderByCustomerId() as $order):?>
+                    <option <?php if (isset($requestData['order_incremental_id']) == $order->getIncrementId()) echo "selected "?> value="<?php echo $order->getIncrementId() ?>" ><?php echo '#'.$order->getIncrementId().' at '.$order->getCreatedAtFormatted(\IntlDateFormatter::MEDIUM).' ( '.$order->formatPrice($order->getGrandTotal()).' )' ?></option>
+                <?php endforeach;?>
+            </select>
+        </div>
+    </li>
+    <li class="wide products" id="ves-list-product-order">
+    </li>
+    <li class="fields">
+        <div class="left">
+            <label for="package_opened" class="required"><em>*</em><?php echo __('Package Opened') ?></label>
+            <div class="input-box">
+                <select name="package_opened" id="package_opened" class="validate-select">
+                    <?php foreach($block->getPackOpened() as $key => $value):?>
+                        <option <?php if (isset($requestData['package_opened']) == $key) echo "selected"?> value="<?php echo $key ?>" ><?php echo $value ?></option>
+                    <?php endforeach;?>
+                </select>
+            </div>
+        </div>
+        <div class="right">
+            <label for="type" class="required"><em>*</em><?php echo __('Request Type') ?></label>
+            <div class="input-box">
+                <select name="type" id="type" class="validate-select" onchange="requestOption.changeType(this.value)">
+                    <option value=""><?php echo __('--- Select an Type ---') ?></option>
+                    <?php foreach($block->getType() as $key => $value):?>
+                        <option <?php if (isset($requestData['type']) == $key) echo "selected"?>  value="<?php echo $key ?>" ><?php echo $value ?></option>
+                    <?php endforeach;?>
+                </select>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </li>
+    <li class="wide" style="display:none">
+        <label for="reason" class="required"><em>*</em><?php echo __('Refund Amount') ?></label>
+        <div class="input-box">
+            <select name="refund_amount_type" id="refund_amount_type" class="validate-select" onchange="requestOption.changeRefundAmountType(this.value)">
+                <?php foreach($block->getRefundAmountType() as $key => $title):?>
+                    <option <?php if (isset($requestData['refund_amount_type']) == $key)
+                        echo "selected"?>  value="<?php echo $key ?>" ><?php echo $title ?>
+                    </option>
+                <?php endforeach;?>
+            </select>
+        </div>
+    </li>
+
+    <li class="wide" style="display:none">
+        <label for="refund_custom_amount"><?php echo __('Custom Amount') ?></label>
+        <div class="input-box">
+            <input type="text" name="refund_custom_amount" class="input-text required-entry validate-number validate-custom-amount"
+                   value="<?php if (isset($requestData['refund_custom_amount'])) echo $requestData['refund_custom_amount']?>" id="refund_custom_amount" />
+            <p class="note"><?php echo __("Max Amount: ") ?><span class="note-amount">N/A</span></p>
+        </div>
+    </li>
+
+    <li class="wide">
+        <label for="reason" class="required"><em>*</em><?php echo __('Reason') ?></label>
+        <div class="input-box">
+            <select name="reason" id="reason" class="validate-select" onchange="requestOption.changeReason(this)">
+                <option value=""><?php echo __('--- Select an Reason ---') ?></option>
+                <?php foreach($block->getReason() as $key =>$reason):?>
+                    <option <?php if (isset($requestData['reason']) == $key) echo "selected"?>  value="<?php echo $reason->getReasonId() ?>" rel="<?php echo $reason->getWhoPayShipping() ?>"><?php echo $reason->getTitle() ?></option>
+                <?php endforeach;?>
+                <?php if($block->getConfig()->allowOtherReasons()) :  ?>
+                    <option value="other"><?php echo __('Other Reason') ?></option>
+                <?php endif ; ?>
+            </select>
+            <div id="rma-reason-note" style="display: none"></div>
+        </div>
+    </li>
+    <?php if($block->getConfig()->allowOtherReasons()) :  ?>
+        <li class="wide" style="display:none">
+            <label for="reason_detail"><?php echo __('Other Reason') ?></label>
+            <div class="input-box">
+                <input type="text" name="other_reason" class="input-text required-entry" value="<?php if (isset($requestData['other_reason'])) echo $requestData['other_reason']?>" id="reason_detail" />
+            </div>
+        </li>
+    <?php endif ; ?>
+
+    <li class="wide">
+        <label for="reason_detail"><?php echo __('Shipment Tracking Number') ?></label>
+        <div class="input-box">
+            <input type="text" name="tracking_code" class="input-text" value="<?php if (isset($requestData['tracking_code'])) echo $requestData['tracking_code']?>" id="tracking_code" />
+        </div>
+    </li>
+
+    <li class="wide">
+        <div class="field message">
+            <label class="label" for="message"><span><?php /* @escapeNotVerified */ echo __('Message') ?></span></label>
+            <div class="control">
+                <?php $message =isset($requestData['message']) ? $requestData['message']:''?>
+                <?php echo $block->getHtmlEditor($message) ?>
+            </div>
+        </div>
+    </li>
+
+    <li class="wide">
+        <div class="field uploader" id="knockout-message-attachment"  data-bind="scope: 'attachment'">
+            <label class="label" for="message"><span><?php echo __('Allow Extension : ').$block->getConfig()->allowFileExtension() ?></span></label>
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <script type="text/x-magento-init">
+                {
+                    "#knockout-message-attachment": {
+                        "Magento_Ui/js/core/app": {
+                            "components": {
+                                "attachment": {
+                                    "component": "Vnecoms_RMA/js/form/upload/uploader",
+                                    "uploaderConfig":{
+                                        "url": "<?php echo $block->getUrl("vrma/guest/upload");?>"
+                                    },
+                                    "dataScope" : "data.attachment",
+                                    "dataType" : "data.text",
+                                    "formElement" : "data.input"
+                                }
+                            }
+                        }
+                    }
+                }
+            </script>
+        </div>
+    </li>
+</ul>

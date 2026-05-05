@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<body>
+		<referenceBlock name="vendor.profile.top.logo" remove="true" />
+		<referenceBlock name="ves.category.menu" remove="true" />
+		<referenceBlock name="quotes_links" remove="true" />
+		<referenceBlock name="theme.footers" remove="true" />
+		<referenceContainer name="footer">
+            <block class="MagentoEgypt\VendorExtend\Block\Footer" name="vendor.footers" template="MagentoEgypt_VendorExtend::html/theme_footers.phtml" before="-">
+            	<block class="Magento\Theme\Block\Html\Footer" name="copyright" template="Magento_Theme::html/copyright.phtml"/>
+            </block>
+        </referenceContainer>
+        <referenceBlock  class="Vnecoms\VendorsDomain\Block\Html\Header\Logo" name="logo" remove="false" template="Vnecoms_VendorsDomain::html/header/logo.phtml" />
+		<referenceBlock class="MagentoEgypt\VendorExtend\Block\Megamenu" name="megamenu" remove="false" />
+	</body>
+</page>

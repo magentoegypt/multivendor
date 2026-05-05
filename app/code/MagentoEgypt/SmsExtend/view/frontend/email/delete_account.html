@@ -1,0 +1,27 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "Your %store_name account has been successfully removed" store_name=$store.frontend_name}} @-->
+<!--@vars {
+"var store.frontend_name":"Store Name",
+"var store_email":"Store Email",
+"var store_phone":"Store Phone",
+"var customer.name":"Customer Name"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">{{trans "%name," name=$customer.name}}</p>
+<p>
+    {{trans "Your %store_name account has been successfully removed, and all associated data and access have been securely deleted from our system. Please note that this action is irreversible, and you will no longer be able to access any features or services linked to this account." store_name=$store.frontend_name}}
+</p>
+<p>
+    {{trans "If you wish to create a new account in the future, you are welcome to do so by signing up again. Should you have any questions or require assistance regarding this process, feel free to reach out to our support team."}}
+</p>
+</p>
+    {{trans 'If you have not authorized this action, please contact us immediately at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}{{depend store_phone}} {{trans 'or call us at <a href="tel:%store_phone">%store_phone</a>' store_phone=$store_phone |raw}}{{/depend}}.
+</p>
+
+{{template config_path="design/email/footer_template"}}

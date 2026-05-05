@@ -1,0 +1,131 @@
+& when (@media-common = true) {
+	.brand-related-products {
+		margin-top: 60px;
+		.block-title {
+			.lib-block-title();
+		}
+	}
+	.brands-grid {
+		.item {
+			margin-bottom: 30px;
+			.image {
+				.brand-image {
+					.lib-flex();
+					.justify-content-center();
+					.lib-align-items-center();
+					height: 150px;
+					border: 1px solid #eaeaea;
+				}
+				img {
+					max-width: calc(~'100% - 20px');
+					width: auto;
+				}
+			}
+			.brand-name	{
+				text-align:center;
+				margin: 15px 0 0;
+				.brand-title {
+					font-size: 1.125rem;
+					font-weight:500;
+					margin: 0;
+				}
+				.count {
+					color:#999;
+				}
+			}
+		}
+	}
+	.shop-by-brand {
+		.description {
+			text-align: center;
+			border: 1px solid #eaeaea;
+			padding: 20px 15px;
+			line-height: 1.9;
+			border-radius: 5px;
+		}
+		.featured-brands {
+			.block-content {
+				margin: 0 calc(~'-15px / 2');
+				.owl-item {
+					padding: 0 calc(~'15px / 2');
+					.item {
+						margin: 0;
+					}
+				}
+			}
+			+ .brand-search {
+				border-top: 1px solid #eaeaea;
+			}
+		}
+		.content-heading {
+			margin: 50px 0;
+			.title {
+				margin: 0 0 5px;
+				font-weight: 600;
+				font-size: 1.375rem;
+				color: #222222;
+				text-align: center;
+			}
+		}
+		.brand-search {
+			margin:50px 0;
+			form {
+				display: table;
+				position: relative;
+				width: 100%;
+				.form-group {
+					> input[type="text"] {
+						border:none;
+						height:42px;
+						line-height:42px;
+						vertical-align:middle;
+						border: 1px solid #e7e7e7;
+					}
+				}
+				.actions {
+					width: 100%;
+					cursor:pointer;
+					text-align: center;
+					margin-top: 15px;
+					overflow: hidden;
+				}
+			}
+		}
+		.characters-filter {
+			.justify-content-center();
+			.lib-flex();
+			.lib-flex-wrap();
+			margin: 15px 0 0;
+			li {
+				height: 35px;
+				line-height: 35px;
+				margin: 2px;
+				padding: 0;
+				text-align: center;
+				width: 35px;
+				> a {
+					display: block;
+					border: 1px solid #f0f0f0;
+					border-radius: 4px;
+					color: #999;
+				}
+			}
+		}
+		.btn.btn-secondary, .primary {
+			height:43px;
+			min-width: calc(~'100% / 2 - 5px');
+		}
+	}
+	.brand-brand-view .brand-info {
+		.brand-image {
+			text-align:center;
+			+ .brand-description {
+				margin-top:50px;
+			}
+		}
+		.brand-description {
+			font-size:1rem;
+			line-height: 1.9;
+		}
+	}
+}

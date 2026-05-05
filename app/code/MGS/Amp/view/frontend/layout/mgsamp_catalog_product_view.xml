@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+
+<page layout="tm_amp" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+		<referenceBlock name="head.additional">
+			<block class="MGS\Amp\Block\Page\Head\AmpProduct" name="amp.metatags" template="MGS_Amp::Magento_Theme/head/amp_metatags.phtml"/>
+			<block class="MGS\Amp\Block\Page\Head\Json\Product" name="amp.json" template="MGS_Amp::Magento_Theme/head/amp_json.phtml"/>
+		</referenceBlock>
+		
+		<referenceContainer name="amp.columns.top">
+			<block class="Magento\Catalog\Block\Product\View" name="amp.page.main.title" template="MGS_Amp::Magento_Catalog/product/view/name.phtml" before="-"/>
+		</referenceContainer>
+		
+		<referenceBlock name="amp.css.theme">
+			<block class="Magento\Framework\View\Element\Template" name="amp.css.category" template="MGS_Amp::Magento_Theme/head/css/amp_css_product.phtml"/>
+		</referenceBlock>
+		
+		<referenceBlock name="amp.javascript">
+			<action method="addJs">
+				<argument name="src" xsi:type="string">https://cdn.ampproject.org/v0/amp-lightbox-gallery-0.1.js</argument>
+				<argument name="type" xsi:type="string">amp-lightbox-gallery</argument>
+			</action>
+			<action method="addJs">
+				<argument name="src" xsi:type="string">https://cdn.ampproject.org/v0/amp-selector-0.1.js</argument>
+				<argument name="type" xsi:type="string">amp-selector</argument>
+			</action>
+			<action method="addJs">
+				<argument name="src" xsi:type="string">https://cdn.ampproject.org/v0/amp-bind-0.1.js</argument>
+				<argument name="type" xsi:type="string">amp-bind</argument>
+			</action>
+			<action method="addJs">
+				<argument name="src" xsi:type="string">https://cdn.ampproject.org/v0/amp-animation-0.1.js</argument>
+				<argument name="type" xsi:type="string">amp-animation</argument>
+			</action>
+			<action method="addJs">
+				<argument name="src" xsi:type="string">https://cdn.ampproject.org/v0/amp-mustache-0.2.js</argument>
+				<argument name="type" xsi:type="string">amp-mustache</argument>
+				<argument name="element" xsi:type="string">template</argument>
+			</action>
+		</referenceBlock>
+		
+		<referenceContainer name="amp.content">
+			<container name="amp.product.info.media" htmlTag="div" htmlClass="product media"  before="-">
+                <block class="Magento\Catalog\Block\Product\View\Gallery" name="amp.product.info.media.image" template="MGS_Amp::Magento_Catalog/product/view/gallery.phtml"/>
+            </container>
+			<container name="amp.product.info.main" htmlTag="div" htmlClass="product-info-main" after="amp.product.info.media">
+				<block class="Magento\Catalog\Block\Product\View" name="amp.product.info.review" template="Magento_Catalog::product/view/review.phtml" before="-"/>
+				
+				<block class="Magento\Catalog\Block\Product\View\Description" name="amp.product.info.sku" template="MGS_Amp::Magento_Catalog/product/view/attribute.phtml" after="amp.product.info.review">
+					<arguments>
+						<argument name="at_call" xsi:type="string">getSku</argument>
+						<argument name="at_code" xsi:type="string">sku</argument>
+						<argument name="css_class" xsi:type="string">sku</argument>
+						<argument name="at_label" xsi:type="string">default</argument>
+						<argument name="add_attribute" xsi:type="string">itemprop="sku"</argument>
+					</arguments>
+				</block>
+				
+				<block class="Magento\Catalog\Pricing\Render" name="amp.product.price.final" after="amp.product.info.sku">
+					<arguments>
+						<argument name="price_render" xsi:type="string">product.price.render.default</argument>
+						<argument name="price_type_code" xsi:type="string">final_price</argument>
+						<argument name="zone" xsi:type="string">item_view</argument>
+					</arguments>
+				</block>
+				
+                <block class="Magento\Catalog\Block\Product\View\Description" name="amp.product.info.overview" template="MGS_Amp::Magento_Catalog/product/view/attribute.phtml" after="amp.product.price.final">
+                    <arguments>
+                        <argument name="at_call" xsi:type="string">getShortDescription</argument>
+                        <argument name="at_code" xsi:type="string">short_description</argument>
+                        <argument name="css_class" xsi:type="string">overview</argument>
+                        <argument name="at_label" translate="true" xsi:type="string">none</argument>
+                        <argument name="title" translate="true" xsi:type="string">Overview</argument>
+                        <argument name="add_attribute" xsi:type="string">itemprop="description"</argument>
+                    </arguments>
+                </block>
+				
+				<block class="Magento\Catalog\Block\Product\View" name="amp.product.info" template="MGS_Amp::Magento_Catalog/product/view/form.phtml">
+					<container name="amp.product.info.form.content" as="amp_product_info_form_content">
+						<block class="Magento\Catalog\Block\Product\View" name="amp.product.info.addtocart" template="MGS_Amp::Magento_Catalog/product/view/addtocart.phtml"/>
+					</container>
+				</block>
+			</container>
+			 <container name="amp.product.details.tabs" htmlTag="div" htmlClass="amp-product-details-tabs" after="amp.product.details">
+                <block class="Magento\Catalog\Block\Product\View\Description" name="amp.product.info.details" template="MGS_Amp::Magento_Catalog/product/view/details.phtml" after="amp.product.info.description">
+                    <block class="Magento\Catalog\Block\Product\View\Description" name="amp.product.info.tab1" as="amp.product.info.description" template="MGS_Amp::Magento_Catalog/product/view/attribute.phtml" group="detailed_info">
+                        <arguments>
+                            <argument name="at_call" xsi:type="string">getDescription</argument>
+                            <argument name="at_code" xsi:type="string">description</argument>
+                            <argument name="css_class" xsi:type="string">description</argument>
+                            <argument translate="true" name="title" xsi:type="string">Description</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Catalog\Block\Product\View\Attributes" name="amp.product.info.tab2" as="amp.product.attributes" template="MGS_Amp::Magento_Catalog/product/view/attributes.phtml" group="detailed_info" after="amp.product.info.main">
+                        <arguments>
+                            <argument translate="true" name="title" xsi:type="string">More Information</argument>
+                        </arguments>
+                    </block>
+                    <block class="Magento\Review\Block\Product\Review" name="amp.product.info.tab3" as="amp.reviews.tab" template="MGS_Amp::Magento_Review/review.phtml" group="detailed_info">
+						<block class="Magento\Review\Block\Product\View\ListView" name="amp.product.reviews.list" template="MGS_Amp::Magento_Review/product/view/list.phtml"/>
+                    </block>
+                </block>
+            </container>
+            <container name="amp.product.items.block" htmlTag="div" htmlClass="amp-product-items-block" after="-">
+                <referenceBlock name="catalog.product.related" remove="true"/>
+                <block class="Magento\Catalog\Block\Product\ProductList\Related" name="amp.catalog.product.related" template="MGS_Amp::Magento_Catalog/product/list/items.phtml" before="-">
+                    <arguments>
+                        <argument name="type" xsi:type="string">related</argument>
+                    </arguments>
+                </block>
+                <block class="Magento\Catalog\Block\Product\ProductList\Upsell" name="product.info.upsell" template="MGS_Amp::Magento_Catalog/product/list/items.phtml" after="amp.catalog.product.related">
+                    <arguments>
+                        <argument name="type" xsi:type="string">upsell</argument>
+                    </arguments>
+                </block>
+            </container>
+		</referenceContainer>
+		
+		<referenceBlock name="page.main.title" remove="true"/>
+    </body>
+</page>

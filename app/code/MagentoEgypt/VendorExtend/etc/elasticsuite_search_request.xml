@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<requests xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Smile_ElasticsuiteCore:etc/elasticsuite_search_request.xsd">
+    <request name="quick_search_container">
+        <filters>
+            <filter name="FilterVendor">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\Vendor</filter>
+            <filter name="VisibleApproved">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\VisibleApproved</filter>
+        </filters>
+        <aggregations>
+            <aggregation xsi:type="termBucket" name="vendor_id" field="vendor_id"/>
+        </aggregations>
+    </request>
+
+    <request name="catalog_product_autocomplete">
+        <filters>
+            <filter name="FilterVendor">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\Vendor</filter>
+            <filter name="VisibleApproved">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\VisibleApproved</filter>
+        </filters>
+        <aggregations>
+            <aggregation xsi:type="termBucket" name="vendor_id" field="vendor_id"/>
+        </aggregations>
+    </request>
+
+    <request name="catalog_view_container">
+        <filters>
+            <filter name="FilterVendor">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\Vendor</filter>
+            <filter name="VisibleApproved">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\VisibleApproved</filter>
+        </filters>
+        <aggregations>
+            <aggregation xsi:type="termBucket" name="vendor_id" field="vendor_id"/>
+        </aggregations>
+    </request>
+
+    <request name="catalog_product_widget">
+        <filters>
+            <filter name="FilterVendor">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\Vendor</filter>
+            <filter name="VisibleApproved">MagentoEgypt\VendorExtend\Model\Product\Search\Request\Container\Filter\VisibleApproved</filter>
+        </filters>
+        <aggregations>
+            <aggregation xsi:type="termBucket" name="vendor_id" field="vendor_id"/>
+        </aggregations>
+    </request>
+</requests>

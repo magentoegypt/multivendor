@@ -1,0 +1,19 @@
+<?php $themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config')?>
+<?php /* Lazy Load */ ?>
+<?php $lazyLoad = $themeSettingConfig->getStoreConfig('themesettings/general/lazy_load') ?>
+<?php if($lazyLoad): ?>
+	<script type="text/javascript">
+		require(['jquery','mlazyload'],function($){
+			$(document).ready(function() {
+				$("img.lazy").unveil(25, function(){
+					var self = $(this);
+					setTimeout(function(){
+						self.removeClass('lazy');
+						self.parents('.parent_lazy').addClass('lazy_loaded');
+					}, 0);
+				});
+			});
+
+		});
+	</script>
+<?php endif ?>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="1column" />
+    <referenceContainer name="product.info.details">
+        <referenceBlock name="product.attributes" remove="false" />
+    </referenceContainer>
+    <referenceContainer name="product.info.description.wrapper" remove="true" />
+
+    <move element="product.info.details.after.wrapper" destination="page.wrapper" before="footer"/>
+</layout>

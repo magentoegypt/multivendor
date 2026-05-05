@@ -1,0 +1,19 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Profile\Content
+ */
+$vendor = $block->getVendor();
+$pageHelper = $this->helper(\Vnecoms\VendorsPage\Helper\Data::class);
+$vendorName = empty($block->getStoreName()) ? $vendor->getVendorId() : $block->getStoreName();
+$vendorUrl = $pageHelper->getUrl($vendor->getVendorId());
+?>
+<h3 class="vendor-title">
+    <?= __('Fullfilled By') ?>
+    <?php if(!empty($vendorUrl)):?>
+        <a href="<?php echo $vendorUrl;?>" title="<?php echo $block->escapeHtml($vendorName)?>"><?php echo $block->escapeHtml($vendorName)?></a>
+    <?php else:?>
+        <?php echo $block->escapeHtml($vendorName)?>
+    <?php endif;?>
+</h3>

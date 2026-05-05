@@ -1,0 +1,27 @@
+<?php $helper = $this->helper('Magento\Framework\Pricing\Helper\Data') ?>
+<?php $price = $helper->currency($this->getProduct()->getFinalPrice(),true,true) ?>
+<div style="display: none;">
+    <div id="modal-installment">
+        <div class="modal-inner-content">
+            <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('mpanel_product_detail_installment_popup')->toHtml() ?>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/modal'
+    ], function ($, modal) {
+        modal({
+            type: 'popup',
+            responsive: true,
+            title: false,
+            modalClass: 'installment-popup-wrap',
+            buttons: []
+        }, $('#modal-installment'));
+
+        $('.product-info-installment .pagebuilder-column .pagebuilder-button-secondary').on('click', function() {
+            $("#modal-installment").modal("openModal"); 
+        });
+    });
+</script>

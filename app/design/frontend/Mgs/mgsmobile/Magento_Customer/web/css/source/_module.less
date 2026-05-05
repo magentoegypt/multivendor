@@ -1,0 +1,134 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  _____________________________________________
+
+@account-nav-background: @sidebar__background-color;
+@account-nav-color: false;
+
+@account-nav-current-border: 3px solid transparent;
+@account-nav-current-border-color: @color-orange-red1;
+@account-nav-current-color: false;
+@account-nav-current-font-weight: @font-weight__semibold;
+
+@account-nav-item-hover: @color-gray91;
+
+@_password-default: @color-gray-light01;
+@_password-weak: #ffafae;
+@_password-medium: #ffd6b3;
+@_password-strong: #c5eeac;
+@_password-very-strong: #81b562;
+
+//
+//  Common
+//  _____________________________________________
+& when (@media-common = true) {
+	.account-nav li,
+	.header.links li {
+		font-size: 1.125rem;
+		padding: 8px 0 0;
+		> span:not(.no-display), 
+		> strong, 
+		> a:not(.no-display) {
+			display: block;
+			margin-bottom: 10px;
+		}
+	}
+	
+	.account-nav {
+		.item.current {
+			display: none;
+		}
+		> .title {
+			display: none;
+		}
+	}
+	
+	body.account .column.main > .block {
+		+ .block {
+			margin-top: 3rem;
+		}
+		> .block-title {
+			margin-bottom: 1rem;
+			strong {
+				font-size: 1.25rem;
+				color: #222;
+			}
+			a.action {
+				text-decoration: underline;
+				color: #05f;
+				font-size: 0.85rem;
+				margin-left: 5px;
+			}
+		}
+	}
+	
+	.form-newsletter-manage,
+	.form-gdpr-manage,
+	.form-address-edit,
+	.form-edit-account {
+		.legend {
+			font-size: 1.25rem;
+			color: #222;
+			font-weight: 600;
+			margin: 0 0 1rem;
+			+ br {
+				display: none;
+			}
+		}
+	}
+
+	.block-content .box {
+		+ .box {
+			margin-top: 2rem;
+		}
+		.box-title {
+			font-size: 1rem;
+			color: #222;
+			font-weight: 600;
+			margin-bottom: 0.75rem;
+			display: block;
+		}
+		.box-actions {
+			.lib-action-myaccount();
+		}
+	}
+	
+	.table-order-items .col.actions {
+		.lib-action-myaccount();
+	}
+	
+	.block-addresses-list .item { 
+		.item.actions {
+			.lib-action-myaccount();
+		}
+	}
+	.login-container {
+		.block-title {
+			font-size: 1.2rem;
+			color: #222;
+			text-transform: uppercase;
+			margin: 0 0 1rem;
+		}
+		.block + .block {
+			margin-top: 3rem;
+		}
+	}
+	.form.form-create-account {
+		.create {
+			.legend {
+				font-size: 1.2rem;
+				color: #222;
+				text-transform: uppercase;
+				margin: 0 0 1rem;
+				+ br {
+					display: none;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,680 @@
+<?php $css = '
+.clear-owl-carousel {
+	margin: 0 -10px;
+}
+'; ?>
+<?php
+// *
+// Font 
+// *****
+$_ampfontimport = '
+@font-face {
+    font-family: "Cerebri Sans";
+    src: url("'.$block->getViewFileUrl('fonts/CerebriSans-Regular.eot').'");
+    src: url("'.$block->getViewFileUrl('fonts/CerebriSans-Regular.eot?#iefix').'") format("embedded-opentype"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-Regular.woff2').'") format("woff2"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-Regular.woff').'") format("woff"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-Regular.ttf').'") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Cerebri Sans";
+    src: url("'.$block->getViewFileUrl('fonts/CerebriSans-SemiBold.eot').'");
+    src: url("'.$block->getViewFileUrl('fonts/CerebriSans-SemiBold.eot?#iefix').'") format("embedded-opentype"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-SemiBold.woff2').'") format("woff2"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-SemiBold.woff').'") format("woff"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-SemiBold.ttf').'") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Cerebri Sans";
+    src: url("'.$block->getViewFileUrl('fonts/CerebriSans-Bold.eot').'");
+    src: url("'.$block->getViewFileUrl('fonts/CerebriSans-Bold.eot?#iefix').'") format("embedded-opentype"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-Bold.woff2').'") format("woff2"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-Bold.woff').'") format("woff"),
+        url("'.$block->getViewFileUrl('fonts/CerebriSans-Bold.ttf').'") format("truetype");
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+  font-family: Linearicons;
+  src: url("'.$block->getViewFileUrl('fonts/Linearicons.eot').'");
+  src: url("'.$block->getViewFileUrl('fonts/Linearicons.eot?#iefix').'") format("embedded-opentype"), 
+		url("'.$block->getViewFileUrl('fonts/Linearicons.woff2').'") format("woff2"), 
+		url("'.$block->getViewFileUrl('fonts/Linearicons.woff').'") format("woff"), 
+		url("'.$block->getViewFileUrl('fonts/Linearicons.ttf').'") format("truetype"), 
+		url("'.$block->getViewFileUrl('fonts/Linearicons.svg').'");
+  font-weight: normal;
+  font-style: normal;
+}
+';
+$css .= $_ampfontimport;
+?>
+<?php
+// *
+// Reset Css
+// *****
+$_ampResetCss = '
+* {
+	margin: 0;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: transparent;
+}
+*:focus {
+	outline: none;
+}
+html {
+	font-size: 16px;
+}
+body {
+	margin: 0;
+	padding: 0 0 50px;
+	font-family: "Cerebri Sans", sans-serif;
+	font-weight: 400;
+	font-size: 1rem;
+	color: #777777;
+}
+a,
+a:hover, 
+a:focus {
+	color: #222222;
+	cursor: pointer;
+	text-decoration: none;
+}
+button {
+	cursor: pointer;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+main,
+footer,
+header,
+nav,
+section,
+summary {
+	display: block;
+}
+audio,
+canvas,
+video {
+	display: inline-block;
+}
+audio:not([controls]) {
+	display: none;
+	height: 0;
+}
+ul,
+ol {
+	list-style: none;
+    padding: 0;
+    margin: 0;
+}
+img {
+	border: 0;
+}
+img,
+object,
+video,
+embed {
+	height: auto;
+	max-width: 100%;
+}
+figure {
+	margin: 0;
+}
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+b,
+strong {
+  font-weight: 700;
+}
+em,
+i {
+  font-style: italic;
+}
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: #222;
+    font-weight: 400;
+    margin: 0 0 1.2rem;
+}
+h1, .h1 {
+    font-size: 2.6rem;
+}
+h2, .h2 {
+    font-size: 2.2rem;
+}
+h3, .h3 {
+    font-size: 1.875rem;
+}
+h4, .h4 {
+    font-size: 1.4rem;
+}
+h5, .h5 {
+    font-size: 1.2rem;
+}
+h6, .h6 {
+    font-size: 1rem;
+}
+.btn.btn-default, .action.default {
+    background: 0 0;
+    border: none;
+    padding: 0 0 5px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #222;
+    font-size: .75rem;
+    font-weight: 700;
+    display: inline-block;
+    font-family: inherit;
+    text-decoration: none;
+    border-radius: 0;
+    border-bottom: 2px solid #222;
+    cursor: pointer;
+    letter-spacing: .075em;
+}
+';
+$css .= $_ampResetCss;
+?>
+<?php
+// *
+// Form 
+// *****
+$_ampForm = '
+input[type="text"], 
+input[type="password"], 
+input[type="url"], 
+input[type="tel"], 
+input[type="search"], 
+input[type="number"], 
+input[type="datetime"], 
+input[type="email"] {
+	border: 1px solid #eaeaea;
+	height: 2.875rem;
+	font-size: 1rem;
+	padding: 0 1.0625rem;
+	box-shadow: none;
+	font-weight: 400;
+	color: #222222;
+	width: 100%;
+}
+';
+$css .= $_ampForm;
+?>
+<?php
+// *
+// Layout
+// *****
+$_ampLayout = '
+.amp-page-main {
+	padding: 0 15px;
+}
+';
+$css .= $_ampLayout;
+?>
+
+<?php
+// *
+// Page Title
+// *****
+$_ampPageTitle = '
+.page-title-wrapper {
+    padding: 22px 15px 21px;
+    background: #f7f7f7;
+    margin: 0 -15px 30px;
+	color: #222;
+}
+.page-title-wrapper .page-title {
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 600;
+    margin: 0;
+}
+';
+$css .= $_ampPageTitle;
+?>
+
+<?php
+// *
+// Price Box
+// *****
+$_ampPrice = '
+.price-box .price {
+	font-size: 16px;
+	color: #bbb;
+}
+.price-box .price-final_price .price {
+	color: #222;
+}
+.price-box .price-final_price:only-child .price {
+	color: #999;
+}
+.price-box .special-price .price-label,
+.price-box .old-price .price-label {
+	display: none;
+}
+.price-box .special-price + .old-price {
+	float: left;
+	margin-right: 16px;
+}
+.price-box .special-price .price {
+	color: #181b31;
+}
+.price-box .old.price,
+.price-box .old-price {
+	text-decoration: none;
+}
+.price-box .old.price .price,
+.price-box .old-price .price {
+text-decoration: line-through;
+	color: #bbb;
+}
+.price-box .price-label {
+	font-size: 80%;
+}
+';
+$css .= $_ampPrice;
+?>
+<?php
+// *
+// AMP Review
+// *****
+$_ampReview = '
+.product-reviews-summary .rating-summary {
+	left: 0;
+	display: block;
+}
+.product-reviews-summary.short.empty,
+.product-reviews-summary.short .reviews-actions {
+	display: none;
+}
+.rating-summary .rating-result {
+	width: 70px;
+	position: relative;
+}
+.rating-summary .rating-result > span:before,
+.rating-summary .rating-result:before {
+	font-family: inherit;
+	content: "\2605" "\2605" "\2605" "\2605" "\2605";
+	font-size: 16px;
+	letter-spacing: 1px;
+}
+.rating-summary .rating-result > span {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+	overflow: hidden;
+}
+.rating-summary .rating-result > span:before {
+	color: #f68872;
+}
+.rating-summary .rating-result > span span {
+	border: 0;
+	clip: rect(0, 0, 0, 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+}
+';
+$css .= $_ampReview;
+?>
+<?php
+// *
+// AMP Header
+// *****
+$_ampHeader = '
+header {
+	padding: 0 15px;
+	position: relative;
+    border-bottom: 1px solid #eaeaea;
+}
+header:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.header-mobile-tabs--bottom {
+	position: fixed;
+	z-index: 2147483647;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #fff;
+	box-shadow: 2px 0 2px #ababab;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	padding: 0;
+}
+.header-mobile-tabs--bottom li {
+	-webkit-flex: 1;
+	flex: 1;
+	margin: 0;
+}
+.header-mobile-tabs--bottom li a,
+.header-mobile-tabs--bottom li button {
+	background: none;
+	box-shadow: none;
+	width: 100%;
+	border: none;
+	text-align: center;
+	height: 50px;
+	padding: 0 5px;
+	color: #222;
+	font-size: 20px;
+	border-radius: 0;
+	position: relative;
+	display: block;
+	font-family: Linearicons;
+	line-height: 50px;
+	cursor: pointer;
+}
+.header-mobile-tabs--bottom .icon-building:before {
+	content: "\e602";
+}
+.header-mobile-tabs--bottom .icon-my-account:before {
+	content: "\e71e";
+}
+.header-mobile-tabs--bottom .icon-wishlist:before {
+	content: "\e68c";
+}
+.header-mobile-tabs--bottom .icon-cart-top:before {
+	content: "\e74d";
+}
+.header-mobile-tabs--bottom .icon-setting-web:before {
+	content: "\e672";
+}
+.header-mobile-tabs--bottom .counter {
+	border-radius: 20px;
+	color: #fff;
+	font-size: 0.625rem;
+	font-weight: 600;
+	height: 0.9375rem;
+	line-height: 0.9375rem;
+	min-width: 0.9375rem;
+	padding: 0;
+	position: absolute;
+	top: 8px;
+	left: 50%;
+	text-align: center;
+	z-index: 1;
+	background-color: #f68872;
+}
+.megamenu_action {
+	float: left;
+    text-align: left;
+	height: 50px;
+    width: 30px;
+}
+.megamenu_action_mb {
+	display: block;
+    font-size: 24px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    height: 100%;
+}
+.megamenu_action_mb .icon-menu:before {
+    font-family: Linearicons;
+    content: "\e92b";
+}
+header .logo {
+    float: left;
+    width: calc(100% - 60px);
+    max-width: 100%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+	line-height: 0;
+}
+header .logo img {
+    margin: 0 auto;
+}
+.block-search {
+    margin: 0;
+    width: 30px;
+    float: right;
+}
+.block-search .block-title {
+    margin: 0;
+    padding: 10px 0;
+    text-align: right;
+    cursor: pointer;
+}
+.block-search .block-title:before {
+    font-family: Linearicons;
+    content: "\e922";
+    line-height: 30px;
+    font-size: 20px;
+}
+.block-search.active .block-title:before {
+    content: "\e935";
+    font-size: 1rem;
+}
+.block-search .form.minisearch {
+    position: absolute;
+    left: 15px;
+    right: 50px;
+    top: 0;
+    background: #fff;
+    padding: 5px 0;
+    -webkit-transform: scaleX(0);
+    -moz-transform: scaleX(0);
+    -ms-transform: scaleX(0);
+    -o-transform: scaleX(0);
+    transform: scaleX(0);
+}
+.block-search.active .form.minisearch {
+    -webkit-transform: scaleX(1);
+    -moz-transform: scaleX(1);
+    -ms-transform: scaleX(1);
+    -o-transform: scaleX(1);
+    transform: scaleX(1);
+}
+.block-search .form.minisearch input {
+    border-radius: 20px;
+    padding: 0 20px;
+    height: 40px;
+}
+.block-search .action.search {
+    border: none;
+    box-shadow: none;
+    position: absolute;
+    right: 15px;
+    top: 0;
+    background: none;
+    padding: 10px 0;
+}
+.block-search .action.search:before {
+    font-family: Linearicons;
+    content: "\e922";
+    line-height: 30px;
+    font-weight: normal;
+    font-size: 18px;
+}
+.setting-site-content {
+	max-width: 100vw;
+	display: block;
+    left: 0;
+	height: calc(100vh - 51px);
+	background-color: #fff;
+}
+[class*="amphtml-sidebar-mask"] {
+    display: none;
+}
+';
+$css .= $_ampHeader;
+?>
+<?php
+// *
+// Footer
+// *****
+$_cssAmpFooter = '
+footer {
+	border-top: 1px solid #eaeaea;
+	margin-top: 60px;
+}
+footer a {
+	color: #999999;
+	letter-spacing: 0.015rem;
+}
+footer .middle-footer {
+	padding: 20px 0 0;
+}
+footer .footer-block {
+	padding: 15px 15px 0;
+	margin-bottom: 15px;
+}
+footer ul li {
+	margin-bottom: 0;
+	padding: 7px 0;
+	font-size: 0.9375rem;
+}
+footer .bottom-footer {
+	border-top: 1px solid #eaeaea;
+	padding: 20px 0;
+	text-align: center;
+}
+footer .bottom-footer address {
+	font-style: normal;
+}
+footer .bottom-footer address strong {
+	color: #222;
+}
+footer .bottom-footer address + * {
+	margin-top: 15px;
+}
+';
+$css .= $_cssAmpFooter;
+?>
+<?php
+// *
+// Amp Accordion
+// *****
+$_cssAmpAccordion = '
+.accordion-header {
+	color: #222;
+	background: none;
+	border: none;
+	font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.075rem;
+    font-weight: 700;
+	padding: 15px 15px 10px;
+	border-top: 1px solid #eaeaea;
+}
+.accordion-header:before {
+	content: "";
+	height: 16px;
+	width: 2px;
+	background-color: #dddddd;
+	position: absolute;
+	right: 22px;
+	top: 50%;
+	margin-top: -8px;
+}
+.accordion-header[aria-expanded="true"]:before {
+	content: none;
+}
+.accordion-header:after {
+	content: "";
+	width: 16px;
+	height: 2px;
+	background-color: #dddddd;
+	position: absolute;
+	right: 15px;
+	top: 50%;
+	margin-top: -1px;
+}
+.accordion-content {
+	padding: 0 15px 10px;
+}
+';
+$css .= $_cssAmpAccordion;
+?>
+<?php
+// *
+// Product List
+// *****
+$_ampProductList = '
+.products.list.product-items {
+	margin: 0 -10px;
+}
+.products.list.product-items .rating-summary .rating-result {
+	margin: 5px 0;
+}
+.products.list.product-items:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+.products.list.product-items .product-item {
+	float: left;
+	width: 50%;
+	padding: 0 10px;
+	margin-bottom: 30px;
+}
+.product-carousel .products.list.product-items .product-item {
+	margin: 0;
+}
+.products.list.product-items .product-item .action.tocart {
+	background: #000;
+    border: 2px solid #000;
+    color: #fff;
+	padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 4px;
+	display: inline-block;
+	text-transform: uppercase;
+	font-weight: 600;
+}
+.products.list.product-items .product-item:nth-child(2n + 1){
+	clear: left;
+}
+.products.list.product-items .product-item .product-item-details {
+	padding-top: 15px;
+}
+.products.list.product-items .product-item .product-item-name {
+	font-weight: 600;
+    font-size: 1rem;
+}
+.products.list.product-items .product-item .product-item-actions {
+    margin-top: 10px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+}
+.products.list.product-items .product-item .rating-summary .label {
+    display: none;
+}
+';
+$css .= $_ampProductList;
+?>
+
+<?php
+	$css .= $block->getChildHtml();
+	$cssOptimize = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $css);
+	$cssOptimize = str_replace(': ', ':', $cssOptimize);
+	$cssOptimize = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $cssOptimize);
+?>
+
+<?= $cssOptimize ?>

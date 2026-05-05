@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Mstore\Wishlist\Api\WishlistRepositoryInterface" type="Mstore\Wishlist\Model\ResourceModel\WishlistRepository"/>
+    <preference for="Mstore\Wishlist\Api\Data\BuyRequestInterface" type="Mstore\Wishlist\Model\BuyRequest"/>
+    <preference for="Mstore\Wishlist\Api\Data\WishlistInterface" type="Mstore\Wishlist\Model\Wishlist"/>
+    <preference for="Mstore\Wishlist\Api\Data\ItemInterface" type="Mstore\Wishlist\Model\Item"/>
+    <preference for="Mstore\Wishlist\Model\WishlistProviderInterface" type="Mstore\Wishlist\Model\WishlistProvider"/>
+    <preference for="Mstore\Wishlist\Api\WishlistManagementInterface" type="Mstore\Wishlist\Model\WishlistManagement"/>
+    <preference for="Mstore\Wishlist\Api\Data\MessageBagInterface" type="Mstore\Wishlist\Model\MessageBagRepository"/>
+</config>

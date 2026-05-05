@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\PageBuilder\Model\Source\VisualSelect">
+        <plugin name="fix_icon_vendor_pagebuilder" type="MagentoEgypt\VendorExtend\Plugin\Model\PageBuilder\VisualSelect" sortOrder="10" disabled="false"/>
+    </type>
+    <type name="Magento\Tax\Model\TaxClass\Source\Product">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\TaxClass\Product" sortOrder="10" />
+    </type>
+    <type name="Vnecoms\VendorsCms\Model\Page\Source\PageLayout">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\PageLayout" sortOrder="10" />
+    </type>
+    <type name="Vnecoms\VendorsCms\Model\Page\Source\CustomLayout">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\PageLayout" sortOrder="10" />
+    </type>
+    <type name="Vnecoms\VendorsPageBuilder\Model\Template\Source\TemplateTypes">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\PageLayout" sortOrder="10" />
+    </type>
+    <preference for="Vnecoms\VendorsDashboard\Block\Vendors\Dashboard\Order\Grid" type="MagentoEgypt\VendorExtend\Block\Dashboard\Order\Grid"/>
+    <preference for="Magento\Store\Ui\Component\Listing\Column\Store\Options" type="MagentoEgypt\VendorExtend\Ui\Component\Listing\Column\Store\Options"/>
+    <preference for="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\Renderer\Status" type="MagentoEgypt\VendorExtend\Block\Vendor\Request\Edit\Renderer\Status"/>
+    <type name="Vnecoms\VendorsNotification\Model\ResourceModel\Notification\Collection">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\Notification" sortOrder="10"/>
+    </type>
+    <type name="Vnecoms\VendorsNotification\Model\ResourceModel\Notification\Grid\Collection">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\Notification" sortOrder="10"/>
+    </type>
+    <type name="Vnecoms\Credit\Model\ResourceModel\Credit\Transaction\Collection">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\Credit" sortOrder="10"/>
+    </type>
+    <type name="Vnecoms\VendorsCredit\Model\ResourceModel\Transaction\Grid\Collection">
+        <plugin name="translation_label" type="MagentoEgypt\VendorExtend\Plugin\Model\Credit" sortOrder="10"/>
+    </type>
+    <preference for="Magento\Framework\Data\Form\Element\Date" type="MagentoEgypt\VendorExtend\Model\Form\Element\Date"/>
+
+    <type name="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\TabsLeft">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\Renderer\Message">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\Renderer\Status">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\RMA\Block\Adminhtml\Request\Edit\AjaxMessage">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Frontend\PrintRma">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+</config>

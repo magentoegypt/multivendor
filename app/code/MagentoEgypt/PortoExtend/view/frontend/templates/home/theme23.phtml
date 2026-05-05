@@ -1,0 +1,775 @@
+<style>
+    .columns .column.main {
+        padding-bottom: 0;
+    }
+    .section {
+        margin-top: 30px;
+        padding: 50px 0;
+    }
+    .custom-shape-wrapper1,
+    .custom-shape-wrapper2 {
+        position: relative;
+    }
+    .custom-shape-wrapper1 {
+        z-index: 8;
+    }
+    .porto-ultimate-content-box {
+        font-size: inherit;
+    }
+    .curved-border {
+        min-height: 7.2vw;
+        position: relative;
+    }
+    .home-slider ul.products,
+    .home-slider ul.products li.product {
+        margin-bottom: 0;
+        padding: 0;
+    }
+    ul.products li.product-col h3 {
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    ul.products li.product-col .price {
+        margin-bottom: 1rem;
+    }
+    ul.products li.product-col .add-links {
+        display: inline-block;
+        position: relative;
+    }
+    .home-slider .porto-ultimate-content-box {
+        padding: 14vh 0;
+    }
+    .home-slider .products .product .add-links .button {
+        font-family: Poppins, sans-serif;
+        background-color: #141a1f !important;
+        font-size: 1em;
+        font-weight: 600;
+        letter-spacing: 0;
+        padding: 0.7em 2.5em 0.7em 3em;
+        height: auto;
+        border-radius: 3em 0 0 3em;
+        margin-right: 4em;
+        overflow: visible;
+        line-height: 34px;
+        min-width: 36px;
+        margin-bottom: 5px;
+        position: relative;
+        display: inline-block;
+        border: 1px solid #ea6253;
+        color: #fff;
+        text-transform: uppercase;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .home-slider .products .product .add-links .button:after {
+        content: "\f054";
+        font-family: "Font Awesome 5 Free";
+        padding: 0.7em 0;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        height: 100%;
+        width: 3.7em;
+        margin-left: 0.3em;
+        background-color: inherit;
+        border-radius: 0 3em 3em 0;
+    }
+    .home-slider .products .product-image,
+    .home-slider .products .product-image img {
+        border-radius: 4px;
+    }
+    .home-slider .products .product .product-loop-title h3 {
+        font-family: Poppins;
+        font-size: 25px;
+        font-weight: 700;
+        background: #fff;
+        border-radius: 5px;
+        padding: 0.75em;
+        text-align: center;
+        margin-bottom: 2.6em;
+    }
+    .home-slider .products .product-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .home-slider .products .product-loop-title {
+        -ms-flex: 0 0 100%;
+        flex: 0 0 100%;
+        width: 100%;
+    }
+    .home-slider .products .product .price {
+        background: #fff;
+        font-size: 1em;
+        padding: 2.2em 3.25em 2.9em;
+        border-radius: 6em;
+        font-family: Poppins;
+        color: #141a1f;
+        font-weight: 700;
+        display: -ms-flexbox;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        visibility: hidden;
+        line-height: 1;
+    }
+    .home-slider .products .product .price del {
+        font-size: 0.55em;
+        display: block;
+        margin-right: 0.2143em;
+        vertical-align: baseline;
+        color: #a7a7a7;
+        line-height: 1;
+    }
+    .home-slider .price ins {
+        display: inline-block;
+        text-decoration: none;
+        vertical-align: baseline;
+        line-height: 1;
+    }
+    .home-slider .products .price-wrapper {
+        display: block;
+        text-align: right;
+        font-size: 3em;
+    }
+    .home-slider .products .add-links-wrap {
+        margin: -3em 2em 0 0;
+    }
+    .home-slider .products .sale-text {
+        font-size: 1.4286em;
+        font-weight: 700;
+        margin-right: 2em;
+        white-space: nowrap;
+    }
+    .home-slider .products .sale-text small {
+        font-weight: 500;
+        display: block;
+        font-size: 0.65em;
+        opacity: 0.7;
+        margin-bottom: 0.25rem;
+    }
+    .home-slider .owl-item:nth-child(2n) .product-image {
+        order: 2;
+    }
+    .home-slider .owl-item:nth-child(2n) .products .add-links-wrap {
+        margin-right: 0;
+        margin-left: 2.75em;
+    }
+    .home-slider .owl-item:nth-child(2n) .products .product-content {
+        align-items: flex-start;
+    }
+    .home-slider .owl-item:nth-child(2n) .products .add-links .button {
+        background-color: #ea6253 !important;
+    }
+    .add-links .add_to_cart_button:before,
+    .add-links .add_to_cart_read_more:before {
+        content: "\f061";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        margin-right: 5px;
+        position: relative;
+        float: left;
+        display: inline-block;
+    }
+    @media (min-width: 576px) {
+        ul.list li.product .product-inner {
+            display: flex;
+            align-items: center;
+        }
+        .home-slider .products .product .product-image {
+            -ms-flex: 0 0 62%;
+            flex: 0 0 62%;
+            max-width: 62%;
+            margin: 0;
+        }
+        .home-slider .products .product .product-content {
+            -ms-flex: 0 0 38%;
+            flex: 0 0 38%;
+            max-width: 38%;
+            position: relative;
+            z-index: 1;
+            padding-left: 20px;
+        }
+        .home-slider .products .product .product-loop-title h3 {
+            margin-left: -50px;
+        }
+        .home-slider .owl-item:nth-child(2n) .products .product-loop-title h3 {
+            margin-right: -50px;
+            margin-left: 0;
+        }
+        .home-slider .owl-item:nth-child(2n) .products .product-image {
+            padding: 0;
+        }
+        .home-slider .owl-item:nth-child(2n) .products .product-content {
+            padding-right: 20px;
+            padding-left: 0;
+        }
+    }
+    @media (max-width: 767px) {
+        .home-slider .products .product .product-loop-title h3 {
+            font-size: 15px;
+        }
+
+        .home-slider .products .add-links-wrap,
+        .home-slider .products .product .price {
+            font-size: 12px;
+        }
+    }
+    .home-slider .owl-carousel.nav-style-2 .owl-nav [class*="owl-"] {
+        font-size: 2.25rem;
+    }
+    .home-slider .owl-carousel .owl-nav {
+        top: 42%;
+    }
+    @media (min-width: 1280px) {
+        .home-slider .owl-carousel .owl-nav .owl-prev {
+            left: 40px;
+        }
+        .home-slider .owl-carousel .owl-nav .owl-next {
+            right: 40px;
+        }
+    }
+</style>
+<div class="row curved-border home-slider no-padding">
+    <div class="col-md-12">
+        <div class="wpb_wrapper vc_column-inner">
+            <div id="banner-slider-demo-23" class="porto-carousel home-banner-slider owl-carousel mb-0 porto-standable-carousel nav-pos-inside nav-style-2">
+                <div class="porto-ultimate-content-box-container">
+                    <div
+                        class="porto-ultimate-content-box"
+                        style="background-color: #d85d4e;
+                      background-size: cover;
+                      background-repeat: no-repeat;
+                      background-position: center center;
+                      background-color: rgba(0, 0, 0, 0);
+                      background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_slide1.jpg}}');
+                      "
+                    >
+                        <div class="container">
+                            <div class="porto-products wpb_content_element mb-0">
+                                <div class="woocommerce">
+                                    <ul class="products products-container list">
+                                        <li class="product-col product type-product">
+                                            <div class="product-inner">
+                                                <div class="product-image">
+                                                    <a href="#">
+                                                        <div class="inner">
+                                                            <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_product1.jpg}}" />
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                                <div class="product-content">
+                                                    <a class="product-loop-title" href="#">
+                                                        <h3>Portoblee – Responsive Theme</h3>
+                                                    </a>
+                                                    <span class="price" style="visibility: visible;">
+                                                        <span class="sale-text"><small>get yours now</small>SALE 34%</span>
+                                                        <span class="price-wrapper">
+                                                            <del>
+                                                                <span class="amount">
+                                                                    <bdi><span>$</span>59</bdi>
+                                                                </span>
+                                                            </del>
+                                                            <ins>
+                                                                <span class="amount">
+                                                                    <bdi><span>$</span>39</bdi>
+                                                                </span>
+                                                            </ins>
+                                                        </span>
+                                                    </span>
+                                                    <div class="add-links-wrap">
+                                                        <div class="add-links clearfix">
+                                                            <a href="#" class="viewcart-style-1 button add_to_cart_button">Select options</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="porto-ultimate-content-box-container">
+                    <div
+                        class="porto-ultimate-content-box porto-lazyload lazy-load-loaded"
+                        style="background-size: cover;
+                      background-repeat: no-repeat;
+                      background-position: center center;
+                      background-color: rgba(0, 0, 0, 0);
+                      background-image: url('{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_slide2.jpg}}');
+                      "
+                    >
+                        <div class="porto-container container">
+                            <div class="porto-products wpb_content_element mb-0">
+                                <div class="woocommerce">
+                                    <ul class="products products-container list">
+                                        <li class="product-col product">
+                                            <div class="product-inner">
+                                                <div class="product-image">
+                                                    <a href="#">
+                                                        <div class="inner">
+                                                            <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_product2.jpg}}" />
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                                <div class="product-content">
+                                                    <a class="product-loop-title" href="#"><h3>Shoport – eCommerce Theme</h3> </a>
+                                                    <span class="price" style="visibility: visible;">
+                                                        <span class="sale-text"><small>get yours now</small>SALE 50%</span>
+                                                        <span class="price-wrapper">
+                                                            <del>
+                                                                <span class="woocommerce-Price-amount amount">
+                                                                    <bdi><span class="woocommerce-Price-currencySymbol">$</span>399</bdi>
+                                                                </span>
+                                                            </del>
+                                                            <ins>
+                                                                <span class="woocommerce-Price-amount amount">
+                                                                    <bdi><span class="woocommerce-Price-currencySymbol">$</span>198</bdi>
+                                                                </span>
+                                                            </ins>
+                                                        </span>
+                                                    </span>
+                                                    <div class="add-links-wrap">
+                                                        <div class="add-links clearfix">
+                                                            <a href="#" class="viewcart-style-1 button add_to_cart_button">Select options</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script type="text/javascript">
+                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                    $("#banner-slider-demo-23").owlCarousel({
+                        items: 1,
+                        autoplay: false,
+                        autoplayTimeout: 5000,
+                        autoplayHoverPause: true,
+                        dots: false,
+                        navRewind: true,
+                        animateIn: "fadeIn",
+                        animateOut: "fadeOut",
+                        loop: false,
+                        nav: true,
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</div>
+<div class="custom-shape-wrapper1 section">
+    <style>
+        .custom-shape-wrapper1 .pc-custom-shape {
+            position: absolute;
+            top: 50%;
+            right: 0;
+        }
+    </style>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="porto-sicon-box style_1 top-icon">
+                        <div class="porto-sicon-top">
+                            <div class="porto-just-icon-wrapper" style="text-align: center;">
+                                <div class="porto-sicon-img" style="display: inline-block; font-size: 45px;">
+                                    <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_icon1.png}}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="porto-sicon-header"><h3 class="porto-sicon-title" style="font-weight: 700; font-size: 16px; line-height: 16px;">DEDICATED SERVICE</h3></div>
+                        <div class="porto-sicon-description" style="">Consult our specialists for help with an order, customization, or design advice.</div>
+                    </div>
+                    <div class="btn-container text-color-primary text-center"><button class="btn-shape-round btn btn-borders btn-md btn-default">Get In Touch</button></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="porto-sicon-box style_1 top-icon">
+                        <div class="porto-sicon-top">
+                            <div class="porto-just-icon-wrapper" style="text-align: center;">
+                                <div class="porto-sicon-img" style="display: inline-block; font-size: 45px;">
+                                    <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_icon2.png}}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="porto-sicon-header"><h3 class="porto-sicon-title" style="font-weight: 700; font-size: 16px; line-height: 16px;">MONEY BACK GUARANTEE</h3></div>
+                        <div class="porto-sicon-description" style="">Consult our specialists for help with an order, customization, or design advice.</div>
+                    </div>
+                    <div class="btn-container text-color-primary text-center"><button class="btn-shape-round btn btn-borders btn-md btn-default">Get In Touch</button></div>
+                </div>
+            </div>
+            <div class="position-static col-md-4">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="wpb_single_image wpb_content_element vc_align_left pc-custom-shape">
+                        <div class="wpb_wrapper">
+                            <div class="vc_single_image-wrapper vc_box_border_grey">
+                                <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_shape1.png}}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div style="position: relative;">
+                        <div class="porto-sicon-box position-relative style_1 top-icon">
+                            <div class="porto-sicon-top">
+                                <div class="porto-just-icon-wrapper" style="text-align: center;">
+                                    <div class="porto-sicon-img" style="display: inline-block; font-size: 45px;">
+                                        <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_icon3.png}}" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="porto-sicon-header"><h3 class="porto-sicon-title" style="font-weight: 700; font-size: 16px; line-height: 16px;">SECURE PAYMENT</h3></div>
+                            <div class="porto-sicon-description" style="">Consult our specialists for help with an order, customization, or design advice.</div>
+                        </div>
+                        <div class="btn-container text-color-primary position-relative text-center"><button class="btn-shape-round btn btn-borders btn-md btn-default">Get In Touch</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="section mb-0 pb-0 porto-inner-container" style="padding-top: 140px; background-color: #f4f4f4;">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div id="featured-products" class="porto-products wpb_content_element">
+                        <h2 class="section-title text-center slider-title"><span class="inline-title">FEATURED ITEMS</span><span class="line"></span></h2>
+                        <div class="slider-wrapper">
+                            {{block class="Smartwave\Filterproducts\Block\Home\FeaturedList" name="featured_product" extra_class="dots-style-1" product_count="3" product_type="3" aspect_ratio="0" image_width="400" image_height="252"
+                            template="owl_list.phtml"}}
+                            <script type="text/javascript">
+                                require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                                    $("#featured-products .owl-carousel").owlCarousel({
+                                        autoplay: false,
+                                        autoplayTimeout: 5000,
+                                        autoplayHoverPause: true,
+                                        loop: true,
+                                        navRewind: true,
+                                        lazyLoad: true,
+                                        margin: 0,
+                                        nav: false,
+                                        dots: false,
+                                        responsive: {
+                                            0: {
+                                                items: 2,
+                                            },
+                                            640: {
+                                                items: 2,
+                                            },
+                                            768: {
+                                                items: 2,
+                                            },
+                                            992: {
+                                                items: 3,
+                                            },
+                                            1200: {
+                                                items: 3,
+                                            },
+                                        },
+                                    });
+                                });
+                            </script>
+                        </div>
+                    </div>
+                    <div class="porto-separator tall"><hr class="separator-line align_center solid" style="background-color: #e1e1e1; margin-top: 60px;" /></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-5 no-padding custom-shape-wrapper2 section mt-0 mb-0 porto-inner-container" style="padding-bottom: 100px; background-color: #f4f4f4;">
+    <style>
+        .custom-shape-wrapper2 .pc-custom-shape {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: translateY(-50%);
+        }
+        .custom-shape-wrapper2 .porto-wrap-container > .row {
+            background: #fff;
+        }
+    </style>
+    <div class="porto-wrap-container container">
+        <div class="row no-padding align-items-center">
+            <div class="position-static col-md-6">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="wpb_single_image wpb_content_element vc_align_left pc-custom-shape">
+                        <div class="wpb_wrapper">
+                            <div>
+                                <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_shape2.png}}" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wpb_content_element mb-0 position-relative">
+                        <div class="wpb_wrapper">
+                            <div class="vc_single_image-wrapper vc_box_border_grey">
+                                <img src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_home_banner1.jpg}}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-3 px-md-0 col-md-6" style="background-color: #ffffff;">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="row" style="padding-top: 30px; padding-bottom: 30px;">
+                        <div class="col-sm-7 mb-4 mb-sm-0 col-md-7 d-flex align-items-center">
+                            <div class="wpb_wrapper vc_column-inner">
+                                <h2 style="font-size: 32px; line-height: 1.2; font-weight: 700;" class="vc_custom_heading mb-0 align-left">Meet Porto</h2>
+                                <p style="font-size: 22px; line-height: 1.3;" class="vc_custom_heading mb-0 align-left">
+                                    The easier way to build your<br />
+                                    portfolio & showcase your work.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-md-5 d-flex align-items-center justify-content-center">
+                            <div class="wpb_wrapper vc_column-inner">
+                                <div class="btn-container mb-0 text-left text-sm-center text-center">
+                                    <button class="btn-shape-round btn btn-modern btn-lg btn-dark">GET STARTED <i style="padding-left: 7px;" class="fas fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="section mt-0 mb-0 porto-inner-container">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="porto-products wpb_content_element mb-4">
+                        <h2 class="section-title text-center"><span class="inline-title">BEST SELLING ITEMS</span><span class="line"></span></h2>
+                        {{block class="Smartwave\Filterproducts\Block\Home\LatestList" name="featured_product" product_type="3" product_count="6" column_count="3" aspect_ratio="0" image_width="400" image_height="252" template="grid.phtml"}}
+                    </div>
+                    <div class="btn-container mb-5 text-center"><a class="btn-shape-round btn btn-borders btn-md btn-default" href="#" title="Themes">View More</a></div>
+                    <div class="porto-products title-border-middle mb-3">
+                        <h3 class="section-title slider-title text-center" style="font-size: 12px; font-weight: 500; color: #999; padding: 0 12px;">
+                            <span class="line-l"></span>
+                            <span class="inline-title">AS FEATURED AT</span>
+                            <span class="line-r"></span>
+                        </h3>
+                    </div>
+                    <div class="porto-carousel carousel-center-active-item brand-carousel owl-carousel py-3 mb-0">
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-1.png}}" alt="" /></div>
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-2.png}}" alt="" /></div>
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-3.png}}" alt="" /></div>
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-4.png}}" alt="" /></div>
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-5.png}}" alt="" /></div>
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-6.png}}" alt="" /></div>
+                        <div class="item"><img src="{{media url=wysiwyg/smartwave/porto/homepage/23/logo-7.png}}" alt="" /></div>
+                    </div>
+                    <script type="text/javascript">
+                        require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                            $(".brand-carousel.owl-carousel").owlCarousel({
+                                autoplay: false,
+                                autoplayTimeout: 5000,
+                                autoplayHoverPause: true,
+                                loop: true,
+                                navRewind: true,
+                                lazyLoad: true,
+                                margin: 0,
+                                center: true,
+                                nav: false,
+                                dots: false,
+                                responsive: {
+                                    0: {
+                                        items: 2,
+                                    },
+                                    640: {
+                                        items: 2,
+                                    },
+                                    768: {
+                                        items: 3,
+                                    },
+                                    992: {
+                                        items: 5,
+                                    },
+                                    1200: {
+                                        items: 7,
+                                    },
+                                },
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="mb-5 porto-inner-container" style="padding-top: 70px; padding-bottom: 70px; background-color: #f4f4f4;">
+    <div class="porto-wrap-container container">
+        <style>
+            .testimonial.testimonial-style-3 {
+                border: 2px solid #ea6253;
+                border-radius: 3px;
+                padding: 25px 30px 70px 25px;
+                margin-bottom: 0;
+            }
+            .testimonial.testimonial-style-3 .testimonial-author {
+                align-items: center;
+                margin-left: 8px;
+            }
+            .testimonial.testimonial-style-3 blockquote {
+                padding: 20px 50px 20px 60px;
+                color: #777;
+            }
+            .testimonial.testimonial-style-3 blockquote:before,
+            .testimonial.testimonial-style-3 blockquote:after {
+                color: #ea6253;
+                font-size: 54px;
+                font-weight: 800;
+            }
+            .testimonial.testimonial-style-3 blockquote:after {
+                font-family: "Playfair Display";
+                display: block !important;
+                content: "\201D";
+                position: absolute;
+                right: 0;
+            }
+            .owl-carousel.nav-inside-left .owl-dots {
+                left: 85px;
+                bottom: 20px;
+            }
+        </style>
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="wpb_wrapper vc_column-inner">
+                    <div class="porto-testimonial porto-carousel owl-carousel mb-5 mb-md-0 nav-inside nav-inside-left dots-style-1">
+                        <div class="porto-testimonial wpb_content_element">
+                            <div class="testimonial testimonial-style-3">
+                                <div class="testimonial-author clearfix">
+                                    <div class="testimonial-author-thumbnail">
+                                        <img class="img-responsive img-circle" src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_author1.jpg}}" alt="John Smith" />
+                                    </div>
+                                    <p><strong style="color: #2b2b2d;">John Smith</strong><span>CEO & Founder</span></p>
+                                </div>
+                                <div class="testimonial-arrow-down"></div>
+                                <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum molestie, massa ut semper egestas, ex ligula ifend neque, eget pharetra elit lectus ac ex.risus.</p></blockquote>
+                            </div>
+                        </div>
+                        <div class="porto-testimonial wpb_content_element">
+                            <div class="testimonial testimonial-style-3">
+                                <div class="testimonial-author clearfix">
+                                    <div class="testimonial-author-thumbnail"><img class="img-responsive img-circle" src="{{media url=wysiwyg/smartwave/porto/homepage/23/shop23_author1.jpg}}" alt="Chris Doe" /></div>
+                                    <p><strong style="color: #2b2b2d;">Chris Doe</strong><span>CEO & Founder</span></p>
+                                </div>
+                                <div class="testimonial-arrow-down"></div>
+                                <blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum molestie, massa ut semper egestas, ex ligula ifend neque, eget pharetra elit lectus ac ex.risus.</p></blockquote>
+                            </div>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                            $(".porto-testimonial.owl-carousel").owlCarousel({
+                                items: 1,
+                                autoplay: false,
+                                autoplayTimeout: 5000,
+                                autoplayHoverPause: true,
+                                dots: true,
+                                nav: false,
+                                loop: false,
+                                navRewind: true,
+                                margin: 1,
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="wpb_wrapper vc_column-inner">
+                    <h2 style="font-size: 20px; line-height: 1.1; font-weight: 700;" class="vc_custom_heading mb-4 align-left text-uppercase">Latest News</h2>
+                    <div class="porto-recent-posts wpb_content_element mb-0">
+                        <div class="row">
+                            <style>
+                                .post-carousel {
+                                    margin-bottom: 0;
+                                }
+                                .post-carousel .post-item > a,
+                                .porto-recent-posts .post-date .month,
+                                .porto-recent-posts .post-date .day {
+                                    display: none !important;
+                                }
+                                .post-carousel .post-item .post-date {
+                                    position: static;
+                                    width: auto;
+                                    float: none;
+                                    text-align: left;
+                                    background: none;
+                                    letter-spacing: 0;
+                                    margin: 0;
+                                }
+                                .post-date > time {
+                                    display: block;
+                                    color: #ea6253;
+                                    font-size: 0.9286em;
+                                    font-weight: 600;
+                                    text-transform: uppercase;
+                                }
+                                .porto-recent-posts h4 {
+                                    font-size: 1.1428em;
+                                    font-weight: 700;
+                                    margin-bottom: 1rem;
+                                }
+                                .porto-recent-posts .post-item .post-excerpt {
+                                    font-size: inherit;
+                                }
+                                .post-item .read-more,
+                                .post-item .read-more-block {
+                                    display: block;
+                                    font-family: Poppins;
+                                    font-size: 0.8571em;
+                                    text-transform: uppercase;
+                                    margin-top: 1rem;
+                                }
+                                .testimonial .testimonial-author p {
+                                    margin: 0 0 0 1.5rem;
+                                }
+                                .testimonial .testimonial-author strong {
+                                    text-transform: uppercase;
+                                    font-size: 13px;
+                                }
+                                .testimonial .testimonial-author span {
+                                    font-weight: 400;
+                                }
+                                .owl-carousel .owl-dots .owl-dot.active span {
+                                    border-color: #05131c;
+                                    color: #05131c;
+                                }
+                            </style>
+                            <div class="post-carousel porto-carousel owl-carousel dots-style-1">
+                                {{widget type="Magefan\Blog\Block\Widget\Recent" number_of_posts="4" custom_template="recent_home.phtml"}}
+                            </div>
+                        </div>
+                        <script type="text/javascript">
+                            require(["jquery", "owl.carousel/owl.carousel.min"], function ($) {
+                                $(".porto-recent-posts .owl-carousel").owlCarousel({
+                                    items: 2,
+                                    autoplay: false,
+                                    autoplayTimeout: 5000,
+                                    autoplayHoverPause: true,
+                                    dots: false,
+                                    nav: false,
+                                    loop: true,
+                                    navRewind: true,
+                                });
+                            });
+                        </script>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

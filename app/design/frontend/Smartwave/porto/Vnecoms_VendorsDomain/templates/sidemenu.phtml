@@ -1,0 +1,28 @@
+<?php
+    $_helper = $this->helper('Smartwave\Megamenu\Helper\Data');
+    if(!$_helper->getConfig('sw_megamenu/general/enable')) return '';
+    $megaMenu = $block->getMegamenuItems();
+?>
+<?php if($megaMenu->getSize()>0):?>
+	<nav class="navigation sw-megamenu side-megamenu" role="navigation">
+        <ul>
+            <?php foreach($megaMenu as $item):?>
+                <li class="ui-menu-item level0">
+                    <div class="open-children-toggle"></div>
+                    <a href="<?= $item->getUrl() ?>" class="level-top">
+                        <i class="Simple-Line-Icons-layers"></i>
+                        <span><?= $item->getName() ?></span>
+                    </a>
+                </li>
+            <?php endforeach ?>
+        </ul>
+	</nav>
+    <script type="text/javascript">
+        require([
+            'jquery',
+            'Smartwave_Megamenu/js/sw_megamenu'
+        ], function ($) {
+            $(".sw-megamenu").swMegamenu();
+        });
+    </script>
+<?php endif ?>

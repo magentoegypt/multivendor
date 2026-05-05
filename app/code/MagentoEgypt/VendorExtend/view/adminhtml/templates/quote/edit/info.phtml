@@ -1,0 +1,229 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Information */
+$_quote = $block->getRealQuote();
+$isEditable = $block->isEdiable();
+
+$createdAtFormatted = new \DateTime($_quote->getCreatedAt());
+$quoteAdminDate = $createdAtFormatted->format('M j, Y g:i:s a');
+
+// $quoteStoreDate = $block->formatDate(
+//     $_quote->getCreatedAt(),
+//     \IntlDateFormatter::MEDIUM,
+//     true,
+//     $block->getTimezoneForStore($_quote->getStore())
+// );
+?>
+
+<section class="admin__page-section quote-view-account-information">
+    <div class="admin__page-section-title">
+        <span class="title"><?php /* @escapeNotVerified */ echo __('Quote & Account Information') ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item quote-information">
+            <?php /* Quote Information */?>
+            <div class="quote-information-container">
+                <div class="admin__page-section-item-title">
+                    <span class="title"><?php /* @escapeNotVerified */ echo __('Quote Information') ?></span>
+                </div>
+                <div class="admin__page-section-item-content">
+                    <table class="admin__table-secondary quote-account-information-table">
+                        <?php if ($block->isQuoteEditPage()): ?>
+                            <tr>
+                                <th><?php /* @escapeNotVerified */ echo __('Quote Date') ?></th>
+                                <td><?php /* @escapeNotVerified */ echo $quoteAdminDate ?></td>
+                            </tr>
+                            <?php /*if ($quoteAdminDate != $quoteStoreDate):?>
+                                <tr>
+                                    <th><?php echo __(
+                                            'Quote Date (%1)',
+                                            $block->getTimezoneForStore($_quote->getStore())
+                                        ) ?></th>
+                                    <td><?php echo $quoteStoreDate ?></td>
+                                </tr>
+                            <?php endif; */ ?>
+                            <?php if ($block->isSingleStoreMode() == false):?>
+                                <tr>
+                                    <th><?php /* @escapeNotVerified */ echo __('Purchased From') ?></th>
+                                    <td><?php /* @escapeNotVerified */ echo $block->getOrderStoreName() ?></td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php if ($_quote->getRemoteIp()): ?>
+                                <tr>
+                                    <th><?php /* @escapeNotVerified */ echo __('Placed from IP') ?></th>
+                                    <td><?php /* @escapeNotVerified */ echo $_quote->getRemoteIp(); ?></td>
+                                </tr>
+                            <?php endif; ?>
+                        <?php endif;?>
+                        <?php /*
+                        <tr>
+                            <th><?php echo __('Currency') ?></th>
+                            <td>
+                                <?php if ($block->getCustomerId()): ?>
+                                    <select id="currency_switcher"
+                                            class="admin__control-select"
+                                            name="quote[currency]"
+                                            onchange="quote.setCurrencyId(this.value); quote.setCurrencySymbol(this.options[this.selectedIndex].getAttribute('symbol'));">
+                                        <?php foreach ($block->getAvailableCurrencies() as $_code): ?>
+                                            <option value="<?php echo $_code ?>"<?php if ($_code == $block->getCurrentCurrencyCode()): ?> selected="selected"<?php endif; ?> symbol="<?php echo $block->getCurrencySymbol($_code) ?>">
+                                                <?php echo $block->getCurrencyName($_code) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        */ ?>
+                        <?php if ($block->isQuoteEditPage()):?>
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Status') ?></th>
+                            <td><select type="text"
+                                        name="quote[status]"
+                                        id="quote-status"
+                                        class="admin__control-select quote-field"
+                                        data-quote-field="status"
+                                        title="Status">
+                                    <?php foreach ($block->getOptions() as $value => $label):?>
+                                        <option value="<?php echo $value ?>"<?php if($_quote->getStatus() == $value):?> selected="selected"<?php endif;?>><?php echo $label ?></option>
+                                    <?php endforeach;?>
+                                </select>
+                            </td>
+                        </tr>
+                        <?php endif;?>
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Reminder Date') ?></th>
+                            <td>
+                                <div class="admin__field-control">
+                                    <span class="datebox-datepicker">
+                                        <input type="text"
+                                               name="quote[reminder_date]"
+                                               id="reminder-date"
+                                               class="input-text admin__control-text no-changes quote-field"
+                                               data-quote-field="reminder_date"
+                                               title="Reminder Date"
+                                               value="<?php echo $_quote->getReminderDate()?>"
+                                               <?php if(!$isEditable):?> disabled="disabled"<?php endif;?>
+                                               data-mage-init='{"calendar": {"showTime": false, "dateFormat": "y-MM-dd"}}' />
+                                    </span>
+                                    <div class="admin__actions-switch" data-role="switcher">
+                                        <input id="quote-reminder-switch" name="quote[reminder_enabled]" data-quote-field="reminder_enabled" type="checkbox" class="admin__actions-switch-checkbox quote-field" value="1"<?php if($_quote->getReminderEnabled()):?> checked="checked"<?php endif;?><?php if(!$isEditable):?> disabled="disabled"<?php endif;?>>
+                                        <label class="admin__actions-switch-label" for="quote-reminder-switch">
+                                            <span class="admin__actions-switch-text" data-text-on="Yes" data-text-off="No"></span>
+                                        </label>
+                                        <div class="switcher-caption">[<?php echo __('send reminder email') ?>]</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Expiration Date') ?></th>
+                            <td>
+                                <div class="admin__field-control">
+                                    <span class="datebox-datepicker">
+                                        <input type="text"
+                                               name="quote[expired_date]"
+                                               id="expire-date"
+                                               class="input-text admin__control-text no-changes quote-field"
+                                               data-quote-field="expired_date"
+                                               title="Expire Date"
+                                               value="<?php echo $_quote->getExpiredDate()?>"
+                                               <?php if(!$isEditable):?> disabled="disabled"<?php endif;?>
+                                               data-mage-init='{"calendar": {"showTime": false, "dateFormat": "y-MM-dd"}}' />
+                                    </span>
+                                    <div class="admin__actions-switch" data-role="switcher">
+                                        <input id="quote-expire-switch" data-quote-field="expire_enabled" name="quote[expire_enabled]" type="checkbox" class="admin__actions-switch-checkbox quote-field" value="1"<?php if($_quote->getExpireEnabled()):?> checked="checked"<?php endif;?><?php if(!$isEditable):?> disabled="disabled"<?php endif;?>>
+                                        <label class="admin__actions-switch-label" for="quote-expire-switch">
+                                            <span class="admin__actions-switch-text" data-text-on="Yes" data-text-off="No"></span>
+                                        </label>
+                                        <div class="switcher-caption">[<?php echo __('send expiration email') ?>]</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Note') ?></th>
+                            <td>
+                                <textarea class="quote-area admin__control-textarea quote-field" data-quote-field="note" name="quote[note]" placeholder="<?php echo __('Enter Your comment') ?>"<?php if(!$isEditable):?> disabled="disabled"<?php endif;?>><?php echo $_quote->getNote() ?></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="quote-account-info-container">
+                <?php /* Account Information */?>
+                <div class="admin__page-section-item-title">
+                    <span class="title"><?php /* @escapeNotVerified */ echo __('Account Information') ?></span>
+                </div>
+                <div class="admin__page-section-item-content">
+                    <table class="admin__table-secondary quote-account-information-table">
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Customer Name') ?></th>
+                            <td>
+                                <?php if ($_customerUrl = $block->getCustomerViewUrl()) : ?>
+                                    <a href="<?php /* @escapeNotVerified */ echo $_customerUrl ?>" target="_blank">
+                                        <span><?php echo $block->escapeHtml($block->getCustomerName()) ?></span>
+                                    </a>
+                                <?php else: ?>
+                                    <?php echo $block->escapeHtml($block->getCustomerName()) ?>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Email') ?></th>
+                            <td><a href="mailto:<?php echo $block->escapeHtml($block->getCustomerEmail()) ?>"><?php echo $block->escapeHtml($block->getCustomerEmail()) ?></a></td>
+                        </tr>
+                        <?php if ($_groupName = $block->getCustomerGroupName()) : ?>
+                            <tr>
+                                <th><?php /* @escapeNotVerified */ echo __('Customer Group') ?></th>
+                                <td><?php /* @escapeNotVerified */ echo $_groupName ?></td>
+                            </tr>
+                        <?php endif; ?>
+                        <?php foreach ($block->getCustomerAccountData() as $data):?>
+                            <tr>
+                                <th><?php /* @escapeNotVerified */ echo $data['label'] ?></th>
+                                <td><?php /* @escapeNotVerified */ echo $data['value'] ?></td>
+                            </tr>
+                        <?php endforeach;?>
+                        <tr>
+                            <th><?php /* @escapeNotVerified */ echo __('Customer Remark') ?></th>
+                            <?php $remark = $_quote->getClientComment()?>
+                            <td>
+                                <textarea class="quote-area admin__control-textarea quote-field" data-quote-field="client_comment" name="quote[client_comment]" placeholder="Customer remark here"<?php if(!$isEditable):?> disabled="disabled"<?php endif;?>><?php echo $remark?></textarea>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin__page-section-item quote-account-information">
+            <div class="admin__page-section-item-title">
+                <span class="title"><?php /* @escapeNotVerified */ echo __('Messages History') ?></span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <?php echo $this->getChildHtml('message') ?>
+            </div>
+        </div>
+        <script type="text/javascript">
+        require([
+             "jquery",
+         ], function($){
+            $('.quote-field').change(function(){
+                var field = $(this);
+                var fieldName = field.data('quote-field');
+                var fieldValue = field.val();
+                if(field.is('[type="checkbox"]')){
+                    fieldValue = field.is(':checked')?1:0;
+                }
+                window.quote.changeQuoteInfo(fieldName, fieldValue);
+            });
+        });
+        </script>
+    </div>
+</section>

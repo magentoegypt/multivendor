@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * Product view template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View
+ */
+?>
+<?php $_helper = $this->helper('Magento\Catalog\Helper\Output'); ?>
+<?php $_configAmpHelper = $this->helper('MGS\Amp\Helper\Config'); ?>
+<?php $_product = $block->getProduct(); ?>
+
+<div class="product-add-form">
+    <form action-xhr="<?php /* @escapeNotVerified */ echo str_replace('http:', '',$block->getUrl('amp_api/cart/add')) ?>" method="post"
+          id="product_addtocart_form"
+		  on="submit-success:AMP.setState({prampGlobal: {form: {productId: <?= $_product->getId(); ?>}}}),successMessage-productAddToCart.restart;submit-error:AMP.setState({prampGlobal: {form: {productId: <?= $_product->getId(); ?>}}}),errorMessage-productAddToCart.restart;">
+        <input type="hidden" name="product" value="<?php /* @escapeNotVerified */ echo $_product->getId() ?>" />
+        <?php echo $block->getChildHtml('form_top'); ?>
+        <?php if (!$block->hasOptions()):?>
+            <?php echo $block->getChildHtml('amp_product_info_form_content'); ?>
+        <?php else:?>
+            <a href="<?= $_configAmpHelper->getCanonicalUrl(); ?>" class="btn-cart"><?= __('Choose Option') ?></a>
+        <?php endif; ?>
+
+        <?php if ($_product->isSaleable() && $block->hasOptions() && $block->getOptionsContainer() == 'container2'):?>
+            <?php echo $block->getChildChildHtml('options_container') ?>
+        <?php endif;?>
+        <?php echo $block->getChildHtml('form_bottom'); ?>
+    </form>
+</div>

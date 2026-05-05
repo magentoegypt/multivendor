@@ -1,0 +1,151 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Vnecoms\Quotation\Block\Quotepage\Item\Renderer */
+
+$_item = $block->getItem();
+$product = $_item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+/** @var \Magento\Msrp\Helper\Data $helper */
+$helper = $this->helper('Magento\Msrp\Helper\Data');
+$canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinimalPriceLessMsrp($product);
+?>
+
+<tbody class="cart item">
+    <tr class="item-info">
+        <td data-th="<?php echo $block->escapeHtml(__('Item')); ?>" class="col item">
+            <?php if ($block->hasProductUrl()):?>
+                <a href="<?php /* @escapeNotVerified */ echo $block->getProductUrl() ?>"
+                   title="<?php echo $block->escapeHtml($block->getProductName()) ?>"
+                   tabindex="-1"
+                   class="product-item-photo">
+            <?php else:?>
+                <span class="product-item-photo">
+            <?php endif;?>
+            <?php echo $block->getImage($block->getProductForThumbnail(), 'cart_page_product_thumbnail')->setProduct($block->getProductForThumbnail())->toHtml(); ?>
+            <?php if ($block->hasProductUrl()):?>
+                </a>
+            <?php else: ?>
+                </span>
+            <?php endif; ?>
+            <div class="product-item-details">
+                <strong class="product-item-name">
+                    <?php if ($block->hasProductUrl()):?>
+                        <a href="<?php /* @escapeNotVerified */ echo $block->getProductUrl() ?>"><?php echo $block->escapeHtml($block->getProductName()) ?></a>
+                    <?php else: ?>
+                        <?php echo $block->escapeHtml($block->getProductName()) ?>
+                    <?php endif; ?>
+                </strong>
+                <!-- option list-->
+                <?php if ($_options = $block->getOptionList()):?>
+                    <dl class="item-options">
+                        <?php foreach ($_options as $_option) : ?>
+                            <?php $_formatedOptionValue = $block->getFormatedOptionValue($_option) ?>
+                            <dt><?php echo $block->escapeHtml($_option['label']) ?></dt>
+                            <dd>
+                                <?php if (isset($_formatedOptionValue['full_view'])): ?>
+                                    <?php /* @escapeNotVerified */ echo $_formatedOptionValue['full_view'] ?>
+                                <?php else: ?>
+                                    <?php /* @escapeNotVerified */ echo $_formatedOptionValue['value'] ?>
+                                <?php endif; ?>
+                            </dd>
+                        <?php endforeach; ?>
+                    </dl>
+                <?php endif;?>
+                <!--message list-->
+                <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+                <?php if ($addInfoBlock): ?>
+                    <?php echo $addInfoBlock->setItem($_item)->toHtml() ?>
+                <?php endif;?>
+
+                <div class="control comment">
+                    <textarea class="input-text quotation-product-comment"
+                              maxlength="1024"
+                              value="<?php echo $_item->getComment() ?>"
+                              placeholder="<?php echo __('Enter your comment') ?>"
+                              id="quote-<?php /* @escapeNotVerified */ echo $_item->getId() ?>-comment"
+                              name="quote[<?php /* @escapeNotVerified */ echo $_item->getId() ?>][comment]"
+                              data-mage-init='{"productUpdater":{
+                                "itemId": <?php echo $_item->getId(); ?>,
+                                "sessionProductKey": "comment",
+                                "quoteUpdateUrl": "<?php echo $block->getUrl('quotation/quote_ajax/updateQuote'); ?>"
+                              }}'><?php echo $_item->getComment() ?></textarea>
+                </div>
+            </div>
+        </td>
+
+        <!-- price-->
+        <?php if ($canApplyMsrp): ?>
+            <td class="col msrp" data-th="<?php echo $block->escapeHtml(__('Price')); ?>">
+                <span class="pricing msrp">
+                    <span class="msrp notice"><?php /* @escapeNotVerified */ echo __('See price before order confirmation.'); ?></span>
+                    <?php $helpLinkId = 'cart-msrp-help-' . $_item->getId(); ?>
+                    <a href="#" class="action help map" id="<?php /* @escapeNotVerified */ echo($helpLinkId); ?>" data-mage-init='{"addToCart":{"helpLinkId": "#<?php /* @escapeNotVerified */ echo $helpLinkId;?>","productName": "<?php /* @escapeNotVerified */ echo $product->getName(); ?>","showAddToCart": false}}'>
+                        <span><?php /* @escapeNotVerified */ echo __("What's this?"); ?></span>
+                    </a>
+                </span>
+            </td>
+        <?php else: ?>
+            <td class="col price original-price" data-th="<?php echo $block->escapeHtml(__('Original Price')); ?>">
+                <?php echo $block->getUnitPriceHtml($_item); ?>
+            </td>
+        <?php endif; ?>
+
+        <td class="col price" data-th="<?php echo $block->escapeHtml(__('Price')); ?>">
+            <input id="quote-<?php /* @escapeNotVerified */ echo $_item->getId() ?>-price"
+                           name="quote[<?php /* @escapeNotVerified */ echo $_item->getId() ?>][price]"
+                           data-cart-item-id="<?php /* @escapeNotVerified */ echo $_item->getSku() ?>"
+                           value="<?php /* @escapeNotVerified */ echo $block->getPrice() ?>"
+                           type="number"
+                           size="4"
+                           title="<?php echo $block->escapeHtml(__('Requested Price')); ?>"
+                           class="input-text price"
+                           maxlength="12"
+                           data-validate="{required:true,'validate-greater-than-zero':true}"
+                           data-role="quote-item-price"
+                           data-mage-init='{"productUpdater":{
+                                "itemId": <?php echo $_item->getId(); ?>,
+                                "sessionProductKey": "price",
+                                "quoteUpdateUrl": "<?php echo $block->getUrl('quotation/quote_ajax/updateQuote'); ?>"
+                           }}'/>
+        </td>
+        <td class="col qty" data-th="<?php echo $block->escapeHtml(__('Qty')); ?>">
+            <div class="field qty">
+                <label class="label" for="quote-<?php /* @escapeNotVerified */ echo $_item->getId() ?>-qty">
+                    <span><?php /* @escapeNotVerified */ echo __('Qty') ?></span>
+                </label>
+                <div class="control qty">
+                    <input id="quote-<?php /* @escapeNotVerified */ echo $_item->getId() ?>-qty"
+                           name="quote[<?php /* @escapeNotVerified */ echo $_item->getId() ?>][qty]"
+                           data-cart-item-id="<?php /* @escapeNotVerified */ echo $_item->getSku() ?>"
+                           value="<?php /* @escapeNotVerified */ echo $block->getQty() ?>"
+                           type="number"
+                           size="4"
+                           title="<?php echo $block->escapeHtml(__('Qty')); ?>"
+                           class="input-text qty"
+                           maxlength="12"
+                           data-validate="{required:true,'validate-greater-than-zero':true}"
+                           data-role="quote-item-qty"
+                           data-mage-init='{"productUpdater":{
+                                "itemId": <?php echo $_item->getId(); ?>,
+                                "sessionProductKey": "qty",
+                                "quoteUpdateUrl": "<?php echo $block->getUrl('quotation/quote_ajax/updateQuote'); ?>"
+                           }}'/>
+                </div>
+            </div>
+        </td>
+
+    </tr>
+    <tr class="item-actions">
+        <td colspan="100">
+            <div class="actions-toolbar">
+                <?php /* @escapeNotVerified */ echo $block->getActions($_item) ?>
+            </div>
+        </td>
+    </tr>
+</tbody>

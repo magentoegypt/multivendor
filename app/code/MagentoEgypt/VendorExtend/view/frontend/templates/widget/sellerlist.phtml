@@ -1,0 +1,114 @@
+<?php
+$sellerCollection = $block->getRegisteredSellerCollection();
+$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+$rtl = $themeSettingConfig->getStoreConfig('themesettings/general/rtl_theme') ? 'true' : 'false';
+?>
+<?php if ($sellerCollection->getSize()>0): ?>
+	<?php
+		$blockId = rand() . time();
+		$showBrandName = $this->getConfig('show_name');
+	?>
+	<div class="block widget ves-sellerlist-inner">
+		<div class="block-content">
+			<div class="owl-carousel ves-sellerlist-<?= $blockId; ?>">
+				<?php foreach ($sellerCollection as $seller): ?>
+                    <div class="item <?php echo $seller->getVendorId() ?>">
+                        <div class="info seller-info">
+                            <div class="info-inner text-center">
+                                <div class="seller-thumbnail-container">
+                                    <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
+                                        <img class="s-logo img-logo" src="<?php echo $block->getSellerImageUrl($seller) ?>" title="<?php echo "Go to ".$seller->getVendorId() ?>" alt="vendor-logo" />
+                                    </a>
+                                </div>
+                                <div class="seller-details">
+                                    <?php $sellerName = $block->getSellerStoreName($seller);?>
+                                    <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
+                                        <strong class="s-name"><?php echo (!empty($sellerName) ? $sellerName : $seller->getVendorId()); ?></strong>
+                                    </a>
+                                </div>
+                                <div class="clearer additional-data">
+                                    <?php echo $block->getReviewSellerHtml($seller) ?>
+                                    <div class="additional-data-bottom">
+                                        <div class="total-items-count"><?php echo __("%1 product(s)",$block->getProductCount($seller))?></div>
+                                        <div class="seller-items-link"><a href="<?php echo $block->getSellerItemsUrl($seller) ?>"><?php echo __('View Collection') ?></a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach;  ?>
+			</div>
+		</div>
+	</div>
+	<?php
+    if ($this->getConfig('autoplay')) {
+        $autoplay = 'true';
+    } else {
+        $autoplay = 'false';
+    }
+    if ($this->getConfig('stop_on_hover')) {
+        $stopOnHover = 'true';
+    } else {
+        $stopOnHover = 'false';
+    }
+    if ($this->getConfig('navigation')) {
+        $navigation = 'true';
+    } else {
+        $navigation = 'false';
+    }
+    ?>
+    <script type="text/javascript">
+        require([
+			'jquery',
+			'mgsowlcarousel'
+		], function ($) {
+            var owl = $('.ves-sellerlist-<?= $blockId ?>');
+            owl.owlCarousel({
+                items: <?= $this->getConfig('mobile_items', 2); ?>,
+                autoPlay: <?= $autoplay; ?>,
+                stopOnHover: <?= $stopOnHover; ?>,
+                rtl: <?= $rtl ?>,
+                margin: 20,
+                navigation: <?= $navigation; ?>,
+                responsive : {
+                	768: {
+                		items: <?= $this->getConfig('tab_items', 4); ?>
+                	},
+                	1140: {
+                		items: <?= $this->getConfig('items', 5); ?>
+                	}
+                }
+            });
+        });
+    </script>
+<?php endif; ?>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        'mgsowlcarousel'
+    ], function ($) {
+        var owlBm = $('.section-builder.banner-modern .line .line, .section-builder.section-builder-full > div > .line');
+
+        var owlBmWinResize = function() {
+            if($(window).width() < 758){
+                owlBm.addClass('owl-carousel');
+                owlBm.owlCarousel({
+                    items: 1,
+                    autoPlay: false,
+                    stopOnHover: false,
+                    rtl: <?= $rtl ?>,
+                    margin: 20,
+                    autoHeight:true,
+                    navigation: true
+                });
+            } else {
+                owlBm.removeClass('owl-carousel');
+                owlBm.trigger('destroy.owl.carousel');
+            }
+        }
+
+        $(window).resize(owlBmWinResize);
+        owlBmWinResize();
+    });
+</script>

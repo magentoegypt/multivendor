@@ -1,0 +1,94 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Components -> Modals
+//  _____________________________________________
+
+//
+//  Variables
+//  ---------------------------------------------
+
+@modal-title__color: @text__color;
+@modal-title__border: 1px solid @color-gray-light5;
+
+@modal-popup-title__font-size: 26px;
+@modal-popup-title-mobile__font-size: @font-size__base;
+@modal-popup-breakpoint-screen__m: @screen__m + 1;
+
+@modal-slide__first__indent-left: 44px;
+@modal-slide-mobile__background-color: @color-gray-light01;
+@modal-overlay__background-color: fade(@color-gray20, 55%);
+
+@modal-action-close__color: @primary__color;
+@modal-action-close__font-size: 32px;
+@modal-action-close__hover__color: darken(@primary__color, 10%);
+
+@modal-slide-action-close__padding: @modal-slide-header__padding-vertical - 1rem @modal-popup__padding - 1rem;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .modal-custom,
+    .modal-popup,
+    .modal-slide {
+		.lib-modal();
+        .action-close {
+            position: absolute;
+            right: 0;
+            top: 0;
+			padding: 0;
+			background: none;
+			border: none;
+			span {
+				.lib-visually-hidden();
+			}
+			&:before {
+				font-family: @theme-icon-font-family-name;
+				content: @theme-icon-content_close;
+				font-size: 18px;
+			}
+        }
+		.page-main-actions {
+            margin-bottom: @modal-slide-header__padding-vertical - (@indent__l/2);
+            margin-top: @modal-slide-header__padding-vertical;
+        }
+    }
+
+    .modals-overlay {
+        .lib-css(background-color, @modal-overlay__background-color);
+        &:extend(.abs-modal-overlay all);
+        .lib-css(z-index, @overlay__z-index);
+        bottom: 0;
+        left: 0;
+        position: fixed;
+        right: 0;
+        top: 0;
+    }
+
+    body {
+        &._has-modal {
+            height: 100%;
+            overflow: hidden;
+            width: 100%;
+			&-custom {
+				height: 100vh;
+				overflow: hidden;
+				width: 100vw;
+				.modal-custom-overlay {
+					height: 100vh;
+					left: 0;
+					position: fixed;
+					top: 0;
+					width: 100vw;
+					z-index: @overlay__z-index;
+					.lib-css(background-color, @modal-overlay__background-color);
+				}
+			}
+        }
+    }
+}

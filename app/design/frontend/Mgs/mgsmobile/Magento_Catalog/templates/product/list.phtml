@@ -1,0 +1,104 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+use Magento\Framework\App\Action\Action;
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Product list template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php $themeHelperImage = $this->helper('MGS\ThemeSettings\Helper\Image'); ?>
+<?php
+$_productCollection = $block->getLoadedProductCollection();
+$_helper = $this->helper('Magento\Catalog\Helper\Output');
+$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+$activeTitle = $themeSettingConfig->getStoreConfig('themesettings/page_title/title_toolbar');
+$showFilter = $themeSettingConfig->getStoreConfig('mgs_ajaxnavigation/general/always_show');
+$activeBreadcrumb = $themeSettingConfig->getStoreConfig('themesettings/page_title/breadcrumb_category');
+$moveBreadcrumb = $themeSettingConfig->getStoreConfig('themesettings/page_title/breadcrumb_toolbar');
+?>
+<?php if (!$_productCollection->count()): ?>
+	<div id="current-filter-place">
+		<?= $this->getLayout()->createBlock(\Magento\LayeredNavigation\Block\Navigation\State::class)->toHtml(); ?> 
+	</div>
+    <div class="message info empty">
+		<div><?php /* @escapeNotVerified */ echo __('We can\'t find products matching the selection.') ?></div>
+	</div>
+<?php else: ?>
+	<div class="top-toolbar">
+		<?= $block->getToolbarHtml() ?>
+	</div>
+    
+    <?php
+		$viewMode = 'grid';
+		$image = 'category_page_grid';
+		$showDescription = false;
+		$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+		/**
+		 * Position for actions regarding image size changing in vde if needed
+		 */
+		$pos = $block->getPositioned();
+    ?>
+    <div class="products wrapper products-grid">
+		<?= $block->getAdditionalHtml() ?>    
+        <?php $iterator = 1; ?>
+        <ol class="products list items product-items">
+            <?php /** @var $_product \Magento\Catalog\Model\Product */ ?>
+            <?php foreach ($_productCollection as $_product): ?>
+                <?php /* @escapeNotVerified */ echo($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
+                <div class="product-item-info" data-container="product-grid">
+                    <?php $productImage = $block->getImage($_product, $image); ?>
+                    <?php // Product Image ?>
+					<div class="product-top">
+						<a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>" class="product photo product-item-photo" tabindex="-1">
+							<?php echo $productImage->toHtml(); ?>
+						</a>
+					</div>
+                    <div class="product details product-item-details">
+                        <?php
+                            $_productNameStripped = $block->stripTags($_product->getName(), null, true);
+                        ?>
+                        <strong class="product name product-item-name">
+                            <a class="product-item-link"
+                               href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>">
+                                <?php /* @escapeNotVerified */ echo $_helper->productAttribute($_product, $_product->getName(), 'name'); ?>
+                            </a>
+                        </strong>
+                        <?= $block->getReviewsSummaryHtml($_product, $templateType); ?>
+                        <?php /* @escapeNotVerified */ echo $block->getProductPrice($_product) ?>
+                        <?= $block->getProductDetailsHtml($_product); ?>
+						<div class="product actions product-item-actions">
+							<a href="<?php /* @escapeNotVerified */ echo $_product->getProductUrl() ?>" class="action primary"><?= __('View Detail') ?></a>
+							<div data-role="add-to-links" class="actions-secondary"<?= strpos($pos, $viewMode . '-secondary') ? $position : ''; ?>>
+								<?php if ($addToBlock = $block->getChildBlock('addto')): ?>
+									<?= $addToBlock->setProduct($_product)->getChildHtml(); ?>
+								<?php endif; ?>
+							</div>
+						</div>
+                    </div>
+                </div>
+                <?=($iterator == count($_productCollection)+1) ? '</li>' : '' ?>
+            <?php endforeach; ?>
+        </ol>
+        <div class="bottom-toolbar">
+             <?= $block->getToolbarHtml() ?>
+        </div>
+    </div>
+    <?php if (!$block->isRedirectToCartEnabled()) : ?>
+        <script type="text/x-magento-init">
+        {
+            "[data-role=tocart-form], .form.map.checkout": {
+                "catalogAddToCart": {}
+            }
+        }
+        </script>
+    <?php endif; ?>
+<?php endif; ?>

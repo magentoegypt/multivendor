@@ -1,0 +1,418 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1000" translate="label">
+            <group id="valu" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label">
+                <label>Paymob.Accept (Valu)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\ValuCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+            <group id="online" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                <label>Paymob.Accept (Visa / Mastercard)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="currency" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="15" translate="label" type="select">
+                    <label>Checkout Currency</label>
+                    <source_model>Accept\Payments\Model\Config\Source\Currency</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\OnlineCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+            <group id="kiosk" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="3" translate="label">
+                <label>Paymob.Accept (Aman)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\KioskCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+            <group id="wallet" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="4" translate="label">
+                <label>Paymob.Accept (Wallets)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\WalletCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+            <group id="installments" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="5" translate="label">
+                <label>Paymob.Accept (installments)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\installmentsCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+            <group id="premium" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="5" translate="label">
+                <label>Paymob.Accept (premium)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\PremiumCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+
+             <group id="getgo" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                <label>Paymob.Accept (Getgo)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\GetgoCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+
+             <group id="souhoola" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                <label>Paymob.Accept (Souhoola)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\SouhoolaCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+
+            <group id="sympl" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                <label>Paymob.Accept (Sympl)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\SymplCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+             <group id="shahry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                <label>Paymob.Accept (Shahry)</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Title</label>
+                </field>
+                <field id="api_key" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>API KEY</label>
+                </field>
+                <field id="merchant_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Merchant ID</label>
+                </field>   
+                <field id="hmac_secret" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
+                    <label>HMAC SECRET</label>
+                </field>     
+                <field id="integration_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="text">
+                    <label>Intergration ID</label>
+                </field>
+                <field id="iframe_id" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="text">
+                    <label>Iframe ID</label>
+                </field>
+                <field id="endpoints" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label comment">
+                    <label>Callback Urls</label>
+                    <frontend_model>Accept\Payments\Block\Adminhtml\ShahryCallback</frontend_model> 
+                </field> 
+                    <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                    <field id="allowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="allowspecific">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="multiselect">
+                    <label>Payment from Applicable Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

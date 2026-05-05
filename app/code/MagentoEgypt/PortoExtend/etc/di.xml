@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Smartwave\Porto\Block\System\Config\Form\Button\Import\Demo">
+        <plugin name="porto_demo_button" type="MagentoEgypt\PortoExtend\Plugin\Block\ImportDemoButton"/>
+    </type>
+    <type name="Vnecoms\VendorsCustomTheme\Model\Theme">
+        <plugin name="porto_demo_button" type="MagentoEgypt\PortoExtend\Plugin\Model\Theme"/>
+    </type>
+    <type name="Smartwave\Porto\Helper\Cssconfig">
+        <plugin name="porto_demo_button" type="MagentoEgypt\PortoExtend\Plugin\Helper\Cssconfig"/>
+    </type>
+    <type name="Smartwave\Megamenu\Helper\Data">
+        <plugin name="fix_cat_issue" type="MagentoEgypt\PortoExtend\Plugin\Helper\Megamenu"/>
+    </type>
+    <preference for="Smartwave\Porto\Model\Import\Demo" type="MagentoEgypt\PortoExtend\Model\ImportDemo" />
+    <preference for="Vnecoms\VendorsCustomTheme\Plugin\Config" type="MagentoEgypt\PortoExtend\Plugin\Config" />
+    <preference for="Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Edit\Form\Fieldset" type="MagentoEgypt\PortoExtend\Block\Adminhtml\Theme\Edit\Form\Fieldset" />
+    <preference for="Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Edit\Tab\Config" type="MagentoEgypt\PortoExtend\Block\Adminhtml\Theme\Edit\Tab\Config" />
+    <type name="Smartwave\Filterproducts\Block\Home\LatestList">
+        <plugin name="fix_cat_issue" type="MagentoEgypt\PortoExtend\Plugin\Block\Home\LatestList"/>
+    </type>
+    <type name="Smartwave\Filterproducts\Block\Home\BestsellersList">
+        <plugin name="fix_cat_issue" type="MagentoEgypt\PortoExtend\Plugin\Block\Home\BestsellersList"/>
+    </type>
+    <type name="Smartwave\Filterproducts\Block\Home\SaleList">
+        <plugin name="fix_cat_issue" type="MagentoEgypt\PortoExtend\Plugin\Block\Home\SaleList"/>
+    </type>
+    <type name="Smartwave\Filterproducts\Block\Home\FeaturedList">
+        <plugin name="fix_cat_issue" type="MagentoEgypt\PortoExtend\Plugin\Block\Home\FeaturedList"/>
+    </type>
+</config>

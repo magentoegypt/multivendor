@@ -1,0 +1,251 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    //
+    //  Shopping cart
+    //  ---------------------------------------------
+	.cart.items.table {
+		.item-info {
+			border-bottom: 0;
+			&:after {
+				content: "";
+				display: table;
+				clear: both;
+			}
+			.col {
+				float: left;
+				width: calc(~'100% / 3');
+				margin-top: 10px;
+				text-align: left;
+				&:before {
+					padding: 0;
+					display: block;
+					font-size: 0.875rem;
+				}
+				&.item {
+					width: 100%;
+					border-bottom: 1px solid #eaeaea;
+					margin: 0;
+					padding-bottom: 10px;
+					&:before {
+						content: none;
+					}
+					&:after {
+						content: "";
+						display: table;
+						clear: both;
+					}
+					.product-item-photo {
+						width: 70px;
+						display: block;
+						float: left;
+					}
+					.product-item-details {
+						float: left;
+						width: calc(~'100% - 70px');
+						padding-left: 20px;
+					}
+				}
+			}
+			.field.qty {
+				> .label {
+					display: none;
+				}
+				.control.qty .input-text {
+					text-align: center;
+					border-width: 1px;
+					margin-top: 10px;
+					border-radius: 20px;
+					height: 35px;
+					max-width: 70px;
+				}
+			}
+			tbody + tbody > tr:first-child {
+				border-top: 0;
+			}
+			.price {
+				font-size: 1rem;
+				color: #222;
+			}
+		}
+		.item-actions {
+			border-top: 0;
+			padding-top: 0;
+			td:before {
+				content: none;
+			}
+			.action {
+				display: inline-block;
+				width: 55px;
+				text-align: center;
+				border: 1px solid #eaeaea;
+				border-radius: 5px;
+				padding: 4px 0;
+				span {
+					.lib-visually-hidden();
+				}
+				&:after {
+					content: @theme-icon-content_wishlist;
+					font-family: @theme-icon-font-family-name;
+				}
+				&.action-edit:after {
+					content: @theme-icon-content_tooledit;
+				}
+				&.action-delete:after {
+					content: @theme-icon-content_remove;
+				}
+			}
+		}
+		.item-options {
+			margin: 5px 0 0;
+			dt, 
+			dd {
+				margin: 0;
+				font-size: .8125rem;
+				color: #969696;
+				display: inline;
+			}
+			dt {
+				font-weight: 500;
+				color: #000;
+			}
+			dd:after {
+				content: "";
+				display: block;
+				height: 1px;
+				margin-top: 3px;
+			}
+		}
+	}
+	.cart.main.actions .action {
+		border-width: 1px;
+		border-style: solid;
+		display: block;
+		font-size: .75rem;
+		padding: .969rem 1rem;
+		line-height: 1;
+		width: 100%;
+		border-color: #000;
+		color: #000;
+		background-color: #fff;
+		text-align: center;
+		margin-top: 15px;
+		text-transform: uppercase;
+		font-weight: 700;
+	}
+	.checkout-cart-index .page-title-wrapper {
+		margin: 0 -15px;
+		border-bottom: 1px solid #d8d8d8;
+	}
+	.cart-summary {
+		margin-bottom: 40px;
+		padding-bottom: 40px;
+		background: #f5f5f5;
+		margin: 0 -15px 30px;
+		padding: 0 15px 30px;
+		.summary.title {
+			display: none;
+		}
+		.block.discount {
+			.title {
+				display: none;
+			}
+			.content {
+				display: block !important;
+			}
+			.fieldset.coupon {
+				position: relative;
+				.field {
+					margin-bottom: 10px;
+					.label {
+						display: none;
+					}
+				}
+			}
+			.actions-toolbar {
+				position: absolute;
+				right: 0;
+				top: 0;
+			}
+			.action.primary {
+				text-transform: none;
+				width: auto;
+				padding: 9px 10px 8px;
+				font-size: 0.75rem;
+			}
+		}
+		.checkout-methods-items .action {
+			width: 100%;
+			text-align: center;
+			display: block;
+			&.multicheckout {
+				margin-top: 10px;
+			}
+		}
+		.block.shipping {
+			.title {
+				margin: 0 -15px;
+				padding: 10px 15px;
+				border-bottom: 1px solid #d8d8d8;
+				margin-bottom: 15px;
+				&:after {
+					content: @theme-icon-content_arrowdown;
+					font-family: @theme-icon-font-family-name;
+					vertical-align: middle;
+					float: right;
+				}
+				strong {
+					color: #222;
+					font-weight: 600;
+				}
+			}
+			&.active .title:after {
+				content: @theme-icon-content_arrowup;
+			}
+			.legend,
+			.legend + br {
+				display: none;
+			}
+			> .content {
+				border-bottom: 1px solid #d8d8d8;
+			}
+			.fieldset,
+			.fieldset > .field {
+				margin-bottom: 10px;
+			}
+		}
+		.items.methods dt.item-title {
+			font-weight: 600;
+			color: #222;
+		}
+	}
+	.cart-totals .data.table.totals tr {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 10px 0 0;
+		border: none;
+		&.grand.totals {
+			border-top: 1px solid #d8d8d8;
+			padding: 15px 0;
+			margin-top: 15px;
+		}
+		th {
+			padding-right: 10px;
+			color: #222;
+			font-weight: 600;
+		}
+		td:before {
+			content: none;
+		}
+	}
+	
+}

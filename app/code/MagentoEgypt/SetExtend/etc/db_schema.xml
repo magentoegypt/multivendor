@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="eav_attribute_set_title" resource="default" engine="innodb" comment="Attribute Set Title">
+        <column xsi:type="int" name="attribute_set_title_id" unsigned="false" nullable="false"
+                identity="true" comment="Attribute Set Title ID"/>
+        <column xsi:type="smallint" name="attribute_set_id" unsigned="true" nullable="false"
+                identity="false" default="0" comment="Attribute Set ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" identity="false"
+                comment="Store ID"/>
+        <column xsi:type="varchar" name="value" nullable="false" length="255" comment="Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="attribute_set_title_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="EAV_ATTRIBUTE_SET_TITLE_STORE_ID_STORE_STORE_ID"
+                    table="eav_attribute_set_title" column="store_id" referenceTable="store"
+                    referenceColumn="store_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="FK_EAV_ATTRIBUTE_SET_TITLE_ID" table="eav_attribute_set_title"
+                    column="attribute_set_id" referenceTable="eav_attribute_set"
+                    referenceColumn="attribute_set_id" onDelete="CASCADE"/>
+        <index referenceId="EAV_ATTRIBUTE_SET_TITLE_EAV_ATTRIBUTE_SET_ID_STORE_ID" indexType="btree">
+            <column name="attribute_set_id"/>
+            <column name="store_id"/>
+        </index>
+        <index referenceId="EAV_ATTRIBUTE_SET_TITLE_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+</schema>

@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V1/mstore/me/orders/:id/cancel" method="POST">
+        <service class="Mstore\Sales\Api\OrderManagementInterface" method="cancel"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/mstore/me/orders/:id" method="GET">
+        <service class="Mstore\Sales\Api\OrderRepositoryInterface" method="get"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/mstore/me/orders" method="GET">
+        <service class="Mstore\Sales\Api\OrderRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/mstore/me/orders/reorder/:id" method="POST">
+        <service class="Mstore\Sales\Api\OrderManagementInterface" method="reorder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <!--  Customer invoice apis  -->
+    <route url="/V1/mstore/me/invoices/:orderId" method="GET">
+        <service class="Mstore\Sales\Api\InvoiceRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <!--  Customer shipment apis  -->
+    <route url="/V1/mstore/me/shipments/:orderId" method="GET">
+        <service class="Mstore\Sales\Api\ShipmentRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <!--  Customer creditmemo apis  -->
+    <route url="/V1/mstore/me/creditmemos/:orderId" method="GET">
+        <service class="Mstore\Sales\Api\CreditmemoRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <!--  Customer order address apis  -->
+    <route url="/V1/mstore/me/order/addresses/:orderId" method="GET">
+        <service class="Mstore\Sales\Api\OrderAddressRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <!-- Customer order payment apis -->
+    <route url="/V1/mstore/me/order/payment/:orderId" method="GET">
+        <service class="Mstore\Sales\Api\OrderPaymentRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+</routes>

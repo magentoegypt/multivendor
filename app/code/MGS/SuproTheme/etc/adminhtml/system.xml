@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="themesettings" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+			<group id="notify" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+				<frontend_model>MGS\SuproTheme\Block\Adminhtml\System\Notify</frontend_model>
+			</group>
+			
+			<group id="header" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+				<field id="img_language" translate="label comment" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Display Images Store Language</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+			
+			</group>
+			<group id="catalog" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+				<field id="hover_effect_mb" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Disable Hover Effect on tablet and mobile</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+            </group>
+			
+			<group id="page_title" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+				<field id="page_title_heading" translate="label" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70">
+                    <label><![CDATA[<span style="display:block; text-align:center">Categories Page</span>]]></label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+				
+				<field id="title_toolbar" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Move Title to Toolbar</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				
+				<field id="breadcrumb_category" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Disable Breadcrumbs</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				
+				<field id="breadcrumb_toolbar" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Move Breadcrumbs to Toolbar</label>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<depends>
+                        <field id="breadcrumb_category">0</field>
+                    </depends>
+				</field>
+			</group>
+		</section>
+		
+		<section id="active_theme" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+			<label>Activate Theme</label>
+			<tab>mgs</tab>
+			<resource>MGS_SuproTheme::config_activetheme</resource>
+			<group id="activate" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+				<label>Activate Theme</label>
+
+				<field id="supro" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+					<label>Supro Theme</label>
+					<comment><![CDATA[Purchase Code. <a href="https://help.market.envato.com/hc/en-us/articles/202822600-Where-Is-My-Purchase-Code-" target="_blank">How to get it ?</a>]]></comment>
+				</field>
+			</group>
+		</section>
+		
+		<section id="fbuilder">
+			<group id="export">
+				<field id="static_line_above" translate="label" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50">
+                    <label><![CDATA[<hr style="border:1px solid #ddd; border-bottom:none; width:80%"/>]]></label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+				
+				<field id="import_static" translate="label" type="MGS\SuproTheme\Block\Adminhtml\System\ImportStatic" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label><![CDATA[Import Supro's Static Blocks]]></label>
+                </field>
+			</group>
+		</section>
+	</system>
+</config>

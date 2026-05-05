@@ -1,0 +1,27 @@
+<?php
+/**
+ * Product media data template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Gallery
+ */
+
+$gallery = $block->getGalleryImages();
+?>
+
+<div class="product-gallery">
+	<amp-carousel width="500" height="500" layout="responsive" type="slides" controls class="fadeIn">
+	<?php foreach($gallery as $_image): ?>
+		<?php $_imgUrl = $_image->getLargeImageUrl(); ?>
+		<?php if($_image->getMediaType() == 'external-video'): ?>
+			<?php $_videoUrl = $_image->getVideoUrl(); ?>
+			<div class="gallery-item">
+				<amp-youtube data-videoid="_aghWPzkB7M" layout="responsive" width="500" height="500"></amp-youtube>
+			</div>
+		<?php else: ?>
+			<div class="gallery-item">
+				<amp-img src="<?= $_imgUrl ?>" width="500" height="500" layout="responsive" role="button" tabindex="0" lightbox></amp-img>
+			</div>
+		<?php endif ?>
+	<?php endforeach ?>
+	</amp-carousel>
+</div>

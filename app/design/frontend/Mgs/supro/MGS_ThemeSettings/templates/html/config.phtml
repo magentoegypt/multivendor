@@ -1,0 +1,55 @@
+<?php $themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config')?>
+<?php /* Hover Effect */ ?>
+<?php $hoverEffect = $themeSettingConfig->getStoreConfig('themesettings/catalog/hover_effect_mb') ?>
+
+<?php if ($hoverEffect): ?>
+    <script>
+        require(['jquery'], function(jQuery){
+            (function($) {
+                $('body').addClass('disable-mobile-hover');
+            })(jQuery);
+        });
+    </script>
+<?php endif ?>
+
+<?php /* Back To Top */ ?>
+<?php $backToTop = $themeSettingConfig->getStoreConfig('themesettings/general/back_to_top') ?>
+<?php if ($backToTop): ?>
+    <a href="#" class="scroll-to-top"><i class="fa fa-arrow-up"></i></a>
+    <script>
+        require(['jquery'], function(jQuery){
+            (function($) {
+                $(window).on( 'scroll', function(){
+                    if ($(this).scrollTop() > 1) {
+                        $('.scroll-to-top').css({bottom:"25px"});
+                    } else {
+                        $('.scroll-to-top').css({bottom:"-45px"});
+                    }
+                });
+
+                $('.scroll-to-top').on('click', function(){
+                    $('html, body').animate({scrollTop: '0px'}, 800);
+                    return false;
+                });
+            })(jQuery);
+        });
+    </script>
+<?php endif; ?>
+
+<?php /* Lazy Load */ ?>
+<?php $lazyLoad = $themeSettingConfig->getStoreConfig('themesettings/general/lazy_load') ?>
+<?php if ($lazyLoad): ?>
+    <script>
+        require(['jquery','mlazyload'], function(jQuery){
+            (function($) {
+                $("img.lazy").unveil(25, function(){
+                    var self = $(this);
+                    setTimeout(function(){
+                        self.removeClass('lazy');
+                        self.parents('.parent_lazy').addClass('lazy_loaded');
+                    }, 0);
+                });
+            })(jQuery);
+        });
+    </script>
+<?php endif ?>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Magento/Widget/etc/widget.xsd">
+    <widget id="vnecoms_widget_seller" class="MagentoEgypt\VendorExtend\Block\Widget\Seller">
+        <label translate="true">Seller List</label>
+        <description translate="true"></description>
+        <parameters>
+            <parameter name="seller_ids" xsi:type="multiselect" required="true" visible="true" sort_order="20" source_model="MagentoEgypt\VendorExtend\Model\Source\SellerList">
+                <label translate="true">Select Sellers</label>
+            </parameter>
+            <parameter name="show_name" xsi:type="select" visible="true" sort_order="30" source_model="Magento\Config\Model\Config\Source\Yesno">
+                <label translate="true">Show Name</label>
+            </parameter>
+            <parameter name="items" xsi:type="text" visible="true" sort_order="60">
+                <label translate="true">Items</label>
+                <description translate="true">This variable allows you to set the maximum amount of items displayed at a time with the widest browser width.</description>
+                <value>5</value>
+            </parameter>
+            <parameter name="autoplay" xsi:type="select" visible="true" sort_order="90" source_model="Magento\Config\Model\Config\Source\Yesno">
+                <label translate="true">Autoplay</label>
+            </parameter>
+            <parameter name="stop_on_hover" xsi:type="select" visible="true" sort_order="100" source_model="Magento\Config\Model\Config\Source\Yesno">
+                <label translate="true">Stop On Hover</label>
+                <description>Stop autoplay on mouse hover.</description>
+            </parameter>
+            <parameter name="navigation" xsi:type="select" visible="true" sort_order="110" source_model="Magento\Config\Model\Config\Source\Yesno">
+                <label translate="true">Navigation</label>
+                <description>Display "next" and "prev" buttons.</description>
+            </parameter>
+            <parameter name="template" xsi:type="select" visible="true" sort_order="120" source_model="MagentoEgypt\VendorExtend\Model\Source\SellerTemplate">
+                <label translate="true">Template</label>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

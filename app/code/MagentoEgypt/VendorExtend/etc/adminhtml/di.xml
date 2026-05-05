@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\TabsLeft">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\Renderer\Message">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\Renderer\Status">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\RMA\Block\Adminhtml\Request\Edit\AjaxMessage">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+    <type name="Vnecoms\VendorsRMA\Block\Frontend\PrintRma">
+        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    </type>
+
+    <preference for="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Header" type="MagentoEgypt\VendorExtend\Block\Adminhtml\Quote\Edit\Header"/>
+</config>

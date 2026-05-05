@@ -1,0 +1,19 @@
+<?php 
+$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+?>
+<?php 
+$headerLeftSidebar = $themeSettingConfig->getStoreConfig('themesettings/header/header_version');
+?>
+<?php if($headerLeftSidebar == 'header7') : ?>
+<script type="text/javascript">
+	require([
+		'jquery',
+	], function(jQuery){
+		(function($) {
+			$(document).ready(function(){
+				$('body').addClass('use-header-left');
+			});	
+		})(jQuery);
+	});
+</script>
+<?php endif; ?>

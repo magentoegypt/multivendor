@@ -1,0 +1,69 @@
+<?php $attribute = NULL ?>
+<?php if($this->getData('attribute')!=''): ?>
+	<?php $attribute = $this->getData('attribute') ?>
+<?php endif ?>
+<?php $_productCollection = $this->getProductByCategories($this->getCategoryIds(), $attribute) ?>
+<?php $builderHelper = $this->helper('MGS\Fbuilder\Helper\Data'); ?>
+<?php $blockType = $this->getData('block_type'); ?>
+<?php $template = 'MGS_Fbuilder::products/grid_item.phtml'; ?>
+
+<div class="content-block <?= $blockType ?>-product-cat-block">
+	<?php // Block Content  ?>
+	<?php if ($_productCollection->getSize()>0): ?>
+		
+		<?php $blockId = rand() . time(); ?>
+		<?php $useSlider = $this->getUseSlider(); ?>
+		<?php $items = $perRowDefault = $this->getPerrow(); ?>
+		<?php $perRowTablet = $this->getPerrowTablet(); ?>
+		<?php $perRowMobile = $this->getPerrowMobile(); ?>
+		
+		<?php if($useSlider && $this->hasData('number_row') && $this->getNumberRow()>1): ?>
+			<?php $slideMultiRow = true; ?>
+			<?php $slideBy = 1 ?>
+			<?php $columnCount = $perRowDefault * $this->getNumberRow(); ?>
+		<?php else: ?>
+			<?php $slideBy = $this->getSlideBy() ?>
+			<?php $slideMultiRow = false; ?>
+		<?php endif ?>
+		
+		<?php if($useSlider): ?>
+		
+		<?php 
+			$settingMode = 'multiple'; 
+			$navPosition = $this->getNavigationPosition();
+	
+			$navType = $builderHelper->getStoreConfig('fbuilder/'.$settingMode.'_slider/navigation');
+			if($navType=='image'){
+				$nextIcon = $builderHelper->getStoreConfig('fbuilder/'.$settingMode.'_slider/next_image');
+				$prevIcon = $builderHelper->getStoreConfig('fbuilder/'.$settingMode.'_slider/prev_image');
+				$navHtml = '["<span><img src=\''.$builderHelper->getMediaUrl().'mgs/fbuilder/slider/'.$prevIcon.'\'/></span>", "<span><img src=\''.$builderHelper->getMediaUrl().'mgs/fbuilder/slider/'.$nextIcon.'\'/></span>"]';
+			}elseif($navType=='font'){
+				$nextIcon = $builderHelper->getStoreConfig('fbuilder/'.$settingMode.'_slider/next_font_class');
+				$prevIcon = $builderHelper->getStoreConfig('fbuilder/'.$settingMode.'_slider/prev_font_class');
+				$navHtml = '["<span><em class=\''.$prevIcon.'\'></em></span>", "<span><em class=\''.$nextIcon.'\'></em></span>"]';
+			}else {
+				$navHtml = '["<span></span>", "<span></span>"]';
+				
+			}
+		?>
+		<?php endif ?>
+		
+		<div class="block widget mgs-products <?= $blockType ?>-products-grid products-grid product-items<?php if($useSlider): ?> active-slider<?php endif ?>">
+			<div id="<?= $blockType ?>-products<?= $blockId; ?>" class="products list items product-items<?php if($useSlider): ?> owl-carousel js-owl-carousel-product <?php else: ?> line<?php endif ?>">
+				<?php foreach ($_productCollection as $_product): ?>
+					<div class="item product product-item">
+						<?= $this->getLayout()
+							->createBlock('MGS\Fbuilder\Block\Products\ProductItem')
+							->setLoadedProduct($_product)
+							->setBlockData($this->getData())
+							->setTemplate($template)
+							->toHtml(); ?>
+										
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	<?php else: ?>
+		<div class="message info empty"><div><?= /* @escapeNotVerified */ __('We can\'t find products matching the selection.') ?></div></div>
+	<?php endif ?>
+</div>

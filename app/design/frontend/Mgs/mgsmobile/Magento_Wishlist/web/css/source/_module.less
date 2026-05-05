@@ -1,0 +1,223 @@
+& when (@media-common = true) {
+	.top-wishlist {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 50px;
+		background-color: #fff;
+		z-index: 99;
+		.lib-transition(all 300ms);
+		.lib-transform(translateX(100%));
+		&:after {
+			content: "";
+			display: block;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 998;
+			height: 100vh;
+			background-color: #fff;
+			opacity: 0;
+			visibility: hidden;
+			.lib-transition(all 400ms);
+		}
+		a {
+			display: block;
+			position: relative;
+		}
+		.counter.qty {
+			border-radius: 20px;
+			color: #fff;
+			font-size: 0.625rem;
+			font-weight: 600;
+			height: 0.9375rem;
+			line-height: 0.9375rem;
+			min-width: 0.9375rem;
+			padding: 0;
+			position: absolute;
+			top: -7px;
+			right: -8px;
+			text-align: center;
+			background-color: #f68872;
+			&:empty {
+				display: none;
+			}
+		}
+		.wishlist-icon {
+			font-size: 22px;
+			position: relative;
+			display: block;
+			line-height: 1;
+			vertical-align: top;
+			margin-top: -2px;
+		}
+		.block-wishlist {
+			min-height: calc(~'100vh - 50px');
+			max-height: calc(~'100vh - 50px');
+			padding: 15px;
+			overflow-x: hidden;
+			overflow-y: auto;
+			.block-content {
+				padding-bottom: 68px;
+				min-height: calc(~'100vh - 80px');
+				position: relative;
+				&.empty {
+					min-height: 0px;
+					padding: 0;
+					top: 50%;
+					left: 50%;
+					width: 100%;
+					position: absolute;
+					.lib-transform(translate(-50%, -50%));
+					&:after {
+						content: "\e68c";
+						font-family: 'Linearicons';
+						position: absolute;
+						z-index: 1;
+						top: 50%;
+						left: 50%;
+						font-size: 100px;
+						color: #f1f1f1;
+						.lib-transform(translate(-50%, -50%));
+					}
+					.empty {
+						width: 100%;
+						text-align: center;
+						position: relative;
+						z-index: 2;
+					}
+				}
+			}
+			.actions-toolbar {
+				padding-top: 25px;
+				border-top: 1px solid #eee;
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				.primary {
+					width: 100%;
+				}
+			}
+		}
+		.close-wishlist-site {
+			padding: 0;
+			background: none !important;
+			border: none !important;
+			box-shadow: none !important;
+			margin: 12px 0 25px;
+		}
+		&.active {
+			&:after {
+				opacity: 0.7;
+				visibility: visible;
+			}
+			.block-wishlist {
+				opacity: 1;
+				visibility: visible;
+				.lib-transform(translateX(0));
+			}
+		}
+		.product-items .product-item {
+			border: none;
+			padding: 0 0 20px;
+			margin: 0;
+			+ .product-item {
+				border-top: 1px solid #eaeaea;
+				padding-top: 20px;
+			}
+			.product-item-info {
+				width: 100%;
+				&:before,
+				&:after {
+					content: "";
+					display: table;
+					clear: both;
+				}
+				.product-item-photo {
+					float: left;
+					.product-image-container,
+					.product-image-wrapper {
+						width: 75px !important;
+						padding: 0 !important;
+						display: block;
+						height: auto;
+					}
+					.product-image-photo {
+						position: static !important;
+						width: 100% !important;
+						height: auto !important;
+					}
+				}
+			}
+			.product-item-details {
+				position: relative;
+				padding-right: 30px;
+				padding-left: 88px;
+				.product-item-name {
+					display: block;
+					margin: 0;
+					a {
+						line-height: 1.4;
+						border-top-width: 0;
+						padding: 0;
+						color: #000;
+						text-transform: none;
+						font-weight: 400;
+						font-size: 1rem;
+						&:hover {
+							color: #f68872;
+						}
+					}
+				}
+				.product-item-actions {
+					margin-top: 9px;
+					.actions-secondary {
+						float: none;
+						margin: 0;
+						position: absolute;
+						top: 0;
+						right: 0;
+					}
+					.btn-xs {
+						display: inline-block;
+						padding: 0.45rem 1em;
+						font-size: 0.775rem;
+						line-height: unset;
+						border-radius: 4px;
+					}
+				}
+				.btn-remove {
+					span {
+						border: 0;
+						clip: rect(0, 0, 0, 0);
+						height: 1px;
+						margin: -1px;
+						overflow: hidden;
+						padding: 0;
+						position: absolute;
+						width: 1px;
+					}
+					&:before {
+						content: "\e681";
+						font-family: 'Linearicons';
+						font-size: 16px;
+					}
+				}
+				.price-box {
+					display: inline-block;
+					width: 100%;
+					margin-top: 6px;
+					.price {
+						color: #c00;
+						font-size: 1.1rem;
+						display: block;
+						font-weight: 500;
+					}
+				}
+			}
+		}
+	}
+}

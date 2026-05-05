@@ -1,0 +1,47 @@
+<?php if ($block->getConfig('general_settings/enabled') && $block->getConfig('product_page_settings/show_related_products_by_brand')): ?>
+	<?php if ($brand = $block->getBrand()): ?>
+		<?php $_productCollection = $block->getProductCollection(); ?>
+		<?php if ($_productCollection->getSize()): ?>
+			<?php $title = $block->getConfig('product_page_settings/title_related_products') ? __($block->getConfig('product_page_settings/title_related_products')) : __('Related Products By Brand'); ?>
+			<div class="block brand-related-products">
+				<div class="block-title title">
+					 <strong id="block-product_brand-heading" role="heading" aria-level="2"><?= $title; ?></strong>
+				</div>
+				 <div class="block-content content" aria-labelledby="block-product_brand-heading">
+					<div class="products grid products-grid active-slider">
+						<ol id="product-slider-product_brand" class="products list items product-items owl-carousel js-owl-carousel-product">
+							<?php foreach ($_productCollection as $_product): ?>
+							<li class="item product product-item">
+								<div class="product-item-info" data-container="product-grid">
+									<div class="product-top">
+										<a href="<?= $block->getProductUrl($_product) ?>" class="product photo product-item-photo">
+											<?= $block->getImage($_product, 'related_products_list')->toHtml(); ?>
+										</a>
+									</div>
+									<div class="product details product-item-details">
+										<strong class="product name product-item-name"><a class="product-item-link" title="<?= $block->escapeHtml($_product->getName()) ?>" href="<?= $block->getProductUrl($_product) ?>">
+											<?= $block->escapeHtml($_product->getName()) ?></a>
+										</strong>
+										
+										<?= $block->getReviewsSummaryHtml($_product, \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW ,true); ?>
+
+										<?= $block->getProductPrice($_product); ?>
+										<div class="product actions product-item-actions">
+											<a href="<?= $_product->getProductUrl() ?>" class="action primary"><?= __('View Detail') ?></a>
+											<?php if ($this->helper('Magento\Wishlist\Helper\Data')->isAllow()): ?>
+												<div data-role="add-to-links" class="actions-secondary">
+													<a href="#" class="action towishlist" title="<?= __('Add to Wish List') ?>" aria-label="<?= __('Save') ?>" data-post='<?= /* @noEscape */ $block->getAddToWishlistParams($_product) ?>' data-action="add-to-wishlist" role="button"></a>
+												</div>
+											<?php endif; ?>
+										</div>
+									</div>
+								</div>
+							</li>
+							<?php endforeach ?>
+						</ol>
+					</div>
+				 </div>
+			</div>
+		<?php endif; ?>
+	<?php endif; ?>
+<?php endif; ?>

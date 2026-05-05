@@ -1,0 +1,42 @@
+<?php 
+/* 	
+* 	Block Guide
+*	Report Bug: $block->getChildHtml('report.bugs');
+*	Store Swicher: $block->getChildHtml('store_switcher');
+*	Footer Links: $block->getChildHtml('footer_links');
+*	Copyright: $block->getChildHtml('copyright');
+*	Form Subcribe: $block->getChildHtml('form.subscribe');
+*	Static block: 		     $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('your_block_identifier')->toHtml();
+*/
+?>
+
+<?php
+	$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+	$themeHelper = $this->helper('MGS\Fbuilder\Helper\Data');
+	$footerVer = $themeSettingConfig->getStoreConfig('themesettings/footer/footer_version');
+	$footerParallax = $themeSettingConfig->getStoreConfig('themesettings/footer/parallax');
+	if($footerVer == ''){ $footerVer = 'footer1'; }
+	if($themeSettingConfig->getStoreConfig('themesettings/footer/footer_bottom_custom_copyright')){
+		$copyright = $themeSettingConfig->getStoreConfig('themesettings/footer/footer_bottom_copyright');
+	}else {
+		$copyright = $block->getChildHtml('copyright');
+	}
+?>
+<div class="middle-footer">
+	<div class="footer-block">
+		<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_4_top_block_1')->toHtml(); ?>
+	</div>
+	<div class="footer-block acc-block">
+		<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_4_top_block_2')->toHtml(); ?>
+	</div>
+	<div class="footer-block acc-block">
+		<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_4_top_block_3')->toHtml(); ?>
+	</div>
+	<div class="footer-block acc-block">
+		<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_4_top_block_4')->toHtml(); ?>
+	</div>
+</div>
+<div class="bottom-footer">
+	<?= $copyright ?>
+	<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_4_bottom_block_2')->toHtml(); ?>
+</div>

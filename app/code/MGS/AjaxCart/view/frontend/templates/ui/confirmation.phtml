@@ -1,0 +1,79 @@
+<?php
+/* @var $block \Magento\Framework\View\Element\Template */
+?>
+<?php
+    $cartSummary = $block->getCartSummary();
+    $cartSummaryText = $cartSummary == 1 ? __('item') : __('items');
+?>
+<div class="ajax_cart-popup popup__columns">
+    <div class="ajax_header">
+        <span><?php echo __('1 Item added to your cart'); ?></span>
+        <div class="action-close popup__action-close"><span class="pe-7s-close"></span></div>
+    </div>
+    <div class="popup__column">
+        <div class="popup__table">
+            <div class="popup__table-col">
+                <div class="popup__column--media">
+                    <?php $product = $this->getProduct(); ?>
+                    <?php if($product != ""): ?>
+                        <?php $_imagehelper = $this->helper('Magento\Catalog\Helper\Image'); ?>
+                        <?php $image = 'category_page_grid'; ?>
+                        <?php
+                        $size = array(
+                            'width' => 300,
+                            'height' => 300,
+                        );
+                        ?>
+                        <div class="popup__image-wrapper">
+                            <?php $productImage = $_imagehelper->init($product, $image)->resize($size['width'], $size['height'])->getUrl(); ?>
+                            <img class="img-fluid" alt="" src="<?php echo $productImage; ?>" />
+                        </div>
+                    <?php endif ?>
+                </div>
+            </div>
+            <div class="popup__table-col">
+                <div class="popup__column--result">
+                    <div class="product-confirm-detail">
+                        <div class="product-confirm-name"><?php echo $this->getProductName() ?></div>
+                        <div class="product-confirm-qty"><span class="title"><?php echo __('Quantity') ?></span><span class="value"><?php echo $this->getProductQty() ?></span></div>
+                        <div class="product-confirm-subtotal"><span class="title"><?php echo $block->escapeHtml(__('Cart Subtotal')) ?></span><span class="value"><?php /* @noEscape */ echo $block->getCartSubtotal() ?></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ajax_footer">
+        <div class="actions">
+            <button type="button" class="btn btn-primary popup__action-close btn-close"><?= __('Continue Shopping'); ?></a>
+            <?php if($block->getIsCart()): ?>
+                <button class="btn btn-primary btn-tocart" type="button" onclick="setLocation('<?= $block->getUrl('checkout/cart') ?>');"><?= $block->escapeHtml(__('Proceed to Cart')) ?></button>
+            <?php endif ?>
+        </div>
+    </div>
+    <script>
+        require(["jquery"], function (jQuery) {
+            (function($) {
+                jQuery('.popup__action-close').on('click', function(){
+                    jQuery('.success-ajax--popup .action-close').trigger('click');
+                });
+
+                jQuery('.popup__result-view-cart').on('click', function(){
+                    var url_cart_update = '<?= $this->getUrl('ajaxcart/index/updatecart') ?>';
+                    jQuery.ajax({
+                        url: url_cart_update,
+                        method: "POST"
+                    });
+                    window.location.href = jQuery(this).attr('data-href');
+                })
+                jQuery('.popup__action-redirect--checkout').on('click', function(){
+                    var url_cart_update = '<?= $this->getUrl('ajaxcart/index/updatecart') ?>';
+                    jQuery.ajax({
+                        url: url_cart_update,
+                        method: "POST"
+                    });
+                    window.location.href = jQuery(this).attr('data-href');
+                })
+            })(jQuery);
+        });
+    </script>
+</div>

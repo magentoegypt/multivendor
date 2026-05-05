@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Default Website -->
+    <route url="/V1/mstore/websites/default" method="GET">
+        <service class="Magento\Store\Api\WebsiteRepositoryInterface" method="getDefault"/>
+        <resources>
+            <resource ref="Magento_Backend::store"/>
+        </resources>
+    </route>
+</routes>

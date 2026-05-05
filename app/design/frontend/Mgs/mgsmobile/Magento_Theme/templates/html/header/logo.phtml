@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * @var \Magento\Theme\Block\Html\Header\Logo $block
+ */
+?>
+<?php
+	$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+	$logoMobile = $themeSettingConfig->getStoreConfig('themesettings/header/mobile_logo');
+	$storeName = $block->getThemeName() ? $block->getThemeName() : $block->getLogoAlt();
+?>
+
+<?php if ($block->isHomePage()):?>
+    <strong class="logo">
+<?php else: ?>
+    <a class="logo" href="<?= $block->getUrl(''); ?>" title="<?php /* @escapeNotVerified */ echo $storeName ?>">
+<?php endif ?>
+		<?php if($logoMobile): ?>
+			<img src="<?php /* @escapeNotVerified */ echo $themeSettingConfig->getMediaUrl('mgs/setting/' . $logoMobile) ?>"
+             alt="<?php /* @escapeNotVerified */ echo $block->getLogoAlt() ?>"/>
+		<?php else: ?>
+			<img src="<?php /* @escapeNotVerified */ echo $block->getLogoSrc() ?>"
+				 alt="<?php /* @escapeNotVerified */ echo $block->getLogoAlt() ?>"
+				 <?= $block->getLogoWidth() ? 'width="' . $block->getLogoWidth() . '"' : '' ?>
+				 <?= $block->getLogoHeight() ? 'height="' . $block->getLogoHeight() . '"' : '' ?>
+			/>
+		<?php endif ?>
+<?php if ($block->isHomePage()):?>
+    </strong>
+<?php else:?>
+    </a>
+<?php endif?>

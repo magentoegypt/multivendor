@@ -1,0 +1,58 @@
+<?php
+$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
+$blockEnable = explode(",",$themeSettingConfig->getStoreConfig('themesettings/header/elements'));
+$settingContentCondition =  false;
+if((in_array('store', $blockEnable) && trim(preg_replace('/\s+/', ' ', $block->getChildHtml('store_language')))) || (in_array('curency', $blockEnable) && trim(preg_replace('/\s+/', ' ', $block->getChildHtml('currency')))) || (in_array('static1', $blockEnable) && trim(preg_replace('/\s+/', ' ', $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_1')->toHtml()))) || (in_array('static2', $blockEnable) && trim(preg_replace('/\s+/', ' ', $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_2')->toHtml())))){
+	$settingContentCondition = true;
+}
+?>
+<?php if(in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
+	<?php if($settingContentCondition): ?>
+		<amp-sidebar id="site_setting" class="setting-site-content" layout="nodisplay" side="right">
+			<div class="customer-web-config">
+				<?php if(in_array('store', $blockEnable)): ?>
+					<?= $block->getChildHtml('store_language'); ?>
+				<?php endif ?>
+				<?php if(in_array('curency', $blockEnable)): ?>
+					<?= $block->getChildHtml('currency'); ?>
+				<?php endif ?>
+			</div>
+			<?php if(in_array('static1', $blockEnable)): ?>
+				<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_1')->toHtml(); ?>
+			<?php endif ?>
+		</amp-sidebar>
+	<?php endif ?>
+<?php endif ?>
+<amp-sidebar id="site_menu" class="site_menu" layout="nodisplay" side="left">
+	<button on='tap:site_menu.close' class="close-menu-site"><span class="icon-cross2"></span></button>
+    <?= $block->getChildHtml('amp.catalog.topnav') ?>
+</amp-sidebar>
+
+<ul id="js_mobile_tabs" class="header-mobile-tabs--bottom">
+	<li><button on='tap:site_setting.close' type="button"><span class="icon-building"></span></button></li>
+	<?php if(in_array('account', $blockEnable)): ?>
+		<li><a href="<?= $block->getUrl('customer/account') ?>"><span class="icon-my-account"></span></a></li>
+	<?php endif ?>
+	<?php if(in_array('wishlist', $blockEnable)): ?>
+	<li>
+		<a href="<?= $this->helper('Magento\Wishlist\Helper\Data')->getListUrl() ?>">
+			<span class="icon-wishlist"></span>
+		</a>
+	</li>
+	<?php endif ?>
+	<?php if(in_array('minicart', $blockEnable)): ?>
+	<li>
+		<a href="<?= $block->getUrl('checkout/cart') ?>">
+			<span class="icon-cart-top"></span>
+		</a>
+	</li>
+	<?php endif ?>
+	<?php if($settingContentCondition): ?>
+	<li>
+		<button on='tap:site_setting.toggle' type="button">
+			<span class="icon-setting-web"></span>
+		</button>
+	</li>
+	<?php endif ?>
+</ul>
+

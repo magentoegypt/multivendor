@@ -1,0 +1,44 @@
+<?php
+    $_helper = $this->helper('Smartwave\Megamenu\Helper\Data');
+    if(!$_helper->getConfig('sw_megamenu/general/enable')) return '';
+    $megaMenu = $block->getMegamenuItems();
+?>
+<?php if($megaMenu->getSize()>0):?>
+<div class="sticky-sidenav sections nav-sections">
+    <nav class="navigation sw-megamenu side-megamenu" role="navigation">
+        <ul>
+            <?php foreach($megaMenu as $item):?>
+                <li class="ui-menu-item level0">
+                    <div class="open-children-toggle"></div>
+                    <a href="<?= $item->getUrl() ?>" class="level-top">
+                        <i class="Simple-Line-Icons-layers"></i>
+                        <span><?= $item->getName() ?></span>
+                    </a>
+                </li>
+            <?php endforeach ?>
+        </ul>
+	</nav>
+</div>
+<style>
+.sticky-sidenav {
+    will-change: position,top,bottom,left;
+    padding-bottom: 1px;
+}
+</style>
+<script type="text/javascript">
+    require([
+        'jquery',
+        'themeSticky',
+        'Smartwave_Megamenu/js/sw_megamenu'
+    ], function ($) {
+        $(".sw-megamenu").swMegamenu();
+        $(".sidebar-nav .sticky-sidenav").themeSticky({
+          autoInit: true,
+          minWidth: 992,
+          containerSelector: '.page-main .page-main-inner',
+          autoFit: true,
+          paddingOffsetBottom: 10
+        });
+    });
+</script>
+<?php endif ?>

@@ -1,0 +1,102 @@
+// /**
+//  * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  ---------------------------------------------
+
+@product-name-link__color: @text__color;
+@product-name-link__color__active: @text__color;
+@product-name-link__color__hover: @text__color;
+@product-name-link__color__visited: @text__color;
+
+@product-name-link__text-decoration: none;
+@product-name-link__text-decoration__active: @link__hover__text-decoration;
+@product-name-link__text-decoration__hover: @link__hover__text-decoration;
+@product-name-link__text-decoration__visited: @link__hover__text-decoration;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+	.products-grid.active-slider {
+		margin-left: calc(~'-15px / 2');
+		margin-right: calc(~'-15px / 2');
+	}
+    .products.list.product-items {
+		&:not(.js-owl-carousel-product) {
+			.lib-flex();
+			.lib-flex-wrap();
+			margin-left: calc(~'-15px / 2');
+			margin-right: calc(~'-15px / 2');
+			.item.product-item {
+				width: 100%;
+				min-height: 1px;
+				-webkit-box-flex: 0;
+				-ms-flex: 0 1 50%;
+				flex: 0 1 50%;
+				max-width: 50%;
+				margin-bottom: 30px;
+			}
+		}
+		.item.product-item {
+			position: relative;
+			padding-left: calc(~'15px / 2');
+			padding-right: calc(~'15px / 2');
+			.product-item-details {
+				padding-top: 15px;
+			}
+			.product-item-name a {
+				font-weight: 600;
+				font-size: 1rem;
+			}
+			.product-reviews-summary {
+				margin: 1px 0 0;
+				&.empty+.price-box, 
+				&.no-rating+.price-box {
+					margin-top: 5px;
+				}
+				&.short .rating-summary .label {
+					display: none;
+				}
+			}
+			.product-item-actions {
+				margin-top: 10px;
+				.lib-flex();
+				.justify-content-between();
+				.action.primary {
+					padding: 5px 10px;
+					font-size: 12px;
+					border-radius: 4px;
+				}
+				.action.towishlist {
+					display: block;
+					width: 31px;
+					height: 31px;
+					line-height: 31px;
+					text-align: center;
+					border: 1px solid @theme-element-border-color;
+					border-radius: 4px;
+					&:after {
+						font-family: @theme-icon-font-family-name;
+						content: @theme-icon-content_wishlist;
+					}
+				}
+			}
+		}
+	}
+	
+	.block {
+		&.upsell,
+		&.related,
+		&.crosssell {
+			margin-top: 60px;
+			.block-title {
+				.lib-block-title();
+			}
+		}
+	}
+}

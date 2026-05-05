@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="ves_quotation_quote_submit_before">
+        <observer name="created_at_while_submit" instance="MagentoEgypt\VendorExtend\Observer\VesQuoteCreatedAt" disabled="false" />
+    </event>
+</config>

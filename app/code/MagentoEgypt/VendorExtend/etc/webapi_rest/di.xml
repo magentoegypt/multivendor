@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Webapi\Controller\PathProcessor">
+        <plugin name="api_locale" type="MagentoEgypt\VendorExtend\Plugin\Controller\PathProcessor"/>
+    </type>
+    <type name="Vnecoms\VendorsApi\Model\Data\Vendor\ToModel">
+        <plugin name="vendor_status_pending" type="MagentoEgypt\VendorExtend\Plugin\Model\Vendor\ToModel"/>
+    </type>
+</config>

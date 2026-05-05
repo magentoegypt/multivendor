@@ -1,0 +1,15 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<form class="form subscribe newsletter"
+	action-xhr="<?= str_replace('http://', 'https://', $block->getFormActionUrl()) ?>"
+	method="post" id="newsletter_validate_detail">
+	<input name="email" type="email" id="newsletter" required placeholder="<?= __('Enter your email address') ?>"/>
+	<button on="tap:newsletter_validate_detail.submit" class="action subscribe primary user-valid valid"></button>
+</form>

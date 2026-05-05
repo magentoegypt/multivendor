@@ -1,0 +1,49 @@
+<?php $footer1 = $block->getFooter1(); ?>
+<?php $footer2 = $block->getFooter2(); ?>
+<?php $footer3 = $block->getFooter3(); ?>
+<?php $footer4 = $block->getFooter4(); ?>
+<div class="footer1">
+	<?php if(!empty($footer1) || !empty($footer2) || !empty($footer3) || !empty($footer4)):?>
+	<div class="middle-footer">
+		<div class="frame">
+			<div class="line">
+				<?php if(!empty($footer1)):?>
+					<div class="footer-block col-des-4 col-tb-6 col-mb-12 col-mb-auto mg-bottom">
+						<?= $footer1; ?>
+					</div>
+				<?php endif;?>
+				<?php if(!empty($footer2)):?>
+					<div class="footer-block acc-block col-des-3 col-tb-6 col-mb-12 col-mb-auto">
+						<?= $footer2; ?>
+					</div>
+				<?php endif;?>
+				<?php if(!empty($footer3)):?>
+					<div class="footer-block acc-block col-des-3 col-tb-6 col-mb-12 col-mb-auto">
+						<?= $footer3; ?>
+					</div>
+				<?php endif;?>
+				<?php if(!empty($footer4)):?>
+					<div class="footer-block acc-block col-des-2 col-tb-6 col-mb-12 col-mb-auto">
+						<?= $footer4; ?>
+					</div>
+				<?php endif;?>
+			</div>
+		</div>
+	</div>
+	<?php endif;?>
+	<div class="bottom-footer">
+		<div class="frame">
+			<div class="content-bottom">
+				<div class="bottom-footer-copyright">
+					<?= $block->getCopyRight(); ?>
+				</div>
+				<div class="bottom-footer-social">
+					<?= $block->getFooterSocial(); ?>
+				</div>
+				<div class="bottom-footer-link">
+					<?= $block->getFooterLinks(); ?>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
