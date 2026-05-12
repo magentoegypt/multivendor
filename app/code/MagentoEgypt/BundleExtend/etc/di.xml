@@ -5,6 +5,18 @@
     <preference for="Magento\Bundle\Model\ResourceModel\Selection\Collection" type="MagentoEgypt\BundleExtend\Model\ResourceModel\Product\Collection" />
     <preference for="Magento\InventoryBundleProduct\Model\GetBundleProductStockStatus" type="MagentoEgypt\BundleExtend\Model\GetBundleProductStockStatus" />
 
+    <!-- Use bundle price models for new_bundle so getPriceType('regular_price') / 'final_price' expose bundle min/max methods -->
+    <type name="Magento\Framework\Pricing\PriceInfo\Factory">
+        <arguments>
+            <argument name="types" xsi:type="array">
+                <item name="new_bundle" xsi:type="array">
+                    <item name="infoClass" xsi:type="string">Magento\Bundle\Pricing\PriceInfo</item>
+                    <item name="prices" xsi:type="string">Magento\Bundle\Pricing\Price\Collection</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- Universal lie about typeId: returns 'bundle' for new_bundle products when override flag is set -->
     <type name="Magento\Catalog\Model\Product">
         <plugin name="me_override_typeid_as_bundle" type="MagentoEgypt\BundleExtend\Plugin\Model\OverrideTypeIdAsBundle" sortOrder="5" />
