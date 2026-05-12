@@ -16,6 +16,17 @@ class BundlePanel
         $this->locator = $locator;
     }
 
+    public function beforeModifyMeta(
+        \Magento\Bundle\Ui\DataProvider\Product\Form\Modifier\BundlePanel $subject,
+        array $meta
+    ) {
+        $product = $this->locator->getProduct();
+        if ($product->getShipmentType() === null) {
+            $product->setShipmentType('0');
+        }
+        return [$meta];
+    }
+
     public function afterModifyMeta(
         \Magento\Bundle\Ui\DataProvider\Product\Form\Modifier\BundlePanel $subject,
         $meta
