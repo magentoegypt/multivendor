@@ -2,6 +2,7 @@
 namespace MagentoEgypt\BundleExtend\Plugin\Ui;
 
 use Magento\Catalog\Model\Locator\LocatorInterface;
+use Magento\Framework\Stdlib\ArrayManager;
 use MagentoEgypt\BundleExtend\Helper\Data as BundleExtendHelper;
 
 class BundlePanel
@@ -11,18 +12,32 @@ class BundlePanel
      */
     private $locator;
 
-    public function __construct(LocatorInterface $locator)
+    /**
+     * @var ArrayManager
+     */
+    private $arrayManager;
+
+    public function __construct(LocatorInterface $locator, ArrayManager $arrayManager)
     {
         $this->locator = $locator;
+        $this->arrayManager = $arrayManager;
     }
 
     public function beforeModifyMeta(
         \Magento\Bundle\Ui\DataProvider\Product\Form\Modifier\BundlePanel $subject,
         array $meta
     ) {
-        $product = $this->locator->getProduct();
-        if ($product->getShipmentType() === null) {
-            $product->setShipmentType('0');
+        if ($this->arrayManager->findPath('shipment_type', $meta, null, 'children') === null) {
+            $meta['shipment_type'] = [
+                'arguments' => [
+                    'data' => [
+                        'config' => [
+                            'componentType' => 'field',
+                            'visible' => false,
+                        ],
+                    ],
+                ],
+            ];
         }
         return [$meta];
     }
