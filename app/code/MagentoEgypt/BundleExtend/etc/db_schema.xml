@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="catalog_product_bundle_option">
+        <column xsi:type="varchar" name="discount_type" nullable="true" length="255" comment="Discount Type"/>
+        <column xsi:type="decimal" name="discount_amount" nullable="true" scale="6" precision="20" comment="Discount Amount"/>
+    </table>
+</schema>

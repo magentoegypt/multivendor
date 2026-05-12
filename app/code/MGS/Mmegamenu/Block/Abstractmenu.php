@@ -68,21 +68,21 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
      * @var \Magento\Catalog\Model\Indexer\Category\Flat\State
      */
     protected $flatState;
-	
+
 	/**
      * @var \Magento\Framework\ObjectManagerInterface
      */
     protected $_objectManager;
-	
+
 	protected $_urlinterface;
-	
+
 	/**
      * @var \Magento\Cms\Model\Template\FilterProvider
      */
     protected $_filterProvider;
-    
+
     protected $_storeManager;
-	
+
 
     /**
      * @var CategoryUrlPathGenerator
@@ -109,9 +109,9 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
         \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\Indexer\Category\Flat\State $flatState,
 		\Magento\Framework\ObjectManagerInterface $objectManager,
-		\Magento\Cms\Model\Template\FilterProvider $filterProvider,        
-        \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $categoryUrlPathGenerator,      
-        \Magento\Store\Model\StoreManagerInterface $storeManager,  
+		\Magento\Cms\Model\Template\FilterProvider $filterProvider,
+        \Magento\CatalogUrlRewrite\Model\CategoryUrlPathGenerator $categoryUrlPathGenerator,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         array $data = []
     ) {
         $this->_productCollectionFactory = $productCollectionFactory;
@@ -124,7 +124,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 		$this->_objectManager = $objectManager;
 		$this->_urlinterface = $context->getUrlBuilder();
 		$this->_filterProvider = $filterProvider;
-        $this->_storeManager = $storeManager; 
+        $this->_storeManager = $storeManager;
         $this->_categoryUrlPathGenerator = $categoryUrlPathGenerator;
         parent::__construct($context, $data);
     }
@@ -238,7 +238,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
      */
     public function getCategoryUrl($category,$storeId)
     {
-              
+
         if ($category instanceof Category) {
             $url = $category->getUrl();
         } else {
@@ -247,7 +247,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
             }else{
                 $categorysuffix = $this->_categoryUrlPathGenerator->getUrlPathWithSuffix($category,$storeId);
                 $url = $this->_storeManager->getStore($category->getStoreId($storeId))->getBaseUrl(). $categorysuffix;
-            }           
+            }
         }
         //echo $url; die();
         return $url;
@@ -277,41 +277,41 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 	public function getModel($model){
 		return $this->_objectManager->create($model);
 	}
-	
+
 	public function getStore(){
 		return $this->_storeManager->getStore();
 	}
-	
+
 	public function getClass($item) {
         $type = $item->getMenuType();
 		$class = 'level0 menu-' . $item->getColumns() . 'columns';
-		
+
         if ($item->getColumns() > 1) {
             $class.= ' mega-menu-item mega-menu-fullwidth';
         }
-		
+
         if ($type == 2) {
             $class.= " static-menu";
         } else {
             $categoryId = $item->getCategoryId();
             $currentCateClass = 'mmegamenu-' . $categoryId;
-			
+
 			$class.= " category-menu " . $currentCateClass;
         }
-		
+
 		if ($item->getSubContent()) {
 			$class.= ' parent';
 		}
-		
+
 		if($item->getSpecialClass()){
 			$class .= ' ' . $item->getSpecialClass();
 		}
-		
+
         return $class;
     }
-	
+
 	public function getSubCategoryAccepp($categoryId, $item) {
-        $subCatExist = explode(',', $item->getSubCategoryIds());
+        $subCatExist = explode(',', $item->getSubCategoryIds() ?? "");
 
         $category = $this->getModel('Magento\Catalog\Model\Category')->load($categoryId);
 
@@ -328,7 +328,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
         }
         return $subCatId;
     }
-	
+
 	public function getMenuHtml($item,$storeId) {
         $type = $item->getMenuType();
         if ($type == 2) {
@@ -337,7 +337,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
             return $this->getCategoryMenu($item,$storeId);
         }
     }
-	
+
 	public function getCategoryMenu($item,$storeId) {
         $html = '<a';
         $categoryId = $item->getCategoryId();
@@ -346,12 +346,12 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
             $category = $this->getModel('Magento\Catalog\Model\Category')->load($categoryId);
             $html.=' href="';
             if ($item->getUrl() != '') {
-				if (filter_var($item->getUrl(), FILTER_VALIDATE_URL)) { 
+				if (filter_var($item->getUrl(), FILTER_VALIDATE_URL)) {
 					$html = $item->getUrl() . '"';
 				}else{
 					$html.= $this->getUrl($item->getUrl()) . '"';
 				}
-				
+
                 $html.= $this->getUrl($item->getUrl()) . '"';
             } else {
                 if ($this->getStore()->getRootCategoryId() == $category->getId()) {
@@ -360,7 +360,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
                     $html.= $this->getCategoryUrl($category,$storeId) . '"';
                 }
             }
-			
+
         }
         $html.=' class="level0';
 
@@ -385,7 +385,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 				if($columns > 1 && $item->getLeftContent()!='' && $item->getLeftCol()!=0){
 					$columns = $columns - $item->getLeftCol();
 				}
-				
+
 				if($columns > 1 && $item->getRightContent()!='' && $item->getRightCol()!=0){
 					$columns = $columns - $item->getRightCol();
 				}
@@ -405,7 +405,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 
                 $newArrColumn = [];
                 $newCount = 0;
-				
+
 				for ($i = 0; $i < count($arrColumn); $i++) {
 					$newColumn = count($arrColumn[$i]);
 					for ($j = 0; $j < $newColumn; $j++) {
@@ -416,7 +416,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 
                 $arrColumn = $newArrColumn;
 
-                
+
 
                 if ($columns > 1) {
                     $html.= '<div class="mega-menu-content"><div class="line">';
@@ -426,7 +426,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
                         $html.= $this->_filterProvider->getBlockFilter()->filter($item->getTopContent());
                         $html.='</div>';
                     }
-					
+
 					if($item->getLeftContent()!='' && $item->getLeftCol()!=0){
 						$html.='<div class="left_content static-content col-des-'.$this->getColumnByCol($item->getColumns()) * $item->getLeftCol().'">';
                         $html.= $this->_filterProvider->getBlockFilter()->filter($item->getLeftContent());
@@ -464,7 +464,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 
         return $html;
     }
-	
+
 	public function drawListSub($item, $catIds,$storeId) {
         $html = '';
 
@@ -485,7 +485,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 
         return $html;
     }
-	
+
 	public function drawList($category, $item,$storeId,$level = 1) {
         /* $maxLevel = $item->getMaxLevel();
         if ($maxLevel == '' || $maxLevel == NULL) {
@@ -501,10 +501,10 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
         $childrenCount = count($children);
 
         $htmlLi = '<li';
-  
+
         $htmlCateClass = 'mmegamenu-' . $category->getId();
 		$htmlLi .= ' class="level'.$level.' '.$htmlCateClass.'';
-        
+
         if ($childrenCount > 0 && $item->getColumns() == 1) {
             $htmlLi .= ' dropdown-submenu';
 			$htmlA = ' onclick="toggleMenu(this)"';
@@ -512,20 +512,20 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 
         $htmlLi .= '">';
         $html[] = $htmlLi;
-		
+
 		if ($category->getmgsCateThumb() !="") {
 			$imageCate = $category->getmgsCateThumb();
 			$imageCateUrl = $this->_urlBuilder->getBaseUrl(
                         ['_type' => \Magento\Framework\UrlInterface::URL_TYPE_MEDIA]
                     ) . 'catalog/category/' . $imageCate;
 			$html[] = '<img class="img-fluid" src="'.$imageCateUrl.'" />';
-			
+
         }
-		
+
         $html[] = '<a href="' . $this->getCategoryUrl($category,$storeId) . '"'.$htmlA.'>';
         if ($item->getColumns() > 1 && $level == 1) {
             $html[] = '<span class="mega-menu-sub-title">';
-			
+
         }
 
         $html[] = $category->getName();
@@ -543,22 +543,22 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 			$html[] = $category->getMgsMegamenuItemLabel();
 			$html[] = '</span>';
 		}
-		
+
         if ($item->getColumns() > 1 && $level == 1) {
             $html[] = '</span>';
         }
-		
+
 		if ($childrenCount > 0 && $item->getColumns() == 1) {
             $html[] = '<span class="icon-next"><i class="fa fa-angle-right">&nbsp;</i></span>';
         }
-		
+
         $html[] = '</a>';
 
         if ($level < $maxLevel) {
 
 
             $maxSub = 50;
-			
+
             $htmlChildren = '';
             if ($childrenCount > 0) {
                 $i = 0;
@@ -588,10 +588,10 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
         $html = implode("\n", $html);
         return $html;
     }
-	
+
 	public function getStaticMenu($item) {
 
-		if (filter_var($item->getUrl(), FILTER_VALIDATE_URL)) { 
+		if (filter_var($item->getUrl(), FILTER_VALIDATE_URL)) {
 			$html = '<a onclick="toggleMenu(this)" href="' . $item->getUrl() . '" class="level0';
 		}else{
 			$html = '<a onclick="toggleMenu(this)" href="' . $this->getUrl($item->getUrl()) . '" class="level0';
@@ -613,7 +613,7 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
 
             $html.='<ul class="dropdown-menu" id="mobile-menu-' . $item->getId() . '-' . $item->getParentId() . '"><li>';
 
-            
+
             $staticContent = $this->_filterProvider->getBlockFilter()->filter($item->getStaticContent());
 
             $html.= $staticContent;
@@ -622,11 +622,11 @@ abstract class Abstractmenu extends \Magento\Framework\View\Element\Template imp
         }
         return $html;
     }
-	
+
 	public function getColumnByCol($col) {
         return 12/$col;
     }
-	
+
 	public function isHomePage()
     {
         $currentUrl = $this->getUrl('', ['_current' => true]);

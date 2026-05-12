@@ -169,21 +169,11 @@ body {
 	}
 	&:not(.rtl-theme) header.page-header .header-area.header3 {
 		.right-content {
-            > div {
-                margin-left: 8px;
-            }
             .block-search .action.search {
                 left: 20px;
                 right: auto;
             }
         }
-		.horizontal-menu .navigation {
-            padding-left: 0px;
-			padding-right: 5px;
-			.nav-main-menu li.level0 {
-				padding: 0 0 0 8px;
-			}
-		}
 	}
     &.checkout-index-index {
         .logo {
@@ -737,10 +727,14 @@ header.page-header {
 				&.search-visible .right-content .block-search {
 					padding: 0 !important;
 					margin: 0 !important;
-					.block-content input {
-						padding: 0 18px 0 50px;
-    					min-width: 215px;
-					}
+                    width: 100%;
+					.block-content {
+                        width: 100%;
+                        input {
+                            padding: 0 18px 0 50px;
+                            min-width: 215px;
+                        }
+                    }
 				}
 				.horizontal-menu {
 					margin-left: 0;
@@ -978,6 +972,18 @@ footer.page-footer {
 		}
 		.footer1 {
 			.middle-footer {
+                .frame {
+                    @media (min-width: 1200px) {
+                        max-width: 1200px !important;
+                        width: 100%;
+                    }
+                    .footer-title, .list-links li a, .list-icon li, .list-icon li a, .list-icon .footer-icon {
+                        color: #FFF;
+                        &:hover {
+                            color: #999;
+                        }
+                    }
+                }
 				@media (min-width:768px) and (max-width:991px) {
 					.footer-block {
 						padding-bottom: 30px;
@@ -991,6 +997,21 @@ footer.page-footer {
 				}
 			}
 			.bottom-footer {
+                .frame {
+                    @media (min-width: 1200px) {
+                        max-width: 1200px !important;
+                        width: 100%;
+                    }
+                    .list-links li a, .social-links li a, .copyright {
+                        color: #FFF;
+                        &:hover {
+                            color: #999;
+                        }
+                    }
+                    .copyright {
+                        margin-top: 0;
+                    }
+                }
 				@media (max-width: 767px) {
 					.content-bottom {
 						display: block;
@@ -1715,13 +1736,13 @@ body.account {
 			margin: 10px 0;
 			font-size: 14px;
 		}
-        .block.newsletter .content .actions{right: 0}
+        .block.newsletter .content .actions{right: 10px}
         .block.newsletter .content .field.newsletter{
             #newsletter {
                 padding-left: 40px;
             }
             .control::before{
-                left: 0;
+                left: 10px;
             }
 		}
 		> .newsletter {
@@ -2766,10 +2787,16 @@ body.account {
 					padding: 22px 15px 21px;
 					background: #f7f7f7;
 					margin-left: -15px;
+                    @media (max-width: 767.98px) {
+                        margin-left: 0;
+                    }
 				}
 			}
 			.toolbar-products{
 				margin: 20px 15px 0 0;
+                @media (max-width: 767.98px) {
+                    margin: 20px 15px;
+                }
 				.filter-placeholder{
 					display: block !important;
 					.action-filter{
@@ -2877,6 +2904,28 @@ body.account {
         }
     }
 	// .toolbar-products{text-align: left;}
+}
+@media (max-width: 767.98px) {
+    .mgs-products.products-grid,
+    .abs-shopping-cart-items-mobile .actions,
+    .cart-container .form-cart .actions,
+    .login-container,
+    .register-container,
+    .password-forget,
+    .account .page-main,
+    .cms-privacy-policy .page-main,
+    .contact-index-index .page-main > .columns,
+    .cms-page-view.fullwidth .page-main > .columns,
+    .shopping-cart-bottom {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .password-forget {
+        padding-top: 50px;
+    }
+    .block-collapsible-nav {
+        top: 0px;
+    }
 }
 @media (max-width: 575.98px){
     .toolbar-products .sorter{margin-right: 0}
@@ -2986,6 +3035,8 @@ body.account {
 		}
 		.product-info-main {
 			margin-top: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
 			.bundle-actions {
 				display: none !important;
 			}

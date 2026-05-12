@@ -21,11 +21,11 @@ class Vertical extends Abstractmenu
 		;
 		return $menuCollection;
 	}
-	
+
 	public function getCustomClass(){
 		$menuId = $this->getMenuId();
 		$class = '';
-		
+
 		$menuCollection = $this->getModel('MGS\Mmegamenu\Model\Parents')
 			->getCollection()
 			->addFieldToFilter('parent_id', $menuId)->getFirstItem();
@@ -33,7 +33,7 @@ class Vertical extends Abstractmenu
 		if($menuCollection){
 			$class = $menuCollection->getCustomClass();
 		}
-		
+
 		return $class;
 	}
 }

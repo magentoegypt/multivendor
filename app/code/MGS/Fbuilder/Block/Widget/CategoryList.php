@@ -16,7 +16,7 @@ class CategoryList extends Template
 	protected $_categoryCollection;
 	protected $_file;
 	protected $_filesystem;
-	
+
 	public function __construct(
 		Template\Context $context,
 		\Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection,
@@ -27,16 +27,16 @@ class CategoryList extends Template
 		$this->_file = $file;
 		$this->_filesystem = $context->getFilesystem();
         parent::__construct($context, $data);
-		
+
     }
-	
+
 	public function getCategoryByIds(){
 		$result = [];
 		if($this->hasData('category_ids')){
 			$categoryIds = $this->getData('category_ids');
 			$categoryArray = explode(',',$categoryIds);
-			
-			if(count($categoryArray)>0){				
+
+			if(count($categoryArray)>0){
 				$result = $this->_categoryCollection->create()
 					->addAttributeToSelect(['name', 'fbuilder_thumbnail', 'fbuilder_icon', 'fbuilder_font_class'])
 					->addAttributeToFilter('entity_id',['in' => $categoryArray])
@@ -45,17 +45,18 @@ class CategoryList extends Template
 		}
 		return $result;
 	}
-	
+
 	public function getCategoryImageHtml($category){
-		if($category->getFbuilderThumbnail()!=''){
-			$filePath = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath('catalog/category/') . $category->getFbuilderThumbnail();
-			if ($this->_file->isExists($filePath))  {
-				return '<img src="'.$this->_urlBuilder->getBaseUrl(['_type' => \Magento\Framework\UrlInterface::URL_TYPE_MEDIA]).'catalog/category/'.$category->getFbuilderThumbnail().'" alt=""/>';
+        $fbThumb = str_replace('/media/catalog/category/','',$category->getFbuilderThumbnail());
+		if($fbThumb!=''){
+			$filePath = $this->_filesystem->getDirectoryRead(DirectoryList::MEDIA)->getAbsolutePath('catalog/category/') . $fbThumb;
+            if ($this->_file->isExists($filePath))  {
+				return '<img src="'.$this->_urlBuilder->getBaseUrl(['_type' => \Magento\Framework\UrlInterface::URL_TYPE_MEDIA]).'catalog/category/'.$fbThumb.'" alt=""/>';
 			}
 		}
 		return;
 	}
-	
+
 	public function getCategoryIconHtml($category){
 		if($category->getFbuilderFontClass()!=''){
 			return '<span class="category-icon font-icon '.$category->getFbuilderFontClass().'"></span>';
@@ -67,7 +68,7 @@ class CategoryList extends Template
 				}
 			}
 		}
-		
+
 		return;
 	}
 }

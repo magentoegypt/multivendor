@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="catalog_product_view_type_bundle"/>
+    <body>
+        <referenceBlock name="customize.button" remove="true" />
+        <referenceContainer name="product.info.main">
+            <block cacheable="true" class="MagentoEgypt\BundleExtend\Block\Bundle" name="bundle.swap" after="product.info.price" template="MagentoEgypt_BundleExtend::bundle.phtml" />
+        </referenceContainer>
+    </body>
+</page>

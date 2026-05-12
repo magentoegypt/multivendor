@@ -247,10 +247,11 @@ require([
 
 			/* Megamenu */
 			var ationMenu = $(".megamenu_action");
-			var ctMenu = $(".horizontal-menu");
+			var ctMenu = $(".horizontal-menu, .vertical-menu");
 			var mbMenuLeft = $(".use-header-left .header7 .middle-header");
 			if (!ationMenu.is(e.target) && ationMenu.has(e.target).length === 0 && !ctMenu.is(e.target) && ctMenu.has(e.target).length === 0 && !mbMenuLeft.is(e.target) && mbMenuLeft.has(e.target).length === 0) {
 				$('header.page-header').removeClass('active-menu');
+                activeBodyScroll(true);
 			}
 			/* ++++++++++++ */
 		});
@@ -342,7 +343,7 @@ require([
 						updateAnimation($_loginForm, "");
 						updateAnimation($_settingSite, "");
 						updateAnimation($_wishlistHeader, "");
-						setTimeout(function(){ $('body').removeClass('atv-cart atv-setting atv-myaccount atv-wishlist atv-sidebar'); }, 300);
+						setTimeout(function(){ if($('header.page-header a.logo').length) window.location.href = $('header.page-header a.logo').attr('href'); $('body').removeClass('atv-cart atv-setting atv-myaccount atv-wishlist atv-sidebar'); }, 300);
 						break;
 					case "my-account-action":
 						$('body').addClass('atv-myaccount');

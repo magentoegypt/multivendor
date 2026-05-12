@@ -1,5 +1,5 @@
-<?php 
-/* 	
+<?php
+/*
 * 	Block Guide
 *	Magento menu: $block->getChildHtml('store.menu');
 *	Language: $block->getChildHtml('store_language');
@@ -16,7 +16,7 @@
 
 <?php
 	$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
-	
+
 	$blockEnable = explode(",",$themeSettingConfig->getStoreConfig('themesettings/header/elements'));
 	$cartType = $themeSettingConfig->getStoreConfig('themesettings/header/mini_cart_type');
 	$accountType = $themeSettingConfig->getStoreConfig('themesettings/header/my_account_type');
@@ -26,7 +26,7 @@
 	$stickyMenuMobile = $themeSettingConfig->getStoreConfig('themesettings/header/sticky_menu_mobile');
 	$_headerVer = $themeSettingConfig->getStoreConfig('themesettings/header/header_version');
 	if($_headerVer == ''){ $_headerVer = 'header1'; }
-	
+
 	$addtionClass = "search-" . $searchType;
 	if($cartType == 'slide'){
 		$addtionClass .= " minicart-slide";
@@ -53,17 +53,17 @@
 <div class="header-area <?php if($_headerVer == 'header2' || $_headerVer == 'header4' || $_headerVer == 'header6'   ): ?>right-slide-menu<?php endif ?> <?= $_headerVer ?> <?= $addtionClass ?>">
 	<?php /* Header 1 */ ?>
 	<?php if($_headerVer == 'header1'): ?>
-		
+
 		<?php if($themeSettingConfig->getStoreConfig('themesettings/header/display_top_header') && in_array('static3', $blockEnable)): ?>
 			<div class="top-header">
 				<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('header_custom_static_block_3')->toHtml(); ?>
 			</div>
 		<?php endif ?>
-		
+
 		<div class="middle-header">
 			<div class="megamenu_action mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 			<?= $block->getChildHtml('logo') ?>
-			
+
 			<div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
 				<button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
 				<?php if($block->getChildHtml('megamenu')): ?>
@@ -72,14 +72,14 @@
 					<?= $block->getChildHtml('store.menu') ?>
 				<?php endif ?>
 			</div>
-			
+
 			<?php if(in_array('minicart', $blockEnable) || in_array('wishlist', $blockEnable) || in_array('search', $blockEnable) || in_array('account', $blockEnable) || in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
 			<div class="right-content">
-				
+
 					<?php if(in_array('search', $blockEnable)): ?>
 						<?= $block->getChildHtml('topSearch') ?>
 					<?php endif ?>
-					
+
 					<?php if(in_array('account', $blockEnable)): ?>
 						<div class="header-top-links">
 							<div class="actions">
@@ -88,11 +88,11 @@
 							<?= $block->getChildHtml('login.form.header'); ?>
 						</div>
 					<?php endif ?>
-					
+
 					<?php if(in_array('wishlist', $blockEnable)): ?>
 						<?= $block->getChildHtml('wishlist-link-header') ?>
 					<?php endif ?>
-					
+
 					<?php if(in_array('minicart', $blockEnable)): ?>
 						<?= $block->getChildHtml('minicart') ?>
 						<?= $block->getChildHtml('quotation') ?>
@@ -224,15 +224,6 @@
                 <div class="megamenu_action mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
                 <?= $block->getChildHtml('logo') ?>
 
-                <div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
-                    <button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
-                    <?php if($block->getChildHtml('megamenu')): ?>
-                        <?= $block->getChildHtml('megamenu') ?>
-                    <?php else: ?>
-                        <?= $block->getChildHtml('store.menu') ?>
-                    <?php endif ?>
-                </div>
-
                 <?php if(in_array('minicart', $blockEnable) || in_array('wishlist', $blockEnable) || in_array('search', $blockEnable) || in_array('account', $blockEnable) || in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
                 <div class="right-content">
 
@@ -290,6 +281,18 @@
                     <div class="megamenu_action tablet"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
                 </div>
                 <?php endif ?>
+            </div>
+            <div class="middle-header">
+                <div class="megamenu_action deskop"><button class="megamenu_action_mb" type="button"><span><?= __('Menu');?></span><i class="icon-menu"></i><i class="icon-cross"></i></button></div>
+                <?= $this->getLayout()->createBlock('MGS\Mmegamenu\Block\Vertical')->setData('menu_id',2)->setTemplate('MGS_Mmegamenu::vertical.phtml')->toHtml(); ?>
+                <div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
+                    <button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
+                    <?php if($block->getChildHtml('megamenu')): ?>
+                        <?= $block->getChildHtml('megamenu') ?>
+                    <?php else: ?>
+                        <?= $block->getChildHtml('store.menu') ?>
+                    <?php endif ?>
+                </div>
             </div>
         </div>
     <?php /* Header 4 */ ?>
@@ -381,7 +384,7 @@
 							<?php if(in_array('curency', $blockEnable)): ?>
 								<?= $block->getChildHtml('currency'); ?>
 							<?php endif ?>
-							
+
 						</div>
 						<div class="item customer-web-config language">
 							<?php if(in_array('store', $blockEnable)): ?>
@@ -398,7 +401,7 @@
 		<div class="middle-header">
 			<div class="megamenu_action mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 			<?= $block->getChildHtml('logo') ?>
-			
+
 			<div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
 				<button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
 				<?php if($block->getChildHtml('megamenu')): ?>
@@ -407,14 +410,14 @@
 					<?= $block->getChildHtml('store.menu') ?>
 				<?php endif ?>
 			</div>
-			
+
 			<?php if(in_array('minicart', $blockEnable) || in_array('wishlist', $blockEnable) || in_array('search', $blockEnable) || in_array('account', $blockEnable) || in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
 			<div class="right-content">
-				
+
 					<?php if(in_array('search', $blockEnable)): ?>
 						<?= $block->getChildHtml('topSearch') ?>
 					<?php endif ?>
-					
+
 					<?php if(in_array('account', $blockEnable)): ?>
 						<div class="header-top-links">
 							<div class="actions">
@@ -423,18 +426,18 @@
 							<?= $block->getChildHtml('login.form.header'); ?>
 						</div>
 					<?php endif ?>
-					
+
 					<?php if(in_array('wishlist', $blockEnable)): ?>
 						<?= $block->getChildHtml('wishlist-link-header') ?>
 					<?php endif ?>
-					
+
 					<?php if(in_array('minicart', $blockEnable)): ?>
 						<?= $block->getChildHtml('minicart') ?>
 						<?= $block->getChildHtml('quotation') ?>
 					<?php endif ?>
-					
+
 				<div class="megamenu_action tablet"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
-				
+
 				<?php if(in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
 					<?php if($settingContentCondition): ?>
 						<div class="setting-site">
@@ -465,7 +468,7 @@
 			</div>
 			<?php endif ?>
 		</div>
-		
+
 	<?php /* Header 6 */ ?>
     <?php elseif($_headerVer == 'header6'): ?>
          <?php if($themeSettingConfig->getStoreConfig('themesettings/header/display_top_header') && in_array('static3', $blockEnable)): ?>
@@ -482,7 +485,7 @@
                     <?= $block->getChildHtml('store.menu') ?>
                 <?php endif ?>
             </div>
-            
+
             <div class="left-content">
                 <?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_custom_static_block_4')->toHtml(); ?>
 
@@ -490,7 +493,7 @@
                     <?= $block->getChildHtml('topSearch') ?>
                 <?php endif ?>
             </div>
-            
+
             <?= $block->getChildHtml('logo') ?>
 
             <?php if(in_array('minicart', $blockEnable) || in_array('wishlist', $blockEnable) || in_array('search', $blockEnable) || in_array('account', $blockEnable) || in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
@@ -546,7 +549,7 @@
             </div>
             <?php endif ?>
         </div>
-	
+
 	<?php /*Header 7 left sidebar*/?>
 	<?php elseif($_headerVer == 'header7'): ?>
 		<div class="top-header">
@@ -611,18 +614,18 @@
 				<?php else: ?>
 					<?= $block->getChildHtml('store.menu') ?>
 				<?php endif ?>
-				
+
 			</div>
-			
+
             <?php endif ?>
 			<div class="bt-content ">
 				<div><?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_header_5_social')->toHtml(); ?></div>
 				<div><address><?= $copyright ?></address></div>
 			</div>
 		</div>
-		
+
 	</div>
-	
+
 	<?php endif ?>
 	<?php // Search Auto Complete ?>
 	<?php if($searchType != "icon-popup"): ?>
