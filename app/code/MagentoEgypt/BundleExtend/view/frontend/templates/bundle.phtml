@@ -1,0 +1,439 @@
+<style>
+    #bundlePackageContainer {
+        margin-top: 20px;
+    }
+    #bundlePackageContainer [data-role="title"] {
+        border: 1px solid #e5e5e5;
+        padding: 15px;
+        cursor: pointer;
+        text-transform: uppercase;
+    }
+    #bundlePackageContainer [data-role="title"] strong:hover {
+        text-decoration: underline;
+        text-underline-offset: 5px;
+    }
+    #bundlePackageContainer [data-role="title"] span {
+        float: inline-end;
+        display: none;
+    }
+    #bundlePackageContainer [aria-expanded="false"] [data-role="title"] span.icon-chevron-down,
+    #bundlePackageContainer [aria-expanded="true"] [data-role="title"] span.icon-chevron-up {
+        display: inline-block;
+    }
+    #bundlePackageContainer [data-role="content"] {
+        border: 1px solid #e5e5e5;
+        border-top: none;
+        padding: 15px 12px;
+    }
+    #bundlePackageContainer .hd-package-item {
+        display: flex;
+        gap: 20px;
+        padding: 16px;
+        border-top: 1px solid #dcdcdc;
+        background-color: #fff;
+    }
+    #bundlePackageContainer .hd-package-item:first-child {
+        border-top: none;
+    }
+    #bundlePackageContainer .hd-item-image {
+        width: 120px;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #bundlePackageContainer .hd-item-image img {
+        max-width: 100%;
+        max-height: 100px;
+        object-fit: contain;
+        position: static;
+        cursor: pointer;
+    }
+    #bundlePackageContainer .hd-item-info {
+        flex: 1;
+    }
+    #bundlePackageContainer .hd-item-brand,
+    .hd-swap-slide-modal .hd-item-brand {
+        font-size: 13px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 4px;
+    }
+    .hd-swap-slide-modal .hd-item-name-alter {
+        cursor: pointer;
+    }
+    #bundlePackageContainer .hd-item-name {
+        font-size: 16px;
+        font-weight: 600;
+        line-height: 1.4;
+        margin-bottom: 6px;
+        cursor: pointer;
+    }
+    #bundlePackageContainer .hd-item-model,
+    .hd-swap-slide-modal .hd-item-model {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 8px;
+    }
+    #bundlePackageContainer button.hd-add-single-btn,
+    #bundlePackageContainer button.hd-swap-btn,
+    .hd-swap-slide-modal button.hd-swap-btn {
+        margin-top: 1rem;
+        text-transform: capitalize;
+        letter-spacing: 1px;
+    }
+    #bundlePackageContainer button.hd-add-single-btn {
+        background-color: #eb5202;
+        border-color: #eb5202;
+    }
+    #bundlePackageContainer button.hd-add-single-btn:hover {
+        background-color: #f68872;
+        border-color: #f68872;
+    }
+    #bundlePackageContainer .hd-package-summary {
+        background: #fff;
+        padding: 20px 15px;
+        border-top: 1px solid #ddd;
+    }
+    #bundlePackageContainer .hd-summary-heading {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    #bundlePackageContainer .hd-summary-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        padding: 6px 0;
+    }
+    #bundlePackageContainer .hd-savings {
+        color: #0a7a2f;
+    }
+
+    #bundlePackageContainer .hd-tax-note {
+        color: #666;
+        font-size: 13px;
+    }
+    #bundlePackageContainer .hd-summary-total {
+        display: flex;
+        justify-content: space-between;
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+    #bundlePackageContainer .hd-summary-save {
+        color: #0a7a2f;
+        font-size: 15px;
+        margin-top: 4px;
+        text-align: end;
+    }
+    #bundlePackageContainer .hd-add-to-cart {
+        width: 100%;
+        background: #f96302;
+        color: #fff;
+        border: none;
+        padding: 14px;
+        font-size: 16px;
+        font-weight: 600;
+        margin-top: 18px;
+        cursor: pointer;
+    }
+    .hd-swap-slide-modal {
+        left: auto;
+    }
+    .hd-swap-slide-modal.modal-slide .modal-header,
+    .hd-swap-slide-modal.modal-slide .modal-content,
+    .hd-swap-slide-modal.modal-slide .modal-footer {
+        padding: 10px 15px;
+    }
+    [lang="ar"] .hd-swap-slide-modal.modal-slide .action-close {
+        left: 0;
+        right: auto;
+    }
+    .hd-swap-slide-modal.modal-slide .modal-header h1 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .hd-swap-slide-modal .modal-inner-wrap .hd-swap-modal {
+        width: 450px;
+        padding: 0;
+    }
+    .hd-swap-slide-modal .hd-swap-selected {
+        border-bottom: 1px solid #a5a5a5;
+        padding-bottom: 2rem;
+        margin-bottom: 1rem;
+    }
+    .hd-swap-slide-modal .hd-swap-heading {
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .hd-swap-slide-modal .hd-swap-selected-item {
+        display: flex;
+        gap: 12px;
+        margin-top: 10px;
+    }
+    .hd-swap-slide-modal .hd-swap-selected img,
+    .hd-swap-slide-modal .hd-swap-item img {
+        width: 100px;
+        height: fit-content;
+        cursor: pointer;
+    }
+    .hd-swap-slide-modal .hd-swap-list {
+        padding: 16px 0;
+    }
+    .hd-swap-slide-modal .hd-swap-item {
+        display: flex;
+        gap: 12px;
+        padding: 10px 0 40px;
+        cursor: pointer;
+    }
+    .hd-swap-slide-modal button.hd-swap-btn,
+    .hd-swap-slide-modal .hd-swap-item > div {
+        width: 100%;
+    }
+    .hd-swap-slide-modal .price {
+        color: #021359;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .hd-swap-slide-modal .price-box .old-price .price {
+        font-size: 0.8em;
+        color: #222222;
+    }
+    .catalog-product-view .product-info-main {
+        position: relative;
+    }
+    .catalog-product-view .product-info-main .bundle-actions {
+        position: sticky;
+        position: -webkit-sticky;
+        bottom: 10px;
+        display: block !important;
+    }
+    #bundle-addtocart-button {
+        display: block;
+        width: 100%;
+        float: none;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 0.075em;
+        height: 2.875rem;
+        line-height: 1;
+    }
+    .hd-configurable-container .swatch-attribute-selected-option {
+        padding-inline-start: 17px;
+    }
+    .hd-configurable-container .swatch-attribute-options {
+        margin-top: 8px;
+    }
+    @media (min-width: 768px) {
+        .catalog-product-view .product-info-main .product-social-links {
+            margin: 25px 0 0;
+            float: inline-start;
+        }
+        .catalog-product-view .product-info-main .margin-top25.extra-link {
+            float: inline-end;
+        }
+    }
+    @media (max-width: 767px) {
+        #bundlePackageContainer .hd-package-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        #bundlePackageContainer .hd-item-image {
+            width: 100%;
+            justify-content: flex-start;
+        }
+        .bundle-options-container {
+            display: none;
+        }
+        .hd-swap-slide-modal .modal-inner-wrap .hd-swap-modal {
+            width: auto;
+        }
+    }
+</style>
+<div id="bundlePackageContainer" data-bind="scope: 'bundlePackage'">
+    <div data-bind="attr: { 'aria-expanded': isExpanded() ? 'true' : 'false' }" class="hd-bundle-package">
+        <div data-role="title" data-bind="click: toggleExpand, css: { 'active': isExpanded() }">
+            <strong><?= __('Appliances in this package') ?></strong>
+            <i data-bind="text: '(' + itemsCount() + ')'"></i>
+            <span class="icon-chevron-up"></span>
+            <span class="icon-chevron-down"></span>
+        </div>
+        <div data-role="content" data-bind="visible: isExpanded">
+            <!-- ko foreach: items -->
+                <!-- ko template: 'hd-package-item-template' --><!-- /ko -->
+            <!-- /ko -->
+        </div>
+    </div>
+    <!-- ko template: 'hd-package-summary-template' --><!-- /ko -->
+</div>
+<div class="actions bundle-actions" data-bind="scope: 'bundlePackage'">
+    <button data-bind="click: addAllToCart, diable: disableAddToCart()" type="button" title="<?= __("Add To Cart") ?>" class="action primary tocart" id="bundle-addtocart-button">
+        <?= __("Add To Cart") ?>
+    </button>
+</div>
+<div id="hd-swap-modal" class="hd-swap-modal" style="display:none" data-bind="scope: 'bundlePackage'">
+    <!-- ko template: 'hd-swap-slide-template' --><!-- /ko -->
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "bundlePackage": {
+                    "component": "MagentoEgypt_BundleExtend/js/bundle-package",
+                    "bundleJson": <?= /* @noEscape */ $block->getJsonConfig() ?>
+                }
+            }
+        }
+    }
+}
+</script>
+<script type="text/x-magento-template" id="hd-package-summary-template">
+    <div class="hd-package-summary">
+        <h3 class="hd-summary-heading" data-bind="i18n: 'Package Summary'"></h3>
+        <div class="hd-summary-row">
+            <span>
+                <span data-bind="i18n: 'Regular Price'"></span>
+                (<span data-bind="text: itemsCount"></span> <span data-bind="i18n: 'items'"></span>)
+            </span>
+            <span data-bind="text: formatted.regular"></span>
+        </div>
+        <div class="hd-summary-row hd-savings">
+            <span data-bind="i18n: 'Bundle Saving'"></span>
+            <span>-<span data-bind="text: formatted.savings"></span></span>
+        </div>
+        <div class="hd-summary-row">
+            <span data-bind="i18n: 'Subtotal'"></span>
+            <span data-bind="text: formatted.subtotal"></span>
+        </div>
+        <hr/>
+        <div class="hd-summary-row">
+            <span data-bind="i18n: 'Appliance Delivery'"></span>
+            <span data-bind="text: formatted.delivery"></span>
+        </div>
+        <div class="hd-summary-row hd-tax-note">
+            <span data-bind="i18n: 'Taxes calculated at checkout'"></span>
+            <span>—</span>
+        </div>
+        <hr/>
+        <div class="hd-summary-total">
+            <span data-bind="i18n: 'Total'"></span>
+            <span data-bind="text: formatted.total"></span>
+        </div>
+        <div class="hd-summary-save">
+            <span  data-bind="i18n: 'Save'"></span>
+            <strong data-bind="text: formatted.savings"></strong>
+            (<span data-bind="text: Math.round((savings() / regularPrice()) * 100)"></span>%)
+        </div>
+    </div>
+</script>
+<script type="text/x-magento-template" id="hd-package-item-template">
+    <div class="hd-package-item product-item-info">
+        <div class="hd-item-image">
+            <img class="product-image-photo" data-bind="attr: { src: image, alt: name }, click: $parent.openProduct.bind($parent, $data)" />
+        </div>
+        <div class="hd-item-info">
+            <div class="hd-item-brand" data-bind="text: optionTitle"></div>
+            <div class="hd-item-name" data-bind="text: name, click: $parent.openProduct.bind($parent, $data)"></div>
+            <div class="hd-item-model">
+                <span data-bind="text: '<?= __('SKU') ?>'"></span>
+                <span data-bind="text: ': ' + sku"></span>
+            </div>
+            <!-- CONFIGURABLE OPTIONS -->
+            <!-- ko if: type === 'configurable' -->
+            <div class="hd-configurable-container" 
+                data-bind="attr:{'data-product-id': productId},afterRender: $parent.initSwatches.bind($parent, $element, $data)">
+            </div>
+            <!-- /ko -->
+            <button type="button" class="hd-swap-btn action primary" data-bind="click: $parent.openSwap.bind($parent, optionId)">
+                <span data-bind="i18n: 'Swap'"></span>
+            </button>
+            <button class="action primary hd-add-single-btn" data-bind="click: $parent.addSingleToCart.bind($parent, $data)">
+                <span data-bind="i18n: 'Add this item only'"></span>
+            </button>
+        </div>
+        <div class="hd-item-price">
+            <div class="price-box">
+                <div class="price-wrapper">
+                    <div class="price" data-bind="text: formattedPrice"></div>
+                </div>
+                <!-- ko if: isSp -->
+                <div class="old-price">
+                    <div class="price-wrapper">
+                        <div class="price" data-bind="text: formattedBasePrice"></div>
+                    </div>  
+                </div>
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/x-magento-template" id="hd-swap-slide-template">
+
+    <!-- SELECTED PRODUCT -->
+    <div class="hd-swap-selected" data-bind="with: currentSelection">
+        <h3 class="hd-swap-heading" data-bind="i18n: 'Current Selection'"></h3>
+
+        <div class="hd-swap-selected-item">
+            <img data-bind="attr:{src:image}, click: $parent.openProduct.bind($parent, $data)" width="100px" />
+            <div>
+                <div class="hd-item-brand" data-bind="text: optionTitle"></div>
+                <div class="hd-item-name-alter" data-bind="text:name, click: $parent.openProduct.bind($parent, $data)"></div>
+                <div class="hd-item-model">
+                    <span data-bind="text: '<?= __('SKU') ?>'"></span>
+                    <span data-bind="text: ': ' + sku"></span>
+                </div>
+                <div class="price-box">
+                    <div class="price-wrapper">
+                        <div class="price" data-bind="text: formattedPrice"></div>
+                    </div>
+                    <!-- ko if: isSp -->
+                    <div class="old-price">
+                        <div class="price-wrapper">
+                            <div class="price" data-bind="text: formattedBasePrice"></div>
+                        </div>  
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- OTHER OPTIONS -->
+    <div class="hd-swap-list">
+        <h3 class="hd-swap-heading" data-bind="i18n: 'Select a Different Item'"></h3>
+
+        <!-- ko foreach: swapSelections -->
+        <div class="hd-swap-item">
+            <img data-bind="attr:{src:image}, click: $parent.openProduct.bind($parent, $data)" width="100px" />
+            <div>
+                <div class="hd-item-brand" data-bind="text: optionTitle"></div>
+                <div data-bind="text:name, click: $parent.openProduct.bind($parent, $data)"></div>
+                <div class="hd-item-model">
+                    <span data-bind="text: '<?= __('SKU') ?>'"></span>
+                    <span data-bind="text: ': ' + sku"></span>
+                </div>
+                <div class="price-box">
+                    <div class="price-wrapper">
+                        <div class="price" data-bind="text: formattedPrice"></div>
+                    </div>
+                    <!-- ko if: isSp -->
+                    <div class="old-price">
+                        <div class="price-wrapper">
+                            <div class="price" data-bind="text: formattedBasePrice"></div>
+                        </div>  
+                    </div>
+                    <!-- /ko -->
+                </div>
+                <button class="hd-swap-btn action primary" data-bind="click: $parent.selectSwap.bind($parent, $data)">
+                    <span data-bind="i18n: 'Select'"></span>
+                    <!-- ko ifnot: isSamePrice -->
+                     (<span data-bind="text: signPlus +  priceDiff"></span>)
+                    <!-- /ko -->
+                </button>
+            </div>
+        </div>
+        <!-- /ko -->
+    </div>
+</script>
+

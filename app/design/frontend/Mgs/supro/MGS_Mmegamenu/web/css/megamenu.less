@@ -1,4 +1,4 @@
-.header-area.right-slide-menu .horizontal-menu {
+.header-area.right-slide-menu .horizontal-menu  {
     .mgs-megamenu--main {
         background: none !important;
         .nav-main-menu .static-content {
@@ -149,6 +149,8 @@
             margin: 0;
             height: 100%;
             position: static !important;
+            padding-left: 0;
+            padding-right: 0;
             .nav-main-menu {
                 display: -ms-flexbox;
                 display: flex;
@@ -259,6 +261,7 @@
                     }
                     &.menu-1columns {
                         position: relative;
+                        padding: 0 15px 1rem;
                         .dropdown-submenu {
                             > .dropdown-menu-ct {
                                 background-color: #fff;
@@ -568,5 +571,108 @@
             margin: 0;
             padding-top: 10px;
         }
+    }
+}
+
+.shop-all {
+    &.nav-main {
+        display: block;
+        padding: 0;
+        a {
+            margin: 0;
+        }
+        .sub-menu > li > a {
+            white-space: nowrap;
+        }
+        li {
+            position: relative;
+            &.level0 {
+                display: block;
+                margin: 0;
+                float: none;
+                border: none;
+                + li.level0 > a.level0 {
+                    border-top: 1px solid #f3f3f3;
+                }
+            }
+            .toggle-menu {
+                cursor: pointer;
+                position: absolute;
+                right: 0;
+                top: 0;
+                display: block;
+                padding: 17px 9px;
+                line-height: 1;
+                > .icon-toggle {
+                    display: block;
+                    line-height: 0;
+                    &:before {
+                        content: "\e936";
+                        font-family: "Linearicons";
+                        font-size: 0.75rem;
+                        color: #222;
+                        font-weight: bold;
+                        line-height: 1;
+                    }
+                }
+                .icon-plus:before {
+                    content: "\e93c";
+                }
+                .active .icon-plus:before {
+                    content: "\e93a";
+                }
+            }
+            > a > .toggle-menu {
+                display: none;
+            }
+            &._show-child > .toggle-menu > .icon-toggle:before {
+                content: "\e937";
+            }
+            &.level0 {
+                > a.level0 {
+                    font-size: 1.125rem;
+                    font-weight: 600;
+                    color: #222222;
+                    padding: 10px 15px 10px 0;
+                    display: block;
+                    border: none;
+                }
+                > .dropdown-mega-menu {
+                    display: none;
+                }
+            }
+            &.level1 > a {
+                padding-left: 10px !important;
+            }
+            &[class*="level"]:not(.level1):not(.level0) > a {
+                padding-left: 20px !important;
+            }
+        }
+        .dropdown-menu,
+        .dropdown-menu-ct,
+        li > .sub-menu {
+            display: none;
+        }
+        .dropdown-submenu-ct > li > a,
+        .dropdown-menu-ct > li > a,
+        .sub-menu > li > a {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #222222;
+            padding: 10px 30px 10px 20px;
+            border-top: 1px solid #f3f3f3;
+            display: block;
+        }
+    }
+}
+
+body.rtl-theme .shop-all.nav-main li.level0 > a.level0 {
+	padding: 10px 0 10px 15px;
+}
+body.rtl-theme .shop-all.nav-main  li .toggle-menu {
+	left: 0;
+	right: auto;
+    .icon-plus:before {
+        content: "\e93b";
     }
 }

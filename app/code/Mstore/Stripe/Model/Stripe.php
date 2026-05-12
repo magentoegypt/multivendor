@@ -21,7 +21,6 @@ class Stripe implements StripeInterface
     ) {
         $this->context = $context;
         // $this->webhooksSetup = $webhooksSetup;
-        $this->initStripe();
     }
 
     public function initStripe()
@@ -51,6 +50,8 @@ class Stripe implements StripeInterface
     public function createPaymentIntent($payment_method_id, $email, $amount, $currencyCode, $captureMethod){
         $params = ["payment_method"=>$payment_method_id, "amount"=>$amount, "receipt_email"=>$email, "currency"=>$currencyCode, "capture_method"=>$captureMethod, "confirm"=>true, "description"=>"Payment from Magento for ".$email];
         try {
+            $this->initStripe();
+            
             $paymentIntent = \Stripe\PaymentIntent::create($params);
             if (!$paymentIntent || !isset($paymentIntent->id)){
                 throw new LocalizedException(__('The payment intent with ID %1 could not be retrieved from Stripe', $payment_method_id));

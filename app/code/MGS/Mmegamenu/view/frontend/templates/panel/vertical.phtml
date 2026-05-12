@@ -1,4 +1,5 @@
 <?php $megaMenu = $this->getMegamenuItems(); ?>
+<?php $storeId = $this->getStore()->getId(); ?>
 <div class="widget megamenu-widget vertical-menu-widget">
 	<?php if($this->hasData('mgs_panel_title') || $this->hasData('mgs_panel_note')): ?>
 		<div class="content-heading">

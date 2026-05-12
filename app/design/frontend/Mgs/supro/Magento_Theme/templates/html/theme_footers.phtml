@@ -1,5 +1,5 @@
-<?php 
-/* 	
+<?php
+/*
 * 	Block Guide
 *	Report Bug: $block->getChildHtml('report.bugs');
 *	Store Swicher: $block->getChildHtml('store_switcher');
@@ -23,6 +23,19 @@
 	}
 ?>
 <div class="<?= $footerVer ?><?php if($footerParallax): ?> footer footer-parallax<?php endif ?>">
+    <div class="middle-footer">
+        <div class="frame no-padding">
+            <div class="newsletter-home line">
+                <div class="col-des-4 left-newsletter title-newsletter">
+                    <h3 class="title"><?= __('Stay in touch') ?></h3>
+                    <div class="subtitle"><?= __('Get updates by subscribing to our weekly newsletter') ?></div>
+                </div>
+                <div class="col-des-8">
+                    <?= $this->getLayout()->createBlock('Magento\Newsletter\Block\Subscribe')->setTemplate("Magento_Newsletter::subscribe.phtml")->toHtml(); ?>
+                </div>
+            </div>
+        </div>
+    </div>
 	<?php if($footerVer == 'footer1'): ?>
 		<div class="middle-footer">
 			<div class="frame">
@@ -39,7 +52,7 @@
 					<div class="footer-block acc-block col-des-2 col-tb-6 col-mb-12 col-mb-auto">
 						<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_1_top_block_4')->toHtml(); ?>
 					</div>
-					<?php ?>	
+					<?php ?>
 				</div>
 			</div>
 		</div>
@@ -108,7 +121,7 @@
 					<div class="footer-block acc-block col-des-2 col-tb-6 col-mb-12 col-mb-auto">
 						<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_4_top_block_4')->toHtml(); ?>
 					</div>
-					<?php ?>	
+					<?php ?>
 				</div>
 			</div>
 		</div>
@@ -159,7 +172,7 @@
 					<div class="footer-block acc-block col-des-2 col-tb-6 col-mb-12 col-mb-auto">
 						<?= $this->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId('supro_footer_1_top_block_4')->toHtml(); ?>
 					</div>
-					<?php ?>	
+					<?php ?>
 				</div>
 			</div>
 		</div>

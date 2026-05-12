@@ -1,11 +1,92 @@
 <?php $megaMenu = $this->getMegamenuItems(); ?>
+<?php $storeId = $this->getStore()->getId(); ?>
 <?php $helper = $this->helper('MGS\Mmegamenu\Helper\Data') ?>
 <?php if ($megaMenu->getSize() > 0): ?>
     <ul id="vertical-menu-<?php echo $this->getMenuId() ?>" class="vertical-menu nav nav-pills nav-main <?php echo $this->getCustomClass(); ?>">
 		<?php foreach ($megaMenu as $item): ?>
 			<li class="<?php echo $this->getClass($item) ?>">
-				<?php echo $helper->generateContentFilter($item->getSubContent()); ?>
+				<?php echo $helper->generateContentFilter($this->getMenuHtml($item, $storeId)); ?>
 			</li>
 		<?php endforeach ?>
     </ul>
 <?php endif ?>
+<style type="text/css">
+    header.page-header .middle-header + .middle-header {
+        justify-content: start;
+    }
+    header.page-header .middle-header + .middle-header .megamenu_action {
+        align-items: baseline;
+        margin-inline-end: 15px;
+    }
+    header.page-header .middle-header + .middle-header .megamenu_action > .megamenu_action_mb > span {
+        margin-inline-end: 10px;
+    }
+    .vertical-menu.shop-all{
+        position: absolute;
+        width: 400px;
+        height: 100vh;
+        top: 100%;
+        background: white;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        z-index: 100;
+        transition: all .3s ease-in-out;
+        box-shadow: 0 0 10px rgba(0,0,0,.2);
+    }
+    header.page-header.active-menu .middle-header + .middle-header:before{
+        content: "";
+        background: #fff;
+        opacity: 0.5;
+        visibility: visible;
+        position: absolute;
+        z-index: 99;
+        top: 100%;
+        left: 0;
+        right: 0;
+        height: 100vh;
+    }
+    body:not(.rtl-theme) .vertical-menu.shop-all{
+        left: -9999px;
+        padding-right: 10px;
+    }
+    body.rtl-theme .vertical-menu.shop-all{
+        right: -9999px;
+        padding-left: 10px;
+    }
+    @media (max-width: 1199px){
+        body:not(.rtl-theme) .vertical-menu.shop-all{
+            padding-left: 25px;
+        }
+        body.rtl-theme .vertical-menu.shop-all{
+            padding-right: 25px;
+        }
+    }
+    @media (min-width: 1200px){
+        body:not(.rtl-theme) .vertical-menu.shop-all{
+            padding-left: 45px;
+        }
+        body.rtl-theme .vertical-menu.shop-all{
+            padding-right: 45px;
+        }
+    }
+    body:not(.rtl-theme) .active-menu .vertical-menu.shop-all{
+        left: 0;
+        overflow: auto;
+    }
+    body.rtl-theme .active-menu .vertical-menu.shop-all{
+        right: 0;
+        overflow: auto;
+    }
+    .active-menu .megamenu_action_mb .icon-menu,
+    .megamenu_action_mb .icon-cross {
+        display: none;
+    }
+    .active-menu .megamenu_action_mb .icon-cross {
+        display: inline-block;
+    }
+    @media screen and (max-width: 991px) {
+        header.page-header .middle-header + .middle-header .megamenu_action {
+            display: none;
+        }
+    }
+</style>

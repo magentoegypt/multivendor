@@ -2,14 +2,14 @@
 <ol class="items">
     <?php foreach ($filterItems as $filterItem): ?>
         <?php
-            $checked = ''; 
+            $checked = '';
             if(!$filterItem->getActive()) {
                 $url = $filterItem->getUrl();
             } else {
                 $checked = 'checked';
                 $url = $filterItem->getRemoveUrl();
             }
-             
+
         ?>
         <li class="item">
             <a class="mgs-ajax-layer-item" href="<?php echo $block->escapeUrl($url) ?>">

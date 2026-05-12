@@ -14,7 +14,7 @@ class FinalPricePlugin
                 return [$template];
             }
         } else {
-            return[$template];
+            return [$template];
         }
     }
 }

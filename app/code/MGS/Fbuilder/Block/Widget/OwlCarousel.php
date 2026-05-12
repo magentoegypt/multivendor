@@ -6,9 +6,9 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 class OwlCarousel extends Template
 {
 	protected $_filesystem;
-	
+
 	protected $_file;
-	
+
 	public function __construct(
 		Template\Context $context,
 		\Magento\Framework\Filesystem\Driver\File $file,
@@ -18,7 +18,7 @@ class OwlCarousel extends Template
 		$this->_filesystem = $context->getFilesystem();
 		$this->_file = $file;
     }
-	
+
 	public function getImages(){
 		$result = [];
 		if($this->hasData('images') && ($this->getData('images')!='')){
@@ -35,7 +35,7 @@ class OwlCarousel extends Template
 		}
 		return $result;
 	}
-	
+
 	public function getLinks(){
 		$links = [];
 		if($this->hasData('links') && ($this->getData('links')!='')){
@@ -44,7 +44,7 @@ class OwlCarousel extends Template
 		}
 		return $links;
 	}
-	
+
 	public function getCustomclass(){
 		$customclass = [];
 		if($this->hasData('customclass') && ($this->getData('customclass')!='')){
@@ -53,7 +53,7 @@ class OwlCarousel extends Template
 		}
 		return $customclass;
 	}
-	
+
 	public function getHtmlCode(){
 		$html = [];
 		if($this->hasData('html') && ($this->getData('html')!='')){
@@ -63,7 +63,7 @@ class OwlCarousel extends Template
 		}
 		return $html;
 	}
-	
+
 	public function getHtml(){
 		$html = [];
 		if($this->hasData('html') && ($this->getData('html')!='')){
@@ -72,7 +72,7 @@ class OwlCarousel extends Template
 		}
 		return $html;
 	}
-	
+
 	public function getHeightPreload(){
 		$heightPreload = '300px';
 		if($this->hasData('height_preload') && ($this->getData('height_preload')!='')){
@@ -80,7 +80,7 @@ class OwlCarousel extends Template
 		}
 		return $heightPreload;
 	}
-	
+
 	public function getAnimateSlider()
 	{
 		$animated = $this->getData('effect');
@@ -101,7 +101,7 @@ class OwlCarousel extends Template
         }
 		return $result;
 	}
-	
+
 	public function getAutoSpeed()
 	{
 		$autoSpeed = 3000;
@@ -110,7 +110,7 @@ class OwlCarousel extends Template
 		}
 		return $autoSpeed;
 	}
-	
+
 	public function getAutoPlay()
 	{
 		if($this->getData('autoplay') != "" && $this->getData('autoplay') == 1){
@@ -118,7 +118,7 @@ class OwlCarousel extends Template
 		}
 		return 'false';
 	}
-	
+
 	public function getRtl()
 	{
 		if($this->getData('rtl') != "" && $this->getData('rtl') == 1){
@@ -126,7 +126,7 @@ class OwlCarousel extends Template
 		}
 		return 'false';
 	}
-	
+
 	public function getTemplateControls()
 	{
 		if($this->getData('navtemple') != ""){
@@ -134,8 +134,8 @@ class OwlCarousel extends Template
 		}
 		return 1;
 	}
-	
-	
+
+
 	public function getControlNav()
 	{
 		if($this->getData('navigation') != "" && $this->getData('navigation') == 1){
@@ -143,7 +143,7 @@ class OwlCarousel extends Template
 		}
 		return 'false';
 	}
-	
+
 	public function getControlDots()
 	{
 		if($this->getData('pagination') != "" && $this->getData('pagination') == 1){
@@ -151,7 +151,7 @@ class OwlCarousel extends Template
 		}
 		return 'false';
 	}
-	
+
 	public function getLoop()
 	{
 		if($this->getData('loop') != "" && $this->getData('loop') == 1){
@@ -159,7 +159,7 @@ class OwlCarousel extends Template
 		}
 		return 'false';
 	}
-	
+
 	public function checkFull()
 	{
 		if($this->getData('fullscreen') != "" && $this->getData('fullscreen') == 1){
