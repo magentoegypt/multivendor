@@ -416,6 +416,16 @@ class Bundle extends AbstractView
                 $this->selectedOptions[$option->getId()][] = $selectionId;
             }
         }
+
+        if (empty($this->selectedOptions[$option->getId()])) {
+            foreach ($option->getSelections() as $selectionItem) {
+                if ($selectionItem->isSalable()) {
+                    $this->selectedOptions[$option->getId()][] = $selectionItem->getSelectionId();
+                    break;
+                }
+            }
+        }
+
         return $selections;
     }
 
