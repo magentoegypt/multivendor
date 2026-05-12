@@ -33,6 +33,8 @@ class BundlePanel
                     'data' => [
                         'config' => [
                             'componentType' => 'field',
+                            'formElement' => 'hidden',
+                            'dataType' => 'text',
                             'visible' => false,
                         ],
                     ],
