@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_creditmemo_save_after">
+        <observer name="magentoegypt_vendorextend_update_order_status_on_creditmemo"
+                  instance="MagentoEgypt\VendorExtend\Observer\UpdateOrderStatusOnCreditmemo" />
+    </event>
+    <event name="vnecoms_vendorssales_order_creditmemo_save_after">
+        <observer name="magentoegypt_vendorextend_override_vendor_order_status_after_creditmemo"
+                  instance="MagentoEgypt\VendorExtend\Observer\UpdateOrderStatusOnCreditmemo" />
+    </event>
+</config>
