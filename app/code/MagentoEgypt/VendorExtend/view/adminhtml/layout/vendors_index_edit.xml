@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="vendors_edit_tabs">
+            <block class="MagentoEgypt\VendorExtend\Block\Adminhtml\Vendor\Edit\Tab\CustomTheme" name="vendors_edit_tab_custom_theme" />
+            <action method="addTab">
+                <argument name="name" xsi:type="string">custom_theme_section</argument>
+                <argument name="block" xsi:type="string">vendors_edit_tab_custom_theme</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>
