@@ -500,7 +500,7 @@ href=""https://dashboard.rjmetrics.com/v2/magento/signup/"">Magento BI Essential
 "Guest","زائر",module,Magento_Backend
 "Items","عناصر",module,Magento_Backend
 "Total","إجمالي",module,Magento_Backend
-"Lifetime Sales","مبيعات مدى الحياة",module,Magento_Backend
+"Lifetime Sales","إجمالي المبيعات",module,Magento_Backend
 "Average Order","متوسط الطلبات",module,Magento_Backend
 "Average","متوسط",module,Magento_Backend
 "Product","المنتج",module,Magento_Backend
@@ -1561,7 +1561,7 @@ and the product descriptor can be up to 18, 14, or 9 characters respectively (wi
 "Add Selected Products","إضافة منتجات مختارة",module,Magento_BundleStaging
 "Add Products to Option","إضافة المنتجات إلى الخيار",module,Magento_BundleStaging
 "Select...","اختر...",module,Magento_BundleStaging
-"Status","الحالة",module,Magento_BundleStaging
+"Status","حالة الطلب",module,Magento_BundleStaging
 "ID","المعرِّف",module,Magento_BundleStaging
 "Thumbnail","صورة مصغرة",module,Magento_BundleStaging
 "Name","اسم",module,Magento_BundleStaging
@@ -4786,7 +4786,7 @@ You need to create a simple product for each configuration (Ex: a product for ea
 "Sales Statistics","إحصائيات المبيعات",module,Magento_Customer
 "Web Site","موقع",module,Magento_Customer
 "Store","متجر",module,Magento_Customer
-"Lifetime Sales","مبيعات مدى الحياة",module,Magento_Customer
+"Lifetime Sales","إجمالي المبيعات",module,Magento_Customer
 "Average Sale","متوسط البيع",module,Magento_Customer
 "All Store Views","واجهه جميع المواقع",module,Magento_Customer
 "Change","تغير",module,Magento_Customer
@@ -15660,8 +15660,8 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "Credit from order #%1, invoice #%2","رصيد من الطلب #%1، الفاتورة #%2"
 "Refund Commission","عمولة الاسترجاع"
 "Refund Commission of order #%1, item %2 x %3","عمولة استرجاع الطلب #%1، المنتج %2 × %3"
-"Refund Order","استرجاع الطلب"
-"Refund order #%1, Creditmemo #%2","استرجاع الطلب #%1، مذكرة الائتمان #%2"
+"Refund Order","طلب استرجاع"
+"Refund order #%1, Creditmemo #%2","طلب استرجاع #%1، مذكرة ائتمان #%2"
 "Refund spent credit(s) from order #%1","استرداد الرصيد المستخدم من الطلب #%1"
 "Withdraw Money","سحب الأموال"
 "Can not cancel this transaction.","لا يمكن إلغاء هذه المعاملة."
@@ -17151,8 +17151,8 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "2YTD","السنة الثانية حتى الآن"
 "ID","رقم الطلب"
 "Customer","العميل"
-"Grand Total","الإجمالي العام"
-"Status","الحالة"
+"Grand Total","الإجمالي"
+"Status","حالة الطلب"
 "Processing","قيد المعالجة"
 "Pending","قيد المراجعة"
 "Last Transactions","آخر المعاملات"
@@ -17166,7 +17166,7 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "per page","لكل صفحة"
 "Cancel","إلغاء"
 "ID","رقم الطلب"
-"Status","الحالة"
+"Status","حالة الطلب"
 "Action","الإجراء"
 "View","عرض"
 "from","من"
@@ -17200,7 +17200,7 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "SKU","كود المنتج"
 "Ordered","تم الطلب"
 "Mixed","متنوع"
-"Grand Total","الإجمالي العام"
+"Grand Total","الإجمالي"
 "Total Paid","الإجمالي المدفوع"
 "Total Due","الإجمالي المستحق"
 "Back","رجوع"
@@ -17350,7 +17350,7 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "January","يناير"
 "Last 30 days","آخر 30 يومًا"
 "Sales by Day of Week","المبيعات حسب يوم الأسبوع"
-"Grand Total","الإجمالي العام"
+"Grand Total","الإجمالي"
 "Staturday","السبت"
 "Friday","الجمعة"
 "Thursday","الخميس"
@@ -17589,7 +17589,7 @@ formElements/*[name(.)=../../@formElement]/settings/title,module,Magento_Ui
 "Sku","الرمز التعريفي"
 "Allowed file types: PNG, GIF, JPG, JPEG","أنواع الملفات المسموح بها: PNG, GIF, JPG, JPEG"
 "RMA dont have escalate.","RMA dont have escalate."
-"Created at","أنشئ في"
+"Created at","انشئت في"
 "سحب الأموال","سحب"
 "Your vendor account magento is approved","تمت الموافقة على حساب البائع الخاص بك في Magento"
 "Active filters:","الفلاتر النشطة:"
@@ -18045,3 +18045,12 @@ Default Notify "Mark as Resolve" To Vendor,الإشعار الافتراضي "و
 "RMA #%1 has been changed it's status to تصعيد","تم تغيير طلب الاسترجاع #%1 إلى حالته تصعيد"
 "RMA #%1 has been changed it's status to Escalated","تم تغيير طلب الاسترجاع #%1 إلى حالته تصعيد"
 "The page URL key contains capital letters or disallowed symbols.","يحتوي مفتاح عنوان URL للصفحة على أحرف كبيرة أو رموز غير مسموح بها."
+"Item","منتج"
+"item","منتج"
+"creditmemo","مذكرة ائتمان"
+"Creditmemo","مذكرة ائتمان"
+"Refund order","طلب استرجاع"
+"refund order","طلب استرجاع"
+"Refund Order","طلب استرجاع"
+"Refund Commission of order","عمولة استرجاع الطلب"
+"refund commission of order","عمولة استرجاع الطلب"
