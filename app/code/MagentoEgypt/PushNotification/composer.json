@@ -1,0 +1,23 @@
+{
+    "name": "magentoegypt/module-push-notification",
+    "description": "Push Notification module for the Marketplace - allows admin to send push notifications to users.",
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": "~7.4.0||~8.1.0||~8.2.0||~8.3.0",
+        "magento/framework": "*",
+        "vnecoms/module-vendors": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MagentoEgypt\\PushNotification\\": ""
+        }
+    }
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="MagentoEgypt\PushNotification\Api\Data\NotificationInterface"
+                type="MagentoEgypt\PushNotification\Model\Notification"/>
+
+    <virtualType name="MagentoEgypt\PushNotification\Model\ResourceModel\Notification\Grid\Collection"
+                 type="MagentoEgypt\PushNotification\Model\ResourceModel\Notification\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_push_notification</argument>
+            <argument name="eventPrefix" xsi:type="string">magentoegypt_push_notification_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">push_notification_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\PushNotification\Model\ResourceModel\Notification</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="magentoegypt_push_notification_listing_data_source" xsi:type="string">MagentoEgypt\PushNotification\Model\ResourceModel\Notification\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
