@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">magentoegypt_push_notification_form.magentoegypt_push_notification_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Push Notification</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back" class="MagentoEgypt\PushNotification\Block\Adminhtml\Notification\BackButton"/>
+            <button name="delete" class="MagentoEgypt\PushNotification\Block\Adminhtml\Notification\DeleteButton"/>
+            <button name="save" class="MagentoEgypt\PushNotification\Block\Adminhtml\Notification\SaveButton"/>
+            <button name="save_and_continue" class="MagentoEgypt\PushNotification\Block\Adminhtml\Notification\SaveAndContinueButton"/>
+            <button name="send" class="MagentoEgypt\PushNotification\Block\Adminhtml\Notification\SendButton"/>
+        </buttons>
+        <namespace>magentoegypt_push_notification_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>magentoegypt_push_notification_form.magentoegypt_push_notification_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="magentoegypt_push_notification_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/save"/>
+        </settings>
+        <dataProvider class="MagentoEgypt\PushNotification\Ui\DataProvider\Notification\Form\DataProvider"
+                      name="magentoegypt_push_notification_form_data_source">
+            <settings>
+                <requestFieldName>notification_id</requestFieldName>
+                <primaryFieldName>notification_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="general">
+        <settings>
+            <label translate="true">General Information</label>
+        </settings>
+        <field name="notification_id" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+                <dataScope>notification_id</dataScope>
+            </settings>
+        </field>
+        <field name="title" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Title</label>
+                <dataScope>title</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="message" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Message</label>
+                <dataScope>message</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="action_url" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Action URL</label>
+                <notice translate="true">Optional URL that opens when the user taps the notification.</notice>
+                <dataScope>action_url</dataScope>
+                <validation>
+                    <rule name="validate-url" xsi:type="boolean">false</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="image" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Image URL</label>
+                <notice translate="true">Optional image URL displayed with the notification.</notice>
+                <dataScope>image</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="audience">
+        <settings>
+            <label translate="true">Audience</label>
+        </settings>
+        <field name="target_type" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Audience</label>
+                <dataScope>target_type</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MagentoEgypt\PushNotification\Model\Source\TargetType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="target_ids" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Specific Target IDs</label>
+                <notice translate="true">Comma-separated IDs (customer group, vendor, or customer IDs) when the audience is restricted.</notice>
+                <dataScope>target_ids</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="delivery">
+        <settings>
+            <label translate="true">Delivery</label>
+        </settings>
+        <field name="status" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Status</label>
+                <dataScope>status</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MagentoEgypt\PushNotification\Model\Source\Status"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="scheduled_at" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">magentoegypt_push_notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Scheduled At</label>
+                <notice translate="true">Required when status is Scheduled.</notice>
+                <dataScope>scheduled_at</dataScope>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="dateFormat" xsi:type="string">yyyy-MM-dd HH:mm:ss</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm:ss</option>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

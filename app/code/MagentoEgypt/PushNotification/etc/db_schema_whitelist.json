@@ -1,0 +1,51 @@
+{
+    "magentoegypt_push_notification": {
+        "column": {
+            "notification_id": true,
+            "title": true,
+            "message": true,
+            "image": true,
+            "action_url": true,
+            "target_type": true,
+            "target_ids": true,
+            "status": true,
+            "recipients_count": true,
+            "success_count": true,
+            "failure_count": true,
+            "scheduled_at": true,
+            "sent_at": true,
+            "created_at": true,
+            "updated_at": true,
+            "created_by": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_STATUS": true,
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_SCHEDULED_AT": true,
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_CREATED_AT": true
+        }
+    },
+    "magentoegypt_push_notification_device": {
+        "column": {
+            "device_id": true,
+            "customer_id": true,
+            "vendor_id": true,
+            "device_token": true,
+            "platform": true,
+            "is_active": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_DEVICE_TOKEN_UNIQUE": true
+        },
+        "index": {
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_DEVICE_CUSTOMER_ID": true,
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_DEVICE_VENDOR_ID": true,
+            "MAGENTOEGYPT_PUSH_NOTIFICATION_DEVICE_PLATFORM": true
+        }
+    }
+}
