@@ -6,4 +6,8 @@
     <event name="controller_action_predispatch">
 		<observer name="vnecoms_core_action_predispatch"  disabled="true" />
 	</event>
+    <event name="adminhtml_vendor_save_after">
+        <observer name="magentoegypt_vendorextend_admin_clear_vendor_theme"
+                  instance="MagentoEgypt\VendorExtend\Observer\AdminClearVendorTheme" />
+    </event>
 </config>

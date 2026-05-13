@@ -1,0 +1,117 @@
+<?php
+/**
+ * Admin Vendor Edit - Custom Theme Tab
+ *
+ * @var $block \MagentoEgypt\VendorExtend\Block\Adminhtml\Vendor\Edit\Tab\CustomTheme
+ */
+
+// @codingStandardsIgnoreFile
+$_htmlName = 'vendor_data[vendor_custom_theme]';
+$selectedId = $block->getSelectedThemeId();
+?>
+<div class="entry-edit form-inline vendor-custom-theme-tab">
+    <div class="fieldset-wrapper">
+        <div class="fieldset-wrapper-title">
+            <strong class="title"><span><?php echo $block->escapeHtml(__('Custom Theme')) ?></span></strong>
+        </div>
+        <div class="admin__fieldset-wrapper-content">
+            <p class="note">
+                <?php echo $block->escapeHtml(__('Select a theme to assign to this seller. Choose "Default Theme" to remove any custom theme assignment.')) ?>
+            </p>
+            <ul class="vendor-theme-container">
+                <li class="no-theme<?php if ($selectedId === ''): ?> selected<?php endif; ?>">
+                    <span class="selected-label"></span>
+                    <span class="vendor-theme-title"><?php echo $block->escapeHtml(__('Default Theme')) ?></span>
+                    <input type="radio" name="<?php echo $block->escapeHtmlAttr($_htmlName) ?>" value="" <?php if ($selectedId === ''): ?>checked="checked" <?php endif; ?>/>
+                </li>
+                <?php foreach ($block->getCollection() as $theme): ?>
+                    <?php $isCurrent = ($selectedId !== '' && (string)$selectedId === (string)$theme->getId()); ?>
+                    <li<?php if ($isCurrent): ?> class="selected"<?php endif; ?>>
+                        <span class="selected-label"></span>
+                        <a href="javascript:void(0)" class="vendor-theme-image">
+                            <img src="<?php echo $block->escapeUrl($block->getPreviewImageUrl($theme->getPreviewImage())) ?>" alt="<?php echo $block->escapeHtmlAttr($theme->getTitle()) ?>" />
+                        </a>
+                        <span class="vendor-theme-title"><?php echo $block->escapeHtml($theme->getTitle()) ?></span>
+                        <input type="radio" name="<?php echo $block->escapeHtmlAttr($_htmlName) ?>" value="<?php echo $block->escapeHtmlAttr($theme->getId()) ?>" <?php if ($isCurrent): ?>checked="checked" <?php endif; ?>/>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.vendor-custom-theme-tab .vendor-theme-container {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.vendor-custom-theme-tab .vendor-theme-container li {
+    position: relative;
+    border: 2px solid #d6d6d6;
+    border-radius: 4px;
+    padding: 10px;
+    width: 220px;
+    background: #fff;
+    text-align: center;
+    cursor: pointer;
+}
+.vendor-custom-theme-tab .vendor-theme-container li.selected {
+    border-color: #eb5202;
+}
+.vendor-custom-theme-tab .vendor-theme-container li .selected-label {
+    display: none;
+}
+.vendor-custom-theme-tab .vendor-theme-container li.selected .selected-label {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #eb5202;
+    color: #fff;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: bold;
+}
+.vendor-custom-theme-tab .vendor-theme-container li.selected .selected-label::before {
+    content: 'SELECTED';
+}
+.vendor-custom-theme-tab .vendor-theme-container li .vendor-theme-image img {
+    max-width: 100%;
+    height: auto;
+}
+.vendor-custom-theme-tab .vendor-theme-container li.no-theme {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+}
+.vendor-custom-theme-tab .vendor-theme-container li .vendor-theme-title {
+    display: block;
+    margin-top: 8px;
+    font-weight: bold;
+}
+.vendor-custom-theme-tab .vendor-theme-container li input[type=radio] {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+</style>
+
+<script>
+require(['jquery'], function ($) {
+    $('.vendor-custom-theme-tab .vendor-theme-container li').on('click', function (event) {
+        if ($(event.target).is('input[type=radio]')) {
+            return;
+        }
+        var $container = $(this).closest('.vendor-theme-container');
+        $container.find('li.selected').removeClass('selected');
+        $container.find('input[type=radio]').prop('checked', false);
+        $(this).addClass('selected');
+        $(this).find('input[type=radio]').prop('checked', true);
+    });
+});
+</script>
