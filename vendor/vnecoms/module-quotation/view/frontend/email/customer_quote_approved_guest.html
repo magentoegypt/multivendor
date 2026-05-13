@@ -1,0 +1,90 @@
+<!--@subject Quote request #{{var quote.increment_id}} is approved. @-->
+<!--@vars
+{"store url=\"\"":"Store Url",
+"var logo_url":"Email Logo Image Url",
+"var logo_alt":"Email Logo Image Alt",
+"htmlescape var=$quote.getCustomerName()":"Customer Name",
+"var store.getFrontendName()":"Store Name",
+"layout handle=\"quotation_email_quote_items\" quote=$quote":"Order Items Grid",
+"var quote.increment_id":"Quote Id"}
+@-->
+<!--@styles
+body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
+.order-details{width: 100%;}
+.address-details{vertical-align: top; width: 50%;}
+.email-items{width: 100%;}
+.email-items th{text-align: left;}
+@-->
+
+{{template config_path="design/email/header_template"}}
+
+<table style="width: 100%;">
+    <tr class="email-intro">
+        <td>
+            <p class="greeting">Hello, {{var quote.getCustomerName()}}</p>
+
+            <p>
+                {{trans "Your quote is approved. You can now add products in your quote to shopping cart and process the order."}}
+            </p>
+            <p>{{trans 'You can check the status of your quote by visiting to this link <a href="%view_quote_url">%view_quote_url</a>.' view_quote_url=$view_quote_url |raw}}</p>
+            <p>
+                {{trans 'If you have questions about your order, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}{{depend store_phone}} {{trans 'or call us at <a href="tel:%store_phone">%store_phone</a>' store_phone=$store_phone |raw}}{{/depend}}.
+                {{depend store_hours}}
+                    {{trans 'Our hours are <span class="no-link">%store_hours</span>.' store_hours=$store_hours |raw}}
+                {{/depend}}
+            </p>
+        </td>
+    </tr>
+    <tr class="email-summary">
+        <td>
+            <h1>{{trans 'Your Quote Request <span class="no-link">#%increment_id</span>' increment_id=$quote.increment_id |raw}}</h1>
+            <p>{{trans 'Placed on <span class="no-link">%created_at</span>' created_at=$quote.getCreatedAtFormatted(2) |raw}}</p>
+        </td>
+    </tr>
+    <tr class="email-information">
+        <td>
+            <table class="order-details">
+                <tr>
+                    <td class="address-details">
+                        <h3>{{trans "Customer Information"}}</h3>
+                        <table style="width: 100%;" cellspacing="0" cellpadding="0" border="0">
+							<tr>
+								<td class="label"><label>{{trans "Customer Name"}}</label></td>
+                                <td class="value">{{var config.customer_name}}</td>
+							</tr>
+							<tr>
+								<td class="label"><label>Email</label></td>
+								<td class="value"><a href="mailto:{{var quote.email}}">{{var quote.customer_email}}</a></td>
+							</tr>
+							{{depend config.show_telephone}}
+							<tr>
+								<td class="label"><label>{{trans "Telephone"}}</label></td>
+								<td class="value">{{var quote.customer_phone}}</td>
+							</tr>
+							{{/depend}}
+							{{depend config.show_company}}
+							<tr>
+								<td class="label"><label>{{trans "Company"}}</label></td>
+								<td class="value">{{var quote.customer_company}}</td>
+							</tr>
+							{{/depend}}
+							{{depend config.show_taxvat}}
+							<tr>
+								<td class="label"><label>{{trans "VAT/Tax Id"}}</label></td>
+								<td class="value">{{var quote.customer_taxvat}}</td>
+							</tr>
+							{{/depend}}
+						</table>
+                    </td>
+                    <td class="address-details">
+                        <h3>{{trans "Remark"}}</h3>
+                        <p>{{var quote.client_comment}}</p>
+                    </td>
+                </tr>
+            </table>
+            {{layout handle="quotation_email_quote_items" quote_id=$quote.entity_id}}
+        </td>
+    </tr>
+</table>
+
+{{template config_path="design/email/footer_template"}}

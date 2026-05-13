@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="quotation_quote_create_item_price"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Data" template="quote/edit/data.phtml" name="data">
+                <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Information" template="quote/edit/info.phtml" name="info"/>
+                <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Comment" template="quote/edit/message.phtml" name="message"/>
+                <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Totals" template="quote/edit/totals.phtml" name="totals"/>
+                <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Search" template="quote/edit/abstract.phtml" name="search">
+                    <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Search\Grid" name="search_grid" as="grid">
+                        <action method="setTemplate">
+                            <argument name="template" xsi:type="string">Vnecoms_Quotation::widget/grid.phtml</argument>
+                        </action>
+                    </block>
+                </block>
+                <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Items" template="quote/edit/items.phtml" name="items">
+                    <block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Items\Grid" template="quote/edit/items/grid.phtml" name="items_grid">
+                        <!--<block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Proposal" template="quote/edit/proposal/form.phtml" name="proposal">-->
+                        <!--<block class="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Proposal\Form" template="quote/edit/proposal/form.phtml" name="quote_create_proposal_form" as="form"/>-->
+                        <!--</block>-->
+                    </block>
+                </block>
+
+                <block class="Magento\Framework\View\Element\Text\ListText" name="quote_item_extra_info"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

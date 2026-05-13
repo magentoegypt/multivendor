@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="vnecoms_rma_process_email_quote" instance="Vnecoms\VendorsRMA\Cron\ProcessQueueNotify" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+
+        <job name="vnecoms_rma_process_escalate_rma" instance="Vnecoms\VendorsRMA\Cron\ProcessEscalateRma" method="execute">
+            <schedule>0 2 * * *</schedule>
+        </job>
+    </group>
+</config>

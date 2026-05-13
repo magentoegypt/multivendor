@@ -1,0 +1,25 @@
+{
+    "name": "vnecoms/module-vendors-cms",
+    "description": "A plugin for Marketplace extension, which allows the vendor to create the static pages and block for their Vendor homepage",
+    "authors": [
+      {
+        "name": "VNECOMS",
+        "email": "support@vnecoms.com"
+      }
+    ],
+    "require": {
+        "magento/framework": ">=103.0.3",
+        "vnecoms/module-vendors-page-builder": "2.4.*",
+        "vnecoms/module-vendors-page": "^2.4.0"
+    },
+    "type": "magento2-module",
+    "version": "2.4.37",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vnecoms\\VendorsCms\\": ""
+        }
+    }
+}

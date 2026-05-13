@@ -1,0 +1,26 @@
+.quotation-message-attachments {width: 100%; overflow: hidden; border-top: 1px dotted #ddd;
+}
+.attachment-count {font-weight: bold; line-height: 29px; height: 29px;}
+
+.quotation-message-attachment {float: left; margin: 0 0 16px 16px; width: 130px; height: 90px; border: 1px solid #e5e5e5; z-index: 0; background: #fff; padding: 5px; position: relative;}
+.attachment-actions{position: absolute; bottom: 10px; right: 10px; display: none; z-index: 3;}
+.attachment-actions a {text-decoration: none; color: #FFF;}
+.attachment-actions .quote-icon-cloud-download{font-size: 16px;}
+.attachment-actions .action{width: 40px; height: 25px; text-align: center; line-height: 28px; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px; display: block; background:#707070;}
+.attachment-actions .action:hover{background: #b0b0b0;}
+.attachment-overlay{display: none; background: #000; opacity: 0.45; filter: alpha(opacity=45); position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
+.attachment-info{font-size: 11px;position: absolute; top: 0; left: 0; width: calc(100% - 10px); overflow-wrap: break-word; padding: 10px 5px; color: #FFF; z-index: 2; display: none;}
+.quotation-message-attachment:hover .attachment-info,
+.quotation-message-attachment:hover .attachment-actions,
+.quotation-message-attachment:hover .attachment-overlay{display: block;}
+.attachment-file .attachment-icon{font-size: 45px; color: #555;}
+.attachment-file .attachment-wrap-inner{text-align: center; line-height: 105px;}
+.attachment-image{cursor: pointer;}
+.attachment-image img{position: absolute; left: 0; top: 0; right: 0; bottom: 0; margin: auto; max-width: 100%; max-height: 100%;}
+.quotation-attachment-modal .modal-content{text-align: center;}
+/* 100% Image Width on Smaller Screens */
+@media only screen and (max-width: 700px){
+    .quotation-customer-view .modal-content {
+        width: 100%;
+    }
+}

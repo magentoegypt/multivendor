@@ -1,0 +1,141 @@
+<div class="box">
+    <div class="box-header with-border">
+        <h3 class="box-title"><i class="fa fa-envelope-o"></i> <?php echo __('SMS Statistics')?></h3>
+    </div>
+    <div class="box-body">
+        <ul class="list-group list-group-unbordered">
+            <li class="list-group-item no-border">
+                <div class="row">
+                    <label class="col-sm-6"><span><?php echo __("Current SMS Credit")?></span></label>
+                    <div class="col-sm-6">
+                        <strong class="text-yellow"><?php echo $block->getCurrentSmsCredit();?></strong> <div class="pull-right"><i class="fa fa-credit-card">&nbsp;</i><a href="#" id="sms-credit-deposit-handle"><?php echo __("Deposit")?></a></div>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row">
+                    <label class="col-sm-6"><span><?php echo __("Today Message")?></span></label>
+                    <div class="col-sm-6">
+                        <?php echo $block->getTodayMessageCount();?>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row">
+                    <label class="col-sm-6"><span><?php echo __("Today Credit Deducted")?></span></label>
+                    <div class="col-sm-6">
+                        <?php echo $block->getTodayCreditDeducted();?>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="sms-credit-deposit-container" id="sms-credit-deposit">
+    <form class="form buy-sms-credit" action="<?php echo $block->getBuyCreditUrl();?>" method="post" id="form-validate" enctype="multipart/form-data" autocomplete="off">
+        <p><?php echo __("You can buy SMS Credit to use SMS service.")?></p>
+        <ul class="list-group list-group-unbordered">
+            <li class="list-group-item no-border">
+                <div class="row">
+                    <label class="col-sm-6"><span><?php echo __("Credit Balance")?></span></label>
+                    <div class="col-sm-6">
+                        <strong class="text-yellow"><?php echo $block->getCurrentCreditBalance();?></strong>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row">
+                    <label class="col-sm-6"><span><?php echo __("SMS Credit Package")?></span></label>
+                    <div class="col-sm-6">
+                        <select name="sms_credit_package" id="sms_credit_package" class="required-entry">
+                        </select>
+                        <span id="sms_credit_package_credit"></span>
+                    </div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div class="row">
+                    <label class="col-sm-6"><span><?php echo __("SMS Package Price")?></span></label>
+                    <div class="col-sm-6">
+                        <span id="sms_credit_package_price"></span>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <div class="btn-container-step1">
+            <button class="btn btn-primary pull-right" id="btn-buy-smscredit-form" type="button"><span><?php echo __("Continue")?></span> <i class="fa fa-angle-right"></i></button>
+        </div>
+        <div class="btn-container-step2">
+            <button class="btn btn-github pull-left" id="btn-buy-smscredit-back" type="button"><i class="fa fa-angle-left"></i> <span><?php echo __("Back")?></span></button>
+            <button class="btn btn-primary pull-right" id="btn-buy-smscredit-save" type="submit"><i class="fa fa-check-circle"></i> <span><?php echo __("Process")?></span></button>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+var smsCreditPackages = <?php echo $block->getSmsCreditJSON()?>;
+require([
+    'jquery',
+    'uiRegistry',
+    'mage/translate',
+    'Magento_Ui/js/modal/modal',
+    'mage/mage',
+    'mage/validation',
+    'domReady!'
+], function($, registry, $t, modal){
+	/**
+	 * Set Credit Package
+	 */
+	function setCreditPackagePrice(credit){
+		$(smsCreditPackages).each(function(index,smsPackage){
+			console.log(smsPackage);
+			if(smsPackage.credit == credit){
+				$('#sms_credit_package_price').html(smsPackage.price_formated);
+				$('#sms_credit_package_credit').html(smsPackage.credit_formated);
+			}
+		});
+	}
+	var currentCredit = <?php echo $this->getCredit();?>;
+	$(smsCreditPackages).each(function(index, smsPackage){
+		$('#sms_credit_package').append('<option value="' + smsPackage.credit + '"'+(smsPackage.price > currentCredit?'disabled="disabled"':"")+'>' + smsPackage.credit_formated + '</option>');
+	});
+
+	setCreditPackagePrice($('#sms_credit_package').val());
+	
+	$('#sms_credit_package').change(function(){
+		var credit = $(this).val();
+		setCreditPackagePrice(credit);
+	});
+
+	var options = {
+        type: 'popup',
+        modalClass:'sms-credit-deposit-modal',
+        responsive: true,
+        innerScroll: true,
+        title: '<?php echo __("Buy SMS Credit")?>',
+        buttons: []
+    };
+    var popup = modal(options, $('#sms-credit-deposit'));
+
+    $('#sms-credit-deposit-handle').click(function(){
+    	$('#sms-credit-deposit').modal('openModal');
+    	$("#sms-credit-deposit").removeClass('review');
+        return false;
+    });
+
+    $('#btn-buy-smscredit-form').click(function(){
+        if(!$('#sms_credit_package').validation().validation('isValid')) return;
+        $("#sms-credit-deposit").addClass('review');
+    });
+
+    $('#btn-buy-smscredit-back').click(function(){
+        $("#sms-credit-deposit").removeClass('review');
+    });
+
+    var dataForm = $('#form-validate');
+    var ignore = null;
+    
+    dataForm.mage('validation').find('input:text').attr('autocomplete', 'off');
+
+});
+</script>

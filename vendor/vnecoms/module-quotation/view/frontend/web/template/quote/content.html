@@ -1,0 +1,84 @@
+<!--
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="block-title">
+    <strong>
+        <span class="text"><!-- ko i18n: 'My Quote' --><!-- /ko --></span>
+        <span
+            class="qty empty"
+            data-bind="css: { empty: !!getQuoteParam('summary_count') == false },
+                       attr: { title: $t('Items in Quote') }">
+            <!-- ko text: getQuoteParam('summary_count') --><!-- /ko -->
+        </span>
+    </strong>
+</div>
+
+<div class="block-content">
+    <button type="button"
+            id="btn-quote-close"
+            class="action close"
+            data-action="close"
+            data-bind="attr: { title: $t('Close')}"
+            click="closeQuoteSidebar.bind($data)">
+        <span><!-- ko i18n: 'Close' --><!-- /ko --></span>
+    </button>
+
+    <!-- ko if: getQuoteParam('summary_count') -->
+        <div class="items-total">
+            <span class="count"><!-- ko text: getQuoteParam('summary_count') --><!-- /ko --></span>
+            <!-- ko if: getQuoteParam('summary_count') == 1 -->
+                <!-- ko i18n: 'item in the Quote' --><!-- /ko -->
+            <!-- /ko -->
+            <!-- ko if: getQuoteParam('summary_count') > 1 -->
+                <!-- ko i18n: 'items in the Quote' --><!-- /ko -->
+            <!-- /ko -->
+        </div>
+
+        <div class="actions">
+            <div class="primary">
+                <a
+                        id="btn-request-quote"
+                        type="button"
+                        class="action primary checkout request-quote"
+                        data-bind="attr: {title: $t('Request a Quote'), href: quotationPageUrl}">
+                    <!-- ko i18n: 'View Quote Request' --><!-- /ko -->
+                </a>
+                <div data-bind="html: getQuoteParam('extra_actions')"></div>
+            </div>
+        </div>
+    <!-- /ko -->
+
+    <!-- ko if: getQuoteParam('summary_count') -->
+    <strong class="subtitle"><!-- ko i18n: 'Recently added item(s)' --><!-- /ko --></strong>
+    <div data-action="scroll" class="quote-items-wrapper">
+        <ol id="ves-quote-items" class="quote-items" data-bind="foreach: { data: items, as: 'item' }">
+            <!-- ko foreach: $parent.getRegion($parent.getItemRenderer(item.product_type)) -->
+                <!-- ko template: {name: getTemplate(), data: item} --><!-- /ko -->
+            <!-- /ko -->
+        </ol>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko ifnot: getQuoteParam('summary_count') -->
+        <strong class="subtitle empty" data-bind="visible: closeSidebar()">
+            <!-- ko i18n: 'You have no items in your quote.' --><!-- /ko -->
+        </strong>
+        <!-- ko if: getQuoteParam('cart_empty_message') -->
+            <p class="quote empty text"><!-- ko text: getQuoteParam('cart_empty_message') --><!-- /ko --></p>
+
+            <div class="actions">
+                <div class="secondary">
+                    <a class="action viewcart" data-bind="attr: {href: quotationPageUrl}">
+                        <span><!-- ko text: $t('View and edit quote') --><!-- /ko --></span>
+                    </a>
+                </div>
+            </div>
+        <!-- /ko -->
+    <!-- /ko -->
+</div>
+<!-- ko foreach: getRegion('sign-in-popup') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!-- /ko -->

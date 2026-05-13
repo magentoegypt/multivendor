@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="\Amasty\CheckoutCore\Api\FeeRepositoryInterface" type="Amasty\CheckoutCore\Model\FeeRepository" />
+
+    <preference for="\Amasty\CheckoutCore\Api\ItemManagementInterface" type="Amasty\CheckoutCore\Model\ItemManagement" />
+    <preference for="\Amasty\CheckoutCore\Api\GuestItemManagementInterface" type="Amasty\CheckoutCore\Model\GuestItemManagement" />
+
+    <preference for="Amasty\CheckoutCore\Api\Data\AdditionalFieldsInterface" type="Amasty\CheckoutCore\Model\AdditionalFields" />
+    <preference for="Amasty\CheckoutCore\Api\AdditionalFieldsManagementInterface" type="Amasty\CheckoutCore\Model\AdditionalFieldsManagement" />
+    <preference for="Amasty\CheckoutCore\Api\GuestAdditionalFieldsManagementInterface" type="Amasty\CheckoutCore\Model\GuestAdditionalFieldsManagement" />
+
+    <preference for="Amasty\CheckoutCore\Api\AccountManagementInterface" type="Amasty\CheckoutCore\Model\AccountManagement" />
+
+    <preference for="Amasty\CheckoutCore\Api\Data\QuoteCustomFieldsInterface" type="Amasty\CheckoutCore\Model\QuoteCustomFields" />
+    <preference for="Amasty\CheckoutCore\Api\Data\OrderCustomFieldsInterface" type="Amasty\CheckoutCore\Model\OrderCustomFields" />
+
+    <preference for="Amasty\CheckoutCore\Api\Data\QuotePasswordsInterface" type="Amasty\CheckoutCore\Model\QuotePasswords" />
+    <preference for="Amasty\CheckoutCore\Api\QuotePasswordsRepositoryInterface" type="Amasty\CheckoutCore\Model\QuotePasswordsRepository" />
+
+    <preference for="Amasty\CheckoutCore\Api\GuestQuoteManagementInterface" type="Amasty\CheckoutCore\Model\GuestQuoteManagement" />
+    <preference for="Amasty\CheckoutCore\Api\QuoteManagementInterface" type="Amasty\CheckoutCore\Model\QuoteManagement" />
+
+    <preference for="Amasty\CheckoutCore\Api\MergeJsInterface" type="Amasty\CheckoutCore\Model\Optimization\MergeFileRepository" />
+
+    <preference for="Amasty\CheckoutCore\Api\CheckoutBlocksProviderInterface" type="Amasty\CheckoutCore\Model\Config\CheckoutBlocksProvider" />
+
+    <preference for="Amasty\CheckoutCore\Api\DeliveryDateStatisticInterface" type="Amasty\CheckoutCore\Model\DeliveryDateStatistic" />
+
+    <preference for="Amasty\CheckoutCore\Api\GiftWrapProviderInterface" type="Amasty\CheckoutCore\Model\GiftWrapProvider" />
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="quote_data_source" xsi:type="string">Amasty\CheckoutCore\Model\ResourceModel\Quote\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Amasty\CheckoutCore\Model\ResourceModel\Quote\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">quote</argument>
+            <argument name="resourceModel" xsi:type="string">Magento\Quote\Model\ResourceModel\Quote</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Quote\Model\Cart\CartTotalRepository">
+        <plugin name="Amasty_CheckoutCore::CartTotalRepository" type="Amasty\CheckoutCore\Plugin\Quote\Model\Cart\CartTotalRepository" />
+    </type>
+    <type name="Magento\Framework\Api\DataObjectHelper">
+        <plugin name="Amasty_CheckoutCore::DataObjectHelper" type="Amasty\CheckoutCore\Plugin\Framework\Api\DataObjectHelperPlugin"/>
+    </type>
+    <type name="Magento\Payment\Model\Info">
+        <plugin name="Amasty_CheckoutCore::PaymentModelInfo" type="Amasty\CheckoutCore\Plugin\Payment\Model\Info" />
+    </type>
+    <type name="Magento\Payment\Helper\Data">
+        <plugin name="Amasty_CheckoutCore::PaymentHelperData" type="Amasty\CheckoutCore\Plugin\Payment\Helper\Data" />
+    </type>
+    <type name="Magento\Sales\Block\Items\AbstractItems">
+        <plugin name="Amasty_CheckoutCore::OrderInfo" type="Amasty\CheckoutCore\Plugin\Sales\Block\Items\AbstractItems\AddComment" sortOrder="20"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote">
+        <plugin name="Amasty_CheckoutCore::SetNullToRegionId" type="Amasty\CheckoutCore\Plugin\Quote\Model\Quote\SetRegionId"/>
+    </type>
+    <type name="Amasty\CheckoutCore\Block\Adminhtml\System\Config\OrderAttributes">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="module_manager" xsi:type="object">Magento\Framework\Module\Manager</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Amasty\CheckoutCore\Model\Subscription">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Amasty\CheckoutCore\Model\FieldsDefaultProvider">
+        <arguments>
+            <argument name="geolocation" xsi:type="object">Amasty\Geoip\Model\Geolocation\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Amasty\Gdpr\Model\Source\CheckboxLocationCombine">
+        <arguments>
+            <argument name="optionGroups" xsi:type="array">
+                <item name="amasty" xsi:type="array">
+                    <item name="optionSources" xsi:type="array">
+                        <item name="amasty_osc_gdpr" xsi:type="object">Amasty\CheckoutCore\Model\Config\Source\Gdpr\CheckboxLocation</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option">
+        <plugin name="Amasty_CheckoutCore::Bundle_Option" type="Amasty\CheckoutCore\Plugin\Bundle\Block\Catalog\Product\View\Type\Bundle\OptionPlugin"/>
+    </type>
+    <type name="Magento\Checkout\CustomerData\DirectoryData">
+        <plugin name="Amasty_CheckoutCore::DirectoryDataCache" type="Amasty\CheckoutCore\Plugin\Checkout\CustomerData\DirectoryDataPlugin"/>
+    </type>
+    <type name="Magento\Quote\Api\Data\AddressInterface">
+        <plugin name="Amasty_CheckoutCore::FixExtensionAttributesType" type="Amasty\CheckoutCore\Plugin\Quote\AddressInterfacePlugin"/>
+    </type>
+    <type name="Magento\Checkout\Block\Onepage">
+        <plugin sortOrder="40" name="Amasty_CheckoutCore::InitializeQuote" type="Amasty\CheckoutCore\Plugin\Checkout\Block\OnepagePlugin"/>
+    </type>
+    <type name="Magento\AdvancedSalesRule\Model\Rule\Condition\FilterTextGenerator\Address\PaymentMethod">
+        <plugin name="Amasty_CheckoutCore::FixAdvancedSalesRules" type="Amasty\CheckoutCore\Plugin\AdvancedSalesRule\Model\Rule\Condition\FilterTextGenerator\Address\PaymentMethodPlugin"/>
+    </type>
+    <type name="Magento\Quote\Model\QuoteRepository\SaveHandler">
+        <plugin name="Amasty_CheckoutCore::saveCustomAddressFields" type="Amasty\CheckoutCore\Plugin\Quote\Model\QuoteRepository\SaveHandlerPlugin"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address\CustomAttributeListInterface">
+        <plugin name="Amasty_CheckoutCore::registerCustomAttributes" type="Amasty\CheckoutCore\Plugin\Quote\Model\Quote\Address\CustomAttributeListPlugin"/>
+    </type>
+    <type name="Magento\Quote\Model\QuoteRepository\LoadHandler">
+        <plugin name="Amasty_CheckoutCore::loadAddressAttributeValues" type="Amasty\CheckoutCore\Plugin\Quote\Model\QuoteRepository\LoadHandlerPlugin"/>
+    </type>
+
+    <type name="Amasty\Gdpr\Model\Consent\DataProvider\CheckoutDataProvider">
+        <plugin name="Amasty_CheckoutCore::skipCountryRestriction" type="Amasty\CheckoutCore\Plugin\Gdpr\Model\Consent\DataProvider\SkipCountryRestriction"/>
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToField\Processor\ProcessorPool">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="Magento\Config\Model\Config\Source\Nooptreq"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToField\Processor\NoOptionalRequired</item>
+                <item name="Magento\Config\Model\Config\Source\Yesno"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToField\Processor\YesNo</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToField\GetAttributeCode">
+        <arguments>
+            <argument name="aliases" xsi:type="array">
+                <item name="customer/create_account/vat_frontend_visibility" xsi:type="string">vat_id</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Amasty\CheckoutCore\UpdateField\AdminhtmlScope" type="Magento\Framework\Config\Scope">
+        <arguments>
+            <argument name="defaultScope" xsi:type="string">adminhtml</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Amasty\CheckoutCore\UpdateField\StructureData"
+                 type="Magento\Config\Model\Config\Structure\Data">
+        <arguments>
+            <argument name="configScope" xsi:type="object">Amasty\CheckoutCore\UpdateField\AdminhtmlScope</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Amasty\CheckoutCore\UpdateField\Structure" type="Magento\Config\Model\Config\Structure">
+        <arguments>
+            <argument name="structureData" xsi:type="object">Amasty\CheckoutCore\UpdateField\StructureData</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\CheckoutCore\Model\Field\ConfigManagement\FieldToConfig\UpdateConfig">
+        <arguments>
+            <argument name="systemConfigSearch" xsi:type="object">Amasty\CheckoutCore\UpdateField\Structure</argument>
+            <argument name="processors" xsi:type="array">
+                <item name="Magento\Config\Model\Config\Source\Nooptreq"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\ConfigManagement\FieldToConfig\Processor\NoOptionalRequired</item>
+                <item name="Magento\Config\Model\Config\Source\Yesno"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\ConfigManagement\FieldToConfig\Processor\YesNo</item>
+            </argument>
+            <argument name="configPaths" xsi:type="array">
+                <item name="vat_id" xsi:type="string">customer/create_account/vat_frontend_visibility</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Customer\Model\Attribute">
+        <plugin name="Amasty_CheckoutCore::setAttributeWebsite"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Attribute\SetWebsitePlugin" />
+    </type>
+
+    <type name="Magento\Customer\Model\ResourceModel\Attribute">
+        <plugin name="Amasty_CheckoutCore::restoreAttributeWebsiteValue"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Attribute\ResourceModel\RestoreWebsiteValuePlugin" />
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Field\ConfigManagement\GetDefaultConfigValue">
+        <arguments>
+            <argument name="systemConfigSearch" xsi:type="object">Amasty\CheckoutCore\UpdateField\Structure</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Checkout\Block\Checkout\AttributeMerger">
+        <arguments>
+            <argument name="addressHelper"
+                      xsi:type="object">Amasty\CheckoutCore\Helper\AttributeMerger\AddressHelper</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Customer\Model\Address\Validator\General">
+        <plugin name="Amasty_CheckoutCore::skipGeneralErrors"
+                type="Amasty\CheckoutCore\Plugin\Customer\Address\SkipErrorsPlugin" />
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToAttribute\Processor\ProcessorPool">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="Magento\Config\Model\Config\Source\Nooptreq"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToAttribute\Processor\NoOptionalRequired</item>
+                <item name="Magento\Config\Model\Config\Source\Yesno"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\ConfigManagement\ConfigToAttribute\Processor\YesNo</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Customer\Address\Attribute\GetRestrictedCodes">
+        <arguments>
+            <argument name="restrictedCodes" xsi:type="array">
+                <item name="postcode" xsi:type="string">postcode</item>
+                <item name="region" xsi:type="string">region</item>
+            </argument>
+    </arguments>
+    </type>
+
+    <type name="Magento\Catalog\Model\Webapi\Product\Option\Type\Date">
+        <plugin name="Amasty_CheckoutCore::ModifyProductCustomOptionValueForEditOnCheckout"
+                type="Amasty\CheckoutCore\Plugin\Catalog\Model\Webapi\Product\Option\Type\Date\ModifyOptionValue"/>
+    </type>
+
+    <type name="Magento\Customer\Model\Address\Validator\Country">
+        <arguments>
+            <argument name="directoryData"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Customer\Address\Validator\Country\DirectoryHelper</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Webapi\Controller\Rest\ParamsOverrider">
+        <arguments>
+            <argument name="paramOverriders" xsi:type="array">
+                <item name="%amasty_checkout_cart_id%" xsi:type="object">Amasty\CheckoutCore\Model\Webapi\ParamOverriderCartId\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address\ToOrderAddress">
+        <plugin name="AmastyCheckoutCore::ConvertCustomFields"
+                type="Amasty\CheckoutCore\Plugin\Quote\Model\Quote\Address\ToOrderAddress\ConvertCustomFields"/>
+    </type>
+    <type name="Magento\Customer\Model\Address">
+        <plugin name="Amasty_CheckoutCore::AddCustomAttributes"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Address\AddCustomAttributes"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address">
+        <plugin name="Amasty_CheckoutCore::ExportCustomFields"
+                type="Amasty\CheckoutCore\Plugin\Quote\Model\Quote\Address\ExportCustomFields"/>
+    </type>
+    <type name="Magento\Customer\Model\Metadata\AddressMetadata">
+        <plugin name="Amasty_CheckoutCore::AddCustomAttributes"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Metadata\AddressMetadata\AddCustomAttributes"/>
+    </type>
+    <type name="Magento\Quote\Model\CustomerManagement">
+        <plugin name="Amasty_CheckoutCore::fixVirtualCheckout"
+                type="Amasty\CheckoutCore\Plugin\Quote\Model\CustomerManagement\VirtualCustomAttribute"/>
+    </type>
+</config>

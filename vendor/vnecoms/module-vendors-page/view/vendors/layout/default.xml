@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+   		<referenceBlock name="vendor.toplinks">
+            <block class="Vnecoms\VendorsPage\Block\Vendors\Toplinks\HomePage" name="vendor.toplinks.homepage" template="toplinks/homepage.phtml" before="-">
+            	<arguments>
+	    			<argument name="title" xsi:type="string" translate="true">Home Page</argument>
+    			</arguments>
+            </block>
+   		</referenceBlock>
+    </body>
+</page>

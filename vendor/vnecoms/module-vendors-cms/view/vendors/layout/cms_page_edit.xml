@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!--<css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>-->
+        <css src="Vnecoms_VendorsCms::css/page_form.css"/>
+        <css src="jquery/jstree/themes/default/style.css"/>
+    </head>
+    <update handle="editor"/>
+    <update handle="cms_page_head"/>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="vendor_cms_page_form"/>
+            <!--
+            <block class="Vnecoms\VendorsCms\Block\Vendors\Page\Edit" name="cms_page_edit"/>
+            -->
+        </referenceContainer>
+
+        <!--
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsCms\Block\Vendors\Page\Edit\Tabs" name="cms_page_edit_tabs">
+                <block class="Vnecoms\VendorsCms\Block\Vendors\Page\Edit\Tab\Main" name="cms_page_edit_tab_main"/>
+                <block class="Vnecoms\VendorsCms\Block\Vendors\Page\Edit\Tab\Content" name="cms_page_edit_tab_content"/>
+                <block class="Vnecoms\VendorsCms\Block\Vendors\Page\Edit\Tab\Meta" name="cms_page_edit_tab_meta"/>
+                <block class="Vnecoms\VendorsCms\Block\Vendors\Page\Edit\Tab\Design" name="cms_page_edit_tab_design"/>
+
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">cms_page_edit_tab_main</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">content_section</argument>
+                    <argument name="block" xsi:type="string">cms_page_edit_tab_content</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">meta_section</argument>
+                    <argument name="block" xsi:type="string">cms_page_edit_tab_meta</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">design_section</argument>
+                    <argument name="block" xsi:type="string">cms_page_edit_tab_design</argument>
+                </action>
+            </block>
+        </referenceContainer> -->
+
+        <referenceContainer name="js">
+            <!--<block class="Magento\Framework\View\Element\Template" template="Vnecoms_VendorsCms::wysiwyg/js.phtml" name="catalog.wysiwyg.js"/>-->
+            <block class="Magento\Framework\View\Element\Template" template="Vnecoms_VendorsCms::wysiwyg/extrajs.phtml" name="vendorscms.wysiwyg.extrajs"/>
+        </referenceContainer>
+    </body>
+</page>

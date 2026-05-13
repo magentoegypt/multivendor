@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vendor_sms_grid_data_source" xsi:type="string">Vnecoms\Sms\Model\ResourceModel\Sms\Grid\Collection</item>
+                <item name="vendor_sms_credit_transaction_grid_data_source" xsi:type="string">Vnecoms\VendorsSms\Model\ResourceModel\Transaction\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <!-- Add new type of credit processor -->
+	<type name="Vnecoms\Credit\Model\Processor">
+        <arguments>
+            <argument name="creditProcessors" xsi:type="array">
+                <item name="buy_sms_credit" xsi:type="object">Vnecoms\VendorsSms\Model\CreditProcessor\Sms</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <!-- add new notification type -->
+	<type name="Vnecoms\VendorsProfileNotification\Helper\Data">
+        <arguments>
+            <argument name="processTypes" xsi:type="array">
+                <item name="type_sms" xsi:type="object">Vnecoms\VendorsSms\Model\NotificationType\Sms</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

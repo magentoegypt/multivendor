@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_Quotation::css/fileuploader.css"/>
+        <css src="Vnecoms_Quotation::css/messages.css"/>
+        <css src="Vnecoms_Quotation::css/attachments.css"/>
+    </head>
+    <update handle="customer_account"/>
+    <!--<update handle="quotation_quotepage_renderers"/>-->
+
+    <block class="Vnecoms\Quotation\Block\Item\Price\Renderer" name="quote.item.price.unit" template="item/price/unit.phtml"/>
+    <block class="Vnecoms\Quotation\Block\Item\Price\Renderer" name="quote.item.price.row" template="item/price/row.phtml"/>
+
+    <body>
+        <referenceContainer name="page.main.title">
+            <block class="Vnecoms\Quotation\Block\Info" name="quote.toolbar" template="quote/toolbar.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="content">
+        	<block class="Vnecoms\Quotation\Block\Info" as="info" name="quote.info" />
+            <block class="Vnecoms\Quotation\Block\Quote\View" name="quote.view" cacheable="false" after="quote.info">
+                <block class="Vnecoms\Quotation\Block\Quote\Items" name="quote_items" template="customer/quote/items.phtml">
+                    <block class="Magento\Framework\View\Element\RendererList" name="quotepage.item.renderers" as="renderer.list">
+                        <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer" as="default" template="Vnecoms_Quotation::customer/quote/items/default.phtml"/>
+                        <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer" as="simple" template="Vnecoms_Quotation::customer/quote/items/default.phtml"/>
+                        <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Configurable" as="configurable" template="Vnecoms_Quotation::customer/quote/items/default.phtml"/>
+                    </block>
+                </block>
+            </block>
+            <block class="Vnecoms\Quotation\Block\Customer\Message" as="message" name="quote.messages" />
+        </referenceContainer>
+        <block class="Magento\Framework\View\Element\Template" name="additional.product.info" template="Magento_Theme::template.phtml"/>
+    </body>
+</page>

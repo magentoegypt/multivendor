@@ -1,0 +1,67 @@
+.price-comparison-container{clear: both;margin-bottom: 30px; min-height: 300px; position: relative;margin-top: 30px}
+.price-comparison-container .loading-mask{ background: rgba(255, 255, 255, 0.5); bottom: 0; left: 0; margin: auto; position: absolute; right: 0; top: 0; z-index: 100;]}
+.price-comparison{border-top: 1px solid #ccc;padding-top: 20px; position: relative;}
+.pc_title{font-weight: bold; font-size: 16px; padding: 10px; text-transform: uppercase; margin-bottom: 10px;float: left;}
+.pc_filter{float: right; width: 50%; display: block; text-align: right;}
+.pc_filter ul, .pc_filter li{list-style: none;}
+.pc_filter ul{margin-left: 0px;padding-left: 0px;}
+.pc_filter label{display: inline;}
+.pc_filter select {display: inline;width: auto;}
+
+.pc_arrow-up, .pc_arrow-down{position: absolute; left: 0; right: 0; margin: auto;}
+.pc_arrow-up {width: 0; height: 0; border-left: 5px solid transparent;border-right: 5px solid transparent;border-bottom: 5px solid #FFF; top: 2px;}
+.pc_arrow-down {width: 0; height: 0; border-left: 5px solid transparent;border-right: 5px solid transparent;border-top: 5px solid #FFF; bottom: 2px;}
+
+.pc_vendor-offers{clear: both;}
+.pc_vendor-offers thead, .pc_vendor-offers tbody tr{border-bottom: 1px solid #eee;}
+.pc_vendor-offers .product-item td{padding: 20px 10px;}
+.pc_vendor-offers .vendor_info{width: 100px; text-align: left;}
+.pc_vendor-offers .product_price{width: 150px; vertical-align: middle;}
+.pc_vendor-offers .add_to_cart{text-align: right; width: 120px;vertical-align: middle;}
+.pc_vendor-offers tbody tr:hover{background: #fafafa;}
+.pc_vendor-offers .product_price .price-box .price,
+.pc_vendor-offers .shipping_price .price-box .price,
+.pc_vendor-offers .total_price .price-box .price
+{font-size: 18px;}
+.pc_vendor-offers .product_price .old-price .price{font-size: inherit;}
+
+.pc_vendor-offers .logo-container img{border: 1px solid #d3d3d3; vertical-align: middle;}
+.pc_vendor-offers h3.vendor-title{margin-top: 0;}
+.pc_vendor-offers .vendor-title a{color: #555; font-weight: bold;}
+.pc_vendor-offers .vendor-profile-description{float: none; padding: 0;width: auto;}
+.price-comparison-container .addition-mobile-info {
+    display: none;
+}
+
+.pc_showmore{text-align: center; display: block; padding-top: 10px;}
+.pc_showmore a{position: relative;}
+.product-info-group{overflow: hidden;}
+.pc_vendor-offers .shipping_price, .pc_vendor-offers .total_price {
+    vertical-align: middle;
+}
+
+@media only screen and (max-width: 480px) {
+    .price-comparison-container .pc_filter{
+        width: auto;
+    }
+    .price-comparison-container .product_price,.price-comparison-container .add_to_cart{
+        display: none;
+    }
+    .price-comparison-container .vendor-info{
+        display: flex;
+        flex-direction: column;
+    }
+    .price-comparison-container .vendor-info > span:nth-child(n+2) {
+        margin-left: 0px;
+        padding-left: 0px;
+        border: none;
+        padding-top: 5px;
+    }
+    .price-comparison-container .addition-mobile-info {
+        display: flex;
+    }
+    .price-comparison-container .addition-mobile-info .price-box {
+        margin-right: 20px;
+    }
+}
+

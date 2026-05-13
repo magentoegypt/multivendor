@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Amasty\CheckoutDeliveryDate\Api\DeliveryInformationManagementInterface"
+                type="Amasty\CheckoutDeliveryDate\Model\DeliveryInformationManagement" />
+    <preference for="Amasty\CheckoutDeliveryDate\Api\GuestDeliveryInformationManagementInterface"
+                type="Amasty\CheckoutDeliveryDate\Model\GuestDeliveryInformationManagement" />
+    <preference for="Amasty\CheckoutDeliveryDate\Api\Data\DeliveryInterface"
+                type="Amasty\CheckoutDeliveryDate\Model\Delivery"/>
+
+    <type name="Amasty\CheckoutCore\Model\StatisticManagement">
+        <arguments>
+            <argument name="deliveryDateStatistic" xsi:type="object">Amasty\CheckoutDeliveryDate\Model\DeliveryDateStatistic</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Sales\Block\Items\AbstractItems">
+        <plugin name="Amasty_CheckoutDeliveryDate::AddDeliveryInfo"
+                type="Amasty\CheckoutDeliveryDate\Plugin\Sales\Block\Items\AbstractItems\AddDeliveryInfo"
+                sortOrder="10" />
+    </type>
+</config>

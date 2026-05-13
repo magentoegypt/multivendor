@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+
+	<event name="controller_action_predispatch_sms">
+		<observer name="vendorssms_predispatch_sms" instance="Vnecoms\VendorsSms\Observer\VendorsSmsPredispatch" />
+	</event>
+
+	<event name="ves_vendorsconfig_form_fieldset_prepare_before">
+		<observer name="ves_vendorssms_form_fieldset_prepare_before" instance="Vnecoms\VendorsSms\Observer\ProcessFieldConfig" />
+	</event>
+
+	<event name="vendor_config_before_change_section_sms_notification">
+		<observer name="ves_vendorssms_vendor_config_before_change_section_sms_notificatione" instance="Vnecoms\VendorsSms\Observer\BeforeSaveConfig" />
+	</event>
+
+</config>

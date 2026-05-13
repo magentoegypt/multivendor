@@ -1,0 +1,112 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+use Amasty\CheckoutCore\Model\FormManagement;
+
+/** @var \Amasty\CheckoutCore\Block\Adminhtml\Field\Edit\Group\Row\Renderer $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Amasty\CheckoutCore\Model\Field $field */
+
+$field = $block->getElement()->getData('field');
+$namePrefix = "field[{$field->getData('attribute_id')}]";
+$isStoreSelected = $block->isStoreSelected();
+$fieldDepend = $field->getData('field_depend');
+?>
+
+<tr <?= (($fieldDepend === FormManagement::ORDER_ATTRIBUTES_DEPEND
+        || $fieldDepend === FormManagement::CUSTOMER_ATTRIBUTES_DEPEND)
+    && $isStoreSelected) ? 'class="unsortable"' : '' ?>>
+    <td>
+        <div class="draggable-handle"></div>
+        <input type="hidden"
+               name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[id]"
+               value="<?= $escaper->escapeHtmlAttr($field->getId()) ?>"/>
+        <input data-role="sort-order"
+               type="hidden"
+               name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[sort_order]"
+               value="<?= $escaper->escapeHtmlAttr($field->getSortOrder()) ?>"/>
+        <input data-role="enabled"
+               type="hidden"
+               name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[enabled]"
+               value="<?= $escaper->escapeHtmlAttr($field->getEnabled()) ?>"/>
+    </td>
+    <td data-role="field"
+        id="amcheckout-field-<?= $escaper->escapeHtmlAttr($field->getData('attribute_code')) ?>"
+        name="<?= $escaper->escapeHtmlAttr(__($field->getData('default_label'))) ?>">
+        <?= $escaper->escapeHtml(__($field->getData('default_label'))) ?>
+    </td>
+    <td>
+        <input data-role="label"
+               type="text"
+               name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[label]"
+               value="<?= $escaper->escapeHtmlAttr($field->getData('label')) ?>"
+                <?= $field->getData('use_default') && $isStoreSelected ? 'readonly="readonly" tabindex="-1"' : '' ?>/>
+    </td>
+    <td data-role="width-control" class="width-control <?= ($fieldDepend === FormManagement::ORDER_ATTRIBUTES_DEPEND
+            || $fieldDepend === FormManagement::CUSTOMER_ATTRIBUTES_DEPEND) ? '-empty' : '' ?>">
+        <div data-role="width-slider"></div>
+        <input class="validate-digits-range digits-range-0-100"
+               data-role="width-input"
+               name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[width]"
+               value="<?= $escaper->escapeHtmlAttr($field->getData('width')) ?>"
+            <?= $field->getData('use_default') && $isStoreSelected ? 'readonly="readonly" tabindex="-1"' : '' ?>/>
+    </td>
+    <td class="center middle checkbox-cell amcheckout-required-option">
+        <div class="tooltip">
+            <?php
+            $canChangeRequiredCheckbox = $block->canChangeRequiredCheckbox($field);
+            $isReadOnly = !$field->isEnabled() || $field->getData('use_default') || !$canChangeRequiredCheckbox;
+            ?>
+
+            <input class="amcheckout-checkbox"
+                   type="checkbox"
+                   data-role="checkbox"
+                   data-is-restricted="<?= (int) !$canChangeRequiredCheckbox ?>"
+                   value="<?= $escaper->escapeHtmlAttr($field->getData('required')) ?>"
+                   name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[required]"
+                <?= $field->getIsRequired() ? 'checked=checked' : '' ?>
+                <?= $isReadOnly ? 'readonly="readonly" tabindex="-1"' : '' ?> />
+
+            <?php if (!$canChangeRequiredCheckbox): ?>
+                <?php $tooltipText = $block->getRequiredTooltipText($field); ?>
+
+                <?php if ($tooltipText): ?>
+                    <div class="tooltip-content">
+                        <?= $escaper->escapeHtml($tooltipText) ?>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </td>
+    <?php if ($isStoreSelected): ?>
+        <td class="center middle checkbox-cell amcheckout-default-option" data-role="use-default">
+            <input  class="amcheckout-default-checkbox"
+                    data-role="use-default"
+                    name="<?= $escaper->escapeHtmlAttr($namePrefix) ?>[use_default]"
+                <?= $field->getData('use_default') ? 'checked=checked' : '' ?>
+                    type="checkbox"
+                    value="1"/>
+        </td>
+    <?php endif ?>
+    <?php if ($fieldDepend === FormManagement::ORDER_ATTRIBUTES_DEPEND): ?>
+        <td class="amcheckout-module-link">
+            <a class="amcheckout-link"
+               href="<?= $escaper->escapeUrl($block->getOrderAttrUrl($field->getAttributeId())) ?>"
+               target="_blank">
+                <span><?= $escaper->escapeHtml(__('Order Attribute')) ?></span>
+            </a>
+        </td>
+    <?php endif ?>
+    <?php if ($fieldDepend === FormManagement::CUSTOMER_ATTRIBUTES_DEPEND): ?>
+        <td class="amcheckout-module-link">
+            <a class="amcheckout-link"
+               href="<?= $escaper->escapeUrl($block->getCustomerAttrUrl($field->getAttributeId())) ?>"
+               target="_blank">
+                <span class="amcheckout-label"><?= $escaper->escapeHtml(__('Customer Attribute')) ?></span>
+            </a>
+        </td>
+    <?php endif ?>
+</tr>

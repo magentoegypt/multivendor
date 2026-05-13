@@ -1,0 +1,50 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+?>
+<?php foreach ($containers as $container): ?>
+<div class="no-display <?php /* @escapeNotVerified */ echo $container['code'] ?> group_container" id="<?php /* @escapeNotVerified */ echo $container['name'] ?>_<%- data.id %>">
+    <input disabled="disabled" type="hidden" class="container_name" name="__[container_name]" value="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>]" />
+    <input disabled="disabled" type="hidden" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][option_id]" value="<%- data.option_id %>" />
+    <input disabled="disabled" type="hidden" class="layout_handle_pattern" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][layout_handle]" value="<?php /* @escapeNotVerified */ echo $container['layout_handle'] ?>" />
+    <table class="data-table">
+        <col width="200" />
+        <thead>
+        <tr>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('%1', $container['label'])) ?></label></th>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Container')) ?> <span class="required">*</span></label></th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <input disabled="disabled" type="radio" class="radio for_all" id="all_<?php /* @escapeNotVerified */ echo $container['name'] ?>_<%- data.id %>" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][page_for]" value="all" onclick="AppInstance.togglePageGroupChooser(this)" checked="checked" />
+                <label for="all_<?php /* @escapeNotVerified */ echo $container['name'] ?>_<%- data.id %>"><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('All')) ?></label><br />
+                <input disabled="disabled" type="radio" class="radio for_specific" id="specific_<?php /* @escapeNotVerified */ echo $container['name'] ?>_<%- data.id %>" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][page_for]" value="specific" onclick="AppInstance.togglePageGroupChooser(this)" />
+                <label for="specific_<?php /* @escapeNotVerified */ echo $container['name'] ?>_<%- data.id %>"><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Specific %1', $container['label'])) ?></label>
+                </td>
+            <td>
+                <div class="block_reference_container">
+                    <div class="block_reference"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="no-display chooser_container" id="<?php /* @escapeNotVerified */ echo $container['name'] ?>_ids_<%- data.id %>">
+        <input disabled="disabled" type="hidden" class="is_anchor_only" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][is_anchor_only]" value="<?php /* @escapeNotVerified */ echo $container['is_anchor_only'] ?>" />
+        <input disabled="disabled" type="hidden" class="product_type_id" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][product_type_id]" value="<?php /* @escapeNotVerified */ echo $container['product_type_id'] ?>" />
+        <p>
+            <input disabled="disabled" type="text" class="input-text entities" name="app_instance[<%- data.id %>][<?php /* @escapeNotVerified */ echo $container['name'] ?>][entities]" value="<%- data.<?php /* @escapeNotVerified */ echo $container['name'] ?>_entities %>" readonly="readonly" />
+            <a class="widget-option-chooser" href="javascript:void(0)" onclick="AppInstance.displayEntityChooser('<?php /* @escapeNotVerified */ echo $container['code'] ?>', '<?php /* @escapeNotVerified */ echo $container['name'] ?>_ids_<%- data.id %>')"  title="<?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Open Chooser')) ?>">
+                <img src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('Vnecoms_VendorsCms::images/rule_chooser_trigger.gif',['area' => 'vendors']) ?>" alt="<?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Open Chooser')); ?>" />
+                </a>
+            <a href="javascript:void(0)" onclick="AppInstance.hideEntityChooser('<?php /* @escapeNotVerified */ echo $container['name'] ?>_ids_<%- data.id %>')" title="<?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Apply')); ?>">
+                <img src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('Vnecoms_VendorsCms::images/rule_component_apply.gif') ?>" alt="<?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Apply')); ?>" />
+                </a>
+            </p>
+        <div class="chooser"></div>
+    </div>
+</div>
+<?php endforeach; ?>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vnecoms_VendorsCms::template" dependsOnConfig="vendors/cms/active" title="Manage Template" sortOrder="50" module="Vnecoms_VendorsPageBuilder" action="pagebuilder/template" parent="Vnecoms_VendorsCms::index" dependsOnModule="Vnecoms_VendorsCms" resource="Vnecoms_VendorsPageBuilder::template"/>
+    </menu>
+</config>
+

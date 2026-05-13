@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Google Address Autocomplete for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Block\Checkout\AttributeMerger">
+        <plugin name="Amasty_GoogleAddressAutocomplete::AttributeMerger"
+                type="Amasty\GoogleAddressAutocomplete\Plugin\Checkout\Block\ReplaceStreetComponent" />
+    </type>
+</config>

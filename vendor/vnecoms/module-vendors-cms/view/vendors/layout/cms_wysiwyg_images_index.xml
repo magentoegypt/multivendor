@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <container name="root">
+        <block class="Vnecoms\VendorsCms\Block\Vendors\Wysiwyg\Images\Content" name="vendorscms.wysiwyg_images.content" template="Vnecoms_VendorsCms::browser/content.phtml">
+            <block class="Vnecoms\VendorsCms\Block\Vendors\Wysiwyg\Images\Tree" name="vendorscms.wysiwyg_images.tree" template="Vnecoms_VendorsCms::browser/tree.phtml"/>
+            <block class="Vnecoms\VendorsCms\Block\Vendors\Wysiwyg\Images\Content\Uploader" name="vendorscms.wysiwyg_images.uploader" template="Vnecoms_VendorsCms::browser/content/uploader.phtml"/>
+        </block>
+    </container>
+</layout>

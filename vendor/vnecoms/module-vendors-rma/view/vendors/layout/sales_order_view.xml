@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- <update handle="sales_order_transactions_grid_block"/> -->
+     <head>
+         <css src="Vnecoms_VendorsRMA::css/rma.css"/>
+         <css src="Vnecoms_VendorsRMA::css/custom.css"/>
+    </head>
+    <update handle="sales_order_item_price"/>
+    <body>
+        <referenceBlock name="sales_order_tabs">
+            <block class="Vnecoms\VendorsRMA\Block\Vendor\Order\View\Tab\Rma" name="vendor_sales_order_rma.grid.container"/>
+            <action method="addTab">
+                <argument name="name" xsi:type="string">order_rma</argument>
+                <argument name="block" xsi:type="string">vendor_sales_order_rma.grid.container</argument>
+            </action>
+        </referenceBlock>
+
+        <referenceBlock name="vendor_sales_order_rma.grid.container">
+            <uiComponent name="vendor_rma_order_request_listing"/>
+        </referenceBlock>
+    </body>
+</page>

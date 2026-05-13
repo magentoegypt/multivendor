@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+    	<add id="Vnecoms_VendorsCoupon::manage_marketing" title="Marketing" sortOrder="30" module="Vnecoms_VendorsCoupon" parent="Vnecoms_Vendors::marketplace" dependsOnModule="Vnecoms_VendorsCoupon" resource="Vnecoms_VendorsCoupon::manage_marketing"/>
+    	<add id="Vnecoms_VendorsCoupon::manage_coupon" title="Manage Coupons" sortOrder="10" module="Vnecoms_VendorsCoupon" parent="Vnecoms_VendorsCoupon::manage_marketing" action="vendors/coupon" dependsOnModule="Vnecoms_VendorsCoupon" resource="Vnecoms_VendorsCoupon::manage_coupon"/>
+    </menu>
+</config>

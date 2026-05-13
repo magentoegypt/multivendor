@@ -1,0 +1,29 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Google Address Autocomplete for Magento 2 (System)
+ */
+    /** @var \Magento\Framework\View\Element\Template $block */
+    /** @var \Amasty\GoogleAddressAutocomplete\ViewModel\Init $viewModel */
+
+    $viewModel = $block->getData('view_model');
+?>
+
+<?php if ($viewModel->isEnabled() && ($apiKey = $viewModel->getApiKey())): ?>
+    <script>
+        function amAutocompleteGmapsInit() {
+            require(['Amasty_GoogleAddressAutocomplete/js/autocomplete'], function (autocomplete) {
+                autocomplete.options = <?= /* @noEscape */ $viewModel->getOptionsJson() ?>;
+                autocomplete.isReady(true);
+                autocomplete.restrictedCountryList = <?= /* @noEscape */ $viewModel->getRestrictedCountryList() ?>;
+            });
+        }
+    </script>
+
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=<?=
+        /* @noEscape */ $block->stripTags($apiKey);?>&libraries=places&callback=amAutocompleteGmapsInit"
+        async defer>
+    </script>
+<?php endif; ?>

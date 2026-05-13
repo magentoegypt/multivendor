@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="vendor_page" />
+    <head>
+    	<css src="Vnecoms_VendorsSearch::css/styles.css"/>
+        <css src="Vnecoms_VendorsSearch::css/search_result_styles.css"/>
+        <css src="Magento_Swatches::css/swatches.css"/>
+    </head>
+    <body>
+        <attribute name="class" value="page-products"/>
+
+        <referenceContainer name="div.sidebar.additional">
+            <block class="Vnecoms\VendorsSearch\Block\Navigation\Search" name="vendor.catalog.leftnav" after="vendor.profile.left" template="layer/view.phtml">
+                <block class="Vnecoms\VendorsSearch\Block\Navigation\State" name="catalog.navigation.state" as="state" />
+                <block class="Vnecoms\VendorsSearch\Block\Navigation\FilterRenderer" name="catalog.navigation.renderer" as="renderer" template="Vnecoms_VendorsPage::layer/filter.phtml"/>
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="content.top">
+        	<container name="vendor.home.search.container" htmlTag="div" htmlClass="vendor-search-container" before="vendor.home.featuredproducts.container">
+	            <block class="Vnecoms\VendorsSearch\Block\Search" name="search.by.vendor.inresult" ifconfig="vendors/search_by_vendor/enabled" as="search_by_vendor_inresult"
+	                       template="Vnecoms_VendorsSearch::menu/search-mobile.phtml" before="vendor.search.result" />
+			</container>
+            <block class="Vnecoms\VendorsSearch\Block\Result" name="vendor.search.result" template="result.phtml" ifconfig="vendors/search_by_vendor/enabled" cacheable="false">
+                <block class="Vnecoms\VendorsSearch\Block\SearchResult\ListProduct" name="search_result_list" template="Magento_Catalog::product/list.phtml" cacheable="false">
+                    <arguments>
+                        <!-- If argument's position depends on image size changeable in VDE:
+                        positions:list-secondary,grid-secondary,list-actions,grid-actions,list-primary,grid-primary
+                    -->
+                        <argument name="positioned" xsi:type="string">positions:list-secondary</argument>
+                    </arguments>
+                    <block class="Vnecoms\VendorsSearch\Block\Product\ProductList\Toolbar" name="product_list_toolbar" template="Magento_Catalog::product/list/toolbar.phtml" cacheable="false">
+                        <block class="Vnecoms\VendorsSearch\Block\Page\Html\Pager" name="product_list_toolbar_pager" cacheable="false"/>
+                    </block>
+                    <action method="setToolbarBlockName">
+                        <argument name="name" xsi:type="string">product_list_toolbar</argument>
+                    </action>
+                    <block class="Magento\Framework\View\Element\RendererList" name="category.product.type.details.renderers" as="details.renderers">
+                        <block class="Magento\Framework\View\Element\Template" as="default"/>
+                    </block>
+                </block>
+                <action method="setListOrders"/>
+                <action method="setListModes"/>
+                <action method="setListCollection"/>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="search_result_list">
+            <arguments>
+                <argument name="viewModel" xsi:type="object">Magento\Catalog\ViewModel\Product\OptionsData</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

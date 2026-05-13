@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <rma>
+            <general>
+                <order_expiry_day>30</order_expiry_day>
+                <allow_guests_request>1</allow_guests_request>
+                <allow_print>5</allow_print>
+                <enable_reasons>1</enable_reasons>
+                <allow_other_reasons>1</allow_other_reasons>
+                <allow_per_order>1</allow_per_order>
+                <allow_file_extension>txt,jpg,jpeg,png,gif,pdf,zip,rar,csv,doc,docx</allow_file_extension>
+                <max_resolve_time>30</max_resolve_time>
+            </general>
+
+            <increment>
+                <start_value>1</start_value>
+                <number_length>9</number_length>
+                <step>1</step>
+            </increment>
+
+            <policy>
+                <enable_policy>0</enable_policy>
+            </policy>
+            <contacts>
+                <enable_contacts>0</enable_contacts>
+                <message_template_customer>rma_contacts_message_template_customer</message_template_customer>
+                <message_template_admin>rma_contacts_message_template_admin</message_template_admin>
+                <email_identity>general</email_identity>
+                <contacts_name>RMA Department</contacts_name>
+                <contacts_email>rma@vnecoms.com</contacts_email>
+            </contacts>
+            <recaptcha>
+                <enable_recapcha>0</enable_recapcha>
+            </recaptcha>
+        </rma>
+
+        <rma_type_methods>
+            <refund>
+                <active>1</active>
+                <title>Refund</title>
+            </refund>
+            <replace>
+                <active>1</active>
+                <title>Replace</title>
+            </replace>
+        </rma_type_methods>
+
+
+    </default>
+</config>

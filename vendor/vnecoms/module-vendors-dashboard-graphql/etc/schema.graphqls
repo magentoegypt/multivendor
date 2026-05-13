@@ -1,0 +1,30 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+    vendorDashboard(
+       period: String @doc(description: "Period."),
+    ): VendorDashboard @resolver(class: "Vnecoms\\VendorsDashboardGraphQl\\Model\\Resolver\\Dashboard") @doc(description: "The vendor query returns information about a vendor dashboard") @cache(cacheable: false)
+}
+
+type VendorDashboard @doc(description: "Vendor Dashboard") {
+  credit_amount: String @doc(description: "credit amount")
+  average_orders: String @doc(description: "average orders")
+  total_products: String @doc(description: "total products")
+  lifetime_sales: String @doc(description: "lifetime sales")
+  order_chart_data: [VendorDashboardOrderChart] @doc(description: "order chart")
+  amount_chart_data: [VendorDashboardOrderChart] @doc(description: "amount chart")
+  credit_chart_data: [VendorDashboardCreditChart] @doc(description: "credit chart")
+}
+
+type VendorDashboardOrderChart @doc(description: "Vendor Order Chart") {
+  time: String @doc(description: "Time")
+  number_of_order: String @doc(description: "number of order")
+  order_amount: String @doc(description: "order amount")
+}
+
+type VendorDashboardCreditChart @doc(description: "Vendor Credit Chart") {
+  time: String @doc(description: "time")
+  received: String @doc(description: "received")
+  spent: String @doc(description: "spent")
+}

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="form">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Vnecoms_VendorsShipping::order/shipment/view/form.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="view_model" xsi:type="object">Vnecoms\VendorsShipping\ViewModel\Shipment\View\Form</argument>
+            </arguments>
+            <block class="Vnecoms\VendorsShipping\Block\Adminhtml\Shipment\Packaging" name="vendor_shipment_packaging" template="order/shipment/packaging/popup.phtml"/>
+            <block class="Vnecoms\VendorsShipping\Block\Adminhtml\Shipment\Packaging" name="vendor_shipment_packed" template="order/shipment/packaging/packed.phtml"/>
+        </referenceBlock>
+    </body>
+</page>

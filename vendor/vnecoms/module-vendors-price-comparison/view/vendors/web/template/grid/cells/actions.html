@@ -1,0 +1,35 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!-- ko if: $col.isSingle($row()._rowIndex) -->
+	<!-- ko ifnot: $row().is_sold_product -->
+	<a
+	    class="btn btn-primary action-menu-item"
+	    data-bind="
+	        repeat: {
+	            foreach: $col.getVisibleActions($row()._rowIndex),
+	            item: '$action'
+	        }"
+	    data-repeat-bind="
+	        attr: {
+	            href: $action().href
+	        },
+	        click: $col.getActionHandler($action())"
+	    ><i class="fa fa-plus-circle"></i> <span data-bind="text:$action().label" /></a>
+    <!-- /ko -->
+    
+    <!-- ko if: $row().is_sold_product -->
+    	<span class="text-muted" data-bind="text: $col.label_sold"></span>
+    <!-- /ko -->
+<!-- /ko -->
+

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="jquery/colorpicker/css/colorpicker.css"/>
+        <css src="Amasty_CheckoutCore::css/config.css" />
+    </head>
+    <body>
+        <referenceContainer name="js">
+            <block class="Magento\Backend\Block\Template" name="amaty_checkout_js.system_config_js" template="Amasty_CheckoutCore::system/config/js.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

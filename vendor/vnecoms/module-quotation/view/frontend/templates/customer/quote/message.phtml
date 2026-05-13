@@ -1,0 +1,177 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var $block \Vnecoms\Quotation\Block\Customer\Message */ ?>
+
+<div class="block quotation-message-list">
+    <div class="block-title">
+        <strong><?php /* @escapeNotVerified */ echo __('Messages') ?></strong>
+    </div>
+    <div class="block-content">
+        <div class="quotation-message-form">
+        <form id="quotation-message-form" method="post">
+            <input name="quote_id" type="hidden" value="<?php echo $block->getQuote()->getId() ?>">
+            <textarea name="message" rows="3" cols="10" class="input-text required-entry quotation-message-textbox"></textarea>
+            <?php if($block->isAllowCustomer()):?>
+			<div class="fileupload upload-wrapper quotation-attachment" data-bind="scope: 'uploader'">
+				<!-- ko template: getTemplate() --><!-- /ko -->
+			</div>
+			<script type="text/x-magento-init">
+			{
+			   ".fileupload": {
+				   "Magento_Ui/js/core/app": {
+					   "components": {
+						   "uploader": {
+							   "component": "Vnecoms_Quotation/js/uploader",
+							   "template": "Vnecoms_Quotation/uploader/uploader",
+							   "previewTmpl": "Vnecoms_Quotation/uploader/preview",
+							   "uploaderConfig": {
+									"url": "<?php echo $block->getUrl('quotation/attachment/upload', ['_secure' => true]); ?>",
+									"maxFileSize": <?php echo $block->getAttachmentFileSizeAllow() ?>,
+									"maxFileNumber": <?php echo $block->getMaxFileNumber() ?>
+							   }
+						   }
+					   }
+				   }
+			   }
+			}
+			</script>
+
+			<?php endif;?>
+            <button class="button action primary quotation-message-send-btn" type="submit"><i class="quote-icon-send-o"></i> <span><?php echo __("Send")?></span></button>
+        </form>
+        </div>
+
+        <?php $_messages = $block->getMessages();?>
+        <div class="quotation-messages">
+            <?php foreach($_messages as $_message):?>
+            <div class="quotation-message <?php echo $block->getMessageCssClass($_message);?>">
+                <div class="quotation-message-content"><pre><?php echo $block->escapeHtml($_message->getMessage())?></pre></div>
+                <div class="quotation-message-info clearfix">
+                    <strong><?php echo $block->formatDate($_message->getCreatedAt(), \IntlDateFormatter::LONG)?></strong>
+                    <?php echo $block->formatTime($_message->getCreatedAt())?><?php echo __(' - by')?>
+                    <span class="quotation-message-sender"><?php echo $_message->getName()?></span>
+                </div>
+                <?php $_attachmentCollection = $_message->getAttachmentCollection()?>
+                <?php $_attachmentCount = $_attachmentCollection->count()?>
+                <?php if($_attachmentCount):?>
+                <div class="quotation-message-attachments">
+                    <p><span class="attachment-count"><?php echo ($_attachmentCount > 1) ? __('%1 attachments', $_attachmentCount): __('%1 attachment', $_attachmentCount); ?></span></p>
+                    <?php $i = 0; foreach($_attachmentCollection as $_attachment):?>
+                        <?php
+                            $attachmentName = $block->getAttachmentName($_attachment);
+                            $attachmentUrl = $block->getAttachmentUrl($_attachment);
+                            $isImage = $block->isMediaTypeImage($_attachment);
+                            $iconClassAttachment = $block->getAttachmentMediaTypeClass($_attachment);
+                        ?>
+                        <div class="quotation-message-attachment <?php echo $isImage?'attachment-image':'attachment-file'?><?php if($i == 0):?> first<?php endif;?>" data-image="<?php echo $attachmentUrl ?>" data-title="<?php echo $attachmentName?>" data-identifier="quotation-attachment-<?php echo $_attachment->getId()?>">
+                            <div class="attachment-wrap-inner" aria-hidden="true">
+                                <?php if ($attachmentUrl && $isImage): ?>
+                                    <a href="<?php echo $attachmentUrl ?>" class="attachment-media-wrap" title="<?php echo $attachmentName?>">
+                                        <img src="<?php echo $attachmentUrl ?>" class="preview-image" alt="<?php echo $attachmentName?>" />
+                                    </a>
+                                <?php else: ?>
+                                    <a href="javascript: void(0);" class="attachment-media-wrap">
+                                        <i class="attachment-icon <?php echo $iconClassAttachment; ?>"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                            <div class="attachment-overlay"></div>
+                            <div class="attachment-info">
+                                <span class="file-name"><?php echo $attachmentName?></span>
+                            </div>
+                            <div class="attachment-actions">
+                                <a class="action download-action" data-tooltip="Download" href="<?php echo $block->getUrl('quotation/attachment/download',
+                                    array('file' => base64_encode($_attachment->getFileName()), 'file_name' => $attachmentName)) ?>">
+                                    <i class="action-icon quote-icon-cloud-download"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <?php $i ++;?>
+                    <?php endforeach;?>
+                </div>
+                <?php endif;?>
+            </div>
+            <?php endforeach;?>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+         'jquery',
+         'Magento_Ui/js/modal/alert',
+         'uiRegistry',
+         'mage/mage',
+         'domReady!'
+    ], function($, alert, registry) {
+         var dataForm = $('#quotation-message-form');
+         var ignore = null;
+         dataForm.mage('validation', {
+                 ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+             }).find('input:text').attr('autocomplete', 'off');
+
+         dataForm.on("submit",function (event) {
+             event.preventDefault();
+             if (dataForm.validation() && dataForm.validation('isValid')) {
+                 $.ajax({
+                     url: "<?php echo $block->getPostAjaxMessageUrl()?>",
+                     dataType: 'json',
+                     type: 'POST',
+                     data: dataForm.serializeArray(),
+                     context: $('body'),
+                     showLoader: true,
+
+                     /**
+                      * @param {*} response
+                      */
+                     success: function (response) {
+                         if(response.error === false){
+                            $(".quotation-messages").prepend(response.html);
+                            $("#quotation-message-form textarea").val('');
+                            registry.get('uploader').value([]);
+                            bindAttachmentImagesEvents();
+                         }else if(response.error){
+                        	 alert({
+      		            		title: $t('Error'),
+      		                    content: response.message
+    		                  });
+                         }else{
+                     	    alert({
+    		            		title: $t('Error'),
+    		                    content: response
+		                    });
+                         }
+                     }
+                 });
+             }
+         });
+
+         function bindAttachmentImagesEvents(){
+             $('.attachment-image').click(function(event){
+                 if($(event.target).is('.action-icon') || $(event.target).is('.download-action')) return true;
+            	 event.preventDefault();
+            	 var id = $(this).data('identifier');
+            	 if($('#'+id).length){
+            		 $('#'+id).modal('openModal');
+            	 }else{
+            	 $('<div class="thumbnail-preview" id="'+id+'"></div>').html('<div class="thumbnail-preview-image-block"><img class="thumbnail-preview-image" src="'+$(this).data('image')+'" /></div>')
+                     .modal({
+                         title: $(this).data('title'),
+                         type: 'popup',
+                         modalClass: '_image-box quotation-attachment-modal',
+                         autoOpen: true,
+                         innerScroll: true,
+                         buttons:{}
+                      });
+            	 }
+             });
+         }
+
+         bindAttachmentImagesEvents();
+    });
+</script>

@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="ileti_merkezi_username" translate="label tooltip" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Ileti Merkezi Username</label>
+	                    <config_path>vsms/settings/ileti_merkezi_username</config_path>
+	                    <depends>
+	                        <field id="gateway">ileti_merkezi</field>
+	                    </depends>
+	                </field>
+	                <field id="ileti_merkezi_password" translate="label tooltip" type="text" sortOrder="111" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Ileti Merkezi Password</label>
+	                    <config_path>vsms/settings/ileti_merkezi_password</config_path>
+	                    <depends>
+	                        <field id="gateway">ileti_merkezi</field>
+	                    </depends>
+	                </field>
+	                <field id="ileti_merkezi_sender" translate="label tooltip" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Ileti Merkezi Sender ID</label>
+	                    <config_path>vsms/settings/ileti_merkezi_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">ileti_merkezi</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

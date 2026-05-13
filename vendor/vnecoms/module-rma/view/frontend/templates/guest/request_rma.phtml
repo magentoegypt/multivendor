@@ -1,0 +1,31 @@
+
+<form action="<?php echo $block->getContinueUrl() ?>" method="post" id="request-new-form" class="request-new-form" enctype="multipart/form-data">
+    <div class="fieldset">
+        <ul class="form-list">
+            <li class="fields">
+                <div class="left">
+                    <label for="department_id" class="required"><?php echo __('Order Increment Id #') ?><em>*</em></label>
+                    <div class="input-box">
+                        <input type="text" class="required-entry input-text" name="order_incremental_id" id="order_incremental_id"/>
+                    </div>
+                </div>
+                <div class="right">
+                    <label for="department_id" class="required"><?php echo __('Email') ?><em>*</em></label>
+                    <div class="input-box">
+                        <input type="text" class="required-entry input-text validate-email" name="customer_email" id="email"/>
+                    </div>
+                </div>
+                <div class="clear"></div>
+        </ul>
+    </div>
+    <div class="buttons-set">
+        <button class='button' id="request-new-submit" title="Submit request" type="submit" ><span><span><?php echo __('Submit RMA') ?></span></span></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "#request-new-form": {
+            "validation": {}
+        }
+    }
+</script>

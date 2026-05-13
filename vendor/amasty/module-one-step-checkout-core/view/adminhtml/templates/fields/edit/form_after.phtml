@@ -1,0 +1,26 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+    /** @var \Amasty\CheckoutCore\Block\Adminhtml\Renderer\Template $block */
+    /** @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php if (!$block->isOrderAttributesEnable()): ?>
+    <div class="fields-comment message">
+        <?= $escaper->escapeHtml(__('Need more custom fields? Please consider')) ?>
+        <a href="https://amasty.com/order-attributes-for-magento-2.html" target="_blank">
+            <?= $escaper->escapeHtml(__('Order Attributes')) ?>
+        </a><?= $escaper->escapeHtml(__(' extension.')) ?>
+    </div>
+<?php endif; ?>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Amasty_CheckoutCore/js/view/checkout-fields": {}
+        }
+    }
+</script>

@@ -1,0 +1,55 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Sales\Block\Order\Email\Items\DefaultItems */
+
+/** @var $_item \Magento\Sales\Model\Order\Item */
+$_item = $block->getItem();
+$_order = $_item->getOrder();
+?>
+<?php if($block->checkItemForCurentRequest($_item)): ?>
+    <tr>
+        <td class="item-image">
+            <img src="<?php echo $block->getImage($_item->getProduct());?>"/>
+        </td>
+        <td class="item-info<?php if ($block->getItemOptions()): ?> has-extra<?php endif; ?>">
+            <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p>
+            <p class="sku"><?= /* @escapeNotVerified */  __('SKU'); ?>: <?= $block->escapeHtml($block->getSku($_item)) ?></p>
+            <?php if ($block->getItemOptions()): ?>
+                <dl class="item-options">
+                    <?php foreach ($block->getItemOptions() as $option): ?>
+                        <dt><strong><em><?= /* @escapeNotVerified */  $option['label'] ?></em></strong></dt>
+                        <dd>
+                            <?= /* @escapeNotVerified */  nl2br($option['value']) ?>
+                        </dd>
+                    <?php endforeach; ?>
+                </dl>
+            <?php endif; ?>
+            <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+            <?php if ($addInfoBlock) :?>
+                <?php $addInfoBlock->setItem($_item)->toHtml() ?>
+            <?php endif; ?>
+            <?php $block->escapeHtml($_item->getDescription()) ?>
+        </td>
+        <td class="item-qty">
+            <?php $dataItems = $block->getRmaItem($_item) ?>
+            <label><?php echo $dataItems["qty"] ?></label>
+
+            <?php if ($dataItems["rma"]) : ?>
+                <p><?php echo __("Other RMA for this product:") ?></p>
+                <ul>
+                    <?php foreach($dataItems["rma"] as $request): ?>
+                        <li><a href="<?php echo $block->getUrl("vrma/guest/view",array("id"=>$request["request_id"])) ?>" target="_blank">
+                                <?php echo "#".$request["request_increment_id"] ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif ?>
+
+        </td>
+    </tr>
+<?php endif ?>

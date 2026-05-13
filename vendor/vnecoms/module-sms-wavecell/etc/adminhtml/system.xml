@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="wavecell_token" translate="label tooltip" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Wavecell.com API Key</label>
+	                    <config_path>vsms/settings/wavecell_api</config_path>
+	                    <depends>
+	                        <field id="gateway">wavecell</field>
+	                    </depends>
+	                    <comment><![CDATA[You can generate tokens from your customer portal <a href="https://app.wavecell.com/" target="_blank">https://app.wavecell.com/</a>]]></comment>
+	                </field>
+	                
+	                <field id="wavecell_type" translate="label tooltip" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Wavecell.com Subaccount ID</label>
+	                    <config_path>vsms/settings/wavecell_subaccount_id</config_path>
+	                    <depends>
+	                        <field id="gateway">wavecell</field>
+	                    </depends>
+	                </field>
+	                
+	                <field id="wavecell_sender" translate="label tooltip" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender Id</label>
+	                    <config_path>vsms/settings/wavecell_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">wavecell</field>
+	                    </depends>
+	                    <comment>The from address that will be used when delivering the SMS to the handset.</comment>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Amasty\CheckoutGiftWrap\Api\GiftWrapInformationManagementInterface"
+                type="Amasty\CheckoutGiftWrap\Model\GiftWrapInformationManagement" />
+    <preference for="Amasty\CheckoutGiftWrap\Api\GuestGiftWrapInformationManagementInterface"
+                type="Amasty\CheckoutGiftWrap\Model\GuestGiftWrapInformationManagement" />
+
+    <preference for="Amasty\CheckoutGiftWrap\Api\GiftMessageInformationManagementInterface"
+                type="Amasty\CheckoutGiftWrap\Model\GiftMessageInformationManagement" />
+    <preference for="Amasty\CheckoutGiftWrap\Api\GuestGiftMessageInformationManagementInterface"
+                type="Amasty\CheckoutGiftWrap\Model\GuestGiftMessageInformationManagement" />
+
+    <type name="Amasty\CheckoutGiftWrap\Model\GiftWrapInformationManagement">
+        <arguments>
+            <argument name="giftWrapProvider" xsi:type="object">Amasty\CheckoutGiftWrap\Model\GiftWrapProvider</argument>
+        </arguments>
+    </type>
+</config>

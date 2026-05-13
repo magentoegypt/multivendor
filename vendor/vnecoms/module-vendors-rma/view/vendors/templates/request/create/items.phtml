@@ -1,0 +1,42 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php $_order = $block->getOrder() ?>
+<?php if ($_order): ?>
+    <?php $_items = $_order->getAllItems(); ?>
+    <table class="request-items">
+        <thead>
+        <tr>
+            <th class="item-info">
+                <?= /* @escapeNotVerified */  __('Items'); ?>
+            </th>
+            <th class="item-qty">
+                <?= /* @escapeNotVerified */  __('Qty'); ?>
+            </th>
+        </tr>
+        </thead>
+        <?php if($_items): ?>
+            <?php foreach ($_items as $_item): ?>
+                <?php
+                if ($_item->getParentItem()) {
+                    continue;
+                }
+                ?>
+                <tbody>
+                <?= $block->getItemHtml($_item) ?>
+                </tbody>
+            <?php endforeach; ?>
+        <?php else:?>
+            <tbody>
+                <?php echo __("This order doesnot have any item") ?>
+            </tbody>
+        <?php endif; ?>
+    </table>
+<?php endif; ?>

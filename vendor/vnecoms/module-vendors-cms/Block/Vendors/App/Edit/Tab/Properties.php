@@ -1,0 +1,123 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * Widget Instance Properties tab block.
+ *
+ * @author      Magento Core Team <core@magentocommerce.com>
+ */
+
+namespace Vnecoms\VendorsCms\Block\Vendors\App\Edit\Tab;
+
+/**
+ * @SuppressWarnings(PHPMD.DepthOfInheritance)
+ */
+class Properties extends \Vnecoms\VendorsCms\Block\Vendors\App\Options implements
+    \Magento\Backend\Block\Widget\Tab\TabInterface
+{
+    /**
+     * Widget config parameters.
+     *
+     * @var array
+     */
+    protected $hiddenParameters = [
+        'template',
+    ];
+
+    /**
+     * Prepare label for tab.
+     *
+     * @return \Magento\Framework\Phrase
+     */
+    public function getTabLabel()
+    {
+        return __('Frontend Application Options');
+    }
+
+    /**
+     * Prepare title for tab.
+     *
+     * @return \Magento\Framework\Phrase
+     */
+    public function getTabTitle()
+    {
+        return __('Frontend Application Options');
+    }
+
+    /**
+     * Returns status flag about this tab can be showen or not.
+     *
+     * @return true
+     */
+    public function canShowTab()
+    {
+        return $this->getApp()->isCompleteToCreate();
+    }
+
+    /**
+     * Returns status flag about this tab hidden or not.
+     *
+     * @return bool
+     */
+    public function isHidden()
+    {
+        return false;
+        $widgetConfig = $this->getApp()->getConfigAsArray();
+
+        if (isset($widgetConfig['parameters'])) {
+            foreach ($widgetConfig['parameters'] as $key => $parameter) {
+                if ($parameter['visible'] == 1 && !in_array($key, $this->hiddenParameters)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Getter.
+     *
+     * @return \Vnecoms\VendorsCms\Model\App
+     */
+    public function getApp()
+    {
+        return $this->_coreRegistry->registry('current_app');
+    }
+
+    /**
+     * Prepare block children and data.
+     * Set widget type and widget parameters if available.
+     *
+     * @return $this
+     */
+    protected function _preparelayout()
+    {
+        $this->setType(
+            $this->getApp()->getType()
+        )->setValues(
+            $this->getApp()->getParameters()
+        );
+
+        return parent::_prepareLayout();
+    }
+
+    /**
+     * Add field to Options form based on option configuration.
+     *
+     * @param \Magento\Framework\DataObject $parameter
+     *
+     * @return \Magento\Framework\Data\Form\Element\AbstractElement
+     */
+    protected function _addField($parameter)
+    {
+        if (!in_array($parameter->getKey(), $this->hiddenParameters)) {
+            return parent::_addField($parameter);
+        }
+
+        return false;
+    }
+}

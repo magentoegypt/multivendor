@@ -1,0 +1,95 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Menu
+ */
+?>
+<div class="vendor-menu-wrapper">
+    <div class="vendor-menu" id="vendor-menu">
+        <div class="vendor-nav-container">
+            <?php echo $this->getChildHtml('top_menu_before');?>
+            <div class="menu-logo-container">
+                <?php echo $this->getChildHtml('small_logo')?>
+            </div>
+            <ul>
+                <?php foreach($links as $link):?>
+                    <li class="vendor-menu-item">
+                        <a href="<?php echo $link['url']?>" title="<?php echo $link['title']?>"><?php echo $link['label']?></a>
+                    </li>
+                <?php endforeach;?>
+            </ul>
+            <?php echo $this->getChildHtml('top_menu_after');?>
+        </div>
+    </div>
+</div>
+<div class="scroll-to-top-container" id="scroll-to-top-container">
+    <a class="vendor-scroll-top-btn" id="scroll-to-top-button" href="#top">
+        <span><?php echo __("Scroll To Top")?></span>
+    </a>
+</div>
+
+<script type="text/javascript">
+
+require([
+     'jquery',
+     'domReady!'
+], function($){
+	var menuElements = [];
+	$('.vendor-menu-item a').each(function(index,elm){
+		var destimation = $($(elm).attr('href'));
+		if(destimation.length) menuElements.push({source: $(elm), destimation: destimation});
+		$(elm).click(function(event){
+			event.preventDefault();
+			var element = $(this);
+			var destimation = $(element.attr('href'));
+			if(destimation.length) $('body,html').animate({
+			    scrollTop: destimation.offset().top - 70
+			}, 600);
+		});
+	});
+
+    for(var i = 0; i < menuElements.length; i ++){
+        for(var j = i; j < menuElements.length; j ++){
+            if(menuElements[j].destimation.offset().top > menuElements[i].destimation.offset().top){
+                var tmpElm = menuElements[i];
+                menuElements[i] = menuElements[j];
+                menuElements[j] = tmpElm;
+            }
+        }
+    }
+    
+	window.menuElements = menuElements;
+	
+	$("#scroll-to-top-button").click(function(event){
+		event.preventDefault();
+		$('body,html').animate({
+		    scrollTop: 0
+		}, 600);
+	});
+
+	window.menu_top_offset = $("#vendor-menu").offset().top;
+	function toggleFixedMenu(){
+		if ($(window).scrollTop() > window.menu_top_offset) {
+	        $('.vendor-menu').addClass('fixed');
+	        $('#scroll-to-top-container').addClass('show');
+	    } else {
+	        $('.vendor-menu').removeClass('fixed');
+	        $('#scroll-to-top-container').removeClass('show');
+	    }
+
+		$(".vendor-menu a").removeClass("selected");
+		for(i =0; i< menuElements.length; i++){
+			if($(window).scrollTop() > (menuElements[i].destimation.offset().top - 330)){
+				menuElements[i].source.addClass('selected');
+				break;
+			}
+		}
+    }
+    
+	$(window).bind('scroll', function () {
+		toggleFixedMenu();
+	});
+	toggleFixedMenu();
+});
+</script>

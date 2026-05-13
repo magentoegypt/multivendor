@@ -1,0 +1,91 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<script type="text/x-magento-init">
+    {
+        "#address_form": {
+            "validation": {}
+        }
+    }
+</script>
+
+<script>
+
+    require([
+        "jquery",
+        "mage/adminhtml/form"
+    ], function(jQuery){
+
+
+        var updater = new RegionUpdater('country_id', 'region', 'region_id', <?php /* @escapeNotVerified */ echo $this->helper('Magento\Directory\Helper\Data')->getRegionJson() ?>, 'disable');
+        updater.disableRegionValidation();
+
+        (function ($) {
+            $(document).ready(function () {
+                'use strict';
+
+                var zipIsRange = $('#zip_is_range')
+                    .on('change.zipRange', function(){
+                        var elem = $(this),
+                            zipIsRangeChecked = elem.is(':checked'),
+                            zipFrom = $('.field-zip_from'),
+                            zipTo = $('.field-zip_to'),
+                            zipCode = $('.field-tax_postcode'),
+                            setState = function(element, visibility) {
+                                var input = element.find(':input');
+                                if (visibility) {
+                                    element
+                                        .addClass('required')
+                                        .removeClass('hidden');
+                                    input.addClass('required-entry');
+                                } else {
+                                    element
+                                        .removeClass('required')
+                                        .addClass('hidden');
+                                    input.removeClass('required-entry');
+                                }
+                            };
+                        elem.val(zipIsRangeChecked ? 1 : 0);
+                        setState(zipCode, !zipIsRangeChecked);
+                        setState(zipFrom, zipIsRangeChecked);
+                        setState(zipTo, zipIsRangeChecked);
+                    });
+                if (zipIsRange.val()) {
+                    zipIsRange.attr({checked: 'checked'})
+                }
+                zipIsRange.trigger('change');
+
+                $("#rma-update-address").click(function(){
+                    if($("#address_form").validation() && $("#address_form").validation('isValid')){
+                        $.ajax({
+                            showLoader: true, // enable loader
+                            method: "POST",
+                            url: "<?php echo $block->getUrl('vrma/request/address');?>",
+                            dataType: 'json',
+                            data : $("#address_form").serializeArray(),
+                            success: function (data) {
+                                if(data.error){
+                                    alert({
+                                        modalClass: 'alert ves-error',
+                                        title: '<?php echo __("Error");?>',
+                                        content: data.msg,
+                                    });
+                                }
+                            }
+                        });
+                    }
+
+                });
+
+            });
+        })(jQuery);
+
+        window.updater = updater;
+    });
+</script>

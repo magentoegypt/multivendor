@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="rma" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="general" translate="label" type="text" sortOrder="0" showInDefault="2" showInWebsite="1" showInStore="1">
+                <field id="max_escalate_time" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum RMA escalate time (days)</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                    <tooltip><![CDATA[After this x days without answering from a side, the RMA request will be automatically escalated to Admin.]]></tooltip>
+                </field>
+            </group>
+
+
+            <group id="contacts" translate="label" type="text" sortOrder="3" showInDefault="2" showInWebsite="1" showInStore="1">
+                <field id="refund_price_change" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Notify Message "Refund Amount"</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <tooltip><![CDATA[This email will be sent to vendor and customer when amount refund of RMA change.]]></tooltip>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

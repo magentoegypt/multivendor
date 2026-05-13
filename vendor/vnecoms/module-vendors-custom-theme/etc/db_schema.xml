@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_theme" resource="default" engine="innodb" comment="Vendor Theme">
+        <column xsi:type="int" name="theme_id" unsigned="true" nullable="false" identity="true"
+                comment="Theme Id"/>
+        <column xsi:type="int" name="base_theme_id" unsigned="true" nullable="false"  comment="Base Theme Id"/>
+        <column xsi:type="varchar" name="title" nullable="false" default="" length="255" comment="Theme Title"/>
+        <column xsi:type="varchar" name="preview_image" nullable="false" default="" length="255" comment="Preview Image"/>
+        <column xsi:type="mediumtext" name="home_content" nullable="false" comment="Home Content"/>
+        <column xsi:type="varchar" name="home_layout" nullable="false" default="" length="255" comment="Layout"/>
+        <column xsi:type="mediumtext" name="home_layout_xml" nullable="false" comment="Layout Update Xml"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" default="1" comment="Status"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="theme_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_VENDOR_THEME_THEME_ID" table="ves_vendor_theme"
+                    column="base_theme_id" referenceTable="theme" referenceColumn="theme_id"/>
+    </table>
+
+    <table name="ves_vendor_theme_config_section" resource="default" engine="innodb" comment="Vendor Theme Config Section">
+        <column xsi:type="int" name="section_id" unsigned="true" nullable="false" identity="true"
+                comment="Section Id"/>
+        <column xsi:type="int" name="theme_id" unsigned="true" nullable="false" comment="Theme Id"/>
+        <column xsi:type="varchar" name="section" nullable="false" default="" length="255" comment="Section name"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="section_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_VENDOR_THEME_CONFIG_SECTION_THEME_ID" table="ves_vendor_theme_config_section"
+                    column="theme_id" referenceTable="ves_vendor_theme" referenceColumn="theme_id"/>
+    </table>
+
+    <table name="ves_vendor_theme_config" resource="default" engine="innodb" comment="Vendor Theme Config">
+        <column xsi:type="int" name="config_id" unsigned="true" nullable="false" identity="true"
+                comment="Theme Id"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" default="0" comment="Vendor Id"/>
+        <column xsi:type="int" name="theme_id" unsigned="true" nullable="false" comment="Theme Id"/>
+        <column xsi:type="varchar" name="path" nullable="false" default="" length="255" comment="Path"/>
+        <column xsi:type="mediumtext" name="value" nullable="true" comment="Preview Image"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="config_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_VENDOR_BADGE_AWARD_BADGE_ID" table="ves_vendor_theme_config"
+                    column="theme_id" referenceTable="ves_vendor_theme" referenceColumn="theme_id"/>
+    </table>
+</schema>

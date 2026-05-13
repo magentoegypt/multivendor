@@ -1,0 +1,24 @@
+<div class="no-display ignore-validate pages group_container" id="pages_<%- data.id %>">
+    <input disabled="disabled" type="hidden" class="container_name" name="__[container_name]" value="app_instance[<%- data.id %>][pages]" />
+    <input disabled="disabled" type="hidden" name="app_instance[<%- data.id %>][pages][page_id]" value="<%- data.page_id %>" />
+    <input disabled="disabled" type="hidden" class="for_all" name="app_instance[<%- data.id %>][pages][for]" value="all" />
+    <table class="data-table">
+        <col width="200" />
+        <thead>
+        <tr>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Page')) ?> <span class="required">*</span></label></th>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Container')) ?> <span class="required">*</span></label></th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><?php /* @escapeNotVerified */ echo $block->getLayoutsChooser() ?></td>
+            <td>
+                <div class="block_reference_container">
+                    <div class="block_reference"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        </table>
+    </div>

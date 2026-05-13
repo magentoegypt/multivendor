@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Google Address Autocomplete for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_address_autocomplete"
+                 translate="label"
+                 sortOrder="151420"
+                 showInDefault="1"
+                 showInWebsite="1"
+                 showInStore="1">
+            <resource>Amasty_GoogleAddressAutocomplete::config</resource>
+            <class>separator-top</class>
+            <label>Google Address Autocomplete</label>
+            <tab>amasty</tab>
+
+            <group id="general"
+                   translate="label"
+                   sortOrder="0"
+                   showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>General</label>
+
+                <field id="google_address_suggestion"
+                       translate="label comment"
+                       type="select"
+                       sortOrder="0"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Google Address Suggestion</label>
+                    <comment>Address auto complete while user is typing, using geolocation Google technology. The browser may ask permissions for Location</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="google_api_key"
+                       translate="label comment"
+                       type="text"
+                       sortOrder="10"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Google API Key</label>
+                    <comment><![CDATA[Click <a href="https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete-addressform" target="_blank">here</a> to get API key]]></comment>
+                    <depends>
+                        <field id="google_address_suggestion">1</field>
+                    </depends>
+                </field>
+
+                <field id="autocomplete_country_restrictions"
+                       translate="label comment tooltip"
+                       type="multiselect"
+                       sortOrder="20"
+                       showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1">
+                    <label>Address Autocomplete Restrictions</label>
+                    <comment><![CDATA[If you ship goods to a limited number of countries, select those countries whose addresses will be offered to customers by the Google Address Autocomplete. Due to Google restrictions, you can specify up to 5 countries (find more information <a href="https://developers.google.com/maps/documentation/javascript/place-autocomplete#add_autocomplete" target="_blank">here</a>). Leave empty to ignore this feature.]]></comment>
+                    <tooltip>If your Magento is multistore, we advise to configure this setting for each Store View specifically to use the feature according to your business needs.</tooltip>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                    <depends>
+                        <field id="google_address_suggestion">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

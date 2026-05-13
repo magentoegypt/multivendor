@@ -1,0 +1,26 @@
+//
+//  Compatibility with Amasty Jet Theme
+//  ______________________________________________
+
+//
+//  Common
+//  ----------------------------------------------
+
+& when (@media-common =true) {
+    .checkout-index-index .am-gift-message {
+        .edit-link {
+            color: @amtheme__link__color;
+        }
+    }
+
+    .checkout-onepage-success {
+        .order-details-items {
+            .order-gift-message,
+            .block-order-details-gift-message {
+                dt:after {
+                    content: none;
+                }
+            }
+        }
+    }
+}

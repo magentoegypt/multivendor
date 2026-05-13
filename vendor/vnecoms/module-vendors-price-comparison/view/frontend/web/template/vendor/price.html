@@ -1,0 +1,22 @@
+<!-- ko if: hasSpecialPrice(item) -->
+	<div class="price-box price-final_price" data-role="priceBox">
+		<div class="special-price">
+			<span class="price-container price-final_price">
+				<span class="price-wrapper" data-bind="attr:{'data-price-amount': item.final_price}, html: formatPrice(item.final_price)"></span>
+			</span>
+		</div>
+		<div class="old-price">
+			<span class="price-container price-final_price">
+		           <span class="price-label"><!-- ko i18n: 'Regular Price' --><!-- /ko --></span>
+		    	<span data-bind="attr:{'data-price-amount': item.price}, html: formatPrice(item.price)" data-price-type="oldPrice" class="price-wrapper "></span>
+		    </span>
+		</div>
+	</div>
+<!-- /ko -->
+<!-- ko ifnot: hasSpecialPrice(item) -->
+<div class="price-box price-final_price" data-role="priceBox">
+	<span class="price-container price-final_price">
+		<span data-bind="attr:{'data-price-amount': item.final_price}, html: formatPrice(item.final_price)" data-price-type="finalPrice" class="price-wrapper "></span>
+	</span>
+</div>
+<!-- /ko -->

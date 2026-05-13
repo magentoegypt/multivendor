@@ -1,0 +1,71 @@
+
+type Mutation {
+    saveMobileToCustomer (input: MobileCustomerInput!): MobileCustomerOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\SaveMobileToCustomer") @doc(description:"Save Mobile To customer")
+
+    customerRegisterSendOtp (input: CustomerSendOtp!): CustomerSendOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerRegisterOtp") @doc(description:"Send OTP")
+    customerRegisterVerifyOtp (input: CustomerrVerifyOtp!): CustomerVerifyOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerVerifyOtp") @doc(description:"Verify OTP")
+
+
+    customerLoginSendOtp (input: CustomerSendOtp!): CustomerSendOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerLoginOtp") @doc(description:"Send OTP")
+    customerLoginVerifyOtp (input: CustomerrVerifyOtp!): CustomerVerifyOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerLoginVerifyOtp") @doc(description:"Verify OTP")
+
+    customerCheckoutSendOtp (input: CustomerSendOtp!): CustomerSendOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerCheckoutOtp") @doc(description:"Send OTP")
+    customerCheckoutVerifyOtp (input: CustomerrVerifyOtp!): CustomerVerifyOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerCheckoutVerifyOtp") @doc(description:"Verify OTP")
+
+    customerForgotPasswordSendOtp (input: CustomerSendOtp!): CustomerSendOtpOutput @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerForgotPasswordOtp") @doc(description:"Send OTP")
+    customerForgotPasswordVerifyOtp (input: CustomerrVerifyOtp!): CustomerVerifyOtpOutputForgot @resolver(class: "\\Vnecoms\\SmsGraphQl\\Model\\Resolver\\CustomerForgotPasswordVerifyOtp") @doc(description:"Verify OTP")
+
+
+}
+
+input MobileCustomerInput {
+   mobile: String! @doc(description: "Mobile Number")
+   otp: String! @doc(description: "Otp Number")
+}
+
+input CustomerSendOtp {
+   mobile: String! @doc(description: "Mobile Number")
+   resend: Boolean! @doc(description: "resend Number")
+}
+
+
+input CustomerrVerifyOtp {
+   mobile: String! @doc(description: "Mobile Number")
+   otp: String! @doc(description: "Otp Number")
+}
+
+
+type CustomerSendOtpOutput {
+    success: Boolean
+    resend: String
+    msg: String
+}
+
+type CustomerVerifyOtpOutput {
+    success: Boolean
+    email: String
+    msg: String
+    customer_id: String
+    otp: String
+}
+
+type CustomerVerifyOtpOutputForgot {
+    success: Boolean
+    email: String
+    msg: String
+    customer_id: String
+    otp: String
+    resetPasswordToken: String
+}
+
+type MobileCustomerOutput {
+    result: Boolean!
+}
+
+input CustomerInput {
+    mobilenumber: String @doc(description: "The customer's mobile number")
+}
+
+type Customer {
+    mobilenumber: String @doc(description: "The customer's mobile number")
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+                    <field id="taqnyat_token" translate="label tooltip" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Taqnyat Bearer Token</label>
+                        <config_path>vsms/settings/taqnyat_token</config_path>
+                        <depends>
+                            <field id="gateway">taqnyat</field>
+                        </depends>
+                    </field>
+
+                    <field id="taqnyat_sender" translate="label tooltip" type="text" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Taqnyat Sender</label>
+                        <config_path>vsms/settings/taqnyat_sender</config_path>
+                        <depends>
+                            <field id="gateway">taqnyat</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

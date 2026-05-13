@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * @var \Vnecoms\VendorsCms\Block\Html\Header\Logo $block
+ */
+?>
+<?php $storeName = $block->getVendorStoreName() ? $block->getVendorStoreName() : 'Vendor Store'?>
+<!--<span data-action="toggle-nav" class="action nav-toggle"><span><?php /* @escapeNotVerified */ //echo __('Toggle Nav') ?></span></span> -->
+<?php if ($block->isVendorHomePage()):?>
+    <strong class="logo">
+<?php else: ?>
+    <a class="" href="<?php //echo $block->getVendorUrl(); ?>" title="<?php /* @escapeNotVerified */ //echo $storeName ?>">
+<?php endif ?>
+        <a class="vendor-logo" href="<?php echo $block->getVendorUrl(); ?>" title="<?php /* @escapeNotVerified */ echo $storeName ?>">
+        <?php if ($block->getVendorLogoSrc() != null): ?>
+        <img src="<?php /* @escapeNotVerified */ echo $block->getVendorLogoSrc() ?>"
+             alt="<?php /* @escapeNotVerified */ echo $block->getLogoAlt() ?>"
+             <?php echo $block->getLogoWidth() ? 'width="' . $block->getLogoWidth() . '"' : '' ?>
+             <?php echo $block->getLogoHeight() ? 'height="' . $block->getLogoHeight() . '"' : '' ?>
+        />
+        <?php else: ?>
+
+        <?php endif; ?>
+        </a>
+<?php if ($block->isVendorHomePage()):?>
+    </strong>
+<?php else:?>
+    </a>
+<?php endif?>
+

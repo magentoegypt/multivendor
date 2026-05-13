@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */-->
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd" class="Amasty\CheckoutCore\Component\Form">
+    <fieldset name="delivery_date">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Delivery Date</item>
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="sortOrder" xsi:type="number">50</item>
+                <item name="opened" xsi:type="boolean">false</item>
+            </item>
+        </argument>
+        <field name="delivery_date_fields">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="template" xsi:type="string">Amasty_CheckoutCore/reports/components/statistic</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="imports" xsi:type="array">
+                        <item name="fields" xsi:type="string">${ $.provider }:data.delivery</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>

@@ -1,0 +1,65 @@
+<?php $request = $block->getRequestRma() ?>
+<div class="request-information">
+    <div class="group-select">
+        <!-- Common ticket info -->
+        <table width="100%">
+            <col width="50%"/>
+            <col width="50%"/>
+            <tbody>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Request Type :')?></span>
+                    <span class="<?php echo $block->getTypeClass() ?>"><?php echo $request->getTypeTitle(); ?></span>
+                </td>
+                <td>
+                    <span class="label"><?php echo __('Order ID :')?></span>
+                    <?php echo "#".$request->getOrderIncrementalId() ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Create At :')?></span>
+                    <?php echo $block->getFormatDateHtml($request->getCreatedAt()) ?>
+                </td>
+                <td>
+                    <span class="label"><?php echo __('Reason :') ?></span>
+                    <?php echo $request->getReasonTitle(); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Package Opened :')?></span>
+                    <?php echo $request->getPackageOpenedLabel(); ?>
+                </td>
+
+                <td>
+                    <span class="label"><?php echo __('Status :')?></span>
+                    <span class="<?php echo $block->getStatusClass() ?>"><?php echo $request->getStatusTitle(); ?></span>
+                </td>
+            </tr>
+            <?php if($request->getWhoPayForShip() || $request->getData("tracking_code")): ?>
+                <tr>
+                    <?php if($request->getWhoPayForShip()): ?>
+                        <td>
+                            <span class="label"><?php echo __('Who pay for ship:')?></span>
+                            <?php echo $request->getWhoPayForShip(); ?>
+                        </td>
+                    <?php endif ?>
+                    <?php if($request->getData("tracking_code")): ?>
+                        <td>
+                            <span class="label"><?php echo __('Tracking Number:')?></span>
+                            <?php echo $request->getData("tracking_code"); ?>
+                        </td>
+                    <?php endif ?>
+                </tr>
+            <?php endif ?>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="item-rma">
+        <?php echo $block->getChildHtml('rma_items')?>
+    </div>
+    <div class="clear"></div>
+</div>
+

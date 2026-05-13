@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="product_import_export" translate="label" type="text" sortOrder="100" showInDefault="1">
+            <label>Mass Import/Export</label>
+            <tab>general</tab>
+            <resource>Vnecoms_Vendors::product_import_export</resource>
+            <group id="general" translate="label tooltip" type="text" sortOrder="10" showInDefault="1">
+				<label>General</label>
+				<field id="multiple_value_separator" translate="label" type="text" sortOrder="10" showInDefault="1">
+	            	<label>Multiple value separator</label>
+	            	<frontend_class>required-entry</frontend_class>
+	        	</field>
+			</group>
+		</section>
+    </system>
+</config>

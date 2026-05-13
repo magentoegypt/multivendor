@@ -1,0 +1,26 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPriceComparison\Block\Vendor
+ */
+?>
+<div id="price-comparison-wrapper" data-bind="scope: 'vendor'">
+    <div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-bind="visible: isLoading">
+        <div class="loader">
+            <img src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>"
+                 alt="<?php /* @escapeNotVerified */ echo __('Loading...'); ?>"
+                 style="position: absolute;">
+        </div>
+    </div>
+    <!-- ko if:(visible()) -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+</div>
+<script type="text/x-magento-init">
+    {
+        "#price-comparison-wrapper": {
+            "Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+        }
+    }
+</script>

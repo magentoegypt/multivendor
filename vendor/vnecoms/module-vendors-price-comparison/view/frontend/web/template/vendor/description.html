@@ -1,0 +1,32 @@
+<div class="vendor-description">
+    <!-- ko if: getHomepageUrl(item) -->
+    <h3 class="vendor-title"><a data-bind="attr:{href: getHomepageUrl(item), title:getVendorTitle(item)}"><span data-bind="html: getVendorTitle(item)"></span></a></h3>
+    <!-- /ko -->
+    <!-- ko ifnot: getHomepageUrl(item) -->
+    <h3 class="vendor-title" data-bind="html: getVendorTitle(item)"></h3>
+    <!-- /ko -->
+    <!-- ko if: getVendorDescription(item) -->
+    <div data-bind="html: getVendorDescription(item)"></div>
+    <!-- /ko -->
+    <!-- ko if: canShowAddress() || canShowSalesCount() || canShowJoinedDate() -->
+    <div class="vendor-profile-description">
+        <p class="vendor-info">
+            <!-- ko if: canShowAddress() -->
+            <span class="vendor-location" data-bind="text: getAddress(item)"></span>
+            <!-- /ko -->
+            <!-- ko if: canShowSalesCount() -->
+            <span class="vendor-sales-count" data-bind="text: $t('%1 Sales').replace('%1',getSalesCount(item))"></span>
+            <!-- /ko -->
+            <!-- ko if: canShowJoinedDate() -->
+            <span class="vendor-joined-date" data-bind="text: $t('Joined since %1').replace('%1',getJoinedDate(item))"></span>
+            <!-- /ko -->
+        </p>
+    </div>
+
+    <div class="addition-mobile-info">
+        <!-- ko foreach: elems() -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>

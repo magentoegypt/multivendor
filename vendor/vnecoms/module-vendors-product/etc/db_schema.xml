@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_product_attribute_set" resource="default" engine="innodb" comment="Product Attribute Set">
+        <column xsi:type="smallint" name="attribute_set_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="smallint" name="parent_set_id" unsigned="true" nullable="false" identity="false"
+                comment="Parent Attribute Set Id"/>
+
+        <column xsi:type="varchar" name="display_type" nullable="false" length="32" comment="Display groups type"/>
+        <column xsi:type="varchar" name="attribute_set_name" nullable="false" length="255" comment="Attribute Set Name"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort Order"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_ATTRIBUTE_SET_ID"
+                    table="ves_vendor_product_attribute_set" column="parent_set_id" referenceTable="eav_attribute_set"
+                    referenceColumn="attribute_set_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="attribute_set_id"/>
+        </constraint>
+
+    </table>
+
+    <table name="ves_vendor_product_attribute_group" resource="default" engine="innodb" comment="Attribute group">
+        <column xsi:type="smallint" name="group_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="smallint" name="attribute_set_id" unsigned="true" nullable="false" identity="false"
+                comment="Attribute Set Id"/>
+
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort Order"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_ATTRIBUTE_SET_ID"
+                    table="ves_vendor_product_attribute_group" column="attribute_set_id" referenceTable="ves_vendor_product_attribute_set"
+                    referenceColumn="attribute_set_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="group_id"/>
+        </constraint>
+    </table>
+
+    <table name="ves_vendor_product_entity_attribute" resource="default" engine="innodb" comment="Vendor Product Entity Attribute">
+        <column xsi:type="smallint" name="entity_attribute_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="smallint" name="attribute_set_id" unsigned="true" nullable="false" identity="false"
+                comment="Attribute Set Id"/>
+
+        <column xsi:type="smallint" name="attribute_group_id" unsigned="true" nullable="false" identity="false"
+                comment="Attribute Group Id"/>
+
+
+        <column xsi:type="smallint" name="attribute_id" unsigned="true" nullable="false" identity="false"
+                comment="Attribute Id"/>
+
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort Order"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_ATTRIBUTE_SET_ID"
+                    table="ves_vendor_product_entity_attribute" column="attribute_set_id" referenceTable="ves_vendor_product_attribute_set"
+                    referenceColumn="attribute_set_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_ATTRIBUTE_GROUP_ID"
+                    table="ves_vendor_product_entity_attribute" column="attribute_group_id" referenceTable="ves_vendor_product_attribute_group"
+                    referenceColumn="group_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_ATTRIBUTE_ID"
+                    table="ves_vendor_product_entity_attribute" column="attribute_id" referenceTable="eav_attribute"
+                    referenceColumn="attribute_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_attribute_id"/>
+        </constraint>
+    </table>
+
+    <table name="ves_vendor_product_update" resource="default" engine="innodb" comment="Vendor Product Update">
+        <column xsi:type="int" name="update_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor Id"/>
+
+        <column xsi:type="int" name="store_id" unsigned="true" nullable="false" identity="false"
+                comment="Store Id"/>
+
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" identity="false"
+                comment="Attribute Id"/>
+
+        <column xsi:type="text" name="product_data" nullable="false" comment="Product Data"/>
+
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Status"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_VENDOR_ID"
+                    table="ves_vendor_product_update" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="update_id"/>
+        </constraint>
+    </table>
+
+    <table name="catalog_product_entity">
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="true" identity="false"
+                comment="Vendor Id" default="0" />
+    </table>
+    
+</schema>

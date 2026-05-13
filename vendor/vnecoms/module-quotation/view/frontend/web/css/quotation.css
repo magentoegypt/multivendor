@@ -1,0 +1,206 @@
+.quote-tbl .image{width: 80px;}
+.quote-tbl .price{width: 100px;}
+.quote-tbl .proposals{width: 90px;}
+.quote-tbl .qty{text-align: right;}
+.proposals-list{list-style: none; padding: 0; margin: 0;}
+.quote-detail-items{margin-bottom: 15px;}
+.quotation-actions{margin: 15px 0 30px;}
+.quotation-action-reject{float: left;}
+.quotation-action-confirm{float: right;}
+
+.quotation-actions:after,
+.quotation-info:after,
+.quotation-message-form:after{clear: both; content: ""; display: table;}
+.quotation-info .quotaion-customer-info, .quotation-info .quotaion-remark{width: 49%; float: left;}
+.quotation-info .quotaion-remark{float: right;}
+.quotation-info .quotaion-customer-info ul{margin: 0; padding: 0; list-style: none; width: 100%;}
+.quotation-info .quotaion-customer-info label{width: 150px; display: inline-block; font-weight: 600;}
+.quote-item-comment{margin-top: 20px; border: 1px solid #ddd; padding: 10px; color: #555; font-style: italic;}
+
+.tbl-customer-quotes .quote-actions{width: 90px; text-align: right;}
+.tbl-customer-quotes .quote-date{width: 120px;}
+.tbl-customer-quotes .quote-id{width: 120px;}
+.tbl-customer-quotes .quote-status{width: 155px;}
+
+.wrapper-quote-link a {
+    color: #333333;
+    text-decoration: none;
+}
+
+/** Category page **/
+.add-to-quotes .action.secondary {
+    background-image: none;
+    border-radius: 0;
+    background: #00A5E3;
+    border: 1px solid #00A5E3;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    padding: 10px 15px;
+    vertical-align: middle;
+}
+
+.category-btn-addtoquote {
+    margin-top: 8px;
+}
+
+.product-item .toquote {
+    box-shadow: none;
+    border-radius: 0;
+    font-size: 1.3rem;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+
+/** Customer account **/
+.tbl-customer-quotes tbody .action:hover {
+    cursor: pointer;
+}
+
+.bx-quote-status {
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    color: #000000;
+    font: normal 600 14px 'Open Sans', sans-serif;
+    display: inline-block;
+    padding: 8px 14px;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.bx-quote-status.disabled {
+    background: red;
+    border: 1px solid red;
+}
+
+.bx-quote-status.enabled,
+.bx-quote-status.starting {
+    color: green;
+    border: 1px solid green;
+}
+.block-customerquotes .pager {
+    text-align: center;
+    display: block;
+}
+.block-customerquotes .pager .pages {
+    display: inline-block;
+}
+.block-customerquotes .limiter {
+    display: block;
+    float: right;
+}
+
+.quotation-customer-index .prompt-message > input{
+    display: none;
+}
+
+
+/** Quote Request page **/
+.col-quote {
+    display: block;
+    position: relative;
+}
+
+.left-col.col-quote {
+    float: left;
+    width: 71%;
+    padding-right: 4%;
+}
+
+.right-col.form-quote-container {
+    float: right;
+    width: 25%;
+}
+
+.form-quote-container .form-quote {
+    display: block;
+    padding: 5px 10px 25px;
+    margin-bottom: 10px;
+}
+.form-quote-container .submitquote {
+    float: right;
+    margin-bottom: 8px;
+}
+
+
+.tbl-quote-container .form-quote .actions {
+    text-align: right;
+}
+
+.tbl-quote-container .product-item-photo {
+    display: block;
+    width: 100%;
+}
+
+.tbl-quote-container .product-item-details {
+    display: table-cell;
+    white-space: normal;
+    width: 99%;
+}
+
+.tbl-quote-container .quote-tbl th.action {
+    text-align: right;
+}
+
+.tbl-quote-container .form-quote .col.qty .input-text {
+    height: 36px;
+    margin-top: -7px;
+    text-align: center;
+    width: 45px;
+}
+
+.tbl-quote-container .form-quote .col.qty .field > label {
+    display: none;
+}
+
+.tbl-quote-container .quote-tbl .action-inner {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.tbl-quote-container .quote-tbl .action-inner .action:before {
+    -webkit-font-smoothing: antialiased;
+    color: #8f8f8f;
+    display: inline-block;
+    font-family: 'extend-luma-icons';
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 20px;
+    overflow: hidden;
+    speak: none;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.tbl-quote-container .quote-tbl .action-inner .action span {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    padding: 0;
+    margin: -1px;
+    width: 1px;
+}
+
+.tbl-quote-container .quote-tbl .action-inner .action.edit:before {
+    content: "\e601";
+}
+
+.tbl-quote-container .quote-tbl .action-inner .action.delete:before {
+    content: "\e604";
+}
+
+.request-quote .proposal-wrapper textarea {
+    height: 200px;
+}
+
+.catalog-category-view .product-item-actions{display: none;}
+.ves-quotation-processed.catalog-category-view .product-item-actions{display: block;}
+@media (max-width: 639px) {
+	.quote-detail-items .quote-tbl .qty,
+	.quote-detail-items .quote-tbl .proposals{text-align: left; display: block; width: 50%; float: left;box-sizing: border-box;}
+}

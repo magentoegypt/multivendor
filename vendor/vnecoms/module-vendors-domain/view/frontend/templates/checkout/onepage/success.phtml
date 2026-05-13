@@ -1,0 +1,18 @@
+<script type="text/javascript">
+    require([
+    'jquery',
+    'underscore',
+    'ko',
+    'Magento_Customer/js/customer-data'
+], function ($, _, ko, customerData) {
+
+    $( document ).ready(function() {
+        var sections;
+        sections = ["cart"];
+        if (sections) {
+            customerData.invalidate(sections);
+        }
+    });
+
+});
+</script>

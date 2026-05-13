@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+        <css src="Vnecoms_VendorsProductImportExport::css/styles.css"/>
+    </head>
+    <body>
+    	<referenceContainer name="content">
+    		<block class="Vnecoms\VendorsProductImportExport\Block\Import\Form" name="vendor.import.form" />
+    		<block class="Vnecoms\VendorsProductImportExport\Block\Import\StartQueue" name="vendor.import.start_queue" template="import/start_queue.phtml">
+    			<arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                    	<item name="components" xsi:type="array">
+                            <item name="import" xsi:type="array">
+                            	<item name="component" xsi:type="string">Vnecoms_VendorsProductImportExport/js/import</item>
+                            </item>
+                        </item>
+                	</argument>
+               	</arguments>
+    		</block>
+        </referenceContainer>
+    </body>
+</page>

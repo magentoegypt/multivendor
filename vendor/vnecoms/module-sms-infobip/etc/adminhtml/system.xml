@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="infobip_username" translate="label tooltip" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Infobip User Name</label>
+	                    <config_path>vsms/settings/infobip_username</config_path>
+	                    <depends>
+	                        <field id="gateway">infobip</field>
+	                    </depends>
+	                </field>
+	                <field id="infobip_password" translate="label tooltip" type="text" sortOrder="91" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Infobip Password</label>
+	                    <config_path>vsms/settings/infobip_password</config_path>
+	                    <depends>
+	                        <field id="gateway">infobip</field>
+	                    </depends>
+	                </field>
+
+	                <field id="infobip_sender" translate="label tooltip" type="text" sortOrder="92" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender Name</label>
+	                    <config_path>vsms/settings/infobip_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">infobip</field>
+	                    </depends>
+	                </field>
+
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,18 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Layout Builder for Magento 2 (System)
+ */
+/**
+ * @var $block Amasty\CheckoutLayoutBuilder\Block\Config\LayoutBuilderField
+ */
+
+$element = $block->getElement();
+?>
+
+<input type="hidden"
+       id="amcheckout-frontend-config"
+       name="<?= /* @noEscape */ $element->getName() ?>"
+       value="<?= /* @noEscape */ $element->getEscapedValue() ?>" />
+

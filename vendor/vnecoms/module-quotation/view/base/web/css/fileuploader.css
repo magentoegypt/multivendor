@@ -1,0 +1,67 @@
+.file-uploader-area {
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+.file-uploader-area input[type='file'] {
+    cursor: pointer;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0;
+}
+.file-uploader-area input[type='file']:focus + .file-uploader-button {
+    box-shadow: 0 0 0 1px #006bb4;
+}
+.file-uploader-button {
+    cursor: pointer;
+    display: inline-block;
+}
+.file-uploader-button._is-dragover {
+    background: #d4d4d4;
+    border: 1px solid #006bb4;
+}
+.file-uploader-spinner {
+    background-image: url('../images/loader-1.gif');
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: 15px;
+    display: none;
+    height: 30px;
+    margin-left: 1rem;
+    vertical-align: top;
+    width: 15px;
+}
+.file-uploader._loading .file-uploader-spinner {
+    display: inline-block;
+}
+.file-uploader .admin__field-note,
+.file-uploader .admin__field-error {
+    margin-bottom: 1rem;
+}
+.file-uploader .file-uploader-filename {
+    word-break: break-all;
+}
+.file-uploader .file-uploader-filename:first-child {
+    margin-bottom: 1rem;
+}
+.file-uploader .file-uploader-meta {
+    color: #9e9e9e;
+}
+.file-uploader .admin__field-fallback-reset {
+    margin-left: 1rem;
+}
+._keyfocus .file-uploader .action-remove:focus {
+    box-shadow: 0 0 0 1px #006bb4;
+}
+
+.quotation-file-uploader-summary{margin-top: 15px; position: relative; display: block;}
+.quotation-file-uploader-summary:after{display: table; content: ""; clear: both;}
+.quotation-file-uploader-preview{position: absolute;width: 40px; height: 40px; border: 1px solid #d3d3d3; margin-right: 10px; text-align: center;}
+.quotation-file-uploader-preview img{max-width: 100%; max-height: 100%; position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto;}
+.quotation-file-uploader-preview [class^="quote-icon"]{font-size: 21px; color: #555;}
+.quotation-file-uploader-preview.attachment-file{line-height: 45px;}
+.quotation-file-uploader-preview a{text-decoration: none;}
+.quotation-file-uploader-summary .actions{display: block; position: absolute; right: 0;}
+.quotation-file-uploader-summary .actions .action-remove{cursor: pointer;}
+.quotation-file-uploader-summary .file-uploader-info{float: left; padding-left: 50px; padding-right: 60px;}
+.quotation-attachment-filename{max-width: 250px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;}

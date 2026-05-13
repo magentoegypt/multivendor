@@ -1,0 +1,64 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+   v_creditTransaction(
+       pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+       currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+   ): VendorCreditTransactions! @doc(description: "The list of vendor credit transaction.") @resolver(class: "Vnecoms\\VendorsCreditGraphQl\\Model\\Resolver\\Transactions")
+
+   v_creditWithdrawalTransaction(
+      pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+      currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+   ): VendorCreditWithdrawalTransactions! @doc(description: "The list of vendor credit transaction.") @resolver(class: "Vnecoms\\VendorsCreditGraphQl\\Model\\Resolver\\Withdrawals")
+
+}
+
+type Mutation {
+    createVendorCreditWithdrawal(
+        method: String!,
+        amount: Int!
+    ): VendorCreditWithdrawalTransaction @doc(description: "Create Withdrawal") @resolver(class: "Vnecoms\\VendorsCreditGraphQl\\Model\\Resolver\\CreateWithdrawal")
+}
+
+type VendorCreditTransactions @doc(description: "List Transactions.") {
+    items: [VendorCreditTransaction] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+type VendorCreditTransaction @doc(description: "Transaction Object.") {
+    transaction_id: Int @doc(description: "The ID assigned to the Transaction") @deprecated(reason: "id of Notification.")
+    type: String @deprecated(reason: "Type")
+    amount: String @deprecated(reason: "amount")
+    balance: String @deprecated(reason: "balance")
+    description: String @deprecated(reason: "description")
+    additional_info: String @doc(description: "additional info")
+    created_at: String @doc(description: "created at")
+}
+
+
+type VendorCreditWithdrawalTransactions @doc(description: "List Withdrawals.") {
+    items: [VendorCreditWithdrawalTransaction] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+type VendorCreditWithdrawalTransaction @doc(description: "Transaction Object.") {
+    withdrawal_id: Int @doc(description: "The ID assigned to the Transaction") @deprecated(reason: "id of Notification.")
+    vendor_id: Int @deprecated(reason: "vendor id")
+    method: String @deprecated(reason: "method")
+    method_title: String @deprecated(reason: "method title")
+    amount: String @deprecated(reason: "amount")
+    fee: String @doc(description: "fee")
+    net_amount: String @doc(description: "net amount")
+    additional_info: String @doc(description: "additional info")
+    note: String @doc(description: "note")
+    status: Int @doc(description: "status")
+    reason_cancel: String @doc(description: "reason cancel")
+    code_of_transfer: String @doc(description: "code of transfer")
+    created_at: String @doc(description: "created at")
+    updated_at: String @doc(description: "updated at")
+}
+
+

@@ -1,0 +1,32 @@
+{
+    "ves_vendor_coupon": {
+        "column": {
+            "coupon_id": true,
+            "vendor_id": true,
+            "code": true,
+            "amount": true,
+            "usage_limit": true,
+            "usage_per_customer": true,
+            "times_used": true,
+            "created_at": true,
+            "from_date": true,
+            "to_date": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_VENDOR_COUPON_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true
+        }
+    },
+    "quote": {
+        "column": {
+            "applied_vendor_coupon_ids": true,
+            "vendor_discount_detail": true
+        }
+    },
+    "ves_vendor_sales_order": {
+        "column": {
+            "coupon_code": true,
+            "discount_description": true
+        }
+    }
+}

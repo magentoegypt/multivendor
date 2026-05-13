@@ -1,0 +1,61 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var $block \Vnecoms\Quotation\Block\Customer\Message */
+    $_message = $block->getData('message');
+?>
+
+<?php if ($_message):?>
+<div class="quotation-message <?php echo $block->getMessageCssClass($_message);?>">
+    <div class="quotation-message-content"><pre><?php echo $block->escapeHtml($_message->getMessage())?></pre></div>
+    <div class="quotation-message-info clearfix">
+        <strong><?php echo $block->formatDate($_message->getCreatedAt(), \IntlDateFormatter::LONG)?></strong>
+        <?php echo $block->formatTime($_message->getCreatedAt())?><?php echo __(' - by')?>
+        <span class="quotation-message-sender"><?php echo $_message->getName()?></span>
+    </div>
+    <?php $_attachmentCollection = $_message->getAttachmentCollection()?>
+    <?php $_attachmentCount = $_attachmentCollection->count()?>
+    <?php if($_attachmentCount):?>
+        <div class="quotation-message-attachments">
+            <p><span class="attachment-count"><?php echo ($_attachmentCount > 1) ? __('%1 attachments', $_attachmentCount): __('%1 attachment', $_attachmentCount); ?></span></p>
+            <?php $i = 0; foreach($_attachmentCollection as $_attachment):?>
+                <?php
+                $attachmentName = $block->getAttachmentName($_attachment);
+                $attachmentUrl = $block->getAttachmentUrl($_attachment);
+                $isImage = $block->isMediaTypeImage($_attachment);
+                $iconClassAttachment = $block->getAttachmentMediaTypeClass($_attachment);
+                ?>
+                <div class="quotation-message-attachment <?php echo $isImage?'attachment-image':'attachment-file'?><?php if($i == 0):?> first<?php endif;?>" data-image="<?php echo $attachmentUrl ?>" data-title="<?php echo $attachmentName?>" data-identifier="quotation-attachment-<?php echo $_attachment->getId()?>">
+                    <div class="attachment-wrap-inner" aria-hidden="true">
+                        <?php if ($attachmentUrl && $isImage): ?>
+                            <a href="<?php echo $attachmentUrl ?>" class="attachment-media-wrap" title="<?php echo $attachmentName?>">
+                                <img src="<?php echo $attachmentUrl ?>" class="preview-image" alt="<?php echo $attachmentName?>" />
+                            </a>
+                        <?php else: ?>
+                            <a href="javascript: void(0);" class="attachment-media-wrap">
+                                <i class="attachment-icon <?php echo $iconClassAttachment; ?>"></i>
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                    <div class="attachment-overlay"></div>
+                    <div class="attachment-info">
+                        <span class="file-name"><?php echo $attachmentName?></span>
+                    </div>
+                    <div class="attachment-actions">
+                        <a class="action download-action" data-tooltip="Download" href="<?php echo $block->getUrl('quotation/attachment/download',
+                            array('file' => base64_encode($_attachment->getFileName()), 'file_name' => $attachmentName)) ?>">
+                            <i class="action-icon quote-icon-cloud-download"></i>
+                        </a>
+                    </div>
+                </div>
+                <?php $i ++;?>
+            <?php endforeach;?>
+        </div>
+    <?php endif;?>
+</div>
+<?php endif; ?>

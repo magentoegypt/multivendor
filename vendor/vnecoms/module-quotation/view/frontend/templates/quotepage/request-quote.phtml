@@ -1,0 +1,118 @@
+<?php
+/**
+ * Copyright © 2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+//@var \
+?>
+<?php if ($block->isEnableRequestQuoteInShoppingCart()):?>
+    <button type="button"
+            data-role="request-a-quote"
+            title="<?php /* @escapeNotVerified */ echo __('Request a Quote') ?>"
+            data-mage-init='{"Vnecoms_Quotation/js/proceed-to-quote":{"quoteUrl":"<?php /* @escapeNotVerified */ echo $block->getQuoteUrl(); ?>", "modalId": "#request-quote-modal"}}'
+            class="action primary checkout request-quote<?php echo($block->isDisabled()) ? ' disabled' : ''; ?>"
+            <?php if ($block->isDisabled()):?>disabled="disabled"<?php endif; ?>>
+        <span><?php /* @escapeNotVerified */ echo __('Request a Quote') ?></span>
+    </button>
+
+    <div id="request-quote-modal">
+        <form enctype="multipart/form-data" action="<?php echo $block->getUrl('quotation/checkout/sendQuote') ?>" id="request-quote-form">
+            <fieldset class="fieldset">
+                <div class="field id required">
+                    <label class="label" for="comment"><span><?php echo __('Add your comment')?></span></label>
+                    <div class="control">
+                        <textarea name="comment" data-validate="{required:true}" aria-required="true"></textarea>
+                    </div>
+                </div>
+                <div class="field id required">
+                    <label class="label" for="name"><span><?php echo __('Quote Name')?></span></label>
+                    <div class="control">
+                        <input type="text" class="input-text" name="name" data-validate="{required:true}" aria-required="true"/>
+                    </div>
+                </div>
+                <div class="upload-wrapper" data-bind="scope: 'uploader'">
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                </div>
+
+                <script type="text/x-magento-init">
+                {
+                   ".upload-wrapper": {
+                       "Magento_Ui/js/core/app": {
+                           "components": {
+                               "uploader": {
+                                   "component": "Vnecoms_Quotation/js/uploader",
+                                   "template": "Vnecoms_Quotation/upload/uploader",
+                                   "uploaderConfig": {
+                                        "url": "<?php echo $block->getUrl('quotation/quote/upload', ['_secure' => true]); ?>"
+                                   }
+                               }
+                           }
+                       }
+                   }
+                }
+
+                </script>
+            </fieldset>
+        </form>
+    </div>
+
+    <script>
+        require([
+                'jquery',
+                'Magento_Ui/js/modal/modal',
+                'Magento_Ui/js/modal/alert',
+                'mage/mage'
+            ],
+            function($,modal,alert){
+                var requestForm = $("#request-quote-form");
+                requestForm.mage('validation', {});
+
+                var options = {
+                    type: 'popup',
+                    modalClass:'request-popup-ves',
+                    responsive: true,
+                    innerScroll: true,
+                    title: '<?php echo __("Request A Quote")?>',
+                    buttons: [{
+                        text: $.mage.__('Send Request'),
+                        class: 'action primary',
+                        click: function () {
+                            if(requestForm.valid()){
+                                requestForm.trigger('processStart');
+                                $.ajax({
+                                    url: '<?php echo $block->getRequestUrl() ?>',
+                                    method: "POST",
+                                    data: {
+                                        customer_id: '<?php echo $block->getCustomerId()?>',
+                                        comment: '',
+                                        name: '',
+                                        attachments: ''
+                                    },
+                                    dataType: "json"
+                                }).done(function( response ){
+                                    if(response.error){
+                                        requestForm.trigger('processStop');
+                                        alert({
+                                            modalClass: 'confirm ves-error',
+                                            title: "<?php echo __("Request A Quote");?>",
+                                            content: response.msg,
+                                        });
+                                    }else{
+                                        $("#vnecoms-credit-balance").html(response.credit_balance);
+                                        creditForm.trigger('processStop');
+                                        $('#request-quote-modal').trigger('closeModal');
+                                        creditForm.trigger('reset');
+                                    }
+                                });
+                            }
+                        }
+                    }]
+                };
+                var popup = modal(options, $('#request-quote-modal'));
+            }
+        );
+    </script>
+<?php endif?>

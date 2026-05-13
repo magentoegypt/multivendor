@@ -1,0 +1,25 @@
+{
+  "name": "vnecoms/module-vendors-custom-theme",
+  "description": "Module allows admin to create multiple theme based on installed theme and set it available for vendor to use.",
+  "authors": [
+    {
+      "name": "VNECOMS",
+      "email": "support@vnecoms.com"
+    }
+  ],
+  "require": {
+    "magento/framework": ">=103.0.3",
+    "vnecoms/module-vendors-media": "2.4.*",
+    "vnecoms/module-vendors-page": "2.4.*"
+  },
+  "type": "magento2-module",
+  "version": "2.4.2",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Vnecoms\\VendorsCustomTheme\\": ""
+    }
+  }
+}

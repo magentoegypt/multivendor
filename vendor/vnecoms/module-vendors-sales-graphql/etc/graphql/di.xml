@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Vnecoms\VendorsSalesGraphQl\Model\OrderInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="orderTypeNameResolvers" xsi:type="array">
+                <item name="sales_order_type_resolver" xsi:type="object">Vnecoms\VendorsSalesGraphQl\Model\SalesOrderTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsSalesGraphQl\Model\OrderAddressInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="orderAddressTypeNameResolvers" xsi:type="array">
+                <item name="sales_order_address_type_resolver" xsi:type="object">Vnecoms\VendorsSalesGraphQl\Model\SalesOrderAddressTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsSalesGraphQl\Model\InvoiceInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="invoiceTypeNameResolvers" xsi:type="array">
+                <item name="sales_invoice_type_resolver" xsi:type="object">Vnecoms\VendorsSalesGraphQl\Model\SalesInvoiceTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsSalesGraphQl\Model\ShipmentInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="shipmentTypeNameResolvers" xsi:type="array">
+                <item name="sales_shipment_type_resolver" xsi:type="object">Vnecoms\VendorsSalesGraphQl\Model\SalesShipmentTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsSalesGraphQl\Model\CreditmemoInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="creditMemoTypeNameResolvers" xsi:type="array">
+                <item name="sales_credit_memo_type_resolver" xsi:type="object">Vnecoms\VendorsSalesGraphQl\Model\SalesCreditMemoTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+    <!--
+    <type name="Magento\Framework\GraphQl\Schema\Type\Entity\DefaultMapper">
+        <arguments>
+            <argument name="map" xsi:type="array">
+                <item name="sales_order" xsi:type="array">
+                    <item name="default" xsi:type="string">Orders</item>
+                </item>
+                <item name="sales_order_address" xsi:type="array">
+                    <item name="default" xsi:type="string">OrderAddressInterface</item>
+                    <item name="billing" xsi:type="string">OrderBillingAddress</item>
+                    <item name="shipping" xsi:type="string">OrderShippingAddress</item>
+                </item>
+                <item name="sales_invoice" xsi:type="array">
+                    <item name="default" xsi:type="string">OrderInvoice</item>
+                </item>
+                <item name="sales_shipment" xsi:type="array">
+                    <item name="default" xsi:type="string">OrderShipment</item>
+                </item>
+                <item name="customizable_options" xsi:type="array">
+                    <item name="field" xsi:type="string">CustomizableFieldOption</item>
+                    <item name="date" xsi:type="string">CustomizableDateOption</item>
+                    <item name="date_time" xsi:type="string">CustomizableDateOption</item>
+                    <item name="time" xsi:type="string">CustomizableDateOption</item>
+                    <item name="file" xsi:type="string">CustomizableFileOption</item>
+                    <item name="area" xsi:type="string">CustomizableAreaOption</item>
+                    <item name="drop_down" xsi:type="string">CustomizableDropDownOption</item>
+                    <item name="multiple" xsi:type="string">CustomizableMultipleOption</item>
+                    <item name="radio" xsi:type="string">CustomizableRadioOption</item>
+                    <item name="checkbox" xsi:type="string">CustomizableCheckboxOption</item>
+                </item>
+            </argument>
+        </arguments>
+    </type> -->
+</config>

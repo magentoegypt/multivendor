@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Vendors Admin -->
+    <route url="/V1/vendors/domain" method="POST">
+        <service class="Vnecoms\VendorsDomain\Api\DomainRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Vendors::vendors" />
+        </resources>
+    </route>
+
+    <route url="/V1/vendors/domain/:vendorId" method="DELETE">
+        <service class="Vnecoms\VendorsDomain\Api\DomainRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Vnecoms_Vendors::vendors"/>
+        </resources>
+    </route>
+
+</routes>

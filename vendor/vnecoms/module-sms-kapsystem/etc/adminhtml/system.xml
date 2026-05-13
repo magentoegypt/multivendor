@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="kapsystem_username" translate="label tooltip" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Kapsystem Username</label>
+	                    <config_path>vsms/settings/kapsystem_username</config_path>
+	                    <depends>
+	                        <field id="gateway">kapsystem</field>
+	                    </depends>
+	                </field>
+	                <field id="kapsystem_password" translate="label tooltip" type="text" sortOrder="61" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Kapsystem Password</label>
+	                    <config_path>vsms/settings/kapsystem_password</config_path>
+	                    <depends>
+	                        <field id="gateway">kapsystem</field>
+	                    </depends>
+	                </field>
+	                <field id="kapsystem_source" translate="label tooltip" type="text" sortOrder="62" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender</label>
+	                    <config_path>vsms/settings/kapsystem_source</config_path>
+	                    <comment>Sender name or phone number</comment>
+	                    <depends>
+	                        <field id="gateway">kapsystem</field>
+	                    </depends>
+	                </field>
+	                <field id="kapsystem_api_url" translate="label tooltip" type="label" sortOrder="63" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Kapsystem API URL</label>
+	                    <config_path>vsms/settings/kapsystem_api_url</config_path>
+	                    <depends>
+	                        <field id="gateway">kapsystem</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

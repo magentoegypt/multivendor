@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="quotation_item_price_renderers"/>
+    <body>
+        <referenceBlock name="quotepage.item.renderers">
+            <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer" as="default" template="Vnecoms_Quotation::quote/item/default.phtml">
+                <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions" name="quotepage.item.renderers.default.actions" as="actions">
+                    <!--<block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Edit" name="quotepage.item.renderers.default.actions.edit" template="Vnecoms_Quotation::quote/item/renderer/actions/edit.phtml"/>-->
+                    <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Remove" name="quotepage.item.renderers.default.actions.remove" template="Vnecoms_Quotation::quote/item/renderer/actions/remove.phtml"/>
+                </block>
+            </block>
+            <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer" as="simple" template="Vnecoms_Quotation::quote/item/default.phtml">
+                <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions" name="quotepage.item.renderers.simple.actions" as="actions">
+                    <!--<block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Edit" name="quotepage.item.renderers.default.actions.edit" template="Vnecoms_Quotation::quote/item/renderer/actions/edit.phtml"/>-->
+                    <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Remove" name="quotepage.item.renderers.simple.actions.remove" template="Vnecoms_Quotation::quote/item/renderer/actions/remove.phtml"/>
+                </block>
+            </block>
+
+            <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Configurable" as="configurable" template="Vnecoms_Quotation::quote/item/default.phtml">
+                <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions" name="quotepage.item.renderers.configurable.actions" as="actions">
+                    <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Remove" name="quotepage.item.renderers.configurable.actions.remove" template="Vnecoms_Quotation::quote/item/renderer/actions/remove.phtml"/>
+                </block>
+            </block>
+
+            <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Bundle" as="bundle" template="Vnecoms_Quotation::quote/item/default.phtml">
+                <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions" name="quotepage.item.renderers.bundle.actions" as="actions">
+                    <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Remove" name="quotepage.item.renderers.bundle.actions.remove" template="Vnecoms_Quotation::quote/item/renderer/actions/remove.phtml"/>
+                </block>
+            </block>
+
+            <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Downloadable" as="downloadable" template="Vnecoms_Quotation::quote/item/default.phtml">
+                <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions" name="quotepage.item.renderers.downloadable.actions" as="actions">
+                    <block class="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Actions\Remove" name="quotepage.item.renderers.downloadable.actions.remove" template="Vnecoms_Quotation::quote/item/renderer/actions/remove.phtml"/>
+                </block>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

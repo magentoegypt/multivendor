@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout" translate="label" type="text" sortOrder="151419" showInDefault="1" showInWebsite="1" showInStore="1">
+            <resource>Amasty_CheckoutCore::config_checkout</resource>
+            <class>separator-top</class>
+            <label>One Step Checkout</label>
+            <tab>amasty</tab>
+            <group id="amasty_information" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Information</label>
+                <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\Information</frontend_model>
+            </group>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable One Step Checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="allow_edit_options" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow to Edit Products in the Order Summary</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="product_editing_type" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Finish Product Editing</label>
+                    <comment>Select ‘Automatically’ to trigger an update of Order Summary automatically after the quantity or product options are changed.</comment>
+                    <source_model>Amasty\CheckoutCore\Model\Config\Source\ProductEditingType</source_model>
+                    <depends>
+                        <field id="allow_edit_options">1</field>
+                    </depends>
+                </field>
+                <field id="bundling" translate="label comment tooltip" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable JS and HTML bundling and minifying for checkout page</label>
+                    <comment>Up to 30% faster checkout page load time and up to twice smaller bandwidth consumption due to reduced resources size.</comment>
+                    <tooltip>How it works: the concept is similar to caching. Initially, checkout page starts loading with bundling disabled, but as soon as all files are loaded, all js and html files get minified and merged into one, so that the next time the page loads faster.</tooltip>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="guest_checkout" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Allow Guest Checkout</label>
+                    <config_path>checkout/options/guest_checkout</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="create_account" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Let Customers Create an Account at Checkout</label>
+                    <config_path>amasty_checkout/additional_options/create_account</config_path>
+                    <source_model>Amasty\CheckoutCore\Model\Config\Source\CustomerRegistration</source_model>
+                </field>
+                <field id="automatically_login" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Automatically Log in Customers After Creating an Account at Checkout</label>
+                    <config_path>amasty_checkout/additional_options/automatically_login</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="create_account" separator="|">2|3</field>
+                    </depends>
+                </field>
+                <field id="create_account_checked" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>'Create an Account' Checkbox is Checked by Default</label>
+                    <config_path>amasty_checkout/additional_options/create_account_checked</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="create_account">1</field>
+                    </depends>
+                </field>
+                <field id="social_login" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Social Login on Checkout</label>
+                    <config_path>amasty_checkout/additional_options/social_login</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\SocialLogin</frontend_model>
+                </field>
+            </group>
+            <group id="design" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Design</label>
+                <group id="text_and_default_values" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Texts and Default Values</label>
+                    <field id="title" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Page Title</label>
+                        <config_path>amasty_checkout/general/title</config_path>
+                    </field>
+                    <field id="description" translate="label comment" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Page Description</label>
+                        <config_path>amasty_checkout/general/description</config_path>
+                        <comment><![CDATA[Provide customers with important info about taxes (e.g. VAT) or any other payment specifics.<br/>Supported HTML tags: &ltb&gt, &ltu&gt, &lti&gt, &lts&gt, &ltstrong&gt.]]></comment>
+                    </field>
+                    <field id="font" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Text Font</label>
+                        <config_path>amasty_checkout/design/font</config_path>
+                        <comment><![CDATA[Specify the <a href="https://fonts.google.com/" target="_blank">Google font</a> name. For example <strong>Roboto</strong>, <strong>Open Sans</strong> or <strong>Indie Flower</strong>
+                    <br/>Some fonts use extra parameters e.g. <strong>Molle:400i</strong> where 400 = regular, i = Italic (100 = thin, 700 = bold)]]></comment>
+                    </field>
+                    <field id="shipping_method" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Shipping Method</label>
+                        <config_path>amasty_checkout/default_values/shipping_method</config_path>
+                        <source_model>\Amasty\CheckoutCore\Model\Config\Source\Shipping</source_model>
+                    </field>
+                    <field id="payment_method" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Payment Method</label>
+                        <config_path>amasty_checkout/default_values/payment_method</config_path>
+                        <source_model>\Amasty\CheckoutCore\Model\Config\Source\Payment</source_model>
+                    </field>
+                    <field id="address_country_id" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Country</label>
+                        <frontend_class>amjscountries</frontend_class><!--@see app/code/Amasty/Checkout/view/adminhtml/templates/system/config/js.phtml-->
+                        <config_path>amasty_checkout/default_values/address_country_id</config_path>
+                        <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    </field>
+                    <field id="address_region_id" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Region/State</label>
+                        <config_path>amasty_checkout/default_values/address_region_id</config_path>
+                    </field>
+                    <field id="address_postcode" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default Zip/Postal Code</label>
+                        <config_path>amasty_checkout/default_values/address_postcode</config_path>
+                    </field>
+                    <field id="address_city" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Default City</label>
+                        <config_path>amasty_checkout/default_values/address_city</config_path>
+                    </field>
+                    <field id="manage_fields_link" type="label" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <frontend_model>Amasty\CheckoutCore\Model\Config\Link</frontend_model>
+                        <config_path>amasty_checkout/manage_fields_link/label</config_path>
+                    </field>
+                </group>
+                <group id="layout" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Layout</label>
+                    <field id="layout" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Page Layout</label>
+                        <comment><![CDATA[Please keep in mind that, for 3 Columns layout, third column will be displayed only if Customer's Order may require shipping (contains non-Virtual products, in most cases).]]></comment>
+                        <source_model>Amasty\CheckoutCore\Model\Config\Source\Layout</source_model>
+                        <depends>
+                            <field id="checkout_design">0</field>
+                        </depends>
+                        <config_path>amasty_checkout/design/layout</config_path>
+                    </field>
+                </group>
+                <group id="address_formatting" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Address Formatting</label>
+                    <field id="street_lines" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                        <label>Number of Lines in a Street Address</label>
+                        <config_path>customer/address/street_lines</config_path>
+                        <backend_model>Magento\Customer\Model\Config\Backend\Address\Street</backend_model>
+                        <comment>Valid range: 1-4</comment>
+                        <validate>required-entry validate-digits validate-digits-range digits-range-1-4</validate>
+                    </field>
+                    <field id="display_shipping_address_in" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display Multiple Shipping Address In</label>
+                        <source_model>Amasty\CheckoutCore\Model\Config\Source\MultipleShippingAddressOptions</source_model>
+                        <config_path>amasty_checkout/design/display_shipping_address_in</config_path>
+                    </field>
+                </group>
+                <group id="color_scheme" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Color Scheme</label>
+                    <field id="heading_color" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Heading Text Color</label>
+                        <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\Field\Color</frontend_model>
+                        <config_path>amasty_checkout/design/heading_color</config_path>
+                    </field>
+                    <field id="summary_color" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Order Summary Background</label>
+                        <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\Field\Color</frontend_model>
+                        <config_path>amasty_checkout/design/summary_color</config_path>
+                    </field>
+                    <field id="bg_color" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Background Color</label>
+                        <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\Field\Color</frontend_model>
+                        <config_path>amasty_checkout/design/bg_color</config_path>
+                    </field>
+                    <field id="button_color" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Place Order Button Color</label>
+                        <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\Field\Color</frontend_model>
+                        <config_path>amasty_checkout/design/button_color</config_path>
+                    </field>
+                </group>
+                <group id="additional_fields_and_other_extras" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Additional Fields and Other Extras</label>
+                    <field id="discount" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Discount Field</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>amasty_checkout/additional_options/discount</config_path>
+                    </field>
+                    <field id="unit_price" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Show Unit Price</label>
+                        <comment>Enable the setting if you want to show the price per item for each product in the Order Summary block</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>amasty_checkout/additional_options/unit_price</config_path>
+                    </field>
+                    <field id="newsletter" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Newsletter Checkbox</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>amasty_checkout/additional_options/newsletter</config_path>
+                    </field>
+                    <field id="newsletter_checked" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Newsletter is Checked by Default</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id="newsletter">1</field>
+                        </depends>
+                        <config_path>amasty_checkout/additional_options/newsletter_checked</config_path>
+                    </field>
+                    <field id="enable_agreements" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Terms and Conditions</label>
+                        <config_path>checkout/options/enable_agreements</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\TermsAndConditions</frontend_model>
+                    </field>
+                    <field id="display_agreements" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Terms and Conditions Checkbox Positioning</label>
+                        <source_model>Amasty\CheckoutCore\Model\Config\Source\DisplayAgreements</source_model>
+                        <depends>
+                            <field id="enable_agreements">1</field>
+                        </depends>
+                        <config_path>amasty_checkout/additional_options/display_agreements</config_path>
+                    </field>
+                    <field id="comment" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Order Comment</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <frontend_model>Amasty\CheckoutCore\Block\Adminhtml\System\Config\OrderAttributes</frontend_model>
+                        <config_path>amasty_checkout/additional_options/comment</config_path>
+                    </field>
+                </group>
+                <group id="optional_ui_elements" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Optional UI Elements</label>
+                    <field id="header_footer" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display Header and Footer</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>amasty_checkout/design/header_footer</config_path>
+                    </field>
+                    <field id="top_block_id" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Top Block</label>
+                        <config_path>amasty_checkout/custom_blocks/top_block_id</config_path>
+                        <comment>Select custom CMS block name to be displayed above the checkout</comment>
+                        <source_model>\Amasty\CheckoutCore\Model\Config\Source\CmsBlock</source_model>
+                    </field>
+                    <field id="bottom_block_id" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Bottom Block</label>
+                        <config_path>amasty_checkout/custom_blocks/bottom_block_id</config_path>
+                        <comment>Select custom CMS block name to be displayed below the checkout</comment>
+                        <source_model>\Amasty\CheckoutCore\Model\Config\Source\CmsBlock</source_model>
+                    </field>
+                </group>
+            </group>
+            <group id="geolocation" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Geolocation</label>
+                <field id="ip_detection" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Geo IP Location</label>
+                    <comment>Detect User Country Based on the IP Address and Automatically Fills it in at Checkout</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

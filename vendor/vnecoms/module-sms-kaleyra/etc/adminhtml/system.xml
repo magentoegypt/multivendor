@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+            		<field id="smskaleyra_url" translate="label tooltip" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>API Url</label>
+	                    <config_path>vsms/settings/smskaleyra_url</config_path>
+	                    <depends>
+	                        <field id="gateway">smskaleyra</field>
+	                    </depends>
+	                    <comment><![CDATA[https://api-alerts.kaleyra.com/v4/<br />or<br />https://api-global.kaleyra.com/v4/ (<i>for Global SMS</i>).]]></comment>
+	                </field>
+	            	<field id="smskaleyra_api_key" translate="label tooltip" type="text" sortOrder="81" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>API Key</label>
+	                    <config_path>vsms/settings/smskaleyra_api_key</config_path>
+	                    <depends>
+	                        <field id="gateway">smskaleyra</field>
+	                    </depends>
+	                    <comment>Kaleyra API KEY</comment>
+	                </field>
+	                <field id="smskaleyra_sender" translate="label tooltip" type="text" sortOrder="82" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender</label>
+	                    <config_path>vsms/settings/smskaleyra_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">smskaleyra</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

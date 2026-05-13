@@ -1,0 +1,41 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+/** @var \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Comment $block */
+
+?>
+
+<?php /* Comments */ ?>
+<div class="admin__page-section-item quote-information">
+    <div class="admin__page-section-item-title">
+        <span class="title"><?php /* @escapeNotVerified */
+            echo __('Messages History') ?></span>
+    </div>
+    <div class="admin__page-section-item-content">
+        <div id="quote-messages-history" data-bind="scope: 'quote-messages'">
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        </div>
+
+<!--        <script type="text/x-magento-init">-->
+<!--                {-->
+<!--                    "#quote-messages-history": {-->
+<!--                        "Magento_Ui/js/core/app": {-->
+<!--                            "components": {-->
+<!--                                "quote-messages": {-->
+<!--                                    "component": "Vnecoms_Quotation/js/messages",-->
+<!--                                    "template": "Vnecoms_Quotation/messages",-->
+<!--                                    "quote_id": "--><?php //echo $block->getQuote()->getId() ?><!--",-->
+<!--                                    "addMessageUrl": "--><?php //echo $block->getUrl("quotation/message/send", ['_secure' => true]); ?><!--"-->
+<!--                                }-->
+<!--                            }-->
+<!--                        }-->
+<!--                    }-->
+<!--                }-->
+<!---->
+<!--        </script>-->
+    </div>
+</div>

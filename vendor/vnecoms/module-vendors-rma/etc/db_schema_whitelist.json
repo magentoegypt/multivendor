@@ -1,0 +1,70 @@
+{
+    "ves_rma_request_entity": {
+        "column": {
+            "vendor_id": true,
+            "refund_amount": true,
+            "is_vendor_read": true
+        }
+    },
+    "ves_rma_reponse": {
+        "column": {
+            "vendor_id": true
+        }
+    },
+    "ves_rma_request_price_refund": {
+        "column": {
+            "refund_id": true,
+            "request_id": true,
+            "amount": true,
+            "additional_information": true,
+            "type": true,
+            "status": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_9D15D3F843F358AFE4CD5D193F2F336A": true
+        }
+    },
+    "ves_rma_request_escalate": {
+        "column": {
+            "escalate_id": true,
+            "request_id": true,
+            "message": true,
+            "attachment": true,
+            "type": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ESCALATE_REQUEST_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true
+        }
+    },
+    "ves_rma_request_escalate_template": {
+        "column": {
+            "template_id": true,
+            "template_code": true,
+            "template_text": true,
+            "template_styles": true,
+            "template_type": true,
+            "use_custom_message": true,
+            "type_send_mail": true,
+            "template_subject": true,
+            "template_sender_name": true,
+            "template_sender_email": true,
+            "added_at": true,
+            "modified_at": true,
+            "orig_template_code": true,
+            "orig_template_variables": true
+        },
+        "index": {
+            "VES_RMA_REQUEST_ESCALATE_TEMPLATE_ADDED_AT_MODIFIED_AT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ESCALATE_TEMPLATE_TEMPLATE_CODE": true
+        }
+    }
+}

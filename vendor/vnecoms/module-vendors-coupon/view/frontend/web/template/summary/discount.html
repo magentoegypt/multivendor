@@ -1,0 +1,49 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: isDisplayed() -->
+	<!-- ko if: canShowDetail() -->
+		<tr class="totals totals-tax-summary vendor-discount" 
+		     data-bind="mageInit: {'toggleAdvanced':{'selectorsToggleClass': 'hide', 'baseToggleClass': 'expanded', 'toggleContainers': '.totals-vendor-discount-detail'}}">
+			<th class="mark" scope="row">
+		        <span class="title" data-bind="text: title"></span>
+			</th>
+			<td class="amount" data-bind="attr: {'data-th': title}">
+		        <span class="price" data-bind="text: getValue()"></span>
+	    	</td>
+		</tr>
+		<!-- ko foreach: getDiscountDetails() -->
+		    <tr class="hide totals-vendor-discount-detail" data-bind="css:$parent.isLastDiscountDetail($index)?'last':''">
+		        <th class="mark" scope="row">
+		        	<!-- ko if: $data.vendor_id -->
+			            <label class="vendor-title" data-bind="text: $data.label"></label>
+			            <!-- ko if: $parent.canShowStoreName() -->
+			            <br /><span class="discount-description" data-bind="text: $parent.getVendorTitle($data.vendor_id)"></span>
+			            <!-- /ko -->
+		            <!-- /ko -->
+		            
+		            <!-- ko ifnot: $data.vendor_id -->
+		            	<label class="vendor-title" data-bind="text: $data.label"></label>
+		            <!-- /ko -->
+		        </th>
+		        <td class="amount">
+		            <span class="price" data-bind="text: $parent.getFormattedPrice($data.amount)"></span>
+		        </td>
+		    </tr>
+		<!-- /ko -->
+	<!-- /ko -->
+	
+	<!-- ko ifnot: canShowDetail() -->
+		<tr class="totals vendor-discount">
+		     <th class="mark" scope="row">
+		         <span class="title" data-bind="text: title"></span>
+		     </th>
+		     <td class="amount" data-bind="attr: {'data-th': title}">
+		        <span><span class="price" data-bind="text: getValue()"></span></span>
+		    </td>
+		</tr>
+	<!-- /ko -->
+<!-- /ko -->

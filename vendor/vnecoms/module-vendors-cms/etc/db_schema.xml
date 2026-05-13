@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="vnecoms_vendor_cms_page" resource="default" engine="innodb" comment="Vendor CMS Page Table">
+        <column xsi:type="int" name="page_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Page Title"/>
+        <column xsi:type="varchar" name="page_layout" nullable="true" length="255" comment="Page Layout"/>
+        <column xsi:type="text" name="meta_title" nullable="true" comment="Page Meta Title"/>
+        <column xsi:type="text" name="meta_keywords" nullable="true" comment="meta keywords"/>
+        <column xsi:type="text" name="meta_description" nullable="true" comment="meta description"/>
+        <column xsi:type="varchar" name="identifier" nullable="false" length="255" comment="Page String Identifier" default=""/>
+        <column xsi:type="varchar" name="content_heading" nullable="false" length="255" comment="Page Content Heading"/>
+        <column xsi:type="text" name="content" nullable="false" comment="Page Content"/>
+        <column xsi:type="timestamp" name="creation_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="update_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Is Active"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort order"/>
+        <column xsi:type="text" name="layout_update_xml" nullable="true" comment="Page Layout Update Content"/>
+        <column xsi:type="varchar" name="custom_theme" nullable="true" length="255" comment="Page Custom Theme"/>
+        <column xsi:type="varchar" name="custom_root_template" nullable="true" length="255" comment="Page Custom Template"/>
+        <column xsi:type="text" name="custom_layout_update_xml" nullable="true" comment="Page Custom Layout Update Content"/>
+        <column xsi:type="date" name="custom_theme_from" nullable="true" comment="Page Custom Theme Active From Date"/>
+        <column xsi:type="date" name="custom_theme_to" nullable="true" comment="Page Custom Theme Active To Date"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+
+        <index referenceId="CMS_PAGE_IDENTIFIER" indexType="btree">
+            <column name="identifier"/>
+        </index>
+
+        <index referenceId="CMS_PAGE_TITLE_META_KEYWORDS_META_DESCRIPTION_IDENTIFIER_CONTENT" indexType="fulltext">
+            <column name="title"/>
+            <column name="meta_keywords"/>
+            <column name="meta_description"/>
+            <column name="identifier"/>
+            <column name="content"/>
+        </index>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_VENDOR_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_page" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="page_id"/>
+        </constraint>
+    </table>
+
+    <table name="vnecoms_vendor_cms_block" resource="default" engine="innodb" comment="Vendor Category Product">
+        <column xsi:type="int" name="block_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+        <column xsi:type="varchar" name="identifier" nullable="false" length="255" comment="Block String Identifier" default=""/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Block Title"/>
+        <column xsi:type="text" name="content" nullable="true" comment="Block Content"/>
+        <column xsi:type="timestamp" name="creation_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="update_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Is Active"/>
+
+        <index referenceId="CMS_BLOCK_TITLE_IDENTIFIER_CONTENT" indexType="fulltext">
+            <column name="title"/>
+            <column name="identifier"/>
+            <column name="content"/>
+        </index>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="block_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_VENDOR_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_block" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+    </table>
+
+    <table name="vnecoms_vendor_cms_app" resource="default" engine="innodb" comment="Vendor CMS App Table">
+        <column xsi:type="int" name="app_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+        <column xsi:type="varchar" name="type" nullable="false" length="255" comment="Type"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="App Title"/>
+        <column xsi:type="varchar" name="instance_type" nullable="false" length="255" comment="Instance Type"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Is Active"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort order"/>
+        <column xsi:type="text" name="parameters" nullable="true" comment="Parameters"/>
+
+        <index referenceId="CMS_APP_TITLE_TYPE" indexType="fulltext">
+            <column name="title"/>
+            <column name="type"/>
+        </index>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="app_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_VENDOR_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_app" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="vnecoms_vendor_cms_app_option" resource="default" engine="innodb" comment="Vendor CMS App Option Table">
+        <column xsi:type="int" name="option_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="app_id" unsigned="true" nullable="false" identity="false"
+                comment="App ID"/>
+        <column xsi:type="varchar" name="page_group" nullable="false" length="25" comment="Block Group Type"/>
+        <column xsi:type="varchar" name="layout_handle" nullable="false" length="255" comment="Layout Handle"/>
+        <column xsi:type="varchar" name="block_reference" nullable="false" length="255" comment="Container"/>
+        <column xsi:type="varchar" name="page_for" nullable="false" length="25" comment="For instance entities"/>
+        <column xsi:type="text" name="entities" nullable="false" comment="Catalog entities (comma separated)"/>
+        <column xsi:type="varchar" name="template" nullable="false" length="255" comment="Path to template"/>
+
+        <index referenceId="CMS_APP_OPTION_APP_ID" indexType="btree">
+            <column name="app_id"/>
+        </index>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_APP_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_app_option" column="app_id" referenceTable="vnecoms_vendor_cms_app"
+                    referenceColumn="app_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="option_id"/>
+        </constraint>
+    </table>
+
+
+    <table name="vnecoms_vendor_cms_layout_update" resource="default" engine="innodb" comment="Vendor CMS Layout updates">
+        <column xsi:type="int" name="layout_update_id" unsigned="true" nullable="false" identity="false"
+                comment="ID"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+        <column xsi:type="varchar" name="handle" nullable="false" length="255" comment="Handle"/>
+        <column xsi:type="text" name="xml" nullable="false" comment="Xml"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort order"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <index referenceId="CMS_APP_LAYOUT_UPDATE_HANDLE" indexType="btree">
+            <column name="handle"/>
+        </index>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="layout_update_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VNECOMS_VENDOR_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_layout_update" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+
+
+    <table name="vnecoms_vendor_cms_app_option_layout" resource="default" engine="innodb" comment="Vendor CMS Layout option updates">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="false"
+                comment="ID"/>
+
+        <column xsi:type="int" name="option_id" unsigned="true" nullable="false" identity="false"
+                comment="ID"/>
+        <column xsi:type="int" name="layout_update_id" unsigned="true" nullable="false" identity="false"
+                comment="Layout Update Id"/>
+        <index referenceId="CMS_APP_LAYOUT_OPTION_ID" indexType="btree">
+            <column name="option_id"/>
+        </index>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_LAYOUT_UPDATE_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_app_option_layout" column="layout_update_id" referenceTable="vnecoms_vendor_cms_layout_update"
+                    referenceColumn="layout_update_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_OPTION_ID_FOREIGN"
+                    table="vnecoms_vendor_cms_app_option_layout" column="option_id" referenceTable="vnecoms_vendor_cms_app_option"
+                    referenceColumn="option_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+    </table>
+
+</schema>

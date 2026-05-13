@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+		<css src="Vnecoms_VendorsDomain::css/styles.css"/>
+	</head>
+	<referenceBlock name="catalog.topnav" remove="true" />
+	<referenceBlock name="vendor.profile.top" remove="true" />
+	<referenceBlock name="vendor.profile.left" remove="true" />
+	<referenceBlock name="seller-dashboard-link" remove="true" />
+	<referenceBlock name="seller-register-link" remove="true" />
+	<referenceBlock name="vendor.profile.container" remove="true" />
+	<referenceBlock name="customer-account-navigation-vnecoms-marketplace-link" remove="true" />
+	<referenceBlock name="vendor_create_form" remove="true" />
+	<!-- 
+	<referenceBlock name="vendor.home.about.container" remove="true" />
+	<referenceBlock name="vendor.home.shipping.container" remove="true" />
+	<referenceBlock name="vendor.home.refund.container" remove="true" />
+	 -->
+	<referenceBlock name="logo" remove="true" />
+	<referenceContainer name="header-wrapper">
+		<block class="Vnecoms\VendorsDomain\Block\Html\Header\Logo" name="vendor.profile.top.logo" template="Vnecoms_VendorsDomain::html/header/logo.phtml">
+			<arguments>
+    			<argument name="logo_width" xsi:type="number">148</argument>
+    			<argument name="logo_height" xsi:type="number">43</argument>
+   			</arguments>
+		</block>
+	</referenceContainer>
+</page>

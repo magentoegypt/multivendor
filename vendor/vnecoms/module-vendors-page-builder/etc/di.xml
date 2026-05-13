@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+
+    <type name="Vnecoms\VendorsPageBuilder\Model\Config\FileResolver">
+        <arguments>
+            <argument name="baseFiles" xsi:type="object">vendorPageBuilderComponentAggregatedSourceBaseFiltered</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsPageBuilder\Model\Config\CompositeReader">
+        <arguments>
+            <argument name="readers" xsi:type="array">
+                <item name="contentTypeReader" xsi:type="object" sortOrder="10">Vnecoms\VendorsPageBuilder\Model\Config\ContentType\Reader</item>
+                <item name="menuSectionReader" xsi:type="object" sortOrder="20">Vnecoms\VendorsPageBuilder\Model\Config\MenuSection\Reader</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="vendorPageBuilderComponentAggregatedSourceBase" type="Vnecoms\VendorsPageBuilder\Model\View\File\Collector\PageBuilder">
+        <arguments>
+            <argument name="subDir" xsi:type="string">pagebuilder</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType shared="false" name="vendorPageBuilderComponentAggregatedSourceBaseFiltered" type="Magento\Framework\View\File\Collector\Decorator\ModuleOutput">
+        <arguments>
+            <argument name="subject" xsi:type="object">vendorPageBuilderComponentAggregatedSourceBase</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="vendorPageBuilderComponentAggregatedSourceBaseSorted" type="Magento\Framework\View\File\Collector\Decorator\ModuleDependency">
+        <arguments>
+            <argument name="subject" xsi:type="object">vendorPageBuilderComponentAggregatedSourceBaseFiltered</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\VendorsPageBuilder\Model\Stage\Config">
+        <arguments>
+            <argument name="cache" xsi:type="object">Magento\PageBuilder\Model\Cache\Type\EditorConfig</argument>
+        </arguments>
+    </type>
+
+
+    <type name="Vnecoms\VendorsPageBuilder\Model\WidgetInitializerConfig">
+        <arguments>
+            <argument name="config" xsi:type="array">
+                <item name="slider" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/slider/appearance/default/widget</item>
+                        <!--optional if you want load widget per appearance-->
+                        <item name="appearance" xsi:type="string">default</item>
+                    </item>
+                </item>
+                <item name="map" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/map/appearance/default/widget</item>
+                    </item>
+                </item>
+                <item name="row" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/row/appearance/default/widget</item>
+                    </item>
+                </item>
+                <item name="tabs" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/tabs/appearance/default/widget</item>
+                    </item>
+                </item>
+                <item name="slide" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <!--required argument-->
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/slide/appearance/default/widget</item>
+                        <!--optional if you need provide some config for your widget-->
+                        <item name="config" xsi:type="array">
+                            <item name="buttonSelector" xsi:type="string">.pagebuilder-slide-button</item>
+                            <item name="showOverlay" xsi:type="string">hover</item>
+                            <item name="dataRole" xsi:type="string">slide</item>
+                        </item>
+                    </item>
+                </item>
+                <item name="banner" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/banner/appearance/default/widget</item>
+                        <item name="config" xsi:type="array">
+                            <item name="buttonSelector" xsi:type="string">.pagebuilder-banner-button</item>
+                            <item name="showOverlay" xsi:type="string">hover</item>
+                            <item name="dataRole" xsi:type="string">banner</item>
+                        </item>
+                    </item>
+                </item>
+                <item name="buttons" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/buttons/appearance/inline/widget</item>
+                    </item>
+                </item>
+                <item name="products" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">Vnecoms_VendorsPageBuilder/js/content-type/products/appearance/carousel/widget</item>
+                        <item name="appearance" xsi:type="string">carousel</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vendor_pagebuilder_block_select_grid_data_source" xsi:type="string">Vnecoms\VendorsCms\Model\ResourceModel\Block\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

@@ -1,0 +1,73 @@
+<?php $note = $block->getEscalateCustomerRma();  ?>
+<?php $noteVendor = $block->getEscalateVendorRma();  ?>
+<?php if($note->getId() || $noteVendor->getId()): ?>
+    <div class="message-box form-escalate">
+        <?php if($note->getId()): ?>
+            <div class="form-escalate-list">
+                <strong class="note-label"><i><?php echo __("Customer") ?>:</i></strong>
+                <div class="note-message">
+                    <blockquote><?php echo $note->getMessage() ?></blockquote>
+                </div>
+                <?php if(sizeof($note->getAttachmentUrls())):?>
+                    <div class="attachment">
+                        <ul>
+                            <?php foreach ($note->getAttachmentUrls() as $key=>$attachment):?>
+                                <li class="file-uploader-preview">
+                                    <?php if($block->isImage($key)): ?>
+                                        <a href="<?php echo $attachment ?>" class="icon-attachment-img-view"
+                                           title="<?php echo $key ?>">
+                                            <img class="preview-image" src="<?php echo $attachment ?>" />
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="<?php echo $block->getUrl('rma/request/download',
+                                            array('file'=>base64_encode($key))) ?>"
+                                           title="<?php echo $key ?>">
+                                            <i class="fa icon-attachment <?php echo $block->getClassIcon($key) ?>"></i></a>
+                                    <?php endif ?>
+
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif;?>
+            </div>
+            <?php endif;?>
+
+            <?php if($noteVendor->getId()): ?>
+                <div class="form-escalate-list">
+                    <strong class="note-label"><i><?php echo __("Vendor") ?>:</i></strong>
+                    <div class="note-message">
+                        <blockquote><?php echo $noteVendor->getMessage() ?></blockquote>
+                    </div>
+
+                    <?php if(sizeof($noteVendor->getAttachmentUrls())):?>
+                        <div class="attachment">
+                            <ul>
+                                <?php foreach ($noteVendor->getAttachmentUrls() as $key=>$attachment):?>
+                                    <li class="file-uploader-preview">
+                                        <?php if($block->isImage($key)): ?>
+                                            <a href="<?php echo $attachment ?>" class="icon-attachment-img-view"
+                                               title="<?php echo $key ?>">
+                                                <img class="preview-image" src="<?php echo $attachment ?>" />
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="<?php echo $block->getUrl('rma/request/download',
+                                                array('file'=>base64_encode($key))) ?>"
+                                               title="<?php echo $key ?>">
+                                                <i class="fa icon-attachment <?php echo $block->getClassIcon($key) ?>"></i></a>
+                                        <?php endif ?>
+
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif;?>
+                </div>
+            <?php endif;?>
+
+        </div>
+<?php else:?>
+    <?php echo __("RMA dont have escalate.") ?>
+<?php endif;?>
+
+

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <vendors>
+        	<import_export>
+        		<import_bunch_size>1000</import_bunch_size>
+        		<import_size>500</import_size>
+        		<export_attributes_restriction>approval,vendor_id,credit_rate,credit_price,credit_value_custom,credit_value_dropdown,credit_value_fixed,credit_type</export_attributes_restriction>
+        		<excel_sheet_name>Data</excel_sheet_name>
+        	</import_export>
+        </vendors>
+
+		<vendor_advanced_group>
+			<product_import_export>
+				<can_use_import_export>1</can_use_import_export>
+			</product_import_export>
+		</vendor_advanced_group>
+
+    </default>
+</config>

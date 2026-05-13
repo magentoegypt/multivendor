@@ -1,0 +1,13 @@
+<?php $_order = $block->getOrder() ?>
+<?php if ($_order): ?>
+    <?php $_items = $_order->getAllItems(); ?>
+
+    <?php foreach ($_items as $_item): ?>
+        <?php
+        if ($_item->getParentItem()) {
+            continue;
+        }
+        ?>
+        <?php echo  $block->getItemHtml($_item) ?>
+    <?php endforeach; ?>
+<?php endif; ?>

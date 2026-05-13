@@ -1,0 +1,51 @@
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="price-comparison">
+	<div class="pc_title" 
+		data-bind="html:totalProducts() > 1?$t('Sold by %1 other sellers').replace('%1',totalProducts()):$t('Sold by %1 other seller').replace('%1',totalProducts())">
+	</div>
+	<!-- ko if: show_country_filter -->
+	<div class="pc_filter">
+		<ul>
+			<li>
+				<label for="pc_filter_country" data-bind="text: $t('Country:')"></label> 
+				<!-- ko if: selectedCountry() -->
+					<a href="#" data-bind="click: unselectCountry.bind($data)"><span data-bind="text: getCountryByCode(selectedCountry())"></span></a>
+				<!-- /ko -->
+				<!-- ko ifnot: selectedCountry() -->
+					<select id="pc_filter_country" data-bind="value: selectedCountry,foreach: getCountries()">
+						<option data-bind="attr:{value: $data.code}, text: $data.country_name"></option>
+					</select>
+				<!-- /ko -->
+			</li>
+		</ul>
+	</div>
+	<!-- /ko -->
+	<table class="pc_vendor-offers">
+		<thead>
+			<tr data-bind="foreach:elems()">
+				<th data-bind="text: $data.title, css: $data.index"></th>
+			</tr>
+		</thead>
+		<tbody>
+			<!-- ko foreach: { data: getProducts(), as: 'item' } -->
+				<tr class="product-item">
+					<!-- ko foreach: $parent.elems() -->
+						<td data-bind="css: $data.index">
+							<!-- ko template: getTemplate() --><!-- /ko -->
+						</td>
+					<!-- /ko -->
+				</tr>
+			<!-- /ko -->
+		</tbody>
+	</table>
+	<!-- ko if: canShowMore() -->
+	<div class="pc_showmore">
+		<a class="action primary" data-bind="click: toggleShowAll"><i data-bind="css: isShowingAll()?'pc_arrow-up':'pc_arrow-down'"></i><span data-bind="text: isShowingAll()?$t('Collapse the list'):$t('View all %1 sellers').replace('%1',totalProducts())"></span></a>
+	</div>
+	<!-- /ko -->
+</div>

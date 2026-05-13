@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!--<css src="Vnecoms_VendorsSellerList::css/flexboxgrid.css"/>-->
+        <css src="Vnecoms_VendorsSellerList::css/styles.css"/>
+    </head>
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Seller List</argument>
+            </action>
+        </referenceBlock>
+        
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsSellerList\Block\SellerList\StaticBlock" name="seller-list-static-block-top"  before="-">
+                <arguments>
+                    <argument name="block_position" xsi:type="string">top</argument>
+                </arguments>
+            </block>
+            <container name="sellers.container" htmlTag="div" htmlClass="seller-list-wrap" >
+                <!-- search box -->
+                <block class="Vnecoms\VendorsSellerList\Block\Seller\Search" name="seller-list-search" as="sellerlist_search" before="vendor.sellers" template="Vnecoms_VendorsSellerList::seller-search.phtml" cacheable="false" />
+
+                <!-- seller list -->
+                <block class="Vnecoms\VendorsSellerList\Block\Seller" name="vendor.sellers" cacheable="false" >
+                    <block class="Vnecoms\VendorsSellerList\Block\SellerList" name="seller_list" as="seller_list" template="Vnecoms_VendorsSellerList::sellerlist.phtml">
+                        <block class="Vnecoms\VendorsSellerList\Block\SellerList\Toolbar" name="seller_list_toolbar" as="seller_list_toolbar" template="Vnecoms_VendorsSellerList::seller/list/toolbar.phtml">
+                            <block class="Magento\Theme\Block\Html\Pager" name="seller_list_toolbar_pager"/>
+                        </block>
+                        <action method="setToolbarBlockName">
+                            <argument name="name" xsi:type="string">seller_list_toolbar</argument>
+                        </action>
+                        <block name="seller_info_before" template="Vnecoms_VendorsSellerList::seller/info.phtml" class="Vnecoms\VendorsSellerList\Block\Seller\Info"/>
+                        <block name="seller_info_after" template="Vnecoms_VendorsSellerList::seller/info.phtml" class="Vnecoms\VendorsSellerList\Block\Seller\Info"/>
+                    </block>
+                </block>
+				
+            </container>
+            <block class="Vnecoms\VendorsSellerList\Block\SellerList\StaticBlock" name="seller-list-static-block-bottom"  after="-">
+                <arguments>
+                    <argument name="block_position" xsi:type="string">bottom</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+		<move element="page.main.title" destination="sellers.container" before="seller-list-search"/>
+
+    </body>
+</page>

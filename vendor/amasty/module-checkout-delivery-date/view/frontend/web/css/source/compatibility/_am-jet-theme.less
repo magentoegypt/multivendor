@@ -1,0 +1,38 @@
+//
+//  Compatibility with Amasty Jet Theme
+//  ______________________________________________
+
+//
+//  Variables
+//  ----------------------------------------------
+
+@amcheckout-delivery-label__font-size: 1.4rem;
+
+//
+//  Common
+//  ----------------------------------------------
+
+& when (@media-common = true) {
+    .checkout-index-index {
+        .amcheckout-delivery-date .field .label {
+            font-size: @amcheckout-delivery-label__font-size;
+        }
+    }
+}
+
+//
+//  Mobile
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .amasty-jet-theme .page-main .block.block-order-details delivery {
+        &,
+        .delivery-field {
+            float: none;
+        }
+
+        .delivery-field {
+            margin-left: 0;
+        }
+    }
+}

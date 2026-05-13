@@ -1,0 +1,29 @@
+<form name="FORM_KEY" action="<?php echo $block->getSubmitUrl() ?>" method="post" id="request-new-form" class="request-new-form" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+    <div class="request-information fieldset">
+        <?php echo $block->getChildHtml("info") ?>
+    </div>
+    <?php if ($block->getConfig()->enablePolicy()):?>
+    <div class="request_policy fieldset">
+        <?php echo $block->getChildHtml("policy") ?>
+    </div>
+    <?php endif;?>
+    <div class="recaptchar">
+        <?php if($block->getConfig()->enableRecaptcha() == 1):?>
+            <?php $siteKey = $block->getConfig()->siteKey();?>
+            <?php $lang = $block->getConfig()->languageRecaptcha();?>
+            <script type='text/javascript' src='https://www.google.com/recaptcha/api.js?hl=<?php echo $lang ?>' async defer></script>
+            <div class='g-recaptcha' data-sitekey='<?php echo  $siteKey ?>'></div>
+            <p class="check_recaptcha" style="display: none"><?php echo __("this is a required field.")?></p>
+        <?php endif ?>
+    </div>
+    <div class="buttons-set">
+        <button  id="request-submit-btn" title="Submit ticket" type="submit" class="action primary add" ><span><?php echo __('Submit RMA') ?></span></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "#request-new-form": {
+            "validation": {}
+        }
+    }
+</script>

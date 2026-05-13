@@ -1,0 +1,77 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+    vendor: Vendor @resolver(class: "Vnecoms\\VendorsGraphQl\\Model\\Resolver\\Vendor") @doc(description: "The vendor query returns information about a vendor account") @cache(cacheable: false)
+}
+
+type Mutation {
+    createVendor (input: VendorInput!): VendorOutput @resolver(class: "\\Vnecoms\\VendorsGraphQl\\Model\\Resolver\\CreateVendor") @doc(description:"Create vendor account")
+}
+
+input VendorInput {
+   prefix: String @doc(description: "An honorific, such as Dr., Mr., or Mrs.")
+   firstname: String! @doc(description: "The customer's first name")
+   middlename: String @doc(description: "The customer's middle name")
+   lastname: String! @doc(description: "The customer's family name")
+   suffix: String @doc(description: "A value such as Sr., Jr., or III")
+   email: String! @doc(description: "The vendor's email address. Required for customer creation")
+   vendor_id: String! @deprecated(reason: "Vendor ID")
+   region: VendorAddressRegionInput @doc(description: "An object containing the region name, region code, and region ID")
+   region_id: Int @doc(description: "The unique ID for a pre-defined region")
+   region_code: String @doc(description: "The unique ID for a pre-defined region")
+   country_id: String @doc(description: "The vendor's country") @deprecated(reason: "Use `country_code` instead.")
+   street: String @doc(description: "An array of strings that define the street number and name")
+   company: String @doc(description: "The vendor's company")
+   telephone: String @doc(description: "The telephone number")
+   fax: String @doc(description: "The fax number")
+   postcode: String @doc(description: "The vendor's ZIP or postal code")
+   city: String @doc(description: "The city or town")
+   password: String! @doc(description: "The vendor's password")
+}
+
+type VendorOutput {
+    vendor: Vendor!
+}
+
+type Vendor @doc(description: "Vendor defines details") {
+    entity_id: Int @doc(description: "The ID assigned to the vendor") @deprecated(reason: "id of vendor.")
+    customer_id: Int @deprecated(reason: "Customer ID")
+    website_id: Int @deprecated(reason: "Website ID")
+    increment_id: String @deprecated(reason: "Increment ID")
+    vendor_id: String @deprecated(reason: "Vendor ID")
+    email: String @doc(description: "The vendor's email")
+    firstname: String @doc(description: "The vendor's first name")
+    lastname: String @doc(description: "The vendor's family name")
+    middlename: String @doc(description: "The vendor's middle name")
+    prefix: String @doc(description: "An honorific, such as Dr., Mr., or Mrs.")
+    suffix: String @doc(description: "A value such as Sr., Jr., or III")
+    created_at: String @doc(description: "Timestamp indicating when the account was created")
+    updated_at: String @doc(description: "Timestamp indicating when the account was updated")
+    group_id: Int @deprecated(reason: "Vendor group should not be exposed in the storefront scenarios")
+    group_name: String @doc(description: "Group Name")
+    status: Int @doc(description: "Status")
+    status_label: String @doc(description: "Status Label")
+    region: VendorAddressRegionOutput @doc(description: "An object containing the region name, region code, and region ID")
+    region_id: Int @doc(description: "The unique ID for a pre-defined region")
+    region_code: String @doc(description: "The unique ID for a pre-defined region")
+    country_id: String @doc(description: "The customer's country") @deprecated(reason: "Use `country_code` instead.")
+    street: String @doc(description: "An array of strings that define the street number and name")
+    company: String @doc(description: "The customer's company")
+    telephone: String @doc(description: "The telephone number")
+    fax: String @doc(description: "The fax number")
+    postcode: String @doc(description: "The customer's ZIP or postal code")
+    city: String @doc(description: "The city or town")
+}
+
+input VendorAddressRegionInput @doc(description: "VendorAddressRegion defines the vendor's state or province") {
+     region_code: String @doc(description: "The address region code")
+     region: String @doc(description: "The state or province name")
+     region_id: Int @doc(description: "The unique ID for a pre-defined region")
+}
+
+type VendorAddressRegionOutput @doc(description: "VendorAddressRegion defines the vendor's state or province") {
+ region_code: String @doc(description: "The address region code")
+ region: String @doc(description: "The state or province name")
+ region_id: Int @doc(description: "The unique ID for a pre-defined region")
+}

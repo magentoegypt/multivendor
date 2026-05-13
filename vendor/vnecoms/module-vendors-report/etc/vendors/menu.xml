@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+    	<add id="Vnecoms_VendorsReport::report" icon="fa fa-pie-chart" title="Reports" sortOrder="40" module="Vnecoms_VendorsReport" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report"/>
+    	<add id="Vnecoms_VendorsReport::report_sales" title="Sales" sortOrder="10" module="Vnecoms_VendorsReport" parent="Vnecoms_VendorsReport::report" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_sales"/>
+    	<add id="Vnecoms_VendorsReport::report_sales_overview" title="Overview" sortOrder="10" module="Vnecoms_VendorsReport" action="reports/sales/" parent="Vnecoms_VendorsReport::report_sales" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_sales_overview"/>
+    	<add id="Vnecoms_VendorsReport::report_sales_month" title="by Month of Year" sortOrder="20" module="Vnecoms_VendorsReport" action="reports/sales/month" parent="Vnecoms_VendorsReport::report_sales" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_sales_month"/>
+    	<add id="Vnecoms_VendorsReport::report_sales_day" title="by Day of Week" sortOrder="30" module="Vnecoms_VendorsReport" action="reports/sales/day" parent="Vnecoms_VendorsReport::report_sales" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_sales_day"/>
+    	<add id="Vnecoms_VendorsReport::report_sales_hour" title="by Hour" sortOrder="40" module="Vnecoms_VendorsReport" action="reports/sales/hour" parent="Vnecoms_VendorsReport::report_sales" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_sales_hour"/>
+    	<add id="Vnecoms_VendorsReport::report_products" title="Products" sortOrder="20" module="Vnecoms_VendorsReport" parent="Vnecoms_VendorsReport::report" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_products"/>
+    	<add id="Vnecoms_VendorsReport::report_products_ordered" title="Ordered" sortOrder="10" module="Vnecoms_VendorsReport" action="reports/product/ordered" parent="Vnecoms_VendorsReport::report_products" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_products_ordered"/>
+    	<add id="Vnecoms_VendorsReport::report_products_low_stock" title="Low Stock" sortOrder="20" module="Vnecoms_VendorsReport" action="reports/product/lowstock" parent="Vnecoms_VendorsReport::report_products" dependsOnModule="Vnecoms_VendorsReport" resource="Vnecoms_VendorsReport::report_products_low_stock"/>
+    </menu>
+</config>

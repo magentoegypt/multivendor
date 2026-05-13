@@ -1,0 +1,18 @@
+<div class="rma-instruction-block">
+    <p>
+        <strong><?=  __("So your return request got approved. That’s a win!") ?></strong><br>
+        <strong><?=  __("What’s next? To return your purchase, follow the step-by-step instructions below.") ?></strong>
+    </p>
+    <p><img src="<?php echo $this->getViewFileUrl('Vnecoms_RMA::images/RMA_banner.png'); ?>" alt="rma_approved">
+    </p>
+    <p><?= __('1. Print out the Packing slip in just one click. See the buttons below:') ?></p>
+    <p>
+        <a class="am-print-shipping-label action primary" target="_blank" href="<?php echo $block->getUrl("vrma/customer/print",array("id"=>$block->getRequestRma()->getId())) ?>">
+            Print Packing Slip</a>
+    </p>
+    <p><?= __('2. If possible, put your purchase(s) in the original package. We remind you that only returns that are in good condition are refunded. Prior to sending your return, make sure you’ve removed all additional labels from the package.') ?></p>
+
+    <p><?= __('3. Now place the packing slip you’ve printed into the package.') ?></p>
+    <p><?= __('4. You should send the package with a pre-paid traceable method like Insured Parcel Post or UPS. NOTE:  Some charges are non-refundable. We don’t return Shipping and Handling costs, gift box costs and other charges. ') ?></p>
+    <p><?= __('5. Click to  <strong>"Confirm Package is Returning"</strong> to let us know the package is being ship.') ?></p>
+</div>

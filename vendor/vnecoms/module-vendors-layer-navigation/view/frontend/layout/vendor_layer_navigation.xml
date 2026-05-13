@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="div.sidebar.additional">
+            <block class="Vnecoms\VendorsLayerNavigation\Block\Navigation\Category" name="vendor.catalog.leftnav" after="vendor.profile.left" template="Vnecoms_VendorsLayerNavigation::layer/view.phtml">
+                <block class="Vnecoms\VendorsLayerNavigation\Block\Navigation\State" name="catalog.navigation.state" as="state" />
+                <block class="Vnecoms\VendorsLayerNavigation\Block\Navigation\FilterRenderer" name="catalog.navigation.renderer" as="renderer" template="Vnecoms_VendorsLayerNavigation::layer/filter.phtml"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

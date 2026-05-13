@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Store Information Section -->
+        <section id="category" translate="label" type="text" sortOrder="10" showInDefault="1">
+            <label>Category</label>
+            <tab>general</tab>
+            <resource>Vnecoms_VendorsSales::sales_email</resource>
+            <group id="general" translate="label tooltip" type="text" sortOrder="10" showInDefault="1">
+                <label>General</label>
+                <field id="header" translate="label" type="text" sortOrder="20" showInDefault="1">
+                    <label>Category Header</label>
+                    <comment>Category Heading Label</comment>
+                </field>
+                <!--<field id="color" translate="label" type="text" sortOrder="30" showInDefault="1">-->
+                    <!--<label>Header Color</label>-->
+                    <!--<frontend_model>Vnecoms\Vendors\Block\Adminhtml\System\Config\Form\Field\Color</frontend_model>-->
+                    <!--<tooltip>Color For Categories Header in Seller Page.</tooltip>-->
+                <!--</field>-->
+            </group>
+        </section>
+    </system>
+</config>

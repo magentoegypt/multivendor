@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <vsms>
+        	<vendor>
+        		<!-- Admin config -->
+        		<admin_pending_vendor>1</admin_pending_vendor>
+        		<admin_pending_vendor_message><![CDATA[Hi,
+A vendor account "{{var vendor.vendor_id}}" is created and awaiting for your approval.]]></admin_pending_vendor_message>
+        		<admin_pending_product>0</admin_pending_product>
+        		<admin_pending_product_message><![CDATA[Hi,
+Product "{{var product.name}}" is awaiting for your approval.]]></admin_pending_product_message>
+
+				<!-- Vendor config -->
+        		<vendor_approved>1</vendor_approved>
+        		<vendor_approved_message><![CDATA[Hi {{var vendor.firstname}},
+Your vendor account {{var vendor.vendor_id}} is approved.]]></vendor_approved_message>
+        		<vendor_unapproved>1</vendor_unapproved>
+        		<vendor_unapproved_message><![CDATA[Hi {{var vendor.firstname}},
+Your vendor account {{var vendor.vendor_id}} is unapproved.]]></vendor_unapproved_message>
+        		<product_approved>1</product_approved>
+        		<product_approved_message><![CDATA[Hi {{var vendor.firstname}},
+Your product {{var product.name}} is approved.]]></product_approved_message>
+        		<product_unapproved>1</product_unapproved>
+        		<product_unapproved_message><![CDATA[Hi {{var vendor.firstname}},
+Your product {{var product.name}} is unapproved.]]></product_unapproved_message>
+        		<new_order>1</new_order>
+        		<new_order_message><![CDATA[Hi {{var vendor.firstname}},
+New order #{{var order.increment_id}} is placed.]]></new_order_message>
+        		<new_invoice>1</new_invoice>
+        		<new_invoice_message><![CDATA[Hi {{var vendor.firstname}},
+New invoice #{{var invoice.increment_id}} is created.]]></new_invoice_message>
+        		<new_shipment>1</new_shipment>
+        		<new_shipment_message><![CDATA[Hi {{var vendor.firstname}},
+New shipment #{{var shipment.increment_id}} is created.]]></new_shipment_message>
+        		<new_creditmemo>1</new_creditmemo>
+        		<new_creditmemo_message><![CDATA[Hi {{var vendor.firstname}},
+New credit memo #{{var creditmemo.increment_id}} is created.]]></new_creditmemo_message>
+        	</vendor>
+        </vsms>
+    </default>
+</config>

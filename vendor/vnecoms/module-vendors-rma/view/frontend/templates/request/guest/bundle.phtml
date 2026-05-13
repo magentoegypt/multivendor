@@ -1,0 +1,95 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var $block \Magento\Bundle\Block\Sales\Order\Items\Renderer */ ?>
+<?php $_item = $block->getItem() ?>
+<?php $_order = $block->getOrder() ?>
+
+<?php $parentItem = $block->getItem() ?>
+<?php $items = array_merge([$parentItem], $parentItem->getChildrenItems()); ?>
+
+<?php if ($block->getItemOptions() || $_item->getDescription() || $this->helper('Magento\GiftMessage\Helper\Message')->isMessagesAllowed('order_item', $_item) && $_item->getGiftMessageId()): ?>
+    <?php $_showlastRow = true ?>
+<?php else: ?>
+    <?php $_showlastRow = false ?>
+<?php endif; ?>
+
+<?php $_prevOptionId = '' ?>
+<?php $itemRma = $block->checkItemForCurentRequest($parentItem->getChildrenItems()) ?>
+
+<?php if($itemRma): ?>
+    <?php foreach ($items as $_item): ?>
+        <?php if(in_array($_item->getId(),$itemRma)): ?>
+            <?php if ($_item->getParentItem()): ?>
+                <?php $attributes = $block->getSelectionAttributes($_item) ?>
+                <?php if ($_prevOptionId != $attributes['option_id']): ?>
+                    <tr class="bundle-option-label">
+                        <td colspan="3">
+                            <strong><em><?= /* @escapeNotVerified */  $attributes['option_label'] ?></em></strong>
+                        </td>
+                    </tr>
+                    <?php $_prevOptionId = $attributes['option_id'] ?>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endif; ?>
+        <?php if (!$_item->getParentItem()): ?>
+            <tr class="bundle-item bundle-parent">
+                <td class="item-image">
+                    <img src="<?php echo $block->getImage($_item->getProduct());?>"/>
+                </td>
+                <td class="item-info" colspan="2">
+                    <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p>
+                    <p class="sku"><?= /* @escapeNotVerified */  __('SKU'); ?>: <?= $block->escapeHtml($block->getSku($_item)) ?></p>
+                </td>
+            </tr>
+        <?php else: ?>
+            <?php if(in_array($_item->getId(),$itemRma)): ?>
+                <tr class="bundle-item bundle-option-value">
+                    <td class="item-image">
+                        <img src="<?php echo $block->getImage($_item->getProduct());?>"/>
+                    </td>
+                    <td class="item-info">
+                        <p><?= $block->getValueHtml($_item)?></p>
+                    </td>
+                    <td class="item-qty">
+                        <?php $dataItems = $block->getRmaItem($_item) ?>
+                        <label><?php echo $dataItems["qty"] ?></label>
+
+                        <?php if ($dataItems["rma"]) : ?>
+                            <p><?php echo __("Other RMA for this product:") ?></p>
+                            <ul>
+                                <?php foreach($dataItems["rma"] as $request): ?>
+                                    <li><a href="<?php echo $block->getUrl("vrma/guest/view",array("id"=>$request["request_id"])) ?>" target="_blank">
+                                            <?php echo "#".$request["request_increment_id"] ?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif ?>
+
+                    </td>
+                </tr>
+            <?php endif; ?>
+        <?php endif; ?>
+
+    <?php endforeach; ?>
+
+    <?php if ($_showlastRow): ?>
+        <tr>
+            <td colspan="2" class="item-extra">
+                <?php if ($block->getItemOptions()): ?>
+                    <dl>
+                        <?php foreach ($block->getItemOptions() as $option): ?>
+                            <dt><strong><em><?= /* @escapeNotVerified */  $option['label'] ?></em></strong></dt>
+                            <dd><?= /* @escapeNotVerified */  $option['value'] ?></dd>
+                        <?php endforeach; ?>
+                    </dl>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endif; ?>
+<?php endif; ?>

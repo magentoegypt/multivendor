@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+    	<referenceBlock name="vendors_edit_tabs">
+        	<block class="Vnecoms\VendorsSms\Block\Adminhtml\Vendor\Edit\Tab\Sms" name="vendors_edit_tab_sms" />
+        	<action method="addTabAfter">
+                <argument name="name" xsi:type="string">sms_credit</argument>
+                <argument name="block" xsi:type="string">vendors_edit_tab_sms</argument>
+                <argument name="after" xsi:type="string">main_section</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

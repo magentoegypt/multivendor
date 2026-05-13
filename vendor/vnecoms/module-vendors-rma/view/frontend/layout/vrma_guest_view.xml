@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="vrma_request_guest_view_item_renderers"/>
+    <head>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_RMA::css/fileupload.css"/>
+        <css src="Vnecoms_RMA::css/font-awesome.css"/>
+        <css src="Vnecoms_RMA::css/tabs.css"/>
+        <css src="Vnecoms_RMA::css/rma.css"/>
+        <css src="Vnecoms_RMA::css/colorbox.css"/>
+        <css src="Vnecoms_VendorsRMA::css/custom.css"/>
+    </head>
+    <body>
+      
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsRMA\Block\Frontend\View" name="guest.view" template="Vnecoms_VendorsRMA::request/guest/view.phtml" cacheable="false">
+                <block class="Vnecoms\RMA\Block\Frontend\View\Items" name="rma_items"
+                       template="request/view/items.phtml" cacheable="false">
+                    <block class="Magento\Framework\View\Element\RendererList" name="rma.request.item.renderers" as="renderer.list"/>
+                </block>
+                <block class="Vnecoms\VendorsRMA\Block\Frontend\View\Escalate" name="rma_escalate" template="Vnecoms_VendorsRMA::request/view/escalate.phtml" />
+                <block class="Vnecoms\VendorsRMA\Block\Frontend\View" name="return_instructions" template="Vnecoms_RMA::request/view/instructions.phtml" />
+                <block class="Vnecoms\VendorsRMA\Block\Frontend\Guest\Message" name="message" template="Vnecoms_VendorsRMA::request/view/message.phtml" />
+                <block class="Vnecoms\VendorsRMA\Block\Frontend\Guest\Message" name="form-reply" template="Vnecoms_RMA::request/view/form-reply.phtml" />
+            </block>
+        </referenceContainer>
+
+    </body>
+</page>

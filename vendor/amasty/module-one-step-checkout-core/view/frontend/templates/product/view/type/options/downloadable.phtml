@@ -1,0 +1,23 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+/** @var $block \Magento\Downloadable\Block\Checkout\Cart\Item\Renderer */
+/** @var \Magento\Framework\Escaper $escaper */
+if ($options = $block->getOptionList()): ?>
+    <?php foreach ($options as $option): ?>
+        <?php $formattedOptionValue = $block->getFormatedOptionValue($option) ?>
+        <dl>
+            <dt><b><?= $escaper->escapeHtml($option['label']) ?>:</b></dt>
+            <dd>
+                <?php if (isset($formattedOptionValue['full_view'])): ?>
+                    <?= $escaper->escapeHtml($formattedOptionValue['full_view']) ?>
+                <?php else: ?>
+                    <?= $escaper->escapeHtml($formattedOptionValue['value']) ?>
+                <?php endif; ?>
+            </dd>
+        </dl>
+    <?php endforeach; ?>
+<?php endif; ?>

@@ -1,0 +1,296 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+        <css src="Vnecoms_VendorsReport::css/reports.css" />
+    </head>
+    <body>
+    	<referenceContainer name="content">
+        	<block class="Vnecoms\VendorsReport\Block\Vendors\Reports" name="vendors.report" before="user" template="Vnecoms_VendorsReport::reports.phtml">
+        		<arguments>
+       				<argument name="data_scope" xsi:type="string">reports</argument>
+       				<argument name="default_date_range_type" xsi:type="string">last-30days</argument>
+       				<argument name="layoutProcessors" xsi:type="array">
+                    	<item name="sales_report" xsi:type="string">Vnecoms\VendorsReport\Block\Vendors\Reports\Sales\Hour</item>
+                    </argument>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="reports" xsi:type="array">
+                                <item name="component" xsi:type="string">Vnecoms_VendorsReport/js/reports</item>
+                                <item name="defaultPeriod" xsi:type="string">day</item>
+                                <item name="showPeriod" xsi:type="boolean">false</item>
+                                <item name="defaultGraphType" xsi:type="string">pieChart</item>
+                                <item name="graphTypes" xsi:type="array">
+                                	<item name="0" xsi:type="array">
+                                		<item name="label" xsi:type="string" translate="true">Pie Chart</item>
+                                		<item name="value" xsi:type="string">pieChart</item>
+                                	</item>
+                                	<item name="1" xsi:type="array">
+                                		<item name="label" xsi:type="string" translate="true">3D Pie Chart</item>
+                                		<item name="value" xsi:type="string">3dPieChart</item>
+                                	</item>
+                                	<item name="2" xsi:type="array">
+                                		<item name="label" xsi:type="string" translate="true">Donut Chart</item>
+                                		<item name="value" xsi:type="string">donutChart</item>
+                                	</item>
+                                	<item name="3" xsi:type="array">
+                                		<item name="label" xsi:type="string" translate="true">Column Chart</item>
+                                		<item name="value" xsi:type="string">columnChart</item>
+                                	</item>
+                                	
+                                </item>
+                                <item name="graphs" xsi:type="array">
+                                	<item name="0" xsi:type="array">
+                                		<item name="type" xsi:type="string">total-chart</item>
+                                		<item name="data_type" xsi:type="string">report_sales</item>
+                                		<item name="graph_type" xsi:type="string">pieChart</item>
+                                		<item name="legend_position" xsi:type="string">right</item>
+                                		<item name="columns" xsi:type="array">
+                                			<item name="0" xsi:type="array">
+                                				<item name="name" xsi:type="string">time</item>
+                                				<item name="title" xsi:type="string" translate="true">Time</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">string</item>
+                                					<item name="week" xsi:type="string">string</item>
+                                					<item name="month" xsi:type="string">string</item>
+                                					<item name="quarter" xsi:type="string">string</item>
+                                					<item name="year" xsi:type="string">string</item>
+                                				</item>
+                                			</item>
+                                			<item name="1" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_grand_total</item>
+                                				<item name="title" xsi:type="string" translate="true">Total</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                		</item>
+                                		<item name="vAxitFormat" xsi:type="string">price</item>
+                                	</item>
+                                	<item name="1" xsi:type="array">
+                                		<item name="type" xsi:type="string">order-num-chart</item>
+                                		<item name="data_type" xsi:type="string">report_sales</item>
+                                		<item name="graph_type" xsi:type="string">donutChart</item>
+                                		<item name="legend_position" xsi:type="string">right</item>
+                                		<item name="columns" xsi:type="array">
+                                			<item name="0" xsi:type="array">
+                                				<item name="name" xsi:type="string">time</item>
+                                				<item name="title" xsi:type="string" translate="true">Time</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">string</item>
+                                					<item name="week" xsi:type="string">string</item>
+                                					<item name="month" xsi:type="string">string</item>
+                                					<item name="quarter" xsi:type="string">string</item>
+                                					<item name="year" xsi:type="string">string</item>
+                                				</item>
+                                			</item>
+                                			<item name="1" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_order_count</item>
+                                				<item name="title" xsi:type="string" translate="true">Number of Orders</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">number</item>
+                                					<item name="week" xsi:type="string">number</item>
+                                					<item name="month" xsi:type="string">number</item>
+                                					<item name="quarter" xsi:type="string">number</item>
+                                					<item name="year" xsi:type="string">number</item>
+                                				</item>
+                                			</item>
+                                		</item>
+                                		<item name="vAxitFormat" xsi:type="string">decimal</item>
+                                	</item>
+                                	<item name="2" xsi:type="array">
+                                		<item name="type" xsi:type="string">item-ordered-chart</item>
+                                		<item name="data_type" xsi:type="string">report_sales</item>
+                                		<item name="graph_type" xsi:type="string">3dPieChart</item>
+                                		<item name="legend_position" xsi:type="string">right</item>
+                                		<item name="columns" xsi:type="array">
+                                			<item name="0" xsi:type="array">
+                                				<item name="name" xsi:type="string">time</item>
+                                				<item name="title" xsi:type="string" translate="true">Time</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">string</item>
+                                					<item name="week" xsi:type="string">string</item>
+                                					<item name="month" xsi:type="string">string</item>
+                                					<item name="quarter" xsi:type="string">string</item>
+                                					<item name="year" xsi:type="string">string</item>
+                                				</item>
+                                			</item>
+                                			<item name="1" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_ordered_qty</item>
+                                				<item name="title" xsi:type="string" translate="true">Items Ordered</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">number</item>
+                                					<item name="week" xsi:type="string">number</item>
+                                					<item name="month" xsi:type="string">number</item>
+                                					<item name="quarter" xsi:type="string">number</item>
+                                					<item name="year" xsi:type="string">number</item>
+                                				</item>
+                                			</item>
+                                		</item>
+                                		<item name="vAxitFormat" xsi:type="string">decimal</item>
+                                	</item>
+                                	<!-- Data table -->
+                                	<item name="3" xsi:type="array">
+                                		<item name="type" xsi:type="string">report-data-table</item>
+                                		<item name="data_type" xsi:type="string">report_sales</item>
+                                		<item name="graph_type" xsi:type="string">tableChart</item>
+                                		<item name="columns" xsi:type="array">
+                                			<item name="0" xsi:type="array">
+                                				<item name="name" xsi:type="string">time</item>
+                                				<item name="value" xsi:type="string">time_num</item>
+                                				<item name="title" xsi:type="string" translate="true">Period</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">number</item>
+                                					<item name="week" xsi:type="string">number</item>
+                                					<item name="month" xsi:type="string">number</item>
+                                					<item name="quarter" xsi:type="string">number</item>
+                                					<item name="year" xsi:type="string">number</item>
+                                				</item>
+                                			</item>
+                                			<item name="1" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_order_count</item>
+                                				<item name="title" xsi:type="string" translate="true">Number of Orders</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">number</item>
+                                					<item name="week" xsi:type="string">number</item>
+                                					<item name="month" xsi:type="string">number</item>
+                                					<item name="quarter" xsi:type="string">number</item>
+                                					<item name="year" xsi:type="string">number</item>
+                                				</item>
+                                			</item>
+                                			<item name="2" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_ordered_qty</item>
+                                				<item name="title" xsi:type="string" translate="true">Items Ordered</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">number</item>
+                                					<item name="week" xsi:type="string">number</item>
+                                					<item name="month" xsi:type="string">number</item>
+                                					<item name="quarter" xsi:type="string">number</item>
+                                					<item name="year" xsi:type="string">number</item>
+                                				</item>
+                                			</item>
+                                			<item name="3" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_subtotal</item>
+                                				<item name="title" xsi:type="string" translate="true">Subtotal</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                			<item name="4" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_shipping</item>
+                                				<item name="title" xsi:type="string" translate="true">Shipping</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                			<item name="5" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_discount</item>
+                                				<item name="title" xsi:type="string" translate="true">Discount</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                			<item name="6" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_grand_total</item>
+                                				<item name="title" xsi:type="string" translate="true">Grand Total</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                			<item name="7" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_total_paid</item>
+                                				<item name="title" xsi:type="string" translate="true">Total Paid</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                			<item name="8" xsi:type="array">
+                                				<item name="name" xsi:type="string">report_refunded</item>
+                                				<item name="title" xsi:type="string" translate="true">Total Refunded</item>
+                                				<item name="type" xsi:type="array">
+                                					<item name="day" xsi:type="string">price</item>
+                                					<item name="week" xsi:type="string">price</item>
+                                					<item name="month" xsi:type="string">price</item>
+                                					<item name="quarter" xsi:type="string">price</item>
+                                					<item name="year" xsi:type="string">price</item>
+                                				</item>
+                                			</item>
+                                		</item>
+                                	</item>
+                                </item>                                    
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+				<container name="vendors.report.graph" as="reports_graph">
+	        		<block class="Vnecoms\VendorsReport\Block\Vendors\Reports\Graph\Tabs" name="graph_tabs" as="graph_tabs" before="-">
+	                    <block class="Vnecoms\VendorsReport\Block\Vendors\Reports\Graph\Tab\DefaultTab" name="report_graph_total">
+	                    	<arguments>
+       							<argument name="tab_label" xsi:type="string">Total</argument>
+       							<argument name="tab_title" xsi:type="string">Total</argument>
+       							<argument name="graph_container_id" xsi:type="string">total-chart</argument>
+   							</arguments>
+	                    </block>
+	                    <action method="addTab">
+	                        <argument name="name" xsi:type="string">report_graph_total</argument>
+	                        <argument name="block" xsi:type="string">report_graph_total</argument>
+	                    </action>
+	                    
+	                    <block class="Vnecoms\VendorsReport\Block\Vendors\Reports\Graph\Tab\DefaultTab" name="report_graph_order_num">
+	                    	<arguments>
+       							<argument name="tab_label" xsi:type="string">Number of Orders</argument>
+       							<argument name="tab_title" xsi:type="string">Number of Orders</argument>
+       							<argument name="graph_container_id" xsi:type="string">order-num-chart</argument>
+   							</arguments>
+	                    </block>
+	                    <action method="addTab">
+	                        <argument name="name" xsi:type="string">report_graph_order_num</argument>
+	                        <argument name="block" xsi:type="string">report_graph_order_num</argument>
+	                    </action>
+	                    
+	                    <block class="Vnecoms\VendorsReport\Block\Vendors\Reports\Graph\Tab\DefaultTab" name="report_graph_items_ordered">
+	                    	<arguments>
+       							<argument name="tab_label" xsi:type="string">Items Ordered</argument>
+       							<argument name="tab_title" xsi:type="string">Items Ordered</argument>
+       							<argument name="graph_container_id" xsi:type="string">item-ordered-chart</argument>
+   							</arguments>
+	                    </block>
+	                    <action method="addTab">
+	                        <argument name="name" xsi:type="string">report_graph_items_ordered</argument>
+	                        <argument name="block" xsi:type="string">report_graph_items_ordered</argument>
+	                    </action>
+	        		</block>
+        	   	</container>
+        	</block>
+        </referenceContainer>
+    </body>
+</page>

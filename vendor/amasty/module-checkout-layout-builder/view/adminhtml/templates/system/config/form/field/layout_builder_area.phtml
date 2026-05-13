@@ -1,0 +1,38 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Layout Builder for Magento 2 (System)
+ */
+/**
+ * @var $block Amasty\CheckoutLayoutBuilder\Block\Config\LayoutBuilderArea
+ * @var $escaper Magento\Framework\Escaper
+ */
+
+$element = $block->getElement();
+?>
+
+<input type="hidden"
+       id="amcheckout-presets"
+       name="<?= /* @noEscape */ $element->getName() ?>"
+       value="<?= /* @noEscape */ $element->getEscapedValue() ?>" />
+
+<div id="ambuilder-main-container" class="ambuilder-main-container"></div>
+
+<script>
+    require([
+        'amLayoutBuilder',
+        'amUseDefaultStateManager'
+    ], function (LayoutBuilder, useDefaultStateManager) {
+        var React = LayoutBuilder.init('ambuilder-main-container', {
+            defaultBlockTitles: <?= /* @noEscape */ $block->getSerializedData($block->getBlockDefaultNames())?>,
+            staticTitle: "<?= $escaper->escapeHtml(__('Static Block')) ?>",
+            dragIconTitle: "<?= $escaper->escapeHtml(__('Drag Icon')) ?>"
+        });
+
+        // If checkout design use default checkbox exists
+        if (document.getElementById('amasty_checkout_design_layout_checkout_design_inherit')) {
+            useDefaultStateManager.init(<?= /* @noEscape */ $block->getSerializedData($block->getConfigForUseDefault())?>);
+        }
+    });
+</script>

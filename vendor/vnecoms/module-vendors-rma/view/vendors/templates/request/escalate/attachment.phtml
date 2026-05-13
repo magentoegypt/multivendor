@@ -1,0 +1,26 @@
+<div id="knockout-message-attachment" class="uploader" data-bind="scope: 'attachment'">
+    <label class="col-sm-3 control-label" for="escalate_form_answer"><span><?php echo __("Attachment") ?></span></label>
+    <div class="col-sm-9">
+        <p> <?php echo __('Allow Extension : ').$block->getUploaderExtensionNote() ?></p>
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+                                {
+                                    "#knockout-message-attachment": {
+                                        "Magento_Ui/js/core/app": {
+                                            "components": {
+                                                "attachment": {
+                                                    "component": "Vnecoms_RMA/js/form/upload/uploader",
+                                                    "uploaderConfig":{
+                                                        "url": "<?php echo $block->getUrl("vrma/request/upload");?>"
+                                                    },
+                                                    "dataScope" : "data.attachment",
+                                                    "dataType" : "data.text",
+                                                    "formElement" : "data.input"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            </script>
+    </div>
+</div>

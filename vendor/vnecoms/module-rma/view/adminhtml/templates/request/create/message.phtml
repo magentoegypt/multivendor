@@ -1,0 +1,44 @@
+<div  id="form-reply-ticket">
+    <div class="ticket-template">
+        <div class="content" >
+            <select class="chosen-select admin__control-select mailbox-quick-reponse"
+                    name="request[reponse_id]" id="reponse_id" style="width:230px">
+                <option value=""><?php echo __('Search Quick Response') ?></option>
+                <?php foreach ($block->getTemplateOptions() as $key=>$template):?>
+                    <option value="<?php echo $key ?>"><?php echo $template ?></option>
+                <?php endforeach;?>
+            </select>
+
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var jsonTemplate = <?php echo $this->getTemplateJson() ?  $this->getTemplateJson() : "" ?>;
+
+    window.tinyMCE_GZ = window.tinyMCE_GZ || {}; window.tinyMCE_GZ.loaded = true;
+    require([
+        "jquery",
+        'mage/validation',
+        "Vnecoms_RMA/js/wysiwyg/tiny_mce/setup",
+        "Vnecoms_RMA/js/chosen.jquery.min",
+        "Vnecoms_RMA/js/jquery.colorbox-min"
+    ],function($){
+        $(function() {
+            if($(".chosen-select")) $(".chosen-select").chosen();
+
+            $('.mailbox-quick-reponse').change(function(){
+
+                for(var i = 0 ; i < jsonTemplate.length ; i++){
+                    if(jsonTemplate[i].reponse_id == $( this ).val())
+                    {
+                        tinyMCE.execCommand('mceInsertContent',false,jsonTemplate[i].content);
+                        break;
+                    }
+                }
+
+            });
+        });
+    });
+</script>

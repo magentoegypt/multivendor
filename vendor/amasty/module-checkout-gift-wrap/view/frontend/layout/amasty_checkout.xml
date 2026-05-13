@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="sidebar" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="summary" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="totals" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="amasty_checkout" xsi:type="array">
+                                                            <item name="component"  xsi:type="string">Amasty_CheckoutGiftWrap/js/view/checkout/summary/gift-wrap</item>
+                                                            <item name="sortOrder" xsi:type="string">30</item>
+                                                            <item name="label" xsi:type="string" translate="true">Gift Wrap</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                        <item name="additional" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="checkboxes" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="gift_message_container" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Amasty_CheckoutGiftWrap/js/view/additional/gift-messages/container</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="popUpForm" xsi:type="array">
+                                                                    <item name="element" xsi:type="string">#amcheckout-gift-messages</item>
+                                                                    <item name="options" xsi:type="array">
+                                                                        <item name="type" xsi:type="string">popup</item>
+                                                                        <item name="responsive" xsi:type="boolean">true</item>
+                                                                        <item name="innerScroll" xsi:type="boolean">true</item>
+                                                                        <item name="title" xsi:type="string" translate="true">Gift Messages</item>
+                                                                        <item name="trigger" xsi:type="string">amcheckout-gift-messages</item>
+                                                                        <item name="buttons" xsi:type="array">
+                                                                            <item name="save" xsi:type="array">
+                                                                                <item name="text" xsi:type="string" translate="true">Update</item>
+                                                                                <item name="class" xsi:type="string">action primary action-save-address</item>
+                                                                            </item>
+                                                                            <item name="cancel" xsi:type="array">
+                                                                                <item name="text" xsi:type="string" translate="true">Close</item>
+                                                                                <item name="class" xsi:type="string">action secondary action-hide-popup</item>
+                                                                            </item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="checkbox" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">Amasty_CheckoutGiftWrap/js/view/additional/gift-messages/checkbox</item>
+                                                                    <item name="description" xsi:type="string" translate="true">Add a gift message</item>
+                                                                    <item name="dataScope" xsi:type="string">amcheckout.gift_message</item>
+                                                                    <item name="value" xsi:type="string">1</item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                        <item name="gift_wrap" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Amasty_CheckoutGiftWrap/js/view/additional/gift-wrap</item>
+                                                            <item name="dataScope" xsi:type="string">amcheckout.gift_wrap</item>
+                                                            <item name="value" xsi:type="string">1</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

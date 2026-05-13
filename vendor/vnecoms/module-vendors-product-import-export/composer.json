@@ -1,0 +1,26 @@
+{
+    "name": "vnecoms/module-vendors-product-import-export",
+    "description": "N/A",
+    "authors": [
+      {
+        "name": "VNECOMS",
+        "email": "support@vnecoms.com"
+      }
+    ],
+    "require": {
+        "vnecoms/module-vendors": ">=100.3.0",
+        "magento/module-catalog-import-export": "*",
+        "vnecoms/module-vendors-product": ">=2.3.0",
+        "box/spout":"^3.0"
+    },
+    "type": "magento2-module",
+    "version": "2.4.10",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vnecoms\\VendorsProductImportExport\\": ""
+        }
+    }
+}

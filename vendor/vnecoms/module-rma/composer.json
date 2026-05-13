@@ -1,0 +1,27 @@
+{
+  "name": "vnecoms/module-rma",
+  "description": "Magento RMA extension is made for keeping the RMA processes (all the steps of returning a product in order to receive a refund, replacement, or repair during the product's warranty period between the customer and the website owner ) neatly and easier for every website using Magento.",
+  "authors": [
+			{
+					"name": "VNECOMS",
+					"email": "support@vnecoms.com"
+			}
+  ],
+  "require": {
+      "magento/framework": "*",
+      "magento/module-sales": "*",
+      "google/recaptcha": "~1.1",
+      "geoip2/geoip2" : "~2.0",
+      "vnecoms/module-core": "2.4.*"
+  },
+  "type": "magento2-module",
+  "version": "2.4.21",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Vnecoms\\RMA\\": ""
+    }
+  }
+}

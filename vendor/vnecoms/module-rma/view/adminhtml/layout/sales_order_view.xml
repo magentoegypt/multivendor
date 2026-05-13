@@ -1,0 +1,18 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_RMA::css/rma.css"/>
+    </head>
+    <body>
+        <referenceBlock name="sales_order_tabs">
+            <block class="Vnecoms\RMA\Block\Adminhtml\Order\View\Tab\Rma" name="sales_order_view.rma.container"/>
+            <action method="addTab">
+                <argument name="name" xsi:type="string">order_rma</argument>
+                <argument name="block" xsi:type="string">sales_order_view.rma.container</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="sales_order_view.rma.container">
+            <uiComponent name="vrma_order_request_listing"/>
+            <block class="Vnecoms\RMA\Block\Adminhtml\Order\View" name="rma_list"/>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Store Information Section -->
+        <section id="shipping_method">
+            <group id="tablerate" translate="label tooltip" type="text" sortOrder="10" showInDefault="1">
+                <label>Table Rate</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="condition" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <source_model>Vnecoms\VendorsShippingTableRate\Model\Source\Config\Condition</source_model>
+                    <label>Condition</label>
+                    <frontend_class>required-entry</frontend_class>
+                    <comment></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

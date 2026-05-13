@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var  $block \Vnecoms\Quotation\Block\Quote\View*/?>
+
+<div id="quote-view-container">
+    <form id="quotation-proposals-form" action="<?php echo $block->getUrl('quotation/customer/confirm',['quote_id' => $block->getQuote()->getId()])?>" method="post">
+        <div class="order-details-items quote-detail-items">
+            <?php echo $block->getChildHtml('quote_items') ?>
+            
+            <div class="actions-toolbar">
+                <div class="secondary">
+                    <a class="action back" href="<?php /* @escapeNotVerified */ echo $block->getUrl('quotation/customer') ?>">
+                        <span><?php /* @escapeNotVerified */ echo __('Back') ?></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <?php if($block->getQuote()->getStatus() == \Vnecoms\Quotation\Model\Quote::STATUS_SENT):?>
+        <div class="quotation-actions">
+            <button class="button action quotation-action-reject" type="button"><span><?php echo __("Reject Proposal")?></span></button>
+            <button class="button action primary quotation-action-confirm" type="submit"><span><?php echo __("Confirm and Add to Cart")?></span></button>
+        </div>
+        <?php endif;?>
+    </form>
+    <script type="text/javascript">
+    require(["jquery", "prototype"], function($){
+        $('.quotation-action-reject').click(function(){
+            setLocation('<?php echo $block->getUrl('quotation/customer/reject',['quote_id' => $block->getQuote()->getId()]);?>');
+        });
+    });
+    </script>
+</div>

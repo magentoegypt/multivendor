@@ -1,0 +1,172 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Add new Tab -->
+        <tab id="vnecoms" translate="label" sortOrder="200">
+            <label>VNECOMS</label>
+        </tab>
+        <section id="rma" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>RMA</label>
+            <tab>vnecoms</tab>
+            <resource>Vnecoms_RMA::rma_setting</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>General</label>
+
+                <field id="order_expiry_day" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label><![CDATA[Allow to request RMA after order completion,days <strong style="color: #FF0000;">*</strong>]]></label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                </field>
+                <field id="allow_guests_request" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Allow guests to request RMA</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="allow_print" translate="label" type="select" sortOrder="4" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Enable 'Print label' button</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!--
+                <field id="enable_reasons" translate="label" type="select" sortOrder="5" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Enable 'Reasons' option</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                -->
+                <field id="allow_other_reasons" translate="label" type="select" sortOrder="6" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Allow add 'Other' option for reasons</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="allow_per_order" translate="label" type="select" sortOrder="7" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Allow per-order item RMA</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="allow_file_extension" translate="label" type="text" sortOrder="8" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Allowed file extensions</label>
+                </field>
+                <field id="max_resolve_time" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Maximum RMA pending time (days)</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                    <tooltip><![CDATA[After this x days without answering from a side, the RMA request will be automatically resolved.]]></tooltip>
+                </field>
+            </group>
+
+            <group id="increment" translate="label tooltip" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Increment ID</label>
+                <field id="prefix" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Prefix</label>
+                </field>
+                <field id="suffix" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Suffix</label>
+                </field>
+                <field id="start_value" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Start Counter From</label>
+                    <frontend_class>required-entry validate-digits</frontend_class>
+                </field>
+                <field id="step" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Counter Increment Step</label>
+                    <frontend_class>required-entry validate-digits</frontend_class>
+                    <comment>E.g. the last number is 00000010, if the increment is 5, the next number will be  00000015</comment>
+                </field>
+                <field id="number_length" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Number Length</label>
+                    <frontend_class>required-entry validate-digits</frontend_class>
+                    <comment><![CDATA[Total number of digits in the order number. If counter value is 15 and Number Length is 9, the order number will be 000000015<br />Set to 0 (zero) if you don't want to add leading zeros to order number.]]></comment>
+                </field>
+                <field id="reset_counter" translate="label" type="checkbox" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Reset counter</label>
+                    <frontend_model>Vnecoms\RMA\Block\System\Config\Backend\ResetCounter</frontend_model>
+                    <backend_model>Vnecoms\RMA\Model\System\Config\Backend\ResetCounter</backend_model>
+                </field>
+            </group>
+
+            <group id="policy" translate="label" type="text" sortOrder="2" showInDefault="2" showInWebsite="1" showInStore="1">
+                <label>RMA Policy</label>
+                <field id="enable_policy" translate="label" type="select" sortOrder="1" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Show policy</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="policy_block" translate="label" type="select" sortOrder="2" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Policy block</label>
+                    <source_model>Vnecoms\RMA\Model\System\Config\Source\Block</source_model>
+                </field>
+
+                <field id="enable_guide" translate="label" type="select" sortOrder="3" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Show Return Instructions</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <!--
+                <field id="policy_block_guide" translate="label" type="select" sortOrder="4" showInDefault="1" showInStore="1" showInWebsite="1">
+                    <label>Send With The Return Instructions</label>
+                    <source_model>Vnecoms\RMA\Model\System\Config\Source\Block</source_model>
+                    <comment>Used for replying the accepted RMA request</comment>
+                </field> -->
+            </group>
+            <group id="contacts" translate="label" type="text" sortOrder="3" showInDefault="2" showInWebsite="1" showInStore="1">
+                <label>Contacts</label>
+                <field id="enable_contacts" translate="label" type="select" sortOrder="1" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Enable email notifications</label>
+                    <source_model>Vnecoms\RMA\Model\System\Config\Source\Notify</source_model>
+                </field>
+
+                <field id="message_template_customer" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Notify Message To Customer</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <tooltip><![CDATA[This email will be sent to customer when a message send.]]></tooltip>
+                </field>
+
+                <field id="message_template_admin" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Notify Message To Admin</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <tooltip><![CDATA[This email will be sent to admin when a message send.]]></tooltip>
+                </field>
+
+                <field id="contacts_name" translate="label" type="text" sortOrder="2" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>RMA department display name</label>
+                    <frontend_class>required-entry</frontend_class>
+                </field>
+                <field id="contacts_email" translate="label" type="text" sortOrder="3" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>RMA department email</label>
+                    <frontend_class>required-entry validate-email</frontend_class>
+                </field>
+                <field id="contacts_address" translate="label" type="textarea" sortOrder="4" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>RMA department address</label>
+                    <frontend_class>required-entry</frontend_class>
+                </field>
+                <field id="email_identity" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+
+
+            <group id="recaptcha" translate="label" type="text" sortOrder="4" showInDefault="4" showInWebsite="1" showInStore="1">
+                <label>reCAPTCHA</label>
+                <field id="enabled_recaptcha" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="site_key" translate="label" type="text" sortOrder="2" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Site Key</label>
+                    <depends>
+                        <field id="enabled_recaptcha">1</field>
+                    </depends>
+                </field>
+                <field id="secret_key" translate="label" type="text" sortOrder="3" showInDefault="1" showInStore="0" showInWebsite="1">
+                    <label>Secret Key</label>
+                    <depends>
+                        <field id="enabled_recaptcha">1</field>
+                    </depends>
+                </field>
+                <field id="language_recaptcha" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable send email after close ticket</label>
+                    <source_model>Vnecoms\RMA\Model\System\Config\Source\Recaptcha\Language</source_model>
+                    <depends>
+                        <field id="enabled_recaptcha">1</field>
+                    </depends>
+                </field>
+            </group>
+
+        </section>
+    </system>
+</config>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <referenceBlock name="amasty.checkout.success.details">
+                <block class="Amasty\CheckoutDeliveryDate\Block\Sales\Order\Info\Delivery" name="delivery" as="delivery"
+                       template="Amasty_CheckoutDeliveryDate::onepage/details/delivery.phtml"/>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>

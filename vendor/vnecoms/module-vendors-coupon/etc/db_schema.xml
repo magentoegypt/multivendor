@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_coupon" resource="default" engine="innodb" comment="Vendor Coupon">
+        <column xsi:type="smallint" name="coupon_id" unsigned="true" nullable="false" identity="true"
+                comment="Coupon Id"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" comment="Vendor Id"/>
+        <column xsi:type="varchar" name="code" length="255" comment="Coupon Code"/>
+        <column xsi:type="decimal" name="amount" unsigned="true" nullable="false" scale="4" precision="12" default="0"  comment="Discount Amount"/>
+        <column xsi:type="int" name="usage_limit" unsigned="true" nullable="false" default="0"  comment="Usage Limit"/>
+        <column xsi:type="int" name="usage_per_customer" unsigned="true" nullable="false" default="0"  comment="Usage per Customer"/>
+        <column xsi:type="int" name="times_used" unsigned="true" nullable="false" default="0"  comment="Times Used"/>
+        <column xsi:type="varchar" name="action" length="255" comment="Coupon Action"/>
+        <column xsi:type="decimal" name="buy_x" unsigned="true" nullable="false" scale="4" precision="12" default="0"  comment="Buy X"/>
+        <column xsi:type="timestamp" name="created_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="date" name="from_date" comment="From Date"/>
+        <column xsi:type="date" name="to_date" comment="To Date"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="coupon_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_VENDOR_COUPON_VENDOR_ID" table="ves_vendor_coupon"
+                    column="vendor_id" referenceTable="ves_vendor_entity" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="quote">
+        <column xsi:type="varchar" name="applied_vendor_coupon_ids" nullable="true" length="255"
+                comment="Applied Vendor Coupon Ids"/>
+        <column xsi:type="text" name="vendor_discount_detail" nullable="true"
+                comment="Vendor Discount Detail"/>
+    </table>
+
+    <table name="ves_vendor_sales_order">
+        <column xsi:type="varchar" name="coupon_code" nullable="true" length="255"
+                comment="Coupon Code"/>
+        <column xsi:type="text" name="discount_description" nullable="true"
+                comment="Discount Description"/>
+    </table>
+</schema>

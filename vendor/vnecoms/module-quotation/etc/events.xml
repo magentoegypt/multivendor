@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">	
+	<!-- Update the price of quote item -->
+	<event name="sales_quote_item_set_product">
+		<observer name="vnecoms_quotation_quote_item_set_product" instance="Vnecoms\Quotation\Observer\UpdateQuoteItemPrice" />
+	</event>
+	
+	<!-- Validate quote qty, All items relate to quote will not be able to change qty -->
+	<event name="checkout_cart_save_before">
+		<observer name="vnecoms_quotation_cart_save_before" instance="Vnecoms\Quotation\Observer\ValidateQuoteItemQty" />
+	</event>
+	
+	<!-- Send new quote notification email -->
+	<event name="ves_quotation_quote_submit_after">
+		<observer name="send_new_quote_email" instance="Vnecoms\Quotation\Observer\SendNewQuoteEmail" />
+	</event>
+	
+	<!-- Send approved quote notification email -->
+	<event name="ves_quotation_quote_approve_after">
+		<observer name="send_approved_quote_email" instance="Vnecoms\Quotation\Observer\SendApprovedQuoteEmail" />
+	</event>
+	
+	<!-- Send cancelled quote notification email -->
+	<event name="ves_quotation_quote_cancel_after">
+		<observer name="send_cancelled_quote_email" instance="Vnecoms\Quotation\Observer\SendCancelledQuoteEmail" />
+	</event>
+	
+	<!-- Send held quote notification email -->
+	<event name="ves_quotation_quote_hold_after">
+		<observer name="send_held_quote_email" instance="Vnecoms\Quotation\Observer\SendHeldQuoteEmail" />
+	</event>
+	
+	<!-- Send unheld quote notification email -->
+	<event name="ves_quotation_quote_unhold_after">
+		<observer name="send_unheld_quote_email" instance="Vnecoms\Quotation\Observer\SendUnheldQuoteEmail" />
+	</event>
+	
+	<!-- Send rejected quote notification email -->
+	<event name="ves_quotation_quote_reject_after">
+		<observer name="send_reject_quote_email" instance="Vnecoms\Quotation\Observer\SendRejectedQuoteEmail" />
+	</event>
+	
+	<!-- Mark the related quote to ordered -->
+
+	<event name="sales_model_service_quote_submit_success">
+		<observer name="ves_quotation_checkout_quote_submit_success" instance="Vnecoms\Quotation\Observer\CheckoutSubmitAll" />
+	</event>
+	<!-- Remove the quote item if it's no longer valid -->
+	<event name="sales_quote_collect_totals_after">
+		<observer name="ves_quotation_quote_collect_totals_before" instance="Vnecoms\Quotation\Observer\RemoveInvalidItem" />
+	</event>
+	
+</config>

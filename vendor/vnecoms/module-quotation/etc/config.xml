@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <quotation>
+            <frontend>
+                <login_require>1</login_require>
+            </frontend>
+            <form_config>
+            	<email>Yes and Required</email>
+            	<firstname>Yes and Required</firstname>
+            	<lastname>Yes and Required</lastname>
+            	<telephone>2</telephone>
+            	<company>1</company>
+            	<taxid>0</taxid>
+            </form_config>
+            <category_page>
+            	<container_selector>.products.wrapper</container_selector>
+            	<add_to_cart_btn_selector>.product .actions-secondary</add_to_cart_btn_selector>
+            </category_page>
+            <sidebar>
+                <enabled>1</enabled>
+                <number>5</number>
+            </sidebar>
+            <format>
+                <prefix>Q{yy}/{m}/{d}-</prefix>
+    			<suffix></suffix>
+    			<start_value>100</start_value>
+    			<number_length>6</number_length>
+    			<step>1</step>
+            </format>
+            <time>
+                <expired>60</expired>
+                <reminder>0</reminder>
+            </time>
+            <message>
+                <allow_extensions>jpeg,jpg,png,zip,rar,tar,tgz,bz,bz2,pdf,xls,xlsx,doc,docx</allow_extensions>
+                <size>5</size>
+                <number>5</number>
+                <allow_customer_upload>1</allow_customer_upload>
+            </message>
+            <email>
+            	<email_sender>sales</email_sender>
+            	
+            	<customer_new_quote>quotation_email_email_customer_new_quote</customer_new_quote>
+            	<customer_new_quote_guest>quotation_email_email_customer_new_quote_guest</customer_new_quote_guest>
+            	<customer_quote_approved>quotation_email_email_customer_quote_approved</customer_quote_approved>
+            	<customer_quote_approved_guest>quotation_email_email_customer_quote_approved_guest</customer_quote_approved_guest>
+            	<customer_quote_cancelled>quotation_email_email_customer_quote_cancelled</customer_quote_cancelled>
+            	<customer_quote_cancelled_guest>quotation_email_email_customer_new_customer_quote_cancelled_guest</customer_quote_cancelled_guest>
+            	<customer_quote_held>quotation_email_email_customer_quote_held</customer_quote_held>
+            	<customer_quote_held_guest>quotation_email_email_customer_quote_held_guest</customer_quote_held_guest>
+            	<customer_quote_unheld>quotation_email_email_customer_quote_unheld</customer_quote_unheld>
+            	<customer_quote_unheld_guest>quotation_email_email_customer_quote_unheld_guest</customer_quote_unheld_guest>
+            	<customer_quote_rejected>quotation_email_email_customer_quote_rejected</customer_quote_rejected>
+            	<customer_quote_rejected_guest>quotation_email_email_customer_quote_rejected_guest</customer_quote_rejected_guest>
+            	<customer_quote_expired>quotation_email_email_customer_quote_expired</customer_quote_expired>
+            	<customer_quote_expired_guest>quotation_email_email_customer_quote_expired_guest</customer_quote_expired_guest>
+            	<customer_quote_reminder>quotation_email_email_customer_quote_reminder</customer_quote_reminder>
+            	<customer_quote_message>quotation_email_email_customer_quote_message</customer_quote_message>
+            	
+            	<admin_new_quote>quotation_email_email_admin_new_quote</admin_new_quote>
+            	<admin_quote_rejected>quotation_email_email_admin_quote_rejected</admin_quote_rejected>
+            	<admin_quote_ordered>quotation_email_email_admin_quote_ordered</admin_quote_ordered>
+            	<admin_quote_message>quotation_email_email_admin_quote_message</admin_quote_message>
+            </email>
+        </quotation>
+    </default>
+</config>

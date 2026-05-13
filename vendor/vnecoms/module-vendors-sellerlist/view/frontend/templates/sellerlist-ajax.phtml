@@ -1,0 +1,36 @@
+<?php
+   /** @var \Vnecoms\VendorsSellerList\Block\SellerList $block */
+
+   $sellerCollection = $block->getRegisteredSellerCollection();
+   $size =  sizeof($sellerCollection);
+?>
+<?php if ($size):?>
+        <?php foreach ($sellerCollection as $seller): ?>
+            <li class="item <?php echo $seller->getVendorId() ?>">
+                <div class="info seller-info">
+                    <div class="info-inner">
+                        <div class="seller-thumbnail-container">
+                            <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
+                                <img class="s-logo img-logo" src="<?php echo $block->getSellerImageUrl($seller) ?>" title="<?php echo "Go to ".$seller->getVendorId() ?>" alt="vendor-logo" />
+                            </a>
+                        </div>
+                        <div class="seller-details">
+                            <?php $sellerName = $seller->getVendorTitle();?>
+                            <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
+                                <strong class="s-name"><?php echo (!empty($sellerName) ? $sellerName : $seller->getVendorId()); ?></strong>
+                            </a>
+                        </div>
+                        <div class="clearer additional-data">
+                            <?php echo $block->getReviewSellerHtml($seller) ?>
+                            <div class="additional-data-bottom">
+                                <?php echo $block->getChildHtml('seller_info_before');?>
+                                <div class="total-items-count"><?php echo __("%1 product(s)",$block->getProductCount($seller))?></div>
+                                <div class="seller-items-link"><a href="<?php echo $block->getSellerItemsUrl($seller) ?>"><?php echo __('View Collection') ?></a></div>
+                                <?php echo $block->getChildHtml('seller_info_after');?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        <?php endforeach;  ?>
+<?php endif;?>

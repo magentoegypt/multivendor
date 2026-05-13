@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout">
+            <group id="design">
+                <group id="layout">
+                    <field id="delivery_builder_template" type="text" sortOrder="5" showInDefault="1" showInWebsite="1"
+                           showInStore="1">
+                        <frontend_model>Amasty\CheckoutDeliveryDate\Block\Config\DDLayoutBuilder</frontend_model>
+                    </field>
+                </group>
+            </group>
+            <group id="delivery_date" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Delivery Date</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="date_required" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Delivery Date Field is Mandatory</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="available_days" translate="label comment" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Available Days</label>
+                    <source_model>Magento\Config\Model\Config\Source\Locale\Weekdays</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="available_hours" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Available Hours</label>
+                    <comment><![CDATA[Please specify the timeframe available for delivery. Example: 8-12, 14-18, 20-24<br/>
+                    Use <a target="_blank" href="https://amasty.com/delivery-date-for-magento-2.html?utm_source=extension&utm_medium=link&utm_campaign=osc-delivery-date-m2">Amasty Delivery Date</a> to limit or restrict delivery for the same or next day the order was placed.]]></comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="delivery_comment_enable" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Delivery Comment</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="delivery_comment_default" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Delivery Comment Default Text</label>
+                    <comment>Specify default text example for delivery comment.</comment>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

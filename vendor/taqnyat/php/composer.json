@@ -1,0 +1,29 @@
+{
+    "name": "taqnyat/php",
+    "type": "library",
+    "description": "A PHP wrapper for Taqnyat's API",
+    "keywords": ["taqnyat","taqnyat.sa","sms", "api", "php"],
+    "homepage": "https://taqnyat.sa/",
+    "minimum-stability":"dev",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Taqnyat",
+            "email": "dev@taqnyat.sa"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url":  "git://github.com/taqnyat/php/blob/master/TaqnyatSms.php"
+        }
+    ]
+    ,
+    "autoload": {
+        "files": ["TaqnyatSms.php"]
+    }
+
+}

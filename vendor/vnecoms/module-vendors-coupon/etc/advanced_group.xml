@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsGroup:etc/advanced_group.xsd">
+<advanced_group>
+	<group id="vendors_coupon" translate="label tooltip" type="text" sortOrder="60">
+		<label>Coupon Code</label>
+		<field id="manage_coupon" translate="label" type="select" sortOrder="10">
+			<label>Can Manage Coupon/Promotion</label>
+			<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+			<comment>If this option is set to Yes, Sellers in this group can generate coupon code to provide discount to customers.</comment>
+		</field>
+	</group>
+</advanced_group>
+</config>

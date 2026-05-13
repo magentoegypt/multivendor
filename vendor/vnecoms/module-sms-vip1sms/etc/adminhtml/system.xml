@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="vip1sms_username" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Vip1sms Username</label>
+	                    <config_path>vsms/settings/vip1sms_username</config_path>
+	                    <depends>
+	                        <field id="gateway">vip1sms</field>
+	                    </depends>
+	                </field>
+					<field id="vip1sms_password" translate="label tooltip" type="password" sortOrder="191" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Vip1sms password</label>
+	                    <config_path>vsms/settings/vip1sms_password</config_path>
+	                    <depends>
+	                        <field id="gateway">vip1sms</field>
+	                    </depends>
+	                </field>
+                    <field id="vip1sms_sender" translate="label tooltip" type="text" sortOrder="192" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Sender</label>
+                        <config_path>vsms/settings/vip1sms_sender</config_path>
+                        <depends>
+                            <field id="gateway">vip1sms</field>
+                        </depends>
+                    </field>
+                    <field id="vip1sms_unicode" translate="label tooltip" type="select" sortOrder="193" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Unicode Message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>vsms/settings/vip1sms_unicode</config_path>
+                        <depends>
+                            <field id="gateway">vip1sms</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

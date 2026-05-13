@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+        <css src="Vnecoms_VendorsPriceComparison::css/price-comparison.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <container name="product.pricecomparison.container" htmlTag="div" htmlClass="product price-comparison-container" after="product.info.media">
+                <block class="Vnecoms\VendorsPriceComparison\Block\Vendor" name="product.pricecomparison.list" template="product/view/price_comparison.phtml">
+                	<arguments>
+	                    <argument name="jsLayout" xsi:type="array">
+	                    	<item name="components" xsi:type="array">
+	                            <item name="vendor" xsi:type="array">
+	                            	<item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor</item>
+	                            	<item name="children" xsi:type="array">
+	                            		<item name="vendor_info" xsi:type="array">
+	                            			<item name="config" xsi:type="array">
+			                                 	<item name="title" xsi:type="string" translate="true">Logo</item>
+			                                </item>
+	                                        <item name="sortOrder" xsi:type="string">10</item>
+	                                        <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor/info</item>
+	                                    </item>
+	                                    <item name="vendor_description" xsi:type="array">
+	                            			  <item name="config" xsi:type="array">
+			                                    <item name="title" xsi:type="string" translate="true">Seller's Description</item>
+			                                    <item name="template" xsi:type="string">Vnecoms_VendorsPriceComparison/vendor/description</item>
+			                                </item>
+	                                        <item name="sortOrder" xsi:type="string">20</item>
+	                                        <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor/info</item>
+                                            <item name="children" xsi:type="array">
+                                                <item name="product_price" xsi:type="array">
+                                                    <item name="config" xsi:type="array">
+                                                        <item name="title" xsi:type="string" translate="true">Price</item>
+                                                    </item>
+                                                    <item name="sortOrder" xsi:type="string">30</item>
+                                                    <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor/price</item>
+                                                </item>
+                                                <item name="add_to_cart" xsi:type="array">
+                                                    <item name="config" xsi:type="array">
+                                                        <item name="title" xsi:type="string"></item>
+                                                    </item>
+                                                    <item name="sortOrder" xsi:type="string">40</item>
+                                                    <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor/addtocart</item>
+                                                </item>
+                                            </item>
+	                                    </item>
+	                                    <item name="product_price" xsi:type="array">
+	                            			  <item name="config" xsi:type="array">
+			                                    <item name="title" xsi:type="string" translate="true">Price</item>
+			                                </item>
+	                                        <item name="sortOrder" xsi:type="string">30</item>
+	                                        <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor/price</item>
+	                                    </item>
+	                                    <item name="add_to_cart" xsi:type="array">
+			                            				<item name="config" xsi:type="array">
+					                                    <item name="title" xsi:type="string"></item>
+					                                </item>
+	                                        <item name="sortOrder" xsi:type="string">40</item>
+	                                        <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/vendor/addtocart</item>
+	                                    </item>
+	                            	</item>
+	                            </item>
+	                        </item>
+	                	</argument>
+	               	</arguments>
+                </block>
+            </container>
+		</referenceContainer>
+    </body>
+</page>

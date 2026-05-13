@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Amasty_CheckoutCore::vendor/tooltipster/css/tooltipster.min.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Amasty\CheckoutCore\Block\Onepage\CustomBlock\Block" name="top.custom_block" before="-">
+                <action method="setPosition">
+                    <argument name="position" xsi:type="string">top</argument>
+                </action>
+            </block>
+            <block class="Amasty\CheckoutCore\Block\Onepage\CustomBlock\Block" name="bottom.custom_block" after="-">
+                <action method="setPosition">
+                    <argument name="position" xsi:type="string">bottom</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="checkout.root">
+            <action method="setTemplate" ifconfig="amasty_checkout/general/enabled">
+                <argument name="setTemplate" xsi:type="string">Amasty_CheckoutCore::onepage.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="amcheckoutOnepageDataProvider" xsi:type="object">Amasty\CheckoutCore\ViewModel\OnepageDataProvider</argument>
+                <argument name="bundleService" xsi:type="object">Amasty\CheckoutCore\Model\Optimization\BundleService</argument>
+                <argument name="amcheckoutStyleSwitcher"
+                          xsi:type="object">Amasty\CheckoutCore\ViewModel\StyleSwitcherProvider</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="page.main.title" remove="true"/>
+    </body>
+</page>

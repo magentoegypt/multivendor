@@ -1,0 +1,13 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vendors" translate="label" type="text" sortOrder="1001" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="create_account" translate="label tooltip" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="default_require_attribute_values" translate="label" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Require Customer Attribute Values</label>
+                    <frontend_model>Vnecoms\VendorsCustomRegister\Block\Adminhtml\Form\Field\Attribute</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

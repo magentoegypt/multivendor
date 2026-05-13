@@ -1,0 +1,139 @@
+@font-face {
+    font-family: 'search-icons';
+    src: url('../fonts/Blank-Theme-Icons.eot'); /* IE9 Compat Modes */
+    src: url('../fonts/Blank-Theme-Icons.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('../fonts/Blank-Theme-Icons.woff2') format('woff2'), /* Super Modern Browsers */
+    url('../fonts/Blank-Theme-Icons.woff') format('woff'), /* Pretty Modern Browsers */
+    url('../fonts/Blank-Theme-Icons.ttf')  format('truetype'), /* Safari, Android, iOS */
+    url('../fonts/Blank-Theme-Icons.svg') format('svg'); /* Legacy iOS */
+}
+.vendor-nav-container {  position: relative;}
+
+.vendor-menu .block-search-by-vendor {margin:0; position:absolute; right:10px; top:10px;}
+.block-search-by-vendor .block-title {display: none;}
+.block-search-by-vendor .block-content {  margin-bottom: 0;  }
+.block-search-by-vendor .label {  text-decoration: none;  display: inline-block;  float: right;  }
+@media all and (min-width: 768px), print {
+    .block-search-by-vendor .label {
+        border: 0;
+        clip: rect(0, 0, 0, 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+    }
+}
+.block-search-by-vendor .control {border-top: 0;  margin: 0;  padding: 0; clear:both;}
+.block-search-by-vendor input {margin: 0;  padding-right: 35px;  float:right; width:250px;}
+.block-search-by-vendor .action.search {
+    display: inline-block;
+    background-image: none;
+    background: none;
+    -moz-box-sizing: content-box;
+    border: 0;
+    box-shadow: none;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    text-shadow: none;
+    font-weight: 400;
+    position: absolute;
+    right: 10px;
+    top: 0;
+    z-index: 1;
+}
+.block-search-by-vendor .action.search > span {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+.block-search-by-vendor .action.search:before {
+    -webkit-font-smoothing: antialiased;
+    font-size: 21px;
+    line-height: 31px;
+    color: #8f8f8f;
+    content: '\e615';
+    font-family: 'search-icons';
+    margin: 0;
+    opacity: .7;
+    vertical-align: top;
+    display: inline-block;
+    font-weight: normal;
+    overflow: hidden;
+    speak: none;
+    text-align: center;
+}
+.block-search-by-vendor .action.search:hover:before {
+    color: #333333;
+}
+.block-search-by-vendor .action.search:active:before {
+    color: inherit;
+}
+.block-search-by-vendor .action.search:focus,
+.block-search-by-vendor .action.search:active {
+    background: none;
+    border: none;
+}
+.block-search-by-vendor .action.search:hover {
+    background: none;
+    border: none;
+}
+.block-search-by-vendor .action.search.disabled,
+.block-search-by-vendor .action.search[disabled],
+fieldset[disabled] .block-search .action.search {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+}
+.block-search-by-vendor .action.search:focus:before {
+    color: #333333;
+}
+
+
+@media screen and (max-width: 850px) {
+  .vendor-menu .block-search-by-vendor{
+        display: none;
+  }
+    .block-search-by-vendor .label {display: none;}
+    .vendor-search-container .block-search-by-vendor {
+        box-sizing: border-box;
+        margin: 0 auto;
+        margin-bottom: 10px;
+        width: 100%;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .vendor-search-container .actions{/*position: absolute; right: 20px;*/}
+    .vendor-search-container {margin-bottom: 20px;}
+    .vendor-search-container:after{display: table; clear: both; content: "";}
+    .block-search-by-vendor input {width: 100%; }
+}
+@media screen and (min-width: 851px) {
+    .vendor-search-container {display: none;}
+}
+
+/** validate **/
+.minisearch-vendor {
+    position: relative;
+}
+.minisearch-vendor-input {
+    position: relative;
+    display: inline-block;
+
+}
+.minisearch-vendor__error {
+
+}
+
+.vendorspage-searchresult-index .vendor-search-container {display: block; margin-bottom: 10px;}
+.vendorspage-searchresult-index .vendor-search-container:after{display: table; content: ""; clear: both;}
+.vendorspage-searchresult-index .block-search-by-vendor input{float: none; padding-left: 25px; width: 100%;}
+.vendorspage-searchresult-index .block-search-by-vendor .action.search{left: 5px; right: auto;}

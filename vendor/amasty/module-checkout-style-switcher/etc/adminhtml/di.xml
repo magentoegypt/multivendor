@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Style Switcher for Magento 2 (System)
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Model\Adminhtml\BillingAddressDisplayOptions">
+        <plugin name="Amasty_CheckoutStyleSwitcher::addOption"
+                type="Amasty\CheckoutStyleSwitcher\Plugin\Checkout\Model\Admin\BillingAddressDisplayOptions\AddOption"/>
+    </type>
+</config>

@@ -1,0 +1,124 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+      vendorProducts(
+         filter: VendorProductFilterInput @doc(description: "Identifies which order attributes to search for and return."),
+         pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+         currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+         sort: VendorProductSortInput @doc(description: "Specifies which attributes to sort on, and whether to return the results in ascending or descending order.")
+      ): VendorProducts! @doc(description: "The list of vendor product.") @resolver(class: "Vnecoms\\VendorsProductGraphQl\\Model\\Resolver\\Product")
+}
+
+input VendorProductFilterInput @doc(description: "ProductFilterInput is deprecated, use @ProductAttributeFilterInput instead. ProductFilterInput defines the filters to be used in the search. A filter contains at least one attribute, a comparison operator, and the value that is being searched for.") {
+    entity_id: FilterTypeInput @doc(description: "The product id.")
+    name: FilterTypeInput @doc(description: "The product name")
+    sku: FilterTypeInput @doc(description: "The product sku")
+    price: FilterTypeInput @doc(description: "The price of an item.")
+    qty: FilterTypeInput @doc(description: "The qty of an item.")
+    type_id: FilterTypeInput @doc(description: "The type of an item.")
+    attribute_set_id: FilterTypeInput @doc(description: "The attribute set of an item.")
+    status: FilterTypeInput @doc(description: "The status of an item.")
+    visibility: FilterTypeInput @doc(description: "The visibility of an item.")
+    or: VendorProductFilterInput @doc(description: "The keyword required to perform a logical OR comparison.")
+}
+
+input VendorProductSortInput {
+    entity_id: SortEnum @doc(description: "sort by id")
+    name: FilterTypeInput @doc(description: "The product name")
+    sku: FilterTypeInput @doc(description: "The product sku")
+    price: FilterTypeInput @doc(description: "The price of an item.")
+    qty: FilterTypeInput @doc(description: "The qty of an item.")
+    created_at: SortEnum @deprecated(reason: "sort by created at")
+    updated_at: SortEnum @deprecated(reason: "sort by updated at")
+}
+
+type VendorProducts @doc(description: "The Products object is the top-level object returned in a product search.") {
+    items: [VendorProductInterface] @doc(description: "An array of products that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of products that are marked as visible. By default, in complex products, parent products are visible, but their child products are not.")
+}
+
+interface VendorProductInterface @typeResolver(class: "Vnecoms\\VendorsProductGraphQl\\Model\\ProductInterfaceTypeResolverComposite") @doc(description: "The ProductInterface contains attributes that are common to all types of products. Note that descriptions may not be available for custom and EAV attributes.") {
+    entity_id: Int @doc(description: "The ID number assigned to the product.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\EntityIdToId")
+    name: String @doc(description: "The product name. Customers use this name to identify the product.")
+    sku: String @doc(description: "A number or code assigned to a product to identify the product, options, price, and manufacturer.")
+    description: ComplexTextValue @doc(description: "Detailed information about the product. The value can include simple HTML tags.") @resolver(class: "\\Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\ProductComplexTextAttribute")
+    short_description: ComplexTextValue @doc(description: "A short description of the product. Its use depends on the theme.") @resolver(class: "\\Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\ProductComplexTextAttribute")
+    special_price: Float @doc(description: "The discounted price of the product.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\SpecialPrice")
+    special_from_date: String @doc(description: "The beginning date that a product has a special price.")
+    special_to_date: String @doc(description: "The end date that a product has a special price.")
+    attribute_set_id: Int @doc(description: "The attribute set assigned to the product.")
+    meta_title: String @doc(description: "A string that is displayed in the title bar and tab of the browser and in search results lists.")
+    meta_keyword: String @doc(description: "A comma-separated list of keywords that are visible only to search engines.")
+    meta_description: String @doc(description: "A brief overview of the product for search results listings, maximum 255 characters.")
+    image: ProductImage @doc(description: "The relative path to the main image on the product page.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\ProductImage")
+    small_image: ProductImage @doc(description: "The relative path to the small image, which is used on catalog pages.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\ProductImage")
+    thumbnail: ProductImage @doc(description: "The relative path to the product's thumbnail image.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\ProductImage")
+    new_from_date: String @doc(description: "The beginning date for new product listings, and determines if the product is featured as a new product.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\NewFromTo")
+    new_to_date: String @doc(description: "The end date for new product listings.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\NewFromTo")
+    tier_price: Float @deprecated(reason: "Use price_tiers for product tier price information.") @doc(description: "The price when tier pricing is in effect and the items purchased threshold has been reached.")
+    options_container: String @doc(description: "If the product has multiple options, determines where they appear on the product page.")
+    created_at: String @doc(description: "Timestamp indicating when the product was created.")
+    updated_at: String @doc(description: "Timestamp indicating when the product was updated.")
+    country_of_manufacture: String @doc(description: "The product's country of origin.")
+    status: Int @doc(description: "The product's status.")
+    visibility: Int @doc(description: "The product's visibility.")
+    qty: Int @doc(description: "The product's qty.")
+    approval: Int @doc(description: "The product's approval.")
+    type_id: String @doc(description: "One of simple, virtual, bundle, downloadable, grouped, or configurable.") @deprecated(reason: "Use __typename instead.")
+    websites: [Website] @doc(description: "An array of websites in which the product is available.") @deprecated(reason: "The field should not be used on the storefront.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\Websites")
+    product_links: [ProductLinksInterface] @doc(description: "An array of ProductLinks objects.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\BatchProductLinks")
+    media_gallery_entries: [MediaGalleryEntry] @deprecated(reason: "Use product's `media_gallery` instead") @doc(description: "An array of MediaGalleryEntry objects.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\MediaGalleryEntries")
+    price: ProductPrices @deprecated(reason: "Use price_range for product price information.") @doc(description: "A ProductPrices object, indicating the price of an item.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\Price")
+    price_range: PriceRange! @doc(description: "A PriceRange object, indicating the range of prices for the product") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\PriceRange")
+    gift_message_available: String @doc(description: "Indicates whether a gift message is available.")
+    manufacturer: Int @doc(description: "A number representing the product's manufacturer.")
+    categories: [CategoryInterface] @doc(description: "The categories assigned to a product.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Categories") @cache(cacheIdentity: "Magento\\CatalogGraphQl\\Model\\Resolver\\Category\\CategoriesIdentity")
+    canonical_url: String @doc(description: "Relative canonical URL. This value is returned only if the system setting 'Use Canonical Link Meta Tag For Products' is enabled") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\CanonicalUrl")
+    media_gallery: [MediaGalleryInterface] @doc(description: "An array of Media Gallery objects.") @resolver(class: "Magento\\CatalogGraphQl\\Model\\Resolver\\Product\\MediaGallery")
+}
+
+type VendorVirtualProduct implements VendorProductInterface, CustomizableProductInterface @doc(description: "A virtual product is non-tangible product that does not require shipping and is not kept in inventory.") {
+}
+
+type VendorSimpleProduct implements VendorProductInterface, VendorPhysicalProductInterface, CustomizableProductInterface @doc(description: "A simple product is tangible and are usually sold as single units or in fixed quantities.")
+{
+}
+
+type VendorConfigurableProduct implements VendorProductInterface, VendorPhysicalProductInterface, CustomizableProductInterface @doc(description: "ConfigurableProduct defines basic features of a configurable product and its simple product variants") {
+    variants: [ConfigurableVariant] @doc(description: "An array of variants of products") @resolver(class: "Magento\\ConfigurableProductGraphQl\\Model\\Resolver\\ConfigurableVariant")
+    configurable_options: [ConfigurableProductOptions] @doc(description: "An array of linked simple product items") @resolver(class: "Magento\\ConfigurableProductGraphQl\\Model\\Resolver\\Options")
+}
+
+type VendorDownloadableProduct implements VendorProductInterface, CustomizableProductInterface @doc(description: "DownloadableProduct defines a product that the customer downloads") {
+    downloadable_product_samples: [DownloadableProductSamples] @resolver(class: "Magento\\DownloadableGraphQl\\Resolver\\Product\\Samples") @doc(description: "An array containing information about samples of this downloadable product.")
+    downloadable_product_links: [DownloadableProductLinks] @resolver(class: "Magento\\DownloadableGraphQl\\Resolver\\Product\\Links") @doc(description: "An array containing information about the links for this downloadable product")
+    links_purchased_separately: Int @doc(description: "A value of 1 indicates that each link in the array must be purchased separately")
+    links_title: String @doc(description: "The heading above the list of downloadable products")
+}
+
+type VendorGroupedProduct implements VendorProductInterface, VendorPhysicalProductInterface @doc(description: "GroupedProduct defines a grouped product") {
+    items: [GroupedProductItem] @doc(description: "An array containing grouped product items") @resolver(class: "Magento\\GroupedProductGraphQl\\Model\\Resolver\\GroupedItems")
+}
+
+type VendorBundleProduct implements VendorProductInterface, VendorPhysicalProductInterface, CustomizableProductInterface @doc(description: "BundleProduct defines basic features of a bundle product and contains multiple BundleItems.") {
+    price_view: PriceViewEnum @doc(description: "One of PRICE_RANGE or AS_LOW_AS.") @resolver(class: "Magento\\BundleGraphQl\\Model\\Resolver\\Product\\Fields\\PriceView")
+    dynamic_price: Boolean @doc(description: "Indicates whether the bundle product has a dynamic price.") @resolver(class: "Magento\\BundleGraphQl\\Model\\Resolver\\Product\\Fields\\DynamicPrice")
+    dynamic_sku: Boolean @doc(description: "Indicates whether the bundle product has a dynamic SK.") @resolver(class: "Magento\\BundleGraphQl\\Model\\Resolver\\Product\\Fields\\DynamicSku")
+    ship_bundle_items: ShipBundleItemsEnum @doc(description: "Indicates whether to ship bundle items together or individually.") @resolver(class: "Magento\\BundleGraphQl\\Model\\Resolver\\Product\\Fields\\ShipBundleItems")
+    dynamic_weight: Boolean @doc(description: "Indicates whether the bundle product has a dynamically calculated weight.") @resolver(class: "Magento\\BundleGraphQl\\Model\\Resolver\\Product\\Fields\\DynamicWeight")
+    items: [BundleItem] @doc(description: "An array containing information about individual bundle items.") @resolver(class: "Magento\\BundleGraphQl\\Model\\Resolver\\BundleItems")
+}
+
+interface VendorPhysicalProductInterface @typeResolver(class: "Vnecoms\\VendorsProductGraphQl\\Model\\ProductInterfaceTypeResolverComposite") @doc(description: "PhysicalProductInterface contains attributes specific to tangible products.") {
+    weight: Float @doc(description: "The weight of the item, in units defined by the store.")
+}
+
+input ProductAttributeFilterInput {
+    vendor_id:  FilterEqualTypeInput @doc(description: "Vendor Id")
+}
+
+input ProductFilterInput {
+    vendor_id:  FilterEqualTypeInput @doc(description: "Vendor Id")
+}

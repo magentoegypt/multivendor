@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_withdrawal" resource="default" engine="innodb" comment="Vendor Withdrawal">
+        <column xsi:type="int" name="withdrawal_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+        <column xsi:type="varchar" name="method" nullable="false" length="255" comment="Method"/>
+        <column xsi:type="varchar" name="method_title" nullable="false" length="255" comment="Method Title"/>
+
+        <column xsi:type="decimal" name="amount" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Amount"/>
+
+        <column xsi:type="decimal" name="fee" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Fee"/>
+
+        <column xsi:type="decimal" name="net_amount" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Net Amount"/>
+        <column xsi:type="text" name="additional_info" nullable="true" comment="Additional Info"/>
+        <column xsi:type="text" name="note" nullable="true" comment="Note"/>
+        <column xsi:type="text" name="reason_cancel" nullable="true" comment="Reason"/>
+        <column xsi:type="text" name="code_of_transfer" nullable="true" comment="Code of Transfer"/>
+
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Status"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_VENDOR_ID"
+                    table="ves_vendor_withdrawal" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="withdrawal_id"/>
+        </constraint>
+
+    </table>
+
+    <table name="ves_vendor_escrow" resource="default" engine="innodb" comment="Store Credit Transaction Table">
+        <column xsi:type="int" name="escrow_id" unsigned="true" nullable="false" identity="true"
+                comment="Transaction Id"/>
+
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+
+        <column xsi:type="int" name="relation_id" unsigned="true" nullable="false" identity="false"
+                comment="Invoice ID"/>
+
+        <column xsi:type="decimal" name="amount" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Amount"/>
+
+        <column xsi:type="text" name="additional_info" nullable="true" comment="Additional Info"/>
+
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Status"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_VENDOR_ID"
+                    table="ves_vendor_withdrawal" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="escrow_id"/>
+        </constraint>
+
+    </table>
+
+    <table name="sales_invoice_item">
+        <column xsi:type="decimal" name="commission" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Commission"/>
+        <column xsi:type="text" name="commission_description" nullable="true" comment="Commission description"/>
+    </table>
+
+    <table name="ves_vendor_sales_order">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+        <column xsi:type="decimal" name="credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+    </table>
+
+    <table name="ves_vendor_sales_invoice">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+
+
+</schema>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+        <css src="Vnecoms_VendorsCoupon::css/coupon.css" />
+    </head>
+    <body>
+    	<referenceBlock name="checkout.cart.coupon">
+    		<action method="setTemplate">
+    			<argument name="template" xsi:type="string">Vnecoms_VendorsCoupon::cart/coupon.phtml</argument>
+    		</action>
+    		<block class="Vnecoms\VendorsCoupon\Block\Cart\Coupon\Detail" name="checkout.cart.coupon.detail" as="coupon_detail" template="cart/coupon/detail.phtml"/>
+    	</referenceBlock>
+    	
+        <referenceBlock name="checkout.cart.totals">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="block-totals" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="before_grandtotal" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="discount" xsi:type="array">
+                                            <item name="component"  xsi:type="string">Vnecoms_VendorsCoupon/js/view/cart/totals/discount</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

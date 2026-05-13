@@ -1,0 +1,20 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div
+        class="data-grid-cell-content"
+        data-bind="
+    	text: $col.getLabel($row()),
+    	css:$col.getStyleClass($row())">
+</div>
+
+<div
+        class="data-grid-cell-content"
+        data-bind="
+    	css:$col.getStyleClass($row())">
+    <img attr="src:$col.getFlag($row()),css:$col.getFlagClass($row())" />
+    <div data-bind="text: $col.getCountry($row())"></div>
+</div>

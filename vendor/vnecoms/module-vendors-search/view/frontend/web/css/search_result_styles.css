@@ -1,0 +1,29 @@
+.vendorspage-searchresult-index .search-label {display: none;}
+.form.minisearch-vendor {margin-bottom: 5px;}
+.minisearch-vendor #vendor-search{
+    position: relative;
+    min-width: 200px;
+}
+#search_by_vendor_form {display: table;border-spacing: 5px;}
+#search_by_vendor_form .actions {display: table-cell;}
+.minisearch-vendor button.search {
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    box-shadow: none;
+    color: #ffffff;
+    vertical-align: inherit;
+}
+
+.minisearch-vendor button.search:hover {
+    background: #006bb4;
+    border: 1px solid #006bb4;
+}
+
+
+@media screen and (max-width: 641px) {
+    #search_by_vendor_form {display: block}
+    .minisearch-vendor #vendor-search{
+        width: 100%;
+    }
+    #search_by_vendor_form .actions {}
+}

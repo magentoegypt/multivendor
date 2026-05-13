@@ -1,0 +1,89 @@
+@font-face {
+    font-family: 'rma';
+    src:    url('../fonts/rma.eot?uqpbf5');
+    src:    url('../fonts/rma.eot?uqpbf5#iefix') format('embedded-opentype'),
+    url('../fonts/rma.ttf?uqpbf5') format('truetype'),
+    url('../fonts/rma.woff?uqpbf5') format('woff'),
+    url('../fonts/rma.svg?uqpbf5#helpdesk') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.request-information .field.uploader{float: left;width: 100%}
+.request-information .file-uploader-summary{float: left;
+    padding-right: 10px;
+    width: 10%;
+    margin-top: 20px;
+}
+.admin__control-wysiwig{margin-bottom:10px;}
+.request-information .file-uploader{margin-top: 10px}
+.request-information .file-uploader-preview{background: #ffffff none repeat scroll 0 0;
+    border: 1px solid #cacaca;
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 150px;
+    line-height: 1;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    position: relative;
+    width: 150px;}
+.request-information .file-uploader .file-uploader-meta{display: none}
+.request-information .file-uploader .file-uploader-filename{display: none}
+.request-information .file-uploader-preview{height: 120px;width: 100%}
+.request-information .file-uploader-area > input{cursor: pointer;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0;}
+.request-information .file-uploader-preview .action-remove {
+    bottom: 4px;
+    cursor: pointer;
+    display: block;
+    left: 6px;
+    position: absolute;
+    text-decoration: none;
+    z-index: 2;
+}
+.request-information .file-uploader-preview .action-remove::before {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 1.6rem;
+    line-height: inherit;
+    color: #514943;
+    font-family: 'rma' !important;
+    content: "\f37f" !important;
+    vertical-align: middle;
+    display: inline-block;
+    font-weight: normal;
+    overflow: hidden;
+    speak: none;
+    text-align: center;
+}
+.request-information .file-uploader-preview .action-remove > span {
+    border: 0 none;
+    clip: rect(0px, 0px, 0px, 0px);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+.request-information .file-uploader .fa-file-pdf-o{color:red}
+.request-information .file-uploader .fa-file-text-o{color:black}
+.request-information .file-uploader .fa-file-archive-o{color:#4e0a83}
+.request-information .file-uploader .fa-file-word-o{color:#1a51b6}
+.request-information .file-uploader .fa-file-excel-o{color:#19b415}
+
+.request-information .file-uploader .icon-attachment{display: inline-block;font-size: 40px;padding-top: 28px;text-align: center;width: 100%;}
+.request-information .file-uploader-spinner {
+    background-image: url("../images/loader-1.gif");
+    background-position: 50% center;
+    background-repeat: no-repeat;
+    background-size: 15px auto;
+    display: none;
+    height: 30px;
+    margin-left: 1rem;
+    vertical-align: top;
+    width: 15px;
+}
+.request-information .file-uploader._loading .file-uploader-spinner{display: inline-block;}

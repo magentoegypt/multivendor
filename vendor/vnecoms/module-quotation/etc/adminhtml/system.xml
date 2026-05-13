@@ -1,0 +1,334 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+	<system>
+		<tab id="vnecoms" translate="label" sortOrder="10">
+			<label>VNECOMS</label>
+		</tab>
+		<section id="quotation" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+			<class>separator-top</class>
+			<label>Quotation</label>
+			<tab>vnecoms</tab>
+			<resource>Vnecoms_Quotation::config</resource>
+			<group id="frontend" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+				<label>Quote Frontend</label>
+				
+				<field id="login_require" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+					<label>Login Required</label>
+					<config_path>quotation/frontend/login_require</config_path>
+					<comment>Require customer to login to submit a quote</comment>
+				</field>
+				
+				<group id="form_config" translate="label tooltip" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Form Configuration</label>
+					<frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+					<field id="email" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Email Address</label>
+						<config_path>quotation/form_config/email</config_path>
+					</field>
+					<field id="firstname" translate="label" type="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>First Name</label>
+						<config_path>quotation/form_config/firstname</config_path>
+					</field>
+					<field id="lastname" translate="label" type="label" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Last Name</label>
+						<config_path>quotation/form_config/lastname</config_path>
+					</field>
+					<field id="telephone" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+						<source_model>Vnecoms\Quotation\Model\Source\FormConfig</source_model>
+						<label>Telephone</label>
+						<config_path>quotation/form_config/telephone</config_path>
+					</field>
+					<field id="company" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+						<source_model>Vnecoms\Quotation\Model\Source\FormConfig</source_model>
+						<label>Company</label>
+						<config_path>quotation/form_config/company</config_path>
+					</field>
+					<field id="taxid" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+						<source_model>Vnecoms\Quotation\Model\Source\FormConfig</source_model>
+						<label>VAT/Tax ID</label>
+						<config_path>quotation/form_config/taxid</config_path>
+					</field>
+				</group>
+				<group id="category_page" translate="label tooltip" type="label" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Category Page</label>
+					<frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+					<field id="container_selector" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Product List Selector</label>
+						<config_path>quotation/category_page/container_selector</config_path>
+					</field>
+					<field id="add_to_cart_btn_selector" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Add to Cart Button Selector</label>
+						<config_path>quotation/category_page/add_to_cart_btn_selector</config_path>
+					</field>
+				</group>
+			</group>
+			<group id="quote" translate="label tooltip" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+				<label>Quotation Configuration</label>
+				<group id="format" translate="label tooltip" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Quote ID Format</label>
+					<frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+					<field id="prefix" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+		            	<label>Prefix</label>
+		            	<config_path>quotation/format/prefix</config_path>
+		        	</field>
+		        	<field id="suffix" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+		            	<label>Suffix</label>
+		            	<config_path>quotation/format/suffix</config_path>
+		        	</field>
+		        	<field id="start_value" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+		            	<label>Start Counter From</label>
+		            	<frontend_class>required-entry validate-digits</frontend_class>
+		            	<config_path>quotation/format/start_value</config_path>
+		        	</field>
+		        	<field id="step" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+		            	<label>Counter Increment Step</label>
+		            	<frontend_class>required-entry validate-digits</frontend_class>
+		            	<config_path>quotation/format/step</config_path>
+		            	<comment>E.g. the last number is 00000010, if the increment is 5, the next number will be  00000015</comment>
+		        	</field>
+		        	<field id="number_length" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+		            	<label>Number Length</label>
+		            	<frontend_class>required-entry validate-digits</frontend_class>
+		            	<config_path>quotation/format/number_length</config_path>
+		            	<comment><![CDATA[Total number of digits in the order number. If counter value is 15 and Number Length is 9, the order number will be 000000015<br />Set to 0 (zero) if you don't want to add leading zeros to order number.]]></comment>
+		        	</field>
+		        	<field id="website_counter" translate="label" type="select" sortOrder="60" showInDefault="0" showInWebsite="1" showInStore="0">
+						<label>Use Separated Counter For This Website</label>
+						<config_path>quotation/format/website_counter</config_path>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+		        	</field>
+		        	<field id="store_counter" translate="label" type="select" sortOrder="70" showInDefault="0" showInWebsite="0" showInStore="1">
+						<label>Use Separated Counter For This Store</label>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<config_path>quotation/format/store_counter</config_path>
+		        	</field>
+		        	<field id="reset_counter" translate="label" type="checkbox" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Reset counter</label>
+						<frontend_model>Vnecoms\Quotation\Block\Adminhtml\System\Config\Form\Field\ResetCounter</frontend_model>
+						<backend_model>Vnecoms\Quotation\Model\Config\Backend\ResetCounter</backend_model>
+						<config_path>quotation/format/reset_counter</config_path>
+		        	</field>
+		        	<!-- <field id="auto_reset_counter" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="0" showInStore="0">
+	                    <label>Auto Reset Counter</label>
+	                    <source_model>Vnecoms\CustomOrderNumber\Model\Config\Source\Frequency</source_model>
+	                    <backend_model>Vnecoms\CustomOrderNumber\Model\Config\Backend\Counter</backend_model>
+	                    <config_path>quotation/format/auto_reset_counter</config_path>
+	                </field> -->
+		        	<comment><![CDATA[
+						<table cellspacing="0" class="form-list">
+						<tr id="row_customordernumber_order_prefix"><td class="label">Instruction</td>
+						<td class="value">
+		           			You can use these variables in <strong>Prefix</strong> and <strong>Suffix</strong>:<br />
+		           			<span style="display: inline-block; width: 50px;">{yyyy}</span>: A full numeric representation of a year, 4 digits<br />
+		           			<span style="display: inline-block; width: 50px;">{yy}</span>: A two digit representation of a year<br />
+		           			<span style="display: inline-block; width: 50px;">{mm}</span>: Numeric representation of a month, with leading zeros<br />
+		           			<span style="display: inline-block; width: 50px;">{m}</span>: Numeric representation of a month, without leading zeros<br />
+		           			<span style="display: inline-block; width: 50px;">{dd}</span>: Day of the month, 2 digits with leading zeros<br />
+		           			<span style="display: inline-block; width: 50px;">{d}</span>: Day of the month without leading zeros<br />
+	           			</td>
+	           			<td class=""></td>
+	           			</tr>
+	           			</table>
+	           		]]></comment>
+				</group>
+				<group id="quote_config_expiry_time" translate="label tooltip" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Expiration Times and Notifications</label>
+					<frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+					<field id="expiration_time" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Default Expiration Time</label>
+						<frontend_class>required-entry validate-number</frontend_class>
+						<config_path>quotation/time/expired</config_path>
+						<comment>days</comment>
+						<tooltip><![CDATA[The number of days it takes for a quote request to be expired.]]></tooltip>
+					</field>
+					<field id="reminder_notice" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Default Reminder Notice Time</label>
+						<config_path>quotation/time/reminder</config_path>
+						<frontend_class>required-entry validate-number</frontend_class>
+						<comment>In days. Set to "0" to disable this feature</comment>
+						<tooltip><![CDATA[This option determines after how many days a reminder will be send for a active quote.]]></tooltip>
+					</field>
+				</group>
+			</group>
+
+			<group id="message" translate="label tooltip" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+				<label>Message Configuration</label>
+				<field id="allow_customer_upload" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+					<label>Allow Customer Upload Files</label>
+					<config_path>quotation/message/allow_customer_upload</config_path>
+					<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+				</field>
+				<field id="allow_extensions" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+					<label>Allowed Extensions</label>
+					<config_path>quotation/message/allow_extensions</config_path>
+				</field>
+			</group>
+
+			<group id="email" translate="label tooltip" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+				<label>Notification Emails</label>
+				<!-- <field id="async_sending" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="1">
+					<label>Asynchronous sending</label>
+					<source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+					<backend_model>Magento\Sales\Model\Config\Backend\Email\AsyncSending</backend_model>
+				</field> -->
+				<field id="email_sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+					<label>Email Sender</label>
+					<config_path>quotation/email/email_sender</config_path>
+					<source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+				</field>
+				<group id="email_customer" translate="label tooltip" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Emails Send to Customer</label>
+					<frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+					<field id="new_quote" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>New Quote Confirmation Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This confirmation email will be sent to customer when he submits a new quote request.]]></tooltip>
+						<config_path>quotation/email/customer_new_quote</config_path>
+					</field>
+					<field id="new_quote_guest" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>New Quote Confirmation Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This confirmation email will be sent to guest when he create request quote.]]></tooltip>
+						<config_path>quotation/email/customer_new_quote_guest</config_path>
+					</field>
+					
+					<field id="quote_approved" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Approved Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when admin approves the quote.]]></tooltip>
+						<config_path>quotation/email/customer_quote_approved</config_path>
+					</field>
+					
+					<field id="quote_approved_guest" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Approved Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to guest when admin approves the quote.]]></tooltip>
+						<config_path>quotation/email/customer_quote_approved_guest</config_path>
+					</field>
+					
+					<field id="quote_cancelled" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Cancelled Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when his quote is cancelled.]]></tooltip>
+						<config_path>quotation/email/customer_quote_cancelled</config_path>
+					</field>
+					<field id="quote_cancelled_guest" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Cancelled Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to guest when his quote is cancelled.]]></tooltip>
+						<config_path>quotation/email/customer_quote_cancelled_guest</config_path>
+					</field>
+					
+					<field id="quote_held" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Held Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when his quote is held.]]></tooltip>
+						<config_path>quotation/email/customer_quote_held</config_path>
+					</field>
+					<field id="quote_held_guest" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Held Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to guest when his quote is held.]]></tooltip>
+						<config_path>quotation/email/customer_quote_held_guest</config_path>
+					</field>
+					
+					<field id="quote_unheld" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Unheld Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when his quote is unheld.]]></tooltip>
+						<config_path>quotation/email/customer_quote_unheld</config_path>
+					</field>
+					
+					<field id="quote_unheld_guest" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Unheld Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to guest when his quote is unheld.]]></tooltip>
+						<config_path>quotation/email/customer_quote_unheld_guest</config_path>
+					</field>
+
+					<field id="quote_rejected" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Rejected Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when his quote is rejected.]]></tooltip>
+						<config_path>quotation/email/customer_quote_rejected</config_path>
+					</field>
+					
+					<field id="quote_rejected_guest" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Rejected Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to guest when his quote is rejected.]]></tooltip>
+						<config_path>quotation/email/customer_quote_rejected_guest</config_path>
+					</field>
+					
+					<field id="quote_expired" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Expired Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when his quote is expired.]]></tooltip>
+						<config_path>quotation/email/customer_quote_expired</config_path>
+					</field>
+					
+					<field id="quote_expired_guest" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Expired Email Template for Guest</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to guest when his quote is expired.]]></tooltip>
+						<config_path>quotation/email/customer_quote_expired_guest</config_path>
+					</field>
+					
+					<field id="quote_reminder" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote Remider Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[Remind the customer to complete the quote.]]></tooltip>
+						<config_path>quotation/email/customer_quote_reminder</config_path>
+					</field>
+
+					<field id="quote_message" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote Message Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to customer when a message is sent to his quote.]]></tooltip>
+						<config_path>quotation/email/customer_quote_message</config_path>
+					</field>
+				</group>
+				<group id="email_admin" translate="label tooltip" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+					<label>Emails Send to Admin</label>
+					<frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+					<field id="emails" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Admin emails</label>
+						<comment><![CDATA[Comma-separated.]]></comment>
+						<config_path>quotation/email/admin_emails</config_path>
+					</field>
+					<field id="new_quote" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>New Quote Confirmation Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This confirmation email will be sent to admin when a new quote is submitted.]]></tooltip>
+						<config_path>quotation/email/admin_new_quote</config_path>
+					</field>
+					<field id="quote_rejected" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Rejected Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to admin when a quote is rejected by customer.]]></tooltip>
+						<config_path>quotation/email/admin_quote_rejected</config_path>
+					</field>
+					<!-- 
+					<field id="quote_ordered" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote is Ordered Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to admin when a quote is ordered.]]></tooltip>
+						<config_path>quotation/email/admin_quote_ordered</config_path>
+					</field>
+					 -->
+					<field id="quote_message" translate="label" type="select" sortOrder="160" showInDefault="1" showInWebsite="1" showInStore="1">
+						<label>Quote Message Email Template</label>
+						<source_model>Vnecoms\Quotation\Model\Config\Source\Email\Template</source_model>
+						<tooltip><![CDATA[This notification email will be sent to admin when a message is sent to a quote.]]></tooltip>
+						<config_path>quotation/email/admin_quote_message</config_path>
+					</field>
+				</group>
+			</group>
+		</section>
+	</system>
+</config>

@@ -1,0 +1,227 @@
+<?php $request = $block->getRequestRma() ?>
+<div class="request-information">
+    <div class="page-title">
+        <?php if($block->isCancelRma($request->getState())): ?>
+            <div class="action-request">
+                <a class="action primary right action-cancel" type="button" href="<?php echo $block->getUrl("vrma/customer/cancel",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                        <i class="fa fa-fw fa-times"></i>
+                        <span><?php echo __('Cancel')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+
+        <?php if($block->isPrintRma($request->getStatus())): ?>
+            <div class="action-request">
+                <a target="_blank" class="action primary action-normal" type="button" href="<?php echo $block->getUrl("vrma/customer/print",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                        <i class="fa fa-fw fa-print"></i>
+                        <span><?php echo __('Print RMA')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+
+        <?php if($block->isConfirmShip($request->getStatus())): ?>
+            <div class="action-request">
+                <a class="action primary right action-save" type="button" href="<?php echo $block->getUrl("vrma/customer/confirm",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                        <i class="fa fa-fw fa-check"></i>
+                        <span><?php echo __('Confirm Package Is Returning')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+        <div class="clear"></div>
+    </div>
+    <div class="group-select">
+        <!-- Common ticket info -->
+        <table width="100%">
+            <col width="50%"/>
+            <col width="50%"/>
+            <tbody>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Request Type :')?></span>
+                    <span class="<?php echo $block->getTypeClass() ?>"><?php echo $request->getTypeTitle(); ?></span>
+                </td>
+                <td>
+                    <span class="label"><?php echo __('Order ID :')?></span>
+                    <a href="<?php echo $block->getUrl("sales/order/view",array("order_id"=> $request->getOrderObject()->getId())) ?>" target="_blank"><?php echo "#".$request->getOrderIncrementalId() ?></a>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Create At :')?></span>
+                    <?php echo $block->getFormatDateHtml($request->getCreatedAt()) ?>
+                </td>
+                <td>
+                    <span class="label"><?php echo __('Reason :') ?></span>
+                    <?php echo $request->getReasonTitle(); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Package Opened :')?></span>
+                    <?php echo $request->getPackageOpenedLabel(); ?>
+                </td>
+
+                <td>
+                    <span class="label"><?php echo __('Status :')?></span>
+                    <span class="<?php echo $block->getStatusClass() ?>"><?php echo $request->getStatusTitle(); ?></span>
+                </td>
+            </tr>
+
+            <?php if($request->getWhoPayForShip() || $request->getData("tracking_code")): ?>
+                <tr>
+                    <?php if($request->getWhoPayForShip()): ?>
+                    <td>
+                        <span class="label"><?php echo __('Who pay for ship:')?></span>
+                        <?php echo $request->getWhoPayForShip(); ?>
+                    </td>
+                    <?php endif ?>
+                    <?php if($request->getData("tracking_code")): ?>
+                    <td>
+                        <span class="label"><?php echo __('Tracking Number:')?></span>
+                        <?php echo $request->getData("tracking_code"); ?>
+                    </td>
+                    <?php endif ?>
+                </tr>
+            <?php endif ?>
+            </tbody>
+        </table>
+    </div>
+    <?php $status = $request->getStatusObject()->getCode(); ?>
+    <?php if($block->getShowReturnInstructions()==1 && $status == 'approval' ):?>
+        <div class="rma-show-guide">
+            <h2 class="legend"><?php echo __('Send with the return instructions'); ?></h2>
+            <div class="page-content">
+                <?php
+                    echo $block->getChildHtml('return_instructions') ?>
+            </div>
+        </div>
+    <?php endif;?>
+
+    <div id="rma-view-tabs">
+        <ul>
+            <li><a href="#message-rma"><?php echo __("RMA Comments") ?></a></li>
+            <li><a href="#item-rma"><?php echo __("RMA Items") ?></a></li>
+        </ul>
+        <div id="message-rma">
+            <?php echo $block->getChildHtml('message')?>
+            <?php if($block->isReplyRma($request->getState())): ?>
+            <?php echo $block->getChildHtml('form-reply')?>
+            <?php endif ?>
+        </div>
+        <div id="item-rma">
+            <?php echo $block->getChildHtml('rma_items')?>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+        <div class="back">
+            <a href="<?php echo $block->getUrl('*/*/index');?>" class="left">
+                <?php echo __('&laquo;Back to My Rma')?>
+            </a>
+        </div>
+</div>
+
+<script type="text/javascript">
+    require([
+        'prototype',
+        'Vnecoms_RMA/js/rma'
+    ], function(){
+        var vnecomsRmaFormAdvice = new VnecomsRmaFormAdvice();
+        $$('td.item-qty .edit-field').each(function(div){
+            div.observe('click',function(){
+                //this.hide();
+                this.parentNode.select('.edit-field').first().hide();
+                this.parentNode.select('.edit-box').first().show();
+                this.parentNode.select('.edit-box').first().addClassName('active');
+                this.parentNode.select('div.value').first().hide();
+            });
+
+        });
+        $$('td.item-qty').each(function(td){
+            if(td.select('a.rule-param-apply') == false) return;
+            td.select('a.rule-param-apply').first().observe('click',function(){
+                td.select('div.value').first().show();
+                td.select('.edit-box').first().hide();
+                td.select('.edit-field').first().show();
+                if (td.select('div.validation-advice').length) td.select('div.validation-advice').first().hide();
+                var node=this.getAttribute('rel');
+                var select= $(node).getAttribute('default');
+                if(select){
+                    $$('#'+node+' option').each(function(o) {
+                        if(o.readAttribute('value') == select) {
+                            o.selected = true;
+                            throw $break;
+                        }
+                    });
+                }
+                else{
+                    $(node).value = $(node).defaultValue;
+                }
+            });
+            td.select('a.rule-chooser-trigger').first().observe('click',function(){
+                var node = this.getAttribute('rel');
+                var value = parseInt($(node).value);
+                var maxItem = $('order-item-count-'+node).value;
+                if (value != '') {
+                    if (!isNaN(value)) {
+                        if (value < 0) {
+                            vnecomsRmaFormAdvice.showAdvice(node, 'Quantity greater 0');
+                            return false;
+                        }
+                        if (value > maxItem) {
+                            vnecomsRmaFormAdvice.showAdvice(node, ' Quantity not greater ' + maxItem);
+                            return false;
+                        }
+                    } else {
+                        vnecomsRmaFormAdvice.showAdvice(node, 'Not a number');
+                        return false;
+                    }
+                }else {
+                    vnecomsRmaFormAdvice.showAdvice(node, 'Can\'t be empty');
+                    return false;
+                }
+                vnecomsRmaFormAdvice.removeAdvice(node);
+                var id= $("item-id-"+node).value;
+                new Ajax.Request('<?php echo $block->getUrl('vrma/customer/updateitem')?>', {
+                    method:'post',
+                    parameters:{
+                        id              : id,
+                        item_qty        : value,
+                        form_key        :"demoformkey"
+                    },
+                    onComplete: function (transport) {
+                        td.select('div.value').first().show();
+                        td.select('.edit-box').first().hide();
+                        td.select('.edit-field').first().show();
+                    },
+                    onSuccess: function(transport) {
+                        var data = transport.responseText.evalJSON();
+                        if(!data.error){
+                            $("value_item_"+node).update('<span>'+data.html+'</span>');
+                            $(node).setAttribute('default',value);
+                        }else{
+                            alert(data.message);
+                        }
+                    },
+                });
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    require([
+        'jquery',
+        'jquery/ui'
+    ], function($){
+        $("#rma-view-tabs").tabs();
+    });
+</script>
+
+

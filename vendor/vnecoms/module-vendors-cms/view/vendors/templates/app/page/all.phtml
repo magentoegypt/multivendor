@@ -1,0 +1,73 @@
+<div class="no-display all_pages group_container" id="all_pages_<%- data.id %>">
+    <input disabled="disabled" type="hidden" class="container_name" name="__[container_name]" value="app_instance[<%- data.id %>][all_pages]" />
+    <input disabled="disabled" type="hidden" name="app_instance[<%- data.id %>][all_pages][option_id]" value="<%- data.option_id %>" />
+    <input disabled="disabled" type="hidden" class="layout_handle_pattern" name="app_instance[<%- data.id %>][all_pages][layout_handle]" value="vendor_page" />
+    <input disabled="disabled" type="hidden" class="for_all" name="app_instance[<%- data.id %>][all_pages][page_for]" value="all" />
+    <table class="data-table">
+        <col width="200" />
+        <thead>
+        <tr>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Container')) ?> <span class="required">*</span></label></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>
+                <div class="block_reference_container">
+                    <div class="block_reference"></div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="no-display ignore-validate pages group_container" id="pages_<%- data.id %>">
+    <input disabled="disabled" type="hidden" class="container_name" name="__[container_name]" value="app_instance[<%- data.id %>][pages]" />
+    <input disabled="disabled" type="hidden" name="app_instance[<%- data.id %>][pages][option_id]" value="<%- data.option_id %>" />
+    <input disabled="disabled" type="hidden" class="for_all" name="app_instance[<%- data.id %>][pages][page_for]" value="all" />
+    <table class="data-table">
+        <col width="200" />
+        <thead>
+        <tr>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Page')) ?> <span class="required">*</span></label></th>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Container')) ?> <span class="required">*</span></label></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><?php /* @escapeNotVerified */ echo $block->getLayoutsChooser() ?></td>
+            <td>
+                <div class="block_reference_container">
+                    <div class="block_reference"></div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="no-display ignore-validate pages_layout group_container" id="pages_layout_<%- data.id %>">
+    <input disabled="disabled" type="hidden" class="container_name" name="__[container_name]" value="app_instance[<%- data.id %>][pages_layout]" />
+    <input disabled="disabled" type="hidden" name="app_instance[<%- data.id %>][pages_layout][option_id]" value="<%- data.option_id %>" />
+    <input disabled="disabled" type="hidden" class="for_all" name="app_instance[<%- data.id %>][pages_layout][page_for]" value="all" />
+    <table class="data-table">
+        <col width="200" />
+        <thead>
+        <tr>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Page Layout')) ?> <span class="required">*</span></label></th>
+            <th><label><?php /* @escapeNotVerified */ echo $block->escapeJsQuote(__('Container')) ?> <span class="required">*</span></label></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><?php /* @escapeNotVerified */ echo $block->getPageLayoutsChooser() ?></td>
+            <td>
+                <div class="block_reference_container">
+                    <div class="block_reference"></div>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

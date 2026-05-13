@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Catalog\Model\Layer">
+        <plugin name="addApprovalOnPrepareFrontCollection" type="Vnecoms\VendorsProduct\Model\Plugin\Layer"/>
+    </type>
+    <!-- <type name="Magento\Catalog\Model\Product">
+        <plugin name="getVendorModel" type="Vnecoms\VendorsProduct\Model\Plugin\Product" />
+    </type> -->
+
+    <!-- These attribute will not be removed from add product form -->
+    <type name="Vnecoms\VendorsProduct\Model\Entity\Product\Attribute\Group\AttributeMapper">
+        <arguments>
+            <argument name="unassignableAttributes" xsi:type="array">
+                <item name="name" xsi:type="string">name</item>
+                <item name="sku" xsi:type="string">sku</item>
+                <item name="price" xsi:type="string">price</item>
+                <item name="image" xsi:type="string">image</item>
+                <item name="quantity_and_stock_status" xsi:type="string">quantity_and_stock_status</item>
+                <item name="weight" xsi:type="string">weight</item>
+                <item name="category_ids" xsi:type="string">category_ids</item>
+                <item name="description" xsi:type="string">description</item>
+                <item name="status" xsi:type="string">status</item>
+                <item name="visibility" xsi:type="string">visibility</item>
+                <item name="gallery" xsi:type="string">gallery</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- These attributes will not be displayed/saved from vendor cpanel. -->
+    <type name="Vnecoms\VendorsProduct\Helper\Data">
+        <arguments>
+            <argument name="notAllowedProductAttributes" xsi:type="array">
+                <item name="vendor_id" xsi:type="string">vendor_id</item>
+                <item name="approval" xsi:type="string">approval</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Magento\Catalog\Model\ResourceModel\Layer\Filter\Price"
+                type="Vnecoms\VendorsProduct\Model\ResourceModel\Layer\Filter\Price"/>
+
+    <type name="Magento\CatalogSearch\Model\Adapter\Mysql\Aggregation\DataProvider">
+        <plugin name="categoryIdAggregation" disabled="true" />
+    </type>
+
+    <type name="Magento\CatalogSearch\Model\Adapter\Mysql\Aggregation\DataProvider">
+        <arguments>
+            <argument name="range" xsi:type="object">Magento\Catalog\Model\Layer\Filter\Price\Range\Proxy</argument>
+        </arguments>
+        <plugin name="categoryIdAggregationCustom" type="Vnecoms\VendorsProduct\Model\Plugin\Aggregation\Category\DataProvider" sortOrder="2" />
+    </type>
+
+    <type name="Vnecoms\VendorsProduct\Helper\Data">
+        <arguments>
+            <argument name="joinProductAttribute" xsi:type="array">
+                <item name="vendor_id" xsi:type="string">static</item>
+                <item name="approval" xsi:type="string">int</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Elasticsearch6\Model\Client\Elasticsearch">
+        <plugin name="vnecoms_customcollection_elastic_product_index" type="Vnecoms\VendorsProduct\Model\Plugin\ElasticLayerPlugin" />
+    </type>
+
+    <type name="Magento\Elasticsearch7\Model\Client\Elasticsearch">
+        <plugin name="vnecoms_customcollection_elastic_product_index" type="Vnecoms\VendorsProduct\Model\Plugin\ElasticLayerPlugin" />
+    </type>
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Attribute\Collection">
+        <plugin name="vnecoms_customcollection_elastic_product_attribute" type="Vnecoms\VendorsProduct\Model\Plugin\Attribute" />
+    </type>
+
+    <!-- These attributes will not use in update approval products. -->
+    <type name="Vnecoms\VendorsProduct\Helper\Data">
+        <arguments>
+            <argument name="ignoreUpdateApprovalProductAttributes" xsi:type="array">
+                <item name="affect_product_custom_options" xsi:type="string">affect_product_custom_options</item>
+                <item name="options" xsi:type="string">options</item>
+                <item name="shipping_product_rate" xsi:type="string">shipping_product_rate</item>
+                <item name="product_has_weight" xsi:type="string">product_has_weight</item>
+                <item name="image" xsi:type="string">image</item>
+                <item name="small_image" xsi:type="string">small_image</item>
+                <item name="thumbnail" xsi:type="string">thumbnail</item>
+                <item name="media_gallery" xsi:type="string">media_gallery</item>
+                <item name="gallery" xsi:type="string">gallery</item>
+                <item name="quantity_and_stock_status" xsi:type="string">quantity_and_stock_status</item>
+                <item name="credit_type" xsi:type="string">credit_type</item>
+                <item name="credit_value_fixed" xsi:type="string">credit_value_fixed</item>
+                <item name="credit_value_dropdown" xsi:type="string">credit_value_dropdown</item>
+                <item name="credit_value_custom" xsi:type="string">credit_value_custom</item>
+                <item name="credit_price" xsi:type="string">credit_price</item>
+                <item name="credit_rate" xsi:type="string">credit_rate</item>
+                <item name="vendor_membership_group_id" xsi:type="string">vendor_membership_group_id</item>
+                <item name="ves_category_ids" xsi:type="string">ves_category_ids</item>
+                <item name="vendor_membership_duration" xsi:type="string">vendor_membership_duration</item>
+                <item name="vendor_membership_feature" xsi:type="string">vendor_membership_feature</item>
+                <item name="vendor_membership_sort_order" xsi:type="string">vendor_membership_sort_order</item>
+                <item name="membership_related_group_id" xsi:type="string">membership_related_group_id</item>
+                <item name="membership_duration" xsi:type="string">membership_duration</item>
+                <item name="membership_feature" xsi:type="string">membership_feature</item>
+                <item name="membership_sort_order" xsi:type="string">membership_sort_order</item>
+                <item name="swatch_image" xsi:type="string">swatch_image</item>
+                <item name="vendor_id" xsi:type="string">vendor_id</item>
+                <item name="approval" xsi:type="string">approval</item>
+                <item name="url_key" xsi:type="string">url_key</item>
+            </argument>
+            <argument name="ignoreRestrictionProductAttributes" xsi:type="array">
+                <item name="affect_product_custom_options" xsi:type="string">affect_product_custom_options</item>
+                <item name="options" xsi:type="string">options</item>
+                <item name="shipping_product_rate" xsi:type="string">shipping_product_rate</item>
+                <item name="image" xsi:type="string">image</item>
+                <item name="small_image" xsi:type="string">small_image</item>
+                <item name="thumbnail" xsi:type="string">thumbnail</item>
+                <item name="media_gallery" xsi:type="string">media_gallery</item>
+                <item name="gallery" xsi:type="string">gallery</item>
+                <item name="credit_type" xsi:type="string">credit_type</item>
+                <item name="credit_value_fixed" xsi:type="string">credit_value_fixed</item>
+                <item name="credit_value_dropdown" xsi:type="string">credit_value_dropdown</item>
+                <item name="credit_value_custom" xsi:type="string">credit_value_custom</item>
+                <item name="credit_price" xsi:type="string">credit_price</item>
+                <item name="credit_rate" xsi:type="string">credit_rate</item>
+                <item name="vendor_membership_group_id" xsi:type="string">vendor_membership_group_id</item>
+                <item name="ves_category_ids" xsi:type="string">ves_category_ids</item>
+                <item name="vendor_membership_duration" xsi:type="string">vendor_membership_duration</item>
+                <item name="vendor_membership_feature" xsi:type="string">vendor_membership_feature</item>
+                <item name="vendor_membership_sort_order" xsi:type="string">vendor_membership_sort_order</item>
+                <item name="membership_related_group_id" xsi:type="string">membership_related_group_id</item>
+                <item name="membership_duration" xsi:type="string">membership_duration</item>
+                <item name="membership_feature" xsi:type="string">membership_feature</item>
+                <item name="membership_sort_order" xsi:type="string">membership_sort_order</item>
+                <item name="swatch_image" xsi:type="string">swatch_image</item>
+                <item name="vendor_id" xsi:type="string">vendor_id</item>
+                <item name="approval" xsi:type="string">approval</item>
+            </argument>
+            <argument name="additionElasticAttribute" xsi:type="array">
+                <item name="vendor_id" xsi:type="string">Vendor Id</item>
+                <item name="approval" xsi:type="string">Approval</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogInventory\Model\Quote\Item\QuantityValidator">
+        <plugin name="vnecoms_check_seller_disable" type="Vnecoms\VendorsProduct\Plugin\Quote\Item\QuantityValidator" />
+    </type>
+    <preference for="Magento\Catalog\Block\Product\ProductList\Related" type="Vnecoms\VendorsProduct\Block\Product\ProductList\Related" />
+    <preference for="Magento\Catalog\Block\Product\ProductList\Upsell" type="Vnecoms\VendorsProduct\Block\Product\ProductList\Upsell" />
+    <preference for="Magento\Catalog\Block\Product\ProductList\Crosssell" type="Vnecoms\VendorsProduct\Block\Product\ProductList\Crosssell" />
+</config>

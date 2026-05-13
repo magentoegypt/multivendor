@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Role -->
+    <route url="/V1/vendors/shipping/tablerate" method="POST">
+        <service class="Vnecoms\VendorsShippingTableRate\Api\TablerateRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/vendors/shipping/tablerate" method="GET">
+        <service class="Vnecoms\VendorsShippingTableRate\Api\TablerateRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/vendors/shipping/tablerate/:rateId" method="DELETE">
+        <service class="Vnecoms\VendorsShippingTableRate\Api\TablerateRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/vendors/shipping/tablerate/:rateId" method="GET">
+        <service class="Vnecoms\VendorsShippingTableRate\Api\TablerateRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+</routes>

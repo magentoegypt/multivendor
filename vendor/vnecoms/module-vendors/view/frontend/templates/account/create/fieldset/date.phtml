@@ -1,0 +1,35 @@
+<?php
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+
+$translatedCalendarConfigJson = $block->getTranslatedCalendarConfigJson();
+?>
+
+<div class="field field-<?php echo $block->getFieldId()?> date <?php if($block->isAttributeRequired()):?> required<?php endif;?>">
+    <label for="<?php echo $block->getFieldId()?>" class="label">
+        <span><?php echo $block->getStoreLabel()?></span>
+    </label>
+
+    <div class="control">
+        <?= $block->getFieldHtml() ?>
+    </div>
+
+</div>
+
+<?php $scriptString = <<<code
+
+require([
+    'jquery',
+    'jquery-ui-modules/datepicker'
+], function($){
+
+//<![CDATA[
+    $.extend(true, $, {
+        calendarConfig: {$translatedCalendarConfigJson}
+    });
+//]]>
+
+});
+code;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+

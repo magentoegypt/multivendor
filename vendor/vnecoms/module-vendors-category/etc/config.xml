@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <vendors>
+            <category>
+                <enabled>1</enabled>
+                <enabled_vendor_subcat>0</enabled_vendor_subcat>
+                <root>{name: "Root", category_id: 0, real_category_id: 0}</root>
+            </category>
+
+            <validate_url_key>
+                <category>
+                    <resource_model>Vnecoms\VendorsCategory\Model\ResourceModel\Category</resource_model>
+                    <vendor_field>vendor_id</vendor_field>
+                    <url_key_field>url_key</url_key_field>
+                </category>
+            </validate_url_key>
+        </vendors>
+
+        <vendor_advanced_group>
+            <vendors_category>
+                <can_use_category>1</can_use_category>
+            </vendors_category>
+        </vendor_advanced_group>
+    </default>
+</config>

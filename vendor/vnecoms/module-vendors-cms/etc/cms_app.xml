@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<apps xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsCms:etc/cms_app.xsd">
+    <app id="static_block" class="Vnecoms\VendorsCms\Block\App\StaticBlock"
+            placeholder_image="Magento_Cms::images/widget_block.png" color="#c9c9c9">
+        <label translate="true">Static Block</label>
+        <description translate="true">Contents of a Static Block</description>
+        <parameters>
+            <parameter name="block_id" xsi:type="block" visible="true" required="true" sort_order="20">
+                <label translate="true">Block</label>
+                <block class="Vnecoms\VendorsCms\Block\Vendors\Block\App\Chooser">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string" translate="true">Select Block...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+        </parameters>
+    </app>
+    <app id="products_list" class="Vnecoms\VendorsCms\Block\App\Product\ProductsList" is_email_compatible="true"
+            placeholder_image="Magento_CatalogWidget::images/products_list.png" ttl="86400">
+        <label translate="true">Catalog Products List</label>
+        <description translate="true">List of Products</description>
+        <parameters>
+            <parameter name="title" xsi:type="text" required="false" visible="true">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="show_pager" xsi:type="select" visible="true"
+                       source_model="Magento\Config\Model\Config\Source\Yesno">
+                <label translate="true">Display Page Control</label>
+            </parameter>
+            <parameter name="products_per_page" xsi:type="text" required="true" visible="true">
+                <label translate="true">Number of Products per Page</label>
+                <depends>
+                    <parameter name="show_pager" value="1" />
+                </depends>
+                <value>5</value>
+            </parameter>
+            <parameter name="products_count" xsi:type="text" required="true" visible="true">
+                <label translate="true">Number of Products to Display</label>
+                <value>10</value>
+            </parameter>
+            <parameter name="condition" xsi:type="conditions" visible="true" required="true" sort_order="10"
+                       class="Vnecoms\VendorsCms\Block\App\Conditions">
+                <label translate="true">Conditions</label>
+            </parameter>
+        </parameters>
+    </app>
+</apps>

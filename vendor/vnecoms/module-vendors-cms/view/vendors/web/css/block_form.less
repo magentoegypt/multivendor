@@ -1,0 +1,72 @@
+#buttonsblock_content {
+  margin: 10px 0;
+  button.plugin {margin-left: 8px;}
+  .action-add-image {
+    //margin-left: 8px;
+  }
+}
+
+//Add missing styles dialog popup
+.cms-block-edit {
+  /*.block-static-modals._show {
+    z-index: 1111 !important;
+  }*/
+  .modal-slide._show {
+    //z-index: 1031 !important; // Fix overlap header for current AdminLTE theme
+    .side-col {
+      float: left;
+      width: 20%;
+      padding-bottom: 0;
+    }
+    .side-col:after, .main-col:after {
+      display: none;
+    }
+    ul.insert-block {
+      list-style: none;
+    }
+    .main-col {
+      float: left;
+      width: 80%;
+      .insert-actions {
+        button#insert_files {
+          background-color: #00a65a;
+          border-color: #008d4c;
+          color: #ffffff;
+        }
+      }
+      .breadcrumbs {
+        list-style: none;
+        padding: 0px;
+        li {
+          display: inline-block;width: auto;
+          padding-right: 9px;
+        }
+      }
+      #content_header{
+        width: 100%; padding-bottom: 2rem;
+        margin: 0 0 2rem; min-height: 37px; border-bottom: 1px solid #adadad;
+        .insert-actions {float: right;}
+      }
+      #contents-uploader {
+        margin: 0 0 2rem; min-height: 37px;
+        .fileinput-button {
+          float: none;
+        }
+      }
+      #contents-uploader .fileinput-button span {
+        display: none;
+      }
+      #contents {
+        clear: both; width: 100%;
+        .filecnt {
+          border: 1px solid #adadad; display: inline-block;
+          margin: 0 1rem 1.5rem 0; padding: 0.5rem;
+          cursor: pointer; overflow: hidden; width: 120px;
+        }
+        .filecnt.selected {
+          border-color: #3c8dbc;
+        }
+      }
+    }
+  }
+}

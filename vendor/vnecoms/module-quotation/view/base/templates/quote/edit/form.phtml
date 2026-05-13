@@ -1,0 +1,31 @@
+<?php
+/**
+ * Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Form $block */
+?>
+<form id="edit_form" 
+data-quote-id="<?php echo $block->getQuote()->getId();?>"  
+data-quote-info-url="<?php echo $block->getUrl('quotation/quote/updateInfo')?>" 
+data-quote-config='<?php /* @escapeNotVerified */ echo $block->getQuoteDataJson() ?>' 
+data-load-base-url="<?php /* @escapeNotVerified */ echo $block->getLoadBlockUrl() ?>" 
+action="<?php /* @escapeNotVerified */ echo $block->getSaveUrl() ?>" 
+method="post" 
+enctype="multipart/form-data">
+    <?php echo $block->getBlockHtml('formkey')?>
+    <div id="quote-message">
+        <?php echo $block->getChildHtml('message') ?>
+    </div>
+    <div id="quote-customer-selector" class="fieldset-wrapper quote-customer-selector" style="display:<?php /* @escapeNotVerified */ echo $block->getCustomerSelectorDisplay() ?>">
+        <?php echo $block->getChildHtml('customer.grid.container') ?>
+    </div>
+    <div id="quote-store-selector" class="fieldset-wrapper" style="display:<?php /* @escapeNotVerified */ echo $block->getStoreSelectorDisplay() ?>">
+        <?php echo $block->getChildHtml('store') ?>
+    </div>
+    <div id="quote-data" style="display:<?php /* @escapeNotVerified */ echo $block->getDataSelectorDisplay() ?>">
+        <?php echo $block->getChildHtml('data') ?>
+    </div>
+</form>

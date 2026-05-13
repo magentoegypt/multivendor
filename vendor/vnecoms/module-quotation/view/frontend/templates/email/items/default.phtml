@@ -1,0 +1,66 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Vnecoms\Quotation\Block\Quotepage\Item\Renderer */
+
+$_item = $block->getItem();
+$product = $_item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+/** @var \Magento\Msrp\Helper\Data $helper */
+$helper = $this->helper('Magento\Msrp\Helper\Data');
+$canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinimalPriceLessMsrp($product);
+$_quote = $_item->getQuote();
+
+?>
+
+
+<tr>
+    <td class="name">
+        <p class="product-name"><?= $block->escapeHtml($block->getProductName()) ?></p>
+        <p class="sku"><?= /* @escapeNotVerified */  __('SKU') ?>: <?= $block->escapeHtml($_item->getSku()) ?></p>
+        <!-- option list-->
+        <?php if ($_options = $block->getOptionList()):?>
+            <dl class="item-options">
+                <?php foreach ($_options as $_option) : ?>
+                    <?php $_formatedOptionValue = $block->getFormatedOptionValue($_option) ?>
+                    <dt><?php echo $block->escapeHtml($_option['label']) ?></dt>
+                    <dd>
+                        <?php if (isset($_formatedOptionValue['full_view'])): ?>
+                            <?php /* @escapeNotVerified */ echo $_formatedOptionValue['full_view'] ?>
+                        <?php else: ?>
+                            <?php /* @escapeNotVerified */ echo $_formatedOptionValue['value'] ?>
+                        <?php endif; ?>
+                    </dd>
+                <?php endforeach; ?>
+            </dl>
+        <?php endif;?>
+        <?php if($_item->getComment()):?>
+        <div class="quote-item-comment">
+            <?php echo $_item->getComment() ?>
+        </div>
+        <?php endif;?>
+    </td>
+    
+    <td class="item-price">
+        <?php echo $_quote->formatPrice($_item->getOriginPrice());?>
+    </td>
+    
+    <td class="item-qty">
+        <?php foreach($_item->getProposalsCollection() as $_proposal):?>
+            <?php echo $_proposal->getQty() * 1;?><br />
+        <?php endforeach;?>
+    </td>
+    <td class="item-price">
+        <?php if($_quote->getStatus() < \Vnecoms\Quotation\Model\Quote::STATUS_SENT):?>
+            <?php echo __("in process ...")?>
+        <?php else:?>
+            <?php foreach($_item->getProposalsCollection() as $_proposal):?>
+                <?php echo $_quote->formatPrice($_proposal->getPrice());?><br />
+            <?php endforeach;?>
+        <?php endif;?>
+    </td>
+</tr>

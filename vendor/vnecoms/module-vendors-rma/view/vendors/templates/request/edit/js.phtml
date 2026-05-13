@@ -1,0 +1,201 @@
+<?php
+/**
+ * get Infomation from Block
+ */
+$request = $block->getRequestRma();
+?>
+
+<script type="text/javascript">
+
+    define("ves-js-tableft-rma",
+        [
+            "jquery",
+            "prototype",
+            'Vnecoms_RMA/js/rma'
+        ], function(Jquery){
+            var vnecomsRmaFormAdvice = new VnecomsRmaFormAdvice();
+            function isNumeric( obj ) {
+                return !Jquery.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+            }
+            /**
+             * process other attribite ticket
+             */
+            $$('.ticket_tabs li.apply-update .edit-field').each(function(div){
+                div.observe('click',function(){
+                    //this.hide();
+                    this.parentNode.select('.edit-field').first().hide()
+                    this.parentNode.select('.edit-box').first().show();
+                    this.parentNode.select('.edit-box').first().addClassName('active');
+                    this.parentNode.select('div.value').first().hide();
+                });
+
+            });
+            $$('.ticket_tabs li.apply-update').each(function(li){
+                li.select('a.rule-param-apply').first().observe('click',function(){
+                    li.select('div.value').first().show();
+                    li.select('.edit-box').first().hide();
+                    li.select('.edit-field').first().show();
+                    var node=this.getAttribute('rel');
+                    var select= $(node).getAttribute('default');
+                    if(select){
+                        $$('#'+node+' option').each(function(o) {
+                            if(o.readAttribute('value') == select) {
+                                o.selected = true;
+                                throw $break;
+                            }
+                        });
+                    }
+                    else{
+                        $(node).value=$(node).defaultValue;
+                    }
+                });
+
+                li.select('a.rule-chooser-trigger').first().observe('click',function(){
+                    var node=this.getAttribute('rel');
+                    var value = $(node).value;
+
+                    if($(node).hasClassName("required-entry") && value == ""){
+                        alert("<?php echo __("This is a required field.") ?>");
+                        return;
+                    }
+
+                    if($(node).hasClassName("validate-number") && !isNumeric(value)){
+                        alert("<?php echo __("Please enter a valid number in this field.") ?>");
+                        return;
+                    }
+
+                    if($(node).hasClassName("validate-max-value")){
+                        var max_amount_refund = $(node+"_max").value;
+                        if(parseFloat(value) > parseFloat(max_amount_refund)){
+                            alert("<?php echo __("Please enter a valid amount in this field. Max amount:") ?>"+max_amount_refund);
+                            return;
+                        }
+                    }
+
+                    var id=<?php echo $request->getId() ?>;
+                    new Ajax.Request('<?php echo $block->getUrl('vrma/request/update')?>', {
+                        method:'post',
+                        parameters:{node: node,id : id,value:value},
+                        onComplete: function (transport) {
+                            switch(node){
+                                default:
+                                    li.select('div.value').first().show();
+                                    li.select('.edit-box').first().hide();
+                                    li.select('.edit-field').first().show();
+                                    break;
+                            }
+                        },
+                        onSuccess: function(transport) {
+                            var response = transport;
+                            switch(node){
+                                case "refund_amount":
+                                    var data=transport.responseText.evalJSON();
+                                    Jquery("#refund_amount").val(data.amount);
+                                    $(node).setAttribute('default',value);
+                                    $("refund-amount-history").update(data.amount_list);
+                                    $("value_refund_amount").select(".amount-refund").first().innerHTML = data.amount_html;
+                                    break;
+                                default:
+                                    li.select('div.value').first().innerHTML='<span>'+response.responseText+'</span>';
+                                    $(node).setAttribute('default',value);
+                                    break;
+                            }
+                        },
+                    });
+
+                });
+            });
+
+
+
+            $$('td.item-qty .edit-field').each(function(div){
+                div.observe('click',function(){
+                    //this.hide();
+                    this.parentNode.select('.edit-field').first().hide();
+                    this.parentNode.select('.edit-box').first().show();
+                    this.parentNode.select('.edit-box').first().addClassName('active');
+                    this.parentNode.select('div.value').first().hide();
+                });
+
+            });
+            $$('td.item-qty').each(function(td){
+                if(td.select('a.rule-param-apply') == false) return;
+                td.select('a.rule-param-apply').first().observe('click',function(){
+                    td.select('div.value').first().show();
+                    td.select('.edit-box').first().hide();
+                    td.select('.edit-field').first().show();
+                    if (td.select('div.validation-advice').length) td.select('div.validation-advice').first().hide();
+                    var node=this.getAttribute('rel');
+                    var select= $(node).getAttribute('default');
+                    if(select){
+                        $$('#'+node+' option').each(function(o) {
+                            if(o.readAttribute('value') == select) {
+                                o.selected = true;
+                                throw $break;
+                            }
+                        });
+                    }
+                    else{
+                        $(node).value = $(node).defaultValue;
+                    }
+                });
+                td.select('a.rule-chooser-trigger').first().observe('click',function(){
+                    var node = this.getAttribute('rel');
+                    var value = parseInt($(node).value);
+                    var maxItem = $('order-item-count-'+node).value;
+                    if (value != '') {
+                        if (!isNaN(value)) {
+                            if (value < 0) {
+                                vnecomsRmaFormAdvice.showAdvice(node, 'Quantity greater 0');
+                                return false;
+                            }
+                            if (value > maxItem) {
+                                vnecomsRmaFormAdvice.showAdvice(node, ' Quantity not greater ' + maxItem);
+                                return false;
+                            }
+                        } else {
+                            vnecomsRmaFormAdvice.showAdvice(node, 'Not a number');
+                            return false;
+                        }
+                    }else {
+                        vnecomsRmaFormAdvice.showAdvice(node, 'Can\'t be empty');
+                        return false;
+                    }
+                    vnecomsRmaFormAdvice.removeAdvice(node);
+                    var id= $("item-id-"+node).value;
+                    new Ajax.Request('<?php echo $block->getUrl('vrma/request/updateitem')?>', {
+                        method:'post',
+                        parameters:{
+                            id              : id,
+                            item_qty        : value,
+                            form_key        :"demoformkey"
+                        },
+                        onComplete: function (transport) {
+                            td.select('div.value').first().show();
+                            td.select('.edit-box').first().hide();
+                            td.select('.edit-field').first().show();
+                        },
+                        onSuccess: function(transport) {
+                            var data = transport.responseText.evalJSON();
+                            if(!data.error){
+                                $("value_item_"+node).update('<span>'+data.html+'</span>');
+                                $(node).setAttribute('default',value);
+                            }else{
+                                alert(data.message);
+                            }
+                        },
+                    });
+                });
+            });
+            $$('.quote-message .do-action').each(function(div){
+                div.observe('click',function(e){
+                    Event.stop(e);
+                    e.stopPropagation();
+                });
+            });
+
+        });
+
+    require(["ves-js-tableft-rma","jquery/chonsen"]);
+
+</script>

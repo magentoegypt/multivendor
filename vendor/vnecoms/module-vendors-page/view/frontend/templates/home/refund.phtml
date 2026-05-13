@@ -1,0 +1,9 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Home\Refund
+ */
+?>
+<h3 id="vendor-refund" class="vendor-refund-title"><?php echo __("Refund Policy")?></h3>
+<?php echo ($block->getVendorRefund()?$block->getVendorRefund():__('Not available'))?>

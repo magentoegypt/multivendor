@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <update handle="vrma_guest_item_renderers"/>
+    <container name="root">
+        <block class="Vnecoms\RMA\Block\Frontend\Guest\NewRequest\Items" name="items" template="new_request/create/items.phtml" cacheable="false">
+            <block class="Magento\Framework\View\Element\RendererList" name="rma.request.item.renderers" as="renderer.list"/>
+        </block>
+        <block class="Magento\Framework\View\Element\Template" name="additional.product.info" template="Magento_Theme::template.phtml"/>
+    </container>
+</layout>
+
+

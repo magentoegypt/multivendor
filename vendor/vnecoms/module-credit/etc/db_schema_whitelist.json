@@ -1,0 +1,92 @@
+{
+    "ves_store_credit": {
+        "column": {
+            "entity_id": true,
+            "customer_id": true,
+            "credit": true
+        },
+        "constraint": {
+            "VES_STORE_CREDIT_CUSTOMER_ID": true,
+            "PRIMARY": true,
+            "VES_STORE_CREDIT_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true
+        }
+    },
+    "ves_store_credit_transaction": {
+        "column": {
+            "transaction_id": true,
+            "customer_id": true,
+            "type": true,
+            "amount": true,
+            "balance": true,
+            "description": true,
+            "additional_info": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_STORE_CREDIT_TRANSACTION_CSTR_ID_VES_STORE_CREDIT_CSTR_ID": true
+        }
+    },
+    "quote": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true
+        }
+    },
+    "quote_item": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true
+        }
+    },
+    "quote_address": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true,
+            "base_credit_refunded": true,
+            "credit_refunded": true
+        }
+    },
+    "sales_order_item": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true,
+            "base_credit_invoiced": true,
+            "credit_invoiced": true,
+            "base_credit_refunded": true,
+            "credit_refunded": true
+        }
+    },
+    "sales_invoice": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true
+        }
+    },
+    "sales_invoice_item": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true
+        }
+    },
+    "sales_creditmemo": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true,
+            "base_credit_refunded": true,
+            "credit_refunded": true
+        }
+    },
+    "sales_creditmemo_item": {
+        "column": {
+            "credit_amount": true,
+            "base_credit_amount": true
+        }
+    }
+}

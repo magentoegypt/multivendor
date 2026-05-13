@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<update handle="vendor_page" />
+	<update handle="vendor_left_navigation" />
+	<update handle="vendor_layer_navigation"/>
+	<body>
+		<referenceContainer name="content">
+			<block class="Vnecoms\VendorsPage\Block\Home\Refund" name="vendor.home.refund" template="Vnecoms_VendorsDomain::refund.phtml" />
+		</referenceContainer>
+	</body>
+</page>

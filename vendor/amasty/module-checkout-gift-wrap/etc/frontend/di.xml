@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<type name="Magento\Checkout\Block\Onepage">
+    <arguments>
+        <argument name="layoutProcessors" xsi:type="array">
+            <item name="amastyCheckoutGiftWrap" sortOrder="102" xsi:type="object">Amasty\CheckoutGiftWrap\Block\Onepage\GiftWrapProcessor</item>
+        </argument>
+    </arguments>
+</type>
+</config>

@@ -1,0 +1,23 @@
+{
+    "name": "vnecoms/module-vendors-config-approval",
+    "description": "Allow admin to set some vendor configs must to be approved before they are applied.",
+		"authors": [
+			{
+					"name": "VNECOMS",
+					"email": "support@vnecoms.com"
+			}
+		],
+		"require": {
+        "vnecoms/module-core": "2.4.*"
+    },
+    "type": "magento2-module",
+    "version": "2.4.5",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vnecoms\\VendorsConfigApproval\\": ""
+        }
+    }
+}

@@ -1,0 +1,118 @@
+<?php $_element = $block->getElement()?>
+<?php $subDomainValue = $_element->getValue() == 'sub_domain'?$block->getDomainObject()->getValue():'';?>
+<?php $domainValue = $_element->getValue() == 'domain'?$block->getDomainObject()->getValue():'';?>
+<?php $isSecureDomain = $block->getDomainObject()->getIsSecure()?>
+<ul class="vendor-domain-container">
+    <li class="item-sub_folder">
+        <input id="vendor-domain-subfolder" type="radio" name="groups[base_url][fields][url_type][value]" value="sub_folder"<?php if($_element->getValue() == 'sub_folder'):?> checked="checked"<?php endif;?>/>
+        <label for="vendor-domain-subfolder" class="vendor-domain-url"><?php echo $block->getHomeUrl()?></label>
+    </li>
+    <?php if($block->canUseSubDomain()):?>
+    <li class="item-sub_domain">
+        <input id="vendor-domain-subdomain" type="radio" name="groups[base_url][fields][url_type][value]" value="sub_domain"<?php if($_element->getValue() == 'sub_domain'):?> checked="checked"<?php endif;?>/>
+        <?php if($block->canChangeSubdomain()):?>
+            <label for="vendor-domain-subdomain"><span class="vendor-domain-url">http://</span> <input name="groups[base_url][fields][url_type][subdomain]" value="<?php echo $subDomainValue;?>" class="input-text admin__control-text" placeholder="<?php echo __("your-identifier");?>" type="text" style="width: 110px; display: inline;"/>.<?php echo $block->getMainDomain();?></label>
+        <?php else:?>
+            <label for="vendor-domain-subdomain"><span class="vendor-domain-url">http://</span><?php echo $block->getVendor()->getVendorId()?>.<?php echo $block->getMainDomain();?></label>
+        <?php endif;?>
+        <?php if($_element->getValue() == 'sub_domain'):?>
+            <small class="label <?php echo $block->getStatusClass($block->getDomainObject())?>"><?php echo $block->getStatusLabel($block->getDomainObject())?></small>
+            <?php if($block->getDomainObject()->getStatus() == \Vnecoms\VendorsDomain\Model\Domain::STATUS_PENDING):?>
+                <div class="alert alert-warning">
+                    <i class="icon fa fa-warning"></i> <?php echo __("We will check and add your domain as soon as possible.")?>
+                </div>
+            <?php endif;?>
+        <?php endif;?>
+    </li>
+    <?php endif;?>
+    <?php if($block->canUseDomain()):?>
+    <li class="item-domain">
+        <input id="vendor-domain-domain" type="radio" name="groups[base_url][fields][url_type][value]" value="domain"<?php if($_element->getValue() == 'domain'):?> checked="checked"<?php endif;?>/>
+        <label for="vendor-domain-domain"><span class="vendor-domain-url">http://</span> <input name="groups[base_url][fields][url_type][domain]" value="<?php echo $domainValue;?>" class="input-text admin__control-text" placeholder="<?php echo __("www.yourdomain.com");?>" type="text" style="width: 250px; display: inline;"/></label>
+        <?php if($_element->getValue() == 'domain'):?>
+            <small class="label <?php echo $block->getStatusClass($block->getDomainObject())?>"><?php echo $block->getStatusLabel($block->getDomainObject())?></small>
+            <?php if($block->getDomainObject()->getStatus() == \Vnecoms\VendorsDomain\Model\Domain::STATUS_PENDING):?>
+                <div class="alert alert-warning">
+                    <i class="icon fa fa-warning"></i> <?php echo __("We will check and setup your domain as soon as possible. Make sure you have changed DNS records of your domain to point to our server.")?>
+                </div>
+            <?php endif;?>
+            <?php if($block->getDnsInstruction()):?>
+                <div class="box collapsed-box">
+        			<div class="box-header with-border">
+        				<h3 class="box-title"><i class="fa fa-question-circle text-light-blue"></i> <?php echo __("How to change domain DNS?")?></h3>
+        				<div class="box-tools pull-right">
+		                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
+	                  	</div>
+       				</div>
+      				<div class="box-body">
+		        		<?php echo $block->getDnsInstruction();?>
+	                </div>
+                </div>
+            <?php endif;?>
+        <?php endif;?>
+    </li>
+    <li class="item-domain secure-domain-container">
+        <div class="admin__actions-switch secure-domain-switch">
+            <input class="admin__actions-switch-checkbox" id="vendor-domain-secure" name="groups[base_url][fields][url_type][secure]" value="1"<?php if($isSecureDomain):?> checked="checked"<?php endif;?> type="checkbox" />
+            <label class="admin__actions-switch-label" for="vendor-domain-secure">
+                <span class="admin__actions-switch-text" data-text-on="<?php echo __("Yes")?>" data-text-off="<?php echo __("No")?>"></span>
+            </label>
+        </div>
+        <label for="vendor-domain-secure" class="secure-domain-label"><?php echo __("Use Secure URLs")?></label>
+    </li>
+    <?php endif;?>
+</ul>
+
+
+<script>
+require([
+    'jquery',
+], function($){
+	function setRequiredElm(type){
+		$('.vendor-domain-container input[type="text"]').removeClass('required-entry');
+		$('.item-'+type).find('input[type="text"]').addClass('required-entry');;
+
+		if(type == 'sub_folder'){
+			$('.secure-domain-container').hide();
+		}else{
+			$('.secure-domain-container').show();
+		}
+	}
+	
+	$('.vendor-domain-container input[type="radio"]').change(function() {
+		setRequiredElm(this.value);
+	});
+
+	$('.vendor-domain-container input[type="text"]').click(function() {
+		$('.vendor-domain-container input[type="radio"]').each(function(){
+			this.checked = false;
+		});
+		var selectedRadio = $(this).parent().parent().find('input[type="radio"]').first();
+		selectedRadio.prop("checked", true);
+		setRequiredElm(selectedRadio.val());
+	});
+	
+	$('.vendor-domain-container input[type="radio"]').each(function(){
+		if(this.checked){
+			setRequiredElm(this.value);
+		}
+	});
+	
+    function updateScheme(isSecure){
+        var find = isSecure?"http://":"https://";
+        var replace = isSecure?"https://":"http://";
+    	$('.vendor-domain-url').each(function(index, elm){
+    		$(elm).html($(elm).html().replace(find,replace));
+    	});
+    }
+    
+	$('#vendor-domain-secure').change(function() {
+        if($(this).is(":checked")) {
+        	updateScheme(true);
+        }else{
+        	updateScheme(false);
+        }
+    });
+	updateScheme(<?php echo $isSecureDomain?"true":"false"?>);
+});
+</script>

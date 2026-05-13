@@ -1,0 +1,27 @@
+<?php
+$status=$block->getRequestStatusHistory();
+?>
+<?php if(count($status) >= 1): ?>
+    <table class="table-status-history">
+        <thead>
+        <tr>
+            <th><?php echo __('Date') ?></th>
+            <th><?php echo __('Change By') ?></th>
+            <th><?php echo __('Status') ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($status as $history):?>
+            <tr>
+                <td><?php echo $block->getFormatDateHtml($history->getData('created_time')) ?></td>
+                <td><?php echo $block->getPrefixChangeBy($history->getData('type')).' <strong>'.$history->getData('change_by').'</strong>'; ?></td>
+                <td><?php echo $block->getStatusTitle($history->getData('status')); ?></td>
+
+            </tr>
+        <?php endforeach;?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <span style="text-align:center;font-style:italic;display:block"><?php echo __('No status change history') ?></span>
+<?php endif; ?>
+

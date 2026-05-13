@@ -1,0 +1,110 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Vnecoms\Quotation\Block\Quotepage\Item\Renderer */
+
+$_item = $block->getItem();
+$product = $_item->getProduct();
+$isVisibleProduct = $product->isVisibleInSiteVisibility();
+/** @var \Magento\Msrp\Helper\Data $helper */
+$helper = $this->helper('Magento\Msrp\Helper\Data');
+$canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinimalPriceLessMsrp($product);
+$_quote = $_item->getQuote();
+?>
+
+<tbody class="cart item">
+    <tr class="item-info">
+        <td data-th="<?php echo $block->escapeHtml(__('Image')); ?>" class="image">
+            <?php echo $block->getImage($block->getProductForThumbnail(), 'quote_view_page_item_thumbnail')->toHtml(); ?>
+        </td>
+        <td data-th="<?php echo $block->escapeHtml(__('Item')); ?>" class="name">
+            <?php if ($block->hasProductUrl()):?>
+                <a href="<?php /* @escapeNotVerified */ echo $block->getProductUrl() ?>"
+                   title="<?php echo $block->escapeHtml($block->getProductName()) ?>"
+                   tabindex="-1"
+                   class="product-item-photo">
+            <?php else:?>
+                <span class="product-item-photo">
+            <?php endif;?>
+            <?php if ($block->hasProductUrl()):?>
+                </a>
+            <?php else: ?>
+                </span>
+            <?php endif; ?>
+            <div class="product-item-details">
+                <strong class="product-item-name">
+                    <?php if ($block->hasProductUrl()):?>
+                        <a href="<?php /* @escapeNotVerified */ echo $block->getProductUrl() ?>"><?php echo $block->escapeHtml($block->getProductName()) ?></a>
+                    <?php else: ?>
+                        <?php echo $block->escapeHtml($block->getProductName()) ?>
+                    <?php endif; ?>
+                </strong>
+                <!-- option list-->
+                <?php if ($_options = $block->getOptionList()):?>
+                    <dl class="item-options">
+                        <?php foreach ($_options as $_option) : ?>
+                            <?php $_formatedOptionValue = $block->getFormatedOptionValue($_option) ?>
+                            <dt><?php echo $block->escapeHtml($_option['label']) ?></dt>
+                            <dd>
+                                <?php if (isset($_formatedOptionValue['full_view'])): ?>
+                                    <?php /* @escapeNotVerified */ echo $_formatedOptionValue['full_view'] ?>
+                                <?php else: ?>
+                                    <?php /* @escapeNotVerified */ echo $_formatedOptionValue['value'] ?>
+                                <?php endif; ?>
+                            </dd>
+                        <?php endforeach; ?>
+                    </dl>
+                <?php endif;?>
+                <!--message list-->
+                <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+                <?php if ($addInfoBlock): ?>
+                    <?php echo $addInfoBlock->setItem($_item)->toHtml() ?>
+                <?php endif;?>
+                <?php if($_item->getComment()):?>
+                <div class="quote-item-comment">
+                    <?php echo $_item->getComment() ?>
+                </div>
+                <?php endif;?>
+            </div>
+        </td>
+
+
+        <td class="sku" data-th="<?php echo $block->escapeHtml(__('SKU')); ?>"><?php /* @escapeNotVerified */ echo $block->prepareSku($block->getSku()) ?></td>
+        <td class="price" data-th="<?php echo $block->escapeHtml(__('Price')); ?>">
+            <?php echo $block->getItemPriceHtml($_item) ?>
+        </td>
+        <td class="qty" data-th="<?php echo $block->escapeHtml(__('QTY')); ?>">
+            <?php if($_quote->getStatus() < \Vnecoms\Quotation\Model\Quote::STATUS_SENT):?>
+                <ul class="proposals-list">
+                    <li><?php echo $_item->getDefaultProposal()->getQty() * 1?></li>
+                </ul>
+            <?php else:?>
+                <ul class="proposals-list">
+                <?php foreach($_item->getProposalsCollection() as $_proposal):?>
+                    <li><label for="proposal_<?php echo $_proposal->getId()?>"><?php echo $_proposal->getQty() * 1;?></label></li>
+                <?php endforeach;?>
+                </ul>
+            <?php endif;?>
+        </td>
+        <td class="proposals" data-th="<?php echo $block->escapeHtml(__('Proposals')); ?>">
+            <?php if($_quote->getStatus() < \Vnecoms\Quotation\Model\Quote::STATUS_SENT):?>
+                <ul class="proposals-list">
+                    <li><?php echo __("in process ...")?></li>
+                </ul>
+            <?php else:?>
+                <?php $disabled = $_quote->getStatus() != \Vnecoms\Quotation\Model\Quote::STATUS_SENT?>
+                <ul class="proposals-list">
+                <?php foreach($_item->getProposalsCollection() as $_proposal):?>
+                    <li>
+                    <input type="radio" name="proposals[<?php echo $_item->getId();?>]" id="proposal_<?php echo $_proposal->getId()?>" value="<?php echo $_proposal->getId()?>" <?php if($_proposal->getIsDefault()):?> checked="checked"<?php endif;?><?php if($disabled):?> disabled="disabled"<?php endif;?>/> 
+                    <label for="proposal_<?php echo $_proposal->getId()?>"><?php echo $_quote->formatPrice($_proposal->getPrice());?></label></li>
+                <?php endforeach;?>
+                </ul>
+            <?php endif;?>
+        </td>
+    </tr>
+</tbody>

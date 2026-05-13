@@ -1,0 +1,27 @@
+{
+  "name": "vnecoms/module-vendors-rma",
+  "description": "Vendor RMA plug-in is a powerful tool for managing, processing return and exchange requests between vendors and customers. Allowing your customers to request and manage returns and exchanges directly from your marketplace website",
+  "authors": [
+			{
+					"name": "VNECOMS",
+					"email": "support@vnecoms.com"
+			}
+  ],
+  "require": {
+      "magento/framework": "*",
+      "vnecoms/module-vendors": ">=2.0.0",
+      "vnecoms/module-vendors-notification": ">=2.0.0",
+      "vnecoms/module-rma": "2.4.*",
+      "vnecoms/module-core": "2.4.*"
+  },
+  "type": "magento2-module",
+  "version": "2.4.24",
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Vnecoms\\VendorsRMA\\": ""
+    }
+  }
+}

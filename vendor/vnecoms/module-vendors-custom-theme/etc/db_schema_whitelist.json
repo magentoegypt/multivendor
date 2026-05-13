@@ -1,0 +1,42 @@
+{
+    "ves_vendor_theme": {
+        "column": {
+            "theme_id": true,
+            "base_theme_id": true,
+            "title": true,
+            "preview_image": true,
+            "home_content": true,
+            "home_layout": true,
+            "home_layout_xml": true,
+            "status": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_VENDOR_THEME_BASE_THEME_ID_THEME_THEME_ID": true
+        }
+    },
+    "ves_vendor_theme_config_section": {
+        "column": {
+            "section_id": true,
+            "theme_id": true,
+            "section": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_45B799D20C800C10116D4696788698FF": true
+        }
+    },
+    "ves_vendor_theme_config": {
+        "column": {
+            "config_id": true,
+            "vendor_id": true,
+            "theme_id": true,
+            "path": true,
+            "value": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_VENDOR_THEME_CONFIG_THEME_ID_VES_VENDOR_THEME_THEME_ID": true
+        }
+    }
+}

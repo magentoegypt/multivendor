@@ -1,0 +1,118 @@
+<?php $note = $block->getEscalateRma();  ?>
+
+<?php if($note->getId()): ?>
+<form class="form-ticket-reply"
+      method="post" id="form-ticket-reply"
+      enctype="multipart/form-data"
+      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>"
+      data-mage-init='{"validation":{}}'
+>
+    <div class="message-box form-escalate">
+        <div class="form-escalate-list">
+            <div class="note-message">
+                <blockquote><?php echo $note->getMessage() ?></blockquote>
+            </div>
+
+            <?php if(sizeof($note->getAttachmentUrls())):?>
+                <div class="attachment">
+                    <ul>
+                        <?php foreach ($note->getAttachmentUrls() as $key=>$attachment):?>
+                            <li class="file-uploader-preview">
+                                <?php if($block->isImage($key)): ?>
+                                    <a href="<?php echo $attachment ?>" class="icon-attachment-img-view"
+                                       title="<?php echo $key ?>">
+                                        <img class="preview-image" src="<?php echo $attachment ?>" />
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo $block->getUrl('vrma/customer/download',
+                                        array('file'=>base64_encode($key))) ?>"
+                                       title="<?php echo $key ?>">
+                                        <i class="fa icon-attachment <?php echo $block->getClassIcon($key) ?>"></i></a>
+                                <?php endif ?>
+
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif;?>
+        </div>
+
+        <?php if($block->isShowButtonReply()):?>
+            <div id="knockout-message-attachment" class="uploader" data-bind="scope: 'attachment'">
+                <div class="col-sm-12">
+                    <p> <?php echo __('Allow Extension : ').$block->getUploaderExtensionNote() ?></p>
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <script type="text/x-magento-init">
+                                {
+                                    "#knockout-message-attachment": {
+                                        "Magento_Ui/js/core/app": {
+                                            "components": {
+                                                "attachment": {
+                                                    "component": "Vnecoms_RMA/js/form/upload/uploader",
+                                                    "uploaderConfig":{
+                                                        "url": "<?php echo $block->getUrl("vrma/customer/upload");?>"
+                                                    },
+                                                    "dataScope" : "data.attachment",
+                                                    "dataType" : "data.text",
+                                                    "formElement" : "data.input"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            </script>
+                </div>
+            </div>
+            <div class="buttons-set">
+                <div class="message-notification-box hide" id="vnecoms-escalate-notification"><?php echo __("Update ...")?></div>
+                <input type="hidden" name="request[request_id]" value="<?php echo $block->getRequest()->getParam("id") ?>">
+                <button type="button" id="msg-escalate-btn" class="action primary right" type="button">
+                    <i class="fa"></i>
+                    <?php echo __('Update Escalate') ?>
+                </button>
+            </div>
+            <div class="clear"></div>
+            <script type="text/javascript">
+                require([
+                    "jquery",
+                    'mage/validation',
+                    "Vnecoms_RMA/js/wysiwyg/tiny_mce/setup"
+                ],function($){
+                    $(function() {
+                        $("#msg-escalate-btn").click(function(){
+                            $("#vnecoms-escalate-notification").removeClass('hide');
+                            $.ajax({
+                                method: "POST",
+                                url: "<?php echo $block->getUrl('*/*/updateEscalate');?>",
+                                dataType: 'json',
+                                data : $("#form-ticket-reply").serializeArray(),
+                                success: function (data) {
+                                    $("#vnecoms-escalate-notification").addClass('hide');
+                                    if(data.error){
+                                        alert({
+                                            modalClass: 'alert ves-error',
+                                            title: '<?php echo __("Error");?>',
+                                            content: data.msg,
+                                        });
+                                    }else{
+                                        $('.form-escalate-list').html(data.message_list);
+                                        $$(".file-uploader-summary").each(function(e){
+                                            e.remove();
+                                        });
+                                    }
+                                }
+                            });
+                        });
+
+                    });
+                });
+            </script>
+
+        <?php endif;?>
+    </div>
+</form>
+<?php else:?>
+    <?php echo __("RMA dont have escalate.") ?>
+<?php endif;?>
+
+

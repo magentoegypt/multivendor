@@ -1,0 +1,28 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * seller list toolbar
+ *
+ * @var $block \Vnecoms\VendorsSellerList\Block\SellerList\Toolbar
+ */
+use Vnecoms\VendorsSellerList\Block\SellerList\Toolbar;
+?>
+<?php if ($block->getCollection()->getSize()): ?>
+    <div class="toolbar toolbar-sellers" data-mage-init='<?php /* @escapeNotVerified */ echo $block->getWidgetOptionsJson(); ?>'>
+
+        <?php //include ($block->getTemplateFile('Vnecoms_VendorsSellerList::seller/list/toolbar/amount.phtml')) ?>
+
+        <?php echo $block->getPagerHtml() ?>
+
+        <?php //include ($block->getTemplateFile('Vnecoms_VendorsSellerList::seller/list/toolbar/limiter.phtml')) ?>
+
+    </div>
+<?php endif ?>

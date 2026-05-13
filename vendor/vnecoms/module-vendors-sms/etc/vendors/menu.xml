@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+    	<add id="Vnecoms_VendorsSms::sms" icon="fa fa-envelope-o" title="SMS Notifications" module="Vnecoms_VendorsSms" sortOrder="80" resource="Vnecoms_VendorsSms::sms" dependsOnModule="Vnecoms_VendorsSms" />
+    	<add id="Vnecoms_VendorsSms::sms_manager" title="SMS Credit" sortOrder="10" module="Vnecoms_VendorsSms" action="sms/manage" parent="Vnecoms_VendorsSms::sms" dependsOnModule="Vnecoms_VendorsSms" resource="Vnecoms_VendorsSms::sms"/>
+    	<add id="Vnecoms_VendorsSms::sms_logs" title="SMS Logs" sortOrder="20" module="Vnecoms_VendorsSms" action="sms/logs" parent="Vnecoms_VendorsSms::sms" dependsOnModule="Vnecoms_VendorsSms" resource="Vnecoms_VendorsSms::sms"/>
+    	<add id="Vnecoms_VendorsSms::sms_config" title="Configuration" sortOrder="30" module="Vnecoms_VendorsSms" action="config/index/edit/section/sms_notification" parent="Vnecoms_VendorsSms::sms" dependsOnModule="Vnecoms_VendorsSms" resource="Vnecoms_VendorsSms::sms"/>
+    </menu>
+</config>

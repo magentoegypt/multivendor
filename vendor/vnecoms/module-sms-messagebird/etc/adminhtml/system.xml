@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="messagebird_access_key" translate="label tooltip" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Messagebird Access Key</label>
+	                    <config_path>vsms/settings/messagebird_access_key</config_path>
+	                    <depends>
+	                        <field id="gateway">messagebird</field>
+	                    </depends>
+	                    <comment>Your REST access key from dashboard.messagebird.com</comment>
+	                </field>
+	                <field id="messagebird_originator" translate="label tooltip" type="text" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Messagebird Originator</label>
+	                    <config_path>vsms/settings/messagebird_originator</config_path>
+	                    <depends>
+	                        <field id="gateway">messagebird</field>
+	                    </depends>
+	                    <comment>The sender of the message. This can be a telephone number (including country code) or an alphanumeric string. In case of an alphanumeric string, the maximum length is 11 characters.</comment>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

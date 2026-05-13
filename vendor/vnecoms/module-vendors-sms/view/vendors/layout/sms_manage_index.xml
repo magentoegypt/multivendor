@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+        <css src="Vnecoms_VendorsSms::css/styles.css" />
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsSms\Block\Vendors\Sms" name="seller.sms" template="sms.phtml">
+            	<block class="Vnecoms\VendorsSms\Block\Vendors\Sms\Info" name="seller.sms.info" as="info" template="sms/info.phtml">
+            	</block>
+            	<uiComponent name="vendor_sms_credit_transaction_grid" as="sms_credit_transaction"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

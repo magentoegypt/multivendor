@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vendors">
+            <group id="vendorspage" translate="label tooltip" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            	<label>Vendor Page</label>
+				<field id="url_key" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>URL Key</label>
+                    <frontend_class>validate-identifier</frontend_class>
+                    <tooltip><![CDATA[<ul><li>The vendor page will have this format: <br />http://example.com/URL_KEY/VENDOR_ID</li>
+                    <li>Leave blank if you want the vendor page like this:<br /> http://example.com/VENDOR_ID</li></ul>]]></tooltip>
+                </field>
+                <field id="profile_position" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Profile block's position</label>
+                    <source_model>Vnecoms\VendorsPage\Model\Source\ProfilePosition</source_model>
+                </field>
+                <field id="default_banner" translate="label" type="image" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+	            	<label>Default Banner</label>
+	            	<comment>Allowed file types: PNG, GIF, JPG, JPEG</comment>
+	            	<backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+	            	<upload_dir config="system/filesystem/media" scope_info="1">ves_vendors/banner</upload_dir>
+                    <base_url type="media" scope_info="1">ves_vendors/banner</base_url>
+	        	</field>
+                <field id="number_of_products" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Number of showing products</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <comment>Number of showing products on vendor's home page.</comment>
+                </field>
+                <field id="show_about" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Vendor's Description</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Vendor can describe about his store and show it on vendor's home page.</tooltip>
+                </field>
+                <field id="show_shipping" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Vendor's Shipping Policy</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Vendor can enter shipping policy and show it on vendor's home page.</tooltip>
+                </field>
+                <field id="show_refund" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Vendor's Refund Policy</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Vendor can enter refund policy and show it on vendor's home page.</tooltip>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

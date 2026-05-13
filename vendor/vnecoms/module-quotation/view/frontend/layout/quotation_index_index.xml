@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="quotation_quotepage_renderers"/>
+    <head>
+        <css src="Vnecoms_Quotation::css/quotation-page.css"/>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_Quotation::css/fileuploader.css"/>
+    </head>
+    <body>
+        <attribute name="class" value="request-quote-page"/>
+        <referenceBlock name="content">
+            <block class="Vnecoms\Quotation\Block\Quotepage" name="quotespage" template="Vnecoms_Quotation::quotepage.phtml" cacheable="false">
+                <container name="quote.items" as="with-items">
+                    <container name="quote.container" htmlTag="div" htmlClass="cart-container" before="-">
+                        <container name="quote.form.before" as="form_before" label="Quote Items Before" htmlTag="div" htmlClass="rewards"/>
+                        <block class="Vnecoms\Quotation\Block\Quotepage" name="quote.form" template="quotepage/form.phtml">
+                            <block class="Magento\Framework\View\Element\RendererList" name="quotepage.item.renderers" as="renderer.list"/>
+                            <block class="Magento\Framework\View\Element\Text\ListText" name="quote.actions"/>
+                        </block>
+
+                        <!-- sidebar -->
+                        <block class="Vnecoms\Quotation\Block\Quotepage\Sidebar" name="quote.request.sidebar" template="Vnecoms_Quotation::quotepage/sidebar.phtml" cacheable="false">
+                        </block>
+                        <container name="quote.form.after" as="form_after" label="Quote Items After" htmlTag="div" htmlClass="rewards"/>
+                    </container>
+                </container>
+                <container name="quote.noitems" as="no-items">
+                    <block class="Vnecoms\Quotation\Block\Quotepage" name="quote.empty" before="-" template="Vnecoms_Quotation::quotepage/noItems.phtml">
+                        <container name="quote.empty.widget" as="quote_empty_widget" label="Empty Quote Before"/>
+                    </block>
+                </container>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,83 @@
+<?php
+/** @var $block \Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Section */
+?>
+<div id="section-popup-mpdal" class="admin__scope-old">
+    <div class="fieldset-wrapper add-credit-form">
+        <div class="admin__fieldset-wrapper-content">
+            <form enctype="multipart/form-data" id="theme-section-form">
+                <fieldset class="fieldset admin__fieldset">
+                    <div class="field admin__field required">
+                        <label class="label admin__field-label" for="credit-transaction-amount">
+                            <span><?php echo __("Section Name")?></span>
+                        </label>
+                    
+                        <div class="admin__field-control">
+                            <select name="theme_section_list" id="theme-section-list" class="required-entry">
+                                <option value=""><?php echo __('-- Select a Tab --')?></option>
+                                <?php foreach($block->getTabs() as $tab):?>
+                                    <optgroup label="<?php echo $tab->getLabel()?>">
+                                        <?php foreach($tab->getChildren() as $section):?>
+                                        <option value="<?php echo $section->getId()?>"<?php if(in_array($section->getId(), $block->getExistSectionIds())):?> disabled="disabled"<?php endif;?>><?php echo $section->getLabel()?></option>
+                                        <?php endforeach;?>
+                                    </optgroup>
+                                <?php endforeach;?>
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+var URL_ADD_SECTION = '<?php echo $block->getAddSectionUrl();?>';
+require([
+        'jquery',
+        'Magento_Ui/js/modal/modal',
+        'Magento_Ui/js/modal/alert',
+        'mage/mage'
+    ],
+    function($,modal,alert){
+        var sectionForm = $("#theme-section-form");
+        sectionForm.mage('validation', {});
+        
+        var options = {
+            type: 'slide',
+            modalClass:'add-subtract-credit',
+            responsive: true,
+            innerScroll: true,
+            title: '<?php echo __("Add a configuration section.")?>',
+            buttons: [{
+                text: $.mage.__('Submit'),
+                class: 'action primary',
+                click: function () {
+                    if(sectionForm.valid()){
+                    	sectionForm.trigger('processStart');
+                    	$.ajax({
+                      		  url: URL_ADD_SECTION,
+                      		  method: "POST",
+                      		  data: { 
+                          		  section : $("#theme-section-list").val(),
+                 			  },
+                      		  dataType: "json"
+                  		}).done(function( response ){
+                      		if(response.error){
+                      			sectionForm.trigger('processStop');
+                      			alert({
+                    				modalClass: 'confirm ves-error',
+                                    title: "<?php echo __("Add Section");?>",
+                                    content: response.msg,
+                                });
+                      		}else{
+                          		window.location.reload();
+                      		}
+                  		});
+                    }
+                }
+            }]
+        };
+        var popup = modal(options, $('#section-popup-mpdal'));
+    }
+);
+</script>

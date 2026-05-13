@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright © 2017 Vnecoms. All rights reserved.
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <virtualType name="Vnecoms\Quotation\FileUploader" type="Magento\Catalog\Model\ImageUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">ves_quotation/tmp/attachments</argument>
+            <argument name="basePath" xsi:type="string">ves_quotation/attachments</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="gif" xsi:type="string">gif</item>
+                <item name="png" xsi:type="string">png</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\Quotation\Controller\Adminhtml\Message\Upload">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">Vnecoms\Quotation\FileUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\Quotation\Controller\Adminhtml\Message\Send">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">Vnecoms\Quotation\FileUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Catalog\Helper\Product\Composite">
+        <plugin name="quotation-after-render-configure-result"
+        type="Vnecoms\Quotation\Plugin\Admin\AfterRenderConfigureResult" sortOrder="1"/>
+    </type>
+</config>

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_withdrawal_method" resource="default" engine="innodb" comment="Vendor Withdrawal Methods">
+        <column xsi:type="int" name="method_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="varchar" name="code" nullable="false" length="32" comment="Type"/>
+        <column xsi:type="smallint" name="is_enabled" unsigned="true" nullable="false" identity="false"
+                default="0" comment="is Enable"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="title"/>
+        <column xsi:type="text" name="description" nullable="true" comment="description"/>
+        <column xsi:type="varchar" name="fee_type" nullable="false" length="32" comment="Type"/>
+        <column xsi:type="decimal" name="fee" scale="4" precision="20" unsigned="false"
+                nullable="true" comment="Fee"/>
+        <column xsi:type="decimal" name="min_value" scale="4" precision="20" unsigned="false"
+                nullable="true" comment="Min Value"/>
+        <column xsi:type="decimal" name="max_value" scale="4" precision="20" unsigned="false"
+                nullable="true" comment="Max Value"/>
+        <column xsi:type="text" name="fields" nullable="true" comment="Fields"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="method_id"/>
+        </constraint>
+    </table>
+
+    <table name="ves_vendor_withdrawal_method_data" resource="default" engine="innodb" comment="Vendor Withdrawal Method Data">
+        <column xsi:type="int" name="data_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+
+        <column xsi:type="int" name="method_id" unsigned="true" nullable="false" identity="false"
+                comment="Method ID"/>
+
+        <column xsi:type="text" name="method_data" nullable="false" comment="Method Data"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_VENDOR_ID"
+                    table="ves_vendor_withdrawal_method_data" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_METHOD_ID"
+                    table="ves_vendor_withdrawal_method_data" column="method_id" referenceTable="ves_vendor_withdrawal_method"
+                    referenceColumn="method_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="data_id"/>
+        </constraint>
+    </table>
+</schema>

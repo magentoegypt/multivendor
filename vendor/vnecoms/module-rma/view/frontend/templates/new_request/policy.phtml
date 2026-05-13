@@ -1,0 +1,7 @@
+<h2 class="legend"><?php echo __('RMA Policy'); ?></h2>
+<div class="page-content">
+    <?php
+    $policy = $block->getConfig()->policyBlock();
+    echo $block->getLayout()->createBlock('Magento\Cms\Block\Block')->setBlockId($policy)->toHtml();
+    ?>
+</div>

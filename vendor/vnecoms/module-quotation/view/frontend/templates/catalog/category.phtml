@@ -1,0 +1,84 @@
+<script type="text/javascript">
+	var quotationConfig = <?php echo $block->getProductConfig();?>;
+    require([
+        'jquery',
+        'uiRegistry',
+        'mage/translate',
+        'Magento_Ui/js/modal/alert',
+        'mage/mage',
+        'Magento_Catalog/js/catalog-add-to-cart'
+    ], function($, registry,$t, alert) {
+        'use strict';
+
+        /*Add quote button*/
+        $('.product .actions-secondary').each(function(){
+        	var form = $(this).closest('.product').find('form[data-role=tocart-form]').first();
+            var productId = form.find('[name="product"]').first().val();
+            var quoteConfig = window.quotationConfig['product_'+productId];
+
+            if(!quoteConfig['order_mode']){
+                form.find('.tocart').attr('disabled','disabled');
+            }
+            if(quoteConfig['quote_mode']){
+                if(!quoteConfig['order_mode']){
+                    var addToCartBtn = form.find('.tocart');
+                    addToCartBtn.after('<button type="button" title="<?php echo $block->escapeHtml(__('Add to Quote')); ?>" class="action tocart primary category-btn-addtoquote product-addtoquote-button"><span><?php /* @escapeNotVerified */ echo __('Add to Quote') ?></span></button>');
+                    addToCartBtn.remove();
+                }else{
+                	$(this).prepend('<a href="javascript: void(0)" title="<?php echo $block->escapeHtml(__('Add to Quote')); ?>" class="action category-link-addtoquote product-addtoquote-link quote-icon-file-text"><span><?php /* @escapeNotVerified */ echo __('Add to Quote') ?></span></a>');
+                }
+            }
+        });
+        var addToQuote = false;
+
+        $(".product-addtoquote-button, .product-addtoquote-link").each(function() {
+            $(this).on( "click",function () {
+                if($(this).hasClass('disabled')) return;
+            	submitQuoteForm($(this));
+            });
+        });
+
+        function submitQuoteForm(button){
+        	var form = button.closest('.product').find('form[data-role=tocart-form]').first();
+        	form.validation();
+            if(!form.validation('isValid')) return;
+            
+            var quotation = registry.get('quote_content');
+        	quotation.isLoading(true);
+        	
+        	if(button.hasClass('product-addtoquote-button')){
+        		button.attr('disabled','disabled');
+        		button.find('span').html('<?php echo __("Adding ...");?>');
+        	}else if(button.hasClass('product-addtoquote-link')){
+            	button.addClass('disabled');
+        	}
+            var formData = {};
+            var inputs = form.serializeArray();
+            $.each(inputs, function (i, input) {
+            	formData[input.name] = input.value;
+            });
+
+            var action = form.attr('action').replace("checkout/cart/add", "quotation/quote/add");
+            $.ajax({
+                url: action,
+                method: "POST",
+                data: formData,
+                dataType: "json"
+            }).done(function( response ){
+                if(response.error){
+                	alert({
+            			title: $t('Error'),
+            			content: response.message,
+            		});
+                }else{
+                	button.find('span').html('<?php echo __("Added");?>');
+                }
+                setTimeout(function(){
+            		button.find('span').html('<?php echo __("Add to Quote");?>');
+            		button.removeAttr('disabled');
+            		button.removeClass('disabled');
+            	}, 1000);
+            });
+        }
+    });
+</script>

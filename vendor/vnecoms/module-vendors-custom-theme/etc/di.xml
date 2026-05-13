@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vendor_theme_grid_data_source" xsi:type="string">Vnecoms\VendorsCustomTheme\Model\ResourceModel\Theme\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <type name="Magento\Framework\App\Config">
+		<plugin name="overWriteSystemConfig" type="Vnecoms\VendorsCustomTheme\Plugin\Config"/>
+	</type>
+	
+	<type name="Vnecoms\VendorsCustomTheme\Block\Theme">
+        <arguments>
+            <argument name="filters" xsi:type="array">
+            	<item name="cms_filter" xsi:type="object">Vnecoms\VendorsCustomTheme\Model\Template\Filter\Cms</item>
+                <item name="image_filter" xsi:type="object">Vnecoms\VendorsMedia\Model\Template\Filter</item>
+                <item name="bestseller_filter" xsi:type="object">Vnecoms\VendorsCustomTheme\Model\Template\Filter\BestSeller</item>
+                <item name="newproducts_filter" xsi:type="object">Vnecoms\VendorsCustomTheme\Model\Template\Filter\NewProducts</item>
+                <item name="widget_filter" xsi:type="object">Vnecoms\VendorsCustomTheme\Model\Template\Filter\Widget</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

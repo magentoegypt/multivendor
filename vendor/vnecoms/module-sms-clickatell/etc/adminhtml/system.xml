@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	                <field id="clickatell_apikey" translate="label tooltip" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Clickatell API Key</label>
+	                    <config_path>vsms/settings/clickatell_apikey</config_path>
+	                    <depends>
+	                        <field id="gateway">clickatell</field>
+	                    </depends>
+	                    <comment>The API key when you add an integration from your clickatell dashboard.</comment>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+
+	            	<field id="termii_api" translate="label tooltip" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Api Key</label>
+	                    <config_path>vsms/settings/termii_api</config_path>
+	                    <depends>
+	                        <field id="gateway">termii</field>
+	                    </depends>
+	                </field>
+
+					<field id="termii_sender_id" translate="label tooltip" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Sender Id</label>
+						<config_path>vsms/settings/termii_sender_id</config_path>
+						<depends>
+							<field id="gateway">termii</field>
+						</depends>
+					</field>
+
+	                <field id="termii_channel" translate="label tooltip" type="text" sortOrder="162" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Channel</label>
+	                    <config_path>vsms/settings/termii_channel</config_path>
+	                    <depends>
+	                        <field id="gateway">termii</field>
+	                    </depends>
+	                </field>
+
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

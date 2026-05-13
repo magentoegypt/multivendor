@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendorscategory_category" resource="default" engine="innodb" comment="Vendor Category">
+        <column xsi:type="int" name="category_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="real_category_id" unsigned="true" nullable="false" identity="false"
+                comment="Real Category ID"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor Id"/>
+        <column xsi:type="int" name="parent_id" unsigned="true" nullable="false" identity="false"
+                comment="Parent Id" default="0" />
+        <column xsi:type="text" name="name" nullable="false" comment="Name"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Status"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Is Active"/>
+        <column xsi:type="text" name="url_key" nullable="false" comment="URL Key"/>
+        <column xsi:type="text" name="url_path" nullable="true" comment="URL Path"/>
+        <column xsi:type="text" name="description" nullable="true" comment="Description"/>
+        <column xsi:type="text" name="meta_title" nullable="true" comment="meta title"/>
+        <column xsi:type="text" name="meta_keywords" nullable="true" comment="meta keywords"/>
+        <column xsi:type="text" name="meta_description" nullable="true" comment="meta description"/>
+        <column xsi:type="text" name="page_layout" nullable="true" comment="page layout"/>
+        <column xsi:type="smallint" name="is_hide_product" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Is Hidden Product"/>
+        <column xsi:type="smallint" name="included_in_menu" unsigned="true" nullable="false" identity="false"
+                default="1" comment="Included In Menu"/>
+        <column xsi:type="text" name="path" nullable="false" comment="Path"/>
+        <column xsi:type="int" name="position" unsigned="true" nullable="false" identity="false"
+                comment="Position" default="0" />
+        <column xsi:type="int" name="level" unsigned="true" nullable="false" identity="false"
+                comment="Level" default="0" />
+        <column xsi:type="int" name="children_count" unsigned="true" nullable="false" identity="false"
+                comment="Children Count" default="0" />
+
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+
+        <index referenceId="CATEGORY_LEVEL" indexType="btree">
+            <column name="level"/>
+        </index>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="category_id"/>
+        </constraint>
+    </table>
+
+    <table name="ves_vendorscategory_category_product" resource="default" engine="innodb" comment="Vendor Category Product">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="category_id" unsigned="true" nullable="false" identity="false"
+                comment="Category ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false" identity="false"
+                comment="Product ID"/>
+        <column xsi:type="int" name="position" unsigned="true" nullable="false" identity="false"
+                comment="Position" default="0" />
+        <index referenceId="CATEGORY_PRODUCT_ID" indexType="btree">
+            <column name="product_id"/>
+        </index>
+        <constraint xsi:type="unique" referenceId="VENDOR_CATEGORY_UNIQUE_CATE_ID_PRO_ID">
+            <column name="category_id"/>
+            <column name="product_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VENDOR_CATEGORY_FOREIGN_PRODUCT_ID"
+                    table="ves_vendorscategory_category_product" column="product_id" referenceTable="catalog_product_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="VENDOR_CATEGORY_FOREIGN_CATEGORY_ID"
+                    table="ves_vendorscategory_category_product" column="category_id" referenceTable="ves_vendorscategory_category"
+                    referenceColumn="category_id" onDelete="CASCADE"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="catalog_product_entity">
+        <column xsi:type="text" name="ves_category_ids" nullable="true" comment="Ves Category Ids"/>
+    </table>
+</schema>

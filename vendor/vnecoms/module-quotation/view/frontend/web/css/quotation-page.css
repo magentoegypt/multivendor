@@ -1,0 +1,22 @@
+.quotation-items{width: 63%; float: left; -ms-flex-order: 1; -webkit-order: 1; order: 1; padding-right: 2%; position: relative;}
+.quotation-summary{width: calc(35% - 40px); float: right; -ms-flex-order: 2; -webkit-order: 2; order: 2; padding: 1px 20px 25px; position: relative; background: #f5f5f5;}
+.quotation-2cols{margin: 0 0 20px;}
+.quotation-2cols:after{display: table; content: ""; clear: both;}
+.quotation-2cols .quotation-col1, .quotation-2cols .quotation-col2{width: calc(50% - 10px); display: block; float: left;}
+.quotation-2cols .quotation-col2{float: right;}
+.quotation-2cols .field{margin: 0;}
+.quote-remarks-fieldset{border-bottom: 1px solid #d3d3d3; margin-bottom: 30px; padding-bottom: 30px;}
+.quote-remarks-label{text-transform: uppercase; padding: 10px 0; font-size: 2.4rem; margin-bottom: 15px; border-bottom: 1px solid #d3d3d3;}
+.quote-remarks-note{color: #777;}
+.quote-form-sidebar-wrapper button.submit-quote{width: 100%; padding: 14px 17px; font-size: 1.6rem;}
+.quote-tbl .price{width: 115px;}
+.quote-tbl .qty{width: 140px;}
+@media (max-width: 639px) {
+	.quote-tbl .item  .col.original-price {white-space: normal;}
+	.quote-tbl .price {width: 100%;}
+	.quote-tbl .qty {width: 100%;}
+}
+@media (max-width: 991px) {
+	.quotation-items, .quotation-summary{width: 100%; box-sizing: border-box;}
+	.quotation-summary{margin-top: 20px;}
+}

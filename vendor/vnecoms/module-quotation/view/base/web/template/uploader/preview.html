@@ -1,0 +1,37 @@
+<div class="quotation-file-uploader-summary">
+    <div class="quotation-file-uploader-preview" data-bind="css:{'attachment-file':!$parent.isImage($file.name)}">
+        <a attr="href: $parent.getFilePreview($file),title:$file.name" target="_blank">
+            <!-- ko if:$parent.isImage($file.name) -->
+            	<img
+                    class="preview-image"
+                    tabindex="0"
+                    event="load: $parent.onPreviewLoad.bind($parent)"
+                    attr="
+                    src: $parent.getFilePreview($file),
+                    alt: $file.name">
+            <!-- /ko -->
+            <!-- ko ifnot:$parent.isImage($file.name) -->
+            	<i data-bind="css:$parent.getClassIcon($file.name)"></i>
+            <!-- /ko -->
+            
+        </a>
+    </div>
+    
+    <div class="file-uploader-info">
+	    <div class="quotation-attachment-filename" text="$file.name"></div>
+	    <div class="file-uploader-meta">
+	        <text args="$parent.formatSize($file.size)"></text>
+	    </div>
+    </div>
+    <div class="actions">
+        <a
+	        type="button"
+	        class="action-remove"
+	        data-role="delete-button"
+	        attr="title: $t('Delete image')"
+	        click="$parent.removeFile.bind($parent, $file)">
+            <span translate="'Remove'"></span>
+        </a>
+    </div>
+    <input type="hidden" data-bind="value: $file.file" name="file_upload[]" />
+</div>

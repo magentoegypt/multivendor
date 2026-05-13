@@ -1,0 +1,25 @@
+{
+    "name": "vnecoms/module-vendors-price-comparison",
+    "description": "Price Comparison extension is made in response to the shoppers, who typically have already made the decision to buy a product and are simply looking for the best deal by allowing different vendor to sell a same product with different price. This extension will also give each vendor in marketplace an opportunity to attract new customers, increase sales, and go head-to-head against the competitor.",
+    "authors": [
+			{
+					"name": "VNECOMS",
+					"email": "support@vnecoms.com"
+			}
+		],
+    "require": {
+        "magento/framework": ">=103.0.6",
+        "vnecoms/module-vendors": ">100.2.0",
+        "vnecoms/module-vendors-product": "2.*"
+    },
+    "type": "magento2-module",
+    "version": "2.4.19",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vnecoms\\VendorsPriceComparison\\": ""
+        }
+    }
+}

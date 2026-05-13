@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<!-- <preference for="Magento\Framework\UrlInterface" type="Vnecoms\VendorsDomain\Model\Url"/> -->
+	<!-- <preference for="Magento\Store\Model\Store" type="Vnecoms\VendorsDomain\Model\Store"/> -->
+
+    <preference for="Vnecoms\VendorsDomain\Api\DomainRepositoryInterface" type="Vnecoms\VendorsDomain\Model\DomainRepository" />
+    <preference for="Vnecoms\VendorsDomain\Api\Data\DomainInterface" type="Vnecoms\VendorsDomain\Model\Data\Domain" />
+
+
+	<preference for="Vnecoms\VendorsPage\Helper\Data" type="Vnecoms\VendorsDomain\Helper\Page\Data"/>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vendor_domain_pending_listing_data_source" xsi:type="string">Vnecoms\VendorsDomain\Model\ResourceModel\Domain\Grid\Pending\Collection</item>
+                <item name="vendor_domain_listing_data_source" xsi:type="string">Vnecoms\VendorsDomain\Model\ResourceModel\Domain\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <type name="Vnecoms\VendorsNotification\Model\Notification">
+        <arguments>
+            <argument name="notificationTypes" xsi:type="array">
+                <item name="domain" xsi:type="string">Vnecoms\VendorsDomain\Model\NotificationType\Domain</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <type name="Vnecoms\Vendors\App\Area\FrontNameResolver">
+        <plugin name="vnecoms_vendorsdomain_frontnameresolver" type="Vnecoms\VendorsDomain\Plugin\FrontNameResolver" sortOrder="10"/>
+    </type>
+    
+    <type name="Magento\Framework\UrlInterface">
+        <plugin name="rewriteBaseUrl" type="Vnecoms\VendorsDomain\Plugin\BaseUrl" sortOrder="10"/>
+    </type>
+    
+    <type name="Magento\Store\Model\Store">
+        <plugin name="rewriteBaseUrl" type="Vnecoms\VendorsDomain\Plugin\StoreBaseUrl" sortOrder="10"/>
+    </type>
+</config>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="semysms_token" translate="label tooltip" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Semysms Token</label>
+	                    <config_path>vsms/settings/semysms_token</config_path>
+	                    <depends>
+	                        <field id="gateway">semysms</field>
+	                    </depends>
+	                </field>
+					<field id="semysms_device" translate="label tooltip" type="text" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Semysms Device Code</label>
+	                    <config_path>vsms/settings/semysms_device</config_path>
+	                    <depends>
+	                        <field id="gateway">semysms</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

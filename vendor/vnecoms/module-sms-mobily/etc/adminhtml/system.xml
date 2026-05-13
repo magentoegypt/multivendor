@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="mobily_username" translate="label tooltip" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>User Name</label>
+	                    <config_path>vsms/settings/mobily_username</config_path>
+	                    <depends>
+	                        <field id="gateway">mobily</field>
+	                    </depends>
+	                    <comment>Your user name from www.mobily.ws</comment>
+	                </field>
+	                
+	                <field id="mobily_password" translate="label tooltip" type="text" sortOrder="91" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Password</label>
+	                    <config_path>vsms/settings/mobily_password</config_path>
+	                    <depends>
+	                        <field id="gateway">mobily</field>
+	                    </depends>
+	                </field>
+	                <field id="mobily_sender" translate="label tooltip" type="text" sortOrder="92" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender Name</label>
+	                    <config_path>vsms/settings/mobily_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">mobily</field>
+	                    </depends>
+	                    <comment>Sender Name musts be activated before do any test.</comment>
+	                </field>
+	                <field id="mobily_app_type" translate="label tooltip" type="text" sortOrder="93" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>App Type</label>
+	                    <config_path>vsms/settings/mobily_app_type</config_path>
+	                    <depends>
+	                        <field id="gateway">mobily</field>
+	                    </depends>
+	                    <comment>Sender Name musts be activated before do any test.</comment>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

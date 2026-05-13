@@ -1,0 +1,17 @@
+<div class="admin__field field" id="resolve-message-<?php echo $block->getType() ?>" style="display:none">
+    <label class="label admin__field-label"><?php echo __("Custom Message") ?></label>
+    <div class="admin__field-control control">
+            <textarea name="custom-message-<?php echo $block->getType() ?>" class="admin__control-textarea" ></textarea>
+    </div>
+</div>
+
+
+<div class="admin__field field" data-ui-id="resolve-edit-content-form-fieldset-element-form-field-preview">
+    <label class="label admin__field-label"></label>
+    <div class="admin__field-control control">
+        <button class="action-default scalable save primary
+        ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" id="ves-preview-customer-template"
+                onclick="previewTemplate('<?php echo $block->getType() ?>')" type="button">
+            <?php echo __("Preview Template") ?></button>
+    </div>
+</div>

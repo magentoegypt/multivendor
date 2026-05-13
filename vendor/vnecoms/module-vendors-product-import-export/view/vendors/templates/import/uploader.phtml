@@ -1,0 +1,80 @@
+<form class="form-horizontal" id="import-upload-form">
+<div class="box box-primary import-product">
+    <div class="box-header with-border">
+        <h3 class="box-title"><?php echo __("Import")?></h3>
+    </div>
+    <div class="box-body">
+        <div class="form-group">
+            <label class="col-sm-4 control-label" for="import_file"><?php echo __("Select File to Import")?></label>
+            <div class="col-sm-8">
+                <input id="import_file" name="import_file" title="<?php echo __("Select File to Import")?>" type="file" data-validate="{required:true}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label" for="basic_behavior"><?php echo __("Import Behavior")?></label>
+            <div class="col-sm-8">
+                <select id="basic_behavior" name="behavior" class="form-control" data-validate="{required:true}">
+                    <option value="" selected="selected"><?php echo __("-- Please Select --")?></option>
+                    <option value="append"><?php echo __("Add/Update")?></option>
+                    <option value="delete"><?php echo __("Delete")?></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4 control-label" for="basic_behavior">&nbsp;</label>
+            <div class="col-sm-8">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-cloud-upload"></i> <?php echo __("Upload")?></button>
+            </div>
+        </div>
+    </div>
+    <div class="box-footer">
+        <p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __("After the csv file is uploaded, all products from the imported file will be validated and added to import queue.")?></p>
+        <p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __("You can import faster by packing the csv file as zip package.")?></p>
+        <p><i class="fa fa-warning text-red"></i> <?php echo __("Importing new file will not affect to current items in import queue. So you will need to take care about two or more items have same sku in import queue.")?></p>
+        <p><i class="fa fa-warning text-red"></i> <?php echo __("The product information will not be added or updated until you run the import queue.")?></p>
+    </div>
+</div>
+</form>
+
+<div id="import-result-container" class="box box-primary import-product" style="display: none;">
+    <div class="box-header with-border">
+        <h3 class="box-title"><?php echo __("Result")?></h3>
+    </div>
+    <div class="box-body">
+        <div id="import-result" class="import-export-form"></div>
+    </div>
+</div>
+<script type="text/javascript">
+var UPLOAD_URL = '<?php echo $block->getUploadUrl();?>';
+require([
+     "jquery",
+     'mage/mage'
+], function($){
+	$('#import-upload-form').mage('validation', {
+        submitHandler: function (form) {
+        	$('#import-result').html('');
+        	var formdata = new FormData();
+            if($('#import_file').prop('files').length > 0){
+                var file =$('#import_file').prop('files')[0];
+                formdata.append("import_file", file);
+            }
+            formdata.append('behavior',$('#basic_behavior').val());
+            $('body').trigger('processStart');
+            $.ajax({
+                url: UPLOAD_URL,
+                type: "POST",
+                data: formdata,
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    $('#import-result-container').show();
+                    $('#import-result').html(result);
+                    $('body').trigger('processStop');
+                     // if all is well
+                     // play the audio file
+                }
+            });
+        }
+    });
+});
+</script>

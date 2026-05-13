@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<cms_page_group xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsCms:etc/cms_page_group.xsd">
+    <group id="product" class="Vnecoms\VendorsCms\Model\App\Page\Group\Product" sort_order="30">
+        <label translate="true">Product</label>
+        <description translate="true">Product Description</description>
+        <option class="Vnecoms\VendorsCms\App\Page\Group\Product\Option" />
+        <steps>
+            <step name="product_chooser" xsi:type="product_chooser" required="true" sort_order="10">
+                <label translate="true">Product</label>
+                <product_chooser class="Vnecoms\VendorsCms\App\Chooser\Product"/>
+            </step>
+            <step name="block_reference" xsi:type="block_reference" required="true" sort_order="20">
+                <label translate="true">Container</label>
+                <block_reference class="Vnecoms\VendorsCms\App\Chooser\Container"/>
+            </step>
+        </steps>
+    </group>
+
+    <group id="all_page" class="Vnecoms\VendorsCms\Model\App\Page\Group\AllPage" sort_order="20">
+        <label translate="true">All Pages</label>
+        <description translate="true">All Pages</description>
+        <option class="Vnecoms\VendorsCms\App\Page\Group\AllPage\Option" />
+        <steps>
+            <step name="block_reference" xsi:type="block_reference" required="true" sort_order="20">
+                <label translate="true">Container</label>
+                <block_reference class="Vnecoms\VendorsCms\App\Chooser\Container"/>
+            </step>
+        </steps>
+        <!--pass step configuration-->
+        <!--that mean option with value = all, in generic_page , will not show page_chooser step-->
+        <!--<pass_step>-->
+            <!--<option value="all">-->
+                <!--<step>page_chooser</step>-->
+            <!--</option>-->
+        <!--</pass_step>-->
+    </group>
+    <group id="specified_page" class="Vnecoms\VendorsCms\Model\App\Page\Group\Specified" sort_order="30">
+        <label translate="true">Specified Pages</label>
+        <description translate="true">Specified Pages</description>
+        <option class="Vnecoms\VendorsCms\App\Page\Group\Specified\Option" />
+        <steps>
+            <step name="page_chooser" xsi:type="page_chooser" required="true" sort_order="10">
+                <label translate="true">Page</label>
+                <page_chooser class="Vnecoms\VendorsCms\App\Chooser\Page"/>
+            </step>
+            <step name="block_reference" xsi:type="block_reference" required="true" sort_order="20">
+                <label translate="true">Container</label>
+                <block_reference class="Vnecoms\VendorsCms\App\Chooser\Container"/>
+            </step>
+        </steps>
+        <!--pass step configuration-->
+        <!--that mean option with value = all, in generic_page , will not show page_chooser step-->
+        <!--<pass_step>-->
+        <!--<option value="all">-->
+        <!--<step>page_chooser</step>-->
+        <!--</option>-->
+        <!--</pass_step>-->
+    </group>
+</cms_page_group>

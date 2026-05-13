@@ -1,0 +1,72 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<form class="form form-quotes-search"
+      action="<?php /* @escapeNotVerified */ echo $block->getFormAction() ?>"
+      id="quotation-widget-quotes-form"
+      method="GET"
+      data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>"
+      data-mage-init='{"quotesSearch":{}, "validation":{}}'
+      name="guest_post">
+    <fieldset class="fieldset">
+        <br>
+
+        <div class="field id required">
+            <label class="label" for="quotation-quote-id"><span><?php /* @escapeNotVerified */ echo __('Quote ID') ?></span></label>
+
+            <div class="control">
+                <input type="text" class="input-text" id="quotation-order-id" name="quote_identifier"
+                       data-validate="{required:true}"/>
+            </div>
+        </div>
+        <div class="field lastname required">
+            <label class="label" for="quotation-lastname"><span><?php /* @escapeNotVerified */ echo __('Last Name') ?></span></label>
+
+            <div class="control">
+                <input type="text" class="input-text" id="quotation-lastname" name="customer_lastname"
+                       data-validate="{required:true}"/>
+            </div>
+        </div>
+        <div class="field find required">
+            <label class="label" for="quote-search-type-id"><span><?php /* @escapeNotVerified */ echo __('Find Quote By') ?></span></label>
+
+            <div class="control">
+                <select name="type" id="quote-search-type-id" class="select">
+                    <option value="customer_email"><?php /* @escapeNotVerified */ echo __('Email'); ?></option>
+                    <option value="customer_phone"><?php /* @escapeNotVerified */ echo __('Telephone'); ?></option>
+                </select>
+            </div>
+        </div>
+        <div id="quotation-email" class="field email required">
+            <label class="label" for="quotation_email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></label>
+
+            <div class="control">
+                <input type="email" class="input-text" id="quotation_email" name="customer_email"
+                       data-validate="{required:true, 'validate-email':true}"/>
+            </div>
+        </div>
+        <div id="quotation-telephone" class="field telephone required">
+            <label class="label" for="quotation_telephone"><span><?php /* @escapeNotVerified */ echo __('Telephone') ?></span></label>
+
+            <div class="control">
+                <input type="tel" class="input-text" id="quotation_telephone" name="customer_phone" data-validate="{required:true}"/>
+            </div>
+        </div>
+        <?php echo $block->getChildHtml('form.additional.info'); ?>
+    </fieldset>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button class="action submit primary g-recaptcha"
+                    data-callback="quoteSearchSubmit"
+                    type="submit" title="<?php /* @escapeNotVerified */ echo __('Search') ?>">
+                <span><?php /* @escapeNotVerified */ echo __('Search') ?></span>
+            </button>
+        </div>
+    </div>
+</form>

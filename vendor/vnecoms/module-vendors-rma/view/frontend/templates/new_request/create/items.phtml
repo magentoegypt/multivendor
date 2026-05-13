@@ -1,0 +1,55 @@
+
+<?php $_order = $block->getOrder() ?>
+<div class="box-customer-request">
+    <table class="data-table my-request-table" id="my-request-table">
+        <col />
+        <col width="1" />
+        <col width="1" />
+        <col width="1" />
+        <thead>
+        <tr class="headings" id="ves-items-head">
+            <th width="10%">
+                <input type="hidden" name="orderitemsselecttoggle"id="ves-items-select-toggle"/></th>
+            <th><?php echo __('Product') ?></th>
+            <th><?php echo __('Sku') ?></th>
+            <th class="last" width="30%"><?php echo __('Qty RMA') ?></th>
+        </tr>
+        <tr id="ves-items-noorder" style="display: none;">
+            <td class="last" colspan="4"><?php echo __("No order selected") ?></td>
+        </tr>
+        <tr id="ves-items-noitems" style="display: none;">
+            <td class="last" colspan="4"><?php echo __("No items selected") ?></td>
+        </tr>
+        <tr id="ves-items-error" class="last" style="display: none;">
+            <td class="last" colspan="4"><?php echo __("Some error occurs. Please, try again to select order") ?></td>
+        </tr>
+        </thead>
+        <?php if ($_order): ?>
+            <?php $_vendorItems = $block->getItemGroupVendor(); ?>
+            <?php foreach ($_vendorItems as $vendorId => $_items): ?>
+                <tbody id="group-item-<?php echo $vendorId ?>" class="group-item" onclick="requestOption.changeBoxVendor(this)" rel="<?php echo $vendorId ?>">
+                    <?php $vendorObject = $block->getVendorById($vendorId) ?>
+                    <tr><th colspan="4" scope="col"><strong class="vendor-title"><?php echo $vendorObject->getVendorId() ? $vendorObject->getVendorId()
+                                : __("No Vendor");
+                            ?></strong></th></tr>
+                    <?php foreach ($_items as $_item): ?>
+                        <?php
+                        if ($_item->getParentItem()) {
+                            continue;
+                        }
+                        ?>
+                        <?php echo  $block->getItemHtml($_item) ?>
+                    <?php endforeach; ?>
+                </tbody>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <?php echo __("Some error occurs. Please, try again to select order") ?>
+        <?php endif ?>
+
+    </table>
+    <div style="text-align: right; font-style:italic; font-size: 9px;"><?php echo __('An item is not available for creating RMA when the order is not paid or there is an open RMA created for that item already.')?></div>
+    <input type="text" style="visibility: hidden" name="validate-items" id="validate-items" data-validate="{'validate-items':true}" />
+</div>
+
+
+

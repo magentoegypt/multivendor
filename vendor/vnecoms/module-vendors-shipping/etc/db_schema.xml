@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="quote_address">
+        <column xsi:type="varchar" name="shipping_method" nullable="false" length="255" comment="Shipping Method" default=""/>
+    </table>
+
+    <table name="ves_vendor_sales_order" resource="default" engine="innodb" comment="Vendor Flat Order">
+        <column xsi:type="decimal" name="base_shipping_discount_amount" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Base Shipping Discount Amount"/>
+        <column xsi:type="decimal" name="shipping_discount_amount" scale="4" precision="20" unsigned="false" nullable="true"
+                comment="Shipping Discount Amount"/>
+    </table>
+
+    <table name="quote_vendors_shipping" resource="default" engine="innodb" comment="Quote Vendors Ship">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="quote_id" unsigned="true" nullable="true" comment="quote_id"/>
+        <column xsi:type="varchar" name="shipping_description" nullable="true" length="255"
+                comment="Shipping Description"/>
+        <column xsi:type="varchar" name="shipping_method" nullable="true" length="250"/>
+        <column xsi:type="decimal" name="shipping_amount" scale="4" precision="12" comment="Shipping Amount"/>
+        <column xsi:type="decimal" name="discount_shipping_amount" scale="4" precision="12" comment="Discount Shipping Amount"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="true" comment="vendor_id"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_QUOTE_SHIPPING_AMOUNT" table="quote_vendors_shipping"
+                    column="quote_id" referenceTable="quote" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="salesrule" resource="default" engine="innodb" comment="Salesrule">
+        <column xsi:type="mediumtext" name="vendor_id" nullable="true" comment="Vendor Id"/>
+        <column xsi:type="smallint" name="stop_rules_processing_vendor" unsigned="false" nullable="false"
+                identity="false" default="0" comment="Stop Vendor Rules Processing"/>
+    </table>
+</schema>

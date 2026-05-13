@@ -1,0 +1,356 @@
+/** Common miniquote **/
+.quotation-wrapper{float: right; margin-left: 10px; position: relative;}
+
+.quotation-wrapper .action.showquote{text-decoration: none; color: #757575;}
+.quotation-wrapper .action.showquote:hover{color: #333333;}
+.quotation-wrapper .action.showquote:before {
+    display: inline-block;
+    font-size: 23px;
+    line-height: 31px;
+    margin: 0;
+    font-weight: normal;
+    vertical-align: top;
+    overflow: hidden;
+    text-align: center;
+}
+
+.quotation-wrapper .block-quote .block-title {
+    display: none;
+}
+
+.quotation-wrapper .action.showquote .text,
+.quotation-wrapper .action.showquote .counter-label {
+    border: 0;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.quotation-wrapper .action.showquote .counter.qty {
+    background: #ffa201;
+    border-radius: 2px;
+    color: #ffffff;
+    display: inline-block;
+    height: 24px;
+    min-width: 18px;
+    margin: 3px 0 0 2px;
+    overflow: hidden;
+    padding: 0 3px;
+    line-height: 24px;
+    text-align: center;
+}
+
+.quotation-wrapper .action.showquote .counter.qty.empty {
+    display: none;
+}
+.quotation-wrapper .action.close{color: #757575;}
+.quotation-wrapper .action.close:hover{color: #333333;}
+.quotation-wrapper .action.close:before {
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px;
+    line-height: 16px;
+    content: '\ea0f';
+    font-family: 'vnecoms-quote';
+    margin: 0;
+    vertical-align: top;
+    display: inline-block;
+    font-weight: normal;
+    overflow: hidden;
+    speak: none;
+    text-align: center;
+}
+
+.quotation-wrapper .action.close > span {
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+/* _____ Mini Quote CONTENT  ______ */
+.block-quote .quote-items-wrapper {
+    border: 1px solid #cccccc;
+    margin: 0 -20px;
+    border-left: 0;
+    border-right: 0;
+    overflow-y: auto;
+    padding: 15px;
+    height: auto !important;
+	max-height: 784px;
+}
+.details-qty .quote-item-qty {
+    text-align: center;
+    width: 40px;
+}
+.quote-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    height: auto;
+}
+
+.quote-items .product-item:first-child {
+    padding-top: 0;
+}
+
+.quotation-wrapper .block-quote li {
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.quotation-wrapper .block-quote li:hover {
+    cursor: pointer;
+}
+
+.quotation-wrapper .block-quote li:last-child {
+    border: 0;
+}
+
+.block-quote .action.request-quote {
+    line-height: 2.2rem;
+    border-radius: 3px;
+    padding: 14px 17px;
+    font-size: 1.8rem;
+}
+
+.quote-items .product-item {
+    padding: 20px 0;
+}
+
+.quote-items .product > .product-item-photo,
+.quote-items .product > .product-image-container {
+    float: left;
+}
+
+.quote-items .product-item-details {
+    padding-left: 88px;
+    position: relative;
+}
+
+.quote-items .product-item-name {
+    font-weight: 400;
+    margin: 0  0 10px 0;
+}
+
+.quote-items .product-item-name a {
+    color: inherit;
+}
+
+
+.block-quote .subtitle {
+    display: none;
+}
+
+.block-quote .subtitle.empty {
+    display: block;
+    font-size: 14px;
+    padding: 30px 0 20px;
+    text-align: center;
+}
+
+.quotation-wrapper .block-quote {
+    background: #ffffff;
+    border: 1px solid #bbbbbb;
+    box-shadow: 0 3px 3px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+    display: none;
+    margin-top: 4px;
+    padding: 25px 20px;
+    list-style: none;
+    right: 0;
+    width: 320px;
+    z-index: 99;
+}
+
+.quotation-wrapper .block-quote {width: 390px; right: 5px;}
+
+.quotation-wrapper.active .block-quote {
+    display: block;
+    position: absolute;
+}
+
+
+.quotation-wrapper .action.close {
+    height: 40px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40px;
+    background-image: none;
+    background: none;
+    -moz-box-sizing: content-box;
+    border: 0;
+    box-shadow: none;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
+    text-shadow: none;
+    font-weight: 400;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.block-quote .items-total {
+    margin: 0 10px;
+}
+
+.block-quote .items-total .count{
+    font-weight: 700;
+}
+
+/*.block-quote .subtotal {
+    float: right;
+    margin: 0 10px;
+}*/
+
+.quote-items .price-container .price {
+    font-weight: 700;
+}
+
+.quote-items .product .toggle {
+    display: block;
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 0;
+    padding: 0 30px 5px 0;
+    text-decoration: none;
+}
+
+
+.quote-items .product .toggle:after{
+    content: "\f107";
+    font-size: 22px;
+    color: #8f8f8f;
+    display: inline-block;
+    font-family: 'vnecoms-quote';
+    overflow: hidden;
+    margin: 0 0 0 5px;
+    text-align: center;
+    position: static;
+    speak: none;
+    vertical-align: middle;
+    font-weight: normal;
+}
+
+.quote-items .product.active .toggle:after{
+    content: "\f106";
+	margin-top: -1px;
+}
+
+.quote-items .product-item-pricing .label {
+    display: inline-block;
+    width: 4.5rem;
+}
+
+.quote-items .actions {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+}
+.block-quote .block-content .actions {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.quote-items .actions .primary {
+    float: left;
+}
+
+.quote-items .actions .secondary {
+    float: right;
+}
+
+.block-quote .block-content > .actions > .primary {
+    margin: 0 10px 15px;
+}
+
+.block-quote .block-content > .actions > .primary .action.primary {
+    display: block;
+    width: 100%;
+}
+
+/** trianglar shape **/
+.quotation-wrapper .block-quote:before,
+.quotation-wrapper .block-quote:after {
+    border-bottom-style: solid;
+    content: '';
+    display: block;
+    height: 0;
+    position: absolute;
+    width: 0;
+}
+
+.quotation-wrapper .block-quote:before {
+    left: auto;
+    right: 26px;
+    border: 6px solid;
+    border-color: transparent transparent #ffffff transparent;
+    z-index: 99;
+}
+
+.quotation-wrapper .block-quote:after {
+    left: auto;
+    top: -14px;
+    right: 25px;
+}
+
+.quotation-wrapper .block-quote:before {
+    top: -12px;
+    left: auto;
+    right: 26px;
+}
+
+.quotation-wrapper .block-quote:after {
+    border: 7px solid;
+    border-color: transparent transparent #bbbbbb transparent;
+    z-index: 98;
+}
+
+
+.quote-items .action.delete, .quote-items .action.edit {color: #757575; text-decoration: none; font-size: 20px;}
+.quote-items .action.delete:hover, .quote-items .action.edit:hover{color: #333333;}
+
+.quote-items .action.edit > span, .quote-items .action.delete > span {
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+}
+
+@media only screen and (min-device-width: 319px) and (max-device-width: 780px ) {
+    .quote-items .product .toggle > span {
+        clip: auto;
+        width: auto;
+        height: auto;
+        position: static;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .quotation-wrapper.active .block-quote {width: 320px;}
+}
+
+@media screen and (max-width: 639px) {
+    .quotation-wrapper {margin-top: 10px; margin-left: 0;}
+}
+@media screen and (max-width: 479px) {
+    .quotation-wrapper.active .block-quote {width: 290px;}
+}
+
+@media screen and (max-width: 370px) {
+    .quotation-wrapper .block-quote{right: -12px;}
+	.quotation-wrapper .block-quote:before{right: 30px;}
+	.quotation-wrapper .block-quote:after{right: 29px;}
+}

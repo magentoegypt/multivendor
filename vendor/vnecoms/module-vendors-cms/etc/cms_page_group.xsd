@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="cms_page_group">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="group" type="groupDeclaration" minOccurs="1" maxOccurs="unbounded">
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="groupDeclaration">
+        <xs:annotation>
+            <xs:documentation>
+                Group declaration.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="id" type="xs:ID" use="required" />
+        <xs:attribute name="label" type="pageGroupLabel" use="required" />
+        <xs:attribute name="class" type="pageGroupClass" use="required" />
+        <xs:attribute name="sort_order" type="xs:string" use="optional" />
+    </xs:complexType>
+
+    <xs:simpleType name="pageGroupLabel">
+        <xs:annotation>
+            <xs:documentation>
+                Label can contain any character.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value=".+" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="pageGroupClass">
+        <xs:annotation>
+            <xs:documentation>
+                Class name can contain only [a-zA-Z\].
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-zA-Z\\]+" />
+        </xs:restriction>
+    </xs:simpleType>
+</xs:schema>

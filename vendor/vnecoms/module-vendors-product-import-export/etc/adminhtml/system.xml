@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+
+        <section id="vendors">
+            <group id="import_export" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Mass Product Import/Export</label>
+                <field id="import_bunch_size" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Import Bunch Size</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                    <tooltip><![CDATA[<p>You can increase this value to increase the speed of importing data from csv file to import queue. This depends on max_allowed_packet configuration of your MySQL server.]]></tooltip>
+                </field>
+                <field id="import_size" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Import Size</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                    <tooltip><![CDATA[<p>The number of products will be imported a time.</p>]]></tooltip>
+                </field>
+                <field id="export_attributes_restriction" translate="label" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Export Attributes Restriction</label>
+                    <source_model>Vnecoms\VendorsProductImportExport\Model\Source\Product\Attributes</source_model>
+                    <tooltip><![CDATA[<p>These selected attributes will not be exported by vendor.</p>]]></tooltip>
+                </field>
+                <field id="excel_sheet_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Excel Sheet Name</label>
+                    <frontend_class>required-entry</frontend_class>
+                    <tooltip><![CDATA[<p>If customer import products from excel file, system will read the product data from this sheet name.</p>]]></tooltip>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

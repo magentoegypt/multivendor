@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V1/vendor_categories/:categoryId" method="DELETE">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryRepositoryInterface" method="deleteByIdentifier" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories/:categoryId" method="GET">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryRepositoryInterface" method="get" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories" method="POST">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryRepositoryInterface" method="save" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories" method="GET">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryManagementInterface" method="getTree" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/vendor_categories/:id" method="PUT">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryRepositoryInterface" method="save" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories/:categoryId/move" method="PUT">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryManagementInterface" method="move" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- Category Product Links -->
+    <route url="/V1/vendor_categories/:categoryId/products" method="GET">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryLinkManagementInterface" method="getAssignedProducts" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories/:categoryId/products" method="POST">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryLinkRepositoryInterface" method="save" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories/:categoryId/products" method="PUT">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryLinkRepositoryInterface" method="save" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/vendor_categories/:categoryId/products/:sku" method="DELETE">
+        <service class="Vnecoms\VendorsCategory\Api\CategoryLinkRepositoryInterface" method="deleteByIds" />
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

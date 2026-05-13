@@ -1,0 +1,51 @@
+@font-face {
+    font-family: 'rma';
+    src:    url('../fonts/rma.eot?uqpbf5');
+    src:    url('../fonts/rma.eot?uqpbf5#iefix') format('embedded-opentype'),
+    url('../fonts/rma.ttf?uqpbf5') format('truetype'),
+    url('../fonts/rma.woff?uqpbf5') format('woff'),
+    url('../fonts/rma.svg?uqpbf5#rma') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body .admin__menu .item-rma > a::before{
+    font-family: 'rma' !important;
+    content: "\f2a5";
+}
+
+.google-visualization-table{width:100%}
+.google-visualization-table div,.google-visualization-table table{width:100%}
+.flag-ip img{float:left;margin-right: 10px}
+.flag-ip{color: #007bdb;font-weight: bold}
+.ves-notifications-wrapper {
+    float: right;
+    line-height: 1;
+    position: relative;
+    z-index: 2;
+}
+.ves-notifications-wrapper .rma-notifications::before {
+    content: '\e608';
+    font-family: 'Admin Icons';
+    font-size: 1.9rem;
+    margin-right: 0;
+}
+.rma-notifications .notifications-counter {
+    background-color: #e22626;
+    border-radius: 1em;
+    color: #fff;
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 700;
+    left: 50%;
+    margin-left: 0.3em;
+    margin-top: -1.1em;
+    padding: 0.3em 0.5em;
+    position: absolute;
+    top: 50%;
+}
+.ves-notifications-wrapper .rma-notifications::after {
+    display: none;
+}
+
+

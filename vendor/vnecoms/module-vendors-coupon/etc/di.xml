@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<preference for="Vnecoms\VendorsCoupon\Api\CouponManagementInterface" type="Vnecoms\VendorsCoupon\Model\CouponManagement" />
+	<preference for="Vnecoms\VendorsCoupon\Api\GuestCouponManagementInterface" type="Vnecoms\VendorsCoupon\Model\GuestCart\GuestCouponManagement" />
+
+	<type name="Magento\SalesRule\Model\ResourceModel\Coupon">
+		<plugin name="vendor_coupon" type="Vnecoms\VendorsCoupon\Plugin\Coupon" sortOrder="10" disabled="false"/>
+	</type>
+
+	<!-- <type name="Magento\Quote\Model\CouponManagement">
+		<plugin name="vendor_coupon" type="Vnecoms\VendorsCoupon\Plugin\CouponManagement" sortOrder="10" disabled="false"/>
+	</type> -->
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vendor_coupon_grid_data_source" xsi:type="string">Vnecoms\VendorsCoupon\Model\ResourceModel\Coupon\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsCoupon\Helper\Data">
+        <arguments>
+            <argument name="couponParameters" xsi:type="array">
+                <item name="separator" xsi:type="string">-</item>
+                <item name="charset" xsi:type="array">
+                    <item name="alphanum" xsi:type="string">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</item>
+                    <item name="alpha" xsi:type="string">ABCDEFGHIJKLMNOPQRSTUVWXYZ</item>
+                    <item name="num" xsi:type="string">0123456789</item>
+                </item>
+            </argument>
+
+						<argument name="actions" xsi:type="array">
+                <item name="by_fixed" xsi:type="array">
+                    <item name="class" xsi:type="string">\Vnecoms\VendorsCoupon\Model\Coupon\Action\ByFixed</item>
+                    <item name="name" xsi:type="string">Fixed Amount Discount of X</item>
+                </item>
+								<item name="by_percent" xsi:type="array">
+										<item name="class" xsi:type="string">\Vnecoms\VendorsCoupon\Model\Coupon\Action\ByPercent</item>
+										<item name="name" xsi:type="string">Product Price Discount of X%</item>
+								</item>
+								<item name="buy_x_get_y" xsi:type="array">
+										<item name="class" xsi:type="string">\Vnecoms\VendorsCoupon\Model\Coupon\Action\BuyXGetYFixed</item>
+										<item name="name" xsi:type="string">Buy at least X and Enjoy Y Off</item>
+								</item>
+								<item name="buy_x_percent_y" xsi:type="array">
+										<item name="class" xsi:type="string">\Vnecoms\VendorsCoupon\Model\Coupon\Action\BuyXGetYPercent</item>
+										<item name="name" xsi:type="string">Buy at least X and Enjoy Y% Off</item>
+								</item>
+								<item name="buy_x_freeship" xsi:type="array">
+										<item name="class" xsi:type="string">\Vnecoms\VendorsCoupon\Model\Coupon\Action\BuyXGetFreeShip</item>
+										<item name="name" xsi:type="string">Buy at least X and Enjoy Free Delivery</item>
+								</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vendors_coupon_sales_order_grid_data_source" xsi:type="string">Vnecoms\VendorsCoupon\Model\ResourceModel\Order\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Sales\Model\Order">
+        <plugin name="add_vendor_coupon_description" type="Vnecoms\VendorsCoupon\Plugin\Order" sortOrder="10" disabled="false"/>
+    </type>
+</config>

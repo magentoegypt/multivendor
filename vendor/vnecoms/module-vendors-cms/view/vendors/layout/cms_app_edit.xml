@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="prototype/windows/themes/default.css"/>
+        <css src="Vnecoms_VendorsCms::css/cms.css"/>
+    </head>
+    <update handle="rule_head"/>
+    <update handle="cms_app_head"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsCms\Block\Vendors\App\Edit" name="app_edit"/>
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsCms\Block\Vendors\App\Edit\Tabs" name="app_edit_tabs">
+                <block class="Vnecoms\VendorsCms\Block\Vendors\App\Edit\Tab\Settings" name="app_edit_tab_settings"/>
+                <block class="Vnecoms\VendorsCms\Block\Vendors\App\Edit\Tab\Main" name="app_edit_tab_main"/>
+                <block class="Vnecoms\VendorsCms\Block\Vendors\App\Edit\Tab\Properties" name="app_edit_tab_properties"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">settings_section</argument>
+                    <argument name="block" xsi:type="string">app_edit_tab_settings</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">app_edit_tab_main</argument>
+                </action>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">properties_section</argument>
+                    <argument name="block" xsi:type="string">app_edit_tab_properties</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="js">
+            <block class="Magento\Backend\Block\Template" template="Vnecoms_VendorsCms::app/js.phtml" name="app_js"/>
+        </referenceContainer>
+    </body>
+</page>

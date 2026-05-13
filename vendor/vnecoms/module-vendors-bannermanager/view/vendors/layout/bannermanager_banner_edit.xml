@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left"  xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+       <!-- <css src="Magento_Catalog::product/product.css"/>-->
+        <css src="Vnecoms_BannerManager::css/button-styles.css"/>
+        <css src="Vnecoms_BannerManager::css/bannermanager_form.css"/>
+        <css src="Vnecoms_BannerManager::css/calendar.css"/>
+    </head>
+    <update handle="editor"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\BannerManager\Block\Vendors\Banner\Edit" name="backend_banner_edit" />
+            <!--<block class="Vnecoms\Vendors\Block\Vendors\Widget\Form\Renderer\Fieldset\Element" >
+                <action method="setTemplate">
+                    <argument name="template" xsi:type="string">Vnecoms_BannerManager::widget/form/renderer/fieldset/element.phtml</argument>
+                </action>
+            </block>-->
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Vnecoms\BannerManager\Block\Vendors\Banner\Edit\Tabs" name="backend_banner_edit_tabs" />
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="msegat_username" translate="label tooltip" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Msegat Username</label>
+	                    <config_path>vsms/settings/msegat_username</config_path>
+	                    <depends>
+	                        <field id="gateway">msegat</field>
+	                    </depends>
+	                </field>
+	                <field id="msegat_api_key" translate="label tooltip" type="password" sortOrder="131" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Msegat API Key</label>
+	                    <config_path>vsms/settings/msegat_api_key</config_path>
+	                    <depends>
+	                        <field id="gateway">msegat</field>
+	                    </depends>
+	                </field>
+	                <field id="msegat_sender" translate="label tooltip" type="text" sortOrder="132" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender</label>
+	                    <config_path>vsms/settings/msegat_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">msegat</field>
+	                    </depends>
+	                </field>
+					<field id="msegat_unicode" translate="label tooltip" type="select" sortOrder="133" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Is Unicode</label>
+						<config_path>vsms/settings/msegat_unicode</config_path>
+						<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+						<comment>Send as Unicode message</comment>
+						<depends>
+							<field id="gateway">msegat</field>
+						</depends>
+					</field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

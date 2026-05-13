@@ -1,0 +1,87 @@
+<?php
+// @codingStandardsIgnoreFile
+/** @var  $block \Vnecoms\Quotation\Block\Catalog\Product */
+?>
+<script type="text/javascript">
+<?php if(!$block->isEnabledAddToCart()):?>
+document.getElementById('product-addtocart-button').remove();
+<?php endif;?>
+</script>
+
+<?php if($block->isEnabledAddToQuote()):?>
+<?php
+$buttonTitle = __('Add to Quote');
+
+$product = $block->getProduct();
+$urlParamName = \Magento\Framework\App\ActionInterface::PARAM_NAME_URL_ENCODED;
+$routeParams = [
+    $urlParamName => $block->getContinueUrl(),
+    'product' => $product->getEntityId(),
+    '_secure' => false
+];
+
+?>
+<div class="quote-actions">
+    <button type="button"
+            title="<?php /* @escapeNotVerified */ echo $buttonTitle ?>"
+            class="action primary toquote"
+            id="product-addtoquote-button">
+        <span><?php /* @escapeNotVerified */ echo $buttonTitle ?></span>
+    </button>
+</div>
+<script>
+    
+    require([
+        'jquery',
+        'uiRegistry',
+        'mage/translate',
+        'Magento_Ui/js/modal/alert',
+        'mage/mage'
+    ], function($, registry, $t, alert) {
+        'use strict';
+        $('#product-addtoquote-button').click(function (e) {
+        	submitQuoteForm($(this));
+        });
+        function submitQuoteForm(button){
+        	var form = $('#product_addtocart_form');
+            form.validation();
+            if(!form.validation('isValid')) return;
+
+            var quotation = registry.get('quote_content');
+        	quotation.isLoading(true);
+        	
+        	button.attr('disabled','disabled');
+    		button.find('span').html('<?php echo __("Adding ...");?>');
+    		
+        	
+    		var formData = new FormData(form[0]);
+
+            var action = form.attr('action').replace("checkout/cart/add", "quotation/quote/add");
+            $.ajax({
+            	url: action,
+				enctype: 'multipart/form-data',
+				method: "POST",
+				data: formData,
+				processData: false,
+				contentType: false,
+				dataType: "json"
+            }).done(function( response ){
+                console.log(response);
+            	if(response.error){
+                	alert({
+            			title: $t('Error'),
+            			content: response.message,
+            		});
+                }else{
+                	button.find('span').html('<?php echo __("Added");?>');
+                }
+                setTimeout(function(){
+            		button.find('span').html('<?php echo __("Add to Quote");?>');
+            		button.removeAttr('disabled');
+            		button.removeClass('disabled');
+            	}, 1000);
+            });
+        }
+    });
+</script>
+<?php endif;?>

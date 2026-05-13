@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="yamamah_user" translate="label tooltip" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Yamamah.com User Name</label>
+	                    <config_path>vsms/settings/yamamah_user</config_path>
+	                    <frontend_class>required-entry</frontend_class>
+	                    <comment>The username or Mobile number (format: 9665xxxxxxx) registered in Yamamah website.</comment>
+	                    <depends>
+	                        <field id="gateway">yamamah</field>
+	                    </depends>
+	                </field>
+	                
+	                <field id="yamamah_password" translate="label tooltip" type="password" sortOrder="121" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Yamamah.com Password</label>
+	                    <config_path>vsms/settings/yamamah_password</config_path>
+	                    <frontend_class>required-entry</frontend_class>
+	                    <comment>The password used in Yamamah website.</comment>
+	                    <depends>
+	                        <field id="gateway">yamamah</field>
+	                    </depends>
+	                </field>
+	                
+	                <field id="yamamah_sender" translate="label tooltip" type="text" sortOrder="123" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Tagname</label>
+	                    <config_path>vsms/settings/yamamah_sender</config_path>
+	                    <comment>The tag name is the sender name, which will appear in the title of the message.</comment>
+	                    <depends>
+	                        <field id="gateway">yamamah</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

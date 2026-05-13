@@ -1,0 +1,32 @@
+{
+    "name": "amasty/module-single-step-checkout",
+    "description": "One Step Checkout by Amasty",
+    "require": {
+        "php": ">=7.3.0",
+        "amasty/base": ">=1.14.7",
+        "amasty/geoip": ">=1.3.6",
+        "amasty/module-one-step-checkout-core": "*",
+        "amasty/module-google-address-autocomplete": "*",
+        "amasty/module-checkout-layout-builder": "*",
+        "amasty/module-checkout-style-switcher": "*",
+        "amasty/module-checkout-delivery-date": "*",
+        "amasty/module-checkout-gift-wrap": "*",
+        "amasty/module-checkout-thank-you-page": "*"
+    },
+    "suggest": {
+        "amasty/module-single-step-checkout-mftf-3": "Install module-single-step-checkout-mftf-3 module to be able to run One Step Checkout MFTF tests for Magento 2.4.0+ version."
+    },
+    "type": "magento2-module",
+    "version": "4.3.2",
+    "license": [
+        "proprietary"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Amasty\\Checkout\\": ""
+        }
+    }
+}

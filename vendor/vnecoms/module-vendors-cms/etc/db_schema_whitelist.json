@@ -1,0 +1,121 @@
+{
+    "vnecoms_vendor_cms_page": {
+        "column": {
+            "page_id": true,
+            "title": true,
+            "page_layout": true,
+            "meta_title": true,
+            "meta_keywords": true,
+            "meta_description": true,
+            "identifier": true,
+            "content_heading": true,
+            "content": true,
+            "creation_time": true,
+            "update_time": true,
+            "is_active": true,
+            "sort_order": true,
+            "layout_update_xml": true,
+            "custom_theme": true,
+            "custom_root_template": true,
+            "custom_layout_update_xml": true,
+            "custom_theme_from": true,
+            "custom_theme_to": true,
+            "vendor_id": true
+        },
+        "index": {
+            "VNECOMS_VENDOR_CMS_PAGE_IDENTIFIER": true,
+            "FTI_B730F660556646F1458950F765A64431": true
+        },
+        "constraint": {
+            "VNECOMS_VENDOR_CMS_PAGE_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "vnecoms_vendor_cms_block": {
+        "column": {
+            "block_id": true,
+            "vendor_id": true,
+            "identifier": true,
+            "title": true,
+            "content": true,
+            "creation_time": true,
+            "update_time": true,
+            "is_active": true
+        },
+        "index": {
+            "VNECOMS_VENDOR_CMS_BLOCK_TITLE_IDENTIFIER_CONTENT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VNECOMS_VENDOR_CMS_BLOCK_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true
+        }
+    },
+    "vnecoms_vendor_cms_app": {
+        "column": {
+            "app_id": true,
+            "vendor_id": true,
+            "type": true,
+            "title": true,
+            "instance_type": true,
+            "is_active": true,
+            "sort_order": true,
+            "parameters": true
+        },
+        "index": {
+            "VNECOMS_VENDOR_CMS_APP_TITLE_TYPE": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VNECOMS_VENDOR_CMS_APP_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true
+        }
+    },
+    "vnecoms_vendor_cms_app_option": {
+        "column": {
+            "option_id": true,
+            "app_id": true,
+            "page_group": true,
+            "layout_handle": true,
+            "block_reference": true,
+            "page_for": true,
+            "entities": true,
+            "template": true
+        },
+        "index": {
+            "VNECOMS_VENDOR_CMS_APP_OPTION_APP_ID": true
+        },
+        "constraint": {
+            "VNECOMS_VENDOR_CMS_APP_OPT_APP_ID_VNECOMS_VENDOR_CMS_APP_APP_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "vnecoms_vendor_cms_layout_update": {
+        "column": {
+            "layout_update_id": true,
+            "vendor_id": true,
+            "handle": true,
+            "xml": true,
+            "sort_order": true,
+            "updated_at": true
+        },
+        "index": {
+            "VNECOMS_VENDOR_CMS_LAYOUT_UPDATE_HANDLE": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VNECOMS_VENDOR_CMS_LYT_UPDATE_VENDOR_ID_VES_VENDOR_ENTT_ENTT_ID": true
+        }
+    },
+    "vnecoms_vendor_cms_app_option_layout": {
+        "column": {
+            "option_id": true,
+            "layout_update_id": true
+        },
+        "index": {
+            "VNECOMS_VENDOR_CMS_APP_OPTION_LAYOUT_OPTION_ID": true
+        },
+        "constraint": {
+            "FK_E38A37CBBBAF249D2F3D2BF73D90E0A7": true,
+            "FK_3EC6E91917EB2CA8B2A4B935048463E4": true
+        }
+    }
+}

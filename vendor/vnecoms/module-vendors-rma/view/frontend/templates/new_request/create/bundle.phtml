@@ -1,0 +1,108 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var $block \Magento\Bundle\Block\Sales\Order\Items\Renderer */ ?>
+<?php $_item = $block->getItem() ?>
+<?php $_order = $block->getOrder() ?>
+
+<?php $parentItem = $block->getItem() ?>
+<?php $items = array_merge([$parentItem], $parentItem->getChildrenItems()); ?>
+
+<?php if ($block->getItemOptions() || $_item->getDescription() || $this->helper('Magento\GiftMessage\Helper\Message')->isMessagesAllowed('order_item', $_item) && $_item->getGiftMessageId()): ?>
+    <?php $_showlastRow = true ?>
+<?php else: ?>
+    <?php $_showlastRow = false ?>
+<?php endif; ?>
+
+<?php $_prevOptionId = '' ?>
+
+<?php foreach ($items as $_item): ?>
+
+    <?php if ($_item->getParentItem()): ?>
+        <?php $attributes = $block->getSelectionAttributes($_item) ?>
+        <?php if ($_prevOptionId != $attributes['option_id']): ?>
+            <tr class="bundle-option-label">
+                <td colspan="3">
+                    <strong><em><?= /* @escapeNotVerified */  $attributes['option_label'] ?></em></strong>
+                </td>
+            </tr>
+            <?php $_prevOptionId = $attributes['option_id'] ?>
+        <?php endif; ?>
+    <?php endif; ?>
+    <?php if (!$_item->getParentItem()): ?>
+        <tr class="bundle-item bundle-parent">
+            <td></td>
+            <td> <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p></td>
+            <td class="item-info" colspan="2">
+
+                <p class="sku"><?= /* @escapeNotVerified */  __('SKU'); ?>: <?= $block->escapeHtml($block->getSku($_item)) ?></p>
+            </td>
+        </tr>
+    <?php else: ?>
+        <?php $dataItems = $block->getRmaItem($_item) ?>
+        <tr class="bundle-item bundle-option-value">
+            <td>
+                <?php if ($dataItems["qty"] != 0):?>
+                    <input type="checkbox" name="orderitems[<?php echo $_item->getId() ?>]" id="ves-items-selected-<?php echo $_item->getId() ?>" value="<?php echo $_item->getId() ?>" class="request-items-selected"/>
+                <?php endif;?>
+            </td>
+
+            <td class="item-info">
+                <p><?= $block->getValueHtml($_item)?></p>
+            </td>
+            <td></td>
+            <td class="item-qty">
+
+                <?php if ($dataItems["qty"] == 0):?>
+                    <span style="color:#FF0000;"><?php echo __("Not available for creating RMA.")?></span>
+                <?php else:?>
+                    <?php if($block->isEditQtyRma()): ?>
+                        <input id="orderitem-count<?php echo $_item->getId() ?>" class="ves-items-count" type="text"
+                               value="<?php echo $dataItems["qty"]  ?>" name="<?php echo $_item->getId() ?>">
+                    <?php else: ?>
+                        <label><?php echo $dataItems["qty"] ?></label>
+                        <input id="orderitem-count<?php echo $_item->getId() ?>" class="ves-items-count" type="hidden"
+                               value="<?php echo $dataItems["qty"]  ?>" name="<?php echo $_item->getId() ?>">
+                    <?php endif;?>
+                <?php endif?>
+                <?php if ($dataItems["rma"]) : ?>
+                    <p><?php echo __("Other RMA for this product:") ?></p>
+                    <ul>
+                        <?php foreach($dataItems["rma"] as $request): ?>
+                            <li><a href="<?php echo $block->getViewOtherRmaUrl($request["request_id"]) ?>" target="_blank">
+                                    <?php echo "#".$request["request_increment_id"] ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif ?>
+                <input id="orderitem-count<?php echo $_item->getId() ?>-maxcount"
+                       type="hidden" value="<?php echo (int)($dataItems["qty"]) ?>">
+                <input id="orderitem-amount<?php echo $_item->getId() ?>"
+                       type="hidden" value="<?php echo $block->getPriceItemRefund($_item) ?>">
+                <input id="orderitem-track<?php echo $_item->getId() ?>"
+                       type="hidden" value="<?php echo $block->getTrackingNumberByItem($_item) ?>">
+            </td>
+        </tr>
+    <?php endif; ?>
+
+<?php endforeach; ?>
+
+<?php if ($_showlastRow): ?>
+    <tr>
+        <td colspan="2" class="item-extra">
+            <?php if ($block->getItemOptions()): ?>
+                <dl>
+                    <?php foreach ($block->getItemOptions() as $option): ?>
+                        <dt><strong><em><?= /* @escapeNotVerified */  $option['label'] ?></em></strong></dt>
+                        <dd><?= /* @escapeNotVerified */  $option['value'] ?></dd>
+                    <?php endforeach; ?>
+                </dl>
+            <?php endif; ?>
+        </td>
+    </tr>
+<?php endif; ?>

@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="controller_action_predispatch_catalog_product_view">
+		<observer name="vnecoms_vendors_pricecomparison_catalog_product_view_predispatch" instance="Vnecoms\VendorsPriceComparison\Observer\ProductViewPredispatch" />
+	</event>
+</config>

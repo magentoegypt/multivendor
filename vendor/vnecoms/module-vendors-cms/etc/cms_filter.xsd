@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="config">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="cms_filter" type="cmsFilter" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="uniqueFilterId">
+            <xs:annotation>
+                <xs:documentation>
+                    Cms Filter Id must be unique.
+                </xs:documentation>
+            </xs:annotation>
+            <xs:selector xpath="cms_filter" />
+            <xs:field xpath="@id" />
+        </xs:unique>
+    </xs:element>
+
+    <xs:complexType name="cmsFilter">
+        <xs:annotation>
+            <xs:documentation>
+                Cms Filter declaration.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="title" type="xs:string" />
+            <xs:element name="note" type="xs:string" />
+        </xs:choice>
+        <!--<xs:sequence>-->
+            <!--<xs:element minOccurs="0" name="title" type="titleType"/>-->
+            <!--<xs:element minOccurs="0" name="note" type="noteType"/>-->
+        <!--</xs:sequence>-->
+        <xs:attribute name="id" type="xs:string" use="required" />
+        <xs:attribute name="class" type="classType" use="required" />
+    </xs:complexType>
+
+    <xs:simpleType name="classType">
+        <xs:annotation>
+            <xs:documentation>
+                Class name can contain only [a-zA-Z\].
+            </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-zA-Z\\]+" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="titleType">
+        <xs:annotation>
+            <xs:documentation>
+                Title declaration.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+
+    <xs:complexType name="noteType">
+        <xs:annotation>
+            <xs:documentation>
+                Note declaration.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+</xs:schema>

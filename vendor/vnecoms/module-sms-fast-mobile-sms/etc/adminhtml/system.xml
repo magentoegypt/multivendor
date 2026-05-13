@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="fastmobilesms_user_name" translate="label tooltip" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Fast Mobile Sms User Name</label>
+	                    <config_path>vsms/settings/fastmobilesms_user_name</config_path>
+	                    <comment>Account from fastmobilesms.net</comment>
+	                    <depends>
+	                        <field id="gateway">fastmobilesms</field>
+	                    </depends>
+	                </field>
+	                <field id="fastmobilesms_password" translate="label tooltip" type="text" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Fast Mobile Sms Password</label>
+	                    <config_path>vsms/settings/fastmobilesms_password</config_path>
+	                    <depends>
+	                        <field id="gateway">fastmobilesms</field>
+	                    </depends>
+	                </field>
+	                <field id="fastmobilesms_sender" translate="label tooltip" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Fast Mobile Sms Sender</label>
+	                    <config_path>vsms/settings/fastmobilesms_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">fastmobilesms</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

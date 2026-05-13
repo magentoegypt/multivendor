@@ -1,0 +1,25 @@
+
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject RMA # {{var request.getIncrementId()}} @-->
+
+
+{{template config_path="design/email/header_template"}}
+
+<h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;">
+    {{trans "Hello %name" name=$request.getCustomerName()}},
+</h1>
+<p>{{trans "New message appended to RMA <strong>#%increnment_id</strong>" increnment_id=$request.getIncrementId() |raw}}</p>
+<p>{{trans "Name: %customer_name" customer_name=$request.getCustomerName()}}</p>
+<p>{{trans "Email: %customer_email" customer_email=$request.getCustomerEmail()}}</p>
+<p>{{trans "Order #: %order_id" order_id=$request.getOrderIncrementalId()}}</p>
+<p>{{trans "%message" message=$message.getMessage() |raw}}</p>
+<p>-------------------</p>
+
+{{template config_path="design/email/footer_template"}}
+

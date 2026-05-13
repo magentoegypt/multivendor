@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vnecoms_BannerManager::index" icon="fa fa-picture-o" title="Banner Manager" module="Vnecoms_BannerManager" dependsOnModule="Vnecoms_VendorsDashboard" sortOrder="60" resource="Vnecoms_BannerManager::bannermanager"/>
+        <add id="Vnecoms_BannerManager::banners" title="Manage Banners" module="Vnecoms_BannerManager" parent="Vnecoms_BannerManager::index" sortOrder="61" action="bannermanager/banner/index" resource="Vnecoms_BannerManager::banners"/>
+    </menu>
+</config>

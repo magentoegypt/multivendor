@@ -1,0 +1,184 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div id="media-uploader-container" class="row" data-bind="scope: 'media'">
+    <div class="col-md-4">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"><?php echo __("Uploader")?></h3>
+            </div>
+            <div class="box-header with-border fileupload-buttonbar">
+                <span class="btn btn-primary fileinput-button">
+                    <i class="fa fa-plus-circle"></i>
+                    <span><?php echo __("Add files ...")?></span>
+                    <input id="image-uploader" type="file" name="impage_uploader" data-bind="afterRender:onElementRender" multiple data-url="<?php echo $block->getUploadUrl()?>"/>
+                </span>
+                <button type="button" class="btn btn-success start" data-bind="click: startUpload">
+                    <i class="fa fa-cloud-upload"></i> 
+                    <span><?php echo __("Upload")?></span>
+                </button>
+                <button type="button" class="btn btn-warning stop" data-bind="click: stopUpload">
+                    <i class="fa fa-minus-circle"></i> 
+                    <span><?php echo __("Stop")?></span>
+                </button>
+                <button type="button" class="btn btn-danger cancel" data-bind="click: cancelUpload">
+                    <i class="fa fa-times-circle"></i> 
+                    <span><?php echo __("Cancel")?></span>
+                </button>
+            </div>
+            <div class="box-body">
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                      <li class="active"><a href="#tab_queue" data-toggle="tab"><?php echo __("Images Queue")?> <span class="label label-primary" data-bind="text:getPendingUploadFiles().length"></span></a></li>
+                      <li><a href="#tab_error" data-toggle="tab"><?php echo __("Error")?> <span class="label label-danger" data-bind="text:errorCount()"></span></a></li>
+                    </ul>
+                    <div class="import-export-form tab-content">
+                        <div class="tab-pane pending-images-upload active" id="tab_queue">
+                            <!-- ko if:(getPendingUploadFiles().size()) -->
+                            <table class="table table-bordered image-upload">
+                                <thead>
+                                    <tr><th class="image-upload-filename"><?php echo __("File name")?></th><th class="image-upload-filesize"><?php echo __("File size")?></th></tr>
+                                </thead>
+                                <tbody data-bind="foreach: getPendingUploadFiles()">
+                                    <tr data-bind="css:$parent.isFileUploading($data)?'uploading':''">
+                                        <td class="image-upload-filename">
+                                            <span data-bind="html:$data.file.name"></span>
+                                            <!-- ko if:($parent.getErrorMessage($data)) -->
+                                            <a href="" data-bind="click: $parent.showErrorMessage.bind($parent)"><i class="fa fa-exclamation-circle text-red error" data-bind="attr:{title:$parent.getErrorMessage($data)}"></i></a>
+                                            <!--/ko-->
+                                        </td>
+                                        <td class="image-upload-filesize" data-bind="html: $parent.formatSize($data.file.size)"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <!--/ko-->
+                            <!-- ko if:(!getPendingUploadFiles().size()) -->
+                                <p><?php echo __("There is no item found.")?></p>
+                            <!--/ko-->
+                        </div>
+                        <div class="tab-pane import-result upload-error" id="tab_error">
+                            <!-- ko if:(!errorCount()) -->
+                                <p><?php echo __("There is no error.")?></p>
+                            <!--/ko-->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="box-footer">
+                <p><i class="fa fa-warning text-red"></i> <?php echo __("Allowed file types: %1.", implode(", ", $block->getAllowedExtensions()))?></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="box box-primary form-inline images-list">
+            <div class="box-header with-border">
+                <h3 class="box-title"><?php echo __("Images")?></h3>
+            </div>
+            <div class="box-header with-border">
+                <p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __("In this page you can manage all of your images that will be used for importing products.")?></p>
+                <p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __("Instead of upload your product images here you can also use the image url in your import csv file.")?></p>
+            </div>
+            <div class="box-body">
+                <div class="row no-margin">
+                    <div class="col-sm-1">
+                        <button type="button" class="btn btn-sm btn-danger start" data-bind="click: deleteImages">
+                            <i class="fa fa-trash"></i> 
+                            <span><?php echo __("Delete")?></span>
+                        </button>
+                    </div>
+                    <div class="col-sm-4">
+                        <span data-bind="html: getImagesCount() +' <?php echo __("images found")?>'"></span>
+                        <span data-bind="html: selectedItems().length?'<?php echo __("(%1 selected) ")?>'.replace('%1',selectedItems().length):''"></span>
+                    </div>
+                    <div class="col-sm-7">
+                        <div class="pull-right dataTables_paginate paging_simple_numbers">
+                            <ul class="pagination no-margin">
+                                <li class="paginate_button previous" data-bind="css:isFirst()?'disabled':''"><a href="#" data-bind="click:previousPage"><i class="fa fa-angle-left"></i></a></li>
+                                <li class="paginate_button"><input class="form-control" type="text" data-bind="value: currentPage" /> <em data-bind="text: '<?php echo __("of")?> '+getTotalPages()"></em></li>
+                                <li class="paginate_button next" data-bind="css:isLast()?'disabled':''"><a href="#" data-bind="click:nextPage"><i class="fa fa-angle-right"></i></a></li>
+                            </ul>
+                            
+                        </div>
+                        
+                        <div class="pull-right page-size">
+                            <select name="page_size" data-bind="value: pageSize, foreach: availablePageSize" class="form-control input-sm">
+                                <option data-bind="value:$data, text: $data"></option>
+                            </select> 
+                            <?php echo __("per page")?>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-margin">
+                    <div class="col-sm-12">
+                        <table class="table table-bordered table-hover table-striped dataTable">
+                            <thead>
+                              <tr>
+                                  <th>
+                                    <div class="action-multicheck-wrap">
+                                          <input id="select-all-checkbox" name="selecte_all" class="admin__control-checkbox" type="checkbox" data-bind="checked:isSelectAll(), event:{change: toggleSelectAll}, enable: getImagesCount()">
+                                          <label for="select-all-checkbox"></label>
+                                          <button class="action-multicheck-toggle" data-toggle="dropdown" data-bind="enable: getImagesCount()">
+                                              <span>Options</span>
+                                          </button>
+                                          <ul class="action-menu">
+                                              <li data-bind="visible: canSelectAll()">
+                                                  <span class="action-menu-item" data-bind="click: selectAll"><?php echo __("Select All")?></span>
+                                              </li>
+                                              <li data-bind="visible: canDeselectAll()">
+                                                  <span class="action-menu-item" data-bind="click: deselectAll"><?php echo __("Deselect All")?></span>
+                                              </li>
+                                              <li data-bind="visible: canSelectAllOnThisPage()">
+                                                  <span class="action-menu-item" data-bind="click: selectAllOnThisPage"><?php echo __("Select All on This Page")?></span>
+                                              </li>
+                                              <li data-bind="visible: canDeselectAllOnThisPage()">
+                                                  <span class="action-menu-item" data-bind="click: deselectAllOnThisPage"><?php echo __("Deselect All on This Page")?></span>
+                                              </li>
+                                          </ul>
+                                    </div>
+                                  </th>
+                                  <th class="sorting_desc"><?php echo __("Thumbnail")?></th>
+                                  <th class="sorting"><?php echo __("File Name")?></th>
+                                  <th class="sorting"><?php echo __("File Size")?></th>
+                                  <th class="sorting"><?php echo __("Last Modify")?></th>
+                              </tr>
+                            </thead>
+                            <!-- ko if:(getImagesCount()) -->
+                            <tbody data-bind="foreach: getUploadedImages()">
+                              <tr>
+                                <td><input type="checkbox" name="selected[]" data-bind="value: $data.name,checked:$parent.selectedItems"/></td>
+                                <td><a data-bind="click: $parent.viewImage" href="#"><img class="thumb" data-bind="attr:{src: $data.url}"/></a></td>
+                                <td data-bind="html:$data.name"></td>
+                                <td data-bind="html:$parent.formatSize($data.size)"></td>
+                                <td data-bind="html: $data.last_modify"></td>
+                              </tr>
+                            </tbody>
+                            <!--/ko-->
+                            <!-- ko if:(!getImagesCount()) -->
+                            <tbody>
+                              <tr>
+                                <td colspan="5" class="text-center"><?php echo __("There is no image found.")?></td>
+                              </tr>
+                            </tbody>
+                            <!--/ko-->
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "#media-uploader-container": {
+            "Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+        }
+    }
+</script>

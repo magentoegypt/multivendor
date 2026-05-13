@@ -1,0 +1,62 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="payment-option _collapsible opc-payment-additional discount-code"
+     data-bind="mageInit: {'collapsible':{'openedState': '_active'}}">
+    <div class="payment-option-title field choice" data-role="title">
+        <span class="action action-toggle" id="block-discount-heading" role="heading" aria-level="2">
+            <!-- ko i18n: 'Apply Discount Code'--><!-- /ko -->
+        </span>
+    </div>
+    <div class="payment-option-content" data-role="content">
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+        <form class="form form-discount" id="discount-form">
+        	<div class="minicart-items vendor-coupon-list">
+        		<ul>
+        			<!-- ko if: getCoupon()-->
+	        		<li>
+		                <span data-bind="text: getCoupon();"></span>
+		                <a id="cancel-coupon-btn" href="#" data-bind="click: cancel" class="action delete remove-coupon"><span data-bind="text: $t('Cancel')"></span></a>
+		            </li>
+		            <!-- /ko -->
+		            <!-- ko foreach: getDiscountDetails() -->
+		            	<!-- ko if: $data.vendor_id -->
+		            	<li class="with-store-name">
+		            		<a id="cancel-coupon-btn" href="#" data-bind="click: $parent.removeDiscount.bind($parent, $data)" class="action delete remove-coupon"><span data-bind="text: $t('Cancel')"></span></a>
+			                <span data-bind="text: $data.label"></span>
+			                <div class="discount-description" data-bind="text: $parent.getVendorTitle($data.vendor_id)"></div>
+			            </li>
+			            <!-- /ko -->
+		            <!-- /ko -->
+	            </ul>
+        	</div>
+            <div class="payment-option-inner">
+                <div class="field">
+                    <label class="label" for="discount-code">
+                        <span data-bind="i18n: 'Enter discount code'"></span>
+                    </label>
+                    <div class="control">
+                        <input class="input-text"
+                               type="text"
+                               id="discount-code"
+                               name="discount_code"
+                               data-validate="{'required-entry':true}"
+                               data-bind="value: couponCode, attr:{placeholder: $t('Enter discount code')} " />
+                    </div>
+                </div>
+            </div>
+            <div class="actions-toolbar">
+                <div class="primary">
+	                <button class="action action-apply" type="submit" data-bind="'value': $t('Apply Discount'), click: apply">
+	                    <span><!-- ko i18n: 'Apply Discount'--><!-- /ko --></span>
+	                </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Google Address Autocomplete for Magento 2 (System)
+ */-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" after="checkout.root"
+                   name="checkout.root.google_autocomplete"
+                   template="Amasty_GoogleAddressAutocomplete::init.phtml">
+                <arguments>
+                    <argument name="view_model"
+                              xsi:type="object">Amasty\GoogleAddressAutocomplete\ViewModel\Init</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,154 @@
+<?php
+/**
+ * @var \Vnecoms\Quotation\Block\Quotepage\Detail $block
+ */
+?>
+<div class="quotation-summary">
+    <div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
+        <div class="loader">
+            <img src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>"
+                 alt="<?php /* @escapeNotVerified */ echo __('Loading...'); ?>"
+                 style="position: absolute;">
+        </div>
+    </div>
+
+    <div class="quote-form-sidebar-wrapper">
+        <div class="quote-remarks-label" data-role="title"><?php echo __("Remarks")?></div>
+        <?php if($block->showLoginRequired()):?>
+            <ul class="checkout methods items checkout-methods-items">
+                <li class="item">
+                    <a class="action primary checkout" href="<?php echo $block->getUrl('customer/account/login')?>">
+                        <span><span><?php echo __("Please login to submit your quote")?></span></span>
+                    </a>
+                </li>
+            </ul>
+        <?php else:?>
+        <form id="quote-form-sidebar" method="post" action="<?php echo $block->getUrl('quotation/quote/submit')?>" novalidate="novalidate" data-mage-init='{"validation":{}}'>
+            <fieldset class="fieldset quote-remarks-fieldset">
+                <div class="field">
+                    <div class="control">
+                        <div class="quote-remarks-note"><?php echo __("Do you have a general remark with this quote request?")?></div>
+                        <textarea class="input-text" name="client_comment" cols="15" rows="5"  placeholder=""></textarea>
+                    </div>
+                </div>
+                <?php /*?>
+                <div class="field">
+                    <div class="control">
+                        <div class="fileupload upload-wrapper" data-bind="scope: 'uploader'">
+                            <!-- ko template: getTemplate() --><!-- /ko -->
+                        </div>
+						<script type="text/x-magento-init">
+						{
+						   ".fileupload": {
+							   "Magento_Ui/js/core/app": {
+								   "components": {
+									   "uploader": {
+										   "component": "Vnecoms_Quotation/js/uploader",
+										   "template": "Vnecoms_Quotation/uploader/uploader",
+                                           "previewTmpl": "Vnecoms_Quotation/uploader/preview",
+										   "uploaderConfig": {
+												"url": "<?php echo $block->getUrl('quotation/attachment/upload', ['_secure' => true]); ?>"
+										   }
+									   }
+								   }
+							   }
+						   }
+						}
+						</script>
+                    </div>
+                </div>
+                */?>
+            </fieldset>
+            <fieldset class="fieldset">
+                <div class="field required">
+                    <label class="label">
+                        <span><?php echo __("Email")?></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" class="input-text required-entry" name="customer_email" data-validate="{required:true, 'validate-email':true}" value="<?php echo $block->getCustomer()->getEmail();?>"/>
+                    </div>
+                </div>
+                <div class="fieldset quotation-2cols">
+                    <div class="field required quotation-col1">
+                        <label class="label">
+                            <span><?php echo __("First Name")?></span>
+                        </label>
+                        <div class="control">
+                            <input type="text" class="input-text required-entry" name="customer_firstname" value="<?php echo $block->getCustomer()->getFirstname();?>"/>
+                        </div>
+                    </div>
+                    <div class="field required  quotation-col2">
+                        <label class="label">
+                            <span><?php echo __("Last Name")?></span>
+                        </label>
+                        <div class="control">
+                            <input type="text" class="input-text required-entry" name="customer_lastname" value="<?php echo $block->getCustomer()->getLastname();?>"/>
+                        </div>
+                    </div>
+                </div>
+                <?php if($block->isEnabledTelephone()):?>
+                <div class="field<?php if($block->isRequiredTelephone()):?> required<?php endif;?>">
+                    <label class="label">
+                        <span><?php echo __("Telephone")?></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" class="input-text<?php if($block->isRequiredTelephone()):?> required-entry<?php endif;?>" name="customer_phone" />
+                    </div>
+                </div>
+                <?php endif;?>
+                <?php if($block->isEnabledCompany()):?>
+                <div class="field<?php if($block->isRequiredCompany()):?> required<?php endif;?>">
+                    <label class="label">
+                        <span><?php echo __("Company")?></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" class="input-text<?php if($block->isRequiredCompany()):?> required-entry<?php endif;?>" name="customer_company" />
+                    </div>
+                </div>
+                <?php endif;?>
+                <?php if($block->isEnabledTaxId()):?>
+                <div class="field<?php if($block->isRequiredTaxId()):?> required<?php endif;?>">
+                    <label class="label">
+                        <span><?php echo __("VAT/Tax Id")?></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" class="input-text<?php if($block->isRequiredTaxId()):?> required-entry<?php endif;?>" name="customer_taxvat" />
+                    </div>
+                </div>
+                <?php endif;?>
+            </fieldset>
+            <fieldset class="fieldset">
+                <button data-role="opc-add-to-quote" type="submit" class="action primary submit-quote">
+                    <span><span><?php echo __("Submit Quote Request")?></span></span>
+                </button>
+            </fieldset>
+        </form>
+        <?php endif;?>
+    </div>
+    <script>
+        window.checkoutConfig = <?php /* @escapeNotVerified */ echo \Laminas\Json\Json::encode($block->getQuotationConfig()); ?>;
+        // Create aliases for customer.js model from customer module
+        window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+        window.customerData = window.checkoutConfig.customerData;
+        require([
+             'jquery',
+             'mage/mage'
+         ], function($){
+             var dataForm = $('#quote-form-sidebar');
+             var ignore = null;
+             dataForm.mage('validation', {
+                     ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+                 }).find('input:text').attr('autocomplete', 'off');
+         });
+    </script>
+
+    <script>
+        require([
+            'mage/url',
+            'Magento_Ui/js/block-loader'
+        ], function(url, blockLoader) {
+            blockLoader("<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/loader-1.gif'); ?>");
+            return url.setBaseUrl('<?php /* @escapeNotVerified */ echo $block->getBaseUrl();?>');
+        })
+    </script>
+</div>

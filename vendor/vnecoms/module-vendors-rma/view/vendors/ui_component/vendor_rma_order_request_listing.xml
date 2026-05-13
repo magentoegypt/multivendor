@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">vendor_rma_order_request_listing.rma_request_listing_data_source</item>
+            <item name="deps" xsi:type="string">vendor_rma_order_request_listing.rma_request_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">rma_request_columns</item>
+    </argument>
+
+    <dataSource name="rma_request_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Vnecoms\VendorsRMA\Ui\Component\DataProvider</argument>
+            <argument name="name" xsi:type="string">rma_request_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="filter_url_params" xsi:type="array">
+                        <item name="vendor_order_id" xsi:type="string">*</item>
+                        <item name="vendor_id" xsi:type="string">*</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+
+    <container name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="template" xsi:type="string">ui/grid/toolbar</item>
+            </item>
+        </argument>
+        <!-- <filterSearch name="fulltext">
+             <argument name="data" xsi:type="array">
+                 <item name="config" xsi:type="array">
+                     <item name="provider" xsi:type="string">vendor_rma_order_request_listing.rma_request_listing_data_source</item>
+                     <item name="chipsProvider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.listing_filters_chips</item>
+                     <item name="storageConfig" xsi:type="array">
+                         <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.bookmarks</item>
+                         <item name="namespace" xsi:type="string">current.search</item>
+                     </item>
+                 </item>
+             </argument>
+         </filterSearch>-->
+        <filters name="listing_filters">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+
+                    <item name="columnsProvider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.rma_request_columns</item>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.bookmarks</item>
+                        <item name="namespace" xsi:type="string">current.filters</item>
+                    </item>
+                    <item name="childDefaults" xsi:type="array">
+                        <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.listing_filters</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.rma_request_columns.${ $.index }:visible</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <filterSelect name="store_id">
+                <argument name="optionsProvider" xsi:type="configurableObject">
+                    <argument name="class" xsi:type="string">Magento\Store\Ui\Component\Listing\Column\Store\Options</argument>
+                </argument>
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="caption" xsi:type="string" translate="true">All Store Views</item>
+                        <item name="dataScope" xsi:type="string">store_id</item>
+                        <item name="label" xsi:type="string" translate="true">Purchase Point</item>
+                    </item>
+                </argument>
+            </filterSelect>
+        </filters>
+        <massaction name="listing_massaction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="selectProvider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.rma_request_columns.ids</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/tree-massactions</item>
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+
+            <action name="print">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">print</item>
+                        <item name="label" xsi:type="string" translate="true">Print PDF</item>
+                        <item name="url" xsi:type="url" path="vrma/request/massPrint"/>
+                    </item>
+                </argument>
+            </action>
+        </massaction>
+        <paging name="listing_paging">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.bookmarks</item>
+                        <item name="namespace" xsi:type="string">current.paging</item>
+                    </item>
+                    <item name="selectProvider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.rma_request_columns.ids</item>
+                </item>
+            </argument>
+        </paging>
+    </container>
+    <columns name="rma_request_columns">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="storageConfig" xsi:type="array">
+                    <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.bookmarks</item>
+                    <item name="namespace" xsi:type="string">current</item>
+                </item>
+
+                <item name="childDefaults" xsi:type="array">
+                    <item name="fieldAction" xsi:type="array">
+                        <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.request_columns.actions</item>
+                        <item name="target" xsi:type="string">applyAction</item>
+                        <item name="params" xsi:type="array">
+                            <item name="0" xsi:type="string">edit</item>
+                            <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                        </item>
+                    </item>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">vendor_rma_order_request_listing.vendor_rma_order_request_listing.listing_top.bookmarks</item>
+                        <item name="root" xsi:type="string">columns.${ $.index }</item>
+                        <item name="namespace" xsi:type="string">current.${ $.storageConfig.root }</item>
+                    </item>
+                </item>
+            </item>
+        </argument>
+        <selectionsColumn name="ids">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                </item>
+            </argument>
+        </selectionsColumn>
+        <column name="increment_id">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">textRange</item>
+                    <item name="sorting" xsi:type="string">desc</item>
+                    <item name="label" xsi:type="string" translate="true">Increment ID</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="customer_id" class="Vnecoms\RMA\Ui\Component\Grid\Request\Customer">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Customer</item>
+                    <item name="component" xsi:type="string">Vnecoms_RMA/js/grid/request/customer</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="type">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">\Vnecoms\RMA\Ui\Component\Grid\Request\Type</item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Type</item>
+                    <item name="component" xsi:type="string">Vnecoms_RMA/js/grid/request/type</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="reason" class="Vnecoms\RMA\Ui\Component\Grid\Request\OtherReason">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Reason</item>
+                </item>
+            </argument>
+        </column>
+
+        <column name="created_at">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Created time</item>
+                </item>
+            </argument>
+        </column>
+        <column name="updated_at">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">dateRange</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/columns/date</item>
+                    <item name="dataType" xsi:type="string">date</item>
+                    <item name="label" xsi:type="string" translate="true">Last reply time</item>
+                </item>
+            </argument>
+        </column>
+
+        <!--
+        <column name="total_replies">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">textRange</item>
+                    <item name="label" xsi:type="string" translate="true">Total Messages</item>
+                </item>
+            </argument>
+        </column>
+
+
+        <column name="ip_address" class="Vnecoms\RMA\Ui\Component\Grid\Request\Ip">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="component" xsi:type="string">Vnecoms_RMA/js/grid/request/ip</item>
+                    <item name="label" xsi:type="string" translate="true">Ip Address</item>
+                </item>
+            </argument>
+        </column>    -->
+
+        <column name="status" class="Vnecoms\RMA\Ui\Component\Request\Status">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">\Vnecoms\RMA\Ui\Component\Grid\Request\Status</item>
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">select</item>
+                    <item name="editor" xsi:type="string">select</item>
+                    <item name="dataType" xsi:type="string">select</item>
+                    <item name="label" xsi:type="string" translate="true">Status</item>
+                    <item name="component" xsi:type="string">Vnecoms_VendorsRMA/js/grid/request/status</item>
+                </item>
+            </argument>
+        </column>
+
+        <actionsColumn name="actions" class="Vnecoms\VendorsRMA\Ui\Component\Listing\Columns\RequestActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                </item>
+            </argument>
+        </actionsColumn>
+    </columns>
+</listing>

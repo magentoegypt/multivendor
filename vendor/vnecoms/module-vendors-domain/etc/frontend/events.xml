@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="vendorspage_controller_router_match_before">
+		<observer name="vnecoms_vendorsdomain_vendorspage_router_match_before" instance="Vnecoms\VendorsDomain\Observer\RouterMatchBefore" />
+	</event>
+	<event name="vendorspage_controller_router_match_vendor">
+		<observer name="vnecoms_vendorsdomain_vendorspage_router_match_vendor" instance="Vnecoms\VendorsDomain\Observer\RouterMatchVendor" />
+	</event>
+	<event name="layout_load_before">
+		<observer name="vnecoms_vendorsdomain_layout_load_before" instance="Vnecoms\VendorsDomain\Observer\LayoutLoadBefore" />
+	</event>
+	
+	<event name="controller_action_predispatch_checkout_index_index">
+		<observer name="vnecoms_vendorsdomain_predispatch_checkout" instance="Vnecoms\VendorsDomain\Observer\Checkout" />
+	</event>
+	
+	<event name="controller_action_predispatch_checkout_onepage_success">
+		<observer name="vnecoms_vendorsdomain_predispatch_checkout" instance="Vnecoms\VendorsDomain\Observer\CheckoutSuccess" />
+	</event>
+	
+	<!-- Add restriction to product page -->
+	<event name="catalog_controller_product_view">
+		<observer name="vnecoms_vendorsdomain_catalog_controller_product_view" instance="Vnecoms\VendorsDomain\Observer\ProductView" />
+	</event>
+	
+	<event name="catalog_controller_category_init_after">
+		<observer name="vnecoms_vendorsdomain_controller_category_init_after" instance="Vnecoms\VendorsDomain\Observer\CategoryView" />
+	</event>
+	<!-- Add restriction to cms page -->
+	<event name="controller_action_predispatch_cms_page_view">
+		<observer name="vnecoms_vendorsdomain_predispatch_cms_page_view" instance="Vnecoms\VendorsDomain\Observer\CmsPage" />
+	</event>
+</config>

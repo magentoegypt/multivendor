@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Pro for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Amasty\Base\Setup\RecurringData">
+        <arguments>
+            <argument name="modulesToDisable" xsi:type="array">
+                <item name="Amasty_OneStepCheckoutLite" xsi:type="string">Amasty_OneStepCheckoutLite</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left"  xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsCoupon\Block\Vendors\Coupon\Edit" name="coupon_edit" />
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsCoupon\Block\Vendors\Coupon\Edit\Tabs" name="coupon_edit_tabs">
+                <block class="Vnecoms\VendorsCoupon\Block\Vendors\Coupon\Edit\Tab\Main" name="coupon_edit_tab_main" />
+                <block class="Vnecoms\VendorsCoupon\Block\Vendors\Coupon\Edit\Tab\Order" name="coupon_edit_tab_orders">
+                	<uiComponent name="vendors_coupon_sales_order_grid"/>
+                </block>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">coupon_edit_tab_main</argument>
+                </action>
+                
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">order_section</argument>
+                    <argument name="block" xsi:type="string">coupon_edit_tab_orders</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

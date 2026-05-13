@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Vnecoms\RMA\Api\Data\RequestSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults" />
+    <preference for="Vnecoms\RMA\Api\Data\StatusSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults" />
+    <preference for="Vnecoms\RMA\Api\Data\ReasonSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults" />
+    <preference for="Vnecoms\RMA\Api\Data\ReponseSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults" />
+    <preference for="Vnecoms\RMA\Api\Data\MessageSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults" />
+
+    <preference for="Vnecoms\RMA\Api\Data\RequestInterface" type="Vnecoms\RMA\Model\Request" />
+    <preference for="Vnecoms\RMA\Api\Data\StatusInterface" type="Vnecoms\RMA\Model\Status" />
+    <preference for="Vnecoms\RMA\Api\Data\ReasonInterface" type="Vnecoms\RMA\Model\Reason" />
+    <preference for="Vnecoms\RMA\Api\Data\ReponseInterface" type="Vnecoms\RMA\Model\Reponse" />
+    <preference for="Vnecoms\RMA\Api\Data\MessageInterface" type="Vnecoms\RMA\Model\Message" />
+
+    <preference for="Vnecoms\RMA\Api\RequestRepositoryInterface" type="Vnecoms\RMA\Model\RequestRepository" />
+    <preference for="Vnecoms\RMA\Api\StatusRepositoryInterface" type="Vnecoms\RMA\Model\StatusRepository" />
+    <preference for="Vnecoms\RMA\Api\ReasonRepositoryInterface" type="Vnecoms\RMA\Model\ReasonRepository" />
+    <preference for="Vnecoms\RMA\Api\ReponseRepositoryInterface" type="Vnecoms\RMA\Model\ReponseRepository" />
+    <preference for="Vnecoms\RMA\Api\MessageRepositoryInterface" type="Vnecoms\RMA\Model\MessageRepository" />
+    
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="rma_request_listing_data_source" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Request\Grid\Collection</item>
+                <item name="rma_status_listing_data_source" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Status\Grid\Collection</item>
+                <item name="rma_reason_listing_data_source" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Reason\Grid\Collection</item>
+                <item name="rma_reponse_listing_data_source" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Reponse\Grid\Collection</item>
+                <item name="rma_queue_listing_data_source" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Queue\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Vnecoms\RMA\RequestFileUploader" type="Vnecoms\RMA\Model\FileUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">rma/tmp/request</argument>
+            <argument name="basePath" xsi:type="string">rma/request</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="gif" xsi:type="string">gif</item>
+                <item name="png" xsi:type="string">png</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\RMA\Controller\Guest\Upload">
+        <arguments>
+            <argument name="fileUploader" xsi:type="object">Vnecoms\RMA\RequestFileUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Controller\Customer\Upload">
+        <arguments>
+            <argument name="fileUploader" xsi:type="object">Vnecoms\RMA\RequestFileUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Controller\Adminhtml\Request\Upload">
+        <arguments>
+            <argument name="fileUploader" xsi:type="object">Vnecoms\RMA\RequestFileUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Model\Entity\RepositoryFactory">
+        <arguments>
+            <argument name="entities" xsi:type="array">
+                <item name="Vnecoms\RMA\Api\Data\RequestInterface" xsi:type="string">Vnecoms\RMA\Api\RequestRepositoryInterface</item>
+                <item name="Vnecoms\RMA\Api\Data\StatusInterface" xsi:type="string">Vnecoms\RMA\Api\StatusRepositoryInterface</item>
+                <item name="Vnecoms\RMA\Api\Data\ReasonInterface" xsi:type="string">Vnecoms\RMA\Api\ReasonRepositoryInterface</item>
+                <item name="Vnecoms\RMA\Api\Data\ReponseInterface" xsi:type="string">Vnecoms\RMA\Api\ReponseRepositoryInterface</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Model\ResourceModel\Request\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ves_rma_request_entity</argument>
+            <argument name="eventPrefix" xsi:type="string">rma_request_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">rma_request_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Request</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Model\ResourceModel\Status\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ves_rma_status</argument>
+            <argument name="eventPrefix" xsi:type="string">rma_status_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">rma_status_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Status</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Model\ResourceModel\Queue\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ves_rma_request_email_queue</argument>
+            <argument name="eventPrefix" xsi:type="string">rma_email_queue_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">rma_email_queue_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Queue</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Model\ResourceModel\Reason\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ves_rma_reason</argument>
+            <argument name="eventPrefix" xsi:type="string">rma_reason_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">rma_reason_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Reason</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\RMA\Model\ResourceModel\Reponse\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ves_rma_reponse</argument>
+            <argument name="eventPrefix" xsi:type="string">rma_reponse_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">rma_reponse_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Vnecoms\RMA\Model\ResourceModel\Reponse</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="pdfConfigDataStorage" type="Magento\Framework\Config\Data">
+        <arguments>
+            <argument name="reader" xsi:type="object">Magento\Sales\Model\Order\Pdf\Config\Reader</argument>
+            <argument name="cacheId" xsi:type="string">sales_pdf_config</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\RMA\Model\Pdf\Config">
+        <arguments>
+            <argument name="dataStorage" xsi:type="object">pdfConfigDataStorage</argument>
+        </arguments>
+    </type>
+
+    <!--
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Vnecoms\RMA\Ui\Component\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </type>
+       -->
+</config>

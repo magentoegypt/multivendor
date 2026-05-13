@@ -1,0 +1,31 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Left menu of vendor
+ *
+ * @var $block \Vnecoms\VendorsCategory\Block\App\Category
+ */
+?>
+<?php $columnsLimit = $block->getColumnsLimit() ?: 0; ?>
+<?php $_menu = $block->getHtml('vendor-category-level-top', 'vendor-submenu', $columnsLimit) ?>
+<div class="block vendor-categories-wrapper">
+    <div class="block-title">
+        <span><?php echo $block->getTitle() ?></span>
+    </div>
+    <div class="block-content">
+        <nav class="vendor-navigation" data-action="navigation">
+            <ul class="clearer accordion vendor-nav vendor-simple-nav" id="vendor-categories-menu">
+                <?php /* @escapeNotVerified */ echo $_menu; ?>
+                <?php /* @escapeNotVerified */ echo $block->getChildHtml(); ?>
+            </ul>
+        </nav>
+    </div>
+</div>

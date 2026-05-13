@@ -1,0 +1,17 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Thank you Page 2 for Magento 2 (System)
+ */
+/**
+ * @var $block Magento\Framework\View\Element\Template
+ * @var $viewModel Amasty\CheckoutThankYouPage\ViewModel\SuccessPage
+ */
+ $viewModel = $block->getViewModel() ?>
+
+<?php if ($viewModel->isEnable()): ?>
+    <?= $block->getChildHtml('amasty.checkout.success.page') ?>
+<?php else: ?>
+    <?= $block->getChildHtml('magento.success.page') ?>
+<?php endif; ?>

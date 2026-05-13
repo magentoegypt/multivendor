@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Vnecoms\VendorsPage\Block\Home\ListProduct">
+        <arguments>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+            <argument name="catalogLayer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Block\Navigation\State" type="Magento\LayeredNavigation\Block\Navigation\State">
+        <arguments>
+            <!--<argument name="catalogLayer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>-->
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\VendorsLayerNavigation\Block\Navigation\FilterRenderer">
+        <arguments>
+            <!--<argument name="catalogLayer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>-->
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Block\Navigation\Category" type="Magento\LayeredNavigation\Block\Navigation\Category">
+        <arguments>
+            <argument name="visibilityFlag" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\AvailabilityFlag</argument>
+            <argument name="filterList" xsi:type="object">vendorFilterList</argument>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </virtualType>
+</config>

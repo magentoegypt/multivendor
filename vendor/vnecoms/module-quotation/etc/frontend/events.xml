@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <!--create quote or merge with exist one-->
+    <event name="customer_login">
+        <observer name="quoteLoadCustomerQuote" instance="Vnecoms\Quotation\Observer\LoadCustomerQuoteObserver" />
+    </event>
+
+    <!--remove session -->
+    <event name="customer_logout">
+        <observer name="quoteUnsetAll" instance="Vnecoms\Quotation\Observer\UnsetAllObserver" />
+    </event>
+    
+    <!-- Add quote button to all product list -->
+	<event name="view_block_abstract_to_html_after">
+		<observer name="vnecoms_quotation_tohtml_after" instance="Vnecoms\Quotation\Observer\Catalog\ProductList" />
+	</event>
+</config>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+		<referenceContainer name="vendor.profile.title">
+		    <block class="Vnecoms\VendorsPage\Block\Catalog\Product\Profile" name="vendorpage.profile.title.link" />
+		</referenceContainer>
+		<referenceContainer name="vendor.profile.logo">
+		    <block class="Vnecoms\VendorsPage\Block\Catalog\Product\Profile" name="vendorpage.profile.logo.link" />
+		</referenceContainer>
+		
+		<referenceBlock name="head.additional">
+            <block class="Vnecoms\VendorsPage\Block\Head" name="vendor.head.html" template="Vnecoms_VendorsPage::head.phtml" after="-"/>
+        </referenceBlock>
+        <referenceContainer name="before.body.end">
+        	<block class="Vnecoms\VendorsPage\Block\Footer" name="vendor.footer.html" template="Vnecoms_VendorsPage::footer.phtml" after="-"/>
+        </referenceContainer>
+    </body>
+</page>

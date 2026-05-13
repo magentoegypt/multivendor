@@ -1,0 +1,54 @@
+<?php $_request_open = $this->getRequestRma(); ?>
+<div class="list-guest-request">
+    <div class="page-title guest-request-title">
+        <div class="buttons-set">
+            <a class="action subscribe primary" href="<?php echo $block->getNewUrl() ?>" ><span><span><?php echo __('Create Request')?></span></span></a>
+        </div>
+        <div class="buttons-log">
+            <a class="action subscribe primary" href="<?php echo $block->getLogOut()?>"><span><span><?php echo __("Log Out Order") ?></span></span></a>
+        </div>
+        <div class="clear"></div>
+    </div>
+    <div class='table-wrapper box-customer-request' id="box-customer-request-open" >
+        <?php echo $block->getPagerHtml(); ?>
+        <?php if(count($_request_open)): ?>
+            <table class="data table my-request-table" id="my-request-table-open">
+                <col width="1" />
+                <col width="1" />
+                <col />
+                <col width="1" />
+                <col />
+                <thead>
+                <tr>
+                    <th width="10%"><span class="nobr"><?php echo __('Type') ?></span></th>
+                    <th width="20%"><span class="nobr"><?php echo __('Created At') ?></span></th>
+                    <th><?php echo __('RMA ID #') ?></th>
+                    <th width="15%"><span class="nobr"><?php echo __('Status') ?></span></th>
+                    <th><span class="nobr"><?php echo __(' ') ?></span></th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php $_odd = ''; ?>
+                <?php foreach ($_request_open as $_rma): ?>
+                    <tr <?php if(!$_rma->getIsCustomerRead()): ?>class="is_not_read"<?php endif ?>>
+                        <td ><p class="type type-<?php echo $_rma->getType()?>"><?php echo $_rma->getTypeTitle();  ?></p> </td>
+                        <td><?php echo $block->getFormatDateHtml($_rma->getCreatedAt()) ?></td>
+                        <td><?php echo __('#').$_rma->getIncrementId() ?></td>
+                        <td><p class="data-grid-cell-content status status-<?php echo $block->getStatusCode($_rma->getStatus())?>"><?php echo $_rma->getStatusTitle();  ?></p></td>
+                        <td class="last">
+                            <a href="<?php echo $block->getViewUrl($_rma) ?>"> <?php echo __("View") ?></a>
+                            <?php if ($block->isCancelRma($_rma)): ?>
+                                | <a href="<?php echo $block->getUrl('*/guest/cancel/',array('id'=>$_rma->getId())) ?>" class="cancel" onclick="return confirm('Are you sure you would like to cancel this RMA?')"> <?php echo __("Cancel") ?></a>
+                            <?php endif;?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p style="text-align:center;font-style:italic"><?php echo __('There is no request rma for this order.'); ?></p>
+        <?php endif ?>
+    </div>
+    <?php echo $block->getPagerHtml(); ?>
+</div>
+

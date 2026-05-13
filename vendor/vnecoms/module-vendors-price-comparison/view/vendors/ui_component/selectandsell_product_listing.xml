@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">selectandsell_product_listing.product_listing_data_source</item>
+            <item name="deps" xsi:type="string">selectandsell_product_listing.product_listing_data_source</item>
+        </item>
+        <item name="spinner" xsi:type="string">product_columns</item>
+    </argument>
+    <dataSource name="product_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">Vnecoms\VendorsPriceComparison\Ui\DataProvider\Product\Vendor\ProductDataProvider</argument>
+            <argument name="name" xsi:type="string">product_listing_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">entity_id</argument>
+            <argument name="requestFieldName" xsi:type="string">id</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <container name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="template" xsi:type="string">ui/grid/toolbar</item>
+            </item>
+        </argument>
+        
+        <filters name="listing_filters">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="columnsProvider" xsi:type="string">selectandsell_product_listing.selectandsell_product_listing.product_columns</item>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">selectandsell_product_listing.selectandsell_product_listing.listing_top.bookmarks</item>
+                        <item name="namespace" xsi:type="string">current.filters</item>
+                    </item>
+                    <!-- <item name="hasVisible" xsi:type="boolean">false</item> -->
+                </item>
+            </argument>
+        </filters>
+        <paging name="listing_paging">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="selectProvider" xsi:type="string">selectandsell_product_listing.selectandsell_product_listing.product_columns.ids</item>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">selectandsell_product_listing.selectandsell_product_listing.listing_top.bookmarks</item>
+                        <item name="namespace" xsi:type="string">current.paging</item>
+                    </item>
+                </item>
+            </argument>
+        </paging>
+    </container>
+    <columns name="product_columns" class="Vnecoms\VendorsPriceComparison\Ui\Component\Listing\Columns">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="storageConfig" xsi:type="array">
+                    <item name="provider" xsi:type="string">selectandsell_product_listing.selectandsell_product_listing.listing_top.bookmarks</item>
+                    <item name="namespace" xsi:type="string">current</item>
+                </item>
+                <item name="childDefaults" xsi:type="array">
+
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">selectandsell_product_listing.selectandsell_product_listing.listing_top.bookmarks</item>
+                        <item name="root" xsi:type="string">columns.${ $.index }</item>
+                        <item name="namespace" xsi:type="string">current.${ $.storageConfig.root}</item>
+                    </item>
+                </item>
+            </item>
+        </argument>
+        <column name="thumbnail" class="Magento\Catalog\Ui\Component\Listing\Columns\Thumbnail">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Vnecoms_VendorsPriceComparison/js/grid/columns/thumbnail</item>
+                    <item name="add_field" xsi:type="boolean">true</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="altField" xsi:type="string">name</item>
+                    <item name="has_preview" xsi:type="string">1</item>
+                    <item name="label" xsi:type="string" translate="true">Thumbnail</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                </item>
+            </argument>
+        </column>
+        <column name="name">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="add_field" xsi:type="boolean">true</item>
+                    <item name="label" xsi:type="string" translate="true">Name</item>
+                    <item name="sortOrder" xsi:type="number">30</item>
+                </item>
+            </argument>
+        </column>
+        
+        <actionsColumn name="preview" class="Vnecoms\VendorsPriceComparison\Ui\Component\Listing\Columns\PreviewActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                    <item name="fieldClass" xsi:type="array">
+                    	<item name="data-grid-preview" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="label" xsi:type="string" translate="true">Preview</item>
+                    <item name="bodyTmpl" xsi:type="string">Vnecoms_VendorsPriceComparison/grid/cells/preview-actions</item>
+                </item>
+            </argument>
+        </actionsColumn>
+        
+        <actionsColumn name="actions" class="Vnecoms\VendorsPriceComparison\Ui\Component\Listing\Columns\ProductActions">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="sortOrder" xsi:type="number">300</item>
+                    <item name="fieldClass" xsi:type="array">
+                    	<item name="data-grid-select-and-sell" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="label_sold" xsi:type="string" translate="true">You are selling this already</item>
+                    <item name="bodyTmpl" xsi:type="string">Vnecoms_VendorsPriceComparison/grid/cells/actions</item>
+                </item>
+            </argument>
+        </actionsColumn>
+    </columns>
+</listing>

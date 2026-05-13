@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="quotation_quote_sidebar_renderer"/>
+    <update handle="quotation_quote_sidebar_item_price_renderers"/>
+    <head>
+    	<css src="Vnecoms_Quotation::css/icons.css"/>
+        <css src="Vnecoms_Quotation::css/quotation.css"/>
+        <css src="Vnecoms_Quotation::css/miniquote.css"/>
+        <css src="Vnecoms_Quotation::css/category-view.css"/>
+    </head>
+    <body>
+	<!--
+        <referenceBlock name="top.links">
+            <block class="Vnecoms\Quotation\Block\QuoteLink" name="my-quotes-link" after="my-account-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Quotes</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+-->
+
+        <referenceContainer name="footer">
+            <block class="Magento\Framework\View\Element\Html\Links" name="quotes_links" after="footer_links">
+                <arguments>
+                    <argument name="css_class" xsi:type="string">footer quotes links</argument>
+                </arguments>
+                <block class="Vnecoms\Quotation\Block\Guest\Link" name="quotation-guest-form-link">
+	                <arguments>
+	                    <argument name="label" xsi:type="string">Quotes Search</argument>
+	                    <argument name="path" xsi:type="string">quotation/guest/index</argument>
+	                </arguments>
+	            </block>
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="header-wrapper">
+            <block class="Vnecoms\Quotation\Block\Quote\Sidebar" name="ves.quotation" as="quotation" after="minicart" template="quote/quotation.phtml">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="types" xsi:type="array"/>
+                        <item name="components" xsi:type="array">
+                            <item name="quote_content" xsi:type="array">
+                                <item name="component" xsi:type="string">Vnecoms_Quotation/js/view/quotation</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Vnecoms_Quotation/quote/content</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="extra_info" xsi:type="array">
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="displayArea" xsi:type="string">extraInfo</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+    </body>
+</page>

@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="amcheckout_address_config_provider" xsi:type="object">Amasty\Checkout\Model\CheckoutConfigProvider\Address</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Checkout\Block\Onepage">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="amastyCheckoutProTooltips" sortOrder="150" xsi:type="object">Amasty\Checkout\CachedLayoutProcessor\TooltipsProcessor</item>
+                <item name="amastyCheckoutProCustomPlaceOrderButton" sortOrder="150" xsi:type="object">Amasty\Checkout\CachedLayoutProcessor\CustomPlaceOrderButton</item>
+                <item name="amastyCheckoutProPlaceholders" sortOrder="170" xsi:type="object">Amasty\Checkout\CachedLayoutProcessor\PlaceholdersProcessor</item>
+                <item name="amastyCheckoutProPhoneValidation" sortOrder="170" xsi:type="object">Amasty\Checkout\CachedLayoutProcessor\PhoneValidationProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Amasty\Checkout\CachedLayoutProcessor\CustomPlaceOrderButton" type="Amasty\CheckoutCore\Cache\Wrappers\LayoutProcessorCacheWrapper">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Amasty\Checkout\Block\Onepage\LayoutProcessor\CustomPlaceOrderButton</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+                <item name="is_logged" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsLoggedIn</item>
+                <item name="is_quote_virtual" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsVirtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\Checkout\CachedLayoutProcessor\PlaceholdersProcessor" type="Amasty\CheckoutCore\Cache\Wrappers\LayoutProcessorCacheWrapper">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Amasty\Checkout\Block\Onepage\LayoutProcessor\PlaceholdersProcessor</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+                <item name="is_logged" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsLoggedIn</item>
+                <item name="is_quote_virtual" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsVirtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\Checkout\CachedLayoutProcessor\PhoneValidationProcessor" type="Amasty\CheckoutCore\Cache\Wrappers\LayoutProcessorCacheWrapper">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Amasty\Checkout\Block\Onepage\LayoutProcessor\PhoneValidationProcessor</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+                <item name="is_logged" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsLoggedIn</item>
+                <item name="is_quote_virtual" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsVirtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\Checkout\CachedLayoutProcessor\TooltipsProcessor" type="Amasty\CheckoutCore\Cache\Wrappers\LayoutProcessorCacheWrapper">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Amasty\Checkout\Block\Onepage\LayoutProcessor\TooltipsProcessor</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+                <item name="is_logged" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsLoggedIn</item>
+                <item name="is_quote_virtual" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsVirtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\Checkout\Model\PlaceholderRepository">
+        <arguments>
+            <argument name="collectionProcessor"
+                      xsi:type="object">Amasty\Checkout\SearchCriteria\CollectionProcessor\PlaceholderProcessor
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Amasty\Checkout\SearchCriteria\CollectionProcessor\PlaceholderProcessor"
+                 type="Magento\Framework\Api\SearchCriteria\CollectionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="filters"
+                      xsi:type="object">Amasty\Checkout\SearchCriteria\CollectionProcessor\Placeholder\FilterProcessor
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\Checkout\SearchCriteria\CollectionProcessor\Placeholder\FilterProcessor"
+                 type="Magento\Framework\Api\SearchCriteria\CollectionProcessor\FilterProcessor">
+        <arguments>
+            <argument name="customFilters" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\Checkout\Model\ResourceModel\Placeholder\FilterProcessor\StoreProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

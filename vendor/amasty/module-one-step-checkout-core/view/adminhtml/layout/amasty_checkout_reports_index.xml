@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="Amasty_CheckoutCore::js/reports/refresh.js"/>
+        <css src="Amasty_CheckoutCore::css/reports.css" />
+    </head>
+    <update handle="styles" />
+    <body>
+        <referenceContainer name="page.main.actions">
+            <container htmlClass="store-switcher" htmlTag="div">
+                <block class="Amasty\CheckoutCore\Block\Adminhtml\Reports\Filters" name="adminhtml.checkout.reports.date.switcher"/>
+            </container>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <uiComponent name="amasty_checkout_reports"/>
+        </referenceContainer>
+    </body>
+</page>

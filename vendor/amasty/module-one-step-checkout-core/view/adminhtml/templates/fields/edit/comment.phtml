@@ -1,0 +1,41 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+    /** @var \Magento\Backend\Block\Template $block */
+    /** @var \Magento\Framework\Escaper $escaper */
+    /** @var \Amasty\CheckoutCore\ViewModel\Adminhtml\Fields\Comment $viewModel */
+    // @codingStandardsIgnoreFile
+
+    $viewModel = $block->getData('view_model');
+
+    $url = $block->getUrl(
+        'adminhtml/system_config/edit/section/amasty_checkout',
+        ['expand' => 'design/layout']
+    );
+?>
+
+<div class="fields-comment message">
+    <?=
+        $escaper->escapeHtml(__(
+            'When disabling City, Country, State/Province, Zip/Postal Code, please keep in mind that shopping cart'
+            . ' will also be affected since those attributes are used in estimations and calculations.'
+        ));
+    ?>
+</div>
+
+<?php if ($viewModel->isStoreSelected()): ?>
+    <div class="fields-comment message">
+        <?=
+            $escaper->escapeHtml(__(
+                "We kindly pay your attention that the configuration on the Store View scope has its nuances."
+                . " Changes of the fields' status made for a specific Store View will be reflected on the storefront"
+                . " for this Store View only. However, it won’t change the status of the updated fields in the"
+                . " Magento configuration (Stores > Configuration > Customers > Customer Configuration)"
+                . " for Website and Global scopes."
+            ));
+        ?>
+    </div>
+<?php endif; ?>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright © 2017 Vnecoms. All rights reserved.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="vendorspage_controller_router_match_vendor">
+        <observer name="vendorscategory_controller_router_match_vendor" instance="Vnecoms\VendorsCategory\Observer\Frontend\RouterMatchBefore"/>
+    </event>
+</config>

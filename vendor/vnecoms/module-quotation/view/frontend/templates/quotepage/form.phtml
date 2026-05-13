@@ -1,0 +1,61 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**  @var $block \Vnecoms\Quotation\Block\Quotepage */
+?>
+<?php echo $block->getChildHtml('form_before') ?>
+<div id="quote-request" data-bind="scope:'quote-request'" class="quotation-items">
+    <form action="<?php /* @escapeNotVerified */ echo $block->getUrl('quotation/quote/updatePost') ?>"
+          method="post"
+          id="form-validate request-quote-form"
+          data-mage-init='{"validation":{}}'
+          class="form">
+        <?php echo $block->getBlockHtml('formkey'); ?>
+        <div class="cart table-wrapper">
+            <table id="quotation-table"
+                   class="quote-tbl items data table cart"
+                   data-mage-init='{"quotationRequest":{"emptyQuoteButton": "action.clear",
+                   "clearButton":"#empty_cart_button", "updateButton":"#update_quote_button",
+                   "submitQuoteButton": "#submit_quote_btn", "updateQuoteActionContainer": "#update_quote_action_container"}}'>
+                <caption role="heading" aria-level="2" class="table-caption"><?php /* @escapeNotVerified */ echo __('Quote Items') ?></caption>
+                <thead>
+                <tr>
+                    <th class="col item" scope="col"><span><?php /* @escapeNotVerified */ echo __('Item') ?></span></th>
+                    <th class="col price original-price" scope="col"><span><?php /* @escapeNotVerified */ echo __('Original Price') ?></span></th>
+                    <th class="col price" scope="col"><span><?php /* @escapeNotVerified */ echo __('Requested Price') ?></span></th>
+                    <th class="col qty" scope="col"><span><?php /* @escapeNotVerified */ echo __('Requested Quantity') ?></span></th>
+                </tr>
+                </thead>
+                <?php foreach ($block->getItems() as $_item): ?>
+                    <?php echo $block->getItemHtml($_item) ?>
+                <?php endforeach ?>
+            </table>
+        </div>
+        <div class="quote-actions cart main actions">
+            <button type="submit"
+                    name="quote_action"
+                    data-cart-empty=""
+                    value="empty"
+                    title="<?php echo $block->escapeHtml(__('Clear Quote')); ?>"
+                    class="action primary" id="empty_cart_button">
+                <span><?php /* @escapeNotVerified */ echo __('Clear Quote'); ?></span>
+            </button>
+            <button type="submit"
+                    name="quote_action"
+                    data-cart-item-update=""
+                    value="update"
+                    id="update_quote_button"
+                    title="<?php echo $block->escapeHtml(__('Update Quote')); ?>"
+                    class="action primary update">
+                <span><?php echo __('Update Quote'); ?></span>
+            </button>
+            <input type="hidden" id="update_quote_action_container" data-quote-item-update=""/>
+        </div>
+    </form>
+</div>
+<?php echo $block->getChildHtml('form_after') ?>

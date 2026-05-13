@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_VendorsCategory::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="div.sidebar.additional">
+            <block class="Vnecoms\VendorsCategory\Block\Menu" name="ves.category.menu" template="menu.phtml" cacheable="false" after="vendor.profile.left"/>
+            <!--<block class="Vnecoms\VendorsCategory\Block\Navigation" name="ves.category.navigation" template="category/navigation.phtml" cacheable="false" after="ves.category.menu"/>-->
+        </referenceContainer>
+    </body>
+</page>

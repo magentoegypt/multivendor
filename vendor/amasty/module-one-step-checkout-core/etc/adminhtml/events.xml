@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="admin_sales_order_address_update">
+        <observer name="Amasty_CheckoutCore::sales_order_address_save" instance="Amasty\CheckoutCore\Observer\Admin\Order\AddressSave" />
+    </event>
+    <event name="sales_model_service_quote_submit_before">
+        <observer name="Amasty_CheckoutCore::set_custom_fields" instance="Amasty\CheckoutCore\Observer\Admin\QuoteSubmit\BeforeAdminSubmitObserver"/>
+    </event>
+    <event name="customer_entity_attribute_save_after">
+        <observer name="Amasty_CheckoutCore::customer_entity_attribute_save_after"
+                  instance="Amasty\CheckoutCore\Observer\Admin\Customer\Attribute\UpdateFieldAfterSave" />
+    </event>
+    <event name="admin_system_config_changed_section_amasty_checkout">
+        <observer name="Amasty_CheckoutCore::save_amasty_checkout"
+                  instance="Amasty\CheckoutCore\Observer\System\ConfigChanged"/>
+    </event>
+    <event name="admin_system_config_changed_section_amsociallogin">
+        <observer name="Amasty_CheckoutCore::save_amasty_social_login"
+                  instance="Amasty\CheckoutCore\Observer\System\ConfigChanged"/>
+    </event>
+</config>

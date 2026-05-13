@@ -1,0 +1,26 @@
+<div class="field field-<?php echo $block->getFieldId()?><?php if($block->isAttributeRequired()):?> required<?php endif;?>">
+    <label for="<?php echo $block->getFieldId()?>" class="label">
+        <span><?php echo $block->getStoreLabel()?></span>
+    </label>
+
+    <div class="control">
+        <textarea type="text" class="<?php echo $block->getFrontendClass()?>" title="<?php echo $block->getStoreLabel()?>" name="<?php echo $block->getFieldName();?>" id="<?php echo $block->getFieldId()?>"><?php echo $block->getFieldValue();?></textarea>
+    </div>
+    <script>
+        require([
+            "jquery",
+            "mage/translate",
+            "mage/adminhtml/events",
+            "mage/adminhtml/wysiwyg/tiny_mce/setup"
+        ], function(jQuery){
+            wysiwygcompany_description = new wysiwygSetup("<?php echo $block->getFieldId()?>", {
+                "width":"99%",  // defined width of editor
+                "height":"200px", // height of editor
+                "plugins":[{"name":"image"}], // for image
+                "tinymce4":{"toolbar":"formatselect | bold italic underline | alignleft aligncenter alignright | bullist numlist | link table charmap","plugins":"advlist autolink lists link charmap media noneditable table contextmenu paste code help table",
+                }
+            });
+            wysiwygcompany_description.setup("exact");
+        });
+    </script>
+</div>

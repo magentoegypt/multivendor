@@ -1,0 +1,37 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+   v_notification_unread_count: Int! @doc(description: "The total count of all the notification given to the vendor.") @resolver(class: "Vnecoms\\VendorsNotificationGraphQl\\Model\\Resolver\\UnreadCount")
+   v_notifications(
+       pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+       currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+   ): VendorNotifications! @doc(description: "The list of vendor notification.") @resolver(class: "Vnecoms\\VendorsNotificationGraphQl\\Model\\Resolver\\Notification")
+}
+
+type VendorNotifications @doc(description: "List Notifications.") {
+    items: [VendorNotification] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+type VendorNotification @doc(description: "Notification Object.") {
+    notification_id: Int @doc(description: "The ID assigned to the Notification") @deprecated(reason: "id of Notification.")
+    type: String @deprecated(reason: "Type")
+    message: String @deprecated(reason: "message")
+    additional_info: String @deprecated(reason: "additional info")
+    is_read: Int @deprecated(reason: "is read")
+    is_reached: Int @doc(description: "is reached")
+    is_hidden: Int @doc(description: "is hidden")
+    created_at: String @doc(description: "created at")
+}
+
+type Mutation {
+    deleteVendorNotification(notification_id: Int!): DeleteVendorNotificationOutput! @doc(description: "Delete notification by id") @resolver(class: "Vnecoms\\VendorsNotificationGraphQl\\Model\\Resolver\\Delete")
+    massDeleteVendorNotification(notification_ids: [Int]!): DeleteVendorNotificationOutput! @doc(description: "Delete notification by id") @resolver(class: "Vnecoms\\VendorsNotificationGraphQl\\Model\\Resolver\\MassDelete")
+    markAllAsReadVendorNotification: DeleteVendorNotificationOutput! @doc(description: "Delete notification by id") @resolver(class: "Vnecoms\\VendorsNotificationGraphQl\\Model\\Resolver\\MarkAllAsRead")
+}
+
+type DeleteVendorNotificationOutput {
+    status: String! @doc(description: "return true when success delete")
+}

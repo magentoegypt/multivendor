@@ -1,0 +1,35 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php /** @var $block \Vnecoms\Quotation\Block\Info */ ?>
+<?php $quote = $block->getQuote() ?>
+<div class="quotation-info">
+    <div class="block quotaion-customer-info">
+        <div class="block-title">
+            <strong><?php /* @escapeNotVerified */ echo __('Customer Information') ?></strong>
+        </div>
+        <div class="block-content">
+            <ul>
+                <li><label><?php echo __("Customer Name")?></label><?php echo $quote->getCustomerName()?></li>
+                <li><label><?php echo __("Email")?></label><?php echo $quote->getCustomerEmail()?></li>
+                <li><label><?php echo __("Telephone")?></label><?php echo $quote->getCustomerPhone()?></li>
+                <li><label><?php echo __("Company")?></label><?php echo $quote->getCustomerCompany()?></li>
+                <li><label><?php echo __("VAT/Tax Id")?></label><?php echo $quote->getCustomerTaxvat()?></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="block quotaion-remark">
+        <div class="block-title">
+            <strong><?php /* @escapeNotVerified */ echo __('Remark With Proposal') ?></strong>
+        </div>
+        <div class="block-content">
+            <?php echo $quote->getClientComment()?>
+        </div>
+    </div>
+</div>

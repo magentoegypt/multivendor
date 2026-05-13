@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="smsglobal_api_key" translate="label tooltip" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>SmsGlobal API Key</label>
+	                    <config_path>vsms/settings/smsglobal_api_key</config_path>
+	                    <depends>
+	                        <field id="gateway">smsglobal</field>
+	                    </depends>
+	                </field>
+	                <field id="smsglobal_api_secret" translate="label tooltip" type="text" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>SmsGlobal API Secret</label>
+	                    <config_path>vsms/settings/smsglobal_api_secret</config_path>
+	                    <depends>
+	                        <field id="gateway">smsglobal</field>
+	                    </depends>
+	                </field>
+                    <field id="smsglobal_sender" translate="label tooltip" type="text" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>SmsGlobal Sender</label>
+                        <config_path>vsms/settings/smsglobal_sender</config_path>
+                        <depends>
+                            <field id="gateway">smsglobal</field>
+                        </depends>
+                        <comment>Where the SMS appears to come from. 3-11 characters A-Za-z0-9 if alphanumeric; 3-15 digits if numeric (if set, set sharedPool to null)</comment>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

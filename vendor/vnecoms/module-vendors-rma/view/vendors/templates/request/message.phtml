@@ -1,0 +1,272 @@
+<?php $request = $block->getRequestRma(); ?>
+<?php $msgDetailCollection = $request->getAllMessageFromRequest();?>
+<?php $detailCollectionSize = $msgDetailCollection->getSize();?>
+<?php $i = 1;?>
+<div class="message-box">
+    <div class="box-message-list ">
+        <?php foreach($msgDetailCollection as $message):?>
+            <div class="box-body no-padding<?php echo " message-".$i;?><?php if($i == $detailCollectionSize):?> last<?php endif?>">
+                <div class="mailbox-read-info <?php if($detailCollectionSize > 1 && $i != $detailCollectionSize):?> read<?php endif;?>">
+                    <div class="pull-left message-icon
+                            <?php if($message->getData('type') == \Vnecoms\VendorsRMA\Model\Source\Message\Type::TYPE_REPLY_DEPARMENT):?>
+                            owner-message
+                            <?php endif;?>
+                             <?php if($message->getData('type') == \Vnecoms\VendorsRMA\Model\Source\Message\Type::TYPE_REPLY_VENDOR):?>
+                            vendor-message
+                            <?php endif;?>
+                     ">
+                        <i class="fa fa-user"></i>
+                    </div>
+                    <div class="pull-left">
+                        <h3><?php echo $message->getFrom()?></h3>
+                        <div class="text-muted">
+                            <?php echo __("to %1",$message->getTo())?></div>
+                    </div>
+
+                    <div class="pull-right">
+                <span class="mailbox-read-time pull-right">
+                    	<?php if(sizeof($message->getAttachmentUrls())):?>
+                            <icon class="icon-attachment"></icon>
+                        <?php endif?>
+                    <?php echo $block->getFormatDateHtml($message->getData('created_at'))?>
+                </span>
+                        <div class="quote-message <?php if($detailCollectionSize > 1 && $i != $detailCollectionSize):?> hide<?php endif;?>" id="quote-message-<?php echo $i ?>">
+                            <?php if($block->isShowButtonReply()): ?>
+                                <a onclick="return quoteMessage(<?php echo $message->getId() ?>)"
+                                   class="do-action do-quote" title="<?php echo __('Quote') ?>" rel="quote">
+                                </a>
+                            <?php endif?>
+                        </div>
+                    </div>
+                </div>
+                <div class="mailbox-read-message<?php if($detailCollectionSize > 1 && $i != $detailCollectionSize):?> hide<?php endif;?>">
+                    <div id="messagebody<?php  echo $message->getId() ?>">
+                        <?php $messageText = $message->getData('message');?>
+                        <?php if($block->isHtmlMessage($messageText)):?>
+                            <?php echo $messageText;?>
+                        <?php else:?>
+                            <pre><?php echo $messageText;?></pre>
+                        <?php endif;?>
+                    </div>
+                    <?php if(sizeof($message->getAttachmentUrls())):?>
+                        <div class="attachment">
+                            <ul>
+                                <?php foreach ($message->getAttachmentUrls() as $key=>$attachment):?>
+                                    <li class="file-uploader-preview">
+                                        <?php if($block->isImage($key)): ?>
+                                            <a href="<?php echo $attachment ?>" class="icon-attachment-img-view"
+                                               title="<?php echo $key ?>">
+                                                <img class="preview-image" src="<?php echo $attachment ?>" />
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="<?php echo $block->getUrl('vrma/request/download',
+                                                array('file'=>base64_encode($key))) ?>"
+                                               title="<?php echo $key ?>">
+                                                <i class="fa icon-attachment <?php echo $block->getClassIcon($key) ?>"></i></a>
+                                        <?php endif ?>
+
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    <?php endif;?>
+                </div>
+            </div>
+            <?php $i++;?>
+        <?php endforeach;?>
+    </div>
+    <?php if($block->isShowButtonReply()): ?>
+        <div class="reply-message" id="reply-message-button">
+            <button class="primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only center" type="button" onclick="showFormReply()">
+                <i class="fa fa-fw fa-reply"></i>
+                <span>
+                            <span><?php echo __('Reply') ?></span>
+                        </span>
+            </button>
+        </div>
+        <div class="form-reply" style="display:none" id="form-reply-ticket">
+
+            <div class="ticket-template">
+                <div class="content" >
+                    <select class="chosen-select mailbox-quick-reponse"  style="width:230px">
+                        <option value="0"><?php echo __('Search Quick Response') ?></option>
+                        <?php foreach ($block->getTemplateOptions() as $key=>$template):?>
+                            <option value="<?php echo $key ?>"><?php echo $template ?></option>
+                        <?php endforeach;?>
+                    </select>
+                </div>
+            </div>
+            <div class="ticket-content">
+                <div>
+                    <textarea name="request[message]" id="content_message_reply" class="textarea input-text" rows="2" cols="15" data-validate="{required:true}"></textarea>
+                    <?php //echo $block->getHtmlEditor(); ?>
+                </div>
+
+
+                <div id="knockout-message-attachment" class="uploader" data-bind="scope: 'attachment'">
+                    <p class="lable"><?php echo __('Allow Extension : ').$block->getUploaderExtensionNote() ?>
+                    </p>
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                    <script type="text/x-magento-init">
+                            {
+                                "#knockout-message-attachment": {
+                                    "Magento_Ui/js/core/app": {
+                                        "components": {
+                                            "attachment": {
+                                                "component": "Vnecoms_RMA/js/form/upload/uploader",
+                                                "uploaderConfig":{
+                                                    "url": "<?php echo $block->getUrl("vrma/request/upload");?>"
+                                                },
+                                                "dataScope" : "data.attachment",
+                                                "dataType" : "data.text",
+                                                "formElement" : "data.input"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        </script>
+                </div>
+
+                <div class="button">
+                    <input type="hidden" name="request[request_id]" value="<?php echo $block->getRequest()->getParam("request_id") ?>">
+                    <button class="btn btn-default" id="msg-discard-btn" type="button"><i class="fa fa-times"></i> <?php echo __("Discard")?></button>
+                    <button type="button" id="msg-send-btn" class="primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only center helpdesk-button" type="button">
+                        <i class="fa fa-envelope-o"></i>
+                        <?php echo __('Send') ?>
+                    </button>
+                </div>
+                <div class="clear"></div>
+
+            </div>
+
+        </div>
+        <div class="clear"></div>
+    <?php endif;?>
+    <div class="message-notification-box hide" id="vnecoms-msg-notification"><?php echo __("Sending ...")?></div>
+
+    <script type="text/javascript">
+        window.tinyMCE_GZ = window.tinyMCE_GZ || {}; window.tinyMCE_GZ.loaded = true;
+        require([
+            "jquery",
+            'mage/validation',
+            "mage/adminhtml/wysiwyg/tiny_mce/setup",
+            "mage/adminhtml/wysiwyg/widget",
+            "jquery/chonsen",
+            "jquery/colorbox"
+        ],function($){
+            $(function() {
+
+                /**
+                 * Show form reply ticket
+                 */
+                function showFormReply(){
+                    $('#form-reply-ticket').show();
+                    $('#reply-message-button').hide();
+                    Effect.ScrollTo("form-reply-ticket", { duration: 1.0 });
+                }
+                window.showFormReply = showFormReply;
+                /**
+                 * add quote to new message
+                 * @param obj
+                 */
+                function quoteMessage(obj) {
+                    var message = $("#messagebody"+obj).html();
+                    this.showFormReply();
+                    if(tinyMCE.getInstanceById('content_message_reply')){
+                        tinyMCE.getInstanceById('content_message_reply').getBody().innerHTML
+                            += '<blockquote>'+message+'</blockquote>';
+                    }
+                    else{
+                        $("#content_message_reply").html('<blockquote>'+message+'</blockquote>');
+                    }
+                    Effect.ScrollTo("form-reply-ticket", { duration: 1.0 });
+                }
+                window.quoteMessage = quoteMessage;
+
+                var jsonTemplate = <?php echo $this->getTemplateJson() ?>;
+                if ($(".chosen-select")) $(".chosen-select").chosen();
+                $(".icon-attachment-img-view").colorbox({rel: 'icon-attachment-img-view'});
+                tinymce.init({
+                  	selector: '#content_message_reply',
+                  	height: 200,
+                  	menubar: false,
+                  	plugins: [
+                	    'advlist autolink lists link image charmap print preview anchor textcolor',
+                	    'searchreplace visualblocks code fullscreen',
+                	    'insertdatetime media table paste code help wordcount'
+                    ],
+                    toolbar: 'undo redo | formatselect | bold italic forecolor | alignleft aligncenter alignright alignjustify | removeformat',
+                });
+                
+
+                $('.mailbox-quick-reponse').change(function(){
+
+                    for(var i = 0 ; i < jsonTemplate.length ; i++){
+                        if(jsonTemplate[i].reponse_id == $( this ).val())
+                        {
+                        	tinyMCE.get('content_message_reply').setContent(jsonTemplate[i].content);
+                            break;
+                        }
+                    }
+
+                });
+
+                $('.mailbox-read-info').click(function(){
+                    if(!$(this).parent().hasClass('last')){
+                        $(this).toggleClass("read");
+                        $(this).siblings('.mailbox-read-message').toggleClass("hide");
+                        $(this).find('.quote-message').toggleClass("hide");
+                    }
+                });
+
+                $("#msg-discard-btn").click(function(){
+                    $("#form-reply-ticket").hide();
+                    $("#reply-message-button").show();
+                    tinyMCE.get('content_message_reply').setContent('<p></p>');
+                    $$(".file-uploader-summary").each(function(e){
+                        e.remove();
+                    });
+                });
+
+                $("#msg-send-btn").click(function(){
+                    var content = tinyMCE.get('content_message_reply').getContent();
+                    $('#content_message_reply').val(content);
+                    if($("edit_form").validation() && $("edit_form").validation('isValid') && content){
+                        $("#vnecoms-msg-notification").removeClass('hide');
+                        $("#form-reply-ticket").hide();
+                        $.ajax({
+                            method: "POST",
+                            url: "<?php echo $block->getUrl('*/*/reply');?>",
+                            dataType: 'json',
+                            data : $("#edit_form").serializeArray(),
+                            success: function (data) {
+                                $("#vnecoms-msg-notification").addClass('hide');
+                                if(data.error){
+                                    $("#form-reply-ticket").show();
+                                    alert({
+                                        modalClass: 'alert ves-error',
+                                        title: '<?php echo __("Error");?>',
+                                        content: data.msg,
+                                    });
+                                }else{
+                                    $("#reply-message-button").show();
+                                    $('.box-message-list').html(data.message_list);
+                                    tinyMCE.get('content_message_reply').setContent('<p></p>');
+                                    $$(".file-uploader-summary").each(function(e){
+                                        e.remove();
+                                    });
+                                }
+                            }
+                        });
+                    } else{
+                        alert('<?php echo __("Please enter message");?>');
+                    }
+
+                });
+
+            });
+        });
+    </script>
+
+</div>

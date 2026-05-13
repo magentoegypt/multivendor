@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="styles"/>
+    <update handle="category_head"/>
+    <head>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="extjs/resources/css/ext-all.css"/>
+        <css src="extjs/resources/css/ytheme-magento.css"/>
+        <css src="Vnecoms_VendorsCategory::css/styles.css"/>
+        <link src="Vnecoms_VendorsCategory::js/edit-tree.js"/>
+    </head>
+    <update handle="editor"/>
+    <body>
+        <referenceContainer name="left" htmlTag="div" />
+        <referenceContainer name="left">
+            <!--<block class="Magento\Framework\View\Element\Template" template="Vnecoms_VendorsCategory::test.phtml"/>-->
+            <block class="Vnecoms\VendorsCategory\Block\Vendors\Category\Tree" name="vendor.category.tree" template="Vnecoms_VendorsCategory::category/tree.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <!--<uiComponent name="category_form"/>-->
+            <block class="Vnecoms\VendorsCategory\Block\Vendors\Category\Edit" name="vendor.category.edit" template="Vnecoms_VendorsCategory::category/edit.phtml" />
+            <!--<block class="Vnecoms\VendorsCategory\Block\Vendors\Category\Tab\ProductNew" name="category.product.grid"/>-->
+        </referenceContainer>
+        <referenceContainer name="js">
+            <block class="Magento\Framework\View\Element\Template" template="Vnecoms_VendorsCategory::wysiwyg/js.phtml" name="catalog.wysiwyg.js"/>
+        </referenceContainer>
+        <referenceBlock name="head.components">
+            <block class="Magento\Framework\View\Element\Js\Components" name="catalog_category_page_head_components" template="Magento_Catalog::js/components.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="category.product.grid">
+            <uiComponent name="product_listing"/>
+        </referenceBlock>
+    </body>
+</page>

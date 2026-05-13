@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+    	<add id="Vnecoms_VendorsCms::index" dependsOnConfig="vendors/cms/active" icon="fa fa-clone" title="CMS" sortOrder="40" module="Vnecoms_VendorsCms" resource="Vnecoms_VendorsCms::index" dependsOnModule="Vnecoms_VendorsDashboard" />
+        <add id="Vnecoms_VendorsCms::page" dependsOnConfig="vendors/cms/active" title="Manage Pages" sortOrder="10" module="Vnecoms_VendorsCms" action="cms/page" parent="Vnecoms_VendorsCms::index" dependsOnModule="Vnecoms_VendorsCms" resource="Vnecoms_VendorsCms::page"/>
+        <add id="Vnecoms_VendorsCms::block" dependsOnConfig="vendors/cms/active" title="Manage Static Blocks" sortOrder="20" module="Vnecoms_VendorsCms" action="cms/block" parent="Vnecoms_VendorsCms::index" dependsOnModule="Vnecoms_VendorsCms" resource="Vnecoms_VendorsCms::block"/>
+        <add id="Vnecoms_VendorsCms::app" dependsOnConfig="vendors/cms/active" title="Manage Frontend Applications" sortOrder="50" module="Vnecoms_VendorsCms" action="cms/app" parent="Vnecoms_VendorsCms::index" dependsOnModule="Vnecoms_VendorsCms" resource="Vnecoms_VendorsCms::app"/>
+    </menu>
+</config>
+

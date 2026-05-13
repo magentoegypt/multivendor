@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+		<css src="Vnecoms_Vendors::css/vendor.css"/>
+		<css src="Vnecoms_VendorsPage::css/styles.css"/>
+	</head>
+    <body>
+    	<referenceBlock name="head.additional">
+            <block class="Vnecoms\VendorsPage\Block\Head" name="vendor.head.html" template="Vnecoms_VendorsPage::head.phtml" after="-"/>
+        </referenceBlock>
+        <referenceContainer name="before.body.end">
+        	<block class="Vnecoms\VendorsPage\Block\Footer" name="vendor.footer.html" template="Vnecoms_VendorsPage::footer.phtml" after="-"/>
+        </referenceContainer>
+        <referenceContainer name="page.top">
+			<block class="Vnecoms\VendorsPage\Block\Profile\Top" name="vendor.profile.top" template="Vnecoms_VendorsPage::profile.phtml" after="navigation.sections">
+				<container name="vendor.profile.top.wrapper" htmlTag="div" htmlClass="vendor-profile-wrapper">
+		        	<container name="vendor.profile.top.container" htmlTag="div" htmlClass="vendor-profile-container vendor-profile-top">
+						<container name="vendor.profile.top.logo.container" htmlTag="div" htmlClass="col-xs-3 vendor-profile-logo" before="-">
+							<block class="Vnecoms\Vendors\Block\Profile\Logo" name="vendor.profile.top.logo" template="Vnecoms_Vendors::profile/logo.phtml">
+								<block class="Vnecoms\VendorsPage\Block\Profile\Link" name="vendor.profile.top.logo.link" />
+								<arguments>
+					    			<argument name="logo_width" xsi:type="number">200</argument>
+					    			<argument name="logo_height" xsi:type="number">200</argument>
+				    			</arguments>
+							</block>
+						</container>
+						<container name="vendor.profile.top.description.container" htmlTag="div" htmlClass="col-xs-8 vendor-profile-description">
+							<block class="Vnecoms\Vendors\Block\Profile\Title" name="vendor.profile.top.title" template="Vnecoms_Vendors::profile/title.phtml">
+								<block class="Vnecoms\VendorsPage\Block\Profile\Link" name="vendor.profile.top.title.link" />
+							</block>
+							<block class="Vnecoms\Vendors\Block\Profile\Description" name="vendor.profile.top.description" template="Vnecoms_Vendors::profile/description.phtml" />
+					    	<container name="vendor.profile.top.sales_joindate.container" htmlTag="p" htmlClass="vendor-info">
+					    		<block class="Vnecoms\Vendors\Block\Profile\Address" name="vendor.profile.top.address" template="Vnecoms_Vendors::profile/address.phtml" />
+					    		<block class="Vnecoms\Vendors\Block\Profile\Sales" name="vendor.profile.top.sales" template="Vnecoms_Vendors::profile/sales.phtml" />
+					    		<block class="Vnecoms\Vendors\Block\Profile\JoinedDate" name="vendor.profile.top.join_date" template="Vnecoms_Vendors::profile/joined_date.phtml" />
+					    	</container>
+					    	<container name="vendor.profile.top.phone_opentime.container" htmlTag="p" htmlClass="vendor-info">
+					    		<block class="Vnecoms\Vendors\Block\Profile\Phone" name="vendor.profile.top.phone" template="Vnecoms_Vendors::profile/phone.phtml" />
+					    		<block class="Vnecoms\Vendors\Block\Profile\OpenTime" name="vendor.profile.top.opentime" template="Vnecoms_Vendors::profile/open_time.phtml" />
+					    	</container>
+					    	
+					    	<!-- Socials -->
+					    	<container name="vendor.profile.top.social.container" htmlTag="div" htmlClass="vendor-social-container">
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.website" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Website</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/website</argument>
+						    			<argument name="icon_class" xsi:type="string">web</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.facebook" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Facebook</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/facebook</argument>
+						    			<argument name="icon_class" xsi:type="string">facebook</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.twitter" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Twitter</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/twitter</argument>
+						    			<argument name="icon_class" xsi:type="string">twitter</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.instagram" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Instagram</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/instagram</argument>
+						    			<argument name="icon_class" xsi:type="string">instagram</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.google_plus" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Google Plus</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/google_plus</argument>
+						    			<argument name="icon_class" xsi:type="string">google_plus</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.youtube" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Youtube</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/youtube</argument>
+						    			<argument name="icon_class" xsi:type="string">youtube</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.pinterest" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Pinterest</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/pinterest</argument>
+						    			<argument name="icon_class" xsi:type="string">pinterest</argument>
+					    			</arguments>
+					    		</block>
+					    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.top.social.vimeo" template="Vnecoms_VendorsPage::home/social.phtml">
+						    		<arguments>
+						    			<argument name="title" xsi:type="string" translate="true">Vimeo</argument>
+						    			<argument name="config_path" xsi:type="string">page/social/vimeo</argument>
+						    			<argument name="icon_class" xsi:type="string">vimeo</argument>
+					    			</arguments>
+					    		</block>
+					    	</container>
+						</container>
+				    </container>
+			    </container>
+		    </block>
+        </referenceContainer>
+        
+        <referenceContainer name="div.sidebar.additional">
+        	<block class="Vnecoms\VendorsPage\Block\Profile\Left" name="vendor.profile.left" template="Vnecoms_VendorsPage::profile.phtml" before="-">
+	        	<container name="vendor.profile.left.container" htmlTag="div" htmlClass="block vendor-profile-container profile-sidebar">
+					<container name="vendor.profile.left.logo.container" htmlTag="div" htmlClass="col-xs-3 vendor-profile-logo" before="-">
+						<block class="Vnecoms\Vendors\Block\Profile\Logo" name="vendor.profile.left.logo" template="Vnecoms_Vendors::profile/logo.phtml">
+							<block class="Vnecoms\VendorsPage\Block\Profile\Link" name="vendor.profile.left.logo.link" />
+						</block>
+					</container>
+					<container name="vendor.profile.left.description.container" htmlTag="div" htmlClass="col-xs-8 vendor-profile-description">
+						<block class="Vnecoms\Vendors\Block\Profile\Title" name="vendor.profile.left.title" template="Vnecoms_Vendors::profile/title.phtml">
+							<block class="Vnecoms\VendorsPage\Block\Profile\Link" name="vendor.profile.left.title.link" />
+						</block>
+						<block class="Vnecoms\Vendors\Block\Profile\Description" name="vendor.profile.left.description" template="Vnecoms_Vendors::profile/description.phtml" />
+						<container name="vendor.profile.left.address.container" htmlTag="p" htmlClass="vendor-info">
+	        				<block class="Vnecoms\Vendors\Block\Profile\Address" name="vendor.profile.left.address" template="Vnecoms_Vendors::profile/address.phtml" />
+		        		</container>
+		        		<container name="vendor.profile.left.phone.container" htmlTag="p" htmlClass="vendor-info">
+				    		<block class="Vnecoms\Vendors\Block\Profile\Phone" name="vendor.profile.left.phone" template="Vnecoms_Vendors::profile/phone.phtml" />
+				    	</container>
+				    	<container name="vendor.profile.left.opentime.container" htmlTag="p" htmlClass="vendor-info">
+				    		<block class="Vnecoms\Vendors\Block\Profile\OpenTime" name="vendor.profile.left.opentime" template="Vnecoms_Vendors::profile/open_time.phtml" />
+				    	</container>
+				    	<container name="vendor.profile.left.sales.container" htmlTag="p" htmlClass="vendor-info">
+				    		<block class="Vnecoms\Vendors\Block\Profile\Sales" name="vendor.profile.left.sales" template="Vnecoms_Vendors::profile/sales.phtml" />
+				    	</container>
+				    	<container name="vendor.profile.left.joindate.container" htmlTag="p" htmlClass="vendor-info">
+				    		<block class="Vnecoms\Vendors\Block\Profile\JoinedDate" name="vendor.profile.left.join_date" template="Vnecoms_Vendors::profile/joined_date.phtml" />
+				    	</container>
+				    	
+				    	<!-- Social -->
+				    	<container name="vendor.profile.left.social.container" htmlTag="div" htmlClass="vendor-social-container">
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.website" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Website</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/website</argument>
+					    			<argument name="icon_class" xsi:type="string">web</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.facebook" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Facebook</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/facebook</argument>
+					    			<argument name="icon_class" xsi:type="string">facebook</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.twitter" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Twitter</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/twitter</argument>
+					    			<argument name="icon_class" xsi:type="string">twitter</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.instagram" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Instagram</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/instagram</argument>
+					    			<argument name="icon_class" xsi:type="string">instagram</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.google_plus" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Google Plus</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/google_plus</argument>
+					    			<argument name="icon_class" xsi:type="string">google_plus</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.youtube" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Youtube</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/youtube</argument>
+					    			<argument name="icon_class" xsi:type="string">youtube</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.pinterest" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Pinterest</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/pinterest</argument>
+					    			<argument name="icon_class" xsi:type="string">pinterest</argument>
+				    			</arguments>
+				    		</block>
+				    		<block class="Vnecoms\VendorsPage\Block\Home\Social" name="vendor.profile.left.social.vimeo" template="Vnecoms_VendorsPage::home/social.phtml">
+					    		<arguments>
+					    			<argument name="title" xsi:type="string" translate="true">Vimeo</argument>
+					    			<argument name="config_path" xsi:type="string">page/social/vimeo</argument>
+					    			<argument name="icon_class" xsi:type="string">vimeo</argument>
+				    			</arguments>
+				    		</block>
+				    		
+				    	</container>
+					</container>
+				</container>
+			</block>
+        </referenceContainer>
+        <referenceBlock name="page.main.title" remove="true" />
+    </body>
+</page>

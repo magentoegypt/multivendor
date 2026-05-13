@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout">
+            <group id="design">
+                <group id="text_and_default_values">
+                    <field id="custom_place_order" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Place Order Custom Name</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Enable this setting if you’d like to set a custom name for the ‘Place Order' button.]]></comment>
+                        <config_path>amasty_checkout/design/custom_place_order</config_path>
+                    </field>
+                    <field id="custom_place_order_text" translate="label comment" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Custom Button Name</label>
+                        <depends>
+                            <field id="custom_place_order">1</field>
+                        </depends>
+                        <comment><![CDATA[Enter the name that will be displayed in the ‘Place Order' button. Limited to 40 symbols.]]></comment>
+                        <validate>validate-no-empty validate-length maximum-length-40</validate>
+                        <config_path>amasty_checkout/design/custom_place_order_text</config_path>
+                    </field>
+                </group>
+                <group id="layout">
+                    <field id="address_checkbox_state" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>'Billing and Shipping Address are the same' by default</label>
+                        <comment><![CDATA[Specify the default state of the ‘My billing and shipping address are the same’ checkbox.]]></comment>
+                        <source_model>Amasty\Checkout\Model\Config\Source\Address</source_model>
+                        <config_path>amasty_checkout/design/address_checkbox_state</config_path>
+                    </field>
+                </group>
+                <group id="optional_ui_elements">
+                    <field id="email_tooltip" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display Tooltip Next to Email Address</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="email_tooltip_text" translate="label comment" type="textarea" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Tooltip Text</label>
+                        <depends>
+                            <field id="email_tooltip">1</field>
+                        </depends>
+                        <validate>validate-no-empty validate-length maximum-length-511</validate>
+                    </field>
+                    <field id="phone_tooltip" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display Tooltip Next to Phone Number</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="phone_tooltip_text" translate="label comment" type="textarea" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Tooltip Text</label>
+                        <depends>
+                            <field id="phone_tooltip">1</field>
+                        </depends>
+                        <validate>validate-no-empty validate-length maximum-length-511</validate>
+                    </field>
+                </group>
+                <group id="additional_fields_and_other_extras">
+                    <field id="phone_validation"
+                           translate="label"
+                           type="select"
+                           sortOrder="90"
+                           showInDefault="1">
+                        <label>Phone Number Field Validation</label>
+                        <tooltip>Please note that this setting is for Checkout 'Phone Number' field only.
+                            To customize the display of this field or make it required,
+                            please go to System -> Manage Checkout Fields.
+                        </tooltip>
+                        <source_model>Amasty\Checkout\Model\Config\Source\PhoneValidationOptions</source_model>
+                        <config_path>amasty_checkout/additional_options/phone_validation</config_path>
+                    </field>
+                    <field id="phone_min_length" translate="label" type="text" sortOrder="100" showInDefault="1">
+                        <label>Minimum Number of Symbols</label>
+                        <depends>
+                            <field id="phone_validation" separator="|">1|2</field>
+                        </depends>
+                        <validate>validate-number validate-zero-or-greater validate-digits</validate>
+                        <config_path>amasty_checkout/additional_options/phone_min_length</config_path>
+                    </field>
+                    <field id="phone_max_length" translate="label" type="text" sortOrder="110" showInDefault="1">
+                        <label>Maximum Number of Symbols</label>
+                        <backend_model>Amasty\Checkout\Model\Config\Backend\MaxPhoneLength</backend_model>
+                        <depends>
+                            <field id="phone_validation" negative="1">0</field>
+                        </depends>
+                        <validate>validate-number validate-zero-or-greater validate-digits</validate>
+                        <config_path>amasty_checkout/additional_options/phone_max_length</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

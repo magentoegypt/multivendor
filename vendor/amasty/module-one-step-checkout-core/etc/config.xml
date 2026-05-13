@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <amasty_checkout>
+            <general>
+                <enabled>1</enabled>
+                <title>Checkout</title>
+                <description>Please enter your details below to complete your purchase</description>
+                <product_editing_type>0</product_editing_type>
+                <bundling>1</bundling>
+                <social_login>0</social_login>
+                <!-- hidden for OSC-128-->
+                <!--subscribe_authorization>1</subscribe_authorization-->
+            </general>
+            <design>
+                <layout>2columns</layout>
+                <header_footer>0</header_footer>
+            </design>
+            <additional_options>
+                <discount>1</discount>
+                <unit_price>0</unit_price>
+            </additional_options>
+            <custom_blocks>
+                <top_block_id></top_block_id>
+                <bottom_block_id></bottom_block_id>
+            </custom_blocks>
+            <manage_fields_link>
+                <label>Also see Layout settings to manage Block Names</label>
+            </manage_fields_link>
+            <manage_fields_link_content>
+                <label>Also see Manage Checkout Fields to rearrange Address Block content</label>
+            </manage_fields_link_content>
+        </amasty_checkout>
+    </default>
+</config>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <vendors>
+            <cms>
+                <active>1</active>
+                <show_app_title>1</show_app_title>
+            </cms>
+        </vendors>
+
+        <vendor_advanced_group>
+            <vendorscms>
+                <can_use_cms>1</can_use_cms>
+            </vendorscms>
+        </vendor_advanced_group>
+
+        <system>
+            <media_storage_configuration>
+                <allowed_resources>
+                    <media_gallery_image_folders>
+                        <vendors_wysiwyg_image_folder>vendorscms</vendors_wysiwyg_image_folder>
+                    </media_gallery_image_folders>
+                </allowed_resources>
+            </media_storage_configuration>
+        </system>
+    </default>
+</config>

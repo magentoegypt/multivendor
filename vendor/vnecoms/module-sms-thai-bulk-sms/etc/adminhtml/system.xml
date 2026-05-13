@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="thaibulksms_username" translate="label tooltip" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>BulkSms Username</label>
+	                    <config_path>vsms/settings/thaibulksms_username</config_path>
+	                    <depends>
+	                        <field id="gateway">thaibulksms</field>
+	                    </depends>
+	                </field>
+	                <field id="thaibulksms_password" translate="label tooltip" type="password" sortOrder="121" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>BulkSms Password</label>
+	                    <config_path>vsms/settings/thaibulksms_password</config_path>
+	                    <depends>
+	                        <field id="gateway">thaibulksms</field>
+	                    </depends>
+	                </field>
+	                <field id="thaibulksms_sender" translate="label tooltip" type="text" sortOrder="122" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender</label>
+	                    <config_path>vsms/settings/thaibulksms_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">thaibulksms</field>
+	                    </depends>
+	                </field>
+	                <field id="thaibulksms_message_type" translate="label tooltip" type="select" sortOrder="123" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message Type</label>
+	                    <config_path>vsms/settings/thaibulksms_message_type</config_path>
+	                    <source_model>Vnecoms\SmsThaiBulkSms\Model\Config\Source\MessageType</source_model>
+	                    <depends>
+	                        <field id="gateway">thaibulksms</field>
+	                    </depends>
+	                </field>
+	                <field id="thaibulksms_is_test" translate="label tooltip" type="select" sortOrder="124" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Test Mode</label>
+	                    <config_path>vsms/settings/thaibulksms_is_test</config_path>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <comment>Use for testing purpose only. SMS(s) will not be sent</comment>
+	                    <depends>
+	                        <field id="gateway">thaibulksms</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

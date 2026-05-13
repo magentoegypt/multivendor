@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Role -->
+    <route url="/V1/vendors/import/images" method="POST">
+        <service class="Vnecoms\VendorsProductImportExport\Api\ImageRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/vendors/import/images" method="GET">
+        <service class="Vnecoms\VendorsProductImportExport\Api\ImageRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/vendors/import/images/delete" method="POST">
+        <service class="Vnecoms\VendorsProductImportExport\Api\ImageRepositoryInterface" method="deleteByFiles"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+</routes>

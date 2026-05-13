@@ -1,0 +1,31 @@
+
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject RMA # {{var request.getIncrementId()}} @-->
+
+
+{{template config_path="design/email/header_template"}}
+<h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;">
+    {{trans "Hello %name" name=$contact_name}},
+</h1>
+
+<p> {{trans "RMA #%increment_id has been changed status to %status." increment_id=$request.getIncrementId() status=$request.getStatusTitle()}},</p>
+
+<h3>{{trans "RMA details"}}</h3>
+<p>
+{{trans "Order ID: #%order_id" order_id=$request.getOrderIncrementalId()}}<br />
+{{trans "Customer: %customer_name <%customer_email>" customer_name=$request.getCustomerName() customer_email=$request.getCustomerEmail()}}<br />
+{{trans "Date: %created_at" created_at=$created_at}}<br />
+{{trans "Request Type: %request_type" request_type=$request_type}}<br />
+{{trans "Request State: %request_state" request_state=$request_state}}<br />
+{{trans "Package Opened: %pack_open" pack_open=$pack_open}}</p>
+<p>{{trans "Items"}}<br />
+    {{layout handle="vrma_email_request_items" rma_id=$request.entity_id}}</p>
+
+
+{{template config_path="design/email/footer_template"}}

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="ves_vendor_menu_check_acl">
+		<observer name="vendorcoupon_check_menu_acl" instance="Vnecoms\VendorsCoupon\Observer\CheckVendorsMenu" />
+	</event>
+    <event name="controller_action_predispatch_coupon_index_index">
+        <observer name="vendorscoupon_predispatch_coupon_index_index" instance="Vnecoms\VendorsCoupon\Observer\CouponPredispatch" />
+    </event>
+    <event name="controller_action_predispatch_coupon_index_save">
+        <observer name="vendorscoupon_predispatch_coupon_index_save" instance="Vnecoms\VendorsCoupon\Observer\CouponPredispatch" />
+    </event>
+</config>

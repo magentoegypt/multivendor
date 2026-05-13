@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Vnecoms_Vendors::vendor">
+                <resource id="Vnecoms_VendorsRMA::rma" title="RMA" translate="title" sortOrder="50">
+                    <resource id="Vnecoms_Vendors::rma_request" title="All RMA" translate="title" sortOrder="10" />
+                    <resource id="Vnecoms_Vendors::rma_response" title="Manage Quick Responses" translate="title" sortOrder="20" />
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

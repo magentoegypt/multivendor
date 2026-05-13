@@ -1,0 +1,39 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */
+/**
+ * @var  $block Magento\Sales\Block\Order\View
+ * @var  $escaper Magento\Framework\Escaper
+ */
+
+// @codingStandardsIgnoreFile
+$messageHelper = $this->helper('Magento\GiftMessage\Helper\Message');
+?>
+<?php $_order = $block->getOrder() ?>
+
+<?php if ($messageHelper->isMessagesAllowed('order', $_order) && $_order->getGiftMessageId()): ?>
+    <?php $_giftMessage = $messageHelper->getGiftMessageForEntity($_order); ?>
+    <div class="block block-order-details-gift-message">
+        <div class="block-title">
+            <strong><?= $escaper->escapeHtml(__('Gift Message for This Order')) ?></strong>
+        </div>
+        <div class="block-content">
+            <dl class="item-options">
+                <dt class="item-sender">
+                    <strong class="label"><?= $escaper->escapeHtml(__('From')) ?></strong>
+                    <?= $escaper->escapeHtml($_giftMessage->getSender()) ?>
+                </dt>
+                <dt class="item-recipient">
+                    <strong class="label"><?= $escaper->escapeHtml(__('To')) ?></strong>
+                    <?= $escaper->escapeHtml($_giftMessage->getRecipient()) ?>
+                </dt>
+                <dd class="item-message">
+                    <?= $escaper->escapeHtml($messageHelper->getEscapedGiftMessage($_order)) ?>
+                </dd>
+            </dl>
+        </div>
+    </div>
+<?php endif; ?>

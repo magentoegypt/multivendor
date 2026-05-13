@@ -1,0 +1,261 @@
+<?php
+
+namespace Vnecoms\BannerManager\Block\Vendors\Banner\Helper\Form\Gallery;
+
+use Magento\Backend\Block\Media\Uploader;
+use Magento\Framework\UrlInterface;
+
+/**
+ * Class Upload helper for get data images to render
+ * 
+ * @category Vnecoms
+ * @package  Vnecoms_BannerManager
+ * @module   BannerManager
+ * @author   Vnecoms Developer Team
+ */
+class Upload extends \Magento\Backend\Block\Widget
+{
+    /**
+     * @var string
+     */
+    protected $_template = 'Vnecoms_BannerManager::banner/helper/gallery.phtml';
+
+
+    /**
+     * For get max file size upload value
+     *
+     * @var \Magento\Framework\File\Size
+     */
+    protected $fileConfig;
+
+    /**
+     * @var \Magento\Framework\DataObject
+     */
+    protected $_config;
+
+    /**
+     * @var \Magento\Framework\Json\EncoderInterface
+     */
+    protected $_jsonEncoder;
+
+    /** @var \Magento\Framework\Data\FormFactory  */
+    protected $_formFactory;
+
+
+    /** @var null  */
+    protected $_element = null;
+
+
+    /** @var \Vnecoms\BannerManager\Model\ResourceModel\Item\CollectionFactory  */
+    protected $_itemCollectionFactory;
+
+    /** @var UrlInterface  */
+    protected $_url;
+
+    /** @var \Magento\Framework\View\LayoutInterface  */
+    protected $_layout;
+
+    /**
+     * Upload constructor.
+     * 
+     * @param \Magento\Backend\Block\Template\Context $context
+     * @param \Magento\Framework\Data\FormFactory $formFactory
+     * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
+     * @param \Magento\Framework\File\Size $fileConfig
+     * @param \Vnecoms\BannerManager\Model\ResourceModel\Item\CollectionFactory $itemCollectionFactory
+     * @param array $data
+     */
+    public function __construct(
+        \Magento\Backend\Block\Template\Context $context,
+        \Magento\Framework\Data\FormFactory $formFactory,
+        \Magento\Framework\Json\EncoderInterface $jsonEncoder,
+        \Magento\Framework\File\Size $fileConfig,
+        \Vnecoms\BannerManager\Model\ResourceModel\Item\CollectionFactory $itemCollectionFactory,
+        array $data = []
+    ) {
+
+        $this->_formFactory           = $formFactory;
+        $this->_jsonEncoder           = $jsonEncoder;
+        $this->fileConfig             = $fileConfig;
+        $this->_itemCollectionFactory = $itemCollectionFactory;
+        parent::__construct($context, $data);
+        $this->_layout                = $context->getLayout();
+        $this->_url                   = $context->getUrlBuilder();
+
+    }
+
+    /**
+     * Set template before render
+     *
+     * @return $this
+     */
+    protected function _beforeToHtml()
+    {
+        $this->setTemplate($this->_template);
+
+        return parent::_beforeToHtml();
+    }
+
+    /**
+     * Get all images of item
+     *
+     * @return array
+     */
+    public function getImagesItemCollection()
+    {
+        $bannerId = $this->getRequest()->getParam('banner_id');
+        if (!isset($bannerId)) {
+            return [];
+        }
+
+        // Get Resource Collection
+        /** @var \Vnecoms\BannerManager\Model\ResourceModel\Item\Collection $itemResourceModel */
+        $itemResourceModel = $this->_itemCollectionFactory->create();
+        /** @var array $itemCollection */
+        $itemCollection = $itemResourceModel->addFieldToFilter('banner_id', $bannerId)
+            ->setOrder('sort_order', 'ASC')->getData();
+
+        $items = [];
+        foreach ($itemCollection as $item) {
+            $items[] = $item;
+        }
+
+        return $items;
+    }
+
+    /**
+     * Get all images json data string
+     *
+     * @param void
+     * @return string
+     */
+    public function getImagesJson()
+    {
+        /** @var array $collection */
+        $collection = $this->getImagesItemCollection();
+        if (is_array($collection)) {
+            $value  = $collection;
+
+            if (sizeof($value)) {
+                $images = [];
+                foreach ($value as $key => $image) {
+                    $images[$key]['item_id']                = $image['item_id'];
+                    $images[$key]['file']                   = $image['filename'];
+                    $images[$key]['media_type']             = 'image';
+                    $images[$key]['entity_id']              = '1';
+                    $images[$key]['label']                  = $image['filename_alt'];
+                    $images[$key]['position']               = $image['sort_order'];
+                    $images[$key]['disabled']               = '0';
+                    $images[$key]['label_default']          = $image['filename_alt'];
+                    $images[$key]['disabled_default']       = '0';
+                    $images[$key]['item_title']             = $image['item_title'];
+                    $images[$key]['item_alt']               = $image['filename_alt'];
+                    $images[$key]['item_url']               = $image['url'];
+                    $images[$key]['item_short_description'] = $image['short_description'];
+                    $images[$key]['item_status']            = $image['status'];
+                    $images[$key]['from_date']              = $this->_localeDate->date($image['from_date'])
+                        ->setTimezone(new \DateTimeZone('UTC'))->format('m/d/Y g:i a');
+                    $images[$key]['to_date']                = $this->_localeDate->date($image['to_date'])
+                        ->setTimezone(new \DateTimeZone('UTC'))->format('m/d/Y g:i a');
+                    $images[$key]['url'] = $this->_url->getBaseUrl(['_type' => UrlInterface::URL_TYPE_MEDIA])
+                        .'ves/bannermanager/images'.$image['filename'];
+                }
+
+                return $this->_jsonEncoder->encode($images);
+            }
+        }
+        return '[]';
+    }
+
+
+    /**
+     * Prepare global layout
+     *
+     * @return $this
+     */
+    protected function _prepareLayout()
+    {
+        $this->addChild('uploader', 'Magento\Backend\Block\Media\Uploader');
+
+        $this->getUploader()->getConfig()->setUrl(
+            $this->_urlBuilder->addSessionParam()->getUrl('bannermanager/banner_gallery/upload')
+        )->setFileField(
+            'image'
+        )->setFilters(
+            [
+                'images' => [
+                    'label' => __('Images (.gif, .jpg, .png)'),
+                    'files' => ['*.gif', '*.jpg', '*.png'],
+                ],
+                'media' => [
+                    'label' => __('Media (.avi, .flv, .swf)'),
+                    'files' => ['*.avi', '*.flv', '*.swf'],
+                ],
+                'all' => ['label' => __('All Files'), 'files' => ['*.*']],
+            ]
+        );
+
+        return parent::_prepareLayout();
+    }
+
+    /**
+     * Retrieve uploader js object name
+     *
+     * @return string
+     */
+    public function getJsObjectName()
+    {
+        return $this->getHtmlId() . 'JsObject';
+    }
+
+
+    /**
+     * Retrieve uploader block
+     *
+     * @return Uploader
+     */
+    public function getUploader()
+    {
+        return $this->getChildBlock('uploader');
+    }
+
+    /**
+     * Get HTML UPloader
+     *
+     * @return string
+     */
+    public function getUploaderHtml()
+    {
+        return $this->getChildHtml('uploader');
+    }
+
+
+    /**
+     * Retrieve config object
+     *
+     * @return \Magento\Framework\DataObject
+     */
+    public function getConfig()
+    {
+        if (null === $this->_config) {
+            $this->_config = new \Magento\Framework\DataObject();
+        }
+
+        return $this->_config;
+    }
+
+    /**
+     * get max size file upload
+     *
+     * @return int
+     */
+    public function getFileMaxSize()
+    {
+        return $this->fileConfig->getMaxFileSize();
+    }
+
+
+}
+
+
+

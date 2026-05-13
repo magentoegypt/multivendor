@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsGroup:etc/advanced_group.xsd">
+<advanced_group>
+	<group id="custom_theme" translate="label tooltip" type="text" sortOrder="60">
+		<label>Theme Changer</label>
+		<field id="enabled" translate="label" type="select" sortOrder="10">
+			<label>Can Use Custom Theme</label>
+			<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+		</field>
+	</group>
+</advanced_group>
+</config>

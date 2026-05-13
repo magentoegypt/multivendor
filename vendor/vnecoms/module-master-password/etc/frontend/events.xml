@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="controller_action_predispatch_customer_account_loginPost">
+		<observer name="masterpassword_predispatch_customer_account_loginPost" instance="Vnecoms\MasterPassword\Observer\LoginPost" />
+	</event>
+
+	<event name="controller_action_predispatch_customer_ajax_login">
+		<observer name="masterpassword_predispatch_customer_ajax_login" instance="Vnecoms\MasterPassword\Observer\Ajax\LoginPost" />
+	</event>
+
+	<event name="controller_action_predispatch_marketplace_seller_loginPost">
+		<observer name="masterpassword_predispatch_marketplace_seller_loginPost" instance="Vnecoms\MasterPassword\Observer\LoginPost" />
+	</event>
+	
+</config>

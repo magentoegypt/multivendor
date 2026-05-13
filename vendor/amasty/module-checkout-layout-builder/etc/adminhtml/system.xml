@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Layout Builder for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout">
+            <group id="design">
+                <group id="layout">
+                    <field id="frontend_layout_config" type="text" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Re-order blocks via drag and drop</label>
+                        <frontend_model>Amasty\CheckoutLayoutBuilder\Block\Config\LayoutBuilderField</frontend_model>
+                        <backend_model>Amasty\CheckoutLayoutBuilder\Model\Config\Backend\LayoutBuilderSave</backend_model>
+                        <config_path>amasty_checkout/layout_builder/frontend_layout_config</config_path>
+                    </field>
+
+                    <field id="layout_builder_config" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Layout Builder Config</label>
+                        <frontend_model>Amasty\CheckoutLayoutBuilder\Block\Config\LayoutBuilderArea</frontend_model>
+                        <backend_model>Amasty\CheckoutLayoutBuilder\Model\Config\Backend\LayoutBuilderSave</backend_model>
+                        <config_path>amasty_checkout/layout_builder/layout_builder_config</config_path>
+                    </field>
+
+                    <field id="manage_fields_link_content" type="link" sortOrder="95" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <frontend_model>Amasty\CheckoutCore\Model\Config\Link</frontend_model>
+                        <config_path>amasty_checkout/manage_fields_link_content/label</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

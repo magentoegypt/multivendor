@@ -1,0 +1,8 @@
+<!-- ko if: (value() !== false) -->
+<div class="commission-calculation-container">
+	<!-- ko text: $t('Marketplace Commission: ')--><!-- /ko --> <span class="commission-estimation" data-bind="text: isLoading() ? $t('Calculating ...') : value()"></span>
+	<div class="commission-estimation-note"
+		 data-bind="html: getCommissionTextHtml()">
+	</div>
+</div>
+<!-- /ko -->

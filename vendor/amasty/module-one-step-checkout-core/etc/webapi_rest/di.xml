@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Quote\Model\Quote\Address">
+        <plugin name="Amasty_CheckoutCore::QuoteAddress" type="Amasty\CheckoutCore\Plugin\Quote\Address" />
+    </type>
+    <type name="Magento\Checkout\Model\ShippingInformationManagement">
+        <plugin name="Amasty_CheckoutCore::FillAddressData" type="Amasty\CheckoutCore\Plugin\Checkout\Model\ShippingInformationManagement\FillAddressData" />
+    </type>
+</config>

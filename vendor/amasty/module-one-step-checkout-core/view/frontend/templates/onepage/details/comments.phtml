@@ -1,0 +1,21 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+/** @var $block \Magento\Sales\Block\Order\View|\Amasty\CheckoutCore\Block\Sales\Order\Email\Comments */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php $history = $block->getOrder()->getVisibleStatusHistory() ?>
+<?php if (count($history)): ?>
+    <div class="block block-order-details-comments">
+        <div class="block-title"><strong><?= $escaper->escapeHtml(__('Comments')) ?></strong></div>
+        <div class="block-content">
+            <?php foreach ($history as $historyItem): ?>
+                <div class="comment-content"><?= $escaper->escapeHtml($historyItem->getComment()) ?></div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+<?php endif; ?>

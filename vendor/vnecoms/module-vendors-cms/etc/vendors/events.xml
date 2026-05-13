@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="controller_action_predispatch_vendorscms">
+        <observer name="check_enable_module" instance="Vnecoms\VendorsCms\Observer\Vendors\CheckEnableModule"/>
+    </event>
+    <event name="controller_action_predispatch_cms">
+        <observer name="check_allow_cms" instance="Vnecoms\VendorsCms\Observer\Vendors\CheckAllowCMSPredispatch"/>
+    </event>
+    <event name="page_url_key_validate">
+        <observer name="cms_page_url_key_validate" instance="Vnecoms\VendorsCms\Observer\Vendors\PageUrlKeyValidate"/>
+    </event>
+</config>

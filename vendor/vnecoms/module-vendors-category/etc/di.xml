@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Vnecoms\VendorsCategory\Api\Data\CategoryInterface" type="Vnecoms\VendorsCategory\Model\Category" />
+    <preference for="Vnecoms\VendorsCategory\Api\Data\CategoryTreeInterface" type="Vnecoms\VendorsCategory\Model\Category" />
+    <preference for="Vnecoms\VendorsCategory\Api\CategoryRepositoryInterface" type="Vnecoms\VendorsCategory\Model\CategoryRepository" />
+    <preference for="Vnecoms\VendorsCategory\Api\CategoryManagementInterface" type="Vnecoms\VendorsCategory\Model\CategoryManagement" />
+    <preference for="Vnecoms\VendorsCategory\Api\CategoryProductLinkInterface" type="Vnecoms\VendorsCategory\Model\CategoryProductLink" />
+    <preference for="Vnecoms\VendorsCategory\Api\CategoryLinkManagementInterface" type="Vnecoms\VendorsCategory\Model\CategoryLinkManagement" />
+    <preference for="Vnecoms\VendorsCategory\Api\CategoryLinkRepositoryInterface" type="Vnecoms\VendorsCategory\Model\CategoryLinkRepository" />
+
+    <!--upload category image-->
+    <virtualType name="Vnecoms\VendorsCategory\CategoryImageUpload" type="Magento\Catalog\Model\ImageUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">ves_vendorscategory/tmp/category</argument>
+            <argument name="basePath" xsi:type="string">ves_vendorscategory/category</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="gif" xsi:type="string">gif</item>
+                <item name="png" xsi:type="string">png</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Vnecoms\VendorsCategory\Controller\Vendors\Category\Image\Upload">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">Vnecoms\VendorsCategory\CategoryImageUpload</argument>
+        </arguments>
+    </type>
+
+    <!--<type name="Magento\Catalog\Model\Product">-->
+        <!--<plugin name="addVesCategoryIds" type="Vnecoms\VendorsCategory\Plugin\Model\ResourceModel\Product"/>-->
+    <!--</type>-->
+    <!--<type name="Vnecoms\VendorsCategory\Model\Rewrite\CategoryUrlPathGenerator">-->
+        <!--<plugin name="afterGetUrlPath" type="Vnecoms\VendorsCategory\Plugin\Model\Rewrite\CategoryUrlPathGenerator"/>-->
+    <!--</type>-->
+    <!--<type name="Vnecoms\VendorsCategory\Model\ResourceModel\Category">-->
+        <!--<plugin name="vendor_category_url_rewrite_plugin" type="Vnecoms\VendorsCategory\Plugin\Model\ResourceModel\Category"/>-->
+    <!--</type>-->
+
+    <!--add filter to filters list-->
+    <!--<virtualType name="vendorFilterList" type="Vnecoms\VendorsLayerNavigation\Model\Layer\FilterList">-->
+        <!--<arguments>-->
+            <!--<argument name="filters" xsi:type="array">-->
+                <!--<item name="vendor_category" xsi:type="string">Vnecoms\VendorsCategory\Model\Layer\Filter\Category</item>-->
+            <!--</argument>-->
+        <!--</arguments>-->
+    <!--</virtualType>-->
+
+    <!--NEW context-->
+    <virtualType name="Vnecoms\VendorsCategory\Model\Layer\Category\Context" type="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\Context">
+        <arguments>
+            <argument name="collectionFilter" xsi:type="object">Vnecoms\VendorsCategory\Model\Layer\Category\CollectionFilter</argument>
+            <!--<argument name="collectionProvider" xsi:type="object">Vnecoms\VendorsCategory\Model\Layer\Category\ItemCollectionProvider</argument>-->
+            <argument name="stateKey" xsi:type="object">Vnecoms\VendorsCategory\Model\Layer\Category\StateKey</argument>
+        </arguments>
+    </virtualType>
+
+    <!--change context-->
+    <type name="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage">
+        <arguments>
+            <argument name="context" xsi:type="object">Vnecoms\VendorsCategory\Model\Layer\Category\Context</argument>
+        </arguments>
+    </type>
+
+    <!--filter category class-->
+    <type name="Vnecoms\VendorsCategory\Model\Layer\Filter\Category">
+        <arguments>
+            <argument name="layer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="vendorFilterList" type="Vnecoms\VendorsLayerNavigation\Model\Layer\FilterList">
+        <arguments>
+            <argument name="filters" xsi:type="array">
+                <item name="attribute" xsi:type="string">Vnecoms\VendorsCategory\Model\Layer\Filter\Attribute</item>
+                <item name="decimal" xsi:type="string">Vnecoms\VendorsCategory\Model\Layer\Filter\Decimal</item>
+                <item name="price" xsi:type="string">Vnecoms\VendorsCategory\Model\Layer\Filter\Price</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+
+    <type name="Vnecoms\VendorsProduct\Block\Adminhtml\PendingProduct\Edit">
+        <plugin name="form.pending" type="Vnecoms\VendorsCategory\Plugin\Block\Adminhtml\PendingProduct\Edit" />
+    </type>
+
+    <!--<type name="Vnecoms\VendorsCategory\Plugin\Model\Layer\Filter\Item">-->
+        <!--<plugin name="changeLayerUrl" type="Magento\Catalog\Model\Layer\Filter\Item"/>-->
+    <!--</type>-->
+</config>

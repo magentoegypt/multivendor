@@ -1,0 +1,56 @@
+{
+    "ves_vendorscategory_category": {
+        "column": {
+            "category_id": true,
+            "real_category_id": true,
+            "vendor_id": true,
+            "parent_id": true,
+            "name": true,
+            "status": true,
+            "is_active": true,
+            "url_key": true,
+            "url_path": true,
+            "description": true,
+            "meta_title": true,
+            "meta_keywords": true,
+            "meta_description": true,
+            "page_layout": true,
+            "is_hide_product": true,
+            "included_in_menu": true,
+            "path": true,
+            "position": true,
+            "level": true,
+            "children_count": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "VES_VENDORSCATEGORY_CATEGORY_LEVEL": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ves_vendorscategory_category_product": {
+        "column": {
+            "entity_id": true,
+            "category_id": true,
+            "product_id": true,
+            "position": true
+        },
+        "index": {
+            "VES_VENDORSCATEGORY_CATEGORY_PRODUCT_PRODUCT_ID": true
+        },
+        "constraint": {
+            "VES_VENDORSCATEGORY_CATEGORY_PRODUCT_CATEGORY_ID_PRODUCT_ID": true,
+            "VES_VENDORSCTGR_CTGR_PRD_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "VES_VENDORSCTGR_CTGR_PRD_CTGR_ID_VES_VENDORSCTGR_CTGR_CTGR_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "catalog_product_entity": {
+        "column": {
+            "ves_category_ids": true
+        }
+    }
+}

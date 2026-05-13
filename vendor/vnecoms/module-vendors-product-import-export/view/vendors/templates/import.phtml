@@ -1,0 +1,31 @@
+<div class="row row-grap">
+    <div class="col-md-12">
+        <div class="box box-primary recently-added-products">
+            <div class="box-header with-border">
+                <h3 class="box-title"><?php echo __("Import Queue")?></h3>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __('In order to import product let click %1 button.','<span class="btn bg-purple btn-xs"><i class="fa fa-cloud-upload"></i> '.__('Import Product').'</span>')?></p>
+                        <p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __('After all of your products are added to import queue let click %1 button to start import product manually.','<span class="btn btn-primary btn-xs"><i class="fa fa-rocket"></i> '.__('Start Queue').'</span>')?></p>
+                        <?php /*?><p><i class="fa fa-lightbulb-o text-yellow"></i> <?php echo __('Products can be imported automatically in background. Let select items in queue then select action "Import in Background".')?></p>*/?>
+                        <?php if($block->isUpdateProductsApproval()):?>
+                        <p><i class="fa fa-warning text-red"></i> <?php echo __('If you update information for exist products using import function, Your products will have status %1 and they will not be displayed in frontend until they are reviewed and approved.','<span class="label label-default product-approval-notsubmited">'.__('Not Submited').'</span>')?></p>
+                        <?php endif;?>
+                    </div>
+                    <div class="col-md-6">
+                        <p><small class="label label-default"><?php echo __("Draft")?></small> <?php echo __('When products are imported to queue they will have this status. You can import these items manually.')?></p>
+                        <!-- 
+                        <p><small class="label label-warning"><?php echo __("In Process")?></small> <?php echo __('Items will have this status when you select action "Import in Background". All items have this status will be imported automatically by cron job.')?></p>
+                        <p><small class="label label-success"><?php echo __("Importing")?></small> <?php echo __('Items with this status are importing by cron job.')?></p>
+                         -->
+                        <p><small class="label label-danger"><?php echo __("Error")?></small> <?php echo __('All items have this status are not imported because error. You can click to the Error label to get detail information about the error.')?></p>
+                    </div>
+                </div>
+                <hr>
+                <?php echo $block->getChildHtml('product_import_export_queue')?>
+            </div>
+        </div>
+    </div>
+</div>

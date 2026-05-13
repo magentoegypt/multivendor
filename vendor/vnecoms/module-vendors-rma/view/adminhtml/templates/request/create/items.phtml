@@ -1,0 +1,111 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php $_order = $block->getOrder() ?>
+<?php if ($_order): ?>
+    <?php $_items = $_order->getAllItems(); ?>
+    <table class="request-items">
+        <thead>
+        <tr>
+            <th class="item-info">
+                <?= /* @escapeNotVerified */  __('Items'); ?>
+            </th>
+            <th class="item-qty">
+                <?= /* @escapeNotVerified */  __('Qty'); ?>
+            </th>
+        </tr>
+        </thead>
+        <?php if($_items): ?>
+
+            <?php $_vendorItems = $block->getItemGroupVendor(); ?>
+            <?php foreach ($_vendorItems as $vendorId => $_items): ?>
+                <tbody id="group-item-<?php echo $vendorId ?>" class="group-item" onclick="requestOption.changeBoxVendor(this)" rel="<?php echo $vendorId ?>">
+                <?php $vendorObject = $block->getVendorById($vendorId) ?>
+                <tr><th colspan="4" scope="col"><strong class="vendor-title"><?php echo $vendorObject->getVendorId() ? $vendorObject->getVendorId()
+                                : __("No Vendor");
+                            ?></strong></th></tr>
+                <?php foreach ($_items as $_item): ?>
+                    <?php
+                    if ($_item->getParentItem()) {
+                        continue;
+                    }
+                    ?>
+                    <?php echo  $block->getItemHtml($_item) ?>
+                <?php endforeach; ?>
+                </tbody>
+            <?php endforeach; ?>
+        <?php else:?>
+            <tbody>
+            <?php echo __("This order doesnot have any item") ?>
+            </tbody>
+        <?php endif; ?>
+    </table>
+<?php endif; ?>
+
+<script type="text/javascript">
+    require(
+    [
+        "jquery",
+        'jquery/validate',
+        "prototype",
+        "rma"
+    ], function(Jquery){
+        var requestOption = function() {
+            return {
+                changeBoxVendor : function(obj){
+                    var _this = this;
+                    var curentVendorId = obj.readAttribute("rel");
+                    $$('.group-item').each(function(element) {
+                        var vendorId = element.readAttribute("rel");
+                        if(curentVendorId != vendorId){
+                            element.addClassName("group-item-hide");
+                            element.removeClassName("group-item-show");
+                            _this.processBoxHideItem();
+                        }else{
+                            element.addClassName("group-item-show");
+                            element.removeClassName("group-item-hide");
+                            _this.processBoxHideItem(vendorId);
+                        }
+                    });
+                    _this.setTotalMaxRefundAmount();
+                },
+                processBoxHideItem : function(flag){
+                    if(flag){
+                        $$('#group-item-'+flag+" input").each(function(element) {
+                            element.removeAttribute("disabled");
+                        });
+                    }else{
+                        $$('.group-item-hide input').each(function(element) {
+                            element.setAttribute("disabled","disabled");
+                        });
+                    }
+                },
+                /* returns self object name */
+                setTotalMaxRefundAmount: function() {
+                    var totalValidateAmount = 0;
+                    $$(".ves-items-count").each(function(obj) {
+                        var price = $("orderitem-amount"+obj.name).value;
+                        var itemQty = $("orderitem-count"+obj.name).value;
+                        price = parseFloat(price);
+                        if (obj && !obj.disabled) {
+                            totalValidateAmount += price*itemQty;
+                        }
+                    });
+                    $$('[name="refund_custom_amount"]').first().value = totalValidateAmount;
+                    return totalValidateAmount;
+                }
+            }
+        }();
+
+        requestOption.changeBoxVendor($$('.group-item').first());
+        window.requestOption = requestOption;
+    });
+
+</script>

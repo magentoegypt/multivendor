@@ -1,0 +1,12 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: parseInt($row()['usage_limit'])>0 && parseInt($row()['usage_limit']) <= parseInt($row()['times_used'])-->
+<div class="data-grid-cell-content used-coupon" text="$col.getLabel($row())"></div>
+<!-- /ko -->
+<!-- ko if: parseInt($row()['usage_limit'])==0 || parseInt($row()['usage_limit']) > parseInt($row()['times_used'])-->
+<div class="data-grid-cell-content" text="$col.getLabel($row())"></div>
+<!-- /ko -->

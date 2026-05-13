@@ -1,0 +1,16 @@
+.vendor-theme-list{display: block; max-height: 500px; overflow-y: auto;}
+.vendor-theme-container{list-style: none; clear: both;}
+.vendor-theme-container::after {clear: both; content: ""; display: table;}
+.vendor-theme-container li{float: left; padding: 20px; margin-right: 20px; border: 1px solid #ccc; text-align: center; cursor: pointer; position: relative; min-height: 380px;}
+.vendor-theme-container li.selected{border-color: #E74C3C;}
+.vendor-theme-container li.no-theme{min-width: 220px; position: relative;}
+.vendor-theme-container li.no-theme .vendor-theme-title{position:absolute; top: 50%; width: 100%; text-align: center;left: 0;margin-top: -20px; color: #999; text-transform: uppercase; font-size: 22px;}
+.vendor-theme-container li .selected-label{background: url(../images/selected.png) no-repeat; width: 88px; height: 90px; position: absolute;top: -3px; left: -3px; display: none;}
+.vendor-theme-container li.selected .selected-label{display: block;}
+.vendor-theme-container li:hover{box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);}
+.vendor-theme-container li .vendor-theme-image{width: 200px; height: 250px; line-height: 230px; display: block;margin-bottom: 20px;}
+.vendor-theme-container li img{width: 100%; vertical-align: middle;}
+.vendor-theme-container li .btn-customize{margin-top: 10px;}
+.vendor-theme-title{font-weight: bold;}
+.vendor-theme-container li input{display: none;}
+.admin__field-control .admin__control-textarea.home_content_textarea{height: 500px;}

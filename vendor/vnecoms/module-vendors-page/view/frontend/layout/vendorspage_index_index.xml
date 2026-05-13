@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<!-- All vendor page will need to update this layout -->
+	<update handle="vendor_page" />
+	<update handle="vendor_left_navigation" />
+	<update handle="vendor_layer_navigation"/>
+
+	<body>
+		<attribute name="class" value="vendor-home-page"/>
+		<!-- Add banner -->
+		<referenceContainer name="page.top">
+			<container name="vendor.home.banner.container" htmlTag="div" htmlClass="vendor-home-banner" before="vendor.profile.top">
+				<block class="Vnecoms\VendorsPage\Block\Home\Banner" name="vendor.home.banner" template="Vnecoms_VendorsPage::home/banner.phtml" before="vendor.profile.top" />
+			</container>
+			<block class="Vnecoms\VendorsPage\Block\Menu" name="vendor.menu.top" template="Vnecoms_VendorsPage::menu.phtml" after="vendor.profile.top">
+				<container name="top_menu_before" />
+				<container name="top_menu_after" />
+				<block class="Vnecoms\Vendors\Block\Profile\Logo" name="vendor.menu.logo" as="small_logo" template="Vnecoms_Vendors::profile/logo.phtml">
+					<block class="Vnecoms\VendorsPage\Block\Profile\Link" name="vendor.menu.logo.link" />
+					<arguments>
+						<argument name="logo_width" xsi:type="number">75</argument>
+						<argument name="logo_height" xsi:type="number">75</argument>
+						<argument name="keep_transparency" xsi:type="boolean">true</argument>
+					</arguments>
+				</block>
+
+				<action method="addLink" ifconfig="vendors/vendorspage/show_about">
+					<argument name="label" translate="true" xsi:type="string">About</argument>
+					<argument name="title" translate="true" xsi:type="string">About</argument>
+					<argument name="url" xsi:type="string">#vendor-about</argument>
+					<argument name="sort_order" xsi:type="number">50</argument>
+				</action>
+				<action method="addLink" ifconfig="vendors/vendorspage/show_shipping">
+					<argument name="label" translate="true" xsi:type="string">Shipping Policies</argument>
+					<argument name="title" translate="true" xsi:type="string">Shipping Policies</argument>
+					<argument name="url" xsi:type="string">#vendor-shipping</argument>
+					<argument name="sort_order" xsi:type="number">60</argument>
+				</action>
+				<action method="addLink" ifconfig="vendors/vendorspage/show_refund">
+					<argument name="label" translate="true" xsi:type="string">Refund Policies</argument>
+					<argument name="title" translate="true" xsi:type="string">Refund Policies</argument>
+					<argument name="url" xsi:type="string">#vendor-refund</argument>
+					<argument name="sort_order" xsi:type="number">70</argument>
+				</action>
+			</block>
+		</referenceContainer>
+
+		<referenceContainer name="content">
+			<!-- Items -->
+			<container name="vendor.home.items.container" htmlTag="div" htmlClass="vendor-home-items">
+				<block class="Vnecoms\VendorsPage\Block\Product" name="vendor.products" template="Vnecoms_VendorsPage::products.phtml">
+					<block class="Vnecoms\VendorsPage\Block\Home\ListProduct" name="vendors.products.list" as="product_list" template="Magento_Catalog::product/list.phtml">
+						<container name="category.product.list.additional" as="additional" />
+
+						<block class="Magento\Framework\View\Element\RendererList" name="category.product.type.details.renderers" as="details.renderers.vpage">
+							<block class="Magento\Framework\View\Element\Template" name="category.product.type.details.renderers.default" as="v.default"/>
+
+							<block class="Magento\Swatches\Block\Product\Renderer\Listing\Configurable"
+								   name="category.product.type.details.renderers.configurable" as="configurable"
+								   template="Magento_Swatches::product/listing/renderer.phtml"
+								   ifconfig="catalog/frontend/show_swatches_in_product_list">
+								<arguments>
+									<argument name="configurable_view_model"
+											  xsi:type="object">Magento\Swatches\ViewModel\Product\Renderer\Configurable</argument>
+								</arguments>
+							</block>
+
+						</block>
+
+						<block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="category.product.addto" as="addto">
+							<block class="Magento\Catalog\Block\Product\ProductList\Item\AddTo\Compare"
+								   name="category.product.addto.compare" as="compare"
+								   template="Magento_Catalog::product/list/addto/compare.phtml"/>
+						</block>
+
+						<block class="Vnecoms\VendorsPage\Block\Home\ProductList\Toolbar" name="product_list_toolbar" template="Vnecoms_VendorsPage::home/product/list/toolbar.phtml">
+							<block class="Magento\Theme\Block\Html\Pager" name="product_list_toolbar_pager"/>
+						</block>
+						<action method="setToolbarBlockName">
+							<argument name="name" xsi:type="string">product_list_toolbar</argument>
+						</action>
+					</block>
+				</block>
+			</container>
+			<!-- About -->
+			<container name="vendor.home.about.container" htmlTag="div" htmlClass="vendor-home-about">
+				<block class="Vnecoms\VendorsPage\Block\Home\About" name="vendor.home.about" template="Vnecoms_VendorsPage::home/about.phtml" />
+			</container>
+
+			<!-- Shipping policy -->
+			<container name="vendor.home.shipping.container" htmlTag="div" htmlClass="vendor-home-shipping">
+				<block class="Vnecoms\VendorsPage\Block\Home\Shipping" name="vendor.home.shipping" template="Vnecoms_VendorsPage::home/shipping.phtml" />
+			</container>
+
+			<!-- Refund policy -->
+			<container name="vendor.home.refund.container" htmlTag="div" htmlClass="vendor-home-refund">
+				<block class="Vnecoms\VendorsPage\Block\Home\Refund" name="vendor.home.refund" template="Vnecoms_VendorsPage::home/refund.phtml" />
+			</container>
+
+			<block class="Magento\Cookie\Block\RequireCookie" name="require-cookie" template="Magento_Cookie::require_cookie.phtml">
+				<arguments>
+					<argument name="triggers" xsi:type="array">
+						<item name="compareProductLink" xsi:type="string">.action.tocompare</item>
+					</argument>
+				</arguments>
+			</block>
+		</referenceContainer>
+
+		<referenceBlock name="vendors.products.list">
+			<arguments>
+				<argument name="viewModel" xsi:type="object">Magento\Catalog\ViewModel\Product\OptionsData</argument>
+			</arguments>
+		</referenceBlock>
+	</body>
+</page>

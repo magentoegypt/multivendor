@@ -1,0 +1,33 @@
+<?php
+    /** @var \Vnecoms\VendorsSellerList\Block\Seller\Search $block */
+?>
+<div class="block seller-search-wrapper">
+    <div class="seller-search-inner">
+        <form class="form  block-seller-search " id="seller-search-form" action="<?php  //echo $block->getSearchResultUrl() ?>" method="get">
+            <div class="field">
+                <label style="display: none" class="label" for="seller-search" data-role="sellersearch-label">
+                    <span><?php echo __("Seller Search")?></span>
+                </label>
+                <div class="control">
+                    <input id="seller-search"
+                           type="text"
+                           name="seller_query"
+                           value="<?php echo $block->getSearchQuery()?>"
+                           placeholder="<?php /* @escapeNotVerified */ echo __('Search sellers here...'); ?>"
+                           class="input-text vendor-search-input"
+                           maxlength="128"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off"/>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                        title="<?php echo $block->escapeHtml(__('Search')) ?>"
+                        class="action seller-search seller-btn-search">
+                    <span><?php /* @escapeNotVerified */ echo __('Search'); ?></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

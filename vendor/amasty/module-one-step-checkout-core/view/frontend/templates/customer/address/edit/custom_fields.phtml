@@ -1,0 +1,40 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+use Amasty\CheckoutCore\Block\Frontend\Customer\Address\Edit\CustomFields;
+use Amasty\CheckoutCore\ViewModel\Frontend\Customer\Address\Edit\CustomFields as ViewModelCustomFields;
+use Magento\Framework\Escaper;
+
+/**
+ * @var CustomFields $block
+ * @var ViewModelCustomFields $viewModel
+ * @var Escaper $escaper
+ */
+
+$viewModel = $block->getViewModel();
+$attributes = $viewModel->getAttributes();
+?>
+
+<?php if ($attributes):
+    foreach ($attributes as $attribute):
+        $attributeCode = $escaper->escapeHtmlAttr($attribute->getAttributeCode());
+        $isRequired = $attribute->getIsRequired();
+        ?>
+
+        <div class="field field-<?= /* @noEscape */ $attributeCode  . ($isRequired ? ' required' : '') ?>">
+            <label class="label" for="<?= /* @noEscape */ $attributeCode ?>">
+                <span><?= $escaper->escapeHtml($attribute->getStoreLabel()) ?></span>
+            </label>
+            <div class="control">
+                <input type="text" id="<?= /* @noEscape */ $attributeCode ?>"
+                       name="<?= /* @noEscape */ $attributeCode ?>"
+                       value="<?= $escaper->escapeHtmlAttr($viewModel->getValue($attributeCode)) ?>"
+                       class="input-text <?= ($isRequired ? 'required-entry' : '') ?>">
+            </div>
+        </div>
+
+    <?php endforeach;
+endif ?>

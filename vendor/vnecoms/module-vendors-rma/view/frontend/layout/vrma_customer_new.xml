@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <head>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_RMA::css/fileupload.css"/>
+        <css src="Vnecoms_RMA::css/font-awesome.css"/>
+        <css src="Vnecoms_RMA::css/rma.css"/>
+        <css src="Vnecoms_VendorsRMA::css/custom.css"/>
+    </head>
+    <body>
+    
+        <referenceContainer name="content">
+            <block class="Vnecoms\RMA\Block\Frontend\Customer\NewRequest" name="customer.list" template="Vnecoms_RMA::customer/new_request.phtml" cacheable="false">
+                <block class="Vnecoms\VendorsRMA\Block\Frontend\Customer\NewRequest\Info" name="info" template="Vnecoms_VendorsRMA::new_request/info.phtml" />
+                <block class="Vnecoms\RMA\Block\Frontend\Customer\NewRequest\Policy" name="policy" template="Vnecoms_RMA::new_request/policy.phtml" />
+            </block>
+            <block class="Vnecoms\VendorsRMA\Block\Frontend\Customer\NewRequest\Info" template="Vnecoms_VendorsRMA::new_request/js.phtml" name="rma_request_new_js"/>
+
+        </referenceContainer>
+    </body>
+</page>

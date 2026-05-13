@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <update handle="vrma_request_view_item_renderers"/>
+    <head>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_RMA::css/fileupload.css"/>
+        <css src="Vnecoms_RMA::css/font-awesome.css"/>
+        <css src="Vnecoms_RMA::css/tabs.css"/>
+        <css src="Vnecoms_RMA::css/rma.css"/>
+        <css src="Vnecoms_RMA::css/colorbox.css"/>
+    </head>
+    <body>
+
+        <referenceContainer name="content">
+            <block class="Vnecoms\RMA\Block\Frontend\View" name="customer.view" template="request/view.phtml" cacheable="false">
+                <block class="Vnecoms\RMA\Block\Frontend\View\Items" name="rma_items"
+                       template="request/view/items.phtml" cacheable="false">
+                    <block class="Magento\Framework\View\Element\RendererList" name="rma.request.item.renderers" as="renderer.list"/>
+                </block>
+                <!--
+                <block class="Vnecoms\RMA\Block\Frontend\View\Items" name="product-items" template="request/view/items.phtml" />
+                -->
+
+                <block class="Vnecoms\RMA\Block\Frontend\View\Message" name="message" template="request/view/message.phtml" />
+                <block class="Vnecoms\RMA\Block\Frontend\View\Message" name="form-reply" template="request/view/form-reply.phtml" />
+            </block>
+            <!--<block class="Vnecoms\RMA\Block\Frontend\Customer\NewRequest\Info" template="view/js.phtml" name="rma_request_js"/>-->
+
+        </referenceContainer>
+
+    </body>
+</page>

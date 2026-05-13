@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+            		<field id="smsvaluefirst_url" translate="label tooltip" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>API Url</label>
+	                    <config_path>vsms/settings/smsvaluefirst_url</config_path>
+	                    <depends>
+	                        <field id="gateway">smsvaluefirst</field>
+	                    </depends>
+	                </field>
+	            	<field id="smsvaluefirst_username" translate="label tooltip" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>User Name</label>
+	                    <config_path>vsms/settings/smsvaluefirst_username</config_path>
+	                    <depends>
+	                        <field id="gateway">smsvaluefirst</field>
+	                    </depends>
+	                    <comment>ValueFirst User name</comment>
+	                </field>
+	                <field id="smsvaluefirst_password" translate="label tooltip" type="text" sortOrder="71" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Password</label>
+	                    <config_path>vsms/settings/smsvaluefirst_password</config_path>
+	                    <comment>ValueFirst Password</comment>
+	                    <depends>
+	                        <field id="gateway">smsvaluefirst</field>
+	                    </depends>
+	                </field>
+	                
+	                <field id="smsvaluefirst_sender" translate="label tooltip" type="text" sortOrder="72" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender</label>
+	                    <config_path>vsms/settings/smsvaluefirst_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">smsvaluefirst</field>
+	                    </depends>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

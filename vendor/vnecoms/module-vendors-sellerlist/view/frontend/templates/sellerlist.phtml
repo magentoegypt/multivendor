@@ -1,0 +1,97 @@
+<?php
+   /** @var \Vnecoms\VendorsSellerList\Block\SellerList $block */
+
+   $sellerCollection = $block->getRegisteredSellerCollection();
+   $size =  sizeof($sellerCollection);
+?>
+
+<div class="ves-sellerlist-inner block">
+    <?php if($query = $block->getSearchQuery()):?>
+        <div class="seller-list-search-nav">
+            <h2><?php echo __("Search result for: %1", $query)?></h2>
+        </div>
+    <?php endif;?>
+    <div class="block-content">
+        <div class="sellers wrapper">
+            <?php if ($size):?>
+                <ul class="seller-list" id="seller-list-container">
+                    <?php $_iterator = 0; ?>
+                    <?php foreach ($sellerCollection as $seller): ?>
+                        <li class="item <?php echo $seller->getVendorId() ?>">
+                            <div class="info seller-info">
+                                <div class="info-inner">
+                                    <div class="seller-thumbnail-container">
+                                        <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
+                                            <img class="s-logo img-logo" src="<?php echo $block->getSellerImageUrl($seller) ?>" title="<?php echo "Go to ".$seller->getVendorId() ?>" alt="vendor-logo" />
+                                        </a>
+                                    </div>
+                                    <div class="seller-details">
+                                        <?php $sellerName = $block->getSellerStoreName($seller);?>
+                                        <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
+                                            <strong class="s-name"><?php echo (!empty($sellerName) ? $sellerName : $seller->getVendorId()); ?></strong>
+                                        </a>
+                                    </div>
+                                    <div class="clearer additional-data">
+                                        <?php echo $block->getReviewSellerHtml($seller) ?>
+                                        <div class="additional-data-bottom">
+                                            <?php echo $block->getChildBlock('seller_info_before')->setVendor($seller)->toHtml();?>
+                                            <div class="total-items-count"><?php echo __("%1 product(s)",$block->getProductCount($seller))?></div>
+                                            <div class="seller-items-link"><a href="<?php echo $block->getSellerItemsUrl($seller) ?>"><?php echo __('View Collection') ?></a></div>
+                                            <?php echo $block->getChildBlock('seller_info_after')->setVendor($seller)->toHtml();?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach;  ?>
+                </ul>
+                <?php $toolbar = $block->getToolbarBlock();?>
+                <?php if($toolbar->getCurrentPage() < $sellerCollection->getLastPageNumber()):?>
+                    <div class="sellerlist-loadmore">
+                        <button id="sellerlist-loadmore"><span><?php echo __("Load More Sellers")?></span></button>
+                        <img src="<?php echo $block->getViewFileUrl('images/loader-1.gif') ?>" alt="Loading..." />
+                    </div>
+                <?php endif;?>
+                <script type="text/javascript">
+                var URL_LOAD_MORE = '<?php echo $block->getLoadMoreUrl()?>';
+                var VENDOR_LIST_CURRENT_PAGE = <?php echo $toolbar->getCurrentPage();?>;
+                var VENDOR_LIST_LASTPAGE        = <?php echo $sellerCollection->getLastPageNumber();?>;
+                require([
+                    'jquery',
+                    'domReady!'
+                ], function($){
+                	function loadMoreSellers(){
+                    	$('.sellerlist-loadmore').addClass('loading');
+                    	$.ajax({
+                      		  url: URL_LOAD_MORE,
+                      		  method: "GET",
+                      		  data: { isAjax : true ,p: parseInt(VENDOR_LIST_CURRENT_PAGE)+1},
+                      		  dataType: "json"
+                  		}).done(function( response ){
+                  			$('.sellerlist-loadmore').removeClass('loading');
+                  			$('#seller-list-container').append(response.sellers);
+                  			VENDOR_LIST_CURRENT_PAGE = response.page;
+                  			if(VENDOR_LIST_CURRENT_PAGE >= VENDOR_LIST_LASTPAGE){
+                  	  			$('.sellerlist-loadmore').hide();
+                  			}
+                  		});
+                    }
+                
+                    $('#sellerlist-loadmore').click(function(){
+                    	loadMoreSellers();
+                    });
+    
+                });
+                </script>
+                                
+            <?php else:?>
+                <p><?php echo __("There is no active vendor available.")?></p>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php if($query = $block->getSearchQuery()):?>
+        <div class="seller-list-backlink">
+            <a href="<?php echo $block->getUrl('sellerlist')?>">< <?php echo __("Back to Sellers List")?></a>
+        </div>
+    <?php endif;?>
+</div>

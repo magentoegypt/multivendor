@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!--
+        <link src="Vnecoms_VendorsTax::js/bootstrap.js"/>
+        <css src="Vnecoms_VendorsTax::css/custom.css"/>
+        -->
+        <css src="jquery/editableMultiselect/css/jquery.multiselect.css"/>
+    </head>
+
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsShippingTableRate\Block\Vendors\Tablerate\Edit" name="rate_edit" template="rate/edit.phtml" />
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsShippingTableRate\Block\Vendors\Tablerate\Edit\Tabs" name="table_edit_tabs">
+                <block class="Vnecoms\VendorsShippingTableRate\Block\Vendors\Tablerate\Edit\Tab\Main" name="table_rate_edit_tab_main"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">table_rate_edit_tab_main</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+
+</page>

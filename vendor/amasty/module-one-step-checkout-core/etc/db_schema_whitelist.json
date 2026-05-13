@@ -1,0 +1,83 @@
+{
+    "amasty_amcheckout_field": {
+        "column": {
+            "id": true,
+            "attribute_id": true,
+            "label": true,
+            "sort_order": true,
+            "required": true,
+            "width": true,
+            "enabled": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_AMCHKT_FIELD_ATTR_ID_EAV_ATTR_ATTR_ID": true
+        }
+    },
+    "amasty_amcheckout_additional_fee": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "quote_id": true,
+            "amount": true,
+            "base_amount": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_85227778BD4EF83694E39B69E4DB902C": true,
+            "AMASTY_AMCHKT_ADDITIONAL_FEE_QUOTE_ID_QUOTE_ENTT_ID": true
+        }
+    },
+    "amasty_amcheckout_additional": {
+        "column": {
+            "id": true,
+            "quote_id": true,
+            "comment": true,
+            "is_subscribe": true,
+            "is_register": true,
+            "register_dob": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_AMCHECKOUT_ADDITIONAL_QUOTE_ID": true
+        }
+    },
+    "amasty_amcheckout_quote_custom_fields": {
+        "column": {
+            "entity_id": true,
+            "name": true,
+            "billing_value": true,
+            "shipping_value": true,
+            "quote_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_ACA9839C90B494176264C9041657DB3C": true
+        }
+    },
+    "amasty_amcheckout_order_custom_fields": {
+        "column": {
+            "entity_id": true,
+            "name": true,
+            "billing_value": true,
+            "shipping_value": true,
+            "order_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_436394041ACEE810656E9635D94FBC69": true
+        }
+    },
+    "amasty_amcheckout_quote_passwords": {
+        "column": {
+            "entity_id": true,
+            "quote_id": true,
+            "password_hash": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_AMCHKT_QUOTE_PASSWORDS_QUOTE_ID_QUOTE_ENTT_ID": true
+        }
+    }
+}

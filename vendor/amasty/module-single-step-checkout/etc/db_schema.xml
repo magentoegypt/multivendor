@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout for Magento 2
+ */-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="amasty_amcheckout_placeholder" resource="default" engine="innodb" comment="Amasty Checkout Placeholder Table">
+    <column xsi:type="smallint" name="placeholder_id" padding="5" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+    <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" comment="EAV Attribute ID"/>
+    <column xsi:type="varchar" name="placeholder" nullable="false" length="255" comment="Placeholder"/>
+    <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="true" identity="false" comment="Store Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="placeholder_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHKT_PLACEHOLDER_ATTR_ID_EAV_ATTR_ATTR_ID" table="amasty_amcheckout_placeholder" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHECKOUT_PLACEHOLDER_STORE_ID_STORE_STORE_ID" table="amasty_amcheckout_placeholder" column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+  </table>
+</schema>

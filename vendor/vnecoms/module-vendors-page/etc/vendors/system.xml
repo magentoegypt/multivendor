@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Store Information Section -->
+        <section id="page" translate="label" type="text" sortOrder="20" showInDefault="1" showInStore="1">
+            <label>Seller's Page</label>
+            <tab>general</tab>
+            <resource>Vnecoms_VendorsPage::page</resource>
+            <group id="general" translate="label tooltip" type="text" sortOrder="10" showInDefault="1" showInStore="1">
+				<label>General</label>
+				<field id="banner" translate="label" type="image" sortOrder="10" showInDefault="1" showInStore="1">
+	            	<label>Banner</label>
+	            	<comment>Allowed file types: PNG, GIF, JPG, JPEG</comment>
+	            	<backend_model>Vnecoms\VendorsConfig\Model\Config\Backend\Image</backend_model>
+	            	<upload_dir config="system/filesystem/media" scope_info="1">ves_vendors/banner</upload_dir>
+                    <base_url type="media">ves_vendors/banner</base_url>
+	        	</field>
+	        	<field id="description" translate="label" type="editor" sortOrder="20" showInDefault="1" showInStore="1">
+	            	<label>About Store</label>
+	            	<frontend_model>Vnecoms\VendorsPage\Block\System\Config\Form\Field\Editor</frontend_model>
+	            	<frontend_class> admin__control-textarea</frontend_class>
+	        	</field>
+	        	<field id="refund_policy" translate="label" type="editor" sortOrder="30" showInDefault="1" showInStore="1">
+	            	<label>Refund Policy</label>
+	            	<frontend_model>Vnecoms\VendorsPage\Block\System\Config\Form\Field\Editor</frontend_model>
+	            	<frontend_class> admin__control-textarea</frontend_class>
+	        	</field>
+	        	<field id="shipping_policy" translate="label" type="editor" sortOrder="30" showInDefault="1" showInStore="1">
+	            	<label>Shipping Policy</label>
+	            	<frontend_model>Vnecoms\VendorsPage\Block\System\Config\Form\Field\Editor</frontend_model>
+	            	<frontend_class> admin__control-textarea</frontend_class>
+	        	</field>
+			</group>
+			<group id="social" translate="label tooltip" type="text" sortOrder="10" showInDefault="1" showInStore="1">
+				<label>Social Accounts</label>
+				<field id="website" translate="label" type="text" sortOrder="10" showInDefault="1" showInStore="1">
+	            	<label>Website Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="facebook" translate="label" type="text" sortOrder="20" showInDefault="1" showInStore="1">
+	            	<label>Facebook Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="twitter" translate="label" type="text" sortOrder="30" showInDefault="1" showInStore="1">
+	            	<label>Twitter Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="instagram" translate="label" type="text" sortOrder="40" showInDefault="1" showInStore="1">
+	            	<label>Instagram Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="google_plus" translate="label" type="text" sortOrder="50" showInDefault="1" showInStore="1">
+	            	<label>Google Plus Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="youtube" translate="label" type="text" sortOrder="60" showInDefault="1" showInStore="1">
+	            	<label>Youtube Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="pinterest" translate="label" type="text" sortOrder="60" showInDefault="1" showInStore="1">
+	            	<label>Pinterest Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	<field id="vimeo" translate="label" type="text" sortOrder="60" showInDefault="1" showInStore="1">
+	            	<label>Vimeo Url</label>
+	            	<frontend_class>validate-url</frontend_class>
+	        	</field>
+	        	
+			</group>
+            <group id="meta" translate="label tooltip" type="text" sortOrder="50" showInDefault="1" showInStore="1">
+				<label>Homepage Meta Information</label>
+				<field id="title" translate="label" type="text" sortOrder="10" showInDefault="1" showInStore="1">
+	            	<label>Title</label>
+	        	</field>
+	        	<field id="description" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInStore="1">
+	            	<label>Description</label>
+	        	</field>
+	        	<field id="keywords" translate="label" type="textarea" sortOrder="30" showInDefault="1" showInStore="1">
+	            	<label>Keywords</label>
+	            	<comment>Comma-separated</comment>
+	        	</field>
+			</group>
+			
+			<group id="html_head" translate="label tooltip" type="text" sortOrder="50" showInDefault="1" showInStore="1">
+				<label>Html Head</label>
+	        	<field id="head_includes" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInStore="1">
+	            	<label>Scripts and Style Sheets</label>
+	            	<comment>This will be included before head closing tag in page HTML of all vendor's pages.</comment>
+	        	</field>
+			</group>
+			
+			<group id="footer" translate="label tooltip" type="text" sortOrder="50" showInDefault="1" showInStore="1">
+				<label>Footer</label>
+	        	<field id="footer_absolute_footer" translate="label" type="textarea" sortOrder="20" showInDefault="1" showInStore="1">
+	            	<label>Miscellaneous HTML</label>
+	            	<comment>This will be displayed just before the body closing tag of all vendor's pages.</comment>
+	        	</field>
+			</group>
+		</section>
+    </system>
+</config>

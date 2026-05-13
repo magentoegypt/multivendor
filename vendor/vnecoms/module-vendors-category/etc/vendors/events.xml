@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <event name="vendors_category_move_after">
+        <observer name="vendor_process_url_rewrite_moving" instance="Vnecoms\VendorsCategory\Observer\CategoryProcessUrlRewriteMovingObserver"/>
+    </event>
+    <event name="catalog_product_save_after">
+        <observer name="vendor_save_categories" instance="Vnecoms\VendorsCategory\Observer\Vendor\VendorSaveCategories"/>
+    </event>
+    <event name="page_url_key_validate">
+        <observer name="category_page_url_key_validate" instance="Vnecoms\VendorsCategory\Observer\Vendor\PageUrlKeyValidate"/>
+    </event>
+    <event name="controller_action_predispatch_catalog_category_edit">
+        <observer name="catalog_category_predispatch" instance="Vnecoms\VendorsCategory\Observer\CatalogCategoryPredispatch"/>
+    </event>
+    <event name="controller_action_predispatch_catalog_category_grid">
+        <observer name="catalog_category_grid_predispatch" instance="Vnecoms\VendorsCategory\Observer\CatalogCategoryPredispatch"/>
+    </event>
+    <event name="ves_vendorsconfig_form_fieldset_prepare_before">
+        <observer name="ves_vendorscategory_form_fieldset_prepare_before" instance="Vnecoms\VendorsCategory\Observer\ProcessFieldConfig" />
+    </event>
+
+</config>

@@ -1,0 +1,20 @@
+<form data-bind="attr:{action: getAddToCartUrl(item), id: getAddToCartForm(item)}" method="post" novalidate="novalidate" style="margin-bottom:10px">
+    <input name="product" data-bind="value: item.entity_id" type="hidden">
+    <input name="in_cart" data-bind="value: false" type="hidden">
+    <!-- ko if: hasAttributeCustom(item) -->
+    <!-- ko foreach: { data: item.attributesConfigurable, as: 'option' } -->
+    <input data-bind="value: option.value, attr: { name: 'super_attribute['+option.id+']'}" type="hidden">
+    <!-- /ko -->
+    <!-- /ko -->
+    <button
+        class="action primary"
+        type="button"
+        data-bind="event: {click: function() { submitAddToCart(item) }}"
+    >
+        <span><!-- ko i18n: 'Add to Cart' --><!-- /ko --></span>
+    </button>
+</form>
+
+<a target="_blank" data-bind="attr: {id: getElementIdSelectProduct(item), href: viewProduct(item) }">
+    <span><!-- ko i18n: 'View This Product' --><!-- /ko --></span>
+</a>

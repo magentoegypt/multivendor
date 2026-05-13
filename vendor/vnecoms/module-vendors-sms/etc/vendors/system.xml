@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Store Information Section -->
+        <section id="sms_notification" translate="label" type="text" sortOrder="100" showInDefault="1">
+        	<label>Sms Notification</label>
+            <tab>general</tab>
+			<resource>Vnecoms_VendorsSms::sms_notification</resource>
+            <group id="general" translate="label tooltip" type="text" sortOrder="5" showInDefault="1">
+				<label>General</label>
+				<field id="mobile" translate="label" type="text" sortOrder="10" showInDefault="1">
+	            	<label>Mobile Number</label>
+	            	<frontend_model>Vnecoms\VendorsSms\Block\Vendors\Config\Form\Field\Mobile</frontend_model>
+	            	<comment><![CDATA[System will send all SMS notifications to this mobile number.<br /> Leave blank to disable this function.]]></comment>
+	        	</field>
+			</group>
+            
+            <group id="configuration" translate="label tooltip" type="text" sortOrder="10" showInDefault="1">
+				<label>Notify me when</label>
+				<field id="product_approved" translate="label" type="select" sortOrder="10" showInDefault="1">
+	            	<label>A product is approved</label>
+	            	<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	        	</field>
+	        	<field id="product_unapproved" translate="label" type="select" sortOrder="20" showInDefault="1">
+	            	<label>A product is unapproved</label>
+	            	<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	        	</field>
+	        	<field id="new_order" translate="label" type="select" sortOrder="30" showInDefault="1">
+	            	<label>A new order placed</label>
+	            	<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	        	</field>
+	        	<field id="new_invoice" translate="label" type="select" sortOrder="40" showInDefault="1">
+	            	<label>A new invoice created</label>
+	            	<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	        	</field>
+	        	<field id="new_shipment" translate="label" type="select" sortOrder="50" showInDefault="1">
+	            	<label>A new shipment created</label>
+	            	<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	        	</field>
+	        	<field id="new_creditmemo" translate="label" type="select" sortOrder="60" showInDefault="1">
+	            	<label>A new creditmemo created</label>
+	            	<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	        	</field>
+			</group>
+		</section>
+    </system>
+</config>

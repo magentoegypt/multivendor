@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Magento\Catalog\Model\Layer">
+		<plugin name="hideSelectAndSellProduct" type="Vnecoms\VendorsPriceComparison\Plugin\Layer"/>
+	</type>
+
+    <type name="Magento\Catalog\Block\Product\ProductList\Toolbar">
+        <plugin name="customCountProductItems" type="Vnecoms\VendorsPriceComparison\Plugin\ProductList\Toolbar"/>
+    </type>
+
+    <!-- These attributes will not be displayed/saved from vendor cpanel. -->
+	<type name="Vnecoms\VendorsProduct\Helper\Data">
+        <arguments>
+            <argument name="notAllowedProductAttributes" xsi:type="array">
+                <item name="is_select_and_sell" xsi:type="string">is_select_and_sell</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsPriceComparison\Helper\Data">
+        <arguments>
+            <argument name="allowedAttributes" xsi:type="array">
+                <item name="sku" xsi:type="string">sku</item>
+                <item name="status" xsi:type="string">status</item>
+                <item name="price" xsi:type="string">price</item>
+                <item name="qty" xsi:type="string">qty</item>
+                <item name="quantity_and_stock_status" xsi:type="string">quantity_and_stock_status</item>
+                <item name="quantity_and_stock_status_qty" xsi:type="string">quantity_and_stock_status_qty</item>
+                <item name="tax_class_id" xsi:type="string">tax_class_id</item>
+                <item name="is_in_stock" xsi:type="string">is_in_stock</item>
+                <item name="weight" xsi:type="string">weight</item>
+                <item name="product_has_weight" xsi:type="string">product_has_weight</item>
+                <item name="url_key" xsi:type="string">url_key</item>
+                <item name="meta_title" xsi:type="string">meta_title</item>
+                <item name="meta_keyword" xsi:type="string">meta_keyword</item>
+                <item name="meta_description" xsi:type="string">meta_description</item>
+                <item name="special_price" xsi:type="string">special_price</item>
+                <item name="special_from_date" xsi:type="string">special_from_date</item>
+                <item name="special_to_date" xsi:type="string">special_to_date</item>
+                <item name="cost" xsi:type="string">cost</item>
+                <item name="tier_price" xsi:type="string">tier_price</item>
+                <item name="listing_fee" xsi:type="string">listing_fee</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+    <type name="Magento\Framework\View\Element\UiComponentFactory">
+        <arguments>
+            <argument name="componentChildFactories" xsi:type="array">
+                <item name="Vnecoms\VendorsPriceComparison\Ui\Component\HtmlContent" xsi:type="object">Magento\Framework\View\Element\UiComponent\Factory\HtmlContentFactory\Proxy</item>
+            </argument>
+            <argument name="configFactory" xsi:type="object">uiComponentConfigFactory</argument>
+            <argument name="definitionData" xsi:type="object">Magento\Ui\Config\Reader\Definition\Data</argument>
+            <argument name="componentManager" xsi:type="object">Magento\Ui\Model\Manager\Proxy</argument>
+        </arguments>
+    </type>
+
+		<type name="Vnecoms\VendorsProduct\Helper\Data">
+        <arguments>
+            <argument name="joinProductAttribute" xsi:type="array">
+                <item name="select_from_product_id" xsi:type="string">int</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

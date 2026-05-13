@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales.order.view">
+            <block class="Magento\Sales\Block\Order\View" name="amasty_checkout_gift_wrap" template="Amasty_CheckoutGiftWrap::onepage/details/order/view.phtml"/>
+        </referenceBlock>
+
+        <referenceBlock name="order_totals">
+            <block class="Amasty\CheckoutGiftWrap\Block\Sales\Order\Fee" name="amasty_checkout_fee"/>
+        </referenceBlock>
+    </body>
+</page>

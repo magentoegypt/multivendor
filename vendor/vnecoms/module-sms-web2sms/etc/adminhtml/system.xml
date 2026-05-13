@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="web2sms_accid" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Web2sms Account Id</label>
+	                    <config_path>vsms/settings/web2sms_accid</config_path>
+	                    <depends>
+	                        <field id="gateway">web2sms</field>
+	                    </depends>
+	                </field>
+                    <field id="web2sms_password" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Web2sms Password</label>
+                        <config_path>vsms/settings/web2sms_password</config_path>
+                        <depends>
+                            <field id="gateway">web2sms</field>
+                        </depends>
+                    </field>
+                    <field id="web2sms_sender" translate="label tooltip" type="text" sortOrder="192" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Sender</label>
+                        <config_path>vsms/settings/web2sms_sender</config_path>
+                        <depends>
+                            <field id="gateway">web2sms</field>
+                        </depends>
+                    </field>
+                    <field id="web2sms_secret_key" translate="label tooltip" type="text" sortOrder="192" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Secret Key</label>
+                        <config_path>vsms/settings/web2sms_secret_key</config_path>
+                        <depends>
+                            <field id="gateway">web2sms</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

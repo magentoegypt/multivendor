@@ -1,0 +1,24 @@
+{
+    "name": "vnecoms/module-vendors-search",
+    "description": "Search By Vendor is a plug-in of magento multiple vendors extension which allows customer can search product inside vendor store. The search will return only products from current seller.",
+    "authors": [
+      {
+        "name": "VNECOMS",
+        "email": "support@vnecoms.com"
+      }
+    ],
+    "require": {
+        "magento/module-catalog": ">=101.0.0",
+        "vnecoms/module-vendors-page": "^2.4.0"
+    },
+    "type": "magento2-module",
+    "version": "2.4.4",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vnecoms\\VendorsSearch\\": ""
+        }
+    }
+}

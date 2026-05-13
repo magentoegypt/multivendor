@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">    <update handle="styles"/>
+    <update handle="editor"/>
+    <update handle="styles"/>
+    <head>
+        <css src="Vnecoms_VendorsRMA::css/rma.css"/>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_VendorsRMA::css/fileupload.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsRMA\Block\Vendor\Escalate\Edit" name="escalate_edit"/>
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsRMA\Block\Vendor\Escalate\Edit\Tabs" name="rma_escalate_edit_tabs">
+                <block class="Vnecoms\VendorsRMA\Block\Vendor\Escalate\Edit\Tab\Main" name="rma_escalate_edit_tab_main"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">rma_escalate_edit_tab_main</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

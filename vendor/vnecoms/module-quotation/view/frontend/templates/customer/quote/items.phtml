@@ -1,0 +1,56 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+/**
+ * @var \Vnecoms\Quotation\Block\Quote\Items $block
+ */
+?>
+<?php $quote = $block->getQuote()->collectTotals()
+?>
+
+<div id="quote-view-content">
+    <div id="tabs-items" class="table-wrapper order-items">
+        <table class="data table table-order-items quote-tbl" id="my-quote-table" summary="<?php /* @escapeNotVerified */ echo __('Items Quoted') ?>">
+            <caption class="table-caption"><?php /* @escapeNotVerified */ echo __('Items Quoted') ?></caption>
+            <thead>
+            <tr>
+                <th class="image"><?php /* @escapeNotVerified */ echo __('Image') ?></th>
+                <th class="name"><?php /* @escapeNotVerified */ echo __('Product Name') ?></th>
+                <th class="sku"><?php /* @escapeNotVerified */ echo __('SKU') ?></th>
+                <th class="price"><?php /* @escapeNotVerified */ echo __('Original Price') ?></th>
+                <th class="qty"><?php /* @escapeNotVerified */ echo __('Qty') ?></th>
+                <th class="proposals"><?php /* @escapeNotVerified */ echo __('Proposals') ?></th>
+            </tr>
+            </thead>
+            <?php $_items = $block->getItems(); ?>
+            <?php $_index = 0; ?>
+            <?php $_count = count($_items); ?>
+            <?php foreach ($_items as $_item): ?>
+                <?php echo $block->getItemHtml($_item) ?>
+            <?php endforeach; ?>
+            <tfoot>
+            <tr class="total_qty">
+                <th colspan="5" class="mark" scope="row">
+                   <strong><?php echo __("Total Qty") ?></strong>
+                </th>
+                <td class="amount" data-th="Subtotal">
+                    <span class="price"><strong><?php echo $quote->getItemsQty() ?></strong></span>
+                </td>
+            </tr>
+
+            <tr class="grand_total">
+                <th colspan="5" class="mark" scope="row">
+                    <strong><?php echo __("Grand Total") ?></strong>
+                </th>
+                <td class="amount" data-th="Subtotal">
+                    <span class="price"><strong><?php echo $block->getFormatedPrice($quote->getBaseGrandTotal()) ?></strong></span>
+                </td>
+            </tr>
+
+            </tfoot>
+        </table>
+    </div>
+</div>

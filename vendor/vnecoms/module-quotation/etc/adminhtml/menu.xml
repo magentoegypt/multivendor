@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vnecoms_Quotation::main" module="Vnecoms_Quotation" parent="Magento_Sales::sales" resource="Vnecoms_Quotation::main" sortOrder="20" title="Quotations"/>
+        <add action="quotation/quote/index" id="Vnecoms_Quotation::quote" module="Vnecoms_Quotation" parent="Vnecoms_Quotation::main" resource="Vnecoms_Quotation::quote" sortOrder="10" title="Quotations"/>
+        <add action="adminhtml/system_config/edit/section/quotation" id="Vnecoms_Quotation::config" module="Vnecoms_Quotation" parent="Vnecoms_Quotation::main" resource="Vnecoms_Quotation::config" sortOrder="20" title="Configuration"/>
+    </menu>
+</config>

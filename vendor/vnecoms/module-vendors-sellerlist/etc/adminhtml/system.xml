@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vendors">
+            <group id="sellerlist" translate="label tooltip" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Seller List</label>
+                <field id="seller_per_page" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sellers Per Page Default Value</label>
+                    <comment>Number of seller for each load more</comment>
+                    <validate>required validate-number</validate>
+                </field>
+                <field id="top_static_block" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Top Static Block</label>
+                    <source_model>Vnecoms\Vendors\Model\Source\Block</source_model>
+                    <tooltip>This static block will be displayed in the top of seller list page.</tooltip>
+                </field>
+                <field id="bottom_static_block" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Bottom Static Block</label>
+                    <source_model>Vnecoms\Vendors\Model\Source\Block</source_model>
+                    <tooltip>This static block will be displayed in the bottom of seller list page.</tooltip>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

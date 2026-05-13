@@ -1,0 +1,38 @@
+
+<?php $note = $block->getEscalate();  ?>
+<div class="note-message">
+    <blockquote><?php echo $note->getMessage() ?></blockquote>
+</div>
+
+<?php if(sizeof($note->getAttachmentUrls())):?>
+    <div class="attachment">
+        <ul>
+            <?php foreach ($note->getAttachmentUrls() as $key=>$attachment):?>
+                <li class="file-uploader-preview">
+                    <?php if($block->isImage($key)): ?>
+                        <a href="<?php echo $attachment ?>" class="icon-attachment-img-view"
+                           title="<?php echo $key ?>">
+                            <img class="preview-image" src="<?php echo $attachment ?>" />
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo $block->getUrl('vrma/request/download',
+                            array('file'=>base64_encode($key))) ?>"
+                           title="<?php echo $key ?>">
+                            <i class="fa icon-attachment <?php echo $block->getClassIcon($key) ?>"></i></a>
+                    <?php endif ?>
+
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+    <script type="text/javascript">
+        require([
+            "jquery",
+            "jquery/colorbox"
+        ], function($){
+            $(function() {
+                $(".icon-attachment-img-view").colorbox({rel:'icon-attachment-img-view'});
+            });
+        });
+    </script>
+<?php endif;?>

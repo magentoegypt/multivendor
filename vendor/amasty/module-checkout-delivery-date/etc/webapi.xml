@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/amasty_checkout/carts/:cartId/delivery" method="POST">
+        <service class="Amasty\CheckoutDeliveryDate\Api\DeliveryInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+
+    <route url="/V1/amasty_checkout/guest-carts/:cartId/delivery" method="POST">
+        <service class="Amasty\CheckoutDeliveryDate\Api\GuestDeliveryInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/amasty_checkout/carts/mine/delivery" method="POST">
+        <service class="Amasty\CheckoutDeliveryDate\Api\DeliveryInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%amasty_checkout_cart_id%</parameter>
+        </data>
+    </route>
+</routes>

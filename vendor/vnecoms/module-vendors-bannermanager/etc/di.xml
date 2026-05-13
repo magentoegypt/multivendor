@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Vnecoms\BannerManager\Api\ItemRepositoryInterface" type="Vnecoms\BannerManager\Model\ResourceModel\ItemRepository" />
+    <preference for="Vnecoms\BannerManager\Api\BlockRepositoryInterface" type="Vnecoms\BannerManager\Model\ResourceModel\BlockRepository" />
+    <preference for="Vnecoms\BannerManager\Api\BannerRepositoryInterface" type="Vnecoms\BannerManager\Model\ResourceModel\BannerRepository" />
+
+    <preference for="Vnecoms\BannerManager\Api\Data\ConditionInterface" type="Vnecoms\BannerManager\Model\Data\Condition" />
+    <preference for="Vnecoms\BannerManager\Api\Data\BlockInterface" type="Vnecoms\BannerManager\Model\Data\Block" />
+    <preference for="Vnecoms\BannerManager\Api\Data\BannerInterface" type="Vnecoms\BannerManager\Model\Data\Banner" />
+    <preference for="Vnecoms\BannerManager\Api\Data\ItemSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="Vnecoms\BannerManager\Api\Data\BannerSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="Vnecoms\BannerManager\Api\Data\BlockSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+
+    <type name="Magento\Framework\EntityManager\MetadataPool">
+        <arguments>
+            <argument name="metadata" xsi:type="array">
+                <item name="Vnecoms\BannerManager\Api\Data\BannerInterface" xsi:type="array">
+                    <item name="entityTableName" xsi:type="string">ves_bannermanager_banner</item>
+                    <item name="identifierField" xsi:type="string">banner_id</item>
+                </item>
+                <item name="Vnecoms\BannerManager\Api\Data\ItemInterface" xsi:type="array">
+                    <item name="entityTableName" xsi:type="string">ves_bannermanager_item</item>
+                    <item name="identifierField" xsi:type="string">item_id</item>
+                </item>
+                
+            </argument>
+        </arguments>
+    </type>
+    
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="banner_listing_data_source" xsi:type="string">Vnecoms\BannerManager\Model\ResourceModel\Banner\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\BannerManager\Model\ResourceModel\Banner\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ves_bannermanager_banner</argument>
+            <argument name="eventPrefix" xsi:type="string">ves_banner_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">banner_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Vnecoms\BannerManager\Model\ResourceModel\Banner</argument>
+        </arguments>
+    </type>
+
+
+    <virtualType name="BannerGridFilterPool" type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="BannerGridDataProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="collection" xsi:type="object" shared="false">Vnecoms\BannerManager\Model\ResourceModel\Banner\Collection</argument>
+            <argument name="filterPool" xsi:type="object" shared="false">BannerGridFilterPool</argument>
+        </arguments>
+    </virtualType>
+    
+</config>

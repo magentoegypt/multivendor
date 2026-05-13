@@ -1,0 +1,25 @@
+<?php
+/**
+ * Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+ ?>
+<script>
+require([
+    "prototype",
+    "Vnecoms_Quotation/quote/create/form",
+    "domReady!"
+], function(){
+   /* quote.sidebarHide(); */
+
+    if (window.productConfigure) {
+        productConfigure.addListType('product_to_add', {
+            urlFetch: '<?php /* @escapeNotVerified */ echo $block->getConfigureProductUrl() ?>'
+        });
+        productConfigure.addListType('quote_items', {
+            urlFetch: '<?php /* @escapeNotVerified */ echo $block->getConfigureQuoteItemsUrl() ?>'
+        });
+    }
+});
+</script>

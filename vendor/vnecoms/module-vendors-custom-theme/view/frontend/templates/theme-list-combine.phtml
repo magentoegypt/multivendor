@@ -1,0 +1,44 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+$_htmlName = 'vendor_data[vendor_custom_theme]';
+?>
+
+<fieldset class="fieldset create">
+    <legend class="legend"><span><?php echo __("Select a Theme")?></span></legend><br>
+    <div class="field vendor-theme-list">
+        <ul class="vendor-theme-container">
+			<li class="no-theme">
+				<span class="selected-label"></span>
+				<span class="vendor-theme-title"><?php echo __('Default Theme')?></span>
+				<input type="radio" name="<?php echo $_htmlName?>" value="" />
+			</li>
+        <?php foreach($block->getCollection() as $theme):?>
+            <?php $isCurrent = false?>
+            <li<?php if($isCurrent):?> class="selected"<?php endif;?>>
+                <span class="selected-label"></span>
+                <a href="javascript:void(0)" class="vendor-theme-image"><img src="<?php echo $block->getPreviewImageUrl($theme->getPreviewImage())?>" /></a>
+                <span class="vendor-theme-title"><?php echo $theme->getTitle()?></span><br />
+                <input type="radio" name="<?php echo $_htmlName?>" value="<?php echo $theme->getId()?>" <?php if($isCurrent):?>checked="checked" <?php endif;?>/>
+            </li>
+        <?php endforeach;?>
+        </ul>
+    </div>
+    
+    <script>
+    require([
+         'jquery'
+    ], function ($) {
+        $('.vendor-theme-container li').click(function(){
+        	$('.vendor-theme-container li.selected').removeClass('selected');
+        	$('.vendor-theme-container li.selected input').attr('checked',false);
+        	$(this).addClass('selected');
+        	$(this).find('input').attr('checked', true);
+        });
+    });
+    </script>
+</fieldset>

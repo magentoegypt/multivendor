@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<preference for="Magento\CatalogImportExport\Model\Import\Product" type="Vnecoms\VendorsProductImportExport\Model\Import\Product"/>
+	<preference for="Magento\CatalogImportExport\Model\Export\Product" type="Vnecoms\VendorsProductImportExport\Model\Export\Product"/>
+	<preference for="Magento\CatalogImportExport\Model\Import\Product\CategoryProcessor" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\CategoryProcessor"/>
+	
+	<preference for="Magento\BundleImportExport\Model\Import\Product\Type\Bundle" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\Type\Bundle"/>
+	<preference for="Magento\CatalogImportExport\Model\Import\Product\Type\Simple" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\Type\Simple"/>
+	<preference for="Magento\CatalogImportExport\Model\Import\Product\Type\Virtual" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\Type\Virtual"/>
+	<preference for="Magento\ConfigurableImportExport\Model\Import\Product\Type\Configurable" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\Type\Configurable"/>
+	<preference for="Magento\GroupedImportExport\Model\Import\Product\Type\Grouped" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\Type\Grouped"/>
+	<preference for="Magento\DownloadableImportExport\Model\Import\Product\Type\Downloadable" type="Vnecoms\VendorsProductImportExport\Model\Import\Product\Type\Downloadable"/>
+</config>

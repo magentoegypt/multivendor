@@ -1,0 +1,24 @@
+
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject RMA # {{var request.getIncrementId()}} @-->
+
+
+{{template config_path="design/email/header_template"}}
+<h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;">
+    {{trans "Hello %name" name=$request.getCustomerName()}},
+</h1>
+<p>
+    {{trans "Your RMA #%increment_id has been accepted process." increment_id=$request.getIncrementId()}},
+</p>
+
+<p>{{trans "Please send your package to:"}}</p>
+<p>{{var contact_address}}</p>
+<p>{{trans "and press 'Confirm Sending' button when view this RMA."}}</p>
+
+{{template config_path="design/email/footer_template"}}

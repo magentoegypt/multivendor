@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="root">
+            <container name="sellers.container" htmlTag="div" htmlClass="seller-list-wrap" >
+                <!-- seller list -->
+                <block class="Vnecoms\VendorsSellerList\Block\Seller" name="vendor.sellers" cacheable="false" >
+                    <block class="Vnecoms\VendorsSellerList\Block\SellerList" name="seller_list" as="seller_list" template="Vnecoms_VendorsSellerList::sellerlist.phtml">
+                        <block class="Vnecoms\VendorsSellerList\Block\SellerList\Toolbar" name="seller_list_toolbar" as="seller_list_toolbar" template="Vnecoms_VendorsSellerList::seller/list/toolbar.phtml">
+                            <!--<block class="Vnecoms\VendorsSellerList\Block\SellerList\Pager" name="seller.list.toolbar.pager" as ="seller_list_toolbar_pager" template="Vnecoms_VendorsSellerList::html/pager.phtml" />-->
+                            <block class="Magento\Theme\Block\Html\Pager" name="seller_list_toolbar_pager"/>
+                        </block>
+                        <action method="setToolbarBlockName">
+                            <argument name="name" xsi:type="string">seller_list_toolbar</argument>
+                        </action>
+                        <block name="seller_info_before" template="Vnecoms_VendorsSellerList::seller/info.phtml" class="Vnecoms\VendorsSellerList\Block\Seller\Info"/>
+                        <block name="seller_info_after" template="Vnecoms_VendorsSellerList::seller/info.phtml" class="Vnecoms\VendorsSellerList\Block\Seller\Info"/>
+                    </block>
+                </block>
+
+            </container>
+
+        </referenceContainer>
+    </body>
+</page>

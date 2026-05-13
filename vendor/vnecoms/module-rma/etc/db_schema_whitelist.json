@@ -1,0 +1,290 @@
+{
+    "ves_rma_request_entity": {
+        "column": {
+            "entity_id": true,
+            "website_id": true,
+            "increment_id": true,
+            "package_opened": true,
+            "type": true,
+            "reason": true,
+            "other_reason": true,
+            "customer_id": true,
+            "customer_name": true,
+            "customer_email": true,
+            "order_incremental_id": true,
+            "ip_address": true,
+            "state": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true,
+            "is_admin_read": true,
+            "is_customer_read": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ENTITY_WEBSITE_ID_STORE_WEBSITE_WEBSITE_ID": true,
+            "VES_RMA_REQUEST_ENTITY_INCREMENT_ID_WEBSITE_ID": true
+        }
+    },
+    "ves_rma_request_entity_datetime": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ENTT_DTIME_ATTR_ID_EAV_ATTR_ATTR_ID": true,
+            "VES_RMA_REQUEST_ENTT_DTIME_ENTT_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true,
+            "VES_RMA_REQUEST_ENTITY_DATETIME_ENTITY_ID_ATTRIBUTE_ID": true
+        }
+    },
+    "ves_rma_request_entity_decimal": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ENTT_DEC_ATTR_ID_EAV_ATTR_ATTR_ID": true,
+            "VES_RMA_REQUEST_ENTT_DEC_ENTT_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true,
+            "VES_RMA_REQUEST_ENTITY_DECIMAL_ENTITY_ID_ATTRIBUTE_ID": true
+        }
+    },
+    "ves_rma_request_entity_int": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ENTT_INT_ATTR_ID_EAV_ATTR_ATTR_ID": true,
+            "VES_RMA_REQUEST_ENTT_INT_ENTT_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true,
+            "VES_RMA_REQUEST_ENTITY_INT_ENTITY_ID_ATTRIBUTE_ID": true
+        }
+    },
+    "ves_rma_request_entity_text": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ENTT_TEXT_ATTR_ID_EAV_ATTR_ATTR_ID": true,
+            "VES_RMA_REQUEST_ENTT_TEXT_ENTT_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true,
+            "VES_RMA_REQUEST_ENTITY_TEXT_ENTITY_ID_ATTRIBUTE_ID": true
+        }
+    },
+    "ves_rma_request_entity_varchar": {
+        "column": {
+            "value_id": true,
+            "attribute_id": true,
+            "entity_id": true,
+            "value": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ENTT_VCHR_ATTR_ID_EAV_ATTR_ATTR_ID": true,
+            "VES_RMA_REQUEST_ENTT_VCHR_ENTT_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true,
+            "VES_RMA_REQUEST_ENTITY_VARCHAR_ENTITY_ID_ATTRIBUTE_ID": true
+        }
+    },
+    "ves_rma_request_eav_attribute": {
+        "column": {
+            "attribute_id": true,
+            "is_visible": true,
+            "input_filter": true,
+            "multiline_count": true,
+            "validate_rules": true,
+            "is_system": true,
+            "is_used_in_profile_form": true,
+            "is_used_in_registration_form": true,
+            "sort_order": true,
+            "data_model": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_EAV_ATTR_ATTR_ID_EAV_ATTR_ATTR_ID": true
+        }
+    },
+    "ves_rma_request_message": {
+        "column": {
+            "message_id": true,
+            "request_id": true,
+            "message": true,
+            "attachment": true,
+            "type": true,
+            "from": true,
+            "to": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_MESSAGE_REQUEST_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true
+        }
+    },
+    "ves_rma_request_item": {
+        "column": {
+            "item_id": true,
+            "order_item_id": true,
+            "qty": true,
+            "request_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ITEM_REQUEST_ID_VES_RMA_REQUEST_ENTITY_ENTITY_ID": true
+        }
+    },
+    "ves_rma_reason": {
+        "column": {
+            "reason_id": true,
+            "title": true,
+            "is_main": true,
+            "status": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ves_rma_reason_store": {
+        "column": {
+            "reason_store_id": true,
+            "title": true,
+            "store_id": true,
+            "reason_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REASON_STORE_REASON_ID_VES_RMA_REASON_REASON_ID": true,
+            "VES_RMA_REASON_STORE_REASON_ID_STORE_ID": true
+        }
+    },
+    "ves_rma_status": {
+        "column": {
+            "status_id": true,
+            "title": true,
+            "code": true,
+            "is_main": true,
+            "status": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ves_rma_status_store": {
+        "column": {
+            "status_store_id": true,
+            "title": true,
+            "store_id": true,
+            "status_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_STATUS_STORE_STATUS_ID_VES_RMA_STATUS_STATUS_ID": true,
+            "VES_RMA_STATUS_STORE_STATUS_ID_STORE_ID": true
+        }
+    },
+    "ves_rma_status_state": {
+        "column": {
+            "status_state_id": true,
+            "state": true,
+            "status_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_STATUS_STATE_STATUS_ID_VES_RMA_STATUS_STATUS_ID": true
+        }
+    },
+    "ves_rma_request_address": {
+        "column": {
+            "address_id": true,
+            "request_id": true,
+            "lastname": true,
+            "firstname": true,
+            "company": true,
+            "telephone": true,
+            "fax": true,
+            "address": true,
+            "city": true,
+            "country_id": true,
+            "region": true,
+            "region_id": true,
+            "postcode": true,
+            "additional_information": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_ADDR_REQUEST_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true
+        }
+    },
+    "ves_rma_request_history": {
+        "column": {
+            "history_id": true,
+            "change_by": true,
+            "type": true,
+            "status": true,
+            "request_id": true,
+            "created_time": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_REQUEST_HISTORY_REQUEST_ID_VES_RMA_REQUEST_ENTT_ENTT_ID": true
+        }
+    },
+    "ves_rma_reponse": {
+        "column": {
+            "reponse_id": true,
+            "title": true,
+            "content": true,
+            "status": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ves_rma_status_template": {
+        "column": {
+            "template_id": true,
+            "template_admin_notify": true,
+            "template_customer_notify": true,
+            "template_status_id": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_RMA_STS_TEMPLATE_TEMPLATE_STS_ID_VES_RMA_STS_STS_ID": true,
+            "VES_RMA_STATUS_TEMPLATE_TEMPLATE_STATUS_ID_STORE_ID": true
+        }
+    },
+    "ves_rma_request_email_queue": {
+        "column": {
+            "queue_id": true,
+            "email_sender": true,
+            "email_to": true,
+            "email_type": true,
+            "addition_information": true,
+            "template_id": true,
+            "status": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ves_rma_request_num": {
+        "column": {
+            "entity_id": true,
+            "sequence_value": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

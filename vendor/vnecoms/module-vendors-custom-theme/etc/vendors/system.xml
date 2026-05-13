@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+    	<tab id="general" translate="label" sortOrder="10">
+            <label>General</label>
+        </tab>
+		
+        <!-- Store Information Section -->
+        <section id="custom_theme" translate="label" type="text" sortOrder="12" showInDefault="1">
+        	<label>Custom Theme</label>
+            <tab>general</tab>
+            <resource>Vnecoms_VendorsCustomTheme::general</resource>
+            <group id="general" translate="label tooltip" type="text" sortOrder="20" showInDefault="1">
+				<label>Theme List</label>
+				<field id="theme" translate="label" type="select" sortOrder="10" showInDefault="1">
+	            	<label>Custom Theme</label>
+                    <source_model>Vnecoms\VendorsCustomTheme\Model\Source\CustomTheme</source_model>
+                    <frontend_model>Vnecoms\VendorsCustomTheme\Block\Adminhtml\System\Config\Form\Field\Theme</frontend_model>
+	        	</field>
+			</group>
+		</section>
+		<section id="page">
+			<group id="general">
+				<field id="logo" translate="label" type="image" sortOrder="5" showInDefault="1">
+	            	<label>Header Logo</label>
+	            	<comment>Allowed file types: PNG, GIF, JPG, JPEG</comment>
+	            	<backend_model>Vnecoms\VendorsConfig\Model\Config\Backend\Image</backend_model>
+	            	<upload_dir config="system/filesystem/media" scope_info="1">ves_vendors/header_logo</upload_dir>
+                    <base_url type="media">ves_vendors/header_logo</base_url>
+	        	</field>
+			</group>
+		</section>
+    </system>
+</config>

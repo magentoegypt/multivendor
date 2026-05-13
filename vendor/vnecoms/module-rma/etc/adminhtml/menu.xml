@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vnecoms_RMA::rma" title="RMA" module="Vnecoms_RMA" sortOrder="10" resource="Vnecoms_RMA::rma" parent="Magento_Sales::sales"/>
+        <add id="Vnecoms_RMA::rma_request_open" title="Open Requests" sortOrder="1" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="vrma/request/open" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_request_open"/>
+        <add id="Vnecoms_RMA::rma_request" title="All RMA" sortOrder="1" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="vrma/request/index" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_request"/>
+        <add id="Vnecoms_RMA::rma_status" title="Manage Statuses" sortOrder="1" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="vrma/status/index" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_status"/>
+        <add id="Vnecoms_RMA::rma_reason" title="Manage Reasons" sortOrder="1" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="vrma/reason/index" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_reason"/>
+        <add id="Vnecoms_RMA::rma_reponse" title="Manage Quick Responses" sortOrder="1" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="vrma/response/index" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_reponse"/>
+        <!-- <add id="Vnecoms_RMA::rma_email_queue" title="Manage Email Queue" sortOrder="4" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="rma/queue/index" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_setting"/> -->
+        <add id="Vnecoms_RMA::rma_setting" title="Configuration" sortOrder="100" module="Vnecoms_RMA" parent="Vnecoms_RMA::rma" action="adminhtml/system_config/edit/section/rma" dependsOnModule="Vnecoms_RMA" resource="Vnecoms_RMA::rma_setting"/>
+    </menu>
+</config>

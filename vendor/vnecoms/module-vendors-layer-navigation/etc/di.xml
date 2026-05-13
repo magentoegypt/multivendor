@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Model\Layer\Resolver">
+        <arguments>
+            <argument name="layersPool" xsi:type="array">
+                <item name="vendor_page" xsi:type="string">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--layer vendor-->
+    <type name="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage">
+        <arguments>
+            <argument name="context" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\Context</argument>
+        </arguments>
+    </type>
+<!-- uncomment this code if use smile elastic search extension.
+	<type name="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\ItemCollectionProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\CollectionFactory</argument>
+        </arguments>
+    </type>
+-->    
+    <!--context for Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage-->
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\Context" type="Magento\Catalog\Model\Layer\Context">
+        <arguments>
+            <argument name="collectionProvider" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\ItemCollectionProvider</argument>
+            <argument name="stateKey" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\StateKey</argument>
+            <argument name="collectionFilter" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\CollectionFilter</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="vendorFilterList" type="Vnecoms\VendorsLayerNavigation\Model\Layer\FilterList">
+        <arguments>
+            <argument name="filterableAttributes" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\FilterableAttributeList</argument>
+            <argument name="filters" xsi:type="array">
+                <item name="price" xsi:type="string">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Price</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\FilterableAttributeList">
+        <arguments>
+            <argument name="layer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </type>
+
+    <!--Filter Items-->
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Attribute" type="Magento\Catalog\Model\Layer\Filter\Attribute">
+        <arguments>
+            <argument name="catalogLayer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Decimal" type="Magento\Catalog\Model\Layer\Filter\Decimal">
+        <arguments>
+            <argument name="catalogLayer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Price">
+        <arguments>
+            <argument name="resource" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\ResourceModel\Layer\Filter\Price</argument>
+            <argument name="algorithmFactory" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\AlgorithmFactory</argument>
+            <!--<argument name="dataProviderFactory" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\DataProvider\PriceFactory</argument>-->
+            <argument name="layer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </type>
+
+    <!--Filter Data Provider-->
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\DataProvider\Price" type="Magento\Catalog\Model\Layer\Filter\DataProvider\Price">
+        <arguments>
+            <argument name="resource" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\ResourceModel\Layer\Filter\Price</argument>
+        </arguments>
+    </virtualType>
+
+    <!--Price ranger-->
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Price\Range" type="Magento\Catalog\Model\Layer\Filter\Price\Range">
+        <arguments>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </virtualType>
+
+    <!--Dynamic Filter-->
+    <type name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\AlgorithmFactory">
+        <arguments>
+            <argument name="algorithms" xsi:type="array">
+                <item name="auto" xsi:type="string">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\Auto</item>
+                <item name="improved" xsi:type="string">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\Improved</item>
+                <item name="manual" xsi:type="string">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\Manual</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+    <!--Filter Type-->
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\Auto"
+     type="Magento\Catalog\Model\Layer\Filter\Dynamic\Auto">
+        <arguments>
+            <argument name="range" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Price\Range</argument>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+            <argument name="resource" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\ResourceModel\Layer\Filter\Price</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\Improved"
+                 type="Magento\Catalog\Model\Layer\Filter\Dynamic\Improved">
+        <arguments>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Dynamic\Manual"
+                 type="Magento\Catalog\Model\Layer\Filter\Dynamic\Manual">
+        <arguments>
+            <argument name="range" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Filter\Price\Range</argument>
+            <argument name="resource" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\ResourceModel\Layer\Filter\Price</argument>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </virtualType>
+
+    <!--resource MODEL-->
+    <type name="Vnecoms\VendorsLayerNavigation\Model\ResourceModel\Layer\Filter\Price">
+        <arguments>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </type>
+
+</config>

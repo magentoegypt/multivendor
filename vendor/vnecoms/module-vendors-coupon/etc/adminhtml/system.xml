@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vendors">
+            <group id="vendorscoupon" translate="label tooltip" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+            	<label>Seller Coupon</label>
+            	<field id="coupons_length" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Code Length</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                </field>
+				<field id="coupons_format" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Code Format</label>
+                    <source_model>Vnecoms\VendorsCoupon\Model\Config\Source\CodeFormat</source_model>
+                </field>
+                <field id="coupons_prefix" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Code Prefix</label>
+                    <frontend_class>validate-alphanum</frontend_class>
+                </field>
+                <field id="coupons_suffix" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Code Suffix</label>
+                    <frontend_class>validate-alphanum</frontend_class>
+                </field>
+                <field id="coupons_dash" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Dash Every X Characters</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                </field>
+
+                <field id="show_discount_detail" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Discount Detail</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="show_vendor_info" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Seller Store Name With Discount Code</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

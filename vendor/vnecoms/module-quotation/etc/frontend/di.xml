@@ -1,0 +1,82 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--session storage quotation-->
+    <virtualType name="Vnecoms\Quotation\Model\Session\Storage" type="Magento\Framework\Session\Storage">
+        <arguments>
+            <argument name="namespace" xsi:type="string">quotation</argument>
+        </arguments>
+    </virtualType>
+
+    <!--session storage-->
+    <type name="Vnecoms\Quotation\Model\Session">
+        <arguments>
+            <argument name="storage" xsi:type="object">Vnecoms\Quotation\Model\Session\Storage</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Customer\CustomerData\SectionPoolInterface">
+        <arguments>
+            <argument name="sectionSourceMap" xsi:type="array">
+                <item name="quotation" xsi:type="string">Vnecoms\Quotation\CustomerData\Quote</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Vnecoms\Quotation\FileUploader" type="Magento\Catalog\Model\ImageUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">ves_quotation/tmp/attachments</argument>
+            <argument name="basePath" xsi:type="string">ves_quotation/attachments</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="gif" xsi:type="string">gif</item>
+                <item name="png" xsi:type="string">png</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\Quotation\Controller\Message\Upload">
+        <arguments>
+            <argument name="fileUploader" xsi:type="object">Vnecoms\Quotation\FileUploader</argument>
+        </arguments>
+    </type>
+		
+		<type name="Magento\Catalog\Helper\Product\ConfigurationPool">
+        <arguments>
+            <argument name="instancesByType" xsi:type="array">
+                <item name="quotation_simple" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</item>
+                <item name="quotation_virtual" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</item>
+                <item name="quotation_configurable" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</item>
+                <item name="quotation_downloadable" xsi:type="object">Vnecoms\Quotation\Helper\Product\Downloadable</item>
+                <item name="quotation_bundle" xsi:type="object">Vnecoms\Quotation\Helper\Product\Bundle</item>
+            </argument>
+        </arguments>
+    </type>
+		
+		<type name="Vnecoms\Quotation\Helper\Product\Downloadable">
+			<arguments>
+				<argument name="productConfig" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</argument>
+			</arguments>
+		</type>
+		<type name="Vnecoms\Quotation\Helper\Product\Bundle">
+			<arguments>
+				<argument name="productConfiguration" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</argument>
+			</arguments>
+		</type>
+		<type name="Vnecoms\Quotation\Block\Quotepage\Item\Renderer">
+			<arguments>
+				<argument name="productConfig" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</argument>
+			</arguments>
+		</type>
+		<type name="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Downloadable">
+			<arguments>
+				<argument name="downloadableProductConfiguration" xsi:type="object">Vnecoms\Quotation\Helper\Product\Downloadable</argument>
+			</arguments>
+		</type>
+		<type name="Vnecoms\Quotation\Block\Quotepage\Item\Renderer\Bundle">
+			<arguments>
+				<argument name="downloadableProductConfiguration" xsi:type="object">Vnecoms\Quotation\Helper\Product\Bundle</argument>
+			</arguments>
+		</type>
+</config>

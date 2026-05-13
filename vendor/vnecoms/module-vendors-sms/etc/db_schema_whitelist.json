@@ -1,0 +1,28 @@
+{
+    "ves_sms_credit_transaction": {
+        "column": {
+            "transaction_id": true,
+            "vendor_id": true,
+            "amount": true,
+            "balance": true,
+            "description": true,
+            "additional_info": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_SMS_CREDIT_TRANSACTION_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true
+        }
+    },
+    "ves_vendor_entity": {
+        "column": {
+            "sms_credit": true
+        }
+    },
+    "ves_sms_message": {
+        "column": {
+            "price": true,
+            "vendor_id": true
+        }
+    }
+}

@@ -1,0 +1,28 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+/**
+ * @var \Vnecoms\Quotation\Block\Info $block
+ **/
+$_quote = $block->getQuote();
+
+?>
+<span class="order-status"><?php /* @escapeNotVerified */ echo $block->getQuoteStatusLabel($_quote->getStatus()) ?></span>
+
+<div class="order-date">
+    <?php /* @escapeNotVerified */ echo __('<span class="label">Quote Date:</span> %1', '<date>' . $block->formatDate($_quote->getCreatedAt(), \IntlDateFormatter::LONG) . '</date>') ?>
+</div>
+
+<?php /*
+<div class="actions-toolbar order-actions-toolbar">
+    <div class="actions">
+        <a class="action print" href="<?php echo $block->getUrl('quotation/quote/print', ['quote_id' => $_quote->getId()])?>" target="_blank">
+            <span><?php echo __('Print Quote')?></span>
+        </a>
+    </div>
+</div>
+*/?>

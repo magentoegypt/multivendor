@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                 <resource id="Magento_Sales::sales">
+                    <resource id="Vnecoms_RMA::rma" title="RMA" sortOrder="30">
+                        <resource id="Vnecoms_RMA::rma_request_open" title="Open Requests" sortOrder="1"></resource>
+                        <resource id="Vnecoms_RMA::rma_request" title="All RMA" sortOrder="2"></resource>
+                        <resource id="Vnecoms_RMA::rma_status" title="Manage Statuses" sortOrder="3"></resource>
+                        <resource id="Vnecoms_RMA::rma_reason" title="Manage Reasons" sortOrder="4"></resource>
+                        <resource id="Vnecoms_RMA::rma_reponse" title="Manage Quick Responses" sortOrder="5"></resource>
+                        <resource id="Vnecoms_RMA::rma_setting" title="Configuration" sortOrder="6"></resource>
+                    </resource>
+                 </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>
+

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Thank you Page 2 for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout">
+            <group id="design">
+                <group id="optional_ui_elements">
+                    <field id="block_id" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Success Page Custom Block</label>
+                        <config_path>amasty_checkout/success_page/block_id</config_path>
+                        <comment>Specify the ID of custom CMS block to be displayed on the checkout success page</comment>
+                        <source_model>\Amasty\CheckoutCore\Model\Config\Source\CmsBlock</source_model>
+                    </field>
+                </group>
+            </group>
+            <group id="success_page" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Success Page</label>
+                <field id="enabled_success_page" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom Order Success Page</label>
+                    <comment>
+                        <![CDATA[ Disable it to show the default order success page instead.<br>
+                        Note: if frozen, the control over the order success page is moved to the Thank You Page module.]]>
+                    </comment>
+                    <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Amasty\CheckoutThankYouPage\Block\Adminhtml\System\Config\SuccessPage</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

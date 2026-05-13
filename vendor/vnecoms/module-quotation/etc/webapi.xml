@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+  -->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route method="POST" url="/V1/vnecoms-quotation/quote">
+        <service class="Vnecoms\Quotation\Api\QuoteRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Quote_save"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/vnecoms-quotation/search">
+        <service class="Vnecoms\Quotation\Api\QuoteRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Quote_view"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/vnecoms-quotation/:quoteId">
+        <service class="Vnecoms\Quotation\Api\QuoteRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Quote_view"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/vnecoms-quotation/:quoteId">
+        <service class="Vnecoms\Quotation\Api\QuoteRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Quote_update"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/vnecoms-quotation/:quoteId">
+        <service class="Vnecoms\Quotation\Api\QuoteRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Quote_delete"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/vnecoms-quotation/message">
+        <service class="Vnecoms\Quotation\Api\MessageRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Message_save"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/vnecoms-quotation/:messageId">
+        <service class="Vnecoms\Quotation\Api\MessageRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Message_view"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/vnecoms-quotation/:messageId">
+        <service class="Vnecoms\Quotation\Api\MessageRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Message_update"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/vnecoms-quotation/:messageId">
+        <service class="Vnecoms\Quotation\Api\MessageRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Message_delete"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/vnecoms-quotation/proposal">
+        <service class="Vnecoms\Quotation\Api\ProposalRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Proposal_save"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/vnecoms-quotation/:proposalId">
+        <service class="Vnecoms\Quotation\Api\ProposalRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Proposal_view"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/vnecoms-quotation/:proposalId">
+        <service class="Vnecoms\Quotation\Api\ProposalRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Proposal_update"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/vnecoms-quotation/:proposalId">
+        <service class="Vnecoms\Quotation\Api\ProposalRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Proposal_delete"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/vnecoms-quotation/item">
+        <service class="Vnecoms\Quotation\Api\ItemRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Item_save"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/vnecoms-quotation/:itemId">
+        <service class="Vnecoms\Quotation\Api\ItemRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Item_view"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/vnecoms-quotation/:itemId">
+        <service class="Vnecoms\Quotation\Api\ItemRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Item_update"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/vnecoms-quotation/:itemId">
+        <service class="Vnecoms\Quotation\Api\ItemRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Vnecoms_Quotation::Item_delete"/>
+        </resources>
+    </route>
+</routes>

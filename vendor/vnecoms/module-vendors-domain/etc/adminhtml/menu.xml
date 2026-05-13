@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+    	<add id="Vnecoms_VendorsDomain::domain" title="Domain" sortOrder="50" module="Vnecoms_VendorsDomain" parent="Vnecoms_Vendors::marketplace" dependsOnModule="Vnecoms_VendorsDomain" resource="Vnecoms_VendorsDomain::domain"/>
+    	<add id="Vnecoms_VendorsDomain::manage_domains" title="Manage Domains" sortOrder="10" module="Vnecoms_VendorsDomain" parent="Vnecoms_VendorsDomain::domain" action="vendors/domain" dependsOnModule="Vnecoms_VendorsDomain" resource="Vnecoms_VendorsDomain::manage_domains"/>
+    	<add id="Vnecoms_VendorsDomain::pending_domains" title="Manage Pending Domains" sortOrder="20" module="Vnecoms_VendorsDomain" parent="Vnecoms_VendorsDomain::domain" action="vendors/domain/pending" dependsOnModule="Vnecoms_VendorsDomain" resource="Vnecoms_VendorsDomain::pending_domains"/>
+    </menu>
+</config>

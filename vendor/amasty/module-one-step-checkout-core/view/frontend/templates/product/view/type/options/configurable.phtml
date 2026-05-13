@@ -1,0 +1,38 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+/** @var $block \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable */
+/** @var \Magento\Framework\Escaper $escaper */
+$product = $block->getProduct();
+$attributes = $block->decorateArray($block->getAllowAttributes());
+$itemId = $block->getData('quote_item')->getId();
+?>
+<?php if ($product->isSaleable() && count($attributes)): ?>
+    <input type="hidden" name="selected_configurable_option" value="" />
+    <?php foreach ($attributes as $attribute): ?>
+        <div class="field configurable required">
+            <label class="label"
+                   for="attribute<?= $escaper->escapeHtml($itemId) ?>-
+                   <?= $escaper->escapeHtml($attribute->getAttributeId()) ?>">
+                <span><?= $escaper->escapeHtml($attribute->getProductAttribute()->getStoreLabel()) ?></span>
+            </label>
+            <div class="control">
+                <select name="super_attribute[<?= $escaper->escapeHtml($attribute->getAttributeId()) ?>]"
+                        data-selector="super_attribute[<?= $escaper->escapeHtml($itemId) ?>]
+                        [<?= $escaper->escapeHtml($attribute->getAttributeId())?>]"
+                        data-validate="{required:true}"
+                        id="attribute<?= $escaper->escapeHtml($itemId) ?>-
+                        <?= $escaper->escapeHtml($attribute->getAttributeId()) ?>"
+                        class="super-attribute-select"
+                        data-attribute-id="<?= $escaper->escapeHtml($attribute->getAttributeId()) ?>">
+                    <option value="">
+                        <?= $escaper->escapeHtml(__('Choose an Option...')) ?>
+                    </option>
+                </select>
+            </div>
+        </div>
+    <?php endforeach; ?>
+<?php endif;?>

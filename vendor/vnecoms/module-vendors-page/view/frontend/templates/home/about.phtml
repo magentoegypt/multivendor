@@ -1,0 +1,9 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Home\About
+ */
+?>
+<h3 id="vendor-about" class="vendor-about-title"><?php echo __("About")?></h3>
+<?php echo ($block->getVendorDescription()?$block->getVendorDescription():__('Not available'))?>

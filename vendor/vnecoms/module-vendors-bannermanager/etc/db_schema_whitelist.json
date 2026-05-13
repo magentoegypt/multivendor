@@ -1,0 +1,55 @@
+{
+    "ves_bannermanager_banner": {
+        "column": {
+            "banner_id": true,
+            "vendor_id": true,
+            "identifier": true,
+            "title": true,
+            "status": true,
+            "banner_template": true,
+            "hide_pagination": true,
+            "show_item_description": true,
+            "type_pagination": true,
+            "effect": true,
+            "speed": true,
+            "delay": true,
+            "from_date": true,
+            "to_date": true,
+            "creation_time": true,
+            "update_time": true,
+            "sort_order": true
+        },
+        "index": {
+            "VES_BANNERMANAGER_BANNER_STATUS": true,
+            "VES_BANNERMANAGER_BANNER_BANNER_ID": true,
+            "VES_BANNERMANAGER_BANNER_VENDOR_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "VES_BANNERMANAGER_BANNER_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true
+        }
+    },
+    "ves_bannermanager_item": {
+        "column": {
+            "item_id": true,
+            "title": true,
+            "filename": true,
+            "alt": true,
+            "url": true,
+            "target": true,
+            "custom_html": true,
+            "short_description": true,
+            "sort_order": true,
+            "status": true,
+            "banner_id": true
+        },
+        "index": {
+            "VES_BANNERMANAGER_ITEM_STATUS": true,
+            "VES_BANNERMANAGER_ITEM_ITEM_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "FK_CE5CC892CD05B5346E28010B1945E037": true
+        }
+    }
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="vendor_categories" xsi:type="array">
+                    <item name="class" xsi:type="string">Vnecoms\VendorsCategory\Ui\DataProvider\Product\Form\Modifier\VendorCategories</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Vnecoms\VendorsProductForm\Ui\DataProvider\ProductAdvancedForm\Modifier\Pool" type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="vendor_categories" xsi:type="array">
+                    <item name="class" xsi:type="string">Vnecoms\VendorsCategory\Ui\DataProvider\Product\Form\Modifier\ProductFormCategories</item>
+                    <item name="sortOrder" xsi:type="number">100</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Vnecoms\VendorsCategory\Ui\DataProvider\Product\Form\Modifier\ProductFormCategories">
+        <arguments>
+            <argument name="locator" xsi:type="object">Vnecoms\VendorsProductForm\Model\Locator\RegistryLocator</argument>
+            <argument name="scopeName" xsi:type="string">product_form_additional_form.product_form_additional_form</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsCms\Model\Rule\Condition\Product">
+        <arguments>
+            <argument name="specialAttributesProduct" xsi:type="array">
+                <item name="ves_category_ids" xsi:type="array">
+                    <item name="code" xsi:type="string">ves_category_ids</item>
+                    <item name="name" xsi:type="string">Vendor Category</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

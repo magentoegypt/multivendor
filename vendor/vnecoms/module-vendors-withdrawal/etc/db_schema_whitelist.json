@@ -1,0 +1,32 @@
+{
+    "ves_vendor_withdrawal_method": {
+        "column": {
+            "method_id": true,
+            "code": true,
+            "is_enabled": true,
+            "title": true,
+            "description": true,
+            "fee_type": true,
+            "fee": true,
+            "min_value": true,
+            "max_value": true,
+            "fields": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "ves_vendor_withdrawal_method_data": {
+        "column": {
+            "data_id": true,
+            "vendor_id": true,
+            "method_id": true,
+            "method_data": true
+        },
+        "constraint": {
+            "FK_8976ED381D086C6D8716F838836A149C": true,
+            "FK_8F45D0C96C52810CFE1F9B7953766996": true,
+            "PRIMARY": true
+        }
+    }
+}

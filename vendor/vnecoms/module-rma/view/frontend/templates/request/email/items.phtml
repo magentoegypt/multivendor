@@ -1,0 +1,29 @@
+<?php $rma = $this->getRma(); ?>
+<?php if($rma): ?>
+<div class="box-customer-request">
+    <table class="email-items data-table my-request-table" id="my-request-table">
+        <col />
+        <col width="1" />
+        <thead>
+        <tr class="headings">
+            <th><?php echo __('Products') ?></th>
+            <th class="last"><?php echo __('Qty') ?></th>
+        </tr>
+        </thead>
+        <?php $_items = $block->getItems() ?>
+        <?php $i=0;foreach ($_items as $_item):?>
+            <tbody class="<?php echo $i%2?'even':'odd' ?>">
+            <tr class="border">
+                <td>
+                    <?php echo $block->getItemName($_item->getData("order_item_id")) ?>
+                </td>
+
+                <td class="a-center last">
+                    <?php echo $_item->getData("qty") ?>
+                </td>
+            </tr>
+            </tbody>
+        <?php endforeach; ?>
+    </table>
+</div>
+<?php endif ?>

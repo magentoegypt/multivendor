@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <scope id="global">
+        <fieldset id="sales_convert_quote_address">
+            <field name="custom_field_1">
+                <aspect name="to_order_address"/>
+                <aspect name="to_customer_address"/>
+            </field>
+            <field name="custom_field_2">
+                <aspect name="to_order_address"/>
+                <aspect name="to_customer_address"/>
+            </field>
+            <field name="custom_field_3">
+                <aspect name="to_order_address"/>
+                <aspect name="to_customer_address"/>
+            </field>
+        </fieldset>
+        <fieldset id="order_address">
+            <field name="custom_field_1">
+                <aspect name="to_customer_address"/>
+            </field>
+            <field name="custom_field_2">
+                <aspect name="to_customer_address"/>
+            </field>
+            <field name="custom_field_3">
+                <aspect name="to_customer_address"/>
+            </field>
+        </fieldset>
+    </scope>
+</config>

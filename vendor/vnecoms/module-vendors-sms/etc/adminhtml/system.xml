@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+        	<group id="settings">
+        		<field id="sms_tier_price" translate="label tooltip" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>SMS Tier Price</label>
+					<frontend_model>Vnecoms\VendorsSms\Block\Adminhtml\System\Config\Form\Field\Price</frontend_model>
+					<backend_model>Vnecoms\VendorsSms\Model\Config\Backend\Price</backend_model>
+                    <comment><![CDATA[You can charge your vendors the fee to use SMS service.<br />
+                    The price of each sms is calculated based on the number of SMS that vendor has got in the current month<br />
+                    e.g. If you add a tier is 100 - $0.05 then first 100 SMS send to vendor will be charged $0.05 per SMS.<br />
+                    ]]></comment>
+                </field>
+                <field id="sms_credit_packages" translate="label tooltip" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>SMS Credit Packages</label>
+					<frontend_model>Vnecoms\VendorsSms\Block\Adminhtml\System\Config\Form\Field\Credit</frontend_model>
+					<backend_model>Vnecoms\VendorsSms\Model\Config\Backend\Credit</backend_model>
+                    <comment><![CDATA[Define the SMS credit packages here to allow your vendor can buy
+                    ]]></comment>
+                </field>
+        	</group>
+        	<group id="admin">
+	            <group id="pending_vendor" translate="label" showInDefault="1" showInWebsite="1" sortOrder="1">
+	            	<label>A vendor account is created and awaiting for approval</label>
+	            	<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	            	<field id="admin_pending_vendor" translate="label tooltip" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to admin when a vendor account is created and awaiting for approval.</tooltip>
+	                    <config_path>vsms/vendor/admin_pending_vendor</config_path>
+	                </field>
+	                <field id="admin_pending_vendor_message" translate="label tooltip" type="textarea" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/admin_pending_vendor_message</config_path>
+	                    <depends>
+	                        <field id="admin_pending_vendor">1</field>
+	                    </depends>
+	                </field>
+	            </group>
+            </group>
+
+            <group id="vendor" translate="label" showInDefault="1" showInWebsite="1" sortOrder="50">
+	            <label>Send SMS to Vendor when</label>
+	            <group id="vendor_approved_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="10">
+	            	<label>Vendor Account is Approved</label>
+	            	<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	            	<field id="vendor_approved" translate="label tooltip" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when vendor account is approved.</tooltip>
+	                    <config_path>vsms/vendor/vendor_approved</config_path>
+	                </field>
+	                <field id="vendor_approved_message" translate="label tooltip" type="textarea" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/vendor_approved_message</config_path>
+	                    <depends>
+	                        <field id="vendor_approved">1</field>
+	                    </depends>
+	                </field>
+            	</group>
+            	<group id="vendor_unapproved_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="20">
+            		<label>Vendor Account is Unapproved</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	                <field id="vendor_unapproved" translate="label tooltip" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when vendor account is unapproved.</tooltip>
+	                    <config_path>vsms/vendor/vendor_unapproved</config_path>
+	                </field>
+	                <field id="vendor_unapproved_message" translate="label tooltip" type="textarea" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/vendor_unapproved_message</config_path>
+	                    <depends>
+	                        <field id="vendor_unapproved">1</field>
+	                    </depends>
+	                </field>
+                </group>
+
+                <group id="product_approved_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="30">
+            		<label>Vendor Product is Approved</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	                <field id="product_approved" translate="label tooltip" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when a vendor's product is approved.</tooltip>
+	                    <config_path>vsms/vendor/product_approved</config_path>
+	                </field>
+	                <field id="product_approved_message" translate="label tooltip" type="textarea" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/product_approved_message</config_path>
+	                    <depends>
+	                        <field id="product_approved">1</field>
+	                    </depends>
+	                </field>
+                </group>
+
+                <group id="product_unapproved_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="40">
+            		<label>Vendor Product is Unapproved</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	                <field id="product_unapproved" translate="label tooltip" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>vsms/vendor/product_unapproved</config_path>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when a vendor's product is unapproved.</tooltip>
+	                </field>
+	                <field id="product_unapproved_message" translate="label tooltip" type="textarea" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/product_unapproved_message</config_path>
+	                    <depends>
+	                        <field id="product_unapproved">1</field>
+	                    </depends>
+	                </field>
+                </group>
+
+                <group id="new_order_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="50">
+            		<label>New Order Created</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	            	<field id="new_order" translate="label tooltip" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>vsms/vendor/new_order</config_path>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when a new order is placed.</tooltip>
+	                </field>
+	                <field id="new_order_message" translate="label tooltip" type="textarea" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/new_order_message</config_path>
+	                    <depends>
+	                        <field id="new_order">1</field>
+	                    </depends>
+	                </field>
+                </group>
+
+                <group id="new_invoice_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="60">
+            		<label>New Invoice Created</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	                <field id="new_invoice" translate="label tooltip" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>vsms/vendor/new_invoice</config_path>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when a new invoice is created.</tooltip>
+	                </field>
+	                <field id="new_invoice_message" translate="label tooltip" type="textarea" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/new_invoice_message</config_path>
+	                    <depends>
+	                        <field id="new_invoice">1</field>
+	                    </depends>
+	                </field>
+                </group>
+
+                <group id="new_shipment_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="60">
+            		<label>New Shipment Created</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	                <field id="new_shipment" translate="label tooltip" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>vsms/vendor/new_shipment</config_path>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when a new shipment is created.</tooltip>
+	                </field>
+	                <field id="new_shipment_message" translate="label tooltip" type="textarea" sortOrder="75" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/new_shipment_message</config_path>
+	                    <depends>
+	                        <field id="new_shipment">1</field>
+	                    </depends>
+	                </field>
+                </group>
+
+                <group id="new_creditmemo_fieldset" translate="label" showInDefault="1" showInWebsite="1" sortOrder="60">
+            		<label>New Creditmemo Created</label>
+            		<frontend_model>Vnecoms\Sms\Block\Adminhtml\System\Config\Fieldset</frontend_model>
+	                <field id="new_creditmemo" translate="label tooltip" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Enabled</label>
+	                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+	                    <config_path>vsms/vendor/new_creditmemo</config_path>
+	                    <tooltip>If this option is set to "Yes", A sms will be sent to vendor when a new credit memo is created.</tooltip>
+	                </field>
+	                <field id="new_creditmemo_message" translate="label tooltip" type="textarea" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Message</label>
+	                    <config_path>vsms/vendor/new_creditmemo_message</config_path>
+	                    <depends>
+	                        <field id="new_creditmemo">1</field>
+	                    </depends>
+	                </field>
+                </group>
+			</group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_domain" resource="default" engine="innodb" comment="Vendor Domain Table">
+        <column xsi:type="int" name="domain_id" unsigned="true" nullable="false" identity="true"
+                comment="Id"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false"  comment="Vendor Id"/>
+        <column xsi:type="varchar" name="value" nullable="false" default="" length="255" comment="Value"/>
+        <column xsi:type="varchar" name="domain" nullable="false" default="" length="255" comment="Domain"/>
+        <column xsi:type="mediumtext" name="note" nullable="true" comment="Note"/>
+        <column xsi:type="boolean" name="is_secure" nullable="false" comment="Is secure"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" default="0" comment="Status"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"  default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="domain_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_VENDOR_THEME_THEME_ID" table="ves_vendor_domain"
+                    column="vendor_id" referenceTable="ves_vendor_entity" referenceColumn="entity_id"/>
+    </table>
+</schema>

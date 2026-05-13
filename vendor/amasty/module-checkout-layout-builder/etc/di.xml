@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Layout Builder for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Amasty\CheckoutCore\Model\StatisticManagement">
+        <arguments>
+            <argument name="checkoutBlocksProvider" xsi:type="object">Amasty\CheckoutLayoutBuilder\Model\Config\CheckoutBlocksProvider</argument>
+        </arguments>
+    </type>
+    <type name="Amasty\CheckoutCore\Model\ConfigProvider">
+        <arguments>
+            <argument name="checkoutBlocksProvider" xsi:type="object">Amasty\CheckoutLayoutBuilder\Model\Config\CheckoutBlocksProvider</argument>
+        </arguments>
+    </type>
+</config>

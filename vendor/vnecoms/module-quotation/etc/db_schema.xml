@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="vnecoms_quotation_quote" resource="default" engine="innodb" comment="Quote">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="varchar" name="increment_id" nullable="false" length="64" comment="Increment ID"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true"  comment="Store Id"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" comment="Customer Id"/>
+        <column xsi:type="boolean" name="customer_is_guest" default="1"  comment="Customer Is Guest"/>
+        <column xsi:type="smallint" name="customer_group_id"  comment="Customer Group Id"/>
+        <column xsi:type="varchar" name="customer_firstname" length="128" comment="Customer Firstname"/>
+        <column xsi:type="varchar" name="customer_lastname" length="128" comment="Customer Lastname"/>
+        <column xsi:type="varchar" name="customer_middlename" length="128" comment="Customer Middlename"/>
+        <column xsi:type="varchar" name="customer_email" length="128" comment="Customer Email"/>
+        <column xsi:type="varchar" name="customer_prefix" length="128" comment="Customer Prefix"/>
+        <column xsi:type="varchar" name="customer_suffix" length="128" comment="Customer Suffix"/>
+        <column xsi:type="varchar" name="customer_dob" length="128" comment="Customer DOB"/>
+        <column xsi:type="varchar" name="customer_company" length="255" comment="Customer Company"/>
+        <column xsi:type="varchar" name="customer_phone" length="31" comment="Customer Phone"/>
+        <column xsi:type="text" name="ip_address" comment="IP"/>
+        <column xsi:type="varchar" name="customer_taxvat" length="32" comment="Customer Taxvat"/>
+        <column xsi:type="text" name="client_comment"  comment="Customer Comment(Remark)"/>
+        <column xsi:type="text" name="note" comment="Note"/>
+        <column xsi:type="varchar" name="status" length="32" comment="Status"/>
+        <column xsi:type="varchar" name="status_before_hold" length="32" comment="Hold Before Status"/>
+        <column xsi:type="varchar" name="coupon_code" length="255" comment="Coupon code"/>
+        <column xsi:type="decimal" name="base_grand_total" scale="4" precision="12" comment="Base Grand total"/>
+        <column xsi:type="decimal" name="grand_total" scale="4" precision="12" comment="Grand total"/>
+        <column xsi:type="decimal" name="base_subtotal" scale="4" precision="12" comment="Base Subtotal"/>
+        <column xsi:type="decimal" name="subtotal" scale="4" precision="12" comment="Subtotal"/>
+        <column xsi:type="decimal" name="items_qty" scale="4" precision="12" comment="Items Qty"/>
+        <column xsi:type="decimal" name="items_count" scale="4" precision="12" comment="Items Count"/>
+        <column xsi:type="varchar" name="base_currency_code" length="32" comment="Base Currency Code"/>
+        <column xsi:type="varchar" name="currency_code" length="32" comment="Currency Code"/>
+        <column xsi:type="varchar" name="quote_currency_code" length="32" comment="Quote Currency Code"/>
+        <column xsi:type="varchar" name="store_currency_code" length="32" comment="Store Currency Code"/>
+        <column xsi:type="varchar" name="is_changed" length="32" comment="Is Changed"/>
+        <column xsi:type="varchar" name="trigger_recollect" length="32" comment="Trigger Recollect"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"  default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false"  default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <column xsi:type="date" name="reminder_date" nullable="true"  comment="Reminder Date"/>
+        <column xsi:type="date" name="expired_date" nullable="true"  comment="Expired Date"/>
+        <column xsi:type="boolean" name="is_active" nullable="false"  default="1" comment="Is Active"/>
+        <column xsi:type="boolean" name="is_virtual" nullable="false"  default="0" comment="Is Virtual"/>
+        <column xsi:type="boolean" name="reminder_enabled" nullable="false"  default="0" comment="Enable Reminder"/>
+        <column xsi:type="boolean" name="expire_enabled" nullable="false"  default="0" comment="Enable expiration"/>
+        <column xsi:type="boolean" name="proposal_type" nullable="false"  default="0" comment="Proposal Type"/>
+        <column xsi:type="decimal" name="proposal_value" nullable="false" scale="4" precision="12" default="0" comment="Proposal Value"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <!--
+        <constraint xsi:type="foreign" referenceId="VNECOMS_QUOTATION_QUOTE_CUSTOMERID_CUSTOMER_ENTITY_CUSTOMERID" table="vnecoms_quotation_quote"
+                    column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id"/> -->
+        <constraint xsi:type="foreign" referenceId="VNECOMS_QUOTATION_QUOTE_STOREID_STORE_STOREID" table="vnecoms_quotation_quote"
+                    column="store_id" referenceTable="store" referenceColumn="store_id"/>
+        <index referenceId="VNECOMS_QUOTATION_QUOTE_INCREMENTID_STATUS_STOREID_CREATEAT_CUSTOMERID_ENTITYID_UPDATEDAT" indexType="btree">
+            <column name="increment_id"/>
+            <column name="status"/>
+            <column name="store_id"/>
+            <column name="created_at"/>
+            <column name="customer_id"/>
+            <column name="entity_id"/>
+            <column name="updated_at"/>
+        </index>
+    </table>
+
+    <table name="vnecoms_quotation_message" resource="default" engine="innodb">
+        <column xsi:type="int" name="message_id" unsigned="true" nullable="false" identity="true"
+                comment="Message ID"/>
+        <column xsi:type="int" name="quote_id" unsigned="true"  comment="Quote Id"/>
+        <column xsi:type="varchar" name="name" length="255" comment="Sender Name"/>
+        <column xsi:type="text" name="message" comment="Message"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"  default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="boolean" name="user_type" nullable="false"  default="0"
+                comment="User Type{0 => customer, 1 => admin, 2 => vendor}"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VNECOMS_QUOTATION_MESSAGE_QUOTEID_VNECOMS_QUOTATION_QUOTE_ENTITYID" table="vnecoms_quotation_message"
+                    column="quote_id" referenceTable="vnecoms_quotation_quote" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="vnecoms_quotation_attachment" resource="default" engine="innodb">
+        <column xsi:type="int" name="attachment_id" unsigned="true" nullable="false" identity="true"
+                comment="Attachment ID"/>
+        <column xsi:type="int" name="message_id" unsigned="true" nullable="false"  comment="Message Id"/>
+        <column xsi:type="varchar" name="file_name" length="255" comment="File Name"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="attachment_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VNECOMS_QUOTATION_MESSAGE_QUOTEID_VNECOMS_QUOTATION_QUOTE_ENTITYID" table="vnecoms_quotation_attachment"
+                    column="message_id" referenceTable="vnecoms_quotation_message" referenceColumn="message_id"/>
+    </table>
+
+    <table name="vnecoms_quotation_item_proposal" resource="default" engine="innodb">
+        <column xsi:type="int" name="proposal_id" unsigned="true" nullable="false" identity="true"
+                comment="Proposal Id"/>
+        <column xsi:type="int" name="item_id" unsigned="true" nullable="false"  comment="Item Id"/>
+        <column xsi:type="decimal" name="qty" unsigned="true" nullable="false" scale="4" precision="12" comment="Qty"/>
+        <column xsi:type="decimal" name="price" unsigned="true" nullable="false" scale="4" precision="12" comment="Price"/>
+        <column xsi:type="decimal" name="base_price" unsigned="true" nullable="false" scale="4" precision="12" comment="Base Price"/>
+        <column xsi:type="text" name="comment" nullable="true"  comment="Comment"/>
+        <column xsi:type="boolean" name="is_default" nullable="false"  default="0"
+                comment="Is Default"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="proposal_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VNECOMS_QUOTATION_PROPOSAL_ITEMID_VNECOMS_QUOTATION_ITEM_ITEMID" table="vnecoms_quotation_item_proposal"
+                    column="item_id" referenceTable="vnecoms_quotation_item" referenceColumn="item_id"/>
+    </table>
+
+    <table name="vnecoms_quotation_item" resource="default" engine="innodb">
+        <column xsi:type="int" name="item_id" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="int" name="quote_id" unsigned="true" nullable="false"  comment="Quote ID"/>
+        <column xsi:type="int" name="product_id" unsigned="true" nullable="false"  comment="Product ID"/>
+        <column xsi:type="int" name="store_id" unsigned="true" nullable="false"  comment="Store ID"/>
+        <column xsi:type="int" name="is_virtual" unsigned="true" nullable="false"  comment="Is Virtual"/>
+        <column xsi:type="varchar" name="product_type" nullable="false" length="255" comment="Product Type"/>
+        <column xsi:type="int" name="parent_item_id" unsigned="true" nullable="false"  comment="Parent Item Id"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="255" comment="SKU"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name"/>
+        <column xsi:type="text" name="comment" nullable="true"  comment="Comment"/>
+        <column xsi:type="int" name="default_proposal" unsigned="true" nullable="false"  comment="Default Proposal"/>
+        <column xsi:type="decimal" name="origin_price" unsigned="true" nullable="false" scale="4" precision="12" comment="Original Price"/>
+        <column xsi:type="decimal" name="base_origin_price" unsigned="true" nullable="false" scale="4" precision="12" comment="Base Original Price"/>
+        <column xsi:type="text" name="options" nullable="true"  comment="Options"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"  default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false"  default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="item_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VNECOMS_QUOTATION_ITEM_QUOTEID_VNECOMS_QUOTATION_QUOTE_ENTITYID" table="vnecoms_quotation_item"
+                    column="quote_id" referenceTable="vnecoms_quotation_quote" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="vnecoms_quotation_quote_num" resource="default" engine="innodb">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="Id"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false"  comment="Store Id"/>
+        <column xsi:type="int" name="sequence_value" unsigned="true" nullable="false" comment="Sequence value"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="VNECOMS_QUOTATION_QUOTE_NUM_STOREID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+</schema>

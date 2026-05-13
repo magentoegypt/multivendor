@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!-- All vendor page will need to update this layout -->
+    <update handle="category_head"/>
+    <update handle="vendor_page" />
+    <update handle="vendor_left_navigation" />
+    <update handle="vendor_layer_navigation"/>
+    <body>
+        <!--<referenceContainer name="columns.top">-->
+            <!--<container name="category.view.container" htmlTag="div" htmlClass="category-view" after="-">-->
+                <!--<block class="Vnecoms\VendorsCategory\Block\Category\View" name="vendorpage.category.image" template="Vnecoms_VendorsCategory::category/image.phtml"/>-->
+                <!--<block class="Vnecoms\VendorsCategory\Block\Category\View" name="vendorpage.category.description" template="Vnecoms_VendorsCategory::category/description.phtml"/>-->
+            <!--</container>-->
+        <!--</referenceContainer>-->
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsCategory\Block\Category\View" name="vendorpage.category.products" template="Vnecoms_VendorsCategory::category/products.phtml">
+                <block class="Vnecoms\VendorsCategory\Block\Category\View" name="vendorpage.category.image" template="Vnecoms_VendorsCategory::category/image.phtml"/>
+                <block class="Vnecoms\VendorsCategory\Block\Category\View" name="vendorpage.category.description" template="Vnecoms_VendorsCategory::category/description.phtml"/>
+                <block class="Vnecoms\VendorsCategory\Block\Product\ListProduct" name="vendors.products.list" as="product_list" template="Magento_Catalog::product/list.phtml">
+                    <container name="product.list.additional" as="additional" />
+                    <block class="Magento\Framework\View\Element\RendererList" name="category.product.type.details.renderers" as="details.renderers">
+                        <block class="Magento\Framework\View\Element\Template" as="default"/>
+                    </block>
+                    <block class="Vnecoms\VendorsCategory\Block\Product\ProductList\Toolbar" name="product_list_toolbar" template="Magento_Catalog::product/list/toolbar.phtml">
+                        <block class="Vnecoms\VendorsCategory\Block\Product\ProductList\Pager" name="product_list_toolbar_pager"/>
+                        <!-- The following code shows how to set your own pager increments -->
+                        <action method="setDefaultListPerPage">
+                            <argument name="limit" xsi:type="string">4</argument>
+                        </action>
+                        <action method="setDefaultGridPerPage">
+                            <argument name="limit" xsi:type="string">3</argument>
+                        </action>
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">list</argument>-->
+                            <!--<argument name="limit" xsi:type="string">2</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">list</argument>-->
+                            <!--<argument name="limit" xsi:type="string">4</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">list</argument>-->
+                            <!--<argument name="limit" xsi:type="string">6</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">list</argument>-->
+                            <!--<argument name="limit" xsi:type="string">8</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit" translate="label">-->
+                            <!--<argument name="mode" xsi:type="string">list</argument>-->
+                            <!--<argument name="limit" xsi:type="string">all</argument>-->
+                            <!--<argument name="label" xsi:type="string">All</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">grid</argument>-->
+                            <!--<argument name="limit" xsi:type="string">3</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">grid</argument>-->
+                            <!--<argument name="limit" xsi:type="string">6</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit">-->
+                            <!--<argument name="mode" xsi:type="string">grid</argument>-->
+                            <!--<argument name="limit" xsi:type="string">9</argument>-->
+                        <!--</action>-->
+                        <!--<action method="addPagerLimit" translate="label">-->
+                            <!--<argument name="mode" xsi:type="string">grid</argument>-->
+                            <!--<argument name="limit" xsi:type="string">all</argument>-->
+                            <!--<argument name="label" xsi:type="string">All</argument>-->
+                        <!--</action>-->
+                    </block>
+                    <action method="setToolbarBlockName">
+                        <argument name="name" xsi:type="string">product_list_toolbar</argument>
+                    </action>
+                </block>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="page.main.title">
+            <arguments>
+                <argument name="id" xsi:type="string">page-title-heading</argument>
+                <argument name="add_base_attribute_aria" xsi:type="string">page-title-heading toolbar-amount</argument>
+            </arguments>
+            <block class="Vnecoms\VendorsCategory\Block\Category\Rss\Link" name="vendorpage.rss.link" template="Vnecoms_VendorsCategory::category/rss.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="vendor.catalog.leftnav">
+                <block class="Vnecoms\VendorsCategory\Block\Navigation\State" name="catalog.navigation.state" as="state" />
+        </referenceBlock>
+
+        <referenceBlock name="vendors.products.list">
+            <arguments>
+                <argument name="viewModel" xsi:type="object">Magento\Catalog\ViewModel\Product\OptionsData</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

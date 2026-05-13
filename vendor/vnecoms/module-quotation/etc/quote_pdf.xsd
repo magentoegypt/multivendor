@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * XSD for an XML, composed as result of merging all config files with PDF settings
+ *
+ *
+ */
+-->
+<xs:schema elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="config" type="configType"/>
+
+    <xs:complexType name="configType">
+        <xs:all>
+            <xs:element name="renderers" type="renderersType" minOccurs="0">
+                <xs:unique name="uniquePageRenderer">
+                    <xs:selector xpath="page"/>
+                    <xs:field xpath="@type"/>
+                </xs:unique>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="renderersType">
+        <xs:sequence>
+            <xs:element name="page" type="pageType" minOccurs="0" maxOccurs="unbounded">
+                <xs:unique name="uniqueProductTypeRenderer">
+                    <xs:selector xpath="renderer"/>
+                    <xs:field xpath="@product_type"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="pageType">
+        <xs:sequence>
+            <xs:element name="renderer" type="rendererType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="type" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="rendererType">
+        <xs:simpleContent>
+            <xs:extension base="classNameType">
+                <xs:attribute name="product_type" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="classNameType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z][a-zA-Z\d]*(\\[A-Z][a-zA-Z\d]*)*" />
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>

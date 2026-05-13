@@ -1,0 +1,25 @@
+<div class="file-uploader-summary">
+    <div class="file-uploader-preview" for="customer-avatar-upload">
+        <img
+                class="preview-image"
+                tabindex="0"
+                event="load: $parent.onPreviewLoad.bind($parent)"
+                attr="
+                src: $parent.getFilePreview($file),
+                alt: $file.name">
+        <span class="file-uploader-spinner"></span>
+
+        <div class="actions">
+            <button
+                    type="button"
+                    class="action-remove"
+                    data-role="delete-button"
+                    attr="title: $t('Delete image')"
+                    disable="$parent.disabled"
+                    click="$parent.removeFile.bind($parent, $file)">
+                <span translate="'Delete image'"></span>
+            </button>
+        </div>
+    </div>
+
+</div>

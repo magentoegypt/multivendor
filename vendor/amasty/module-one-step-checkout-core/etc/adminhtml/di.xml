@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Customer\Model\Metadata\Form">
+        <plugin name="Amasty_CheckoutCore::MetadataForm" type="Amasty\CheckoutCore\Plugin\Customer\Metadata\Form"/>
+    </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\Address\Form">
+        <plugin name="Amasty_CheckoutCore::SalesOrderAddressForm" type="Amasty\CheckoutCore\Plugin\Sales\Admin\Order\Address\Form"/>
+    </type>
+    <type name="Magento\Config\Block\System\Config\Form">
+        <plugin name="Amasty_CheckoutCore::ExpanderBlockRenderer" type="Amasty\CheckoutCore\Plugin\Config\Block\System\Config\FormPlugin"/>
+    </type>
+    <type name="Magento\Customer\Model\Address\DataProvider">
+        <plugin name="Amasty_CheckoutCore::CustomerAddressDataProvider" type="Amasty\CheckoutCore\Plugin\Customer\Address\DataProvider"/>
+    </type>
+    <type name="Amasty\Base\Model\ModuleInfoProvider">
+        <plugin name="Amasty_CheckoutCore::restrictModuleOSCInMenu" type="Amasty\CheckoutCore\Plugin\Base\Model\ModuleInfoProvider\RestrictOSC" />
+    </type>
+
+    <type name="Magento\Customer\Model\Config\Backend\Show\Customer">
+        <plugin name="Amasty_CheckoutCore::updateFieldFromConfigValueChange"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Config\UpdateFieldOnChangePlugin" />
+    </type>
+
+    <type name="Magento\Framework\App\Config\Value">
+        <plugin name="Amasty_CheckoutCore::saveVatFieldPlugin"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Config\SaveVatFieldPlugin" />
+        <plugin name="Amasty_CheckoutCore::deleteVatFieldPlugin"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Config\DeleteVatFieldPlugin" />
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Field\Form\GetAllowedKeys">
+        <arguments>
+            <argument name="allowedKeys" xsi:type="array">
+                <item name="attribute_id" xsi:type="string">attribute_id</item>
+                <item name="sort_order" xsi:type="string">sort_order</item>
+                <item name="enabled" xsi:type="string">enabled</item>
+                <item name="width" xsi:type="string">width</item>
+                <item name="required" xsi:type="string">required</item>
+                <item name="label" xsi:type="string">label</item>
+                <item name="store_id" xsi:type="string">store_id</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\CheckoutCore\Model\Field\Form\SaveHandler">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="order_attributes"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\Form\Processor\OrderAttributes</item>
+                <item name="customer_attributes"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\Form\Processor\CustomerAttributes</item>
+                <item name="fields_by_store"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\Form\Processor\FieldsByStore</item>
+                <item name="fields"
+                      xsi:type="object">Amasty\CheckoutCore\Model\Field\Form\Processor\Fields</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

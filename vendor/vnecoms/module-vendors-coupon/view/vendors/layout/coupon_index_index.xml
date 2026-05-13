@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<head>
+        <css src="Vnecoms_VendorsCoupon::css/coupon.css" />
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsCoupon\Block\Vendors\Coupon" name="seller.coupon" template="coupon.phtml">
+            	<arguments>
+	    			<argument name="block_title" xsi:type="string">Inbox</argument>
+    			</arguments>
+            	<block class="Vnecoms\VendorsCoupon\Block\Vendors\Coupon\Form" name="seller.coupon.generate_form" as="generate_form" template="coupon/form.phtml">
+									<arguments>
+											<argument name="view_model" xsi:type="object">Vnecoms\VendorsCoupon\ViewModel\Coupon\Form</argument>
+									</arguments>
+            	</block>
+            	<uiComponent name="vendor_coupon_grid" as="coupon_grid"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

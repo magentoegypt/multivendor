@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+/** @var \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Comment $block */
+
+?>
+
+<div class="admin__page-section-item">
+    <div class="admin__page-section-item-content">
+        <div id="quote-messages-history" data-bind="scope: 'quote_messages'">
+            <!-- ko template: getTemplate() --><!-- /ko-->
+        </div>
+        <script type="text/x-magento-init">
+                {
+                    "#quote-messages-history": {
+                        "Magento_Ui/js/core/app": <?php echo $block->getJsLayout(); ?>
+                    }
+                }
+        </script>
+    </div>
+</div>

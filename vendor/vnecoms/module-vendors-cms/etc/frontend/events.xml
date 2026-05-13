@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="vendorspage_controller_router_match_vendor">
+        <observer name="process_router_page_match" instance="Vnecoms\VendorsCms\Observer\ProcessRouterMatchObserver" />
+    </event>
+
+    <event name="controller_action_predispatch_vendorspage_index_index">
+        <observer name="ves_vendorscms_action_predispatch_vendorspage_index_index" instance="Vnecoms\VendorsCms\Observer\PredispatchVendorsPageObserver" />
+    </event>
+    
+</config>

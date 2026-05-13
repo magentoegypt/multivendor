@@ -1,0 +1,28 @@
+
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<!--@subject RMA # {{var request.getIncrementId()}} @-->
+
+
+{{template config_path="design/email/header_template"}}
+<h1 style="font-size:22px; font-weight:normal; line-height:22px; margin:0 0 11px 0;">
+    {{trans "Hello %name" name=$request.getCustomerName()}},
+</h1>
+
+<p> {{trans "RMA #%increment_id has been processed by admin" increment_id=$request.getIncrementId()}},</p>
+
+<p>
+    {{trans 'If you have questions about your order, you can email us at <a href="mailto:%store_email">%store_email</a>' store_email=$store_email |raw}}{{depend store_phone}} {{trans 'or call us at <a href="tel:%store_phone">%store_phone</a>' store_phone=$store_phone |raw}}{{/depend}}.
+    {{depend store_hours}}
+    {{trans 'Our hours are <span class="no-link">%store_hours</span>.' store_hours=$store_hours |raw}}
+    {{/depend}}
+</p>
+<p>{{trans "Items"}}<br />
+    {{layout handle="vrma_email_request_items" rma_id=$request.entity_id}}</p>
+
+{{template config_path="design/email/footer_template"}}

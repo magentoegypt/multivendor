@@ -1,0 +1,13 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */ /** @var \Amasty\CheckoutCore\Block\Adminhtml\System\Config\Expander $block **/ ?>
+<script type="text/javascript">
+    //<![CDATA[
+    require(['Amasty_CheckoutCore/js/fieldset-expander'], function (expander) {
+        expander.init('<?=$block->escapeHtml($block->getSection())?>','<?=$block->escapeHtml($block->getExpand())?>');
+    });
+    //]]>
+</script>

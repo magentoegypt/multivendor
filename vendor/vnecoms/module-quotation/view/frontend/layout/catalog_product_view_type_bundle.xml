@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2017 Vnecoms, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.addtocart.bundle">
+            <block class="Vnecoms\Quotation\Block\Catalog\Product"
+                   name="product.bundle.addtoquote"
+                   as="product_bundle_addtoquote" template="Vnecoms_Quotation::catalog/product.phtml" />
+        </referenceBlock>
+        <referenceBlock name="customize.button">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Vnecoms_Quotation::product/view/customize.phtml</argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

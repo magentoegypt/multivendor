@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="catalog_product_save_after">
+		<observer name="vnecoms_vendors_pricecomparison_product_save_after" instance="Vnecoms\VendorsPriceComparison\Observer\ProductSaveAfter" />
+	</event>
+	<event name="catalog_product_delete_after">
+		<observer name="vnecoms_vendors_pricecomparison_product_delete_after" instance="Vnecoms\VendorsPriceComparison\Observer\ProductDeleteAfter" />
+	</event>
+
+	<event name="controller_action_add_product_comparison_after">
+		<observer name="vnecoms_controller_action_add_product_comparison_after" instance="Vnecoms\VendorsPriceComparison\Observer\AddNewComparisonSaveAfter" />
+	</event>
+</config>

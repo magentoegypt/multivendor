@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_bannermanager_banner" resource="default" engine="innodb" comment="Vendor Banner">
+        <column xsi:type="int" name="banner_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor Id"/>
+        <column xsi:type="varchar" name="identifier" nullable="false" length="255" comment="Identifier"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Banner Title"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Status"/>
+        <column xsi:type="varchar" name="banner_template" nullable="false" length="255" comment="Banner template"/>
+        <column xsi:type="smallint" name="hide_pagination" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Hide Pagination"/>
+        <column xsi:type="smallint" name="show_item_description" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Show Item Description"/>
+        <column xsi:type="varchar" name="type_pagination" nullable="true" length="60" comment="Type of Pagination"/>
+        <column xsi:type="varchar" name="effect" nullable="true" length="60" comment="Effect"/>
+        <column xsi:type="smallint" name="speed" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Slider speed"/>
+        <column xsi:type="smallint" name="delay" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Slider Delay"/>
+        <column xsi:type="date" name="from_date" nullable="true" comment="From Date"/>
+        <column xsi:type="date" name="to_date" nullable="true" comment="To Date"/>
+        <column xsi:type="timestamp" name="creation_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+        <column xsi:type="timestamp" name="update_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated At"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort Order"/>
+
+        <index referenceId="BANNER_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+        <index referenceId="BANNER_ID" indexType="btree">
+            <column name="banner_id"/>
+        </index>
+        <index referenceId="BANNER_VENDOR_ID" indexType="btree">
+            <column name="vendor_id"/>
+        </index>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="banner_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_VENDOR_ID_FOREIGN"
+                    table="ves_bannermanager_banner" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="ves_bannermanager_item" resource="default" engine="innodb" comment="Vendor Banner Item">
+        <column xsi:type="int" name="item_id" unsigned="true" nullable="false" identity="true"
+                comment="Id"/>
+
+        <column xsi:type="varchar" name="title" nullable="true" length="255" comment="Title"/>
+        <column xsi:type="varchar" name="filename" nullable="false" length="255" comment="Filename"/>
+        <column xsi:type="varchar" name="alt" nullable="true" length="255" comment="Alt"/>
+        <column xsi:type="text" name="url" nullable="true" comment="Url"/>
+        <column xsi:type="text" name="target" nullable="true" comment="Target" />
+        <column xsi:type="text" name="custom_html" nullable="true" comment="Custom Html"/>
+        <column xsi:type="text" name="short_description" nullable="false" comment="Short Description"/>
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort Order"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Status"/>
+
+        <column xsi:type="int" name="banner_id" unsigned="true" nullable="false" identity="false"
+                comment="Banner Id"/>
+
+        <index referenceId="ITEM_STATUS" indexType="btree">
+            <column name="status"/>
+        </index>
+        <index referenceId="ITEM_ID" indexType="btree">
+            <column name="item_id"/>
+        </index>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="item_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_FOREIGN_BANNER_ID"
+                    table="ves_bannermanager_item" column="banner_id" referenceTable="ves_bannermanager_banner"
+                    referenceColumn="banner_id" onDelete="CASCADE"/>
+    </table>
+
+
+</schema>

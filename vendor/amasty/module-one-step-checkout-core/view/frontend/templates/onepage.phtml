@@ -1,0 +1,88 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */
+/**
+ * @var $block Magento\Checkout\Block\Onepage
+ * @var $escaper Magento\Framework\Escaper
+ * @var $onepageDataProvider Amasty\CheckoutCore\ViewModel\OnepageDataProvider
+ * @var $bundleService Amasty\CheckoutCore\Model\Optimization\BundleService
+ * @var $styleSwitcher Amasty\CheckoutCore\ViewModel\StyleSwitcherProvider
+ */
+
+$onepageDataProvider = $block->getData('amcheckoutOnepageDataProvider');
+$bundleService = $block->getData('bundleService');
+$styleSwitcher = $block->getData('amcheckoutStyleSwitcher');
+$design = $styleSwitcher->isModernCheckoutDesign() ? 'modern' : 'classic';
+$layout = $styleSwitcher->getDesignLayout();
+$layoutTemplate = $styleSwitcher->getLayoutTemplate();
+?>
+
+<div id="checkout"
+     data-bind="scope:'checkout'"
+     class="checkout-container am-checkout -<?= /* @noEscape */ $design?> -layout-<?= /* @noEscape */ $layout?>"
+     data-amcheckout-js="checkout">
+    <div class="checkout-header">
+        <h1 class="title"><?= $escaper->escapeHtml($onepageDataProvider->getTitle()); ?></h1>
+        <div class="description">
+            <?= $escaper->escapeHtml($onepageDataProvider->getDescription(), ['b', 'i', 'u', 's', 'strong']); ?>
+        </div>
+    </div>
+
+    <div id="checkout-loader" data-role="checkout-loader" class="loading-mask" data-mage-init='{"checkoutLoader": {}}'>
+        <div class="loader">
+            <img src="<?=
+            /* @noEscape */ $block->getViewFileUrl('images/loader-1.gif'); ?>"
+                 alt="<?= $escaper->escapeHtml(__('Loading...')); ?>"
+                 style="position: absolute;">
+        </div>
+    </div>
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "#checkout": {
+                "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout();?>
+            }
+        }
+    </script>
+    <script>
+        require.config({
+            config: {
+                mixins: {
+                    'Magento_Ui/js/view/messages': {
+                        'Amasty_CheckoutCore/js/view/messages-mixin': true
+                    }
+                }
+            }
+        });
+        window.checkoutConfig = <?= /* @noEscape */ json_encode($block->getCheckoutConfig()); ?>;
+        // Create aliases for customer.js model from customer module
+        window.isCustomerLoggedIn = window.checkoutConfig.isCustomerLoggedIn;
+        window.customerData = window.checkoutConfig.customerData;
+        window.checkoutDesign = "<?= /* @noEscape */ $design ?>";
+        window.checkoutLayout = "<?= $escaper->escapeHtml($layoutTemplate)?>";
+    </script>
+    <script>
+        require([
+            'mage/url',
+            'Magento_Ui/js/block-loader'
+        ], function(url, blockLoader) {
+            blockLoader("<?=
+                /* @noEscape */ $block->getViewFileUrl('images/loader-1.gif'); ?>");
+            return url.setBaseUrl('<?= /* @noEscape */ $block->getBaseUrl();?>');
+        });
+    </script>
+<?php if ($bundleService->canCollectBundle()): ?>
+    <script>
+        require([
+            'rjsResolver',
+            'underscore',
+            '<?= \Amasty\CheckoutCore\Model\Optimization\BundleService::COLLECT_SCRIPT_PATH ?>',
+        ], function(requireResolver, _, createBundle) {
+            requireResolver(_.debounce(createBundle, 1000));
+        });
+    </script>
+<?php endif; ?>
+</div>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Admin -->
+    <route url="/V1/vendors/config" method="POST">
+        <service class="Vnecoms\VendorsConfig\Api\ConfigRepositoryInterface" method="saveByVendorId"/>
+        <resources>
+            <resource ref="Vnecoms_Vendors::vendors" />
+        </resources>
+    </route>
+
+    <!-- Vendor -->
+    <route url="/V1/vendors/me/config" method="POST">
+        <service class="Vnecoms\VendorsConfig\Api\ConfigRepositoryInterface" method="saveByCustomerId"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/vendors/config/list" method="GET">
+        <service class="Vnecoms\VendorsConfig\Api\ConfigRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+</routes>

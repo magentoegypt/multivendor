@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Gift Wrap -->
+    <route url="/V1/amasty_checkout/carts/:cartId/gift-wrap" method="POST">
+        <service class="Amasty\CheckoutGiftWrap\Api\GiftWrapInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+
+    <route url="/V1/amasty_checkout/guest-carts/:cartId/gift-wrap" method="POST">
+        <service class="Amasty\CheckoutGiftWrap\Api\GuestGiftWrapInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/amasty_checkout/carts/mine/gift-wrap" method="POST">
+        <service class="Amasty\CheckoutGiftWrap\Api\GiftWrapInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%amasty_checkout_cart_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Gift Messages -->
+    <route url="/V1/amasty_checkout/carts/:cartId/gift-message" method="POST">
+        <service class="Amasty\CheckoutGiftWrap\Api\GiftMessageInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="Magento_Cart::manage" />
+        </resources>
+    </route>
+
+    <route url="/V1/amasty_checkout/guest-carts/:cartId/gift-message" method="POST">
+        <service class="Amasty\CheckoutGiftWrap\Api\GuestGiftMessageInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/amasty_checkout/carts/mine/gift-message" method="POST">
+        <service class="Amasty\CheckoutGiftWrap\Api\GiftMessageInformationManagementInterface" method="update"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%amasty_checkout_cart_id%</parameter>
+        </data>
+    </route>
+</routes>

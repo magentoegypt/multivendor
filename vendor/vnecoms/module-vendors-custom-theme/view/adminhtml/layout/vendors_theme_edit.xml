@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+	<update handle="adminhtml_system_config_edit" />
+	<referenceBlock name="adminhtml.system.config.switcher" remove="true"/>
+	<referenceBlock name="adminhtml.system.config.tabs" remove="true" />
+	<referenceBlock name="system.config.edit" remove="true" />
+    <body>
+    	<referenceContainer name="left">
+            <block class="Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Edit\Tabs" name="theme_edit_tabs">
+                <block class="Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Edit\Tab\Main" name="theme_edit_tab_main"/>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Edit" name="theme_edit"/>
+            <block class="Vnecoms\VendorsCustomTheme\Block\Adminhtml\Theme\Section" name="theme_edit.section" template="Vnecoms_VendorsCustomTheme::edit/section_form.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsCms:etc/cms_filter.xsd">
+    <!--<cms_filter id="cms_filter_page" class="Vnecoms\VendorsCms\Model\Template\Filter">
+        <title>Page Filter</title>
+        <note><![CDATA[Just Test.]]></note>
+    </cms_filter>-->
+    <cms_filter id="url" class="Vnecoms\VendorsCms\Model\Template\UrlFilter">
+        <title>Vendor URL Filter</title>
+        <note><![CDATA[Use <strong>{{url path="PATH"}}</strong> to add an URL.]]></note>
+    </cms_filter>
+    <cms_filter id="block" class="Vnecoms\VendorsCms\Model\Template\BlockFilter">
+        <title>Vendor URL Filter</title>
+        <note><![CDATA[Use <strong>{{block block_id="BLOCK_IDENTIFIER"}}</strong> to add a static block.]]></note>
+    </cms_filter>
+    <cms_filter id="widget" class="Magento\Widget\Model\Template\Filter">
+        <title>Vendor Widget Filter</title>
+        <note><![CDATA[Use <strong>{{block block_id="BLOCK_IDENTIFIER"}}</strong> to add a static block.]]></note>
+    </cms_filter>
+    <cms_filter id="media" class="Vnecoms\VendorsCms\Model\Template\MediaFilter">
+        <title>Vendor Media Filter</title>
+        <note><![CDATA[Use <strong>{{media url="path"}}</strong> to add a static media.]]></note>
+    </cms_filter>
+    <cms_filter id="app" class="Vnecoms\VendorsCms\Model\Template\AppFilter">
+        <title>Vendor Application Filter</title>
+        <note><![CDATA[Use <strong>{{app app_id="APP_ID"}}</strong> to add a application.]]></note>
+    </cms_filter>
+</config>

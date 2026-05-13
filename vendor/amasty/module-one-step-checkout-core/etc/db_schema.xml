@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="amasty_amcheckout_field" resource="default" engine="innodb" comment="Amasty Checkout Field Table">
+    <column xsi:type="smallint" name="id" padding="5" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+    <column xsi:type="smallint" name="attribute_id" padding="5" unsigned="true" nullable="false" identity="false" comment="EAV Attribute ID"/>
+    <column xsi:type="varchar" name="label" nullable="false" length="255" comment="Label"/>
+    <column xsi:type="smallint" name="sort_order" padding="6" unsigned="false" nullable="false" identity="false" comment="Sort Order"/>
+    <column xsi:type="boolean" name="required" nullable="false" comment="Is Required"/>
+    <column xsi:type="smallint" name="width" padding="6" unsigned="false" nullable="false" identity="false" comment="Width"/>
+    <column xsi:type="boolean" name="enabled" nullable="false" comment="Enabled"/>
+    <column xsi:type="smallint" name="store_id" padding="6" unsigned="false" nullable="false" identity="false" default="0" comment="Store Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHKT_FIELD_ATTR_ID_EAV_ATTR_ATTR_ID" table="amasty_amcheckout_field" column="attribute_id" referenceTable="eav_attribute" referenceColumn="attribute_id" onDelete="CASCADE"/>
+  </table>
+  <table name="amasty_amcheckout_additional_fee" resource="default" engine="innodb" comment="Amasty Checkout Additional Fee Table">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity ID"/>
+    <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Order Id"/>
+    <column xsi:type="int" name="quote_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Quote Id"/>
+    <column xsi:type="float" name="amount" scale="0" precision="0" unsigned="false" nullable="false" comment="Amount"/>
+    <column xsi:type="float" name="base_amount" scale="0" precision="0" unsigned="false" nullable="false" comment="Base Amount"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHKT_ADDITIONAL_FEE_ORDER_ID_SALES_ORDER_ENTT_ID" table="amasty_amcheckout_additional_fee" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHECKOUT_ADDITIONAL_FEE_QUOTE_ID_QUOTE_ENTITY_ID" table="amasty_amcheckout_additional_fee" column="quote_id" referenceTable="quote" referenceColumn="entity_id" onDelete="SET NULL"/>
+  </table>
+  <table name="amasty_amcheckout_additional" resource="default" engine="innodb" comment="amasty_amcheckout_additional">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="quote_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Quote Id"/>
+    <column xsi:type="text" name="comment" nullable="true" comment="Order Comment"/>
+    <column xsi:type="boolean" name="is_subscribe" nullable="false" comment="Subscribe Customer"/>
+    <column xsi:type="boolean" name="is_register" nullable="false" comment="Register Customer"/>
+    <column xsi:type="varchar" name="register_dob" nullable="true" length="255" comment="Date of Birth"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <constraint xsi:type="unique" referenceId="AMASTY_AMCHECKOUT_ADDITIONAL_QUOTE_ID">
+      <column name="quote_id"/>
+    </constraint>
+  </table>
+  <table name="amasty_amcheckout_quote_custom_fields" resource="default" engine="innodb" comment="Quote Custom Checkout Fields Values">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Custom Field Id"/>
+    <column xsi:type="varchar" name="name" nullable="true" length="255" comment="Name"/>
+    <column xsi:type="varchar" name="billing_value" nullable="true" length="255" comment="Billing Value"/>
+    <column xsi:type="varchar" name="shipping_value" nullable="true" length="255" comment="Shipping Value"/>
+    <column xsi:type="int" name="quote_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Quote Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHKT_QUOTE_CUSTOM_FIELDS_QUOTE_ID_QUOTE_ENTT_ID" table="amasty_amcheckout_quote_custom_fields" column="quote_id" referenceTable="quote" referenceColumn="entity_id" onDelete="CASCADE"/>
+  </table>
+  <table name="amasty_amcheckout_order_custom_fields" resource="default" engine="innodb" comment="Order Custom Checkout Fields Values">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Custom Field Id"/>
+    <column xsi:type="varchar" name="name" nullable="true" length="255" comment="Name"/>
+    <column xsi:type="varchar" name="billing_value" nullable="true" length="255" comment="Billing Value"/>
+    <column xsi:type="varchar" name="shipping_value" nullable="true" length="255" comment="Shipping Value"/>
+    <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Order Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="FK_285D20E7EF7969047AB6C58EABA9F224" table="amasty_amcheckout_order_custom_fields" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+  </table>
+  <table name="amasty_amcheckout_quote_passwords" resource="default" engine="innodb" comment="Storage for customer quote passwords (needed to create account while place order)">
+    <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Entity Id"/>
+    <column xsi:type="int" name="quote_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Quote Id"/>
+    <column xsi:type="varchar" name="password_hash" nullable="true" length="128" comment="Password Hash"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="entity_id"/>
+      <column name="quote_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="AMASTY_AMCHECKOUT_QUOTE_PASSWORDS_QUOTE_ID_QUOTE_ENTITY_ID" table="amasty_amcheckout_quote_passwords" column="quote_id" referenceTable="quote" referenceColumn="entity_id" onDelete="CASCADE"/>
+  </table>
+</schema>

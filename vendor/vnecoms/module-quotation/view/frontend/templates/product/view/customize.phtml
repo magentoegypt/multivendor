@@ -1,0 +1,27 @@
+<?php
+/** @var $block \Magento\Catalog\Block\Product\View */
+
+?>
+
+<?php
+/** @var $quoteButton \Vnecoms\Quotation\Block\Catalog\Product */
+$quoteButton = $block->addChild('quote_button', 'Vnecoms\Quotation\Block\Catalog\Product');
+?>
+<?php $_product = $block->getProduct() ?>
+<?php if (($_product->isSaleable() || $quoteButton->isEnabledAddToQuote()) && $block->hasOptions()) : ?>
+    <div class="bundle-actions">
+        <button id="bundle-slide"
+                class="action primary customize"
+                type="button">
+
+            <?php if ($_product->isSaleable() && !$quoteButton->isEnabledAddToQuote() && $quoteButton->isEnabledAddToCart()) : ?>
+                <span><?php echo __('Customize and Add to Cart'); ?></span>
+            <?php elseif ($_product->isSaleable() && $quoteButton->isEnabledAddToQuote() && !$quoteButton->isEnabledAddToCart()) : ?>
+                <span><?php echo __('Customize and Add to Quote'); ?></span>
+            <?php else : ?>
+                <span><?php echo __('Customize'); ?></span>
+            <?php endif; ?>
+
+        </button>
+    </div>
+<?php endif; ?>

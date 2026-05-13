@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_PageBuilder:etc/content_type.xsd">
+    <type name="block"
+          label="Block"
+          component="Vnecoms_VendorsPageBuilder/js/content-type"
+          preview_component="Vnecoms_VendorsPageBuilder/js/content-type/block/preview"
+          form="pagebuilder_block_form"
+          menu_section="add_content"
+          icon="icon-pagebuilder-block"
+          sortOrder="1"
+          translate="label">
+        <parents default_policy="deny">
+            <parent name="root-container" policy="allow"/>
+            <parent name="row" policy="allow"/>
+            <parent name="column" policy="allow"/>
+            <parent name="tab-item" policy="allow"/>
+        </parents>
+        <children default_policy="deny"/>
+        <appearances>
+            <appearance default="true"
+                        name="default"
+                        preview_template="Vnecoms_VendorsPageBuilder/content-type/block/default/preview"
+                        master_template="Vnecoms_VendorsPageBuilder/content-type/block/default/master"
+                        reader="Vnecoms_VendorsPageBuilder/js/master-format/read/configurable">
+                <elements>
+                    <element name="main">
+                        <style name="text_align" source="text_align"/>
+                        <style name="border" source="border_style" converter="Vnecoms_VendorsPageBuilder/js/converter/style/border-style"/>
+                        <style name="border_color" source="border_color"/>
+                        <style name="border_width" source="border_width" converter="Vnecoms_VendorsPageBuilder/js/converter/style/border-width"/>
+                        <style name="border_radius" source="border_radius" converter="Vnecoms_VendorsPageBuilder/js/converter/style/remove-px"/>
+                        <style name="display" source="display" converter="Vnecoms_VendorsPageBuilder/js/converter/style/display" preview_converter="Vnecoms_VendorsPageBuilder/js/converter/style/preview/display"/>
+                        <style name="margins" storage_key="margins_and_padding" reader="Vnecoms_VendorsPageBuilder/js/property/margins" converter="Vnecoms_VendorsPageBuilder/js/converter/style/margins"/>
+                        <style name="padding" storage_key="margins_and_padding" reader="Vnecoms_VendorsPageBuilder/js/property/paddings" converter="Vnecoms_VendorsPageBuilder/js/converter/style/paddings"/>
+                        <attribute name="name" source="data-content-type"/>
+                        <attribute name="appearance" source="data-appearance"/>
+                        <html name="html" preview_converter="Vnecoms_VendorsPageBuilder/js/converter/attribute/preview/store-id"/>
+                        <css name="css_classes"/>
+                    </element>
+                </elements>
+                <converters>
+                    <converter component="Vnecoms_VendorsPageBuilder/js/content-type/block/mass-converter/widget-directive" name="widget_directive">
+                        <config>
+                            <item name="html_variable" value="html"/>
+                        </config>
+                    </converter>
+                </converters>
+            </appearance>
+        </appearances>
+        <additional_data>
+            <item name="chooserConfig" xsi:type="array">
+                <item name="dataUrl" xsi:type="object">Magento\PageBuilder\Model\Config\ContentType\AdditionalData\Provider\BlockDataUrl</item>
+            </item>
+        </additional_data>
+    </type>
+</config>

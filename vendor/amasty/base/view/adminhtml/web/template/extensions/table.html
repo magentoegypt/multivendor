@@ -1,0 +1,49 @@
+<table class="ambase-table-container">
+    <thead class="ambase-thead">
+    <tr class="ambase-tr">
+        <th class="ambase-th" data-bind="i18n: 'Products'"></th>
+        <th class="ambase-th" data-bind="i18n: 'Version'"></th>
+        <th class="ambase-th" data-bind="i18n: 'Actions'"></th>
+    </tr>
+    </thead>
+    <tbody class="ambase-tbody">
+        <!-- ko foreach: $data.modules -->
+            <tr class="ambase-tr">
+                <td class="ambase-td">
+                    <span data-bind="text: $data.name"></span>
+                    <!-- ko if: $data.plan_label -->
+                        <span class="ambase-plan" data-bind="text: $data.plan_label"></span>
+                    <!-- /ko -->
+                </td>
+                <td class="ambase-td">
+                    <!-- ko if: $data.has_update -->
+                        <div class="ambase-version-container">
+                            <span class="ambase-version -current" data-bind="text: $data.version"></span>
+                            <span class="ambase-version -update" data-bind="text: $data.last_version"></span>
+                        </div>
+                        <a class="ambase-link"
+                           target="_blank"
+                           data-bind="i18n: 'New Update',
+                                      attr: {href: $data.update_url,
+                                      title: $('New Update')}"></a>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $data.has_update -->
+                        <span class="ambase-version -last" data-bind="text: $data.version"></span>
+                    <!-- /ko -->
+                </td>
+                <td class="ambase-td">
+                    <!-- ko if: $data.upgrade_url -->
+                        <a class="ambase-link"
+                           target="_blank"
+                           data-bind="i18n: 'Upgrade Your Plan',
+                                      attr: {href: $data.upgrade_url,
+                                      title: $('Upgrade Your Plan')}"></a>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $data.upgrade_url -->
+                        <span data-bind="i18n: 'None'"></span>
+                    <!-- /ko -->
+                </td>
+            </tr>
+        <!-- /ko-->
+    </tbody>
+</table>

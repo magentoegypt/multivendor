@@ -1,0 +1,9 @@
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Home\Shipping
+ */
+?>
+<h3 id="vendor-shipping" class="vendor-shipping-title"><?php echo __("Shipping Policy")?></h3>
+<?php echo ($block->getVendorShipping()?$block->getVendorShipping():__('Not available'))?>

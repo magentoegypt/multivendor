@@ -1,0 +1,142 @@
+<?php
+
+/** @var $block \Vnecoms\VendorsSms\Block\Adminhtml\Vendor\Edit\Tab\Sms */
+?>
+<div class="fieldset-wrapper credit-information">
+    <div class="fieldset-wrapper-title">
+        <span class="title"><?php echo __("SMS Dashboard")?></span>
+        <div class="actions">
+            <button title="<?php echo __("Add / Subtract SMS Credit")?>" type="button" class="action-default action-secondary" onclick="jQuery('#sms-credit-popup-mpdal').modal('openModal');"><span><?php echo __("Add / Subtract SMS Credit")?></span></button>
+        </div>
+    </div>
+</div>
+
+<div id="sms-credit-popup-mpdal" class="admin__scope-old">
+    <div class="fieldset-wrapper add-credit-form">
+        <div class="admin__fieldset-wrapper-content">
+            <form enctype="multipart/form-data" id="sms-credit-form">
+                <fieldset class="fieldset admin__fieldset">
+                    <div class="field admin__field required">
+                        <label class="label admin__field-label" for="sms-credit-amount">
+                            <span><?php echo __("Amount")?></span>
+                        </label>
+                    
+                        <div class="admin__field-control">
+                            <input type="text" class="admin__control-text required-entry validate-number" name="sms_credit[amount]" placeholder="" id="sms-credit-amount">
+                            <div class="note"><?php echo __("Add or subtract credit by entering a positive or negative value. For example: enter 10 to add $10 and -10 to subtract $10")?></div>
+                        </div>
+                    </div>
+        
+                    <div class="field admin__field">
+                        <label class="label admin__field-label" for="sms-credit-description">
+                            <span><?php echo __("Description")?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <textarea cols="15" rows="2" class="textarea admin__control-text _required" id="sms-credit-description" title="" name="sms_credit[description]"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+var URL_ADD_SMS_CREDIT = '<?php echo $block->getAddSmsCreditUrl();?>';
+require([
+        'jquery',
+        'Magento_Ui/js/modal/modal',
+        'Magento_Ui/js/modal/alert',
+        'mage/mage'
+    ],
+    function($,modal,alert){
+        var smsCreditForm = $("#sms-credit-form");
+        
+        var options = {
+            type: 'slide',
+            responsive: true,
+            innerScroll: true,
+            title: '<?php echo __("Add / Subtract SMS Credit")?>',
+            buttons: [{
+                text: $.mage.__('Submit'),
+                class: 'action primary',
+                click: function () {
+                    if(smsCreditForm.valid()){
+                    	smsCreditForm.trigger('processStart');
+                    	$.ajax({
+                      		  url: URL_ADD_SMS_CREDIT,
+                      		  method: "POST",
+                      		  data: { 
+                          		  credit : $("#sms-credit-amount").val(),
+                          		  description: $("#sms-credit-description").val(),
+                          		  vendor_id: '<?php echo $block->getVendor()->getId()?>'
+                 			  },
+                      		  dataType: "json"
+                  		}).done(function( response ){
+                      		if(response.error){
+                      			smsCreditForm.trigger('processStop');
+                      			alert({
+                    				modalClass: 'confirm ves-error',
+                                    title: "<?php echo __("Add / Edit Credit");?>",
+                                    content: response.msg,
+                                });
+                      		}else{
+                      			smsCreditForm.trigger('processStop');
+                      			$("#sms-credit-form")[0].reset();
+                      			smsCreditTransactionGridJsObject.resetFilter();
+                      			$('#sms-credit-popup-mpdal').trigger('closeModal');
+                      		}
+                  		});
+                    }
+                }
+            }]
+        };
+        var popup = modal(options, $('#sms-credit-popup-mpdal'));
+    }
+);
+</script>
+
+<div class="row">
+    <div class="col-xs-4 credit-amount">
+        <!-- small box -->
+        <div class="small-box bg-red">
+            <div class="inner">
+                <h3><?php echo $block->formatCredit($block->getAvailableSmsCreditAmount())?></h3>
+                <p><?php echo __("SMS Credit Amount")?></p>
+            </div>
+            <div class="credit-icon">
+                <i class="credit-ion credit-ion-card"></i>
+            </div>
+        </div>
+    </div>
+        
+    <div class="col-xs-4 lifetime-sms">
+        <!-- small box -->
+        <div class="small-box bg-yellow">
+            <div class="inner">
+                <h3><?php echo $block->getTotalSms()?></h3>
+                <p><?php echo __("Total Received SMS")?></p>
+            </div>
+            <div class="credit-icon">
+                <i class="credit-ion credit-ion-bag"></i>
+            </div>
+        </div>
+    </div>
+        
+    <div class="col-xs-4 credit-spent">
+        <!-- small box -->
+        <div class="small-box bg-olive">
+            <div class="inner">
+              <h3><?php echo $block->formatCredit($block->getTotalSpentSmsCredit())?></h3>
+              <p><?php echo __("Total Spent Credit")?></p>
+            </div>
+            <div class="credit-icon">
+                <i class="credit-ion credit-ion-card"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="entry-edit form-inline">
+    <?php echo $block->getChildHtml();?>
+</div>
+

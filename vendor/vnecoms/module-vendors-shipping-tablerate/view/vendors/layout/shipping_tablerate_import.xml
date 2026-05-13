@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <body>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsShippingTableRate\Block\Vendors\Import\Edit" name="rate_import" />
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsShippingTableRate\Block\Vendors\Import\Edit\Tabs" name="import_edit_tabs">
+                <block class="Vnecoms\VendorsShippingTableRate\Block\Vendors\Import\Edit\Tab\Main" name="import_rate_edit_tab_main"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main_section</argument>
+                    <argument name="block" xsi:type="string">import_rate_edit_tab_main</argument>
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+
+</page>

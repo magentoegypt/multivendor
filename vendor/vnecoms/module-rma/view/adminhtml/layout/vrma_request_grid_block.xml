@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="rma_request.grid.container">
+            <block class="Vnecoms\RMA\Block\Adminhtml\Customer\Grid" name="rma_request_customer.grid" as="grid">
+                <arguments>
+                    <argument name="id" xsi:type="string">customer_rma</argument>
+                    <argument name="dataSource" xsi:type="object">Vnecoms\RMA\Model\ResourceModel\Request\History\Collection</argument>
+                    <argument name="use_ajax" xsi:type="boolean">true</argument>
+                    <argument name="default_sort" xsi:type="string">created_at</argument>
+                    <argument name="default_dir" xsi:type="string">DESC</argument>
+                    <argument name="grid_url" xsi:type="url" path="rma/request/grid">
+                        <param name="_current">1</param>
+                    </argument>
+                </arguments>
+                <block class="Magento\Backend\Block\Widget\Grid\ColumnSet" as="grid.columnSet" name="rma_request_customer.grid.columnSet">
+                    <arguments>
+                        <argument name="id" xsi:type="string">customer_rma</argument>
+                        <argument name="rowUrl" xsi:type="array">
+                            <item name="path" xsi:type="string">rma/request/view</item>
+                            <item name="extraParamsTemplate" xsi:type="array">
+                                <item name="ticket_id" xsi:type="string">getId</item>
+                            </item>
+                        </argument>
+                    </arguments>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="increment_id">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Increment ID</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                            <argument name="index" xsi:type="string">increment_id</argument>
+                            <argument name="id" xsi:type="string">increment_id</argument>
+                            <argument name="header_css_class" xsi:type="string">col-id</argument>
+                            <argument name="column_css_class" xsi:type="string">col-id</argument>
+                        </arguments>
+                    </block>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="order_incremental_id">
+                        <arguments>
+                            <argument name="header" xsi:type="string" translate="true">Order ID</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                            <argument name="index" xsi:type="string">order_incremental_id</argument>
+                            <argument name="id" xsi:type="string">order_incremental_id</argument>
+                            <argument name="header_css_class" xsi:type="string">col-order-id</argument>
+                            <argument name="column_css_class" xsi:type="string">col-order-id</argument>
+                        </arguments>
+                    </block>
+
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="type">
+                        <arguments>
+                            <argument name="id" xsi:type="string">type</argument>
+                            <argument name="header" xsi:type="string" translate="true">Type</argument>
+                            <argument name="type" xsi:type="string">options</argument>
+                            <argument name="index" xsi:type="string">type</argument>
+                            <argument name="options" xsi:type="options" model="Vnecoms\RMA\Ui\Component\Grid\Request\Type"/>
+                            <argument name="header_css_class" xsi:type="string">col-type</argument>
+                            <argument name="column_css_class" xsi:type="string">col-type</argument>
+                            <argument name="renderer" xsi:type="string">Vnecoms\RMA\Block\Adminhtml\Widget\Columns\Type</argument>
+                        </arguments>
+                    </block>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="reason">
+                        <arguments>
+                            <argument name="id" xsi:type="string">reason</argument>
+                            <argument name="header" xsi:type="string" translate="true">Reason</argument>
+                            <argument name="type" xsi:type="string">text</argument>
+                            <argument name="filter" xsi:type="boolean">false</argument>
+                            <argument name="index" xsi:type="string">reason</argument>
+                            <argument name="header_css_class" xsi:type="string">col-reason</argument>
+                            <argument name="column_css_class" xsi:type="string">col-reason</argument>
+                            <argument name="renderer" xsi:type="string">Vnecoms\RMA\Block\Adminhtml\Widget\Columns\Reason</argument>
+                        </arguments>
+                    </block>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="created_at">
+                        <arguments>
+                            <argument name="id" xsi:type="string">created_at</argument>
+                            <argument name="header" xsi:type="string" translate="true">Created Time</argument>
+                            <argument name="index" xsi:type="string">created_at</argument>
+                            <argument name="header_css_class" xsi:type="string">col-created</argument>
+                            <argument name="column_css_class" xsi:type="string">col-created</argument>
+                            <argument name="type" xsi:type="string">datetime</argument>
+                        </arguments>
+                    </block>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="updated_at">
+                        <arguments>
+                            <argument name="id" xsi:type="string">updated_at</argument>
+                            <argument name="header" xsi:type="string" translate="true">Updated Time</argument>
+                            <argument name="index" xsi:type="string">updated_at</argument>
+                            <argument name="header_css_class" xsi:type="string">col-updated</argument>
+                            <argument name="column_css_class" xsi:type="string">col-updated</argument>
+                            <argument name="type" xsi:type="string">datetime</argument>
+                        </arguments>
+                    </block>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="status">
+                        <arguments>
+                            <argument name="id" xsi:type="string">status</argument>
+                            <argument name="header" xsi:type="string" translate="true">Status</argument>
+                            <argument name="type" xsi:type="string">options</argument>
+                            <argument name="index" xsi:type="string">status</argument>
+                            <argument name="options" xsi:type="options" model="Vnecoms\RMA\Ui\Component\Grid\Request\Status"/>
+                            <argument name="header_css_class" xsi:type="string">col-status</argument>
+                            <argument name="column_css_class" xsi:type="string">col-status</argument>
+                            <argument name="renderer" xsi:type="string">Vnecoms\RMA\Block\Adminhtml\Widget\Columns\Status</argument>
+                        </arguments>
+                    </block>
+
+                    <block class="Magento\Backend\Block\Widget\Grid\Column" as="action">
+                        <arguments>
+                            <argument name="id" xsi:type="string">action</argument>
+                            <argument name="header" xsi:type="string" translate="true">Action</argument>
+                            <argument name="type" xsi:type="string">action</argument>
+                            <argument name="getter" xsi:type="string">getId</argument>
+                            <argument name="actions" xsi:type="array">
+                                <item name="view_action" xsi:type="array">
+                                    <item name="caption" xsi:type="string" translate="true">View</item>
+                                    <item name="url" xsi:type="array">
+                                        <item name="base" xsi:type="string">rma/request/view</item>
+                                    </item>
+                                    <item name="field" xsi:type="string">request_id</item>
+                                    <item name="target" xsi:type="string">_blank</item>
+                                </item>
+                            </argument>
+                            <argument name="filter" xsi:type="boolean">false</argument>
+                            <argument name="sortable" xsi:type="boolean">false</argument>
+                            <argument name="header_css_class" xsi:type="string">col-action</argument>
+                            <argument name="column_css_class" xsi:type="string">col-action</argument>
+                        </arguments>
+                    </block>
+
+                </block>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

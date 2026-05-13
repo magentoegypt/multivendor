@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Vnecoms\RMA\Model\Request" type="Vnecoms\VendorsRMA\Model\Request" />
+    <preference for="Vnecoms\RMA\Model\Source\Message\Type" type="Vnecoms\VendorsRMA\Model\Source\Message\Type" />
+    <preference for="Vnecoms\RMA\Model\System\Config\Source\Notify" type="Vnecoms\VendorsRMA\Model\System\Config\Source\Notify" />
+    <preference for="Vnecoms\RMA\Model\Source\Email\Type" type="Vnecoms\VendorsRMA\Model\Source\Email\Type" />
+    <preference for="Vnecoms\RMA\Model\Request\Queue" type="Vnecoms\VendorsRMA\Model\Request\Queue" />
+    <preference for="Vnecoms\RMA\Block\Adminhtml\Request\Edit\Tabs\Message" type="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\Tabs\Message" />
+    <preference for="Vnecoms\RMA\Controller\Adminhtml\Request\Reply" type="Vnecoms\VendorsRMA\Controller\Adminhtml\Request\Reply" />
+
+    <preference for="Vnecoms\RMA\Controller\Customer\Reply" type="Vnecoms\VendorsRMA\Controller\Customer\Reply" />
+    <preference for="Vnecoms\RMA\Controller\Guest\Reply" type="Vnecoms\VendorsRMA\Controller\Guest\Reply" />
+
+    <preference for="Vnecoms\RMA\Controller\Customer\Cancel" type="Vnecoms\VendorsRMA\Controller\Customer\Cancel" />
+    <preference for="Vnecoms\RMA\Controller\Customer\Confirm" type="Vnecoms\VendorsRMA\Controller\Customer\Confirm" />
+    <preference for="Vnecoms\RMA\Controller\Customer\UpdateItem" type="Vnecoms\VendorsRMA\Controller\Customer\UpdateItem" />
+
+    <preference for="Vnecoms\RMA\Controller\Guest\Cancel" type="Vnecoms\VendorsRMA\Controller\Guest\Cancel" />
+    <preference for="Vnecoms\RMA\Controller\Guest\Confirm" type="Vnecoms\VendorsRMA\Controller\Guest\Confirm" />
+    <preference for="Vnecoms\RMA\Controller\Guest\UpdateItem" type="Vnecoms\VendorsRMA\Controller\Guest\UpdateItem" />
+
+    <preference for="Vnecoms\RMA\Block\Adminhtml\Request\Edit\Tabs" type="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\Tabs" />
+    <preference for="Vnecoms\RMA\Observer\SetIsReadAdmin" type="Vnecoms\VendorsRMA\Observer\SetIsReadAdmin" />
+    <preference for="Vnecoms\RMA\Observer\SetIsReadCustomer" type="Vnecoms\VendorsRMA\Observer\SetIsReadCustomer" />
+
+    <preference for="Vnecoms\RMA\Block\Frontend\PrintRma" type="Vnecoms\VendorsRMA\Block\Frontend\PrintRma" />
+
+    <preference for="Vnecoms\RMA\Observer\Action" type="Vnecoms\VendorsRMA\Observer\Action" />
+
+    <type name="Vnecoms\VendorsRMA\Controller\Vendors\Request\Upload">
+        <arguments>
+            <argument name="fileUploader" xsi:type="object">Vnecoms\RMA\RequestFileUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsNotification\Model\Notification">
+        <arguments>
+            <argument name="notificationTypes" xsi:type="array">
+                <item name="rma" xsi:type="string">Vnecoms\VendorsRMA\Model\Notification\Type\Rma</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

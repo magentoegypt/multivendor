@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Amasty\CheckoutCore\Block\Adminhtml\Field\Edit\Group\Row\Renderer" type="Amasty\Checkout\Block\Adminhtml\Field\Edit\Group\Row\Renderer" />
+    <preference for="Amasty\CheckoutCore\Block\Adminhtml\Field\Edit\Group\Renderer" type="Amasty\Checkout\Block\Adminhtml\Field\Edit\Group\Renderer" />
+
+    <type name="Amasty\CheckoutCore\Controller\Adminhtml\Field\Save">
+        <plugin name="Amasty_Checkout::savePlaceholder" type="Amasty\Checkout\Plugin\Controller\Adminhtml\Field\Save"/>
+    </type>
+    <type name="Amasty\Base\Model\ModuleInfoProvider">
+        <plugin name="Amasty_Checkout::replaceModuleInfo" type="Amasty\Checkout\Plugin\Base\Model\ModuleInfoProvider\ReplaceModuleInfo" />
+    </type>
+    <type name="Magento\Sales\Block\Adminhtml\Order\Create\Form\Address">
+        <plugin name="Amasty_Checkout::AddPhoneValidation"
+                type="Amasty\Checkout\Plugin\Sales\Block\Adminhtml\Order\Create\Form\Address\AddPhoneValidation"/>
+    </type>
+</config>

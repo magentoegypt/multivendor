@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+    <head>
+        <css src="Vnecoms_VendorsRMA::css/rma.css"/>
+        <css src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+        <css src="Vnecoms_VendorsRMA::css/fileupload.css"/>
+        <css src="Vnecoms_VendorsRMA::css/font-awesome.css"/>
+        <css src="Vnecoms_VendorsRMA::css/chosen.css"/>
+        <css src="Vnecoms_VendorsRMA::css/colorbox.css"/>
+        <css src="Vnecoms_VendorsRMA::css/custom.css"/>
+    </head>
+    <update handle="styles"/>
+    <update handle="vendors_request_view_item_renderer"/>
+    <body>
+        <block class="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\Renderer\Items" name="rma_items"
+               template="request/edit/items.phtml" cacheable="false">
+            <block class="Magento\Framework\View\Element\RendererList" name="rma.request.item.renderers" as="renderer.list"/>
+        </block>
+
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\TabsLeft" name="request_edit_tabs_left"
+                   template="request/edit/tableft.phtml">
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit" name="request_edit_content"/>
+        </referenceContainer>
+
+        <referenceContainer name="js">
+            <block class="Vnecoms\VendorsRMA\Block\Vendor\Request\Edit\Js" template="request/edit/js.phtml"/>
+        </referenceContainer>
+
+        <!--
+        <block class="Vnecoms\HelpDesk\Block\Vendor\Ticket\Edit\Tabs\History" name="rma_request.grid.customer"/>
+        <referenceBlock name="adminhtml_request_edit_tab_history">
+            <uiComponent name="rma_request_listing"/>
+        </referenceBlock>
+        -->
+
+       
+    </body>
+</page>

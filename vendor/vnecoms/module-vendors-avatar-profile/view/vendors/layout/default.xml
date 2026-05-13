@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_VendorsAvatarProfile::css/avatar.css" />
+    </head>
+    <body>
+        <referenceBlock name="user.info.panel" remove="true"/>
+
+        <referenceContainer name="page.menu.before">
+            <block class="Vnecoms\VendorsAvatarProfile\Block\Vendors\Menu\User" name="avatar.user.info.default" template="Vnecoms_VendorsAvatarProfile::menu/user-default.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

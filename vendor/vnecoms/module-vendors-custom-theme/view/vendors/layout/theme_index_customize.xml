@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="vendor-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_VendorsCustomTheme::css/styles.css" />
+    </head>
+    <body>
+        <referenceContainer name="left">
+            <block class="Vnecoms\VendorsCustomTheme\Block\Vendors\Theme\Edit\Tabs" name="vendor.customtheme.edit.tabs">
+                <block class="Vnecoms\VendorsCustomTheme\Block\Vendors\Theme\Edit\Tab\Main" name="vendor.customtheme.edit.tab.main"/>
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">main</argument>
+                    <argument name="block" xsi:type="string">vendor.customtheme.edit.tab.main</argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Vnecoms\VendorsCustomTheme\Block\Vendors\Theme\Edit" name="vendor.customtheme.edit"/>
+        </referenceContainer>
+    </body>
+</page>

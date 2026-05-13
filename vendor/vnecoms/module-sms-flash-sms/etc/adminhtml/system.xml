@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="flashsms_username" translate="label tooltip" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>User Name</label>
+	                    <config_path>vsms/settings/flashsms_user</config_path>
+	                    <depends>
+	                        <field id="gateway">flashsms</field>
+	                    </depends>
+						<comment>User name from www.flashsms.net</comment>
+	                </field>
+					
+					<field id="flashsms_password" translate="label tooltip" type="text" sortOrder="71" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Password</label>
+	                    <config_path>vsms/settings/flashsms_pass</config_path>
+	                    <depends>
+	                        <field id="gateway">flashsms</field>
+	                    </depends>
+	                </field>
+
+	                <field id="flashsms_sender" translate="label tooltip" type="text" sortOrder="72" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Sender Name</label>
+	                    <config_path>vsms/settings/flashsms_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">flashsms</field>
+	                    </depends>
+	                </field>
+
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

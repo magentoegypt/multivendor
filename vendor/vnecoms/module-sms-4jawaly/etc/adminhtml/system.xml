@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="sms4jawaly_user" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>www.4jawaly.net User Name</label>
+	                    <config_path>vsms/settings/sms4jawaly_user</config_path>
+	                    <depends>
+	                        <field id="gateway">sms4jawaly</field>
+	                    </depends>
+	                </field>
+                    <field id="sms4jawaly_password" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>www.4jawaly.net Password</label>
+                        <config_path>vsms/settings/sms4jawaly_password</config_path>
+                        <depends>
+                            <field id="gateway">sms4jawaly</field>
+                        </depends>
+                    </field>
+                    <field id="sms4jawaly_sender" translate="label tooltip" type="text" sortOrder="192" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Sender</label>
+                        <config_path>vsms/settings/sms4jawaly_sender</config_path>
+                        <depends>
+                            <field id="gateway">sms4jawaly</field>
+                        </depends>
+                    </field>
+                    <field id="sms4jawaly_unicode" translate="label tooltip" type="select" sortOrder="193" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Unicode Message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>vsms/settings/sms4jawaly_unicode</config_path>
+                        <depends>
+                            <field id="gateway">sms4jawaly</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

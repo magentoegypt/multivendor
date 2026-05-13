@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) 2023 Amasty (https://www.amasty.com)
+ * @package One Step Checkout Gift Wrap for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout">
+            <group id="gifts" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Gift Wrap</label>
+                <field id="allow_order" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Allow Gift Messages on Order Level</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>sales/gift_options/allow_order</config_path>
+                    <depends>
+                        <field id="enabled">0</field>
+                    </depends>
+                </field>
+                <field id="allow_items" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Allow Gift Messages for Order Items</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>sales/gift_options/allow_items</config_path>
+                    <depends>
+                        <field id="enabled">0</field>
+                    </depends>
+                </field>
+                <field id="gift_wrap" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Gift Wrap</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enabled">0</field>
+                    </depends>
+                </field>
+                <field id="gift_wrap_fee" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Gift Wrap Fee</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                    <depends>
+                        <field id="gift_wrap">1</field>
+                        <field id="enabled">0</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

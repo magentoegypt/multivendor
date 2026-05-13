@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Core for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Checkout\Block\Onepage">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="addressFormAttributes" xsi:type="object">Amasty\CheckoutCore\Cache\CachedLayoutProcessor\AddressFormAttributes</item>
+                <item name="directoryData" xsi:type="object">Amasty\CheckoutCore\CachedLayoutProcessor\DirectoryData</item>
+                <item name="amastyCheckout" sortOrder="100" xsi:type="object">Amasty\CheckoutCore\CachedLayoutProcessor\AmastyCheckout</item>
+                <item name="amastyCheckoutCustomer" sortOrder="101" xsi:type="object">Amasty\CheckoutCore\Block\Onepage\CustomerProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+<!--    Checkout Cache with wrapper. START -->
+    <type name="Amasty\CheckoutCore\Cache\CachedLayoutProcessor\AddressFormAttributes">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Magento\Checkout\Block\Checkout\LayoutProcessor</argument>
+            <argument name="attributeValueUpdate" xsi:type="object">Amasty\CheckoutCore\Cache\CachedLayoutProcessor\AddressFormAttributes\DefaultAttributeValueUpdate\Proxy</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+                <item name="is_logged" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsLoggedIn</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Amasty\CheckoutCore\CachedLayoutProcessor\AmastyCheckout" type="Amasty\CheckoutCore\Cache\Wrappers\LayoutProcessorCacheWrapper">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Amasty\CheckoutCore\Block\Onepage\LayoutProcessor</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+                <item name="is_logged" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsLoggedIn</item>
+                <item name="is_quote_virtual" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\IsVirtual</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\CheckoutCore\CachedLayoutProcessor\DirectoryData" type="Amasty\CheckoutCore\Cache\Wrappers\LayoutProcessorCacheWrapper">
+        <arguments>
+            <argument name="processorClass" xsi:type="string">Magento\Checkout\Block\Checkout\DirectoryDataProcessor</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\CheckoutCore\CachedConfigProvider\AmastyCheckout" type="Amasty\CheckoutCore\Cache\Wrappers\ConfigProviderCacheWrapper">
+        <arguments>
+            <argument name="originalClass" xsi:type="string">Amasty\CheckoutCore\Model\ConfigProvider</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Amasty\CheckoutCore\CachedConfigProvider\AmastyCheckoutGdpr" type="Amasty\CheckoutCore\Cache\Wrappers\ConfigProviderCacheWrapper">
+        <arguments>
+            <argument name="originalClass" xsi:type="string">Amasty\CheckoutCore\Model\CheckoutConfigProvider\Gdpr</argument>
+            <argument name="cacheVariators" xsi:type="array">
+                <item name="store_id" xsi:type="object">Amasty\CheckoutCore\Cache\ConditionVariator\StoreId</item>
+            </argument>
+        </arguments>
+    </virtualType>
+<!--    Checkout Cache with wrapper. FINISH -->
+
+    <type name="Amasty\CheckoutCore\Block\Frontend\Customer\Address\Edit\CustomFields">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item name="view_model" xsi:type="object">Amasty\CheckoutCore\ViewModel\Frontend\Customer\Address\Edit\CustomFields</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Checkout\Block\Checkout\AttributeMerger">
+        <plugin name="Amasty_CheckoutCore::AttributeMerger" type="Amasty\CheckoutCore\Plugin\Checkout\Block\Checkout\AttributeMerger" />
+    </type>
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="Amasty_CheckoutCore::LayoutProcessor" type="Amasty\CheckoutCore\Plugin\Checkout\Block\Checkout\LayoutProcessor" />
+    </type>
+
+    <type name="Magento\Checkout\Block\Cart\LayoutProcessor">
+        <plugin name="Amasty_CheckoutCore::CartLayoutProcessor" type="Amasty\CheckoutCore\Plugin\Checkout\Block\Cart\CartLayoutProcessor" />
+    </type>
+
+    <type name="Magento\Checkout\Model\DefaultConfigProvider">
+        <plugin name="Amasty_CheckoutCore::DefaultConfigProvider" type="Amasty\CheckoutCore\Plugin\Checkout\Model\DefaultConfigProvider" />
+    </type>
+
+    <type name="Magento\Checkout\Controller\Onepage\Success">
+        <plugin name="Amasty_CheckoutCore::SuccessPlugin" type="Amasty\CheckoutCore\Plugin\Checkout\Controller\Onepage\SuccessPlugin" />
+    </type>
+
+    <type name="Magento\Framework\View\Page\Config\Renderer">
+        <plugin name="Amasty_CheckoutCore::DisableJsMixins" type="Amasty\CheckoutCore\Plugin\Framework\View\Page\Config\Renderer\DisableJsMixins" />
+    </type>
+    <type name="Magento\RequireJs\Model\FileManager">
+        <plugin name="Amasty_CheckoutCore::merge-js" type="Amasty\CheckoutCore\Plugin\RequireJs\Model\FileManagerPlugin"/>
+    </type>
+    <type name="Magento\Framework\View\Asset\ConfigInterface">
+        <plugin name="amastyCheckoutConfigInterface" type="Amasty\CheckoutCore\Plugin\Framework\View\Asset\ConfigInterfacePlugin"/>
+    </type>
+
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="amasty_checkout" xsi:type="object">Amasty\CheckoutCore\CachedConfigProvider\AmastyCheckout</item>
+                <item name="amasty_checkout_gdpr" xsi:type="object">Amasty\CheckoutCore\CachedConfigProvider\AmastyCheckoutGdpr</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Customer\Model\Address">
+        <plugin name="Amasty_CheckoutCore::SetHiddenCountryIdValue"
+                type="Amasty\CheckoutCore\Plugin\Customer\Model\Address\SetHiddenCountry"/>
+    </type>
+    <type name="Magento\Customer\Block\Address\Edit">
+        <plugin name="Amasty_CheckouCore::AddCustomFields"
+                type="Amasty\CheckoutCore\Plugin\Customer\Block\Address\Edit\AddCustomFields"/>
+    </type>
+</config>

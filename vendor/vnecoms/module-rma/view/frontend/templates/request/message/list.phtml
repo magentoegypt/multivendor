@@ -1,0 +1,95 @@
+<?php $request = $this->getRma() ?>
+<?php $msgDetailCollection = $request->getAllMessageFromRequest();?>
+<?php $detailCollectionSize = $msgDetailCollection->getSize();?>
+<?php $i = 1;?>
+<?php foreach($msgDetailCollection as $message):?>
+    <div class="box-body no-padding<?php echo " message-".$i;?><?php if($i == $detailCollectionSize):?> last<?php endif?>">
+        <div class="mailbox-read-info <?php if($detailCollectionSize > 1 && $i != $detailCollectionSize):?> read<?php endif;?>">
+            <div class="pull-left message-icon<?php if($message->getData('type') != \Vnecoms\RMA\Model\Source\Message\Type::TYPE_REPLY_DEPARMENT):?> owner-message<?php endif;?>">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="pull-left">
+                <h3><?php echo $message->getFrom()?></h3>
+                <div class="text-muted">
+                    <?php echo __("to %1",$message->getTo())?></div>
+            </div>
+
+            <div class="pull-right">
+                <span class="mailbox-read-time pull-right">
+                    	<?php if(sizeof($message->getAttachmentUrls())):?>
+                            <icon class="icon-attachment"></icon>
+                        <?php endif?>
+                    <?php echo $block->getFormatDateHtml($message->getData('created_at'))?>
+                </span>
+                <div class="quote-message <?php if($detailCollectionSize > 1 && $i != $detailCollectionSize):?> hide<?php endif;?>" id="quote-message-<?php echo $i ?>">
+                    <?php /*if($message->getData('html_message')): ?>
+                            <a onclick="return vesticket.showHtmlMessageBox(<?php echo $message->getId()?>)"
+                               class="do-action do-html" title="<?php echo __('Html Message') ?>" rel="html">
+                            </a>
+                        <?php endif*/ ?>
+                    <?php if($block->isShowButtonReply()): ?>
+                        <a onclick="return quoteMessage(<?php echo $message->getId() ?>)"
+                           class="do-action do-quote" title="<?php echo __('Quote') ?>" rel="quote">
+                        </a>
+                    <?php endif?>
+                </div>
+            </div>
+        </div>
+        <div class="mailbox-read-message<?php if($detailCollectionSize > 1 && $i != $detailCollectionSize):?> hide<?php endif;?>">
+            <div id="messagebody<?php  echo $message->getId() ?>">
+                <?php $messageText = $message->getData('message');?>
+                <?php if($block->isHtmlMessage($messageText)):?>
+                    <?php echo $messageText;?>
+                <?php else:?>
+                    <pre><?php echo $messageText;?></pre>
+                <?php endif;?>
+            </div>
+            <?php /*
+                <div id="message-html-body-<?php  echo $message->getId() ?>" style="display: none">
+                    <?php $messageText = $message->getData('html_message');?>
+                    <?php echo $messageText;?>
+                </div>
+                */ ?>
+            <?php if(sizeof($message->getAttachmentUrls())):?>
+                <div class="attachment">
+                    <ul>
+                        <?php foreach ($message->getAttachmentUrls() as $key=>$attachment):?>
+                            <li class="file-uploader-preview">
+                                <?php if($block->isImage($key)): ?>
+                                    <a href="<?php echo $attachment ?>" class="icon-attachment-img-view"
+                                       title="<?php echo $key ?>">
+                                        <img class="preview-image" src="<?php echo $attachment ?>" />
+                                    </a>
+                                <?php else: ?>
+                                    <a href="<?php echo $block->getUrl('vrma/customer/download',
+                                        array('file'=>base64_encode($key))) ?>"
+                                       title="<?php echo $key ?>">
+                                        <i class="fa icon-attachment <?php echo $block->getClassIcon($key) ?>"></i></a>
+                                <?php endif ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif;?>
+        </div>
+    </div>
+    <?php $i++;?>
+<?php endforeach;?>
+
+
+<?php if($detailCollectionSize > 1):?>
+    <script type="text/javascript">
+        require(["jquery","jquery/colorbox"], function($){
+            $(function() {
+                $(".icon-attachment-img-view").colorbox({rel:'icon-attachment-img-view'});
+                $('.mailbox-read-info').click(function(){
+                    if(!$(this).parent().hasClass('last')){
+                        $(this).toggleClass("read");
+                        $(this).siblings('.mailbox-read-message').toggleClass("hide");
+                    }
+                })
+            });
+        });
+    </script>
+<?php endif;?>
+

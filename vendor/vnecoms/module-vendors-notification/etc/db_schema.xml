@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_notification" resource="default" engine="innodb" comment="Vendor Notification">
+        <column xsi:type="int" name="notification_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" identity="false"
+                comment="Vendor ID"/>
+        <column xsi:type="varchar" name="type" nullable="false" length="32" comment="Type"/>
+        <column xsi:type="text" name="message" nullable="true" comment="Message"/>
+        <column xsi:type="text" name="additional_info" nullable="true" comment="Additional Info"/>
+
+        <column xsi:type="smallint" name="is_read" unsigned="true" nullable="false" identity="false"
+                default="0" comment="is read"/>
+        <column xsi:type="smallint" name="is_reached" unsigned="true" nullable="false" identity="false"
+                default="0" comment="is reached"/>
+        <column xsi:type="smallint" name="is_hidden" unsigned="true" nullable="false" identity="false"
+                default="0" comment="is hidden"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+
+        <constraint xsi:type="foreign" referenceId="VENDOR_FOREIGN_KEY_VENDOR_ID"
+                    table="ves_vendor_notification" column="vendor_id" referenceTable="ves_vendor_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="notification_id"/>
+        </constraint>
+
+    </table>
+</schema>

@@ -1,0 +1,12 @@
+<div class="file-uploader-summary">
+    <label class="file-uploader-preview" for="vendor-avatar-upload">
+        <img
+                class="preview-image img-circle"
+                tabindex="0"
+                event="load: $parent.onPreviewLoad.bind($parent)"
+                attr="
+                src: $parent.getFilePreview($file),
+                alt: $file.name">
+        <span class="file-uploader-spinner"></span>
+    </label>
+</div>

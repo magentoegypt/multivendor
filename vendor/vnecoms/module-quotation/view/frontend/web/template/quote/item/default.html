@@ -1,0 +1,89 @@
+<!--
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<li class="item product quote__item product-item" data-role="product-item">
+    <div class="product">
+        <a data-bind="attr: {href: product_url, title: product_name}" tabindex="-1" class="product-item-photo">
+            <!-- ko foreach: $parent.getRegion('itemImage') -->
+                <!-- ko template: {name: getTemplate(), data: item.product_image} --><!-- /ko -->
+            <!-- /ko -->
+        </a>
+
+        <div class="product-item-details">
+            <strong class="product-item-name">
+                <a data-bind="attr: {href: product_url}, text: product_name"></a>
+            </strong>
+
+            <!-- ko if: options.length -->
+            <div class="product options" data-bind="css:{'active': showOptions()}">
+                <span data-role="title" class="toggle" data-bind="click: $parents[2].tonggleItemOption.bind(item)"><!-- ko i18n: 'See Details' --><!-- /ko --></span>
+
+                <div data-role="content" class="content" data-bind="visible: showOptions">
+                    <strong class="subtitle"><!-- ko i18n: 'Options Details' --><!-- /ko --></strong>
+                    <dl class="product options list">
+                        <!-- ko foreach: { data: options, as: 'option' } -->
+                        <dt class="label"><!-- ko text: option.label --><!-- /ko --></dt>
+                        <dd class="values">
+                            <!-- ko if: Array.isArray(option.value) -->
+                                <span data-bind="html: option.value.join('<br>')"></span>
+                            <!-- /ko -->
+                            <!-- ko ifnot: Array.isArray(option.value) -->
+                                <span data-bind="html: option.value"></span>
+                            <!-- /ko -->
+                        </dd>
+                        <!-- /ko -->
+                    </dl>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <div class="product-item-pricing">
+                <!-- ko foreach: $parent.getRegion('priceSidebar') -->
+                <!-- ko template: {name: getTemplate(), data: item.product_price, as: 'price'} --><!-- /ko -->
+                <!-- /ko -->
+
+                <div class="details-qty qty">
+                    <label class="label" data-bind="i18n: 'Qty', attr: {
+                           for: 'quote-item-'+item_id+'-qty'}"></label>
+                    <input data-bind="attr: {
+	                           id: 'quote-item-'+item_id+'-qty',
+	                           'data-quote-item': item_id,
+	                           'data-quote-qty': qty,
+	                           'data-quote-item-id': product_sku
+                           }, events:{
+                           	   'change': $parents[2].itemQtyChange.bind($parents[2], item)
+                           }, value: item.qty,
+                           valueUpdate: 'keyup'"
+                           type="number"
+                           size="4"
+                           class="item-qty quote-item-qty"
+                           maxlength="12"/>
+                    <button data-bind="attr: {
+	                           id: 'update-quote-item-'+item_id,
+	                           'data-quote-item': item_id,
+	                           title: $t('Update'),
+                           },
+                           visible: $parents[2].isItemQtyChanged(item),
+                           click: $parents[2].updateItemQty.bind($parents[2], item)"
+                            class="update-quote-item"
+                            >
+                        <span data-bind="i18n: 'Update'"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="product actions">
+                <div class="secondary">
+                    <a href="#" data-bind="attr: {'data-quote-item': item_id, title: $t('Remove item')}"
+                       class="action delete quote-icon-trash" 
+                       click="$parents[2].removeItem.bind($parent, item_id)">
+                        <span data-bind="i18n: 'Remove'"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</li>

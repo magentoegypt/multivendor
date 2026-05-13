@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Vnecoms\VendorsProductGraphQl\Model\ProductInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="productTypeNameResolvers" xsi:type="array">
+                <item name="catalog_product_type_resolver" xsi:type="object">Vnecoms\VendorsProductGraphQl\Model\CatalogProductTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\ProductSearch\ProductCollectionSearchCriteriaBuilder">
+        <plugin name="add_custom_vendor_status" type="Vnecoms\VendorsProductGraphQl\Model\Plugin\ProductSearch\ProductCollectionSearchCriteriaBuilder" />
+    </type>
+
+</config>

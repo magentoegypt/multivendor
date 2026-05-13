@@ -1,0 +1,639 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+    vendorOrders(
+       filter: VendorOrderAttributeFilterInput @doc(description: "Identifies which order attributes to search for and return."),
+       pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+       currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+       sort: VendorOrderSortInput @doc(description: "Specifies which attributes to sort on, and whether to return the results in ascending or descending order.")
+    ): VendorOrders! @doc(description: "The list of vendor order.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\Order")
+
+    vendorInvoices(
+      filter: VendorInvoiceFilterInput @doc(description: "Identifies which order attributes to search for and return."),
+      pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+      currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+      sort: VendorInvoiceSortInput @doc(description: "Specifies which attributes to sort on, and whether to return the results in ascending or descending order.")
+    ): VendorInvoices! @doc(description: "The list of vendor order.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\Invoice")
+
+    vendorShipments(
+      filter: VendorShipmentFilterInput @doc(description: "Identifies which order attributes to search for and return."),
+      pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+      currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+      sort: VendorShipmentSortInput @doc(description: "Specifies which attributes to sort on, and whether to return the results in ascending or descending order.")
+    ): VendorShipments! @doc(description: "The list of vendor order.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\Shipment")
+
+    vendorCreditmemos(
+      filter: VendorCreditmemoFilterInput @doc(description: "Identifies which order attributes to search for and return."),
+      pageSize: Int = 20 @doc(description: "Specifies the maximum number of results to return at once."),
+      currentPage: Int = 1 @doc(description: "Specifies which page of results to return."),
+      sort: VendorCreditmemoSortInput @doc(description: "Specifies which attributes to sort on, and whether to return the results in ascending or descending order.")
+    ): VendorCreditmemos! @doc(description: "The list of vendor order.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\Creditmemo")
+}
+
+type Mutation {
+    createVendorOrderInvoice(
+        vendor_order_id: Int!,
+        items: [VendorOrderItemInput]!,
+        comment: String
+    ): CreateVendorOrderInvoiceOutput @resolver(class: "\\Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\CreateVendorOrderInvoice") @doc(description:"Create order invoice")
+    createVendorOrderShipment(
+        vendor_order_id: Int!,
+        items: [VendorOrderItemInput]!,
+        comment: String,
+        tracking: [VendorOrderTrackingInput]
+    ): CreateVendorOrderShipmentOutput @resolver(class: "\\Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\CreateVendorOrderShipment") @doc(description:"Create order shipment")
+    createVendorOrderCreditMemo(
+        vendor_order_id: Int!,
+        items: [VendorOrderItemInput]!,
+        comment: String,
+        do_offline: Boolean
+    ): CreateVendorOrderCreditMemoOutput @resolver(class: "\\Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\CreateVendorOrderMemo") @doc(description:"Create order memo")
+    vendorCancelOrder(order_id: Int!): VendorSalesStatusOutput @resolver(class: "\\Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\CancelOrder") @doc(description:"Cancel Order")
+}
+
+type VendorOrders @doc(description: "List Orders.") {
+    items: [VendorOrder] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+type VendorShipments @doc(description: "List shipments.") {
+    items: [VendorOrderShipment] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+type VendorCreditmemos @doc(description: "List shipments.") {
+    items: [VendorOrderCreditmemo] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+type VendorInvoices @doc(description: "List Invoices.") {
+    items: [VendorOrderInvoice] @doc(description: "An array of notifications that match the specified search criteria.")
+    page_info: SearchResultPageInfo @doc(description: "An object that includes the page_info and currentPage values specified in the query.")
+    total_count: Int @doc(description: "The number of notification.")
+}
+
+interface VendorOrderInterface  @typeResolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\OrderInterfaceTypeResolverComposite") @doc(description: "Details of order") {
+    entity_id: Int @doc(description: "The ID assigned to the Order") @deprecated(reason: "id of Notification.")
+    increment_id: String @doc(description: "increment id")
+    vendor_id: Int @doc(description: "vendor id")
+    order_id: Int @doc(description: "order id")
+    status: String @doc(description: "status")
+    shipping_description: String @doc(description: "shipping description")
+    base_discount_amount: Float @doc(description: "base discount amount")
+    base_grand_total: Float @doc(description: "base grand total")
+    base_shipping_invoiced: Float @doc(description: "base shipping invoiced")
+    base_shipping_refunded: Float @doc(description: "base shipping refunded")
+    base_shipping_amount: Float @doc(description: "base shipping amount")
+    base_shipping_tax_amount: Float @doc(description: "base shipping tax amount")
+    base_shipping_tax_refunded: Float @doc(description: "base shipping tax refunded")
+    base_subtotal: Float @doc(description: "base subtotal")
+    base_total_invoiced: Float @doc(description: "base total invoiced")
+    base_total_paid: Float @doc(description: "base total paid")
+    base_total_refunded: Float @doc(description: "base total refunded")
+    base_tax_amount: Float @doc(description: "base tax amount")
+    discount_amount: Float @doc(description: "discount amount")
+    grand_total: Float @doc(description: "grand total")
+    shipping_amount: Float @doc(description: "shipping amount")
+    shipping_invoiced: Float @doc(description: "shipping invoiced")
+    shipping_refunded: Float @doc(description: "shipping refunded")
+    shipping_tax_amount: Float @doc(description: "shipping tax amount")
+    shipping_tax_refunded: Float @doc(description: "shipping tax refunded")
+    subtotal: Float @doc(description: "subtotal")
+    tax_amount: Float @doc(description: "tax amount")
+    total_invoiced: Float @doc(description: "total invoiced")
+    total_paid: Float @doc(description: "total paid")
+    total_qty_ordered: Float @doc(description: "total qty ordered")
+    total_refunded: Float @doc(description: "total refunded")
+    tax_refunded: Float @doc(description: "tax refunded")
+    base_tax_refunded: Float @doc(description: "base tax refunded")
+    tax_invoiced: Float @doc(description: "tax invoiced")
+    base_tax_invoiced: Float @doc(description: "base tax invoiced")
+    tax_canceled: Float @doc(description: "tax canceled")
+    base_tax_canceled: Float @doc(description: "base tax canceled")
+    subtotal_incl_tax: Float @doc(description: "subtotal incl tax")
+    base_subtotal_incl_tax: Float @doc(description: "base subtotal incl tax")
+    weight: String @doc(description: "weight")
+    shipping_method: String @doc(description: "shipping method")
+    created_at: String @doc(description: "created at")
+    updated_at: String @doc(description: "updated at")
+    shipping_incl_tax: Float @doc(description: "shipping incl tax")
+    base_shipping_incl_tax: Float @doc(description: "base shipping incl tax")
+    total_due: Float @doc(description: "total due")
+    base_total_due: Float @doc(description: "base total due")
+    billing_name: String @doc(description: "billing name")
+    shipping_name: String @doc(description: "shipping name")
+    customer_email: String @doc(description: "customer email")
+    customer_group: String @deprecated(reason: "customer group")
+    shipping_and_handling: String @doc(description: "shipping and handling")
+    customer_name: String @doc(description: "customer name")
+    payment_method: String @doc(description: "payment method")
+    base_currency_code: String @doc(description: "base currency code")
+    order_currency_code: String @doc(description: "order currency code")
+}
+
+type VendorOrder implements VendorOrderInterface {
+    billing_address: VendorOrderBillingAddress @doc(description: "Billing Address")
+    shipping_address: VendorOrderShippingAddress @doc(description: "Shipping Address")
+    payment: VendorOrderPayment @doc(description: "payment")
+    items: [VendorOrderItem] @doc(description: "items")
+    can_cancel: Boolean @doc(description: "can cancel")
+    can_invoice: Boolean @doc(description: "can invoice")
+    can_ship: Boolean @doc(description: "can ship")
+    can_credit_memo: Boolean @doc(description: "can credit memo")
+}
+
+interface VendorOrderAddressInterface  @typeResolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\OrderAddressInterfaceTypeResolverComposite") @doc(description: "Details of order address") {
+    entity_id: Int @doc(description: "Entity Id.")
+    parent_id: Int @doc(description: "Parent Id.")
+    customer_address_id: Int @doc(description: "Customer Address Id.")
+    region_id: Int @doc(description: "Region Id.")
+    customer_id: Int @doc(description: "Customer Id.")
+    fax: String @doc(description: "Fax.")
+    region: String @doc(description: "Region.")
+    postcode: String @doc(description: "Postcode.")
+    lastname: String @doc(description: "Lastname.")
+    street: [String] @doc(description: "Street.")
+    city: String @doc(description: "City.")
+    email: String @doc(description: "Email.")
+    telephone: String @doc(description: "Telephone.")
+    country_id: String @doc(description: "Country Id.")
+    firstname: String @doc(description: "Firstname.")
+    address_type: String @doc(description: "Address Type.")
+    prefix: String @doc(description: "Prefix.")
+    middlename: String @doc(description: "Middlename.")
+    suffix: String @doc(description: "Suffix.")
+    company: String @doc(description: "Company.")
+    vat_id: String @doc(description: "Vat Id.")
+    vat_is_valid: Int @doc(description: "Vat Is Valid.")
+    vat_request_id: String @doc(description: "Vat Request Id.")
+    vat_request_date: String @doc(description: "Vat Request Date.")
+    vat_request_success: Int @doc(description: "Vat Request Success.")
+    city_id: Int @doc(description: "City Id.")
+    ward: String @doc(description: "Ward.")
+    ward_id: Int @doc(description: "Ward Id.")
+}
+
+
+type VendorOrderBillingAddress implements VendorOrderAddressInterface{
+
+}
+
+type VendorOrderShippingAddress implements VendorOrderAddressInterface{
+
+}
+
+type VendorOrderPayment {
+    entity_id: Int @doc(description: "Entity Id.")
+    parent_id: Int @doc(description: "Parent Id.")
+    base_shipping_captured: Float @doc(description: "Base Shipping Captured.")
+    shipping_captured: Float @doc(description: "Shipping Captured.")
+    amount_refunded: Float @doc(description: "Amount Refunded.")
+    base_amount_paid: Float @doc(description: "Base Amount Paid.")
+    amount_canceled: Float @doc(description: "Amount Canceled.")
+    base_amount_authorized: Float @doc(description: "Base Amount Authorized.")
+    base_amount_paid_online: Float @doc(description: "Base Amount Paid Online.")
+    base_amount_refunded_online: Float @doc(description: "Base Amount Refunded Online.")
+    base_shipping_amount: Float @doc(description: "Base Shipping Amount.")
+    shipping_amount: Float @doc(description: "Shipping Amount.")
+    amount_paid: Float @doc(description: "Amount Paid.")
+    amount_authorized: Float @doc(description: "Amount Authorized.")
+    base_amount_ordered: Float @doc(description: "Base Amount Ordered.")
+    base_shipping_refunded: Float @doc(description: "Base Shipping Refunded.")
+    shipping_refunded: Float @doc(description: "Shipping Refunded.")
+    base_amount_refunded: Float @doc(description: "Base Amount Refunded.")
+    amount_ordered: Float @doc(description: "Amount Ordered.")
+    base_amount_canceled: Float @doc(description: "Base Amount Canceled.")
+    quote_payment_id: Int @doc(description: "Quote Payment Id.")
+    additional_data: String @doc(description: "Additional Data.")
+    cc_exp_month: String @doc(description: "Cc Exp Month.")
+    cc_ss_start_year: String @doc(description: "Cc Ss Start Year.")
+    echeck_bank_name: String @doc(description: "Echeck Bank Name.")
+    method: String @doc(description: "Method.")
+    cc_debug_request_body: String @doc(description: "Cc Debug Request Body.")
+    cc_secure_verify: String @doc(description: "Cc Secure Verify.")
+    protection_eligibility: String @doc(description: "Protection Eligibility.")
+    cc_approval: String @doc(description: "Cc Approval.")
+    cc_last_4: String @doc(description: "Cc Last 4.")
+    cc_status_description: String @doc(description: "Cc Status Description.")
+    echeck_type: String @doc(description: "Echeck Type.")
+    cc_debug_response_serialized: String @doc(description: "Cc Debug Response Serialized.")
+    cc_ss_start_month: String @doc(description: "Cc Ss Start Month.")
+    echeck_account_type: String @doc(description: "Echeck Account Type.")
+    last_trans_id: String @doc(description: "Last Trans Id.")
+    cc_cid_status: String @doc(description: "Cc Cid Status.")
+    cc_owner: String @doc(description: "Cc Owner.")
+    cc_type: String @doc(description: "Cc Type.")
+    po_number: String @doc(description: "Po Number.")
+    cc_exp_year: String @doc(description: "Cc Exp Year.")
+    cc_status: String @doc(description: "Cc Status.")
+    echeck_routing_number: String @doc(description: "Echeck Routing Number.")
+    account_status: String @doc(description: "Account Status.")
+    anet_trans_method: String @doc(description: "Anet Trans Method.")
+    cc_debug_response_body: String @doc(description: "Cc Debug Response Body.")
+    cc_ss_issue: String @doc(description: "Cc Ss Issue.")
+    echeck_account_name: String @doc(description: "Echeck Account Name.")
+    cc_avs_status: String @doc(description: "Cc Avs Status.")
+    cc_number_enc: String @doc(description: "Cc Number Enc.")
+    cc_trans_id: String @doc(description: "Cc Trans Id.")
+    address_status: String @doc(description: "Address Status.")
+    additional_informations: String @doc(description: "Additionals Information.")
+}
+
+type VendorOrderItem @doc(description: "Vendor Order Item") {
+    item_id: Int @doc(description: "The ID assigned to the item order") @deprecated(reason: "id of Item Order.")
+    order_id: Int @doc(description: "order id")
+    vendor_id: Int @doc(description: "vendor id")
+    vendor_order_id: Int @doc(description: "vendor id")
+    parent_item_id: Int @doc(description: "parent item id")
+    quote_item_id: Int @doc(description: "quote item id")
+    store_id: Int @doc(description: "store id")
+    created_at: String @doc(description: "created at")
+    updated_at: String @doc(description: "updated at")
+    product_id: Int @doc(description: "product id")
+    product_type: String @doc(description: "product type")
+    weight: String @doc(description: "weight")
+    is_virtual: String @doc(description: "is virtual")
+    sku: String @doc(description: "sku")
+    name: String @doc(description: "name")
+    description: String @doc(description: "description")
+    applied_rule_ids: String @doc(description: "applied rule ids")
+    additional_data: String @doc(description: "additional data")
+    is_qty_decimal: String @doc(description: "is qty decimal")
+    no_discount: String @doc(description: "no discount")
+    qty_backordered: String @doc(description: "qty backordered")
+    qty_canceled: String @doc(description: "qty canceled")
+    qty_invoiced: String @doc(description: "qty invoiced")
+    qty_ordered: String @doc(description: "qty ordered")
+    qty_refunded: String @doc(description: "qty refunded")
+    qty_shipped: String @doc(description: "qty shipped")
+    base_cost: String @doc(description: "base cost")
+    price: String @doc(description: "price")
+    base_price: String @doc(description: "base_price")
+    original_price: String @doc(description: "original_price")
+    base_original_price: String @doc(description: "base_original_price")
+    tax_percent: String @doc(description: "tax_percent")
+    tax_amount: String @doc(description: "tax_amount")
+    base_tax_amount: String @doc(description: "base_tax_amount")
+    tax_invoiced: String @doc(description: "tax_invoiced")
+    base_tax_invoiced: String @doc(description: "base_tax_invoiced")
+    discount_percent: String @doc(description: "discount_percent")
+    discount_amount: String @doc(description: "discount_amount")
+    base_discount_amount: String @doc(description: "base_discount_amount")
+    discount_invoiced: String @doc(description: "discount_invoiced")
+    base_discount_invoiced: String @doc(description: "base_discount_invoiced")
+    amount_refunded: String @doc(description: "amount_refunded")
+    base_amount_refunded: String @doc(description: "base_amount_refunded")
+    row_total: String @doc(description: "row_total")
+    base_row_total: String @doc(description: "base_row_total")
+    row_invoiced: String @doc(description: "row_invoiced")
+    base_row_invoiced: String @doc(description: "base_row_invoiced")
+    row_weight: String @doc(description: "row_weight")
+    base_tax_before_discount: String @doc(description: "base_tax_before_discount")
+    tax_before_discount: String @doc(description: "tax_before_discount")
+    ext_order_item_id: String @doc(description: "ext_order_item_id")
+    locked_do_invoice: String @doc(description: "locked_do_invoice")
+    locked_do_ship: String @doc(description: "locked_do_ship")
+    price_incl_tax: String @doc(description: "price_incl_tax")
+    base_price_incl_tax: String @doc(description: "base_price_incl_tax")
+    row_total_incl_tax: String @doc(description: "row_total_incl_tax")
+    base_row_total_incl_tax: String @doc(description: "base_row_total_incl_tax")
+    discount_tax_compensation_amount: String @doc(description: "discount_tax_compensation_amount")
+    base_discount_tax_compensation_amount: String @doc(description: "base_discount_tax_compensation_amount")
+    discount_tax_compensation_invoiced: String @doc(description: "discount_tax_compensation_invoiced")
+    base_discount_tax_compensation_invoiced: String @doc(description: "base_discount_tax_compensation_invoiced")
+    discount_tax_compensation_refunded: String @doc(description: "discount_tax_compensation_refunded")
+    base_discount_tax_compensation_refunded: String @doc(description: "base_discount_tax_compensation_refunded")
+    tax_canceled: String @doc(description: "tax_canceled")
+    discount_tax_compensation_canceled: String @doc(description: "discount_tax_compensation_canceled")
+    tax_refunded: String @doc(description: "tax_refunded")
+    base_tax_refunded: String @doc(description: "base_tax_refunded")
+    discount_refunded: String @doc(description: "discount_refunded")
+    base_discount_refunded: String @doc(description: "base_discount_refunded")
+    gw_id: String @doc(description: "gw_id")
+    gw_base_price: String @doc(description: "gw_base_price")
+    gw_price: String @doc(description: "gw_price")
+    gw_base_tax_amount: String @doc(description: "gw_base_tax_amount")
+    gw_tax_amount: String @doc(description: "gw_tax_amount")
+    gw_base_price_invoiced: String @doc(description: "gw_base_price_invoiced")
+    gw_price_invoiced: String @doc(description: "gw_price_invoiced")
+    gw_base_tax_amount_invoiced: String @doc(description: "gw_base_tax_amount_invoiced")
+    gw_tax_amount_invoiced: String @doc(description: "gw_tax_amount_invoiced")
+    gw_base_price_refunded: String @doc(description: "gw_base_price_refunded")
+    gw_price_refunded: String @doc(description: "gw_price_refunded")
+    gw_base_tax_amount_refunded: String @doc(description: "gw_base_tax_amount_refunded")
+    gw_tax_amount_refunded: String @doc(description: "gw_tax_amount_refunded")
+    free_shipping: String @doc(description: "free_shipping")
+    qty_returned: String @doc(description: "qty_returned")
+    event_id: String @doc(description: "event_id")
+    base_weee_tax_applied_amount: String @doc(description: "base_weee_tax_applied_amount")
+    base_weee_tax_applied_row_amnt: String @doc(description: "base_weee_tax_applied_row_amnt")
+    weee_tax_applied_amount: String @doc(description: "weee_tax_applied_amount")
+    weee_tax_applied_row_amount: String @doc(description: "weee_tax_applied_row_amount")
+    weee_tax_applied: String @doc(description: "weee_tax_applied")
+    weee_tax_disposition: String @doc(description: "weee_tax_disposition")
+    weee_tax_row_disposition: String @doc(description: "weee_tax_row_disposition")
+    base_weee_tax_disposition: String @doc(description: "base_weee_tax_disposition")
+    base_weee_tax_row_disposition: String @doc(description: "base_weee_tax_row_disposition")
+}
+
+input VendorOrderAttributeFilterInput @doc(description: "vendor order filter input") {
+    entity_id: FilterTypeInput @doc(description: "Order ID")
+    increment_id: FilterTypeInput @doc(description: "Increment Id")
+    state: FilterTypeInput @doc(description: "State")
+    status: FilterTypeInput @doc(description: "Status")
+    store_id: FilterTypeInput @doc(description: "Store Id")
+    customer_id: FilterTypeInput @doc(description: "Customer Id")
+    grand_total: FilterTypeInput @doc(description: "Grand Total")
+    subtotal: FilterTypeInput @doc(description: "Subtotal")
+    created_at: FilterTypeInput @doc(description: "Create at")
+    updated_at: FilterTypeInput @doc(description: "Update at")
+    store_id: FilterTypeInput @doc(description: "Store Id")
+    base_grand_total: FilterTypeInput @doc(description: "Base Grand Total")
+    customer_email: FilterTypeInput @doc(description: "Customer Email")
+    customer_firstname: FilterTypeInput @doc(description: "Customer Firstname")
+    customer_lastname: FilterTypeInput @doc(description: "Customer Lastname")
+    or: VendorOrderAttributeFilterInput @doc(description: "Or condition")
+}
+
+input VendorOrderSortInput {
+    entity_id: SortEnum @doc(description: "sort by id")
+    created_at: SortEnum @deprecated(reason: "sort by created at")
+    updated_at: SortEnum @deprecated(reason: "sort by updated at")
+}
+
+input VendorOrderItemInput {
+    item_id: Int,
+    qty: Int
+}
+
+input VendorOrderTrackingInput {
+    carrier_code: String,
+    title: String,
+    number: String
+}
+
+type VendorSalesStatusOutput {
+    result: Boolean
+}
+
+type CreateVendorOrderInvoiceOutput {
+    invoice: VendorOrderInvoice @doc(description: "Result Invoice.")
+}
+
+interface VendorInvoiceInterface  @typeResolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\InvoiceInterfaceTypeResolverComposite") @doc(description: "Details of Invoice") {
+    entity_id: Int @doc(description: "Entity Id.")
+    vendor_id: Int @doc(description: "vendor id")
+    vendor_order_id: Int @doc(description: "vendor order id")
+    invoice_id: Int @doc(description: "invoice id")
+    store_id: Int @doc(description: "Store Id.")
+    base_grand_total: Float @doc(description: "Base grand Total.")
+    shipping_tax_amount: Float @doc(description: "Shipping Tax Amount.")
+    tax_amount: Float @doc(description: "Tax Amount.")
+    base_tax_amount: Float @doc(description: "Base Tax Amount.")
+    store_to_order_rate: Float @doc(description: "Store To Order Rate.")
+    base_shipping_tax_amount: Float @doc(description: "Base Shipping Tax Amount.")
+    base_discount_amount: Float @doc(description: "Base Discount Amount.")
+    base_to_order_rate: Float @doc(description: "Base To Order Rate.")
+    grand_total: Float @doc(description: "Grand Total.")
+    shipping_amount: Float @doc(description: "Shipping Amount.")
+    subtotal_incl_tax: Float @doc(description: "Subtotal Incl Tax.")
+    base_subtotal_incl_tax: Float @doc(description: "Base Subtotal Incl Tax.")
+    store_to_base_rate: Float @doc(description: "Store To Base Rate.")
+    base_shipping_amount: Float @doc(description: "Base Shipping Amount.")
+    total_qty: Float @doc(description: "Total Qty.")
+    base_to_global_rate: Float @doc(description: "Base To Global Rate.")
+    subtotal: Float @doc(description: "Subtotal.")
+    base_subtotal: Float @doc(description: "Base Subtotal.")
+    discount_amount: Float @doc(description: "Discount Amount.")
+    billing_address_id: Int @doc(description: "Billing Address Id.")
+    is_used_for_refund: Int @doc(description: "Is Used For Refund.")
+    order_id: Int @doc(description: "Order Id.")
+    email_sent: Int @doc(description: "Email Sent.")
+    send_email: Int @doc(description: "Send Email.")
+    can_void_flag: Int @doc(description: "Can Void Flag.")
+    state: Int @doc(description: "State.")
+    shipping_address_id: Int @doc(description: "Shipping Address Id.")
+    store_currency_code: String @doc(description: "Store Currency Code.")
+    transaction_id: String @doc(description: "Transaction Id.")
+    order_currency_code: String @doc(description: "Order Currency Code.")
+    base_currency_code: String @doc(description: "Base Currency Code.")
+    global_currency_code: String @doc(description: "Global Currency Code.")
+    increment_id: String @doc(description: "Increment Id.")
+    created_at: String @doc(description: "Created At.")
+    updated_at: String @doc(description: "Updated At.")
+    discount_tax_compensation_amount: Float @doc(description: "Discount Tax Compensation Amount.")
+    base_discount_tax_compensation_amount: Float @doc(description: "Base Discount Tax Compensation Amount.")
+    shipping_discount_tax_compensation_amount: Float @doc(description: "Shipping Discount Tax Compensation Amount.")
+    base_shipping_discount_tax_compensation_amnt: Float @doc(description: "Base Shipping Discount Tax Compensation Amount.")
+    shipping_incl_tax: Float @doc(description: "Shipping Incl Tax.")
+    base_shipping_incl_tax: Float @doc(description: "Base Shipping Incl Tax.")
+    base_total_refunded: Float @doc(description: "Base Total Refunded.")
+    discount_description: String @doc(description: "Discount Description.")
+    customer_note: String @doc(description: "Customer Note.")
+    customer_note_notify: Int @doc(description: "Customer Note Notify.")
+}
+
+type AdminOrderInvoice implements VendorInvoiceInterface
+{
+}
+
+type VendorOrderInvoice implements VendorInvoiceInterface
+{
+    billing_address: VendorOrderBillingAddress @doc(description: "Billing Address")
+    shipping_address: VendorOrderShippingAddress @doc(description: "Shipping Address")
+    invoice: AdminOrderInvoice @doc(description: "Invoice Data")
+    vendor_order: VendorOrder @doc(description: "Order Information")
+    items: [VendorInvoiceItem] @doc(description: "Invoice Items")
+}
+
+type VendorInvoiceItem {
+    entity_id: Int @doc(description: "Entity Id.")
+    parent_id: Int @doc(description: "Parent Id.")
+    base_price: Float @doc(description: "Base Price.")
+    tax_amount: Float @doc(description: "Tax Amount.")
+    base_row_total: Float @doc(description: "Base Row Total.")
+    discount_amount: Float @doc(description: "Discount Amount.")
+    row_total: Float @doc(description: "Row Total.")
+    base_discount_amount: Float @doc(description: "Base Discount Amount.")
+    price_incl_tax: Float @doc(description: "Price Incl Tax.")
+    base_tax_amount: Float @doc(description: "Base Tax Amount.")
+    base_price_incl_tax: Float @doc(description: "Base Price Incl Tax.")
+    qty: Float @doc(description: "Qty.")
+    base_cost: Float @doc(description: "Base Cost.")
+    price: Float @doc(description: "Price.")
+    base_row_total_incl_tax: Float @doc(description: "Base Row Total Incl Tax.")
+    row_total_incl_tax: Float @doc(description: "Row Total Incl Tax.")
+    product_id: Int @doc(description: "Product Id.")
+    order_item_id: Int @doc(description: "Order Item Id.")
+    additional_data: String @doc(description: "Additional Data.")
+    description: String @doc(description: "Description.")
+    sku: String @doc(description: "Sku.")
+    name: String @doc(description: "Name.")
+    discount_tax_compensation_amount: Float @doc(description: "Discount Tax Compensation Amount.")
+    base_discount_tax_compensation_amount: Float @doc(description: "Base Discount Tax Compensation Amount.")
+    tax_ratio: String @doc(description: "Tax Ratio.")
+    order_item: VendorOrderItem @doc(description: "Order Item.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\OrderItem")
+}
+
+input VendorInvoiceFilterInput @doc(description: "Invoice filter variables") {
+    entity_id: FilterTypeInput @doc(description: "Invoice ID")
+    increment_id: FilterTypeInput @doc(description: "Increment Id")
+    state: FilterTypeInput @doc(description: "State")
+    created_at: FilterTypeInput @doc(description: "Create at")
+    updated_at: FilterTypeInput @doc(description: "Update at")
+    order_id: FilterTypeInput @doc(description: "Order Increment Id")
+    vendor_order_id: FilterTypeInput @doc(description: "Order Increment Id")
+    or: VendorInvoiceFilterInput @doc(description: "Or condition")
+}
+
+input VendorInvoiceSortInput {
+    entity_id: SortEnum @doc(description: "sort by id")
+    created_at: SortEnum @deprecated(reason: "sort by created at")
+    updated_at: SortEnum @deprecated(reason: "sort by updated at")
+}
+
+type CreateVendorOrderShipmentOutput {
+    shipment: VendorOrderShipment @doc(description: "Result shipment.")
+}
+
+interface VendorShipmentInterface @typeResolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\ShipmentInterfaceTypeResolverComposite") @doc(description: "Details of Shipment") {
+    entity_id: Int @doc(description: "Entity Id.")
+    vendor_id: Int @doc(description: "vendor id")
+    vendor_order_id: Int @doc(description: "vendor order id")
+    store_id: Int @doc(description: "Store Id.")
+    total_weight: Float @doc(description: "Total Weight.")
+    total_qty: Float @doc(description: "Total Qty.")
+    email_sent: Int @doc(description: "Email Sent.")
+    send_email: Int @doc(description: "Send Email.")
+    order_id: Int @doc(description: "Order Id.")
+    customer_id: Int @doc(description: "Customer Id.")
+    shipping_address_id: Int @doc(description: "Shipping Address Id.")
+    billing_address_id: Int @doc(description: "Billing Address Id.")
+    shipment_status: Int @doc(description: "Shipment Status.")
+    increment_id: String @doc(description: "Increment Id.")
+    created_at: String @doc(description: "Created At.")
+    updated_at: String @doc(description: "Updated At.")
+    package: String @doc(description: "Packages.")
+    customer_note: String @doc(description: "Customer Note.")
+    customer_note_notify: Int @doc(description: "Customer Note Notify.")
+}
+
+type VendorOrderShipment implements VendorShipmentInterface {
+    billing_address: VendorOrderBillingAddress @doc(description: "Billing Address")
+    shipping_address: VendorOrderShippingAddress @doc(description: "Shipping Address")
+    items: [VendorShipmentItem] @doc(description: "Invoice Items")
+}
+
+type VendorShipmentItem @doc(description: "Shipment item detail."){
+    entity_id: Int @doc(description: "Entity Id")
+    parent_id: Int @doc(description: "Parent Id")
+    price: Float @doc(description: "Price")
+    weight: Float @doc(description: "Weight")
+    qty: Float @doc(description: "Qty")
+    product_id: Int @doc(description: "Product Id")
+    order_item_id: Int @doc(description: "Order Item Id")
+    additional_data: String @doc(description: "Additional Data")
+    description: String @doc(description: "Description")
+    name: String @doc(description: "Name")
+    sku: String @doc(description: "Sku")
+    order_item: VendorOrderItem @doc(description: "Order Item.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\OrderItem")
+}
+
+input VendorShipmentFilterInput @doc(description: "Invoice filter variables") {
+    entity_id: FilterTypeInput @doc(description: "Invoice ID")
+    increment_id: FilterTypeInput @doc(description: "Increment Id")
+    store_id: FilterTypeInput @doc(description: "Store Id")
+    created_at: FilterTypeInput @doc(description: "Create at")
+    shipment_status: FilterTypeInput @doc(description: "Shipment Status")
+    order_id: FilterTypeInput @doc(description: "Order Id")
+    or: VendorShipmentFilterInput @doc(description: "Or condition")
+}
+
+input VendorShipmentSortInput {
+    entity_id: SortEnum @doc(description: "sort by id")
+    created_at: SortEnum @deprecated(reason: "sort by created at")
+    updated_at: SortEnum @deprecated(reason: "sort by updated at")
+}
+
+interface VendorCreditmemoInterface @typeResolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\CreditmemoInterfaceTypeResolverComposite") @doc(description: "Details of Creditmemo") {
+    entity_id: Int @doc(description: "Entity Id.")
+    vendor_id: Int @doc(description: "vendor id")
+    order_id: Int @doc(description: "order id")
+    vendor_order_id: Int @doc(description: "vendor order id")
+    store_id: Int @doc(description: "Store Id.")
+    increment_id: Int @doc(description: "Increment Id.")
+    created_at: String @doc(description: "Created At.")
+    updated_at: String @doc(description: "Updated At.")
+    order_increment_id: String @doc(description: "order_increment_id")
+    order_created_at: String @doc(description: "order_created_at")
+    billing_name: String @doc(description: "billing_name")
+    state: String @doc(description: "state")
+    base_grand_total: Float @doc(description: "base_grand_total")
+    order_status: String @doc(description: "order_status")
+    customer_name: String @doc(description: "customer_name")
+    customer_email: String @doc(description: "customer_email")
+    payment_method: String @doc(description: "payment_method")
+    shipping_information: String @doc(description: "shipping_information")
+    subtotal: Float @doc(description: "subtotal")
+    shipping_and_handling: String @doc(description: "shipping_and_handling")
+    adjustment_positive: Float @doc(description: "adjustment_positive")
+    adjustment_negative: Float @doc(description: "adjustment_negative")
+    order_base_grand_total: Float @doc(description: "order_base_grand_total")
+    customer_group_id: Int @doc(description: "customer_group_id")
+}
+
+type VendorOrderCreditmemo implements VendorCreditmemoInterface
+{
+    billing_address: VendorOrderBillingAddress @doc(description: "Billing Address")
+    shipping_address: VendorOrderShippingAddress @doc(description: "Shipping Address")
+    items: [VendorCreditmemoItem] @doc(description: "Credit memo Items")
+}
+
+type VendorCreditmemoItem @doc(description: "Credit memo item detail."){
+    entity_id: Int @doc(description: "Entity Id")
+    parent_id: Int @doc(description: "Parent Id")
+    order_item: VendorOrderItem @doc(description: "Order Item.") @resolver(class: "Vnecoms\\VendorsSalesGraphQl\\Model\\Resolver\\OrderItem")
+    base_price: Float @doc(description: "base_price")
+    tax_amount: Float @doc(description: "tax_amount")
+    base_row_total: Float @doc(description: "base_row_total")
+    discount_amount: Float @doc(description: "discount_amount")
+    row_total: Float @doc(description: "row_total")
+    base_discount_amount: Float @doc(description: "base_discount_amount")
+    price_incl_tax: Float @doc(description: "price_incl_tax")
+    base_tax_amount: Float @doc(description: "base_tax_amount")
+    base_price_incl_tax: Float @doc(description: "base_price_incl_tax")
+    qty: Float @doc(description: "qty")
+    base_cost: Float @doc(description: "base_cost")
+    price: Float @doc(description: "price")
+    base_row_total_incl_tax: Float @doc(description: "base_row_total_incl_tax")
+    row_total_incl_tax: Float @doc(description: "row_total_incl_tax")
+    product_id: Float @doc(description: "product_id")
+    order_item_id: Float @doc(description: "order_item_id")
+    additional_data: Float @doc(description: "additional_data")
+    description: String @doc(description: "description")
+    sku: String @doc(description: "sku")
+    name: String @doc(description: "name")
+}
+
+input VendorCreditmemoFilterInput @doc(description: "Invoice filter variables") {
+    entity_id: FilterTypeInput @doc(description: "Invoice ID")
+    increment_id: FilterTypeInput @doc(description: "Increment Id")
+    store_id: FilterTypeInput @doc(description: "Store Id")
+    created_at: FilterTypeInput @doc(description: "Create at")
+    order_id: FilterTypeInput @doc(description: "Order Id")
+    or: VendorCreditmemoFilterInput @doc(description: "Or condition")
+}
+
+input VendorCreditmemoSortInput {
+    entity_id: SortEnum @doc(description: "sort by id")
+    created_at: SortEnum @deprecated(reason: "sort by created at")
+    updated_at: SortEnum @deprecated(reason: "sort by updated at")
+}
+
+type CreateVendorOrderCreditMemoOutput {
+    memo: VendorOrderCreditmemo @doc(description: "Result shipment.")
+}

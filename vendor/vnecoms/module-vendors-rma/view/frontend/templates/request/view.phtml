@@ -1,0 +1,387 @@
+<?php $request = $block->getRequestRma() ?>
+<div class="request-information">
+    <div class="page-title">
+        <?php if($block->isCancelRma($request->getState())): ?>
+            <div class="action-request">
+                <a class="action primary right action-cancel" type="button" href="<?php echo $block->getUrl("vrma/customer/cancel",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                        <i class="fa fa-fw fa-times"></i>
+                        <span><?php echo __('Cancel')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+
+        <?php if($block->isEscalateRma($request)): ?>
+            <div class="action-request">
+                <a class="action primary right action-escalate" type="button" href="<?php echo $block->getUrl("vrma/customer/escalate",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                         <i class="fa fa-fw fa-balance-scale"></i>
+                        <span><?php echo __('Escalate RMA')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+
+        <?php if($block->isPrintRma($request->getStatus())): ?>
+            <div class="action-request">
+                <a target="_blank" class="action primary action-normal" type="button" href="<?php echo $block->getUrl("vrma/customer/print",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                        <i class="fa fa-fw fa-print"></i>
+                        <span><?php echo __('Print RMA')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+
+        <?php if($block->isConfirmShip($request->getStatus())): ?>
+            <div class="action-request">
+                <a class="action primary right action-save" type="button" href="<?php echo $block->getUrl("vrma/customer/confirm",array("id"=>$block->getRequestRma()->getId())) ?>">
+                    <span>
+                        <i class="fa fa-fw fa-check"></i>
+                        <span><?php echo __('Confirm Package Is Returning')?></span>
+                    </span>
+                </a>
+            </div>
+        <?php endif ?>
+        <div class="clear"></div>
+    </div>
+    <div class="group-select">
+        <!-- Common ticket info -->
+        <table width="100%">
+            <col width="50%"/>
+            <col width="50%"/>
+            <tbody>
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Request Type :')?></span>
+                    <span class="<?php echo $block->getTypeClass() ?>"><?php echo $request->getTypeTitle(); ?></span>
+                </td>
+                <td>
+                    <span class="label"><?php echo __('Order ID :')?></span>
+                    <a href="<?php echo $block->getUrl("sales/order/view",array("order_id"=> $request->getOrderObject()->getId())) ?>" target="_blank"><?php echo "#".$request->getOrderIncrementalId() ?></a>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Create At :')?></span>
+                    <?php echo $block->getFormatDateHtml($request->getCreatedAt()) ?>
+                </td>
+                <td>
+                    <span class="label"><?php echo __('Reason :') ?></span>
+                    <?php echo $request->getReasonTitle(); ?>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <span class="label"><?php echo __('Package Opened :')?></span>
+                    <?php echo $request->getPackageOpenedLabel(); ?>
+                </td>
+
+                <td>
+                    <span class="label"><?php echo __('Status :')?></span>
+                    <span class="<?php echo $block->getStatusClass() ?>"><?php echo $request->getStatusTitle(); ?></span>
+                </td>
+            </tr>
+
+            <?php if($request->getWhoPayForShip() || $request->getData("tracking_code")): ?>
+                <tr>
+                    <?php if($request->getWhoPayForShip()): ?>
+                        <td>
+                            <span class="label"><?php echo __('Who pay for ship:')?></span>
+                            <?php echo $request->getWhoPayForShip(); ?>
+                        </td>
+                    <?php endif ?>
+                    <?php if($request->getData("tracking_code")): ?>
+                        <td>
+                            <span class="label"><?php echo __('Tracking Number:')?></span>
+                            <?php echo $request->getData("tracking_code"); ?>
+                        </td>
+                    <?php endif ?>
+                </tr>
+            <?php endif ?>
+
+            <?php if($block->isEnableRefundTab()): ?>
+                <tr>
+                    <td>
+                        <span class="label"><?php echo __('Refund Amount :')?></span>
+                        <div class="value" id="value_tracking_code" >
+                            <span class="customer-amount"><?php echo $request->getOrderObject()->formatPrice($request->getData("refund_amount")) ?></span>
+                        </div>
+                        <?php if($block->isEnableEditTabs()): ?>
+                        <div class="value edit-box" id="edit-box-tracking_code" style="display:none" >
+                            <input type="text" class="input-text required-entry validate-number" style="width:200px;"
+                                   value="<?php echo $request->getData("refund_amount") ?>" number
+                                   name="refund_amount" id="refund_amount"
+                                   autocomplete="off" />
+                            <div class="info-edit-ctrls">
+                                <a class="rule-chooser-trigger" href="javascript:void(0)" rel="refund_amount"></a>
+                                <a class="rule-param-apply" href="javascript:void(0)" rel="refund_amount"></a>
+                            </div>
+                        </div>
+                        <?php endif ?>
+                        <div class="<?php if($block->isEnableEditTabs()): ?>edit-field<?php else: ?>show-field<?php endif ?>">
+                            <?php if($block->isEnableEditTabs()): ?>
+                            <a class="rule-param-edit" href="javascript:void(0)" title="<?php echo __("Change Amount") ?>">
+                            </a>
+                            <?php endif ?>
+                            <a class="rule-param-history" href="javascript:void(0)" title="<?php echo __("View History") ?>">
+                            </a>
+                            <div id="refund-amount-history" class="refund-amount-history">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th><?php echo __("Change By") ?></th>
+                                            <th><?php echo __("Amount") ?></th>
+                                            <th><?php echo __("Created Date") ?></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($block->getHistoryAmountRefundObject() as $amount): ?>
+                                            <tr>
+                                                <td><?php echo $block->getTypeHtml($amount->getType()) ?></td>
+                                                <td>
+                                                   <span class="<?= $amount->getType() ?>-amount">
+                                                        <strong><?php echo $block->formatPrice($amount->getAmount()) ?></strong>
+                                                    </span>
+                                                </td>
+                                                <td><?php echo $block->getFormatDateHtml($amount->getCreatedAt()) ?></td>
+                                            </tr>
+                                        <?php endforeach;?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            <?php endif ?>
+
+            </tbody>
+        </table>
+    </div>
+
+    <?php $status = $request->getStatusObject()->getCode(); ?>
+    <?php if($block->getShowReturnInstructions() && $status == 'approval' ):?>
+    <div class="rma-show-guide">
+        <h2 class="legend"><?php echo __('Send with the return instructions'); ?></h2>
+        <div class="page-content">
+            <?php
+            echo $block->getChildHtml('return_instructions') ?>
+        </div>
+    </div>
+    <?php endif;?>
+
+    <div id="rma-view-tabs">
+        <ul>
+            <li><a href="#message-rma"><?php echo __("RMA Comments") ?></a></li>
+            <li><a href="#item-rma"><?php echo __("RMA Items") ?></a></li>
+            <li><a href="#escalate-rma"><?php echo __("RMA Escalate") ?></a></li>
+        </ul>
+        <div id="message-rma">
+            <?php echo $block->getChildHtml('message')?>
+            <?php if($block->isReplyRma($request->getState())): ?>
+                <?php echo $block->getChildHtml('form-reply')?>
+            <?php endif ?>
+        </div>
+        <div id="item-rma">
+            <?php echo $block->getChildHtml('rma_items')?>
+        </div>
+        <div id="escalate-rma">
+            <?php echo $block->getChildHtml('rma_escalate')?>
+        </div>
+    </div>
+
+    <div class="clear"></div>
+    <div class="back">
+        <a href="<?php echo $block->getUrl('*/*/index');?>" class="left">
+            <?php echo __('&laquo;Back to My Rma')?>
+        </a>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    require([
+        'prototype',
+        'Vnecoms_RMA/js/rma'
+    ], function(){
+        var vnecomsRmaFormAdvice = new VnecomsRmaFormAdvice();
+        $$('td.item-qty .edit-field').each(function(div){
+            div.observe('click',function(){
+                //this.hide();
+                this.parentNode.select('.edit-field').first().hide();
+                this.parentNode.select('.edit-box').first().show();
+                this.parentNode.select('.edit-box').first().addClassName('active');
+                this.parentNode.select('div.value').first().hide();
+            });
+
+        });
+        $$('td.item-qty').each(function(td){
+            if(td.select('a.rule-param-apply') == false) return;
+            td.select('a.rule-param-apply').first().observe('click',function(){
+                td.select('div.value').first().show();
+                td.select('.edit-box').first().hide();
+                td.select('.edit-field').first().show();
+                if (td.select('div.validation-advice').length) td.select('div.validation-advice').first().hide();
+                var node=this.getAttribute('rel');
+                var select= $(node).getAttribute('default');
+                if(select){
+                    $$('#'+node+' option').each(function(o) {
+                        if(o.readAttribute('value') == select) {
+                            o.selected = true;
+                            throw $break;
+                        }
+                    });
+                }
+                else{
+                    $(node).value = $(node).defaultValue;
+                }
+            });
+            td.select('a.rule-chooser-trigger').first().observe('click',function(){
+                var node = this.getAttribute('rel');
+                var value = parseInt($(node).value);
+                var maxItem = $('order-item-count-'+node).value;
+                if (value != '') {
+                    if (!isNaN(value)) {
+                        if (value < 0) {
+                            vnecomsRmaFormAdvice.showAdvice(node, 'Quantity greater 0');
+                            return false;
+                        }
+                        if (value > maxItem) {
+                            vnecomsRmaFormAdvice.showAdvice(node, ' Quantity not greater ' + maxItem);
+                            return false;
+                        }
+                    } else {
+                        vnecomsRmaFormAdvice.showAdvice(node, 'Not a number');
+                        return false;
+                    }
+                }else {
+                    vnecomsRmaFormAdvice.showAdvice(node, 'Can\'t be empty');
+                    return false;
+                }
+                vnecomsRmaFormAdvice.removeAdvice(node);
+                var id= $("item-id-"+node).value;
+                new Ajax.Request('<?php echo $block->getUrl('vrma/customer/updateitem')?>', {
+                    method:'post',
+                    parameters:{
+                        id              : id,
+                        item_qty        : value,
+                        form_key        :"demoformkey"
+                    },
+                    onComplete: function (transport) {
+                        td.select('div.value').first().show();
+                        td.select('.edit-box').first().hide();
+                        td.select('.edit-field').first().show();
+                    },
+                    onSuccess: function(transport) {
+                        var data = transport.responseText.evalJSON();
+                        if(!data.error){
+                            $("value_item_"+node).update('<span>'+data.html+'</span>');
+                            $(node).setAttribute('default',value);
+                        }else{
+                            alert(data.message);
+                        }
+                    },
+                });
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    require([
+        'prototype',
+        'jquery',
+        'jquery/ui'
+    ], function(_,Jquery){
+        Jquery("#rma-view-tabs").tabs();
+
+        <?php if($block->isEnableRefundTab()): ?>
+        /**
+         * process other attribite ticket
+         */
+        $$('.request-information .edit-field').each(function(div){
+            div.observe('click',function(){
+                //this.hide();
+                this.parentNode.select('.edit-field').first().hide()
+                this.parentNode.select('.edit-box').first().show();
+                this.parentNode.select('.edit-box').first().addClassName('active');
+                this.parentNode.select('div.value').first().hide();
+            });
+
+        });
+
+        function isNumeric( obj ) {
+            return !Jquery.isArray( obj ) && (obj - parseFloat( obj ) + 1) >= 0;
+        }
+
+        $$('a.rule-param-apply').first().observe('click',function(){
+            $(this).up('.value').previous().show();
+            $(this).up('.edit-box').hide();
+            $(this).up('.value').next().show();
+            var node=this.getAttribute('rel');
+            var select= $(node).getAttribute('default');
+            if(select){
+                $$('#'+node+' option').each(function(o) {
+                    if(o.readAttribute('value') == select) {
+                        o.selected = true;
+                        throw $break;
+                    }
+                });
+            }
+            else{
+                $(node).value=$(node).defaultValue;
+            }
+        });
+
+        $$('a.rule-chooser-trigger').first().observe('click',function(){
+            var node=this.getAttribute('rel');
+            var value = $(node).value;
+            var max_amount_refund = <?php echo $block->getMaxAmountRefund() ?>;
+            var _this = this;
+            if($(node).hasClassName("required-entry") && value == ""){
+                alert("<?php echo __("This is a required field.") ?>");
+                return;
+            }
+
+            if($(node).hasClassName("validate-number") && !isNumeric(value)){
+                alert("<?php echo __("Please enter a valid number in this field.") ?>");
+                return;
+            }
+
+            if(parseFloat(value) > parseFloat(max_amount_refund)){
+                alert("<?php echo __("Please enter a valid amount in this field. Max amount:") ?>"+max_amount_refund);
+                return;
+            }
+
+            var id=<?php echo $request->getId() ?>;
+            new Ajax.Request('<?php echo $block->getUrl('vrma/customer/updateAmount')?>', {
+                method:'post',
+                parameters:{id : id,amount:value,form_key:"demoformkey"},
+                onComplete: function (transport) {
+                    $(_this).up('.value').previous().show();
+                    $(_this).up('.edit-box').hide();
+                    $(_this).up('.value').next().show();
+                },
+                onSuccess: function(transport) {
+                    var data=transport.responseText.evalJSON();
+                    if(!data.error){
+                        Jquery("#refund_amount").val(data.amount);
+                        $("refund_amount").setAttribute('default',data.amount);
+                        $$(".customer-amount").first().update(data.amount_html);
+                        $("refund-amount-history").update(data.amount_list);
+                    }else{
+                        alert(data.error);
+                    }
+                },
+            });
+
+        });
+        <?php endif ?>
+
+    });
+</script>
+
+

@@ -1,0 +1,54 @@
+<?php /* Account Information */
+/** @var \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Information $block */
+
+?>
+<div class="admin__page-section-item-title">
+    <span class="title"><?php /* @escapeNotVerified */ echo __('Account Information') ?></span>
+</div>
+<div class="admin__page-section-item-content">
+    <table class="admin__table-secondary order-account-information-table">
+        <?php if (!$block->isGuest()):?>
+        <tr>
+            <th><?php /* @escapeNotVerified */ echo __('Customer Name') ?></th>
+            <td>
+                <?php if ($_customerUrl = $block->getCustomerViewUrl()) : ?>
+                    <a href="<?php /* @escapeNotVerified */ echo $_customerUrl ?>" target="_blank">
+                        <span><?php echo $block->escapeHtml($block->getCustomerName()) ?></span>
+                    </a>
+                <?php else: ?>
+                    <?php echo $block->escapeHtml($block->getCustomerName()) ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php else:?>
+        <tr>
+            <th><?php /* @escapeNotVerified */ echo __('First Name') ?></th>
+            <td><input value="<?php echo $block->getRealQuote()->getFirstName() ?>" type="text" class="validate-email admin__control-text input-text admin__control-text" name="quote[customer_firstname]"/></td>
+        </tr>
+        <tr>
+            <th><?php /* @escapeNotVerified */ echo __('Last Name') ?></th>
+            <td><input value="<?php echo $block->getRealQuote()->getLastName() ?>" type="text" class="validate-email admin__control-text input-text admin__control-text" name="quote[customer_lastname]"/></td>
+        </tr>
+        <?php endif;?>
+        <tr>
+            <th><?php /* @escapeNotVerified */ echo __('Email') ?></th>
+            <?php if (!$block->isGuest()):?>
+            <td><a href="mailto:<?php echo $block->escapeHtml($block->getCustomerEmail()) ?>"><?php echo $block->escapeHtml($block->getCustomerEmail()) ?></a></td>
+            <?php else:?>
+            <td><input type="text" value="<?php echo $block->getRealQuote()->getCustomerEmail() ?>" class="validate-email admin__control-text input-text admin__control-text" name="quote[customer_email]"/></td>
+            <?php endif;?>
+        </tr>
+        <?php if ($_groupName = $block->getCustomerGroupName()) : ?>
+            <tr>
+                <th><?php /* @escapeNotVerified */ echo __('Customer Group') ?></th>
+                <td><?php /* @escapeNotVerified */ echo $_groupName ?></td>
+            </tr>
+        <?php endif; ?>
+        <?php foreach ($block->getCustomerAccountData() as $data):?>
+            <tr>
+                <th><?php /* @escapeNotVerified */ echo $data['label'] ?></th>
+                <td><?php /* @escapeNotVerified */ echo $data['value'] ?></td>
+            </tr>
+        <?php endforeach;?>
+    </table>
+</div>

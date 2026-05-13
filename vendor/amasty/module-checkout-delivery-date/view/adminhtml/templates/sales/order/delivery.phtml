@@ -1,0 +1,28 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */
+/** @var \Amasty\CheckoutDeliveryDate\Block\Adminhtml\Sales\Order\Delivery $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<?php if ($fields = $block->getDeliveryDateFields()): ?>
+<section class="admin__page-section amasty-deliverydate">
+    <div class="admin__page-section-title">
+        <span class="title"><?= $escaper->escapeHtml(__('Delivery Information')) ?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item" style="width: 49%;">
+            <table class="admin__table-secondary">
+                <?php foreach ($fields as $field): ?>
+                    <tr>
+                        <td><?= $escaper->escapeHtml($field['label']); ?></td>
+                        <td style="text-align: right;"><?= $escaper->escapeHtml($field['value']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
+</section>
+<?php endif ?>

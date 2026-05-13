@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Style Switcher for Magento 2 (System)
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amasty_checkout">
+            <group id="design">
+                <group id="layout">
+                    <field id="checkout_design" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Design</label>
+                        <source_model>Amasty\CheckoutStyleSwitcher\Model\Config\Source\CheckoutDesign</source_model>
+                        <config_path>amasty_checkout/design/checkout_design</config_path>
+                    </field>
+
+                    <field id="layout_modern" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Checkout Page Layout</label>
+                        <source_model>Amasty\CheckoutStyleSwitcher\Model\Config\Source\LayoutModern</source_model>
+                        <depends>
+                            <field id="checkout_design">1</field>
+                        </depends>
+                        <config_path>amasty_checkout/design/layout_modern</config_path>
+                    </field>
+
+                    <field id="display_billing_address_on" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Display Billing Address On</label>
+                        <config_path>checkout/options/display_billing_address_on</config_path>
+                        <source_model>Amasty\CheckoutStyleSwitcher\Model\Config\Source\BillingAddressDisplayOptions</source_model>
+                        <frontend_model>Amasty\CheckoutStyleSwitcher\Block\Adminhtml\System\Config\BillingAddress</frontend_model>
+                    </field>
+
+                    <field id="layout_place_button" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Place Order Button Position</label>
+                        <comment><![CDATA[Please keep in mind that some payment methods may override this option, thus for such methods the button may remain in Payment Methods block regardless of this option's value.]]></comment>
+                        <source_model>Amasty\CheckoutStyleSwitcher\Model\Config\Source\PlaceButtonLayout</source_model>
+                        <config_path>amasty_checkout/design/place_button_layout</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

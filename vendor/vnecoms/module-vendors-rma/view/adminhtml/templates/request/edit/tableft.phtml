@@ -1,0 +1,243 @@
+<?php
+/**
+ * get Infomation from Block
+ */
+$request = $block->getRequestRma();
+?>
+
+<!-- block customer information -->
+
+<div class="ticket_tabs_left ticket_customer_tabs">
+    <?php if($block->getTitleCustomerTab()): ?>
+        <h3><i class="fa fa-user" aria-hidden="true"></i><?php echo $block->getTitleCustomerTab() ?></h3>
+    <?php endif ?>
+    <ul id="ticket_customer_tabs" class="ticket_tabs">
+        <li>
+            <div class="label"><span><?php echo __('Name');?></span></div>
+            <div class="value" id="value_name" >
+                <?php if($request->getCustomerObject()->getId()): ?>
+                    <a href="<?php echo $block->getUrl('customer/index/edit',
+                        array('id'=>$request->getCustomerObject()->getId())) ?>"
+                       target="_blank"><span><?php echo $request->getCustomerName() ?></span></a>
+                <?php else:?>
+                    <span><?php echo $request->getCustomerName() ?></span>
+                <?php endif;?>
+            </div>
+        </li>
+        <li>
+            <div class="label"><span><?php echo __('Email');?></span>
+            </div>
+            <div class="value" id="value-email" ><span><?php echo $request->getData('customer_email');?></span></div>
+        </li>
+    </ul>
+</div>
+<!-- end block customer -->
+
+
+<!-- block customer information -->
+
+<?php if($request->getVendorObject()->getId()): ?>
+<div class="ticket_tabs_left ticket_customer_tabs">
+    <?php if($block->getTitleCustomerTab()): ?>
+        <h3><i class="fa fa-user" aria-hidden="true"></i><?php echo $block->getTitleVendorTab() ?></h3>
+    <?php endif ?>
+    <ul id="ticket_vendor_tabs" class="ticket_tabs">
+        <li>
+            <div class="label"><span><?php echo __('Vendor Id');?></span></div>
+            <div class="value" id="value_name" >
+                <a href="<?php echo $block->getUrl('vendors/index/edit',
+                    array('id'=>$request->getVendorObject()->getId())) ?>"
+                   target="_blank"><span><?php echo $request->getVendorObject()->getVendorId() ?></span></a>
+            </div>
+        </li>
+        <li>
+            <div class="label"><span><?php echo __('Email');?></span>
+            </div>
+            <div class="value" id="value-email" ><span><?php echo $request->getVendorObject()->getEmail() ?></span></div>
+        </li>
+    </ul>
+</div>
+<!-- end block vendor -->
+<?php endif ?>
+
+
+<!-- refund Amount Refund -->
+<?php if($block->isEnableRefundTab()): ?>
+
+    <div class="ticket_tabs_left ticket_infomation_tabs ticket_refund_tabs">
+        <?php if($block->getTitleRefundTab()): ?>
+            <h3><i class="fa fa-money" aria-hidden="true"></i><?php echo $block->getTitleRefundTab() ?></h3>
+        <?php endif ?>
+        <ul id="ticket_refund_tabs" class="ticket_tabs">
+            <li class="apply-update">
+                    <div class="value" id="value_refund_amount" >
+                        <p class="amount-refund"><?php echo $block->formatPrice($request->getRefundAmount()); ?></p>
+                    </div>
+                    <div class="value edit-box" id="edit-box-refund_amount" style="display:none" >
+                        <input type="text" class="input-text required-entry validate-number validate-max-value" style="width:200px;"
+                               value="<?php echo $request->getRefundAmount() ?>" name="refund_amount" id="refund_amount"
+                        />
+                        <div class="info-edit-ctrls">
+                            <a class="rule-chooser-trigger" href="javascript:void(0)" rel="refund_amount"></a>
+                            <a class="rule-param-apply" href="javascript:void(0)" rel="refund_amount"></a>
+                        </div>
+                    </div>
+                    <div class="edit-field">
+                        <a class="rule-param-edit" href="javascript:void(0)" title="<?php echo __("Edit Amount") ?>">
+                        </a>
+                        <a class="rule-param-history" href="javascript:void(0)" title="<?php echo __("View History") ?>">
+                        </a>
+                        <div id="refund-amount-history" class="refund-amount-history">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th><?php echo __("Change By") ?></th>
+                                    <th><?php echo __("Amount") ?></th>
+                                    <th><?php echo __("Created Date") ?></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <?php foreach ($block->getHistoryAmountRefundObject() as $amount): ?>
+                                    <tr>
+                                        <td><?php echo $block->getTypeHtml($amount->getType()) ?></td>
+                                        <td>
+                                                                              <span class="<?= $amount->getType() ?>-amount">
+                                                                        <strong><?php echo $block->formatPrice($amount->getAmount()) ?></strong>
+                                                                    </span>
+                                        </td>
+                                        <td><?php echo $block->getFormatDateHtml($amount->getCreatedAt()) ?></td>
+                                    </tr>
+                                <?php endforeach;?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <input type="hidden"
+                           value="<?php echo $block->getMaxAmountRefund() ?>" name="refund_amount_max" id="refund_amount_max"
+                    />
+            </li>
+        </ul>
+    </div>
+<?php endif ?>
+<!-- end block refund  -->
+
+
+<!-- start block information ticket -->
+<div class="ticket_tabs_left ticket_infomation_tabs">
+    <?php if($block->getTitleRequestTab()): ?>
+        <h3><i class="fa fa-home" aria-hidden="true"></i><?php echo $block->getTitleRequestTab() ?></h3>
+    <?php endif ?>
+    <ul id="ticket_information_tabs" class="ticket_tabs">
+
+        <li>
+            <div class="label"><span><?php echo __('Status');?></span></div>
+            <div class="value" id="value-status" >
+                <span class="<?php echo $block->getStatusClass()?>"><?php echo $request->getStatusTitle(); ?></span>
+            </div>
+        </li>
+
+        <li>
+            <div class="label"><span><?php echo __('Order #');?></span></div>
+            <div class="value" id="value-status" >
+                <?php if($request->getOrderObject()->getId()): ?>
+                    <a href="<?php echo $block->getUrl('sales/order/view',array('order_id'=>
+                        $request->getOrderObject()->getId())) ?>"
+                       target="_blank">#<?php echo $request->getOrderObject()->getIncrementId() ?></a>
+                <?php else:?>
+                    <?php if($request->getData("order_incremental_id") ): ?>
+                        #<?php echo $request->getData("order_incremental_id") ?>
+                    <?php endif;?>
+                <?php endif;?>
+            </div>
+        </li>
+
+        <li>
+            <div class="label"><span><?php echo __('Reason');?></span></div>
+            <div class="value" id="value-status" >
+                <span><?php echo $request->getReasonTitle(); ?></span>
+            </div>
+        </li>
+
+        <li>
+            <div class="label"><span><?php echo __('Type');?></span></div>
+            <div class="value" id="value-status" >
+                <span class="<?php echo $block->getTypeClass()?>"><?php echo $request->getTypeTitle(); ?></span>
+            </div>
+        </li>
+
+        <li <?php if($block->isEnableEditTabs()): ?>class="apply-update"<?php endif?>>
+            <div class="label"><span><?php echo __('Tracking Code');?></span></div>
+            <div class="value" id="value_tracking_code" >
+                <span><?php echo $request->getData('tracking_code') ?></span>
+            </div>
+            <div class="value edit-box" id="edit-box-tracking_code" style="display:none" >
+                <input type="text" class="input-text required-entry" style="width:200px;"
+                       value="<?php echo $request->getData('tracking_code') ?>" name="tracking_code" id="tracking_code"
+                       autocomplete="off" />
+                <div class="info-edit-ctrls">
+                    <a class="rule-chooser-trigger" href="javascript:void(0)" rel="tracking_code"></a>
+                    <a class="rule-param-apply" href="javascript:void(0)" rel="tracking_code"></a>
+                </div>
+            </div>
+            <?php if($block->isEnableEditTabs()): ?>
+                <div class="edit-field">
+                    <a class="rule-param-edit" href="javascript:void(0)">
+                    </a>
+                </div>
+            <?php endif?>
+        </li>
+
+        <li>
+            <div class="label"><span><?php echo __('Created Time');?></span></div>
+            <div class="value" id="value-order" >
+                <span>
+                    <?php echo $block->getFormatDateHtml($request->getData("created_at")) ?>
+                </span>
+            </div>
+        </li>
+        <li>
+            <div class="label"><span><?php echo __('Last Reply');?></span></div>
+            <div class="value" id="value-order" ><span>
+                    <?php echo $block->getFormatDateHtml($request->getData("updated_at")) ?>
+                </span>
+            </div>
+        </li>
+        <?php $geoip = $block->getGeoIp(); ?>
+        <?php if($request->getData('ip_address')):?>
+            <li>
+                <div class="label"><span><?php echo __('IP address');?></span></div>
+                <div class="value" id="value-order" ><span><?php echo $request->getData('ip_address') ?></span>
+            </li>
+            <?php if($geoip->getRecord()): ?>
+                <li>
+                    <div class="label"><span><?php echo __('Country');?></span></div>
+                    <div class="value" id="value-order" >
+                        <img src="<?php echo $geoip->getFlags()?>" class="icon-country"
+                             style="float:left;margin:8px 10px 0px 0px"/>
+                        <span><?php echo $geoip->getCountryName() ?></span>
+                </li>
+                <li>
+                    <div class="label"><span><?php echo __('City:');?></span></div>
+                    <div class="value" id="value-order" ><span><?php echo $geoip->getCity() ?></span>
+                </li>
+            <?php endIf; ?>
+        <?php endIf; ?>
+        <li>
+            <div class="label"><span><?php echo __('Package Opened');?></span></div>
+            <div class="value" id="value-status" >
+                <span><?php echo $request->getPackageOpenedLabel(); ?></span>
+            </div>
+        </li>
+        <?php if($request->getWhoPayForShip()): ?>
+            <li>
+                <div class="label"><span><?php echo __('Who pay for ship');?></span></div>
+                <div class="value">
+                    <span><?php echo $request->getWhoPayForShip(); ?></span>
+                </div>
+            </li>
+        <?php endif ?>
+    </ul>
+</div>
+<?php echo $block->getChildHtml('before_information_end') ?>
+<!-- end block -->
+

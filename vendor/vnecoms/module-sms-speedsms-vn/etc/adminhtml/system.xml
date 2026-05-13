@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="speedsmsvn_token" translate="label tooltip" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>SpeedSms.vn Token</label>
+	                    <config_path>vsms/settings/speedsmsvn_token</config_path>
+	                    <depends>
+	                        <field id="gateway">speedsmsvn</field>
+	                    </depends>
+	                </field>
+	                
+	                <field id="speedsmsvn_type" translate="label tooltip" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>SpeedSms.vn Type</label>
+	                    <config_path>vsms/settings/speedsmsvn_type</config_path>
+	                    <depends>
+	                        <field id="gateway">speedsmsvn</field>
+	                    </depends>
+	                    <frontend_class>validate-number</frontend_class>
+	                    <comment><![CDATA[2: CSKH<br />3: Brand name<br />4: Default Brandname (Notify)<br />5: Send By Android App]]></comment>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

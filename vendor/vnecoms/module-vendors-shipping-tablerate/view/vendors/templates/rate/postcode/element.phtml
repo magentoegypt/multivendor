@@ -1,0 +1,91 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/* @var $block \Magento\Backend\Block\Widget\Form\Renderer\Fieldset\Element */
+$element = $block->getElement();
+$note = $element->getNote() ? '<div class="note" id="' . $element->getId() . '-note">' . $element->getNote() . '</div>' : '';
+$elementBeforeLabel = $element->getExtType() == 'checkbox admin__control-checkbox' || $element->getExtType() == 'radio admin__control-radio';
+$addOn = ($element->getBeforeElementHtml() || $element->getAfterElementHtml()) && !$element->getNoWrapAsAddon();
+$fieldId = ($element->getHtmlContainerId()) ? ' id="' . $element->getHtmlContainerId() . '"' : '';
+$fieldClass = "form-group field-{$element->getId()} {$element->getCssClass()}";
+$fieldClass .= ($elementBeforeLabel) ? ' choice' : '';
+$fieldClass .= ($addOn) ? ' with-addon' : '';
+$fieldClass .= ($element->getRequired()) ? ' required _required' : '';
+$fieldClass .= ($note) ? ' with-note' : '';
+$fieldClass .= (!$element->getLabelHtml()) ? ' no-label' : '';
+
+$fieldAttributes = $fieldId . ' class="' . $fieldClass . '" '
+    . $block->getUiId('form-field', $element->getId())
+    . ($element->getFieldExtraAttributes() ? ' ' . $element->getFieldExtraAttributes() : '');
+?>
+
+<?php $element->setClass('form-control '.$element->getClass());?>
+
+<?php if (!$element->getNoDisplay()): ?>
+    <?php if ($element->getType() == 'hidden'): ?>
+        <?php echo $element->getElementHtml() ?>
+    <?php else: ?>
+    <div<?php /* @escapeNotVerified */ echo $fieldAttributes ?>>
+        <?php if ($elementBeforeLabel): ?>
+            <?php echo $element->getElementHtml() ?>
+            <?php echo $element->getLabelHtml() ?>
+            <?php /* @escapeNotVerified */ echo $note ?>
+        <?php else: ?>
+            <label class="col-sm-3 control-label" for="<?php echo $element->getHtmlId()?>"><span><?php echo $element->getLabel();?></span></label>
+            <div class="col-sm-9">
+                <?php
+                     $value = [];
+                    if ($element->getValue()) {
+                        $value = explode("-", $element->getValue());
+                    }
+                    $isRange = (sizeof($value) == 2);
+                ?>
+
+                <div class="dest_zip" id="dest_zip_handle" style="display: <?php echo $isRange?'none':'block'?> ;"><?php /* @escapeNotVerified */ echo($addOn) ? '<div class="admin__field">' . $element->getElementHtml() . '</div>' : $element->getElementHtml(); ?></div>
+                <div class="dest_zip" id="dest_zip_range_handle" style="display: <?php echo $isRange?'block':'none'?> ;">
+                    <?php echo __('From:')?> <input id="rate_form_dest_zip_from" name="dest_zip_from"  value="<?php echo $isRange?$value[0]:$element->getValue()?>" type="text" class="form-control dest_zip_range input-text admin__control-text required-entry _required" />
+                    <?php echo __('To:')?> <input id="rate_form_dest_zip_to"  name="dest_zip_to"  value="<?php echo $isRange?$value[1]:$element->getValue()?>" type="text" class="form-control dest_zip_range  input-text admin__control-text required-entry _required" />
+                </div>
+                <input type="checkbox" id="rate_form_dest_zip_handle" value="1" name="dest_zip_handle"<?php if(sizeof($value) == 2):?> checked="checked"<?php endif;?>/> <label for="rate_form_dest_zip_handle"><?php echo __("Use range of zip codes");?></label>
+                <?php /* @escapeNotVerified */ echo $note ?>
+                <script>
+                    require([
+                        'jquery',
+                        'domReady!'
+                    ], function($){
+                        function checkZipRange(){
+                            var zipHandle = $('#rate_form_dest_zip_handle').is(':checked');
+                            if(zipHandle){
+                                $('#dest_zip_handle').hide();
+                                $('#dest_zip_handle input').removeClass('required-entry');
+                                $('#dest_zip_range_handle').show();
+                                $('#dest_zip_range_handle input').addClass('required-entry');
+                            }else{
+                                $('#dest_zip_handle').show();
+                                $('#dest_zip_handle input').addClass('required-entry');
+                                $('#dest_zip_range_handle').hide();
+                                $('#dest_zip_range_handle input').removeClass('required-entry');
+                            }
+                        }
+                        checkZipRange();
+                        $('#rate_form_dest_zip_handle').click(function(){
+                            checkZipRange();
+                        });
+                    });
+                </script>
+            </div>
+        <?php endif; ?>
+        <?php if ($element->getScopeLabel()): ?>
+            <div class="field-service" value-scope="<?php /* @escapeNotVerified */ echo $element->getScopeLabel()?>">
+            </div>
+        <?php endif;?>
+    </div>
+    <?php endif; ?>
+<?php endif; ?>

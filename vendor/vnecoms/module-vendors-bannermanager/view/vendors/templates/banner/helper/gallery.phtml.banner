@@ -1,0 +1,443 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Vnecoms\BannerManager\Block\Vendors\Banner\Helper\Form\Gallery\Upload $block */
+$elementName = 'banner[media_gallery][images]';
+$formName = 'product_form';
+//echo $formName;die;
+
+$uploadUrl = $block->getUrl('bannermanager/banner_gallery/upload');
+$ImageTypes = [];
+$ImageTypes = [
+    'swatch_image' => [
+        'code' => 'swatch_image',
+        'value' => '',
+        'label' => __('Swatch Image'),
+        'scope' => __('[STORE VIEW]'),
+        'name' => __('product[swatch_image]')
+    ],
+    'image' => [
+        'code' => 'image',
+        'value' => '',
+        'label' => __('Base Image'),
+        'scope' => __('[STORE VIEW]'),
+        'name' => __('product[image]')
+    ],
+    'small_image' => [
+        'code' => 'small_image',
+        'value' => '',
+        'label' => 'Small Image',
+        'scope' => __('[STORE VIEW]'),
+        'name' => __('product[small_image]')
+    ],
+    'thumbnail' => [
+        'code' => 'thumbnail',
+        'value' => '',
+        'label' => 'Thumbnail',
+        'scope' => __('[STORE VIEW]'),
+        'name' => __('product[thumbnail]')
+    ]
+];
+
+?>
+
+<!--<div class="row">
+    <div class="add-video-button-container">
+        <button id="add_video_button"
+                title="<?php /*echo $block->escapeHtml(__('Add Video'));*/?>"
+                data-role="add-video-button"
+                type="button"
+                class="action-secondary"
+                data-ui-id="widget-button-1">
+            <span><?php /*echo $block->escapeHtml(__('Add Video')) */?></span>
+        </button>
+    </div>
+</div>-->
+
+<?php
+/** @var $block \Magento\Catalog\Block\Adminhtml\Product\Helper\Form\Gallery\Content */
+$element = $block->getElement();
+$elementToggleCode = $element->getToggleCode() ? $element->getToggleCode() : 'toggleValueElements(this, this.parentNode.parentNode.parentNode)';
+?>
+
+<div id="ves_media_gallery" class="field field-image"  data-attribute-code="image" >
+    <div data-role="gallery"
+         class="gallery"
+         data-images="[]"
+         data-types="<?php /* @escapeNotVerified */ echo $block->escapeHtml($this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($ImageTypes)) ?>"
+         style="display:none">
+
+        <div class="image image-placeholder">
+            <div data-role="uploader" class="uploader">
+                <div class="image-browse">
+                    <span>Browse Files...</span>
+                    <input type="file" name="image" multiple="multiple" data-url="<?php echo $uploadUrl ?>" />
+                </div>
+            </div>
+            <p class="image-placeholder-text">Browse to find or drag image here</p>
+            <div class="spinner">
+                <span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+        <script data-template="uploader" type="text/x-magento-template">
+            <div id="<%- data.id %>" class="file-row">
+                <span class="file-info"><%- data.name %> (<%- data.size %>)</span>
+                <div class="progressbar-container">
+                    <div class="progressbar upload-progress" style="width: 0%;"></div>
+                </div>
+                <div class="spinner">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+        </script>
+
+        <script data-template="gallery-content" type="text/x-magento-template">
+            <div class="image item <% if (data.disabled == 1) { %>hidden-for-front<% } %>"
+                 data-role="image">
+                <input type="hidden"
+                       name="banner[media_gallery][images][<%- data.file_id %>][position]"
+                       value="<%- data.position %>" class="position"/>
+                <input type="hidden"
+                       name="banner[media_gallery][images][<%- data.file_id %>][file]"
+                       value="<%- data.file %>"/>
+                <input type="hidden"
+                       name="banner[media_gallery][images][<%- data.file_id %>][value_id]"
+                       value="<%- data.value_id %>"/>
+                <input type="hidden"
+                       name="banner[media_gallery][images][<%- data.file_id %>][label]"
+                       value="<%- data.label %>"/>
+                <input type="hidden"
+                       name="banner[media_gallery][images][<%- data.file_id %>][disabled]"
+                       value="<%- data.disabled %>"/>
+                <input type="hidden"
+                       name="banner[media_gallery][images][<%- data.file_id %>][removed]"
+                       value=""
+                       class="is-removed"/>
+                <img class="product-image" src="<%- data.url %>" alt="<%- data.label %>"/>
+
+                <button type="button"
+                        class="action-remove"
+                        data-role="delete-button"
+                        title="Remove image">
+                    <span>Remove image</span>
+                </button>
+                <div class="draggable-handle"></div>
+                <div class="image-label" title="Edit role"></div>
+                <div class="image-fade"><span>Hidden</span></div>
+            </div>
+        </script>
+
+        <script data-template="image" type="text/x-magento-template">
+            <div class="image">
+                <img
+                    class="product-image"
+                    src="<%- data.url %>"
+                    data-position="<%- data.position %>"
+                    alt="<%- data.label %>" />
+
+                <button type="button"
+                        class="action-remove"
+                        data-role="delete-button"
+                        title="Remove image">
+                    <span>Remove image</span>
+                </button>
+                <div class="draggable-handle"></div>
+                <div class="image-label" title="Edit role"></div>
+                <div class="image-fade"><span>Hidden</span></div>
+            </div>
+        </script>
+
+    </div>
+
+
+    <div id="image_container"
+         class="images"
+         data-mage-init='{"baseImage": {}}'
+         data-max-file-size="<?php /* @escapeNotVerified */ echo $block->getFileMaxSize() ?>"
+         style="display:none">
+
+        <div class="image image-placeholder">
+            <input type="file" name="image" data-url="<?php /* @escapeNotVerified */ echo $uploadUrl;?>" multiple="multiple" />
+            <img class="spacer" src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/spacer.gif')?>"/>
+            <p class="image-placeholder-text"><?php /* @escapeNotVerified */ echo __('Click here or drag and drop to add images.'); ?></p>
+        </div>
+        <script id="image_container-template"
+                data-template="image"
+                type="text/x-magento-template">
+            <div class="image">
+                <img class="spacer" src="<?php /* @escapeNotVerified */ echo $block->getViewFileUrl('images/spacer.gif')?>"/>
+                <img
+                    class="product-image"
+                    src="<%- data.url %>"
+                    data-position="<%- data.position %>"
+                    alt="<%- data.label %>" />
+                <div class="actions">
+                    <button
+                        type="button"
+                        class="action-delete"
+                        data-role="delete-button"
+                        title="<?php /* @escapeNotVerified */ echo __('Delete image');?>">
+                        <span><?php /* @escapeNotVerified */ echo __('Delete image');?></span>
+                    </button>
+                    <button
+                        type="button"
+                        class="action-make-base"
+                        data-role="make-base-button"
+                        title="<?php /* @escapeNotVerified */ echo __('Make Base');?>">
+                        <span><?php /* @escapeNotVerified */ echo __('Make Base');?></span>
+                    </button>
+                    <div class="draggable-handle"></div>
+                </div>
+                <div class="image-label"></div>
+                <div class="image-fade"><span><?php /* @escapeNotVerified */ echo __('Hidden');?></span></div>
+            </div>
+        </script>
+
+    </div>
+
+    <div id="media_gallery_content<?php //echo $block->getHtmlId() ?>"
+         class="gallery"
+         data-mage-init='{"bannerGallery":{"template": "#media_gallery_content-template"}}'
+         data-parent-component="<?php echo $block->escapeHtml($block->getData('config/parentComponent')) ?>"
+         data-images="<?php echo $block->escapeHtml($block->getImagesJson()) ?>"
+         data-types="<?php echo $block->escapeHtml(
+             $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($ImageTypes)
+         ) ?>"
+    >
+
+        <?php
+        if (!$block->getElement()->getReadonly()):
+            ?>
+            <div class="image image-placeholder">
+                <?php /* @escapeNotVerified */ echo $block->getUploaderHtml();
+                ?>
+                <div class="product-image-wrapper">
+                    <p class="image-placeholder-text">
+                        <?php echo $block->escapeHtml(
+                            __('Browse to find or drag image here')
+                        ); ?>
+                    </p>
+                </div>
+            </div>
+            <?php /* @escapeNotVerified */ echo $block->getChildHtml('additional_buttons'); ?>
+            <?php
+        endif;
+        ?>
+        <?php
+        foreach ($ImageTypes as $typeData):
+            ?>
+            <input name="<?php echo $block->escapeHtml($typeData['name']) ?>"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   class="image-<?php echo $block->escapeHtml($typeData['code']) ?>"
+                   type="hidden"
+                   value="<?php echo $block->escapeHtml($typeData['value']) ?>"/>
+            <?php
+        endforeach;
+        ?>
+        <script id="media_gallery_content<?php /* @escapeNotVerified */ //echo $block->getHtmlId() ?>-template" data-template="image" type="text/x-magento-template">
+            <div class="image item <% if (data.disabled == 1) { %>hidden-for-front<% } %>  <% if (data.video_url) { %>video-item<% } %>"
+                 data-role="image">
+                <input type="hidden" class="item_id" name="banner[media_gallery][images][<%- data.file_id %>][item_id]" value="<%- data.item_id %>" />
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][position]" value="<%- data.position %>" class="position"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][media_type]" value="<%- data.media_type %>"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][file]" value="<%- data.file %>"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][value_id]" value="<%- data.value_id %>"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][label]" value="<%- data.label %>"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][disabled]" value="<%- data.disabled %>"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][removed]" value="" class="is-removed"/>
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_title]" value="<%- data.item_title %>" />
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_alt]" value="<%- data.item_alt %>" />
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_url]" value="<%- data.item_url %>" />
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_short_description]" value="<%- data.item_short_description %>" />
+                <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_status]" value="<%- data.item_status %>" />
+                <input type="hidden" class="item_from_date" name="banner[media_gallery][images][<%- data.file_id %>][from_date]" value="<%- data.from_date %>" />
+                <input type="hidden" class="item_to_date" name="banner[media_gallery][images][<%- data.file_id %>][to_date]" value="<%- data.to_date %>" />
+                <ul class="type-labels" style="display: none">
+                    <li class="type-swatch_image"><?php /* @escapeNotVerified */ echo __('Swatch Image') ?></li>
+                    <li class="type-small_image"><?php /* @escapeNotVerified */ echo __('Small Image') ?></li>
+                    <li class="type-thumbnail"><?php /* @escapeNotVerified */ echo __('Thumbnail') ?></li>
+                </ul>
+                <img class="spacer" src="<?php echo $block->getViewFileUrl('images/spacer.gif')?>"/>
+                <img class="product-image" src="<%- data.url %>" alt="<%- data.label %>"/>
+                <div class="actions" >
+                    <button type="button" class="action-delete" data-role="delete-button" title="<% if (data.media_type == 'external-video') {%>
+                            <?php /* @escapeNotVerified */ echo __('Delete video') ?>
+                        <%} else {%>
+                            <?php /* @escapeNotVerified */ echo __('Delete image') ?>
+                        <%}%>">
+                        <span>
+                            <% if (data.media_type == 'external-video') { %>
+                            <?php /* @escapeNotVerified */ echo __('Delete video') ?>
+                            <% } else {%>
+                            <?php /* @escapeNotVerified */ echo __('Delete image') ?>
+                            <%} %>
+                        </span >
+                    </button>
+
+                    <div class="draggable-handle" ></div >
+                </div >
+
+                <div class="image-fade"><span><?php /* @escapeNotVerified */ echo __('Hidden') ?></span></div>
+
+                <div class="item-description">
+                    <% if (data.media_type !== 'external-video') {%>
+                    <div class="item-title" data-role="img-title"><%- data.label %></div>
+                    <div class="item-size">
+                        <span data-role="image-dimens"></span>, <span data-role="image-size"><%- data.sizeLabel %></span>
+                    </div>
+                    <% } else { %>
+                    <div class="item-title" data-role="img-title"><%- data.video_title %></div>
+                    <% } %>
+                </div>
+
+                <ul class="item-roles" data-role="roles-labels">
+                    <?php
+                    foreach ($ImageTypes as $typeData):
+                        ?>
+                        <li data-role-code="<?php echo $block->escapeHtml(
+                            $typeData['code']
+                        ) ?>" class="item-role item-role-<?php echo $block->escapeHtml(
+                            $typeData['code']
+                        ) ?>">
+                            <?php echo $block->escapeHtml($typeData['label']) ?>
+                        </li>
+                        <?php
+                    endforeach;
+                    ?>
+                </ul>
+            </div>
+        </script>
+
+        <script data-role="img-dialog-container-tmpl" type="text/x-magento-template">
+            <div class="image-panel" data-role="dialog">
+            </div>
+        </script>
+
+        <script data-role="img-dialog-tmpl" type="text/x-magento-template">
+            <div class="image-panel-preview">
+                <img src="<%- data.url %>" alt="<%- data.label %>" />
+            </div>
+            <div class="image-panel-controls">
+                <strong class="image-name"><%- data.label %></strong>
+
+                <fieldset class="admin__fieldset fieldset-image-panel">
+                    <div class="admin__field field-image-description">
+                        <label class="admin__field-label" for="image-description">
+                            <span><?php /* @escapeNotVerified */ echo __('Alt Text')?></span>
+                        </label>
+
+                        <div class="admin__field-control">
+                                <textarea data-role="image-description"
+                                          rows="3"
+                                          class="admin__control-textarea"
+                                          name="<?php /* @escapeNotVerified */
+                                          echo $elementName
+                                          ?>[<%- data.file_id %>][label]"><%- data.label %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="admin__field field-image-role">
+                        <label class="admin__field-label">
+                                <span><?php echo $block->escapeHtml(
+                                        __('Role')
+                                    ); ?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <ul class="multiselect-alt">
+                                <?php
+                                foreach ($ImageTypes as $attribute) :
+                                    ?>
+                                    <li class="item">
+                                        <label>
+                                            <input class="image-type"
+                                                   data-role="type-selector"
+                                                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                                                   type="checkbox"
+                                                   value="<?php echo $block->escapeHtml(
+                                                       $attribute['code']
+                                                   ) ?>"
+                                            />
+                                            <?php /* @escapeNotVerified */ echo $block->escapeHtml(
+                                                $attribute['label']
+                                            ) ?>
+                                        </label>
+                                    </li>
+                                    <?php
+                                endforeach;
+                                ?>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="admin__field admin__field-inline field-image-size" data-role="size">
+                        <label class="admin__field-label">
+                            <span><?php /* @escapeNotVerified */ echo __('Image Size') ?></span>
+                        </label>
+                        <div class="admin__field-value" data-message="<?php /* @escapeNotVerified */ echo __('{size}') ?>"></div>
+                    </div>
+
+                    <div class="admin__field admin__field-inline field-image-resolution" data-role="resolution">
+                        <label class="admin__field-label">
+                            <span><?php /* @escapeNotVerified */ echo __('Image Resolution') ?></span>
+                        </label>
+                        <div class="admin__field-value" data-message="<?php /* @escapeNotVerified */ echo __('{width}^{height} px') ?>"></div>
+                    </div>
+
+                    <div class="admin__field field-image-hide">
+                        <div class="admin__field-control">
+                            <div class="admin__field admin__field-option">
+                                <input type="checkbox"
+                                       id="hide-from-product-page"
+                                       data-role="visibility-trigger"
+                                       data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                                       value="1"
+                                       class="admin__control-checkbox"
+                                       name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][disabled]"
+                                <% if (data.disabled == 1) { %>checked="checked"<% } %> />
+
+                                <label for="hide-from-product-page" class="admin__field-label">
+                                    <?php echo $block->escapeHtml(
+                                        __('Hide from Product Page')
+                                    ); ?>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </script>
+        <!--<div id="<?php /*/* @noEscape */ //echo $block->getNewVideoBlockName();*/?>" style="display:none">
+            <?php /*/* @escapeNotVerified */ //echo $block->getFormHtml();*/?>
+            <div id="video-player-preview-location" class="video-player-sidebar">
+                <div class="video-player-container"></div>
+                <div class="video-information title">
+                    <label><?php /*//echo $block->escapeHtml(__('Title:')); */?> </label><span></span>
+                </div>
+                <div class="video-information uploaded">
+                    <label><?php /*//echo $block->escapeHtml(__('Uploaded:')); */?> </label><span></span>
+                </div>
+                <div class="video-information uploader">
+                    <label><?php /*//echo $block->escapeHtml(__('Uploader:')); */?> </label><span></span>
+                </div>
+                <div class="video-information duration">
+                    <label><?php /*//echo $block->escapeHtml(__('Duration:')); */?> </label><span></span>
+                </div>
+            </div>
+        </div>-->
+
+        <?php //echo $block->getChildHtml('new-video'); ?>
+    </div>
+
+</div><!-- end ves_media_gallery -->
+<!--<script>
+    require(['jquery'], function(jQuery){
+        //jQuery('body').trigger('contentUpdated');
+    });
+</script>-->

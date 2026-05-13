@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="vnecoms_sms_can_send">
+		<observer name="vnecoms_vendorssms_sms_can_send" instance="Vnecoms\VendorsSms\Observer\CanSendSms" />
+	</event>
+	<event name="vnecoms_sms_prepare_sms_data">
+		<observer name="vnecoms_vendorssms_prepare_sms_data" instance="Vnecoms\VendorsSms\Observer\PrepareSmsData" />
+	</event>
+	
+	<!-- Vendor account approval -->
+	<event name="vendor_save_before">
+		<observer name="vnecoms_vendorssms_vendor_save_before" instance="Vnecoms\VendorsSms\Observer\VendorSaveBefore" />
+	</event>
+	
+	<!-- Product approval -->
+	<event name="catalog_product_save_before">
+		<observer name="vnecoms_vendorssms_product_save_before" instance="Vnecoms\VendorsSms\Observer\ProductSaveBefore" />
+	</event>
+	<event name="vnecoms_vendors_push_notification">
+		<observer name="vnecoms_vendorssms_product_approval" instance="Vnecoms\VendorsSms\Observer\ProductApproval" />
+	</event>
+	
+	<!-- New vendor order -->
+	<event name="vendor_order_save_after">
+		<observer name="vnecoms_vendorssms_vendor_order_save_after" instance="Vnecoms\VendorsSms\Observer\OrderSaveAfter" />
+	</event>
+	
+	<!-- New vendor invoice -->
+	<event name="vendor_invoice_save_after">
+		<observer name="vnecoms_vendorssms_vendor_invoice_save_after" instance="Vnecoms\VendorsSms\Observer\InvoiceSaveAfter" />
+	</event>
+	
+	<!-- New vendor shipment -->
+	<event name="sales_order_shipment_save_after">
+		<observer name="vnecoms_vendorssms_shipment_save_after" instance="Vnecoms\VendorsSms\Observer\ShipmentSaveAfter" />
+	</event>
+	
+	<!-- New vendor creditmemo -->
+	<event name="sales_order_creditmemo_save_after">
+		<observer name="vnecoms_vendorssms_creditmemo_save_after" instance="Vnecoms\VendorsSms\Observer\CreditmemoSaveAfter" />
+	</event>
+
+	<event name="vendor_save_after">
+		<observer name="vnecoms_vendorssms_vendor_save_commit_after" instance="Vnecoms\VendorsSms\Observer\UpdateMobileConfig" />
+	</event>
+
+	<event name="customer_save_after">
+		<observer name="vnecoms_vendorssms_customer_save_after" instance="Vnecoms\VendorsSms\Observer\CustomerSaveAfter" />
+	</event>
+
+</config>

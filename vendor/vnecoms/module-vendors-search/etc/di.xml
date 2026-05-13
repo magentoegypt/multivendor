@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <type name="Magento\Catalog\Model\Layer\Resolver">
+        <arguments>
+            <argument name="layersPool" xsi:type="array">
+                <item name="vendor_page_search" xsi:type="string">Vnecoms\VendorsSearch\Model\Layer\Search</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsSearch\Model\Layer\Search">
+        <arguments>
+            <argument name="context" xsi:type="object">Vnecoms\VendorsSearch\Model\Layer\Search\Context</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsSearch\Model\Layer\Search\FilterableAttributeList">
+        <arguments>
+            <argument name="layer" xsi:type="object">Vnecoms\VendorsSearch\Model\Layer\Search</argument>
+        </arguments>
+    </type>
+
+
+    <virtualType name="Vnecoms\VendorsSearch\Model\Layer\Search\Context" type="Magento\Catalog\Model\Layer\Context">
+        <arguments>
+            <argument name="collectionProvider" xsi:type="object">Vnecoms\VendorsSearch\Model\Layer\Search\ItemCollectionProvider</argument>
+            <argument name="stateKey" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\StateKey</argument>
+            <argument name="collectionFilter" xsi:type="object">Vnecoms\VendorsSearch\Model\Layer\Search\CollectionFilter</argument>
+        </arguments>
+    </virtualType>
+
+
+    <virtualType name="Vnecoms\VendorsSearch\Model\ResourceModel\Fulltext\SearchCollection" type="Vnecoms\VendorsSearch\Model\ResourceModel\Fulltext\Collection">
+        <arguments>
+            <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Vnecoms\VendorsSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory" type="Magento\Catalog\Model\ResourceModel\Product\CollectionFactory">
+        <arguments>
+            <argument name="instanceName" xsi:type="string">Vnecoms\VendorsSearch\Model\ResourceModel\Fulltext\SearchCollection</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Vnecoms\VendorsSearch\Model\Layer\Search\ItemCollectionProvider" type="Magento\Catalog\Model\Layer\Search\ItemCollectionProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">Vnecoms\VendorsSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Elasticsearch\SearchAdapter\Query\Builder\Sort">
+        <arguments>
+            <argument name="skippedFields" xsi:type="array">
+                <item name="null" xsi:type="string"></item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\Search\Adapter\Mysql\TemporaryStorage">
+        <plugin name="vendor_search_mysql_temporary_storage" type="Vnecoms\VendorsSearch\Plugin\Search\Adapter\Mysql\TemporaryStorage"/>
+    </type>
+
+</config>

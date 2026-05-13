@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="smsala_apikey" translate="label tooltip" type="obscure" sortOrder="196" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>SMSala API ID</label>
+	                    <config_path>vsms/settings/smsala_apikey</config_path>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+	                    <depends>
+	                        <field id="gateway">smsala</field>
+	                    </depends>
+	                </field>
+                    <field id="smsala_apipassword" translate="label tooltip" type="obscure" sortOrder="196" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>SMSala API Password</label>
+                        <config_path>vsms/settings/smsala_apipassword</config_path>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                            <field id="gateway">smsala</field>
+                        </depends>
+                    </field>
+                    <field id="smsala_sender" translate="label tooltip" type="text" sortOrder="197" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Sender</label>
+                        <config_path>vsms/settings/smsala_sender</config_path>
+                        <depends>
+                            <field id="gateway">smsala</field>
+                        </depends>
+                    </field>
+                    <field id="smsala_unicode" translate="label tooltip" type="select" sortOrder="198" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Unicode Message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>vsms/settings/smsala_unicode</config_path>
+                        <depends>
+                            <field id="gateway">smsala</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,32 @@
+<?php
+$isVendor = $block->isVendor();
+$isAllowCustomer = $block->isAllowCustomerAvatar();
+if ($isAllowCustomer):?>
+    <div id="knockout-avatar-upload" class="field customer-avatar" data-bind="scope: 'avatar'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+        {
+            "#knockout-avatar-upload": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "avatar": {
+                            "component": "Vnecoms_VendorsAvatarProfile/js/form/upload/uploader",
+                            "uploaderConfig":{
+                                "url": "<?= $block->escapeUrl($block->getUrl("customer/avatar/upload")); ?>"
+                            },
+                            "dataScope" : "data.attachment",
+                            "dataType" : "data.text",
+                            "formElement" : "data.input",
+                            "maxFileSize" : "<?= $block->escapeHtml($block->getMaxSizeUpload()); ?>",
+                            "profileUrl": "<?= $block->escapeUrl($block->getUrl("customer/avatar/current")); ?>",
+                            "removeUrl": "<?= $block->escapeUrl($block->getUrl("customer/avatar/remove")); ?>"
+                        }
+                    }
+                }
+            }
+        }
+
+
+        </script>
+    </div>
+<?php endif; ?>

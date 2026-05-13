@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <table name="ves_sms_credit_transaction" resource="default" engine="innodb" comment="SMS Credit Transaction Table">
+        <column xsi:type="int" name="transaction_id" unsigned="true" nullable="false" identity="true" comment="Transaction ID"/>
+
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="true" comment="Vendor Id"/>
+        <column xsi:type="decimal" name="amount" scale="4" precision="12" comment="Amount"/>
+        <column xsi:type="decimal" name="balance" scale="4" precision="12" comment="Balance"/>
+        <column xsi:type="text" name="description" nullable="true"
+                comment="Description"/>
+        <column xsi:type="text" name="additional_info" nullable="true"
+                comment="Additional Info"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="transaction_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VES_VENDOR_ID_CREDIT_SMS" table="ves_sms_credit_transaction"
+                    column="vendor_id" referenceTable="ves_vendor_entity" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="ves_vendor_entity">
+        <column xsi:type="decimal" name="sms_credit" scale="4" precision="12" comment="Sms Credit"/>
+    </table>
+
+    <table name="ves_sms_message">
+        <column xsi:type="decimal" name="price" scale="4" precision="12" comment="Price"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="true" comment="Vendor Id"/>
+    </table>
+
+</schema>

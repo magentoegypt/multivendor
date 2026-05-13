@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" label="Email Creditmemo Items List" design_abstraction="custom">
+    <body>
+
+        <referenceBlock name="vendor.rma.request.item.renderers">
+            <block class="Vnecoms\VendorsRMA\Block\Frontend\Customer\NewRequest\DefaultItems"
+                   as="default" template="Vnecoms_VendorsRMA::new_request/create/default.phtml"/>
+
+            <block class="Vnecoms\VendorsRMA\Block\Frontend\Customer\NewRequest\BundleItems"
+                   as="bundle" template="Vnecoms_VendorsRMA::new_request/create/bundle.phtml" />
+        </referenceBlock>
+
+    </body>
+</page>

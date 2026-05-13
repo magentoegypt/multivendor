@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Vnecoms_Quotation::main" sortOrder="10" title="Quote">
+                	<resource id="Vnecoms_Quotation::quote" sortOrder="10" title="Manage Quotes">
+	                    <resource id="Vnecoms_Quotation::save" sortOrder="10" title="Save Quote"/>
+	                    <resource id="Vnecoms_Quotation::delete" sortOrder="20" title="Delete Quote"/>
+	                    <resource id="Vnecoms_Quotation::update" sortOrder="30" title="Update Quote"/>
+	                    <resource id="Vnecoms_Quotation::view" sortOrder="40" title="View Quote"/>
+	                    <resource id="Vnecoms_Quotation::send" sortOrder="40" title="Send Message Quote"/>
+	                    <resource id="Vnecoms_Quotation::cancel" sortOrder="40" title="Cancel Quote"/>
+	                    <resource id="Vnecoms_Quotation::approve" sortOrder="40" title="Approve Quote"/>
+                    </resource>
+                    <resource id="Vnecoms_Quotation::config" sortOrder="20" title="Quote Configuration"/>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

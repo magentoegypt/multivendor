@@ -1,0 +1,17 @@
+<?php
+/**
+ * @var $this \Vnecoms\VendorsCms\Model\App\Page\Group\AbstractGroup
+ */
+?>
+<div class="fieldset-wrapper page_group_container" id="page_group_container_<%- data.id %>">
+    <div class="fieldset-wrapper-title">
+        <label for="app_instance[<%- data.id %>][page_group]">Display on <span class="required">*</span></label>
+        <?php echo $this->getDisplayOnSelectHtml(); ?>
+        <div class="actions">
+            <?php /* @escapeNotVerified */ echo $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($this->getRemoveLayoutButtonHtml()) ?>
+        </div>
+        <div class="fieldset-wrapper-content">
+
+        </div>
+    </div>
+</div>

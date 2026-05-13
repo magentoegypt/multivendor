@@ -1,0 +1,26 @@
+<?php
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * @var $block \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Proposal
+ *
+ */
+?>
+
+<div class="admin__field field-apply-coupon-code">
+    <label class="admin__field-label"><span><?php /* @escapeNotVerified */ echo __('Apply Proposal') ?></span></label>
+    <div class="admin__field-control">
+        <input type="text" class="admin__control-text" id="proposal:subtotal_proposal" value="" name="subtotal_proposal" />
+        <div class="admin__field admin__field-option">
+            <input type="checkbox" class="admin__control-checkbox" id="proposal:proposal_is_percentage" value="1" name="proposal_is_percentage">
+            <label class="admin__field-label" for="proposal:proposal_is_percentage"><?php echo __(' as percentage') ?></label>
+        </div>
+        <?php echo $block->getButtonHtml(__('Apply'), 'quote.applyProposal($F(\'proposal:subtotal_proposal\'))') ?>
+    </div>
+</div>

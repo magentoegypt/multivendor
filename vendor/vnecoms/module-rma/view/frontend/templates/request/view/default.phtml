@@ -1,0 +1,79 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Magento\Sales\Block\Order\Email\Items\DefaultItems */
+
+/** @var $_item \Magento\Sales\Model\Order\Item */
+$_item = $block->getItem();
+$_order = $_item->getOrder();
+$RmaItemExtant = $block->getRmaItemExtant($_item);
+?>
+<?php if($block->checkItemForCurentRequest($_item)): ?>
+    <tr>
+        <td class="item-image">
+            <img src="<?php echo $block->getImage($_item->getProduct());?>"/>
+        </td>
+        <td class="item-info<?php if ($block->getItemOptions()): ?> has-extra<?php endif; ?>">
+            <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p>
+            <p class="sku"><?= /* @escapeNotVerified */  __('SKU'); ?>: <?= $block->escapeHtml($block->getSku($_item)) ?></p>
+            <?php if ($block->getItemOptions()): ?>
+                <dl class="item-options">
+                    <?php foreach ($block->getItemOptions() as $option): ?>
+                        <dt><strong><em><?= /* @escapeNotVerified */  $option['label'] ?></em></strong></dt>
+                        <dd>
+                            <?= /* @escapeNotVerified */  nl2br($option['value']) ?>
+                        </dd>
+                    <?php endforeach; ?>
+                </dl>
+            <?php endif; ?>
+            <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+            <?php if ($addInfoBlock) :?>
+                <?php $addInfoBlock->setItem($_item)->toHtml() ?>
+            <?php endif; ?>
+            <?php $block->escapeHtml($_item->getDescription()) ?>
+        </td>
+        <?php $dataItems = $block->getRmaItem($_item) ?>
+
+        <td class="item-qty">
+
+            <div class="value value_item_qty" id="value_item_qty<?php echo $dataItems["item_id"] ?>" >
+                <span><?php echo $dataItems["qty"] ?></span>
+            </div>
+
+            <?php if ($block->checkStatusRma()): ?>
+                <div class="value edit-box" id="edit-box-item_qty" style="display:none"  >
+                    <input type="text" class="input-text required-entry" style="width:160px;"
+                           value="<?php echo $dataItems["qty"] ?>" name="qty" id="qty<?php echo $dataItems["item_id"] ?>"
+                           autocomplete="off" />
+                    <div class="info-edit-ctrls">
+                        <a class="rule-chooser-trigger" href="javascript:void(0)" rel="qty<?php echo $dataItems["item_id"] ?>"></a>
+                        <a class="rule-param-apply" href="javascript:void(0)" rel="qty<?php echo $dataItems["item_id"] ?>"></a>
+                    </div>
+                </div>
+                <div class="edit-field">
+                    <a class="rule-param-edit" href="javascript:void(0)"></a>
+                </div>
+            <?php endif;?>
+
+            <?php if ($dataItems["rma"]) : ?>
+                <p><?php echo __("Other RMA for this product:") ?></p>
+                <ul>
+                    <?php foreach($dataItems["rma"] as $request): ?>
+                        <li><a href="<?php echo $block->getUrl("vrma/customer/view",array("id"=>$request["request_id"])) ?>" target="_blank">
+                                <?php echo "#".$request["request_increment_id"] ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif ?>
+            <input id="order-item-count-qty<?php echo $dataItems["item_id"] ?>"
+                   type="hidden" value="<?php echo (int)($RmaItemExtant["qty"]) ?>">
+            <input id="item-id-qty<?php echo $dataItems["item_id"] ?>"
+                   type="hidden" value="<?php echo $dataItems["item_id"] ?>">
+        </td>
+
+    </tr>
+<?php endif ?>

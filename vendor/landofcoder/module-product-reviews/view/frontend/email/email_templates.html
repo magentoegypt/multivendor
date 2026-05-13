@@ -1,0 +1,44 @@
+<!--
+  ~ Landofcoder
+  ~
+  ~ NOTICE OF LICENSE
+  ~
+  ~ This source file is subject to the Landofcoder.com license that is
+  ~ available through the world-wide-web at this URL:
+  ~ https://landofcoder.com/terms
+  ~
+  ~ DISCLAIMER
+  ~
+  ~ Do not edit or add to this file if you wish to upgrade this extension to newer
+  ~ version in the future.
+  ~
+  ~ @category   Landofcoder
+  ~ @package    Lof_ProductReviews
+  ~ @copyright  Copyright (c) 2021 Landofcoder (https://www.landofcoder.com/)
+  ~ @license    https://landofcoder.com/terms
+  -->
+<!--@subject {{trans "Welcome to %store_name" store_name=$store.getFrontendName()}} @-->
+<!--@vars {
+"var this.getUrl($store, 'customer/account/')":"Customer Account URL",
+"var data.sender_email":"sender Email",
+"var data.sender_name":"sender Name",
+"var data.name":"Customer Name",
+"var data.email":"sender Name",
+"var data.product_name":"product Name",
+"var data.product_url":"Product Url"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+<h5>{{trans "Dear "}} {{var data.name|raw}}</h5>
+<p>{{trans "Thanks so much for purchasing"}} <strong>{{var data.product_name|raw}}</strong> {{trans "on our %store_name." store_name=$store.getFrontendName()}}</p>
+<p>{{trans 'We are so happy if you feel free and possibility to make a review and rating for our product which you purchased.'}}</p>
+<p>
+    {{trans
+        'To sign in to our site for the review, please go <a href="%customer_url">My Account</a> page:'
+        customer_url=$this.getUrl($store,'customer/account/',[_nosid:1])
+    |raw}}
+</p>
+<p>{{trans 'Here is the product which you purchased '}}</p>
+<p>{{var data.products|raw}}</p>
+<p>{{trans 'Order ID:'}} #{{var data.order_increment_id|raw}}</p>
+{{template config_path="design/email/footer_template"}}

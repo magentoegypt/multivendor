@@ -1,0 +1,38 @@
+<?php
+
+// @codingStandardsIgnoreFile
+
+/**
+ * @var Vnecoms\BannerManager\Block\Vendors\Banner\Edit\Tab\Implementcode $block
+ */
+?>
+
+<?php if($block->getBanner()->getId()):?>
+    <div class="banner-implement-wrapper ves-banner notices-wrapper">
+        <div class="messages">
+
+            <div class="message cms-page-add">
+                <div class="notice-msg">
+                    <strong><?php /* @escapeNotVerified */ echo __("Place code below in the Page or Block which you want to display this banner")?></strong>
+                </div>
+                <div class="code">
+                    <div class="message info ">
+                    {{banner banner_id="<?php /* @escapeNotVerified */ echo $block->getBanner()->getId()?>"}}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<?php else: ?>
+    <div class="banner-implement-wrapper ves-banner notices-wrapper">
+        <div class="messages">
+            <div class="message info">
+                <div class="notice-msg">
+                    <strong><?php /* @escapeNotVerified */ echo __("You must save this banner first to see the implement code.") ?></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif;?>
+

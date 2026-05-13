@@ -1,0 +1,45 @@
+<script type="text/javascript">
+    require([
+            "jquery",
+            "prototype",
+        ], function(Jquery){
+            var custom_message = JSON.parse('<?php echo $block->getOptionVendorTemplate() ?>');
+
+            function changeTemplate(type){
+                if(type == "customer"){
+                    var templateId = $('template_customer').value;
+
+                }else{
+                    var templateId = $('template_vendor').value;
+                }
+
+                if(templateId != "" && custom_message[templateId] == 1){
+                    $("resolve-message-"+type).show();
+                }else{
+                    $("resolve-message-"+type).hide();
+                }
+
+            }
+           window.changeTemplate = changeTemplate;
+            function previewTemplate(type){
+                if(type == "customer"){
+                    var templateId = $('template_customer').value;
+                    if(!templateId){
+                        alert("<?php echo __("Please Select Template!") ?>")
+                    }else{
+                        var win = window.open('<?php echo $block->getUrl("vrma/email/preview") ?>id/'+templateId, '_blank');
+                        win.focus();
+                    }
+                }else{
+                    var templateId = $('template_vendor').value;
+                    if(!templateId){
+                        alert("<?php echo __("Please Select Template!") ?>")
+                    }else{
+                        var win = window.open('<?php echo $block->getUrl("vrma/email/preview") ?>id/'+templateId, '_blank');
+                        win.focus();
+                    }
+                }
+            }
+            window.previewTemplate = previewTemplate;
+    });
+</script>

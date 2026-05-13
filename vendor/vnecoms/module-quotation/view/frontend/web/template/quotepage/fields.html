@@ -1,0 +1,29 @@
+<!--
+  ~ Copyright © 2017 Vnecoms. All rights reserved.
+  -->
+
+
+<div class="step-title" data-bind="i18n: 'Enter your details'" data-role="title"></div>
+<!-- ko if: loginEnabled -->
+<!-- ko foreach: getRegion('customer-email') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!--/ko-->
+<!--/ko-->
+
+<!-- ko foreach: getRegion('guest-checkout') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!--/ko-->
+
+<form class="form" id="quotation-fields" data-hasrequired="* Required Fields">
+    <fieldset class="fieldset" id="guest-fields" data-bind="visible: showGuestField">
+        <!-- ko foreach: getRegion('guest-fieldsets') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+    </fieldset>
+
+    <fieldset class="fieldset" data-bind="visible: showQuotationFields">
+        <!-- ko foreach: getRegion('quote-information-fieldsets') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+    </fieldset>
+</form>

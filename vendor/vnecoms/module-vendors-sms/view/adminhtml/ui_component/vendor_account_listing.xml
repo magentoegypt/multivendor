@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <columns name="vendor_columns">
+        <column name="sms_credit" class="Vnecoms\VendorsSms\Ui\Component\Listing\Columns\Price">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">textRange</item>
+                    <item name="component" xsi:type="string">Vnecoms_Credit/js/grid/columns/balance</item>
+                    <item name="add_field" xsi:type="boolean">true</item>
+                    <item name="label" xsi:type="string" translate="true">SMS Credit</item>
+                    <item name="sortOrder" xsi:type="number">86</item>
+                </item>
+            </argument>
+        </column>
+    </columns>
+</listing>

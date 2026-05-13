@@ -1,0 +1,36 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout for Magento 2
+ */
+/** @var \Amasty\Checkout\Block\Adminhtml\Field\Edit\Group\Renderer $block */
+/** @var Magento\Framework\Escaper $escaper */
+?>
+<?php $isStoreSelected = $block->isStoreSelected() ?>
+
+<div class="admin__page-section-title">
+    <span class="title"><?= $escaper->escapeHtml($block->getElement()->getData('title')) ?></span>
+</div>
+
+<table class="data-table" data-role="fields-table">
+<thead>
+    <tr>
+        <td></td>
+        <td><?= $escaper->escapeHtml(__('Field'))?></td>
+        <td><?= $escaper->escapeHtml(__('Label'))?></td>
+        <td><?= $escaper->escapeHtml(__('Placeholder'))?></td>
+        <td class="center"><?= $escaper->escapeHtml(__('Width'))?></td>
+        <td class="required"><?= $escaper->escapeHtml(__('Required'))?></td>
+        <?php if ($isStoreSelected): ?>
+            <td class="center default-value"><?= $escaper->escapeHtml(__('Default Value'))?></td>
+        <?php endif ?>
+    </tr>
+</thead>
+    <tbody data-role="field-set" data-enabled="<?= (int)$block->getElement()->getData('enabled')?>">
+<?= $block->getElement()->getChildrenHtml() ?>
+    <tr class="placeholder">
+        <td colspan="<?= $isStoreSelected ? 6 : 5 ?>"><?= $escaper->escapeHtml(__('Drop fields here'))?></td>
+    </tr>
+    </tbody>
+</table>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <event name="ves_vendorsconfig_form_fieldset_prepare_before">
+        <observer name="ves_vendorstablerate_form_fieldset_prepare_before" instance="Vnecoms\VendorsShippingTableRate\Observer\ProcessFieldConfig" />
+    </event>
+
+    <event name="ves_vendor_menu_check_acl">
+        <observer name="ves_vendorstablerate_menu_check_acl" instance="Vnecoms\VendorsShippingTableRate\Observer\ProcessMenuConfig" />
+    </event>
+
+</config>

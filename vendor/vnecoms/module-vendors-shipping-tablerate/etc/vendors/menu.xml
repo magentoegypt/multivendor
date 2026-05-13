@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <!--<add id="Vnecoms_VendorsRMA::rma" icon="fa fa-rma" title="RMA" module="Vnecoms_VendorsRMA" sortOrder="30" parent="Vnecoms_VendorsSales::sales" resource="Vnecoms_Vendors::rma" dependsOnModule="Vnecoms_VendorsRMA" />-->
+        <add id="Vnecoms_VendorsShippingTableRate::shipping" title="Shipping Methods" sortOrder="100" module="Vnecoms_VendorsShippingTableRate"  parent="Vnecoms_VendorsSales::sales" dependsOnModule="Vnecoms_VendorsShippingTableRate" resource="Vnecoms_VendorsShippingTableRate::shipping" />
+        <add id="Vnecoms_VendorsShippingTableRate::shipping_table" title="Table Rate" sortOrder="50" module="Vnecoms_VendorsShippingTableRate" action="shipping/tablerate/" parent="Vnecoms_VendorsShippingTableRate::shipping" dependsOnModule="Vnecoms_VendorsShippingTableRate" resource="Vnecoms_VendorsShippingTableRate::shipping_table" />
+    </menu>
+</config>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_shipping_tablerate" resource="default" engine="innodb" comment="Vendor Shipping Table Rate">
+        <column xsi:type="int" name="rate_id" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="vendor_id" unsigned="true" nullable="false" comment="Vendor Id"/>
+        <column xsi:type="varchar" name="dest_country_id" nullable="false" length="255" comment="Country Id"/>
+        <column xsi:type="varchar" name="dest_region_id" nullable="false" length="255" comment="Region Id"/>
+        <column xsi:type="varchar" name="dest_region_name" nullable="false" length="255" comment="Region Name"/>
+        <column xsi:type="varchar" name="dest_zip" nullable="false" length="255" comment="Zip code"/>
+        <column xsi:type="varchar" name="condition_name" nullable="false" length="255" comment="Condition name"/>
+        <column xsi:type="decimal" name="condition_value_from" scale="4" precision="12" nullable="false" comment="Condition value from"/>
+        <column xsi:type="decimal" name="condition_value_to" scale="4" precision="12" nullable="false" comment="Condition value to"/>
+        <column xsi:type="decimal" name="price" scale="4" precision="12" comment="Price"/>
+        <column xsi:type="varchar" name="delivery_type" nullable="false" length="255" comment="Delivery Type"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rate_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_SHIPPING_TABLE_RATE_ENTITY_ID" table="ves_vendor_shipping_tablerate"
+                    column="vendor_id" referenceTable="ves_vendor_entity" referenceColumn="entity_id"/>
+    </table>
+</schema>

@@ -1,0 +1,66 @@
+<!--
+/**
+ * Copyright © 2017 Vnecoms. All rights reserved.
+ * See LICENSE.txt for license details.
+ */
+-->
+
+<div class="seller-search-result" data-bind="visible: showContent()">
+
+    <div class="ves-sellerlist-inner block" data-bind="visible: anyResultCount()">
+
+        <div class="block-content">
+            <div class="sellers wrapper">
+
+                <div class="sellers-container ajax-sellers-container" data-bind="visible: result.seller.data().length > 0">
+
+                    <div class="seller-loading-mask" data-role="chat-loader" >
+                        <div class="seller-loader">
+                            <img alt="Loading..." data-bind="attr: {'src': getLoaderImage()}">
+                        </div>
+                    </div>
+
+                    <!-- ko i18n: 'Found Seller: '--><!-- /ko -->
+                    <span class="search-result" data-bind="text: result.seller.size"></span>
+
+                    <ul class="seller-list " role="listbox" data-bind="foreach: result.seller.data">
+                        <li class="item">
+                            <div class="info seller-info">
+                                <div class="info-inner">
+
+                                    <div class="qs-option-image" data-bind="visible: image">
+                                        <a data-bind="attr: {href: seller_url}">
+                                            <img data-bind="attr: { src: image, title: 'Go to '+ vendor_id, class: 's-logo img-logo' }" />
+                                        </a>
+                                    </div>
+
+                                    <div class="name-area">
+                                        <a href="javascript:void(0);">
+                                            <h2 data-bind="attr: { title: vendor_id, class: 's-name' }, text: vendor_id"></h2>
+                                        </a>
+                                    </div>
+
+                                    <div class="clearer additional-data">
+                                        <div>
+                                            <span class="total-items-count" data-bind="text: product_counts + ' product(s)'"></span>
+                                            <a class="seller-items-link" data-bind="attr: {href: seller_item_urls}, i18n: 'View Seller Items'"></a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="no-result" data-bind="visible: !anyResultCount()"><!-- ko i18n: 'No Result'--><!-- /ko --></div>
+
+</div>
+

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_Quotation::css/product-view.css"/>
+    </head>
+    <body>
+        <referenceBlock name="product.info.addtocart">
+            <block class="Vnecoms\Quotation\Block\Catalog\Product"
+                   name="product.info.addtoquote"
+                   as="product_info_addtoquote" template="Vnecoms_Quotation::catalog/product.phtml" />
+        </referenceBlock>
+
+        <referenceBlock name="product.info.addtocart.additional">
+            <block class="Vnecoms\Quotation\Block\Catalog\Product"
+                   name="product.info.additional.addtoquote"
+                   as="product_form_additional_addtoquote" template="Vnecoms_Quotation::catalog/product.phtml" />
+        </referenceBlock>
+
+    </body>
+</page>

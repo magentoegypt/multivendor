@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vendors">
+            <group id="vendorsdomain" translate="label tooltip" type="text" sortOrder="42" showInDefault="1" showInWebsite="1" showInStore="1">
+            	<label>Vendor Domain</label>
+            	<field id="main_domain" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Main Marketplace Domain</label>
+                    <frontend_class>required-entry</frontend_class>
+                    <comment><![CDATA[This domain will be used to generate subdomains for vendor to use for his home page.<br /> Enter the domain without http. e.g. <strong>marketplace.com</strong> => <strong>vendor001.marketplace.com</strong>]]></comment>
+                </field>
+                <field id="url_key" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>URL Key</label>
+                    <frontend_class>required-entry</frontend_class>
+                    <comment><![CDATA[This URL key is used to separate vendor page and general page.]]></comment>
+                </field>
+                <field id="enable_login" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Allow vendor to login to vendor panel from his own domain</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="use_custom_path" translate="label" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Use Custom Vendor Path</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If this option is set to No, The vendor panel URL will be like this: http://www.vendordomain.com/admin/</comment>
+                    <depends>
+                    	<field id="enable_login">1</field>
+                    </depends>
+                </field>
+                <field id="custom_path" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>URL Key of Vendor Panel</label>
+                    <depends>
+                    	<field id="enable_login">1</field>
+                        <field id="use_custom_path">1</field>
+                    </depends>
+                    <comment>Vendor panel url will be like this: http://www.vendordomain.com/vendor_panel_url_key</comment>
+                </field>
+                <field id="current_domain_param" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Current Domain Server Param</label>
+                    <source_model>Vnecoms\VendorsDomain\Model\Config\Source\DomainServerParams</source_model>
+                    <comment>The extension will use this param to get current domain from $_SERVER variable.</comment>
+                </field>
+                <field id="custom_domain_param" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Custom Param</label>
+                    <depends>
+                        <field id="current_domain_param">custom</field>
+                    </depends>
+                </field>
+                <field id="redirect_checkout" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Redirect to main marketplace domain to process checkout</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="dns_instruction" translate="label" type="editor" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                	<frontend_model>Vnecoms\Vendors\Block\System\Config\Form\Field\Editor</frontend_model>
+                    <label>Change DNS Instruction</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

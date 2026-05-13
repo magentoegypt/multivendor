@@ -1,0 +1,72 @@
+
+<?php
+
+// @codingStandardsIgnoreFile
+/** @var \Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Items\Proposal $block */
+
+?>
+
+<div class="quote-item-proposals-container" id="item-<?php echo $block->getItem()->getId()?>" data-element-id="item-<?php echo $block->getItem()->getId()?>" data-bind="scope: '<?php /* @escapeNotVerified */ echo $block->getUiElementId(); ?>'">
+    <table class="admin__dynamic-rows admin__control-table quote-table-proposal" data-bind="afterRender: setIsRendered">
+        <thead>
+            <tr class="headings">
+                <th class="col-qty"><span><?php echo __('Qty')?></span></th>
+                <th class="col-proposal"><span><?php echo __('Price')?></span></th>
+                <th class="col-margin"><span><?php echo __('Margin GP')?></span></th>
+                <th class="col-default"><span><?php echo __('Default')?></span></th>
+                <th class="col-proposal-action last"><span></span></th>
+            </tr>
+        </thead>
+        <tbody style="display: none;" data-bind="visible: isRendered">
+        <!-- ko foreach: {data: proposals(), as: 'proposal'} -->
+            <tr>
+                <td class="col-qty">
+                    <input type="text" class="admin__control-text validate-number required-entry" data-bind="enable: $parent.isEditable, valueUpdate: 'keyup' , value: qty, event: {keyup: $parent.updateIsSaved.bind($parent, $index, 'qty')}"/>
+                </td>
+                <td class="col-price col-proposal">
+                    <input type="text"
+                           class="admin__control-text validate-number required-entry"
+                           data-bind="enable: $parent.isEditable, valueUpdate: 'keyup', value: price, event: {keyup: $parent.updateIsSaved.bind($parent, $index, 'price')}"/>
+                </td>
+                <td class="col-margin">
+                    <span data-bind="text: $parent.getMarginGp(proposal)"></span>
+                </td>
+                <td class="col-default">
+                    <input type="radio" name="item<?php echo $block->getItem()->getId()?>_proposal" data-bind="enable: (proposal_id() != 0) && $parent.isEditable(), value: proposal_id, checked: $parent.defaultProposal"/>
+                </td>
+                <td class="col-proposal-action last">
+                <!-- ko if:$parent.isEditable() -->
+                    <!-- ko ifnot:isSaved() -->
+                    <a class="proposal-action-save" href="#" data-bind="click: $parent.saveProposal.bind($parent, $index)"><i class="quote-icon-check-circle"></i></a>
+                    <!-- /ko -->
+                    <a class="proposal-action-delete" href="#" data-bind="click: $parent.removeProposal.bind($parent, $index)"><i class="quote-icon-times-circle"></i></a>
+                <!-- /ko -->
+                </td>
+            </tr>
+        <!-- /ko -->
+        </tbody>
+        <tfoot style="display: none;" data-bind="visible: isRendered() && isEditable()">
+            <tr>
+                <td colspan="5">
+                    <button type="button" class="btn-success primary" data-action="add_new_row" data-bind="click: addProposal">
+                        <i class="quote-icon-plus-circle"></i> <span><?php echo __("Add")?></span>
+                    </button>
+                    <!-- ko if:canSaveAllProposals() -->
+                    <button type="button" class="action-secondary proposal-action-save-all" data-action="save_all_proposals" data-bind="click: saveAllProposals">
+                        <i class="quote-icon-check-circle"></i> <span><?php echo __("Save All")?></span>
+                    </button>
+                    <!-- /ko -->
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
+<script>
+require([
+    'jquery',
+    'Magento_Ui/js/core/app'
+], function ($, uiApp) {
+	uiApp(<?php /* @escapeNotVerified */ echo $block->getJsLayout();?>);
+});
+</script>

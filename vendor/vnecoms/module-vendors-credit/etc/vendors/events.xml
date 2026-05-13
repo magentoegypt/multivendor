@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="ves_vendorsconfig_form_fieldset_prepare_before">
+		<observer name="ves_vendorscredit_enable_disable_withdrawal_methods" instance="Vnecoms\VendorsCredit\Observer\WithdrawalMethods" />
+	</event>
+
+	<!-- Refund order, add credit to customer credit account -->
+	<event name="vendors_sales_order_creditmemo_register_before">
+		<observer name="vnecoms_vendors_credit_creditmemo_register_before" instance="Vnecoms\VendorsCredit\Observer\RegisterCreditmemo" />
+	</event>
+
+	<event name="vendor_order_cancel_after">
+		<observer name="vnecoms_vendorscredit_vendor_order_cancel_after" instance="Vnecoms\VendorsCredit\Observer\BackCredit" />
+	</event>
+
+	<event name="ves_vendor_menu_check_acl">
+		<observer name="ves_vendorscredit_menu_check_acl" instance="Vnecoms\VendorsCredit\Observer\ProcessMenuConfig" />
+	</event>
+
+</config>

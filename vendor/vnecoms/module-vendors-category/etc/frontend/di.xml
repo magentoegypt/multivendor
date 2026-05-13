@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!--<type name="Magento\Framework\App\RouterList">-->
+        <!--<arguments>-->
+            <!--<argument name="routerList" xsi:type="array">-->
+                <!--<item name="urlrewrite" xsi:type="array">-->
+                    <!--<item name="class" xsi:type="string">Magento\UrlRewrite\Controller\Router</item>-->
+                    <!--<item name="disable" xsi:type="boolean">false</item>-->
+                    <!--<item name="sortOrder" xsi:type="string">40</item>-->
+                <!--</item>-->
+            <!--</argument>-->
+        <!--</arguments>-->
+    <!--</type>-->
+    <!--<type name="Vnecoms\VendorsPage\Controller\Router">-->
+        <!--<plugin name="compatibleVendorCategory" type="Vnecoms\VendorsCategory\Plugin\Controller\Router" sortOrder="10"/>-->
+    <!--</type>-->
+
+    <type name="Vnecoms\VendorsCategory\Block\Product\ListProduct">
+        <arguments>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+            <argument name="catalogLayer" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsCategory\Block\Navigation\State">
+        <arguments>
+            <argument name="layerResolver" xsi:type="object">Vnecoms\VendorsLayerNavigation\Model\Layer\Resolver</argument>
+        </arguments>
+    </type>
+    <!--<type name="Vnecoms\VendorsLayerNavigation\Block\Navigation\State">-->
+        <!--<plugin name="changeClearUrl" type="Vnecoms\VendorsCategory\Plugin\Block\Navigation\State"/>-->
+    <!--</type>-->
+</config>

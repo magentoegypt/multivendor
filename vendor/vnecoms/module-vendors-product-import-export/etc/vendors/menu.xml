@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Vnecoms. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_Vendors:etc/menu.xsd">
+    <menu>
+    	<add id="Vnecoms_Vendors::product_import_export" icon="fa fa-cloud-upload" title="Mass Import/Export" translate="title" sortOrder="90" module="Vnecoms_VendorsProductImportExport" dependsOnModule="Vnecoms_VendorsProductImportExport" resource="Vnecoms_Vendors::product_import_export"/>
+    	<add id="Vnecoms_Vendors::product_import_media" title="Manage Images" translate="title" sortOrder="10" module="Vnecoms_VendorsProductImportExport" action="catalog/import_media" parent="Vnecoms_Vendors::product_import_export" dependsOnModule="Vnecoms_VendorsProductImportExport" resource="Vnecoms_Vendors::product_import_media"/>
+    	<add id="Vnecoms_Vendors::product_import" title="Import" translate="title" sortOrder="20" module="Vnecoms_VendorsProductImportExport" action="catalog/import" parent="Vnecoms_Vendors::product_import_export" dependsOnModule="Vnecoms_VendorsProductImportExport" resource="Vnecoms_Vendors::product_import"/>
+    	<add id="Vnecoms_Vendors::product_export" title="Export" translate="title" sortOrder="30" module="Vnecoms_VendorsProductImportExport" action="catalog/export" parent="Vnecoms_Vendors::product_import_export" dependsOnModule="Vnecoms_VendorsProductImportExport" resource="Vnecoms_Vendors::product_export"/>
+    </menu>
+</config>

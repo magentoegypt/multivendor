@@ -1,0 +1,39 @@
+<?php
+/** @var \Vnecoms\VendorsCms\Block\Vendors\App\Edit\Tab\Implementcode $block  */
+//echo __('BLOCK');
+?>
+
+
+<?php if($block->getCurrentApp()->getAppId() !== NULL) :?>
+    <div class="appcode-wrap">
+        <div class="fieldset admin__fieldset fieldset-widget-options box box-primary">
+            <div class="box-header with-border">
+                <i class="fa fa-bars"></i>
+                <h3 class="box-title notice-msg"><?php echo __("Implementation code")?></h3>
+            </div><!-- /.box-header -->
+            <div class="box-body form-horizontal">
+                <div class="messages">
+                </div>
+                <pre><?php echo $block->getAppStringEncode() ?></pre>
+            </div>
+        </div><!-- /.box-body -->
+    </div>
+<?php else:?>
+    <div class="appcode-wrap">
+        <div class="fieldset admin__fieldset fieldset-widget-options box box-primary">
+            <div class="box-header with-border">
+                <i class="fa fa-bars"></i>
+                <h3 class="box-title notice-msg"><?php echo __("Implementation code")?></h3>
+            </div><!-- /.box-header -->
+            <div class="box-body form-horizontal">
+                <div class="messages">
+                    <strong><?php echo __("You need to save this app before you can see the implementation code.")?></strong>
+                </div>
+            </div>
+        </div><!-- /.box-body -->
+    </div>
+<?php endif;?>
+
+
+
+

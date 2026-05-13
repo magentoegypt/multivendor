@@ -1,0 +1,59 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    window.READY_FOR_DRAWING = false;
+    google.charts.load('current', {'packages':['corechart','table'], 'language': 'en'});
+
+    google.charts.setOnLoadCallback(setReadyForDrawChart);
+    function setReadyForDrawChart(){
+      window.READY_FOR_DRAWING = true;
+    }
+</script>
+<div class="row row-grap reports-container" id="reports-container">
+    <div class="col-md-12">
+        <div id="calendar-controller" class="dropdown calendar-controller" data-bind="scope: 'reports'">
+            <div id="calendar-title" class="calendar-title" data-toggle="dropdown">
+                <span data-bind="html:selectedDateRangeTitle"></span>
+                <i class="fa fa-calendar pull-right"></i>
+            </div>
+            <ul id="calendar-container" class="dropdown-menu calendar-container">
+                <li>
+                    <a data-period="custom"><?php echo __("Custom")?></a>
+                </li>
+                <?php foreach($block->getDateRanges() as $key => $range):?>
+                <li><a data-bind="click: changeDateRange;" data-date-type="<?php echo $key?>" data-date-title="<?php echo $range['title']?>" data-date-value="<?php echo $range['value']?>"><?php echo $range['label']?></a></li>
+                <?php endforeach;?>
+            </ul>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <?php echo $this->getChildHtml("reports_graph")?>
+    </div>
+
+    <div class="col-md-12">
+        <div class="box">
+            <div class="box-body">
+                <div id="report-data-table"></div>
+            </div>
+        </div>
+    </div>
+
+    <?php if($this->getJsLayout()):?>
+        <script type="text/x-magento-init">
+        {
+            "#calendar-controller": {
+                "Magento_Ui/js/core/app": <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+            }
+        }
+    </script>
+    <?php endif;?>
+</div>
+<script type="text/javascript">
+require(['jquery'], function($){
+    $('#vendor_report_graph').on("tabsactivate", function(event, ui) {
+    	if(typeof(vnecoms_reports) != 'undefined'){
+        	var graphType = $(ui.newPanel).children('div').attr('id');
+    		vnecoms_reports.drawGraph(graphType);
+    	}
+    });
+});
+</script>

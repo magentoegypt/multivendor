@@ -1,0 +1,3 @@
+<?php foreach($block->getChildNames() as $childName):?>
+    <?php echo $this->getChildBlock($childName)->setVendor($block->getVendor())->toHtml(); ?>
+<?php endforeach;?>

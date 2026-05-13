@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_vendor_profile_notification" resource="default" engine="innodb" comment="Vendor Profile Notification">
+        <column xsi:type="int" name="process_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+
+        <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Title"/>
+        <column xsi:type="varchar" name="type" nullable="false" length="63" comment="Type"/>
+        <column xsi:type="text" name="additional_data" nullable="true" comment="Additional Info"/>
+
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Sort Order"/>
+        <column xsi:type="smallint" name="status" unsigned="true" nullable="false" identity="false"
+                default="0" comment="Status"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="process_id"/>
+        </constraint>
+
+    </table>
+</schema>

@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+	<route url="/V1/carts/mine/vendor-coupons/:couponCode" method="PUT">
+        <service class="Vnecoms\VendorsCoupon\Api\CouponManagementInterface" method="set"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/guest-carts/:cartId/vendor-coupons/:couponCode" method="PUT">
+        <service class="Vnecoms\VendorsCoupon\Api\GuestCouponManagementInterface" method="set"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/carts/mine/vendor-coupons/:couponCode" method="DELETE">
+        <service class="Vnecoms\VendorsCoupon\Api\CouponManagementInterface" method="removeCoupon"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/guest-carts/:cartId/vendor-coupons/:couponCode" method="DELETE">
+        <service class="Vnecoms\VendorsCoupon\Api\GuestCouponManagementInterface" method="removeCoupon"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/carts/mine/vendor-coupons" method="GET">
+        <service class="Vnecoms\VendorsCoupon\Api\CouponManagementInterface" method="getDiscountDetail"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/guest-carts/:cartId/vendor-coupons" method="GET">
+        <service class="Vnecoms\VendorsCoupon\Api\GuestCouponManagementInterface" method="getDiscountDetail"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+</routes>

@@ -1,0 +1,46 @@
+{
+    "ves_vendor_withdrawal": {
+        "column": {
+            "withdrawal_id": true,
+            "vendor_id": true,
+            "method": true,
+            "method_title": true,
+            "amount": true,
+            "fee": true,
+            "net_amount": true,
+            "additional_info": true,
+            "note": true,
+            "reason_cancel": true,
+            "code_of_transfer": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "VES_VENDOR_WITHDRAWAL_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "ves_vendor_escrow": {
+        "column": {
+            "escrow_id": true,
+            "vendor_id": true,
+            "relation_id": true,
+            "amount": true,
+            "additional_info": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "VES_VENDOR_ESCROW_VENDOR_ID_VES_VENDOR_ENTITY_ENTITY_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "sales_invoice_item": {
+        "column": {
+            "commission": true,
+            "commission_description": true
+        }
+    }
+}

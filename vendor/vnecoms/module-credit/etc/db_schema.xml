@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_store_credit" resource="default" engine="innodb" comment="Store Credit Table">
+        <column xsi:type="int" name="entity_id" unsigned="true" nullable="false" identity="true"
+                comment="ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" identity="false"
+                comment="Customer ID"/>
+
+        <column xsi:type="decimal" name="credit" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Credit"/>
+
+        <constraint xsi:type="unique" referenceId="VNECOMS_UNIQUE_CUSOMTER_ID">
+            <column name="customer_id"/>
+        </constraint>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_CREDIT_CUSTOMER_ID_FOREIGN"
+                    table="ves_store_credit" column="customer_id" referenceTable="customer_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="ves_store_credit_transaction" resource="default" engine="innodb" comment="Store Credit Transaction Table">
+        <column xsi:type="int" name="transaction_id" unsigned="true" nullable="false" identity="true"
+                comment="Transaction Id"/>
+
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" identity="false"
+                comment="Customer ID"/>
+
+        <column xsi:type="varchar" name="type" nullable="false" length="32" comment="Customer Gender"/>
+
+        <column xsi:type="decimal" name="amount" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Amount"/>
+
+        <column xsi:type="decimal" name="balance" scale="4" precision="12" unsigned="false" nullable="true"
+                default="0" comment="Balance"/>
+
+        <column xsi:type="text" name="description" nullable="true" comment="Description"/>
+
+        <column xsi:type="text" name="additional_info" nullable="true" comment="Additional Info"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="transaction_id"/>
+        </constraint>
+
+        <constraint xsi:type="foreign" referenceId="VNECOMS_CREDIT_CUSTOMER_ID_FOREIGN"
+                    table="ves_store_credit_transaction" column="customer_id" referenceTable="ves_store_credit"
+                    referenceColumn="customer_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="quote">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+
+    <table name="quote_item">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+
+    <table name="quote_address">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+
+    <table name="sales_order">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+        <column xsi:type="decimal" name="credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+    </table>
+
+    <table name="sales_order_item">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_invoiced" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit Invoice"/>
+        <column xsi:type="decimal" name="credit_invoiced" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit Invoice"/>
+        <column xsi:type="decimal" name="base_credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+        <column xsi:type="decimal" name="credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+    </table>
+
+    <table name="sales_invoice">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+
+    <table name="sales_invoice_item">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+
+    <table name="sales_creditmemo">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+        <column xsi:type="decimal" name="credit_refunded" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Refunded to Store Credit"/>
+    </table>
+
+    <table name="sales_creditmemo_item">
+        <column xsi:type="decimal" name="credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+        <column xsi:type="decimal" name="base_credit_amount" scale="4" precision="12" unsigned="false" nullable="false"
+                default="0" comment="Used credit"/>
+    </table>
+</schema>

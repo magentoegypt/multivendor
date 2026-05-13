@@ -1,0 +1,86 @@
+@font-face {
+    font-family: 'helpdesk';
+    src:    url('../fonts/helpdesk.eot?uqpbf5');
+    src:    url('../fonts/helpdesk.eot?uqpbf5#iefix') format('embedded-opentype'),
+    url('../fonts/helpdesk.ttf?uqpbf5') format('truetype'),
+    url('../fonts/helpdesk.woff?uqpbf5') format('woff'),
+    url('../fonts/helpdesk.svg?uqpbf5#helpdesk') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+.message-box .field.uploader{float: left;width: 100%}
+.message-box .file-uploader-summary{float: left;
+    padding-right: 10px;
+    width: 20%;
+    margin-top: 20px;
+}
+.admin__control-wysiwig{margin-bottom:10px;}
+.message-box .file-uploader{margin-top: 10px}
+.message-box .file-uploader-preview{background: #ffffff none repeat scroll 0 0;
+    border: 1px solid #cacaca;
+    box-sizing: border-box;
+    cursor: pointer;
+    height: 125px;
+    line-height: 1;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    position: relative;
+    width: 100%;}
+.message-box .file-uploader .file-uploader-meta{display: none}
+.message-box .file-uploader .file-uploader-filename{display: none}
+/*.file-uploader-preview{height: 120px;width: 100%}*/
+.message-box .file-uploader-area > input{cursor: pointer;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0;}
+.message-box .file-uploader-preview .action-remove {
+    bottom: 4px;
+    cursor: pointer;
+    display: block;
+    left: 6px;
+    position: absolute;
+    text-decoration: none;
+    z-index: 2;
+}
+.message-box .file-uploader-preview .action-remove::before {
+    color: #514943;
+    content: "";
+    display: inline-block;
+    font-family: "helpdesk" !important;
+    font-size: 2rem;
+    font-weight: normal;
+    line-height: inherit;
+    overflow: hidden;
+    text-align: center;
+    vertical-align: middle;
+}
+.message-box .file-uploader-preview .action-remove > span {
+    border: 0 none;
+    clip: rect(0px, 0px, 0px, 0px);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+.message-box .file-uploader .fa-file-pdf-o{color:red}
+.message-box .file-uploader .fa-file-text-o{color:black}
+.message-box .file-uploader .fa-file-archive-o{color:#4e0a83}
+.message-box .file-uploader .fa-file-word-o{color:#1a51b6}
+.message-box .file-uploader .fa-file-excel-o{color:#19b415}
+
+.message-box .file-uploader .icon-attachment{display: inline-block;font-size: 40px;padding-top: 28px;text-align: center;width: 100%;}
+.message-box .file-uploader-spinner {
+    background-image: url("../images/loader-1.gif");
+    background-position: 50% center;
+    background-repeat: no-repeat;
+    background-size: 15px auto;
+    display: none;
+    height: 30px;
+    margin-left: 1rem;
+    vertical-align: top;
+    width: 15px;
+}
+.message-box .file-uploader._loading .file-uploader-spinner{display: inline-block;}

@@ -1,0 +1,132 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<preference for="Vnecoms\Quotation\Api\QuoteRepositoryInterface" type="Vnecoms\Quotation\Model\QuoteRepository"/>
+	<preference for="Vnecoms\Quotation\Api\Data\QuoteInterface" type="Vnecoms\Quotation\Model\Quote"/>
+	<preference for="Vnecoms\Quotation\Api\Data\QuoteSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+	<preference for="Vnecoms\Quotation\Api\MessageRepositoryInterface" type="Vnecoms\Quotation\Model\MessageRepository"/>
+	<preference for="Vnecoms\Quotation\Api\Data\MessageInterface" type="Vnecoms\Quotation\Model\Message"/>
+	<preference for="Vnecoms\Quotation\Api\Data\MessageSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+	<preference for="Vnecoms\Quotation\Api\ItemRepositoryInterface" type="Vnecoms\Quotation\Model\ItemRepository"/>
+	<preference for="Vnecoms\Quotation\Api\Data\ItemInterface" type="Vnecoms\Quotation\Model\Item"/>
+	<preference for="Vnecoms\Quotation\Api\Data\ItemSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+	<preference for="Vnecoms\Quotation\Api\ProposalRepositoryInterface" type="Vnecoms\Quotation\Model\ProposalRepository"/>
+	<preference for="Vnecoms\Quotation\Api\Data\ProposalInterface" type="Vnecoms\Quotation\Model\Proposal"/>
+	<preference for="Vnecoms\Quotation\Api\Data\ProposalSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+	<virtualType name="Vnecoms\Quotation\Model\ResourceModel\Quote\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">vnecoms_quotation_quote</argument>
+			<argument name="resourceModel" xsi:type="string">Vnecoms\Quotation\Model\ResourceModel\Quote\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="vnecoms_quote_grid_data_source" xsi:type="string">Vnecoms\Quotation\Model\ResourceModel\Quote\Grid\Collection</item>
+				<item name="vnecoms_message_grid_data_source" xsi:type="string">Vnecoms\Quotation\Model\ResourceModel\Message\Grid\Collection</item>
+				<item name="vnecoms_proposal_grid_data_source" xsi:type="string">Vnecoms\Quotation\Model\ResourceModel\Proposal\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
+	<!--<virtualType name="Vnecoms\Quotation\Model\ResourceModel\Message\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">-->
+		<!--<arguments>-->
+			<!--<argument name="mainTable" xsi:type="string">vnecoms_message</argument>-->
+			<!--<argument name="resourceModel" xsi:type="string">Vnecoms\Quotation\Model\ResourceModel\Message\Collection</argument>-->
+		<!--</arguments>-->
+	<!--</virtualType>-->
+	<!--<virtualType name="Vnecoms\Quotation\Model\ResourceModel\Proposal\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">-->
+		<!--<arguments>-->
+			<!--<argument name="mainTable" xsi:type="string">vnecoms_proposal</argument>-->
+			<!--<argument name="resourceModel" xsi:type="string">Vnecoms\Quotation\Model\ResourceModel\Proposal\Collection</argument>-->
+		<!--</arguments>-->
+	<!--</virtualType>-->
+
+	<virtualType name="Vnecoms\Quotation\FileUploader" type="Magento\Catalog\Model\ImageUploader">
+		<arguments>
+			<argument name="baseTmpPath" xsi:type="string">ves_quotation/tmp/attachments</argument>
+			<argument name="basePath" xsi:type="string">ves_quotation/attachments</argument>
+			<argument name="allowedExtensions" xsi:type="array">
+				<item name="jpg" xsi:type="string">jpg</item>
+				<item name="jpeg" xsi:type="string">jpeg</item>
+				<item name="gif" xsi:type="string">gif</item>
+				<item name="png" xsi:type="string">png</item>
+			</argument>
+		</arguments>
+	</virtualType>
+
+	<type name="Vnecoms\Quotation\Controller\Message\Upload">
+		<arguments>
+			<argument name="fileUploader" xsi:type="object">Vnecoms\Quotation\FileUploader</argument>
+		</arguments>
+	</type>
+
+	<type name="Vnecoms\Quotation\Controller\Message\Send">
+		<arguments>
+			<argument name="imageUploader" xsi:type="object">Vnecoms\Quotation\FileUploader</argument>
+		</arguments>
+	</type>
+
+	<virtualType name="Vnecoms\Quotation\Model\Quote\Pdf\Config" type="Magento\Sales\Model\Order\Pdf\Config">
+		<arguments>
+			<argument name="dataStorage" xsi:type="object">quotePdfConfigDataStorage</argument>
+		</arguments>
+	</virtualType>
+
+	<type name="Vnecoms\Quotation\Model\Quote\Pdf">
+		<arguments>
+			<argument name="pdfConfig" xsi:type="object">Vnecoms\Quotation\Model\Quote\Pdf\Config</argument>
+		</arguments>
+	</type>
+
+	<virtualType name="Vnecoms\Quotation\Model\Quote\Pdf\Config\Reader" type="Magento\Sales\Model\Order\Pdf\Config\Reader">
+		<arguments>
+			<argument name="fileName" xsi:type="string">quote_pdf.xml</argument>
+			<argument name="converter" xsi:type="object">Magento\Sales\Model\Order\Pdf\Config\Converter</argument>
+			<argument name="schemaLocator" xsi:type="object">Vnecoms\Quotation\Model\Quote\Pdf\Config\SchemaLocator</argument>
+		</arguments>
+	</virtualType>
+
+	<virtualType name="quotePdfConfigDataStorage" type="Magento\Framework\Config\Data">
+		<arguments>
+			<argument name="reader" xsi:type="object">Vnecoms\Quotation\Model\Quote\Pdf\Config\Reader</argument>
+			<argument name="cacheId" xsi:type="string">quote_pdf_config</argument>
+		</arguments>
+	</virtualType>
+
+
+	<!--<type name="Vnecoms\Quotation\Model\Session">
+		<arguments>
+			<argument name="storage" xsi:type="object">Vnecoms\Quotation\Model\Session\Storage</argument>
+		</arguments>
+	</type>
+
+	<virtualType name="Vnecoms\Quotation\Model\Session\Storage" type="Magento\Framework\Session\Storage">
+		<arguments>
+			<argument name="namespace" xsi:type="string">quotation</argument>
+		</arguments>
+	</virtualType>-->
+	
+	<type name="Vnecoms\VendorsPriceComparison\Helper\Data">
+        <arguments>
+            <argument name="allowedAttributes" xsi:type="array">
+                <item name="ves_enable_order" xsi:type="string">ves_enable_order</item>
+                <item name="ves_enable_quote" xsi:type="string">ves_enable_quote</item>
+            </argument>
+        </arguments>
+    </type>
+
+	<type name="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Items\Grid">
+		<arguments>
+			<argument name="productConfig" xsi:type="object">Vnecoms\Quotation\Helper\Product\Configuration</argument>
+			<argument name="bundleConfig" xsi:type="object">Vnecoms\Quotation\Helper\Product\Bundle</argument>
+		</arguments>
+	</type>
+
+	<type name="Magento\Checkout\Controller\Cart\Configure">
+		<plugin name="beforeUpdateItemQuote" type="Vnecoms\Quotation\Plugin\Controller\UpdateItemOptions" disabled="false"/>
+	</type>
+
+</config>

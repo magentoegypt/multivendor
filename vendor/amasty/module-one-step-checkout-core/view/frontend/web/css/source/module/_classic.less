@@ -1,0 +1,601 @@
+// @codingStandardsIgnoreFile
+//
+//  One Step Checkout
+
+//
+//  Variables
+//  ---------------------------------------------
+
+@mobile-screen-width: 900px;
+@icon-close-base64: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZmlsbD0ibm9uZSIgZD0iTS0xLTFoMTJ2MTJILTF6Ii8+PHBhdGggZmlsbD0iI2I1YjViNSIgY2xhc3M9ImFjdGl2ZS1wYXRoIiBkPSJNNiA1bDQtNC0xLTEtNCA0LTQtNC0xIDEgNCA0LTQgNCAxIDEgNC00IDQgNCAxLTEtNC00eiIgc3Ryb2tlPSJudWxsIi8+PC9zdmc+);
+@amcheckout-fieldbox-side__padding: 7px;
+@amcheckout__background-color: #eaeaea;
+@amcheckout-minicart-delete__border-color: #b6b6b6;
+@amcheckout-registration__border-color: #f58c12;
+
+//
+//  Utils
+//  ---------------------------------------------
+
+.-am-blocked {
+    pointer-events: none;
+}
+
+//
+//  Common
+//  ---------------------------------------------
+
+& when (@media-common = true) {
+    //  Checkout Page
+    .checkout-index-index {
+        .page-header .minicart-wrapper {
+            display: none;
+        }
+
+        .authentication-wrapper {
+            margin-right: 9px;
+        }
+
+        .checkout-header {
+            & {
+                margin: 12px 0 20px;
+                padding: 0 9px;
+                width: 70%;
+            }
+
+            .title {
+                margin: 0 auto 7px;
+            }
+
+            .description {
+                font-size: 18px;
+            }
+        }
+
+        .opc-wrapper.am-opc-wrapper {
+            & {
+                .lib-vendor-prefix-display(flex);
+                .lib-css(justify-content, space-between, 1);
+                .lib-vendor-prefix-flex-direction(column);
+
+                float: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+            }
+
+            &.layout-2columns .checkout-column,
+            &.layout-3columns .checkout-column {
+                width: 100%;
+            }
+
+            &.layout-3columns .shipping-address-item {
+                &:nth-child(3n + 1):before {
+                    display: block;
+                }
+
+                &:nth-child(2n + 1):before {
+                    display: none;
+                }
+            }
+
+            &.layout-3columns .shipping-address-item,
+            &.layout-2-3-columns .shipping-address-item {
+                & {
+                    width: 50%;
+                }
+
+                &:only-child {
+                    width: 100%;
+                }
+            }
+
+            &.layout-3columns .table-checkout-shipping-method,
+            &.layout-2-3-columns .table-checkout-shipping-method {
+                min-width: 0;
+                width: 100%;
+            }
+
+            &:before {
+                display: none;
+            }
+
+            .step-content {
+                margin: 0;
+            }
+
+            .shipping-address {
+                margin-bottom: 0;
+            }
+
+            #co-payment-form { // phpcs:ignore
+                .discount-code {
+                    display: none;
+                }
+
+                .rewards-add {
+                    display: none;
+                }
+
+                .gift-code {
+                    display: none;
+                }
+            }
+
+            .form-login {
+                &:not(:last-child) {
+                    border-bottom: none;
+                    padding-bottom: 0;
+                }
+            }
+
+            .discount-code .payment-option-title {
+                border: none;
+            }
+
+            .checkout-agreement {
+                .lib-vendor-prefix-display(flex);
+                .lib-vendor-prefix-flex-wrap(wrap);
+            }
+
+            .checkout-agreement label {
+                .lib-css(flex, 1, 1);
+            }
+
+            .checkout-agreement div.mage-error {
+                .lib-vendor-prefix-flex-basis(100%);
+            }
+
+            .checkout-agreement .action-show {
+                text-align: left;
+            }
+
+            .payment-method-content,
+            .payment-option-content {
+                padding: 0 22px 20px;
+            }
+
+            .payment-option-content .action-apply {
+                margin-right: 0;
+            }
+
+            .payment-method-content .actions-toolbar > .primary {
+                padding-right: 0;
+            }
+
+            .checkout-block > li {
+                list-style-type: none;
+            }
+
+            .checkout-payment-method .payment-methods .step-title {
+                border-bottom: 1px solid #ccc;
+            }
+
+            .field.amcheckout-comment {
+                margin-bottom: 10px;
+            }
+
+            .label {
+                word-break: break-all;
+                word-wrap: break-word;
+            }
+
+            .checkout-billing-address {
+                & {
+                    max-width: 500px;
+                }
+
+                .billing-address-same-as-shipping-block {
+                    margin: 5px 0 10px;
+                }
+
+                .actions-toolbar {
+                    margin-top: 15px;
+                }
+
+                .actions-toolbar .action.action-cancel {
+                    margin: 0 20px 0 0;
+                }
+
+                .primary {
+                    float: right;
+                }
+
+                .field-select-billing .label {
+                    display: none;
+                }
+            }
+
+            .checkout-shipping-address {
+                .primary {
+                    float: right;
+                }
+            }
+        }
+
+        //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+        .am-submit-summary #checkout-payment-method-load {
+            .actions-toolbar {
+                display: none;
+            }
+
+            .payment-method-billing-address .actions-toolbar {
+                display: block;
+            }
+        }
+
+        .am-submit-fixed {
+            //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+            #checkout-payment-method-load .actions-toolbar {
+                background-color: @amcheckout__background-color;
+                display: block;
+                left: 50%;
+                margin-left: auto;
+                margin-right: auto;
+                position: fixed;
+                text-align: center;
+                transform: translate(-50%);
+                width: @layout__max-width - (@layout-indent__width * 2);
+                z-index: 999;
+            }
+
+            //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+            #checkout-payment-method-load .actions-toolbar > * {
+                float: none;
+            }
+
+            //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+            &.-top #checkout-payment-method-load .actions-toolbar {
+                bottom: auto;
+                top: 0;
+            }
+
+            //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+            &.-bottom #checkout-payment-method-load .actions-toolbar {
+                bottom: 0;
+            }
+        }
+
+        .checkout-block {
+            .lib-css(transition, box-shadow .5s, 1);
+            background: @color-white;
+            box-shadow: 0 1px 1px 1px rgba(0, 0, 0, .15);
+            margin: 7px 9px 32px;
+            padding: 24px 12px;
+
+            &:hover {
+                box-shadow: 0 1px 4px 1px rgba(25, 121, 195, .45);
+            }
+
+            .fieldset > br,
+            .fieldset > hr {
+                display: none;
+            }
+        }
+
+        .am-checkout {
+            & {
+                margin: 20px 0;
+                padding: 12px;
+            }
+
+            .product-item {
+                .amcheckout-price-wrapper {
+                    .lib-font-size(12);
+                    margin: 5px 0;
+                }
+            }
+        }
+
+        .am-checkout:not(.-modern) {
+            background: @amcheckout__background-color;
+        }
+
+        .opc-block-summary {
+            & {
+                margin: -24px -12px 0;
+                padding: 24px 12px;
+            }
+
+            .minicart-items-wrapper {
+                margin: 0;
+            }
+        }
+
+        .additional-options {
+            & {
+                margin: 24px 7px 12px;
+            }
+
+            & .checkout-agreements {
+                & .action-show {
+                    background: none;
+                    border: 0;
+                    border-radius: 0;
+                    color: @color-blue2;
+                    display: inline;
+                    font-weight: 400;
+                    line-height: 1.42857143;
+                    padding: 0;
+                    text-decoration: none;
+                }
+
+                & .action-show:not(:focus) {
+                    box-shadow: none;
+                }
+            }
+
+            .field {
+                margin-top: 7px;
+            }
+        }
+
+        .amcheckout-form-login {
+            .mage-error:not([style*='display: none;']) + .field-error {
+                display: none;
+            }
+        }
+
+        .additional-options .field._required .label:after {
+            color: @color-red10;
+            content: '*';
+            font-size: 1.2rem;
+            margin: 0 0 0 5px;
+        }
+
+        .opc-block-summary .minicart-items {
+            input[type='number']::-webkit-inner-spin-button,
+            input[type='number']::-webkit-outer-spin-button {
+                -webkit-appearance: inner-spin-button !important;
+            }
+
+            input[type='number']:focus {
+                -moz-appearance: spinner !important;
+            }
+
+            input.qty {
+                width: 55px;
+            }
+
+            button {
+                float: right;
+                margin-top: 12px;
+            }
+
+            .delete {
+                .lib-css(background, @icon-close-base64 no-repeat center);
+                background-size: 7px;
+                border: 1px @amcheckout-minicart-delete__border-color solid;
+                cursor: pointer;
+                float: left;
+                height: 7px;
+                padding: 3px;
+                width: 7px;
+            }
+
+            .product-item-details {
+                padding-left: 118px;
+            }
+
+            .product-image-container {
+                margin-left: 16px;
+            }
+        }
+
+        @media (min-width: @mobile-screen-width) {
+            .opc-wrapper.am-opc-wrapper {
+                .lib-vendor-prefix-flex-direction(row);
+
+                &.layout-2columns .checkout-column {
+                    width: 50%;
+                }
+
+                &.layout-3columns .checkout-column {
+                    width: 33.3%;
+                }
+            }
+        }
+
+        //  Override PostNL styles - Begin
+        //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+        #opc-shipping_method #checkout-shipping-method-load .table-checkout-shipping-method {
+            & {
+                max-width: 600px;
+            }
+
+            .col-price {
+                min-width: unset;
+            }
+        }
+
+        //  Override PostNL styles - End
+        .modal-popup:not(.agreements-modal):not(.popup-authentication) .modal-inner-wrap {
+            left: 0;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 500px;
+            right: 0;
+            width: 100%;
+        }
+
+        #recaptcha-checkout-place-order-wrapper .grecaptcha-badge {
+            margin-bottom: 20px;
+        }
+    }
+
+    .checkout-payment-method .payment-methods {
+        & {
+            margin: 0;
+        }
+
+        .actions-toolbar .primary {
+            font-size: 1.8rem;
+            line-height: 2.2rem;
+            padding: 14px 17px;
+        }
+    }
+
+    .checkout-payment-method.submit .payment-methods {
+        margin: 0;
+    }
+
+    .fieldset.address {
+        margin: 0 -@amcheckout-fieldbox-side__padding;
+
+        & > .field {
+            box-sizing: border-box;
+            display: inline-block;
+            padding: 0 @amcheckout-fieldbox-side__padding;
+            vertical-align: top;
+            width: 100%;
+        }
+    }
+
+    //  Success Page
+    .checkout-success .success-messages {
+        font-size: 1.8rem;
+        margin-bottom: 40px;
+    }
+
+    .account .column.main .order-details-items {
+        & {
+            margin-bottom: 0;
+        }
+
+        .order-items .data.table > tbody > tr:nth-child(even) > td {
+            background: none;
+        }
+    }
+
+    .page-main .block.block-order-details {
+        & {
+            margin-bottom: 25px;
+        }
+
+        .order-date {
+            border-bottom: 1px solid @color-gray-light6;
+            font-size: 1.6rem;
+            padding-bottom: 25px;
+        }
+    }
+
+    .page-main .block.block-order-details-comments {
+        margin-bottom: 35px;
+    }
+
+    .page-main .block.block-order-details-view {
+        & {
+            margin-bottom: 10px;
+        }
+
+        &:nth-child(2) .block-title {
+            display: none;
+        }
+    }
+
+    //  phpcs:ignore Magento2.Less.AvoidId.IdSelectorUsage
+    #registration {
+        border-left: 3px solid @amcheckout-registration__border-color;
+        margin: 20px 0 25px;
+        padding: 0 0 0 12px;
+        position: relative;
+        width: 600px;
+
+        br {
+            display: none;
+        }
+
+        form {
+            .lib-css(transform, translateY(-50%), 1);
+            position: absolute;
+            right: 0;
+            top: 50%;
+        }
+    }
+
+    //  Disable minicart in estimated total block
+    .opc-estimated-wrapper .minicart-wrapper {
+        display: none;
+    }
+
+    .amcheckout-trust-badges {
+        display: flex;
+        justify-content: flex-start;
+        margin-top: 10px;
+    }
+
+    .amcheckout-trust-seal {
+        & {
+            font-size: 8px;
+            max-width: 137px; // default place order button width (classic/English)
+        }
+
+        .checkout-payment-method & {
+            font-size: 10px;
+            margin: 0 auto 15px;
+            max-width: 66%;
+            text-align: center;
+        }
+
+        .am-checkout.-layout-3columns .checkout-payment-method & {
+            font-size: 12px;
+        }
+
+        .amcheckout-title,
+        .amcheckout-description {
+            margin-bottom: 0;
+        }
+    }
+}
+
+//
+//  Mobile
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .am-checkout {
+        .product-item {
+            .product-item-inner {
+                flex-direction: column;
+            }
+        }
+    }
+}
+
+//
+//  Tablet
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__s) {
+    .checkout-index-index .modal-popup.modal-slide:not(.agreements-modal):not(.popup-authentication) .modal-inner-wrap {
+        width: 500px;
+    }
+
+    .amcheckout-trust-seal {
+        .checkout-payment-method & {
+            font-size: inherit;
+        }
+    }
+}
+
+//
+//  Tablet +
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .checkout-index-index {
+        .amcheckout-trust-badges {
+            justify-content: flex-end;
+        }
+    }
+}
+
+//
+//  Desktop
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .checkout-index-index .opc-wrapper.am-opc-wrapper .shipping-address-item {
+        width: 50%;
+    }
+}

@@ -1,0 +1,2 @@
+# module-vendors-price-comparison
+

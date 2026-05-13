@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div class="minicart-items vendor-coupon-list">
+    <ul>
+        <?php if ($block->getCouponCode()): ?>
+            <li>
+                <span><?php echo $block->getCouponCode()?></span>
+                <a id="cancel-coupon-btn" href="javascript:void(0);" title="<?php echo __("Remove")?>" class="action delete remove-coupon"><span><?php echo __("Remove")?></span></a>
+            </li>
+        <?php endif;?>
+        <?php 
+            $discountDetail = $block->getQuote()->getData('vendor_discount_detail');
+            if ($discountDetail):
+            $discountDetail = json_decode($discountDetail, true);
+            if(is_array($discountDetail)):
+        ?>
+            <?php foreach($discountDetail as $discountInfo):?>
+            <?php if(isset($discountInfo['vendor_id']) && $discountInfo['vendor_id']):?>
+                <li<?php if($block->canShowStoreName()):?> class="with-store-name"<?php endif;?>>
+                    <a href="<?php echo $block->getUrl('vendorcoupon/index/remove',['code' => $discountInfo['label']])?>" title="<?php echo __("Remove")?>" class="action delete remove-coupon"><span><?php echo __("Remove")?></span></a>
+                    <span><?php echo $discountInfo['label']?></span>
+                    <?php if($block->canShowStoreName()):?>
+                    <div class="discount-description"><?php echo $block->getVendorStoreName($discountInfo['vendor_id'])?></div>
+                    <?php endif;?>
+                </li>
+            <?php endif;?>
+            <?php endforeach;?>
+        <?php endif;?>
+            <?php endif;?>
+    </ul>
+</div>

@@ -1,0 +1,23 @@
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: $col.isSingle($row()._rowIndex) -->
+<a
+    class="action-menu-item"
+    data-bind="
+        repeat: {
+            foreach: $col.getVisibleActions($row()._rowIndex),
+            item: '$action'
+        }"
+    data-repeat-bind="
+        attr: {
+            href: $action().href,
+            target: $action().target,
+        },
+        click: $col.getActionHandler($action()),
+        text: $action().label"
+    ></a>
+<!-- /ko -->

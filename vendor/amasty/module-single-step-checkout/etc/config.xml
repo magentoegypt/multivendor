@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <amasty_checkout>
+            <design>
+                <text_and_default_values>
+                    <custom_place_order>0</custom_place_order>
+                    <custom_place_order_text>Place Order</custom_place_order_text>
+                </text_and_default_values>
+                <address_checkbox_state>checked</address_checkbox_state>
+                <optional_ui_elements>
+                    <email_tooltip>1</email_tooltip>
+                    <email_tooltip_text>We’ll send your order confirmation here</email_tooltip_text>
+                    <phone_tooltip>1</phone_tooltip>
+                    <phone_tooltip_text>For delivery questions</phone_tooltip_text>
+                </optional_ui_elements>
+            </design>
+            <additional_options>
+                <phone_validation>0</phone_validation>
+                <phone_min_length>1</phone_min_length>
+                <phone_max_length>10</phone_max_length>
+            </additional_options>
+        </amasty_checkout>
+    </default>
+</config>

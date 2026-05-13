@@ -1,0 +1,278 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var $block \Vnecoms\BannerManager\Block\Vendors\Banner\Helper\Form\Gallery */
+$elementName = $block->getElement()->getName() . '[images]';
+$formName = $block->getFormName();
+
+?>
+<div id="<?php echo $block->getHtmlId() ?>"
+     class="gallery"
+     data-mage-init='{"bannerGallery":{"template":"#<?php echo $block->getHtmlId() ?>-template"}}'
+     data-parent-component="<?php echo $block->escapeHtml($block->getData('config/parentComponent')) ?>"
+     data-images="<?php echo $block->escapeHtml($block->getImagesJson()) ?>"
+     data-types="<?php echo $block->escapeHtml(
+         $this->helper('Magento\Framework\Json\Helper\Data')->jsonEncode($block->getImageTypes())
+     ) ?>"
+    >
+    <?php if (!$block->getElement()->getReadonly()) {?>
+        <div class="image image-placeholder">
+            <?php echo $block->getUploaderHtml(); ?>
+            <div class="product-image-wrapper">
+                <p class="image-placeholder-text">
+                    <?php /* @escapeNotVerified */ echo __('Browse to find or drag image here'); ?>
+                </p>
+            </div>
+        </div>
+    <?php } ?>
+    <?php foreach ($block->getImageTypes() as $typeData) {
+    ?>
+        <input name="<?php echo $block->escapeHtml($typeData['name']) ?>"
+               data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+               class="image-<?php echo $block->escapeHtml($typeData['code']) ?>"
+               type="hidden"
+               value="<?php echo $block->escapeHtml($typeData['value']) ?>"/>
+    <?php
+
+} ?>
+
+    <script id="<?php echo $block->getHtmlId() ?>-template" type="text/x-magento-template">
+        <div class="image item<% if (data.disabled == 1) { %> hidden-for-front<% } %>"
+             data-role="image">
+            <input type="hidden" class="item_id" name="banner[media_gallery][images][<%- data.file_id %>][item_id]" value="<%- data.item_id %>" />
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][position]" value="<%- data.position %>" class="position"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][media_type]" value="<%- data.media_type %>"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][file]" value="<%- data.file %>"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][value_id]" value="<%- data.value_id %>"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][label]" value="<%- data.label %>"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][disabled]" value="<%- data.disabled %>"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][removed]" value="" class="is-removed"/>
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][title]" value="<%- data.title %>" />
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][alt]" value="<%- data.alt %>" />
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_url]" value="<%- data.item_url %>" />
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_short_description]" value="<%- data.item_short_description %>" />
+            <input type="hidden" name="banner[media_gallery][images][<%- data.file_id %>][item_status]" value="<%- data.item_status %>" />
+            <input type="hidden" class="item_from_date" name="banner[media_gallery][images][<%- data.file_id %>][from_date]" value="<%- data.from_date %>" />
+            <input type="hidden" class="item_to_date" name="banner[media_gallery][images][<%- data.file_id %>][to_date]" value="<%- data.to_date %>" />
+
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][position]"
+                   value="<%- data.position %>"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   class="position"/>
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][file]"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   value="<%- data.file %>"/>
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][value_id]"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   value="<%- data.value_id %>"/>
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][label]"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   value="<%- data.label %>"/>
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][disabled]"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   value="<%- data.disabled %>"/>
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][media_type]"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   value="image"/>
+            <input type="hidden"
+                   name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][removed]"
+                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                   value=""
+                   class="is-removed"/>
+
+            <div class="product-image-wrapper">
+                <img class="product-image"
+                     data-role="image-element"
+                     src="<%- data.url %>"
+                     alt="<%- data.label %>"/>
+
+                <div class="actions">
+                    <button type="button"
+                            class="action-remove"
+                            data-role="delete-button"
+                            title="<?php /* @escapeNotVerified */ echo __('Delete image') ?>">
+                    <span>
+                        <?php /* @escapeNotVerified */ echo __('Delete image') ?>
+                    </span>
+                    </button>
+                    <div class="draggable-handle"></div>
+                </div>
+                <div class="image-fade"><span><?php /* @escapeNotVerified */ echo __('Hidden') ?></span></div>
+            </div>
+
+
+            <div class="item-description">
+                <div class="item-title" data-role="img-title"><%- data.label %></div>
+                <div class="item-size">
+                  <span data-role="image-dimens"></span>, <span data-role="image-size"><%- data.sizeLabel %></span>
+                </div>
+            </div>
+            <!--
+            <ul class="item-roles" data-role="roles-labels">
+                <?php
+                //foreach ($block->getImageTypes() as $typeData) {
+                    ?>
+                    <li data-role-code="<?php /* @escapeNotVerified */ //echo $block->escapeHtml($typeData['code']) ?>" class="item-role item-role-<?php /* @escapeNotVerified */ //echo $block->escapeHtml($typeData['code']) ?>">
+                        <?php /* @escapeNotVerified */ //echo $block->escapeHtml($typeData['label']) ?>
+                    </li>
+                    <?php
+                //}
+                ?>
+            </ul> -->
+        </div>
+    </script>
+
+    <script data-role="img-dialog-container-tmpl" type="text/x-magento-template">
+      <div class="image-panel" data-role="dialog">
+      </div>
+    </script>
+
+    <script data-role="img-dialog-tmpl" type="text/x-magento-template">
+            <div class="image-panel-preview">
+                <img src="<%- data.url %>" alt="<%- data.label %>" />
+            </div>
+            <div class="image-panel-controls">
+                <strong class="image-name"><%- data.label %></strong>
+
+                <fieldset class="fieldset-image-panel custom-field banner-item-fields">
+                    <strong class="image-name"><%- data.item_title %></strong>
+
+                    <div class="field field-item-title">
+                        <label class="label" for="item_title"><?php /* @escapeNotVerified */ echo __('Item Title') ?></label>
+                        <div class="control">
+                            <input id="item_title" type="text" name="banner[media_gallery][images][<%- data.file_id %>][title]" value="<%- data.title %>"  />
+                        </div>
+                    </div>
+
+                    <div class="field field-item-alt">
+                        <label class="label" for="item_alt"><?php /* @escapeNotVerified */ echo __('Item Image Alt') ?></label>
+                        <div class="control">
+                            <input id="item_alt" type="text" name="banner[media_gallery][images][<%- data.file_id %>][alt]" value="<%- data.alt %>"  />
+                        </div>
+                    </div>
+
+                    <div class="field field-item-url">
+                        <label class="label" for="item_url"><?php /* @escapeNotVerified */ echo __('Item Url') ?></label>
+                        <div class="control">
+                            <input id="item_url" type="text" name="banner[media_gallery][images][<%- data.file_id %>][item_url]" value="<%- data.item_url %>"/>
+                        </div>
+                    </div>
+
+                    <div class="field field-item-short-description">
+                        <label class="label required" for="item_short_desc"><?php /* @escapeNotVerified */ echo __('Item Short Description') ?></label>
+                        <div class="control">
+                            <textarea id="item_short_desc" rows="3" name="banner[media_gallery][images][<%- data.file_id %>][item_short_description]"><%- data.item_short_description %></textarea>
+                        </div>
+                    </div>
+
+                    <div class="field field-item-status">
+                        <label class="label required"><?php /* @escapeNotVerified */ echo __('Item Status') ?></label>
+                        <div class="control">
+                            <select id="item_status" class="item_select select" name="banner[media_gallery][images][<%- data.file_id %>][item_status]">
+                                <option value="1"><?php /* @escapeNotVerified */ echo __('Enable') ?></option>
+                                <option value="0"><?php /* @escapeNotVerified */ echo __('Disable') ?></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--<div class="field date-item-range date-items-<%- data.file_id %>">
+                        <div class="field-row field-from">
+                            <label class="label required" for="from_date"><?php /* echo __('From Date') */?></label>
+                            <div class="control">
+                                <input type="text"  name="banner[media_gallery][images][<%- data.file_id %>][from_date]"  class="<%- data.file_id %>_from_date input_from_date input-text required-entry" readonly="1" title="From date" value="<%- data.from_date %>" />
+                                <div class="note"><?php /*echo __('M/d/yy h:mm a') */?></div>
+                            </div>
+                        </div>
+
+                        <div class="field-row field-to">
+                            <label class="label required" for="to_date"><?php /*echo __('To Date') */?></label>
+                            <div class="control">
+                                <input type="text" name="banner[media_gallery][images][<%- data.file_id %>][to_date]" class="<%- data.file_id %>_to_date input_to_date input-text required-entry" readonly="1" title="To date" value="<%- data.to_date %>"  />
+                                <div class="note"><?php /*echo __('M/d/yy h:mm a') */?></div>
+                            </div>
+                        </div>
+                    </div>-->
+                </fieldset>
+
+                <fieldset class="admin__fieldset fieldset-image-panel">
+
+                    <div class="admin__field field-image-role">
+                        <label class="admin__field-label">
+                            <span><?php /* @escapeNotVerified */ echo __('Role')?></span>
+                        </label>
+                        <div class="admin__field-control">
+                            <ul class="multiselect-alt">
+                                <?php
+                                foreach ($block->getImageTypes() as $attribute) :
+                                    ?>
+                                    <li class="item">
+                                        <label>
+                                            <input class="image-type"
+                                                   data-role="type-selector"
+                                                   data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                                                   type="checkbox"
+                                                   value="<?php /* @escapeNotVerified */ echo $block->escapeHtml($attribute['code']) ?>"
+                                                />
+                                            <?php /* @escapeNotVerified */ echo $block->escapeHtml($attribute['label']) ?>
+                                        </label>
+                                    </li>
+                                <?php
+                                endforeach;
+                                ?>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="admin__field admin__field-inline field-image-size" data-role="size">
+                        <label class="admin__field-label">
+                            <span><?php /* @escapeNotVerified */ echo __('Image Size') ?></span>
+                        </label>
+                        <div class="admin__field-value" data-message="<?php /* @escapeNotVerified */ echo __('{size}') ?>"></div>
+                    </div>
+
+                    <div class="admin__field admin__field-inline field-image-resolution" data-role="resolution">
+                        <label class="admin__field-label">
+                            <span><?php /* @escapeNotVerified */ echo __('Image Resolution') ?></span>
+                        </label>
+                        <div class="admin__field-value" data-message="<?php /* @escapeNotVerified */ echo __('{width}^{height} px') ?>"></div>
+                    </div>
+
+                    <div class="admin__field field-image-hide">
+                        <div class="admin__field-control">
+                            <div class="admin__field admin__field-option">
+                                <input type="checkbox"
+                                       id="hide-from-product-page"
+                                       data-role="visibility-trigger"
+                                       data-form-part="<?php /* @escapeNotVerified */ echo $formName ?>"
+                                       value="1"
+                                       class="admin__control-checkbox"
+                                       name="<?php /* @escapeNotVerified */ echo $elementName ?>[<%- data.file_id %>][disabled]"
+                                <% if (data.disabled == 1) { %>checked="checked"<% } %> />
+
+                                <label for="hide-from-product-page" class="admin__field-label">
+                                    <?php /* @escapeNotVerified */ echo __('Hide from Product Page')?>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+    </script>
+    <?php //echo $block->getChildHtml('new-video'); ?>
+</div>
+<script>
+    require(['jquery'], function(jQuery){
+        jQuery('body').trigger('contentUpdated');
+    });
+</script>

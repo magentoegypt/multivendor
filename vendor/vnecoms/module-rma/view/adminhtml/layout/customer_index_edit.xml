@@ -1,0 +1,17 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_RMA::css/rma.css"/>
+    </head>
+    <body>
+        <referenceBlock name="customer_form">
+            <block class="Vnecoms\RMA\Block\Adminhtml\Customer\Tab\Rma"
+                   name="customer.rma.container">
+                <arguments>
+                    <argument name="tab_label" xsi:type="string" translate="true">RMA</argument>
+                    <argument name="sort_order" xsi:type="number">110</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+    </body>
+</page>

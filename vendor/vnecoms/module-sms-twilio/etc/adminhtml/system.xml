@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="twilio_account_sid" translate="label tooltip" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Twilio Account SID</label>
+	                    <config_path>vsms/settings/twilio_account_sid</config_path>
+	                    <depends>
+	                        <field id="gateway">twilio</field>
+	                    </depends>
+	                    <comment>Your Account SID from twilio.com/console</comment>
+	                </field>
+	                <field id="twilio_auth_token" translate="label tooltip" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Twilio Auth Token</label>
+	                    <config_path>vsms/settings/twilio_auth_token</config_path>
+	                    <depends>
+	                        <field id="gateway">twilio</field>
+	                    </depends>
+	                    <comment>Your Auth Token from twilio.com/console</comment>
+	                </field>
+	                <field id="twilio_phone_num" translate="label tooltip" type="text" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Twilio Phone Number</label>
+	                    <config_path>vsms/settings/twilio_phone_num</config_path>
+	                    <depends>
+	                        <field id="gateway">twilio</field>
+	                    </depends>
+	                    <comment>A Twilio phone number you purchased at twilio.com/console</comment>
+	                </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

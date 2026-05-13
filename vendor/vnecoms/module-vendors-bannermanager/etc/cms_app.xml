@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<apps xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsCms:etc/cms_app.xsd">
+    <app id="bannermanager" class="Vnecoms\BannerManager\Block\Cms\App\Banner"
+            placeholder_image="Magento_Cms::images/widget_block.png" color="#c9c9c9">
+        <label translate="true">Banner Manager</label>
+        <description translate="true">Configuration</description>
+        <parameters>
+            <parameter name="banner_id" xsi:type="block" visible="true" required="true" sort_order="20">
+                <label translate="true">Banner</label>
+                <block class="Vnecoms\BannerManager\Block\Vendors\Banner\App\Chooser">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string" translate="true">Select Banner...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+        </parameters>
+    </app>
+</apps>

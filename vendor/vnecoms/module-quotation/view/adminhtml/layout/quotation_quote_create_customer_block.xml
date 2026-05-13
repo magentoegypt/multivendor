@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright (c) 2017 Vnecoms Co ltd. All rights reserved.
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="sales_order_create_customer_block"/>
+
+    <body>
+        <referenceBlock name="adminhtml.customer.grid.container">
+            <!--alternative to require quote/create/form-->
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Vnecoms_Quotation::widget/grid.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="id" xsi:type="string">quote_create_customer_grid</argument>
+                <argument name="row_click_callback" xsi:type="string">quote.selectCustomer.bind(quote)</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

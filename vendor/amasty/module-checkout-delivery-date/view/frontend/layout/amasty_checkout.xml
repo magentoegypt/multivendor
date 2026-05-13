@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package One Step Checkout Delivery Date for Magento 2 (System)
+ */-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="amcheckout-delivery-date" xsi:type="array">
+                                                    <item name="component" xsi:type="string">Amasty_CheckoutDeliveryDate/js/view/delivery-date</item>
+                                                    <item name="dataScope" xsi:type="string">amcheckoutDelivery</item>
+                                                    <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                    <item name="config" xsi:type="array">
+                                                        <item name="deps" xsi:type="array">
+                                                            <item name="0" xsi:type="string">checkoutProvider</item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="date" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Amasty_CheckoutDeliveryDate/js/form/element/delivery-date</item>
+                                                            <item name="template" xsi:type="string">ui/form/field</item>
+                                                            <item name="elementTmpl" xsi:type="string">Amasty_CheckoutCore/form/date</item>
+                                                            <item name="readonly" xsi:type="string">1</item>
+                                                            <item name="outputDateFormat" xsi:type="string">y-MM-dd</item>
+                                                            <item name="label" xsi:type="string" translate="true">Delivery Date</item>
+                                                            <item name="additionalClasses" xsi:type="string">date</item>
+                                                            <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                            <item name="dataScope" xsi:type="string">date</item>
+                                                        </item>
+                                                        <item name="time" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Magento_Ui/js/form/element/select</item>
+                                                            <item name="template" xsi:type="string">ui/form/field</item>
+                                                            <item name="label" xsi:type="string" translate="true">Delivery Time Interval</item>
+                                                            <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                            <item name="dataScope" xsi:type="string">time</item>
+                                                            <item name="additionalClasses" xsi:type="string">timepicker</item>
+                                                        </item>
+                                                        <item name="comment" xsi:type="array">
+                                                            <item name="component" xsi:type="string">Magento_Ui/js/form/element/textarea</item>
+                                                            <item name="template" xsi:type="string">ui/form/field</item>
+                                                            <item name="label" xsi:type="string" translate="true">Delivery Comment</item>
+                                                            <item name="provider" xsi:type="string">checkoutProvider</item>
+                                                            <item name="dataScope" xsi:type="string">comment</item>
+                                                            <item name="additionalClasses" xsi:type="string">comment</item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

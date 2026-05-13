@@ -1,0 +1,26 @@
+{
+    "name": "amasty/module-one-step-checkout-core",
+    "description": "One Step Checkout Core by Amasty",
+    "require": {
+        "php": ">=7.3.0",
+        "amasty/base": ">=1.14.7",
+        "amasty/geoip": ">=1.3.6"
+    },
+    "suggest": {
+        "amasty/checkout-graph-ql": "Install checkout-graph-ql module to be able to use One Step Checkout GraphQL queries.",
+        "amasty/module-mixin-rewrite-patch": "Install mixin rewrite patch if you have a problem with extension on Magento 2.4.2 version on Checkout"
+    },
+    "type": "magento2-module",
+    "version": "1.2.13",
+    "license": [
+        "proprietary"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Amasty\\CheckoutCore\\": ""
+        }
+    }
+}

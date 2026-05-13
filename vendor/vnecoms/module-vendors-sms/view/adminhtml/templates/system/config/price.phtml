@@ -1,0 +1,93 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/* @var $block \Magento\Catalog\Block\Adminhtml\Product\Edit\Tab\Price\Tier */
+$element = $block->getElement();
+?>
+<?php $_htmlId      = $block->getElement()->getHtmlId() ?>
+<?php $_htmlClass   = $block->getElement()->getClass() ?>
+<?php $_htmlName    = $block->getElement()->getName() ?>
+<?php $_readonly    = $block->getElement()->getReadonly() ?>
+
+<div class="control">
+    <table class="admin__control-table tiers_table" id="tiers_table">
+        <thead>
+            <tr>
+                <th class="col-group-value required"><?php /* @escapeNotVerified */ echo __('SMS') ?></th>
+                <th class="col-group-priority required"><?php /* @escapeNotVerified */ echo __('Price (per SMS)') ?></th>
+                <th class="col-delete"><?php /* @escapeNotVerified */ echo __('Action') ?></th>
+            </tr>
+        </thead>
+        <tbody id="<?php /* @escapeNotVerified */ echo $_htmlId ?>_container"></tbody>
+        <tfoot>
+            <tr>
+                <td class="col-actions-add" colspan="3"><?php echo $block->getAddButtonHtml() ?></td>
+            </tr>
+        </tfoot>
+    </table>
+
+<script>
+require([
+    'mage/template',
+    "prototype",
+    "mage/adminhtml/form"
+], function (mageTemplate) {
+
+//<![CDATA[
+var smsPriceTemplate = '<tr>'
+	+ '<td class="col-sms-tier"><input class="<?php /* @escapeNotVerified */ echo $_htmlClass ?> required-entry validate-number validate-greater-than-zero" type="text" name="<?php /* @escapeNotVerified */ echo $_htmlName ?>[<%- data.index %>][tier]" value="<%- data.tier %>" id="sms_price_row_<%- data.index %>_tier" /></td>'
+    + '<td class="col-sms-price"><input class="<?php /* @escapeNotVerified */ echo $_htmlClass ?> required-entry validate-number validate-greater-than-zero" type="text" name="<?php /* @escapeNotVerified */ echo $_htmlName ?>[<%- data.index %>][price]" value="<%- data.price %>" id="sms_price_row_<%- data.index %>_price" /></td>'
+    + '<td class="col-delete"><input type="hidden" name="<?php /* @escapeNotVerified */ echo $_htmlName ?>[<%- data.index %>][delete]" class="delete" value="" id="sms_price_row_<%- data.index %>_delete" />'
+    + '<button title="<?php /* @escapeNotVerified */ echo $block->escapeHtml(__('Delete Membership Group')); ?>" type="button" class="action- scalable delete icon-btn delete-product-option" id="sms_price_row_<%- data.index %>_delete_button" onclick="return smsControl.deleteItem(event);">'
+    + '<span><?php /* @escapeNotVerified */ echo __("Delete") ?></span></button></td>'
+    + '</tr>';
+
+var smsControl = {
+    template: mageTemplate(smsPriceTemplate),
+    itemsCount: 0,
+    addItem : function (tier, price) {
+        var data = {
+        	tier: tier,
+        	price: price,
+            index: this.itemsCount++
+        };
+
+        Element.insert($('<?php /* @escapeNotVerified */ echo $_htmlId ?>_container'), {
+            bottom : this.template({
+                data: data
+            })
+        });
+        $('<?php /* @escapeNotVerified */ echo $_htmlId ?>_container').select('input', 'select').each(function(el){ Event.observe(el, 'change', el.setHasChanges.bind(el)); });
+        
+    },
+    disableElement: function(el) {
+        el.disabled = true;
+        el.addClassName('disabled');
+    },
+    deleteItem: function(event) {
+        var tr = Event.findElement(event, 'tr');
+        if (tr) {
+            Element.select(tr, '.delete').each(function(elem){elem.value='1'});
+            Element.select(tr, ['input', 'select']).each(function(elem){elem.hide()});
+            Element.hide(tr);
+            Element.addClassName(tr, 'no-display template');
+        }
+        return false;
+    }
+};
+<?php foreach ($block->getValues() as $_item): ?>
+smsControl.addItem('<?php /* @escapeNotVerified */ echo $_item['tier'] ?>', '<?php /* @escapeNotVerified */ echo $_item['price'] ?>');
+<?php endforeach; ?>
+
+window.smsControl = smsControl;
+//]]>
+
+});
+</script>
+</div>
+

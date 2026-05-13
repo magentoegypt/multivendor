@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="rma" translate="label" type="text" sortOrder="20" showInDefault="1">
+            <label>RMA</label>
+            <tab>sales</tab>
+            <resource>Vnecoms_VendorsRMA::rma</resource>
+            <group id="contact" translate="label tooltip" type="text" sortOrder="10" showInDefault="1">
+                <label>Contact RMA</label>
+                <field id="address" translate="label" type="textarea" sortOrder="10" showInDefault="1">
+                    <label>Address</label>
+                </field>
+
+            </group>
+            <group id="rmapolicy" translate="label tooltip" type="text" sortOrder="20" showInDefault="1">
+                <label>RMA Policy</label>
+                <field id="show_return_instructions" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Show Return Instructions</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!--
+                <field id="return_instructions" translate="label" type="textarea" sortOrder="20" showInDefault="1">
+                    <label>Send With The Return Instructions</label>
+                </field> -->
+            </group>
+        </section>
+    </system>
+</config>

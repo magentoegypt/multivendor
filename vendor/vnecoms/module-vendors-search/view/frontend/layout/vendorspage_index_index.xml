@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_VendorsSearch::css/styles.css"/>
+    </head>
+    <body>
+        <referenceBlock name="content">
+            <block class="Vnecoms\VendorsSearch\Block\Js\Components" name="checkout_page_head_components" ifconfig="vendors/search_by_vendor/enabled" template="Vnecoms_VendorsSearch::js/components.phtml" before="-">
+                <!--<arguments>-->
+                    <!--<argument name="jsLayout" xsi:type="array">-->
+                        <!--<item name="components" xsi:type="array">-->
+                            <!--<item name="autocompleteInjection" xsi:type="array">-->
+                                <!--<item name="component" xsi:type="string">Vnecoms_VendorsSearch/js/injection</item>-->
+                                <!--<item name="config" xsi:type="array"/>-->
+                            <!--</item>-->
+                            <!--<item name="autocompleteNavigation" xsi:type="array">-->
+                                <!--<item name="component" xsi:type="string">Vnecoms_VendorsSearch/js/navigation</item>-->
+                                <!--<item name="autocomplete" xsi:type="string">autocomplete</item>-->
+                                <!--<item name="config" xsi:type="array"/>-->
+                            <!--</item>-->
+                            <!--<item name="autocompleteProvider" xsi:type="array">-->
+                                <!--<item name="component" xsi:type="string">Vnecoms_VendorsSearch/js/provider</item>-->
+                                <!--<item name="config" xsi:type="array">-->
+                                    <!--<item name="minSearchLength" xsi:type="string">3</item>-->
+                                <!--</item>-->
+                            <!--</item>-->
+                        <!--</item>-->
+                    <!--</argument>-->
+                <!--</arguments>-->
+            </block>
+        </referenceBlock>
+        <container name="vendor.home.search.container" htmlTag="div" htmlClass="vendor-search-container" before="vendor.home.featuredproducts.container">
+        <referenceBlock name="top_menu_after">
+            <block class="Vnecoms\VendorsSearch\Block\Search" name="search.by.vendor" ifconfig="vendors/search_by_vendor/enabled" as="search_by_vendor"
+                   template="Vnecoms_VendorsSearch::menu/search.phtml" after="-">
+                <!--<block class="Vnecoms\VendorsSearch\Block\Js\Components" name="search.components" template="Vnecoms_VendorsSearch::js/components.phtml"/>-->
+                <!--<arguments>-->
+                    <!--<argument name="jsLayout" xsi:type="array">-->
+                        <!--<item name="components" xsi:type="array">-->
+                            <!--<item name="autocompleteInjection" xsi:type="array">-->
+                                <!--<item name="component" xsi:type="string">Vnecoms_VendorsSearch/js/injection</item>-->
+                                <!--<item name="config" xsi:type="array"/>-->
+                            <!--</item>-->
+                            <!--<item name="autocompleteNavigation" xsi:type="array">-->
+                                <!--<item name="component" xsi:type="string">Vnecoms_VendorsSearch/js/navigation</item>-->
+                                <!--<item name="config" xsi:type="array"/>-->
+                            <!--</item>-->
+                        <!--</item>-->
+                    <!--</argument>-->
+                <!--</arguments>-->
+            </block>
+        </referenceBlock>
+        </container>
+        <referenceContainer name="content.top">
+            <container name="vendor.home.search.container" htmlTag="div" htmlClass="vendor-search-container" before="vendor.home.featuredproducts.container">
+                <block class="Vnecoms\VendorsSearch\Block\Search" name="search.by.vendor.second" ifconfig="vendors/search_by_vendor/enabled" as="search_by_vendor_second"
+                       template="Vnecoms_VendorsSearch::menu/search-mobile.phtml" />
+            </container>
+        </referenceContainer>
+    </body>
+</page>

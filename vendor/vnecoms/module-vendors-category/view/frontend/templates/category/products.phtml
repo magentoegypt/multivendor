@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php
+/**
+ * Category view template
+ *
+ * @var $block \Vnecoms\VendorsCategory\Block\Category\View
+ */
+?>
+<?php //if (!$block->isContentMode() || $block->isMixedMode()): ?>
+    <?php echo $this->getChildHtml('vendorpage.category.image');?>
+<?php echo $this->getChildHtml('vendorpage.category.description');?>
+    <?php echo $block->getProductListHtml() ?>
+<?php //endif; ?>

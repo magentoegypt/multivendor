@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var \Vnecoms\BannerManager\Block\Cms\App\Banner $block */
+
+// @codingStandardsIgnoreFile
+
+// get config
+$bannerId        = $block->getData('banner_id');
+$banner          = $block->getBanner();
+$itemCollection  = $block->getItemsByBannerId($bannerId);
+$showNavigationButtons = true;
+$totalSlides = sizeof($itemCollection);
+$hidePagination  = $banner->gethidePagination();
+$delay           = $banner->getBannerDelay();
+
+?>
+
+<?php
+$bannerInitParam = $block->getBannerInitParams();
+?>
+
+<div class="banner-widget block block-bannermanager">
+    <?php if(sizeof($itemCollection)): ?>
+        <div class="swiper-container slide-rtl swiper<?php /* @escapeNotVerified */ echo $bannerId ?>" data-mage-init='{"bannerWidget": <?php /* @noEscape */ echo $bannerInitParam ?> }' dir="rtl" >
+            <?php if ($showNavigationButtons && $totalSlides > 1): ?>
+                <div class="swiper-nav-button swiper-button-prev"></div>
+                <div class="swiper-nav-button swiper-button-next"></div>
+            <?php endif; ?>
+            <div class="swiper-wrapper">
+                <?php $_iterator = 0; ?>
+                <?php foreach($itemCollection as $item): ?>
+
+                    <div class="swiper-slide<?php if( ++$_iterator == count($itemCollection) ): ?> last<?php endif; ?>" <?php echo isset($delay) ? ' data-swiper-autoplay="'.$delay.'"' :'' ?> >
+
+                        <a href="<?php /* @escapeNotVerified */ echo (isset($item['url']))? $item['url']: 'javascript:void(0);' ?>" >
+                            <img class="item banner-item"
+                                 src="<?php echo $block->getImageUrl($item['filename']) ?>"
+                                 alt="<?php /* @escapeNotVerified */ echo (isset($item['alt']))?$item['alt']:'Image Alt' ?>" />
+                        </a>
+
+
+                    </div>
+
+                <?php endforeach; ?>
+            </div>
+            <?php if (!$hidePagination && $totalSlides > 1): ?>
+                <div class="swiper-pagination swiper-pagination-white pagination<?php echo $bannerId ?>"></div>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+</div>

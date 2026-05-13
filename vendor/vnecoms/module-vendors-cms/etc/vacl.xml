@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Vnecoms_Vendors::vendor">
+                <resource id="Vnecoms_VendorsCms::index" title="CMS" translate="title" sortOrder="40">
+                    <resource id="Vnecoms_VendorsCms::page" title="Manage Pages" translate="title" sortOrder="10" >
+                        <resource id="Vnecoms_VendorsCms::page_action_save" title="Add/Edit" translate="title" sortOrder="10" />
+                        <resource id="Vnecoms_VendorsCms::page_action_delete" title="Delete" translate="title" sortOrder="10" />
+                    </resource>
+                    <resource id="Vnecoms_VendorsCms::block" title="Manage Static Blocks" translate="title" sortOrder="20" >
+                        <resource id="Vnecoms_VendorsCms::block_action_save" title="Add/Edit" translate="title" sortOrder="10" />
+                        <resource id="Vnecoms_VendorsCms::block_action_delete" title="Delete" translate="title" sortOrder="10" />
+                    </resource>
+                    <resource id="Vnecoms_VendorsCms::app" title="Manage Frontend Applications" translate="title" sortOrder="50" >
+                        <resource id="Vnecoms_VendorsCms::app_action_save" title="Add/Edit" translate="title" sortOrder="10" />
+                        <resource id="Vnecoms_VendorsCms::app_action_delete" title="Delete" translate="title" sortOrder="10" />
+                    </resource>
+                    <resource id="Vnecoms_VendorsCms::wysiwyg_blocks" title="blocks" translate="title" sortOrder="10" />
+                    <resource id="Vnecoms_VendorsCms::wysiwyg_directive" title="directive" translate="title" sortOrder="10" />
+                    <resource id="Vnecoms_VendorsCms::wysiwyg_images" title="images" translate="title" sortOrder="10" />
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

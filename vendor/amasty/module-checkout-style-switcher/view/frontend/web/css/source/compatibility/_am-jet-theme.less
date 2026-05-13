@@ -1,0 +1,123 @@
+//
+//  Compatibility with Amasty Jet Theme
+//  ______________________________________________
+
+//
+//  Common
+//  ----------------------------------------------
+
+& when (@media-common =true) {
+    .amasty-jet-theme {
+        .amcheckout-shipping-address {
+            .checkout-billing-address {
+                .actions-toolbar {
+                    justify-content: flex-end;
+    
+                    >.primary {
+                        display: flex;
+                    }
+    
+                    .action-cancel {
+                        & {
+                            .lib-button-reset();
+                            .am-margin(0 @indent__l 0 0);
+    
+                            color: @amtheme__text-secondary__color;
+                            font-size: 1.6rem;
+                            font-weight: @font-weight__bold;
+                            letter-spacing: .03em;
+                            order: 1;
+                        }
+    
+                        &:hover {
+                            color: @amtheme__text-primary__color;
+                        }
+                    }
+    
+                    .action-update {
+                        order: 2;
+                    }
+                }
+            }
+        }
+
+        .fieldset {
+            border: none;
+        }
+    
+        .am-checkout.-classic {
+            .payment-method-content {
+                padding-bottom: 0;
+            }
+        }
+    
+        .am-checkout.-modern {
+            .amcheckout-step-container {
+                input[type='checkbox'] + label:before {
+                    margin-top: 0;
+                }
+            }
+
+            .amcheckout-email {
+                .field-tooltip {
+                    max-height: inherit;
+                    transform: none;
+                }
+    
+                .note {
+                    margin-top: 0;
+                }
+            }
+        }
+    
+        .am-checkout.-modern.-layout-3columns {
+            .amcheckout-email {
+                width: inherit;
+    
+                .note {
+                    margin-top: 10px;
+                }
+            }
+
+            .amcheckout-delivery-date {
+                .date {
+                    ._has-datepicker ~ .ui-datepicker-trigger {
+                        right: 0;
+                        top: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+//
+//  Desktop
+//  ---------------------------------------------
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .amasty-jet-theme {
+        .am-checkout.-modern.-layout-3columns {
+            ._has-datepicker {
+                ~.ui-datepicker-trigger {
+                    right: 0 !important;
+                    top: 0 !important;
+                }
+            }
+
+            .checkout-payment-method.submit {
+                .actions-toolbar {
+                    justify-content: center;
+                }
+            }
+        }
+
+        .am-checkout.-modern {
+            .amcheckout-additional-options {
+                .amcheckout-checkboxes {
+                    width: 100%;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="page" translate="label" type="text" sortOrder="20" showInDefault="1">
+            <label>Seller's Page</label>
+            <tab>general</tab>
+            <resource>Vnecoms_VendorsPage::page</resource>
+            <group id="general" translate="label tooltip" type="text" sortOrder="10" showInDefault="1">
+                <label>General</label>
+                <field id="banner_type" translate="label" type="select" sortOrder="10" showInDefault="1">
+                    <label>Banner Type</label>
+                    <comment>Choose banner type: static or banner slider</comment>
+                    <source_model>Vnecoms\BannerManager\Model\Config\Source\BannerType</source_model>
+                </field>
+
+                <field id="banner_id" translate="label" type="select" sortOrder="11" showInDefault="1">
+                    <label>Show Banner</label>
+                    <source_model>Vnecoms\BannerManager\Model\Config\Source\Banner</source_model>
+                    <depends><field id="banner_type">1</field></depends>
+                </field>
+
+                <field id="banner" translate="label" type="image" sortOrder="12" showInDefault="1">
+                    <label>Banner </label>
+                    <comment>Allowed file types: PNG, GIF, JPG, JPEG</comment>
+                    <backend_model>Vnecoms\VendorsConfig\Model\Config\Backend\Image</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">ves_vendors/banner</upload_dir>
+                    <base_url type="media">ves_vendors/banner</base_url>
+                    <depends><field id="banner_type">0</field></depends>
+                </field>
+
+
+
+            </group>
+
+        </section>
+    </system>
+</config>

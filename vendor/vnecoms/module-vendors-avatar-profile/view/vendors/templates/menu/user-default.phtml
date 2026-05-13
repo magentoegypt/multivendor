@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div id="knockout-avatar-load" data-bind="scope: 'avatar'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "#knockout-avatar-load": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "avatar": {
+                            "component": "Vnecoms_VendorsAvatarProfile/js/avatar",
+                            "vendor_name" : "<?= $block->escapeHtml($block->getVendorName()); ?>",
+                            "uploaderConfig":{
+                                "url": "<?= $block->escapeUrl($block->getUrl("avatar/index/upload")); ?>"
+                            },
+                            "dataScope" : "data.attachment",
+                            "dataType" : "data.text",
+                            "formElement" : "data.input",
+                            "maxFileSize" : "<?= $block->escapeHtml($block->getMaxSizeUpload()); ?>",
+                            "profileUrl": "<?= $block->escapeUrl($block->getUrl("avatar/index/current")); ?>"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</div>

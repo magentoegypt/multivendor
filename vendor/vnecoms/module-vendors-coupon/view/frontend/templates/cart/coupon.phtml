@@ -1,0 +1,42 @@
+<?php
+/**
+ * Copyright © 2013-2017 Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<div class="block discount" id="block-discount" data-mage-init='{"collapsible":{"openedState": "active", "saveState": false}}'>
+    <div class="title" data-role="title">
+        <strong id="block-discount-heading" role="heading" aria-level="2"><?php /* @escapeNotVerified */ echo __('Apply Discount Code') ?></strong>
+    </div>
+    <div class="content" data-role="content" aria-labelledby="block-discount-heading">
+        <form id="discount-coupon-form"
+              action="<?php /* @escapeNotVerified */ echo $block->getUrl('checkout/cart/couponPost') ?>"
+              method="post"
+              data-mage-init='{"discountCode":{"couponCodeSelector": "#coupon_code",
+                                               "removeCouponSelector": "#remove-coupon",
+                                               "applyButton": "button.action.apply",
+                                               "cancelButton": "#cancel-coupon-btn"}}'>
+           <?php echo $block->getChildHtml('coupon_detail')?>
+
+            <div class="fieldset coupon<?php $block->getCouponCode() ? ' applied' : ''?>">
+                <input type="hidden" name="remove" id="remove-coupon" value="0" />
+                <div class="field">
+                    <label for="coupon_code" class="label"><span><?php /* @escapeNotVerified */ echo __('Enter discount code') ?></span></label>
+                    <div class="control">
+                        <input type="text" class="input-text" id="coupon_code" name="coupon_code" value="" placeholder="<?php echo $block->escapeHtml(__('Enter discount code'));?>" />
+                    </div>
+                </div>
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button class="action apply primary" type="button" value="<?php /* @escapeNotVerified */ echo __('Apply Discount') ?>">
+                            <span><?php /* @escapeNotVerified */ echo __('Apply Discount') ?></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

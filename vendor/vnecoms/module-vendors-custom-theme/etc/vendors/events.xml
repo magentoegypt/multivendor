@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <event name="ves_vendorsconfig_form_fieldset_prepare_before">
+        <observer name="ves_vendorscustomtheme_form_fieldset_prepare_before" instance="Vnecoms\VendorsCustomTheme\Observer\ProcessFieldConfig" />
+    </event>
+
+</config>

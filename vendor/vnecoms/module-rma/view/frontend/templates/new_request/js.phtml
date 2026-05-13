@@ -1,0 +1,286 @@
+<script type="text/javascript">
+
+
+define("ves-js-tableft-request",
+    [
+        "jquery",
+        'mage/validation',
+        "prototype",
+        "rma"
+    ], function(){
+   // var loader = new RequestLoadingBox("ves_request_loading","ves_request_overlay");
+    var formControl = new VnecomsRmaOrdersControl(null, null);
+    var customerPayShipping = "<?= \Vnecoms\RMA\Ui\Component\Listing\Columns\Reason\Shipping::CUSTOMER ?>";
+    var lastId = 1;
+    var filename=new Array('0');
+    /* ajax find order increment ID */
+
+    var requestOption = function() {
+        return {
+            findOrder : function (order_id){
+                formControl.disableSelectAllToggle();
+                $(formControl.orderSelectId).disable();
+                new Ajax.Request('<?php echo $block->getUrlFindProduct() ?>', {
+                    method:'post',
+                    parameters:{order: order_id},
+                    onCreate: function(obj) {
+                        //$(".loading-mask").hide();
+                       // loader.show();
+                    },
+                    onComplete: function (transport) {
+                       // loader.close();
+                    },
+                    onSuccess: function(transport) {
+                        var response = transport;
+                        document.getElementById("ves-list-product-order").innerHTML=response.responseText;
+
+                        $(formControl.orderSelectId).enable();
+                        formControl.observeItemsCount();
+                        formControl.observeSelectAllToggle();
+                        formControl.syncItems();
+                        decorateTable(formControl.orderedItemsTableId);
+                    },
+                });
+            },
+
+            slideUp :function(obj){
+                $$('.'+obj).each(function(div) {
+                    div.observe('mouseout', function(e) {
+                        var mouse_over_element;
+                        if (e.toElement) {
+                            mouse_over_element = e.toElement;
+                        } else if (e.relatedTarget) {
+                            mouse_over_element = e.relatedTarget;
+                        }
+
+                        if (mouse_over_element == null) {
+                            return;
+                        }
+                        if (!mouse_over_element.descendantOf(div) && div != mouse_over_element) {
+                            Effect.SlideUp(obj,{ duration: 0.5 });
+                        }
+                    });
+                });
+            },
+            del : function(obj) {
+                if( confirm('Are you sure ?') ) {
+                    var fileRow = document.getElementById('file'+obj);
+                    fileRow.remove();
+                    for (x in filename){
+                        if(obj == filename[x]) filename.splice(x,1);
+                    }
+                    document.getElementById('filename').value=filename;
+                }
+            },
+            addNew : function(obj) {
+                var id = this.createId();
+                var fileRow = document.getElementById('file'+obj);
+                var fileTable = fileRow.parentNode.parentNode;
+                var newRow = fileTable.insertRow(fileTable.rows.length);
+                newRow.innerHTML=this.getTemplateNew(id);
+                newRow.id='file'+id;
+                filename.push(id);
+                document.getElementById('filename').value=filename;
+            },
+            getTemplateNew : function(id) {
+                return '<td class="lable"></td>'
+                + '<td class="value">'
+                + '<input type="file" value="" name="filename'+ id + '" id="filename'+ id + '">'
+                + '<button class="button form-button" id="deletefile_button" type="button" onclick="requestOption.del('+ id + ')"><span>Delete</span></button>'
+            },
+            add : function(obj) {
+                var id = this.createId();
+                var file = document.getElementById('file'+obj);
+                var fileParent = file.parentNode;
+                var newDiv = fileParent.insert({ 'bottom' : this.getTemplate(id) });
+                filename.push(id);
+                document.getElementById('filename').value=filename;
+            },
+            getTemplate : function(id) {
+                return  '<div id="file'+id+'" >'
+                +'<input type="file" value="" name="filename'+ id + '" id="filename'+ id + '">'
+                + '<button class="button form-button" id="deletefile_button" type="button" onclick="requestOption.del('+ id + ')"><span>Delete</span></button>'
+                +'<div>'
+            },
+            createId : function () {
+                return lastId++;
+            },
+
+
+            saveMessage : function(obj){
+                var message=document.getElementById("messageBodyText"+obj).value;
+                new Ajax.Request('<?php echo $block->getUrlUpdateMessage() ?>', {
+                    method:'post',
+                    parameters:{id: obj,message:message},
+                    onCreate: function(obj) {
+                        Element.show(loader_id);
+                    },
+                    onComplete: function (transport) {
+                        Element.hide(loader_id);
+                        $('message-body-'+obj).show();
+                        $('messagebody'+obj).setStyle({display:''});
+                        $('messagedit'+obj).setStyle({display:'none'});;
+                    },
+                    onSuccess: function(transport) {
+                        var response = transport;
+                        document.getElementById("messagebody"+obj).innerHTML=response.responseText;
+
+                    },
+                });
+            },
+
+            changeReason : function(object){
+                var type = object.options[object.selectedIndex].getAttribute("rel");
+                if (type == customerPayShipping) {
+                    $("rma-reason-note").update("<?php echo __("You are supposed to cover shipping costs") ?>");
+                    $("rma-reason-note").show();
+                } else {
+                    $("rma-reason-note").update(null);
+                    $("rma-reason-note").hide();
+                }
+                if(object.value != "other"){
+                    if($("reason_detail")){
+                        $("reason_detail").up().up().hide();
+                        $("reason_detail").value ="";
+                        if($("reason_detail").hasClassName("required-entry")) $("reason_detail").removeClassName("required-entry");
+                        if($("advice-required-entry-reason_detail")) $("advice-required-entry-reason_detail").remove();
+                    }
+                }
+                else{
+                    if($("reason_detail")){
+                        $("reason_detail").up().up().show();
+                        if(!$("reason_detail").hasClassName("required-entry")) $("reason_detail").addClassName("required-entry");
+                    }
+                }
+            },
+
+            showTinyMce : function(){
+                tinyMCE.init({
+                    forced_root_block : '',
+                    force_br_newlines: true,
+                    force_p_newlines: false,
+                    mode : "exact",
+                    theme : "advanced",
+                    width:"100%",
+                    height:"300px",
+                    strict_loading_mode : true,
+                    elements : "content_message",
+                    theme_advanced_buttons1 : "bold,italic,underline,bullist,numlist,separator,outdent,indent,separator,undo,redo,separator",
+                    theme_advanced_buttons2 : "",
+                    theme_advanced_buttons3 : "",
+                    theme_advanced_toolbar_location : "top",
+                    theme_advanced_toolbar_align : "left",
+                    theme_advanced_path_location : "bottom",
+                    extended_valid_elements : "a[name|href|target|title|onclick],img[class|src|border=0|alt|title|hspace|vspace|width|height|align|onmouseover|onmouseout|name],hr[class|width|size|noshade],font[face|size|color|style],span[class|align|style]",
+                    theme_advanced_resize_horizontal : "true",
+                    theme_advanced_resizing : "true",
+                    apply_source_formatting : "true",
+                    convert_urls : "false",
+                    doctype : '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+                });
+            },
+            submitReplyRequest:function(){
+                var content = tinyMCE.get('content_message_reply').getContent(); // msg = textarea id
+                if( content == "" || content == null){
+                    $("message-validate").update('<div id="advice-required-entry-message" class="validation-advice" style="">This is a required field.</div>');
+                }
+                else{
+                    $("request-rma_reply-form").submit();
+                }
+            },
+            reasonDetailClick: function(){
+                if( $('reason_detail').value != "" &&  $('reason_detail').value != null){
+                    if($("reason")){
+                        $("reason").up().up().hide();
+                        $("reason").value ="";
+                    }
+                    if($("reason").hasClassName("required-entry")) $("reason").removeClassName("required-entry");
+                    if($("advice-required-entry-reason")) $("advice-required-entry-reason").remove();
+
+                }
+                else{
+                    if($("reason")) $("reason").up().up().show();
+                    if(!$("reason_detail").hasClassName("required-entry")) $("reason_detail").addClassName("required-entry");
+                }
+            },
+            disableButtonSave : function(chPassed,vnecomsRmaFormAdvice){
+                if(chPassed){
+                    $('request-new-submit').removeClassName('disabled');
+                    $('request-new-submit').removeAttribute('disabled');
+                    $('request-new-submit').setAttribute('aria-disabled',false);
+//                    this.setItemData();
+                }
+                else{
+                    $('request-new-submit').addClassName('disabled');
+                    $('request-new-submit').setAttribute('disabled','disabled');
+                    $('request-new-submit').setAttribute('aria-disabled',true);
+                }
+                return true;
+            },
+            setItemData : function(){
+                var itemsData = {
+                    accounting: []
+                };
+                $$('#ves-list-product-order .ves-items-count').each(function(element) {
+                    if(element.value > 0){
+                        itemsData.accounting.push({
+                            "item_id" : element.name,
+                            "item_qty"  : element.value,
+                        });
+                    }
+                });
+                this.set("items",itemsData.accounting);
+                // this.items = itemsData.accounting;
+                console.log( this.items );
+            },
+            checkItemSelect : function(vnecomsRmaFormAdvice){
+                var check = false;
+                $$('#ves-list-product-order .ves-items-count').each(function(element) {
+                    if(formControl.validateItemCount('change', element)
+                        && formControl.validateItemCountMax('change', element)){
+                        check = true;
+                    }
+                });
+
+                $$('#ves-list-product-order .ves-items-count').each(function(element) {
+                    if(!formControl.validateItemCountMax('change', element)){
+                        check = false;
+
+                    }
+                });
+                requestOption.disableButtonSave(check);
+                return check;
+            },
+
+        }
+
+    }();
+    window.requestOption = requestOption;
+
+
+});
+
+
+require([
+    "prototype",
+    'ves-js-tableft-request'
+
+],function(){
+
+        if($('reason_detail')) $('reason_detail').observe('keyup', requestOption.reasonDetailClick);
+
+        Event.observe(window,"load",function(){
+            var order_id= $("order_incremental_id").value;
+            if(order_id != "" && order_id != null){
+                requestOption.findOrder(order_id);
+            }
+        });
+        $('order_incremental_id').observe('change', function() {
+            requestOption.findOrder(this.value);
+        });
+        $('ves-list-product-order').observe('change', function() {
+            requestOption.checkItemSelect(this.value);
+        });
+
+});
+</script>

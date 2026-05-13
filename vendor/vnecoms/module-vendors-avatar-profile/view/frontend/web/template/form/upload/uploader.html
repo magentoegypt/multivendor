@@ -1,0 +1,19 @@
+<div class="admin__field avatar-container" visible="visible" css="$data.additionalClasses">
+    <div class="admin__field-control" css="'_with-tooltip': $data.tooltip">
+        <div class="file-uploader" data-role="drop-zone" css="_loading: isLoading">
+            <each args="data: value, as: '$file'" render="$parent.getPreviewTmpl($file)"></each>
+            <div class="file-uploader-area">
+                <input type="file" afterRender="onElementRender" id = "customer-avatar-upload"
+                       attr="name: inputName, multiple: isMultipleFiles" disable="disabled" />
+                <label class="file-uploader-button abs-action-primary primary action" for="customer-avatar-upload"
+                       translate="'Upload Avatar'">
+                </label>
+                <render args="fallbackResetTpl" if="$data.showFallbackReset && $data.isDifferedFromDefault"></render>
+            </div>
+            <div class="admin__field-note" if="$data.notice" attr="id: noticeId">
+                <span html="notice"></span>
+            </div>
+            <label class="admin__field-error" if="error" attr="for: uid" text="error"></label>
+        </div>
+    </div>
+</div>

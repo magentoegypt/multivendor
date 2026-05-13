@@ -1,0 +1,34 @@
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+   vendorReportBestSelling(
+       limit: Int = 20 @doc(description: "Specifies the maximum number of results to return at once.")
+   ): VendorReportBestSellings! @doc(description: "The list of vendor report.") @resolver(class: "Vnecoms\\VendorsReportGraphQl\\Model\\Resolver\\BestSelling")
+
+   vendorReportMostView(
+      limit: Int = 20 @doc(description: "Specifies the maximum number of results to return at once.")
+   ): VendorReportMostViews! @doc(description: "The list of vendor report.") @resolver(class: "Vnecoms\\VendorsReportGraphQl\\Model\\Resolver\\MostView")
+}
+
+type VendorReportBestSellings @doc(description: "List BestSelling.") {
+    items: [VendorReportBestSelling] @doc(description: "An array of products that match the specified search criteria.")
+}
+
+type VendorReportBestSelling @doc(description: "Product Best Selling Object.") {
+    id: Int @doc(description: "Product Id")
+    name: String @doc(description: "name")
+    price: Float @doc(description: "price")
+    qty: Int @doc(description: "qty")
+}
+
+type VendorReportMostViews @doc(description: "List Most View.") {
+    items: [VendorReportMostView] @doc(description: "An array of products that match the specified search criteria.")
+}
+
+type VendorReportMostView @doc(description: "Product Most View Object.") {
+    id: Int @doc(description: "Product Id")
+    name: String @doc(description: "name")
+    price: Float @doc(description: "price")
+    view_count: Int @doc(description: "view_count")
+}

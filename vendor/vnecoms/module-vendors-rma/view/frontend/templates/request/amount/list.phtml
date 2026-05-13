@@ -1,0 +1,22 @@
+<table>
+    <thead>
+    <tr>
+        <th><?php echo __("Change By") ?></th>
+        <th><?php echo __("Amount") ?></th>
+        <th><?php echo __("Created Date") ?></th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($block->getHistoryAmountRefundObject() as $amount): ?>
+        <tr>
+            <td><?php echo $block->getTypeHtml($amount->getType()) ?></td>
+            <td>
+                                                    <span class="<?= $amount->getType() ?>-amount">
+                                                        <strong><?php echo $block->formatPrice($amount->getAmount()) ?></strong>
+                                                    </span>
+            </td>
+            <td><?php echo $block->getFormatDateHtml($amount->getCreatedAt()) ?></td>
+        </tr>
+    <?php endforeach;?>
+    </tbody>
+</table>

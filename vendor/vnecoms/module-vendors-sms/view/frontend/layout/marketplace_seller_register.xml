@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Vnecoms_Sms::css/intlTelInput.css"/>
+        <css src="Vnecoms_Sms::css/styles.css"/>
+    </head>
+    <body>
+        <referenceContainer name="register_form_addition_field_after">
+            <block class="Vnecoms\Sms\Block\Customer\Register\Mobile" name="vnecoms.register.customer_mobile" cacheable="false" template="Vnecoms_VendorsSms::register/mobile.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

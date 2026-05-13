@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Vnecoms_VendorsGroup:etc/advanced_group.xsd">
+<advanced_group>
+
+	<group id="product_import_export" translate="label" type="text" sortOrder="80">
+		<label>Product Import/Export</label>
+		<field id="can_use_import_export" translate="label" type="select" sortOrder="10">
+			<label>Can Use Import/Export</label>
+			<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+		</field>
+	</group>
+</advanced_group>
+</config>

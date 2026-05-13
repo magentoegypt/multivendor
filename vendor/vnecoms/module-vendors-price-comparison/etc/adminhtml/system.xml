@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vendors">
+            <group id="pricecomparison" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Price Comparison</label>
+                <field id="main_product" translate="label tooltip comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Main Product</label>
+                    <source_model>Vnecoms\VendorsPriceComparison\Model\Source\Product\Main</source_model>
+                    <tooltip>This product info will be shown in product list, product detail page, Products from other seller will be shown in "Sold by Other Sellers".</tooltip>
+                </field>
+                <field id="redirect_to_main_product" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Redirect to main product</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[<p>Product will always redirect to main product.</p>]]></tooltip>
+                    <depends>
+                        <field id="main_product">first_vendor</field>
+                    </depends>
+                </field>
+                <field id="product_type_restriction" translate="label tooltip comment" type="multiselect" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Product Type Restriction</label>
+                    <source_model>Vnecoms\VendorsProduct\Model\Source\Product\Type</source_model>
+                    <tooltip>Sellers will not be able to Select and Sell products from these product types.</tooltip>
+                </field>
+                <field id="attribute_set_restriction" translate="label tooltip comment" type="multiselect" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Attribute Set Restriction</label>
+                    <source_model>Vnecoms\VendorsProduct\Model\Source\Product\Set</source_model>
+                    <tooltip>Sellers will not be able to Select and Sell products from these selected attribute sets.</tooltip>
+                </field>
+                <field id="filter_attributes" translate="label tooltip comment" type="multiselect" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Filter attributes</label>
+                    <source_model>Vnecoms\VendorsPriceComparison\Model\Source\Product\Attribute</source_model>
+                    <tooltip><![CDATA[<p>These selected products attributes will be displayed in select and sell page.<br /></p><p>Seller will use these attributes to find the products which he want to sell</p>]]></tooltip>
+                </field>
+                <field id="showing_number" translate="label tooltip comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Number of showing seller</label>
+                    <frontend_class>required-entry validate-number</frontend_class>
+                    <tooltip><![CDATA[<p>The first this number of seller will be displayed in price comparison page. The rest sellers will be collapsed. Customer will need to click to a button to explain all sellers.</p>]]></tooltip>
+                </field>
+                <field id="show_address" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Address</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[<p>Show the seller address in price comparison page.</p>]]></tooltip>
+                </field>
+                <field id="show_sales_count" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Sales Count</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[<p>Show the number of sales of the seller in price comparison page.</p>]]></tooltip>
+                </field>
+                <field id="show_joined_date" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Joined Date</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[<p>Show the joined date of the seller in price comparison page.</p>]]></tooltip>
+                </field>
+                <field id="show_country_filter" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Country Filter</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip><![CDATA[<p>Customer can filter seller by country in price comparison page.</p>]]></tooltip>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

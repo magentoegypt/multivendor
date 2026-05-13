@@ -1,0 +1,30 @@
+{
+    "name": "vnecoms/module-vendors-product",
+    "description": "A component module of Marketplace extension, which allows the vendor to be able to create product from his vendor dashboard.",
+    "authors": [
+			{
+					"name": "VNECOMS",
+					"email": "support@vnecoms.com"
+			}
+		],
+		"require": {
+        "magento/module-catalog": ">=104.0.6",
+        "vnecoms/module-vendors-product-configurable": "2.4.*",
+        "vnecoms/module-vendors-product-downloadable": "2.4.*",
+        "vnecoms/module-vendors-product-bundle": "2.4.*",
+        "vnecoms/module-vendors-product-grouped": "2.4.*",
+        "vnecoms/module-vendors-product-video" : "2.0.*",
+        "vnecoms/module-vendors": ">=100.2.0",
+        "vnecoms/module-core": "2.4.*"
+    },
+    "type": "magento2-module",
+    "version": "2.4.43",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Vnecoms\\VendorsProduct\\": ""
+        }
+    }
+}

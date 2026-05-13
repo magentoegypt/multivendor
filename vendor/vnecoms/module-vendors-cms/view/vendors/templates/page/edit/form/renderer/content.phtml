@@ -1,0 +1,23 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+<?php $_element = $block->getElement() ?>
+
+<?php if (!$_element->getNoDisplay()): ?>
+<div class="cms-manage-content-actions">
+    <?php echo trim($_element->getElementHtml()) ?>
+    <?php if($notes = $_element->getNote()):?>
+        <?php foreach($notes as $id => $note):?>
+        <p id="note_<?php echo $_element->getId()?>_<?php echo $id ?>" class="note"><span>
+    		<?php echo $note;?>
+    	</span></p>
+        <?php endforeach;?>
+    <?php endif;?>
+</div>
+<?php endif; ?>

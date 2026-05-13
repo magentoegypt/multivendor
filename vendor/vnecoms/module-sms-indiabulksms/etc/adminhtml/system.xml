@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+	            	<field id="indiabulksms_apikey" translate="label tooltip" type="text" sortOrder="190" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>indiabulksms.in API Key</label>
+	                    <config_path>vsms/settings/indiabulksms_apikey</config_path>
+	                    <depends>
+	                        <field id="gateway">indiabulksms</field>
+	                    </depends>
+	                </field>
+                    <field id="indiabulksms_sender" translate="label tooltip" type="text" sortOrder="192" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Sender</label>
+                        <config_path>vsms/settings/indiabulksms_sender</config_path>
+                        <depends>
+                            <field id="gateway">indiabulksms</field>
+                        </depends>
+                    </field>
+                    <field id="indiabulksms_unicode" translate="label tooltip" type="select" sortOrder="193" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Unicode Message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>vsms/settings/indiabulksms_unicode</config_path>
+                        <depends>
+                            <field id="gateway">indiabulksms</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

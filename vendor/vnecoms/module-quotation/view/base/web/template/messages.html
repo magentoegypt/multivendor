@@ -1,0 +1,56 @@
+<div class="quotation-message-form">
+       <form id="quotation-message-form" method="post">
+           <input name="quote_id" type="hidden" data-bind="value: quote_id">
+           <textarea name="message" rows="3" cols="10" class="input-text required-entry quotation-message-textbox" data-bind="value: messageInput"></textarea>
+		<div class="fileupload upload-wrapper quotation-attachment">
+			<!-- ko foreach: getRegion('uploader') -->
+		        <!-- ko template: getTemplate() --><!-- /ko -->
+		    <!--/ko-->
+		</div>
+           <button class="button action primary btn-primary quotation-message-send-btn" type="button" data-bind="click: sendMessage.bind($data)"><i class="quote-icon-send-o"></i> <span data-bind="text: $t('Send')"></span></button>
+       </form>
+</div>
+<div class="quotation-messages">
+    <!-- ko foreach: getMessages() -->
+    <div class="quotation-message" data-bind="css: $parent.getMessageCssClass($data)">
+        <div class="quotation-message-content">
+	        <pre><!--ko text: $data.message--><!--/ko--></pre>
+        </div>
+        <div class="quotation-message-info clearfix">
+            <strong data-bind="text: $data.createdAtDate"></strong> 
+            <!--ko text: $data.createdAtTime + ' ' +$t('by')--><!--/ko-->
+            <span class="quotation-message-sender" data-bind="text: $data.name"></span> <!--ko text: $parent.getUserLabel($data)--><!--/ko-->
+        </div>
+        <!-- ko if: $data.attachments_count > 0 -->
+        <div class="quotation-message-attachments">
+			<p><span class="attachment-count" data-bind="text: ($data.attachments_count > 1?$t('%1 attachments'):$t('%1 attachment')).replace('%1', $data.attachments_count)"></span></p>
+			<!-- ko foreach: $data.attachments -->
+				<div class="quotation-message-attachment" data-bind="click: function(data, event) {$parents[1].previewImage(data, event)}, css: {'attachment-image': $data.is_image, 'attachment-file': !$data.is_image}">
+                    <div class="attachment-wrap-inner" aria-hidden="true">
+                    <!-- ko if: $data.is_image -->
+	                    <a data-bind="attr:{href: $data.url, title: $data.name}" class="attachment-media-wrap">
+	                        <img data-bind="attr:{src: $data.url, alt: $data.name}" class="preview-image" />
+	                    </a>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $data.is_image -->
+                        <a href="javascript: void(0);" class="attachment-media-wrap">
+                            <i class="attachment-icon" data-bind="css: $data.icon"></i>
+                        </a>
+                    <!-- /ko -->
+                    </div>
+                    <div class="attachment-overlay"></div>
+                    <div class="attachment-info">
+                        <span class="file-name" data-bind="text: $data.name"></span>
+                    </div>
+                    <div class="attachment-actions">
+                        <a class="action download-action" data-tooltip="Download" data-bind="attr:{href: $data.download_url}">
+                            <i class="action-icon quote-icon-cloud-download"></i>
+                        </a>
+                    </div>
+                </div>
+			<!-- /ko -->
+        </div>
+        <!-- /ko -->
+    </div>
+    <!-- /ko -->
+</div>

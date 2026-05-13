@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="main">
+        <field name="refund_amount_type">
+            <argument name="data" xsi:type="array">
+                <item name="options" xsi:type="object">\Vnecoms\VendorsRMA\Ui\Component\Listing\Columns\Request\Refund</item>
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Refund Amount</item>
+                    <item name="formElement" xsi:type="string">select</item>
+                    <item name="source" xsi:type="string">request</item>
+                    <item name="component" xsi:type="string">Vnecoms_VendorsRMA/js/form/element/refund</item>
+                    <item name="dataScope" xsi:type="string">refund_amount_type</item>
+                    <item name="sortOrder" xsi:type="number">31</item>
+                    <item name="default" xsi:type="string">0</item>
+                    <item name="required" xsi:type="boolean">true</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="refund_custom_amount">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Custom Amount</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">request</item>
+                    <item name="dataScope" xsi:type="string">refund_custom_amount</item>
+                    <item name="component" xsi:type="string">Vnecoms_VendorsRMA/js/form/element/other_amount</item>
+                    <item name="sortOrder" xsi:type="number">32</item>
+                    <item name="value" xsi:type="number">0</item>
+                    <item name="required" xsi:type="boolean">true</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                        <item name="validate-number" xsi:type="boolean">true</item>
+                        <item name="validate-custom-amount" xsi:type="boolean">true</item>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="order_incremental_id" class="Vnecoms\RMA\Ui\Component\Request\Order">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="label" xsi:type="string" translate="true">Order #</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="component" xsi:type="string">Vnecoms_VendorsRMA/js/form/element/order</item>
+                    <item name="elementTmpl" xsi:type="string">Vnecoms_RMA/form/element/order</item>
+                    <item name="template" xsi:type="string">ui/form/field</item>
+                    <item name="source" xsi:type="string">ticket</item>
+                    <item name="sortOrder" xsi:type="number">60</item>
+                    <item name="dataScope" xsi:type="string">order_incremental_id</item>
+                    <item name="required" xsi:type="boolean">true</item>
+                    <item name="note" xsi:type="string" translate="true">This order is not exist, you're only allowed for chosing the order, which has the status is complete or processing</item>
+                    <item name="validation" xsi:type="array">
+                        <item name="required-entry" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+    <fieldset name="message">
+
+        <!--
+        <container name="message_container">
+            <htmlContent name="html_content">
+                <argument name="block" xsi:type="object">Vnecoms\VendorsRMA\Block\Adminhtml\Request\Create\Message</argument>
+            </htmlContent>
+        </container>
+        -->
+
+    </fieldset>
+</form>

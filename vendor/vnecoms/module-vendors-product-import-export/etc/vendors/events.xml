@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+	<event name="controller_action_predispatch_catalog_import_media_index">
+		<observer name="vendors_import_export_predispatch_catalog_import_media" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+	<event name="controller_action_predispatch_catalog_import_media_block">
+		<observer name="vendors_import_export_predispatch_catalog_import_media_block" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+	<event name="controller_action_predispatch_catalog_import_index">
+		<observer name="vendors_import_export_predispatch_catalog_import" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+	<event name="controller_action_predispatch_catalog_import_form">
+		<observer name="vendors_import_export_predispatch_catalog_import_form" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+	<event name="controller_action_predispatch_catalog_import_startqueue">
+		<observer name="vendors_import_export_predispatch_catalog_import_startqueue" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+	<event name="controller_action_predispatch_catalog_import_upload">
+		<observer name="vendors_import_export_predispatch_catalog_import_upload" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+	<event name="controller_action_predispatch_catalog_export_index">
+		<observer name="vendors_import_export_predispatch_catalog_export" instance="Vnecoms\VendorsProductImportExport\Observer\ProductImportExportPredispatch" />
+	</event>
+</config>

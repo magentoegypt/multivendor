@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="vsms">
+            <group id="settings">
+            	<group id="sms_gateway">
+
+	            	<field id="experttext_api" translate="label tooltip" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>Api Key</label>
+	                    <config_path>vsms/settings/experttext_api</config_path>
+	                    <depends>
+	                        <field id="gateway">experttext</field>
+	                    </depends>
+	                </field>
+
+					<field id="experttext_api_secret" translate="label tooltip" type="text" sortOrder="161" showInDefault="1" showInWebsite="1" showInStore="0">
+						<label>Api Secret</label>
+						<config_path>vsms/settings/experttext_api_secret</config_path>
+						<depends>
+							<field id="gateway">experttext</field>
+						</depends>
+					</field>
+
+	                <field id="experttext_sender" translate="label tooltip" type="text" sortOrder="162" showInDefault="1" showInWebsite="1" showInStore="0">
+	                    <label>User Name</label>
+	                    <config_path>vsms/settings/experttext_sender</config_path>
+	                    <depends>
+	                        <field id="gateway">experttext</field>
+	                    </depends>
+	                </field>
+
+					<field id="experttext_unicode" translate="label tooltip" type="select" sortOrder="163" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Unicode Message</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>vsms/settings/experttext_unicode</config_path>
+                        <depends>
+                            <field id="gateway">experttext</field>
+                        </depends>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

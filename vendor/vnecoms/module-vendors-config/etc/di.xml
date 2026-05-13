@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Vnecoms\VendorsConfig\Api\ConfigRepositoryInterface" type="Vnecoms\VendorsConfig\Model\ConfigRepository" />
+    <preference for="Vnecoms\VendorsConfig\Api\Data\ConfigInterface" type="Vnecoms\VendorsConfig\Model\Config" />
+    <preference for="Vnecoms\VendorsConfig\Api\Data\ConfigSearchResultInterface"
+                type="Magento\Framework\Api\SearchResults" />
+    
+    <preference for="Vnecoms\VendorsConfig\Api\Data\DocumentContentInterface" type="Vnecoms\VendorsConfig\Model\Data\DocumentContent" />
+    <preference for="Vnecoms\VendorsConfig\Api\Data\DocumentContentValidatorInterface" type="Vnecoms\VendorsConfig\Model\Data\DocumentContentValidator" />
+    <preference for="Vnecoms\VendorsConfig\Api\Data\DocumentProcessorInterface" type="Vnecoms\VendorsConfig\Model\Data\DocumentProcessor" />
+
+    <type name="Vnecoms\VendorsConfig\App\Config\Initial\SchemaLocator">
+        <arguments>
+            <argument name="moduleName" xsi:type="string">Vnecoms_VendorsConfig</argument>
+        </arguments>
+    </type>
+    <type name="Vnecoms\VendorsConfig\App\Config\Initial\Reader">
+        <arguments>
+            <argument name="converter" xsi:type="object">Magento\Framework\App\Config\Initial\Converter</argument>
+        </arguments>
+    </type>
+
+    <type name="Vnecoms\VendorsConfig\Helper\Api">
+        <arguments>
+            <argument name="fieldConfigFile" xsi:type="array">
+                <item name="general/store_information/logo" xsi:type="string">ves_vendors/logo</item>
+                <item name="page/general/logo" xsi:type="string">ves_vendors/header_logo</item>
+                <item name="page/general/banner" xsi:type="string">ves_vendors/banner</item>
+            </argument>
+        </arguments>
+    </type>
+
+</config>

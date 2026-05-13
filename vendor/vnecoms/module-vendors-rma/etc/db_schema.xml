@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="ves_rma_request_entity">
+        <column xsi:type="int" name="vendor_id" nullable="false" comment="Vendor Id"/>
+        <column xsi:type="int" name="vendor_order_id" nullable="false" comment="Vendor Order Id"/>
+        <column xsi:type="decimal" name="refund_amount" scale="4" precision="12" comment="Refund Amount"/>
+        <column xsi:type="int" name="is_vendor_read" nullable="false" comment="Is Vendor Read"/>
+    </table>
+
+    <table name="ves_rma_reponse">
+        <column xsi:type="int" name="vendor_id" nullable="false" comment="Vendor Id"/>
+    </table>
+
+    <table name="ves_rma_request_price_refund" resource="default" engine="innodb" comment="RMA Request Refund Price">
+        <column xsi:type="int" name="refund_id" unsigned="true" nullable="false" identity="true" comment="Refund ID"/>
+        <column xsi:type="int" name="request_id" unsigned="true" nullable="true" comment="request_id"/>
+        <column xsi:type="decimal" name="amount" scale="4" precision="12" comment="Amount"/>
+        <column xsi:type="mediumtext" name="additional_information" nullable="false" comment="additional_information"/>
+        <column xsi:type="varchar" name="type" nullable="false" default="" length="255" comment="Type"/>
+        <column xsi:type="smallint" name="status" nullable="false" default="0" comment="Status"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="refund_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_RMA_REQUEST_PRICE_REFUND_REQUEST_ID" table="ves_rma_request_price_refund"
+                    column="request_id" referenceTable="ves_rma_request_entity" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="ves_rma_request_escalate" resource="default" engine="innodb" comment="RMA Request Escalate">
+        <column xsi:type="int" name="escalate_id" unsigned="true" nullable="false" identity="true" comment="Escalate ID"/>
+        <column xsi:type="int" name="request_id" unsigned="true" nullable="true" comment="request_id"/>
+        <column xsi:type="mediumtext" name="message" nullable="false" comment="Message"/>
+        <column xsi:type="mediumtext" name="attachment" nullable="false" comment="Attachment"/>
+        <column xsi:type="varchar" name="type" nullable="false" default="" length="255" comment="Type"/>
+        <column xsi:type="smallint" name="status" nullable="false" default="0" comment="Status"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="escalate_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VES_RMA_REQUEST_ESCALATE_REQUEST_ID" table="ves_rma_request_escalate"
+                    column="request_id" referenceTable="ves_rma_request_entity" referenceColumn="entity_id"/>
+    </table>
+
+    <table name="ves_rma_request_escalate_template" resource="default" engine="innodb" comment="Escalate Email Templates">
+        <column xsi:type="int" name="template_id" unsigned="true" nullable="false" identity="true" comment="Template ID"/>
+        <column xsi:type="varchar" name="template_code" nullable="false" length="150" comment="Template Name"/>
+        <column xsi:type="text" name="template_text" nullable="false" comment="Template Content"/>
+        <column xsi:type="text" name="template_styles" nullable="false" comment="Templste Styles"/>
+        <column xsi:type="int" name="template_type" unsigned="true" comment="Template Type"/>
+        <column xsi:type="int" name="use_custom_message" unsigned="true" comment="Use Custom Message"/>
+        <column xsi:type="int" name="type_send_mail" unsigned="true" comment="Type Send Mail"/>
+        <column xsi:type="varchar" name="template_subject" nullable="false" length="200" comment="Template Subject"/>
+        <column xsi:type="varchar" name="template_sender_name" length="200" comment="Template Sender Name"/>
+        <column xsi:type="varchar" name="template_sender_email" length="200" comment="Template Sender Email"/>
+        <column xsi:type="timestamp" name="added_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Date of Template Creation"/>
+        <column xsi:type="timestamp" name="modified_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Date of Template Modification"/>
+        <column xsi:type="varchar" name="orig_template_code" length="200" comment="Original Template Code"/>
+        <column xsi:type="text" name="orig_template_variables" comment="Original Template Variables"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="template_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="VES_RMA_REQUEST_ESCALATE_TEMPLATE_UNIQUE_INDEX">
+            <column name="template_code"/>
+        </constraint>
+        <index referenceId="VES_RMA_REQUEST_ESCALATE_TEMPLATE_ADDED_AT_MODIFIED_AT" indexType="btree">
+            <column name="added_at"/>
+            <column name="modified_at"/>
+        </index>
+    </table>
+</schema>
