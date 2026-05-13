@@ -53,7 +53,9 @@ class AdminClearVendorTheme implements ObserverInterface
         }
 
         $config = $this->configFactory->create();
-        $configCollection = $config->getCollection()->addPathFilter(self::CONFIG_PATH, $vendor->getId());
+        $configCollection = $config->getCollection()
+            ->addFieldToFilter('vendor_id', $vendor->getId())
+            ->addFieldToFilter('path', self::CONFIG_PATH);
         foreach ($configCollection as $item) {
             $item->delete();
         }
