@@ -8,10 +8,10 @@ namespace MagentoEgypt\PushNotification\Controller\Adminhtml\Notification;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use Magento\Framework\Stdlib\DateTime\DateTime;
-use MagentoEgypt\PushNotification\Api\Data\NotificationInterface;
+use Magento\Framework\Exception\LocalizedException;
 use MagentoEgypt\PushNotification\Model\NotificationFactory;
 use MagentoEgypt\PushNotification\Model\ResourceModel\Notification as NotificationResource;
+use MagentoEgypt\PushNotification\Service\NotificationSender;
 
 class Send extends Action
 {
@@ -28,32 +28,24 @@ class Send extends Action
     protected $notificationResource;
 
     /**
-     * @var DateTime
+     * @var NotificationSender
      */
-    protected $dateTime;
+    protected $notificationSender;
 
-    /**
-     * @param Context $context
-     * @param NotificationFactory $notificationFactory
-     * @param NotificationResource $notificationResource
-     * @param DateTime $dateTime
-     */
     public function __construct(
         Context $context,
         NotificationFactory $notificationFactory,
         NotificationResource $notificationResource,
-        DateTime $dateTime
+        NotificationSender $notificationSender
     ) {
         parent::__construct($context);
         $this->notificationFactory = $notificationFactory;
         $this->notificationResource = $notificationResource;
-        $this->dateTime = $dateTime;
+        $this->notificationSender = $notificationSender;
     }
 
     /**
-     * Trigger sending the notification.
-     *
-     * @return \Magento\Framework\Controller\Result\Redirect
+     * Trigger sending the notification via FCM.
      */
     public function execute()
     {
@@ -65,21 +57,27 @@ class Send extends Action
             return $resultRedirect->setPath('*/*/');
         }
 
-        $model = $this->notificationFactory->create();
-        $this->notificationResource->load($model, $id);
+        $notification = $this->notificationFactory->create();
+        $this->notificationResource->load($notification, $id);
 
-        if (!$model->getId()) {
+        if (!$notification->getId()) {
             $this->messageManager->addErrorMessage(__('This notification no longer exists.'));
             return $resultRedirect->setPath('*/*/');
         }
 
         try {
-            $model->setStatus(NotificationInterface::STATUS_SENT);
-            $model->setSentAt($this->dateTime->gmtDate());
-            $this->notificationResource->save($model);
+            $result = $this->notificationSender->send($notification);
             $this->messageManager->addSuccessMessage(
-                __('The notification "%1" has been marked as sent. Configure a push gateway to deliver to devices.', $model->getTitle())
+                __(
+                    'Notification "%1" dispatched: %2 recipient(s), %3 delivered, %4 failed.',
+                    $notification->getTitle(),
+                    $result['recipients'],
+                    $result['success'],
+                    $result['failure']
+                )
             );
+        } catch (LocalizedException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
         } catch (\Exception $e) {
             $this->messageManager->addExceptionMessage($e, __('Something went wrong while sending the notification.'));
         }
@@ -87,9 +85,6 @@ class Send extends Action
         return $resultRedirect->setPath('*/*/edit', ['notification_id' => $id]);
     }
 
-    /**
-     * @return bool
-     */
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed(self::ADMIN_RESOURCE);

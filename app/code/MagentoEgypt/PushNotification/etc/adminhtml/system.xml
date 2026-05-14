@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magentoegypt" translate="label" sortOrder="350">
+            <label>MagentoEgypt</label>
+        </tab>
+        <section id="pushnotification" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Push Notifications</label>
+            <tab>magentoegypt</tab>
+            <resource>MagentoEgypt_PushNotification::manage_notification</resource>
+            <group id="fcm" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Firebase Cloud Messaging (HTTP v1)</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable FCM Delivery</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When disabled the Send action only marks the notification as sent and skips real delivery.</comment>
+                </field>
+                <field id="project_id" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Firebase Project ID</label>
+                    <comment>Numeric or string project ID from your Firebase console.</comment>
+                </field>
+                <field id="service_account_path" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Service Account JSON Path</label>
+                    <comment>Absolute path on the server to the Firebase service-account JSON file. Keep it outside the web root.</comment>
+                </field>
+                <field id="batch_size" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Batch Size</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Number of devices processed per Send invocation. Recommended: 500.</comment>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>HTTP Timeout (seconds)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
