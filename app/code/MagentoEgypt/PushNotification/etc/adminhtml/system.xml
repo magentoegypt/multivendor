@@ -1,12 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
-        <tab id="magentoegypt" translate="label" sortOrder="350">
-            <label>MagentoEgypt</label>
-        </tab>
-        <section id="pushnotification" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <section id="pushnotification" translate="label" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Push Notifications</label>
-            <tab>magentoegypt</tab>
+            <tab>vnecoms</tab>
             <resource>MagentoEgypt_PushNotification::manage_notification</resource>
             <group id="fcm" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Firebase Cloud Messaging (HTTP v1)</label>
