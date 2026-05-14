@@ -56,7 +56,16 @@ class Save extends Action
             return $resultRedirect->setPath('*/*/');
         }
 
-        $id = isset($data['notification_id']) ? (int) $data['notification_id'] : null;
+        if (isset($data['data']) && is_array($data['data'])) {
+            $data = $data['data'];
+        }
+
+        $id = (int) $this->getRequest()->getParam('notification_id');
+        if (!$id && !empty($data['notification_id'])) {
+            $id = (int) $data['notification_id'];
+        }
+        unset($data['notification_id']);
+
         $model = $this->notificationFactory->create();
 
         if ($id) {
