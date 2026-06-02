@@ -13,6 +13,9 @@
     </settings>
     <dataSource name="odooconnector_entitymap_listing_data_source" component="Magento_Ui/js/grid/provider">
         <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">map_id</param>
+            </storageConfig>
             <updateUrl path="mui/index/render"/>
         </settings>
         <aclResource>MagentoEgypt_OdooConnector::monitor</aclResource>
@@ -26,10 +29,28 @@
     <listingToolbar name="listing_top">
         <bookmark name="bookmarks"/>
         <columnsControls name="columns_controls"/>
+        <massaction name="listing_massaction">
+            <action name="resync">
+                <settings>
+                    <confirm>
+                        <message translate="true">Re-enqueue the selected mapping(s) for sync to Odoo? The cron consumer will push them.</message>
+                        <title translate="true">Resync to Odoo</title>
+                    </confirm>
+                    <url path="odooconnector/entitymap/massResync"/>
+                    <type>resync</type>
+                    <label translate="true">Resync to Odoo</label>
+                </settings>
+            </action>
+        </massaction>
         <filters name="listing_filters"/>
         <paging name="listing_paging"/>
     </listingToolbar>
     <columns name="odooconnector_entitymap_columns">
+        <selectionsColumn name="ids">
+            <settings>
+                <indexField>map_id</indexField>
+            </settings>
+        </selectionsColumn>
         <column name="map_id">
             <settings>
                 <filter>textRange</filter>

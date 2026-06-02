@@ -6,6 +6,8 @@ namespace MagentoEgypt\OdooConnector\Model\Product;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use MagentoEgypt\OdooConnector\Helper\Config;
 use MagentoEgypt\OdooConnector\Model\Api\OdooClient;
 use MagentoEgypt\OdooConnector\Model\EntityMap;
 use MagentoEgypt\OdooConnector\Model\Mapping\MapManager;
@@ -24,17 +26,23 @@ class ProductPusher
     private OdooClient $odooClient;
     private ProductPushMapper $pushMapper;
     private MapManager $mapManager;
+    private Config $config;
+    private StoreManagerInterface $storeManager;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
         OdooClient $odooClient,
         ProductPushMapper $pushMapper,
-        MapManager $mapManager
+        MapManager $mapManager,
+        Config $config,
+        StoreManagerInterface $storeManager
     ) {
         $this->productRepository = $productRepository;
         $this->odooClient = $odooClient;
         $this->pushMapper = $pushMapper;
         $this->mapManager = $mapManager;
+        $this->config = $config;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -51,7 +59,14 @@ class ProductPusher
     public function push(ProductInterface $product, string $correlationId): array
     {
         $sku = (string)$product->getSku();
+        $companyId = $this->resolveCompanyId($product);
         $values = $this->pushMapper->toOdooValues($product);
+        // Multi-company scoping: assign the product to the website's configured Odoo
+        // company, or make it a global/shared record (company_id = false) when no
+        // per-website company id is set. Sending false (rather than omitting the key)
+        // is deliberate — omitting it would let Odoo default the product to the API
+        // user's company instead of keeping it global.
+        $values['company_id'] = $companyId ?? false;
 
         $map = $this->mapManager->findByNaturalKey(self::ENTITY_TYPE, $sku, 0);
         $existingOdooId = ($map !== null && $map->getData('odoo_id')) ? (int)$map->getData('odoo_id') : null;
@@ -86,9 +101,40 @@ class ProductPusher
             'last_direction' => EntityMap::DIRECTION_M2O,
             'sync_status' => EntityMap::STATUS_LINKED,
             'website_id' => 0,
+            'odoo_company_id' => $companyId,
             'last_correlation_id' => $correlationId,
         ]);
 
         return ['action' => $action, 'odoo_id' => $odooId, 'sku' => $sku];
+    }
+
+    /**
+     * Resolve the Odoo company for this product from its website(s).
+     *
+     * Reads odooconnector/connection/odoo_company_id at each of the product's
+     * websites (store scope, so a value set only at default scope is inherited).
+     * Returns the single configured company when the product's websites agree;
+     * returns null — i.e. a global/shared Odoo product — when no website has a
+     * company id set, or when websites map to different companies (a single
+     * product.template cannot belong to more than one company).
+     */
+    private function resolveCompanyId(ProductInterface $product): ?int
+    {
+        $companyIds = [];
+        foreach ((array)$product->getWebsiteIds() as $websiteId) {
+            $storeId = null;
+            try {
+                $store = $this->storeManager->getWebsite((int)$websiteId)->getDefaultStore();
+                $storeId = $store ? (int)$store->getId() : null;
+            } catch (\Throwable $e) {
+                $storeId = null;
+            }
+            $companyId = $this->config->getOdooCompanyId($storeId);
+            if ($companyId !== null) {
+                $companyIds[$companyId] = $companyId;
+            }
+        }
+
+        return count($companyIds) === 1 ? (int)reset($companyIds) : null;
     }
 }

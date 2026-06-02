@@ -10,6 +10,11 @@ use MagentoEgypt\OdooConnector\Model\ResourceModel\EntityMap as EntityMapResourc
 
 class Collection extends AbstractCollection
 {
+    /**
+     * @var string
+     */
+    protected $_idFieldName = 'map_id';
+
     protected function _construct(): void
     {
         $this->_init(EntityMap::class, EntityMapResource::class);
