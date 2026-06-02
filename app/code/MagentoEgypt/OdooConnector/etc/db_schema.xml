@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+
+    <!-- Entity ID map: the idempotency keystone. One row per (entity_type, natural_key, website). -->
+    <table name="magentoegypt_odoo_entity_map" resource="default" engine="innodb" comment="Odoo-Magento entity ID mapping (idempotency keystone)">
+        <column xsi:type="int" name="map_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Map ID"/>
+        <column xsi:type="varchar" name="entity_type" length="40" nullable="false" comment="product|customer_buyer|customer_vendor|order|order_vendor|inventory_source_item|category|commission|promotion"/>
+        <column xsi:type="varchar" name="magento_id" length="64" nullable="true" comment="Magento entity id (string)"/>
+        <column xsi:type="varchar" name="magento_natural_key" length="255" nullable="false" comment="Natural key: sku/email/increment_id/source:sku/url_key"/>
+        <column xsi:type="varchar" name="odoo_model" length="80" nullable="true" comment="Odoo model name"/>
+        <column xsi:type="int" name="odoo_id" padding="10" unsigned="true" nullable="true" comment="Odoo record id"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" default="0" comment="Website scope (0=global)"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" default="0" comment="Store scope (0=n/a)"/>
+        <column xsi:type="int" name="odoo_company_id" padding="10" unsigned="true" nullable="true" comment="Mapped Odoo company id"/>
+        <column xsi:type="int" name="vendor_id" padding="10" unsigned="true" nullable="false" default="0" comment="CedCommerce vendor id (0=n/a)"/>
+        <column xsi:type="varchar" name="last_direction" length="8" nullable="true" comment="m2o|o2m"/>
+        <column xsi:type="varchar" name="magento_checksum" length="64" nullable="true" comment="Last synced Magento payload sha256"/>
+        <column xsi:type="varchar" name="odoo_checksum" length="64" nullable="true" comment="Last synced Odoo payload sha256"/>
+        <column xsi:type="datetime" name="magento_updated_at" nullable="true" comment="Magento watermark"/>
+        <column xsi:type="datetime" name="odoo_write_date" nullable="true" comment="Odoo write_date watermark"/>
+        <column xsi:type="varchar" name="sync_status" length="16" nullable="false" default="pending" comment="linked|pending|conflict|error"/>
+        <column xsi:type="varchar" name="last_correlation_id" length="36" nullable="true" comment="Last correlation id touching this row"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="map_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ME_ODOO_ENTITY_MAP_ETYPE_MAGENTO_ID_WEBSITE_ID">
+            <column name="entity_type"/>
+            <column name="magento_id"/>
+            <column name="website_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ME_ODOO_ENTITY_MAP_ETYPE_ODOO_MODEL_ODOO_ID_WEBSITE_ID">
+            <column name="entity_type"/>
+            <column name="odoo_model"/>
+            <column name="odoo_id"/>
+            <column name="website_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="ME_ODOO_ENTITY_MAP_ETYPE_NATURAL_KEY_WEBSITE_ID">
+            <column name="entity_type"/>
+            <column name="magento_natural_key"/>
+            <column name="website_id"/>
+        </constraint>
+        <index referenceId="ME_ODOO_ENTITY_MAP_VENDOR_ID" indexType="btree">
+            <column name="vendor_id"/>
+        </index>
+        <index referenceId="ME_ODOO_ENTITY_MAP_SYNC_STATUS" indexType="btree">
+            <column name="sync_status"/>
+        </index>
+        <index referenceId="ME_ODOO_ENTITY_MAP_LAST_CORRELATION_ID" indexType="btree">
+            <column name="last_correlation_id"/>
+        </index>
+    </table>
+
+    <!-- Sync queue: observers enqueue, cron consumer drains. -->
+    <table name="magentoegypt_odoo_sync_queue" resource="default" engine="innodb" comment="Odoo-Magento outbound/inbound sync queue">
+        <column xsi:type="int" name="queue_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Queue ID"/>
+        <column xsi:type="varchar" name="entity_type" length="40" nullable="false" comment="Entity type"/>
+        <column xsi:type="varchar" name="magento_id" length="64" nullable="true" comment="Magento entity id"/>
+        <column xsi:type="int" name="odoo_id" padding="10" unsigned="true" nullable="true" comment="Odoo record id"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" default="0" comment="Website scope"/>
+        <column xsi:type="int" name="vendor_id" padding="10" unsigned="true" nullable="false" default="0" comment="Vendor id (0=n/a)"/>
+        <column xsi:type="varchar" name="direction" length="8" nullable="false" comment="m2o|o2m"/>
+        <column xsi:type="varchar" name="operation" length="16" nullable="false" comment="create|update|delete|status|price|stock"/>
+        <column xsi:type="longtext" name="payload" nullable="true" comment="JSON envelope or lean key-set"/>
+        <column xsi:type="varchar" name="correlation_id" length="36" nullable="false" comment="Correlation id"/>
+        <column xsi:type="varchar" name="idempotency_key" length="64" nullable="true" comment="Idempotency key"/>
+        <column xsi:type="varchar" name="status" length="16" nullable="false" default="pending" comment="pending|processing|done|failed|skipped"/>
+        <column xsi:type="smallint" name="attempts" padding="5" unsigned="true" nullable="false" default="0" comment="Attempts made"/>
+        <column xsi:type="smallint" name="max_attempts" padding="5" unsigned="true" nullable="false" default="5" comment="Max attempts"/>
+        <column xsi:type="text" name="last_error" nullable="true" comment="Last error message"/>
+        <column xsi:type="datetime" name="scheduled_at" nullable="true" comment="Next-eligible time (backoff)"/>
+        <column xsi:type="datetime" name="locked_at" nullable="true" comment="Consumer claim marker"/>
+        <column xsi:type="smallint" name="priority" padding="5" unsigned="false" nullable="false" default="0" comment="Higher runs first"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP" comment="Updated at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="queue_id"/>
+        </constraint>
+        <index referenceId="ME_ODOO_SYNC_QUEUE_STATUS_SCHEDULED_AT_PRIORITY" indexType="btree">
+            <column name="status"/>
+            <column name="scheduled_at"/>
+            <column name="priority"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_QUEUE_CORRELATION_ID" indexType="btree">
+            <column name="correlation_id"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_QUEUE_ENTITY_TYPE_MAGENTO_ID" indexType="btree">
+            <column name="entity_type"/>
+            <column name="magento_id"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_QUEUE_LOCKED_AT" indexType="btree">
+            <column name="locked_at"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_QUEUE_DEDUPE" indexType="btree">
+            <column name="entity_type"/>
+            <column name="magento_id"/>
+            <column name="operation"/>
+            <column name="status"/>
+        </index>
+    </table>
+
+    <!-- Sync log: append-only audit, one row per attempt. -->
+    <table name="magentoegypt_odoo_sync_log" resource="default" engine="innodb" comment="Odoo-Magento sync audit log (append-only)">
+        <column xsi:type="int" name="log_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Log ID"/>
+        <column xsi:type="varchar" name="correlation_id" length="36" nullable="false" comment="Correlation id"/>
+        <column xsi:type="varchar" name="entity_type" length="40" nullable="true" comment="Entity type"/>
+        <column xsi:type="varchar" name="magento_id" length="64" nullable="true" comment="Magento entity id"/>
+        <column xsi:type="int" name="odoo_id" padding="10" unsigned="true" nullable="true" comment="Odoo record id"/>
+        <column xsi:type="smallint" name="website_id" padding="5" unsigned="true" nullable="false" default="0" comment="Website scope"/>
+        <column xsi:type="varchar" name="direction" length="8" nullable="true" comment="m2o|o2m"/>
+        <column xsi:type="varchar" name="operation" length="16" nullable="true" comment="Operation"/>
+        <column xsi:type="text" name="request_snippet" nullable="true" comment="Truncated request (secrets redacted)"/>
+        <column xsi:type="text" name="response_snippet" nullable="true" comment="Truncated response"/>
+        <column xsi:type="smallint" name="http_status" padding="5" unsigned="false" nullable="true" comment="HTTP status"/>
+        <column xsi:type="varchar" name="result" length="16" nullable="false" comment="success|failed|skipped|retry"/>
+        <column xsi:type="smallint" name="attempt_no" padding="5" unsigned="true" nullable="false" default="0" comment="Attempt number"/>
+        <column xsi:type="int" name="duration_ms" padding="10" unsigned="true" nullable="true" comment="Call latency in ms"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="log_id"/>
+        </constraint>
+        <index referenceId="ME_ODOO_SYNC_LOG_CORRELATION_ID" indexType="btree">
+            <column name="correlation_id"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_LOG_ENTITY_TYPE_MAGENTO_ID" indexType="btree">
+            <column name="entity_type"/>
+            <column name="magento_id"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_LOG_CREATED_AT" indexType="btree">
+            <column name="created_at"/>
+        </index>
+        <index referenceId="ME_ODOO_SYNC_LOG_RESULT" indexType="btree">
+            <column name="result"/>
+        </index>
+    </table>
+
+</schema>

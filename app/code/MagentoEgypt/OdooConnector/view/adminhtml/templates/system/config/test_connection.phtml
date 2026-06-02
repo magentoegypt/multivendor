@@ -1,0 +1,31 @@
+<?php
+/** @var \MagentoEgypt\OdooConnector\Block\Adminhtml\System\Config\TestConnection $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<div class="odoo-connector-test">
+    <?= /* @noEscape */ $block->getButtonHtml() ?>
+    <span id="odoo_test_connection_result" class="odoo-test-result" style="margin-inline-start: 12px;"></span>
+</div>
+<script>
+    require(['jquery', 'mage/translate'], function ($, $t) {
+        'use strict';
+
+        $('#odoo_test_connection_button').on('click', function () {
+            var $result = $('#odoo_test_connection_result');
+
+            $result.css('color', '').text($t('Testing…'));
+
+            $.ajax({
+                url: '<?= $escaper->escapeJs($block->getAjaxUrl()) ?>',
+                type: 'GET',
+                dataType: 'json',
+                showLoader: true,
+                data: { form_key: window.FORM_KEY }
+            }).done(function (res) {
+                $result.css('color', res.success ? '#1a7f37' : '#c0392b').text(res.message);
+            }).fail(function () {
+                $result.css('color', '#c0392b').text($t('Request failed.'));
+            });
+        });
+    });
+</script>

@@ -1,0 +1,98 @@
+{
+    "magentoegypt_odoo_entity_map": {
+        "column": {
+            "map_id": true,
+            "entity_type": true,
+            "magento_id": true,
+            "magento_natural_key": true,
+            "odoo_model": true,
+            "odoo_id": true,
+            "website_id": true,
+            "store_id": true,
+            "odoo_company_id": true,
+            "vendor_id": true,
+            "last_direction": true,
+            "magento_checksum": true,
+            "odoo_checksum": true,
+            "magento_updated_at": true,
+            "odoo_write_date": true,
+            "sync_status": true,
+            "last_correlation_id": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "ME_ODOO_ENTITY_MAP_ETYPE_MAGENTO_ID_WEBSITE_ID": true,
+            "ME_ODOO_ENTITY_MAP_ETYPE_ODOO_MODEL_ODOO_ID_WEBSITE_ID": true,
+            "ME_ODOO_ENTITY_MAP_ETYPE_NATURAL_KEY_WEBSITE_ID": true
+        },
+        "index": {
+            "ME_ODOO_ENTITY_MAP_VENDOR_ID": true,
+            "ME_ODOO_ENTITY_MAP_SYNC_STATUS": true,
+            "ME_ODOO_ENTITY_MAP_LAST_CORRELATION_ID": true
+        }
+    },
+    "magentoegypt_odoo_sync_queue": {
+        "column": {
+            "queue_id": true,
+            "entity_type": true,
+            "magento_id": true,
+            "odoo_id": true,
+            "website_id": true,
+            "vendor_id": true,
+            "direction": true,
+            "operation": true,
+            "payload": true,
+            "correlation_id": true,
+            "idempotency_key": true,
+            "status": true,
+            "attempts": true,
+            "max_attempts": true,
+            "last_error": true,
+            "scheduled_at": true,
+            "locked_at": true,
+            "priority": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "ME_ODOO_SYNC_QUEUE_STATUS_SCHEDULED_AT_PRIORITY": true,
+            "ME_ODOO_SYNC_QUEUE_CORRELATION_ID": true,
+            "ME_ODOO_SYNC_QUEUE_ENTITY_TYPE_MAGENTO_ID": true,
+            "ME_ODOO_SYNC_QUEUE_LOCKED_AT": true,
+            "ME_ODOO_SYNC_QUEUE_DEDUPE": true
+        }
+    },
+    "magentoegypt_odoo_sync_log": {
+        "column": {
+            "log_id": true,
+            "correlation_id": true,
+            "entity_type": true,
+            "magento_id": true,
+            "odoo_id": true,
+            "website_id": true,
+            "direction": true,
+            "operation": true,
+            "request_snippet": true,
+            "response_snippet": true,
+            "http_status": true,
+            "result": true,
+            "attempt_no": true,
+            "duration_ms": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "ME_ODOO_SYNC_LOG_CORRELATION_ID": true,
+            "ME_ODOO_SYNC_LOG_ENTITY_TYPE_MAGENTO_ID": true,
+            "ME_ODOO_SYNC_LOG_CREATED_AT": true,
+            "ME_ODOO_SYNC_LOG_RESULT": true
+        }
+    }
+}

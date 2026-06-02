@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">odooconnector_entitymap_listing.odooconnector_entitymap_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>odooconnector_entitymap_columns</spinner>
+        <deps>
+            <dep>odooconnector_entitymap_listing.odooconnector_entitymap_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="odooconnector_entitymap_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>MagentoEgypt_OdooConnector::monitor</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider" name="odooconnector_entitymap_listing_data_source">
+            <settings>
+                <requestFieldName>map_id</requestFieldName>
+                <primaryFieldName>map_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="odooconnector_entitymap_columns">
+        <column name="map_id">
+            <settings>
+                <filter>textRange</filter>
+                <sorting>desc</sorting>
+                <label translate="true">ID</label>
+            </settings>
+        </column>
+        <column name="entity_type">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Entity Type</label>
+            </settings>
+        </column>
+        <column name="magento_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Magento ID</label>
+            </settings>
+        </column>
+        <column name="magento_natural_key">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Natural Key</label>
+            </settings>
+        </column>
+        <column name="odoo_model">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Odoo Model</label>
+            </settings>
+        </column>
+        <column name="odoo_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Odoo ID</label>
+            </settings>
+        </column>
+        <column name="website_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Website</label>
+            </settings>
+        </column>
+        <column name="odoo_company_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Odoo Company</label>
+            </settings>
+        </column>
+        <column name="last_direction">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Direction</label>
+            </settings>
+        </column>
+        <column name="sync_status">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <column name="last_correlation_id">
+            <settings>
+                <filter>text</filter>
+                <label translate="true">Correlation ID</label>
+            </settings>
+        </column>
+        <column name="updated_at" class="Magento\Ui\Component\Listing\Columns\Date" component="Magento_Ui/js/grid/columns/date">
+            <settings>
+                <filter>dateRange</filter>
+                <dataType>date</dataType>
+                <label translate="true">Updated At</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

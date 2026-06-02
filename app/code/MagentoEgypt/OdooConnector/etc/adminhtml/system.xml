@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magentoegypt" translate="label" sortOrder="400">
+            <label>Magento Egypt</label>
+        </tab>
+        <section id="odooconnector" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Odoo Connector</label>
+            <tab>magentoegypt</tab>
+            <resource>MagentoEgypt_OdooConnector::config</resource>
+
+            <group id="connection" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Odoo Connection (16.0 Enterprise)</label>
+                <field id="odoo_url" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Odoo Base URL</label>
+                    <comment>e.g. https://erp.example.com (no trailing slash needed).</comment>
+                </field>
+                <field id="odoo_db" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Database Name</label>
+                </field>
+                <field id="api_user" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API User (login)</label>
+                    <comment>Dedicated Odoo integration user. Note: consumes an Enterprise seat.</comment>
+                </field>
+                <field id="api_key" translate="label comment" type="obscure" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>API Key</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>Odoo API key for the integration user (Settings &gt; Users &gt; API Keys) — not the password.</comment>
+                </field>
+                <field id="auth_protocol" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Protocol</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\AuthProtocol</source_model>
+                </field>
+                <field id="odoo_company_id" translate="label comment" type="text" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Odoo Company ID (per website)</label>
+                    <comment>Numeric Odoo res.company id this scope maps to (multi-company). Set per website. Leave blank to use Odoo's default company.</comment>
+                </field>
+                <field id="inbound_shared_secret" translate="label comment" type="obscure" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Inbound Shared Secret (HMAC)</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                    <comment>Used to verify the X-Odoo-Signature header on inbound (Odoo to Magento) calls.</comment>
+                </field>
+                <field id="test_connection" translate="label comment" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Test Connection</label>
+                    <frontend_model>MagentoEgypt\OdooConnector\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <comment>Save the configuration first, then test (credentials are read from the saved values).</comment>
+                </field>
+            </group>
+
+            <group id="domains" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Domains &amp; Conflict Rules</label>
+                <field id="enable_products" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Products Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_customers" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Customers Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_orders" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Orders Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_inventory" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Inventory Sync</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_reports" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Reports Export</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="conflict_rule_products" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Conflict Rule: Products</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\ConflictRule</source_model>
+                </field>
+                <field id="product_price_owner" translate="label comment" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Product Sale-Price Owner</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\PriceOwner</source_model>
+                    <comment>Open decision (see architecture doc section 9) - confirm with the business.</comment>
+                </field>
+                <field id="conflict_rule_customers" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Conflict Rule: Customers</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\ConflictRule</source_model>
+                </field>
+                <field id="conflict_rule_inventory" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Conflict Rule: Inventory</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\ConflictRule</source_model>
+                </field>
+                <field id="order_granularity" translate="label" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order Granularity</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\OrderGranularity</source_model>
+                </field>
+            </group>
+
+            <group id="processing" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Processing</label>
+                <field id="batch_size" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Queue Batch Size</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="max_attempts" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Max Retry Attempts</label>
+                    <validate>validate-digits</validate>
+                </field>
+                <field id="backoff_base_minutes" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Retry Backoff Base (minutes)</label>
+                    <validate>validate-digits</validate>
+                    <comment>Next retry is scheduled at base * 2^attempts minutes (capped).</comment>
+                </field>
+                <field id="pull_enabled" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Scheduled Pull (Odoo to Magento)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Watermark-based catch-all in addition to Odoo push.</comment>
+                </field>
+            </group>
+
+            <group id="logging" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Logging</label>
+                <field id="log_level" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Log Level</label>
+                    <source_model>MagentoEgypt\OdooConnector\Model\Config\Source\LogLevel</source_model>
+                    <comment>Writes to var/log/odoo_sync.log and the sync log table.</comment>
+                </field>
+                <field id="callback_url" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Inbound Callback URL</label>
+                    <frontend_model>MagentoEgypt\OdooConnector\Block\Adminhtml\System\Config\CallbackUrl</frontend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

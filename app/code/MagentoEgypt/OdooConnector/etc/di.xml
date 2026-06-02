@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="MagentoEgypt\OdooConnector\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">odooSync</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">MagentoEgypt\OdooConnector\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="magentoegypt_odoo_status" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\StatusCommand</item>
+                <item name="magentoegypt_odoo_products_pull" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\ProductsPullCommand</item>
+                <item name="magentoegypt_odoo_products_push" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\ProductsPushCommand</item>
+                <item name="magentoegypt_odoo_queue_run" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\QueueRunCommand</item>
+                <item name="magentoegypt_odoo_customers_pull" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\CustomersPullCommand</item>
+                <item name="magentoegypt_odoo_customers_push" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\CustomersPushCommand</item>
+                <item name="magentoegypt_odoo_inventory_push" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\InventoryPushCommand</item>
+                <item name="magentoegypt_odoo_orders_push" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\OrdersPushCommand</item>
+                <item name="magentoegypt_odoo_report" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\ReportConsistencyCommand</item>
+                <item name="magentoegypt_odoo_report_analytics" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\ReportAnalyticsCommand</item>
+                <item name="magentoegypt_odoo_reconcile" xsi:type="object">MagentoEgypt\OdooConnector\Console\Command\ReconcileCommand</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\InventoryApi\Api\SourceItemsSaveInterface">
+        <plugin name="magentoegypt_odoo_source_items_save" type="MagentoEgypt\OdooConnector\Plugin\SourceItemsSaveAfter"/>
+    </type>
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="magentoegypt_odoo_order_save" type="MagentoEgypt\OdooConnector\Plugin\OrderRepositorySaveAfter"/>
+    </type>
+
+    <!-- Admin UI grid collections over the three sync tables (sortable/filterable/paged listings). -->
+    <virtualType name="MagentoEgypt\OdooConnector\Ui\EntityMapGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_odoo_entity_map</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\OdooConnector\Model\ResourceModel\EntityMap</argument>
+            <argument name="identifierName" xsi:type="string">map_id</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MagentoEgypt\OdooConnector\Ui\SyncQueueGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_odoo_sync_queue</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\OdooConnector\Model\ResourceModel\SyncQueue</argument>
+            <argument name="identifierName" xsi:type="string">queue_id</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MagentoEgypt\OdooConnector\Ui\SyncLogGridCollection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_odoo_sync_log</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\OdooConnector\Model\ResourceModel\SyncLog</argument>
+            <argument name="identifierName" xsi:type="string">log_id</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="odooconnector_entitymap_listing_data_source" xsi:type="string">MagentoEgypt\OdooConnector\Ui\EntityMapGridCollection</item>
+                <item name="odooconnector_syncqueue_listing_data_source" xsi:type="string">MagentoEgypt\OdooConnector\Ui\SyncQueueGridCollection</item>
+                <item name="odooconnector_synclog_listing_data_source" xsi:type="string">MagentoEgypt\OdooConnector\Ui\SyncLogGridCollection</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="MagentoEgypt_OdooConnector::menu_root" title="Magento Egypt" translate="title" module="MagentoEgypt_OdooConnector" sortOrder="11" resource="MagentoEgypt_OdooConnector::odooconnector"/>
+        <add id="MagentoEgypt_OdooConnector::entitymap" title="Entity Map" translate="title" module="MagentoEgypt_OdooConnector" sortOrder="10" parent="MagentoEgypt_OdooConnector::menu_root" action="odooconnector/entitymap/index" resource="MagentoEgypt_OdooConnector::monitor"/>
+        <add id="MagentoEgypt_OdooConnector::queue" title="Sync Queue" translate="title" module="MagentoEgypt_OdooConnector" sortOrder="20" parent="MagentoEgypt_OdooConnector::menu_root" action="odooconnector/queue/index" resource="MagentoEgypt_OdooConnector::monitor"/>
+        <add id="MagentoEgypt_OdooConnector::log" title="Sync Log" translate="title" module="MagentoEgypt_OdooConnector" sortOrder="30" parent="MagentoEgypt_OdooConnector::menu_root" action="odooconnector/log/index" resource="MagentoEgypt_OdooConnector::monitor"/>
+        <add id="MagentoEgypt_OdooConnector::config_link" title="Configuration" translate="title" module="MagentoEgypt_OdooConnector" sortOrder="40" parent="MagentoEgypt_OdooConnector::menu_root" action="adminhtml/system_config/edit/section/odooconnector" resource="MagentoEgypt_OdooConnector::config"/>
+    </menu>
+</config>
