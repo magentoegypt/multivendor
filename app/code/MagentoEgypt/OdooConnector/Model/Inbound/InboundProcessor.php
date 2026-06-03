@@ -241,6 +241,22 @@ class InboundProcessor
                 $product->setCustomAttribute('special_price', (float)$payload['special_price']);
                 $changed[] = 'special_price';
             }
+            if (isset($payload['cost']) && is_numeric($payload['cost']) && (float)$payload['cost'] > 0) {
+                $product->setCustomAttribute('cost', (float)$payload['cost']);
+                $changed[] = 'cost';
+            }
+            if (isset($payload['weight']) && is_numeric($payload['weight']) && (float)$payload['weight'] > 0) {
+                $product->setWeight((float)$payload['weight']);
+                $changed[] = 'weight';
+            }
+            if (isset($payload['barcode']) && is_string($payload['barcode']) && $payload['barcode'] !== '') {
+                $product->setCustomAttribute('barcode', (string)$payload['barcode']);
+                $changed[] = 'barcode';
+            }
+            if (isset($payload['short_description']) && (string)$payload['short_description'] !== '') {
+                $product->setCustomAttribute('short_description', (string)$payload['short_description']);
+                $changed[] = 'short_description';
+            }
             if (isset($payload['image']) && is_string($payload['image']) && $payload['image'] !== '') {
                 if ($this->productMediaCategory->applyImage($product, $payload['image'])) {
                     $changed[] = 'image';

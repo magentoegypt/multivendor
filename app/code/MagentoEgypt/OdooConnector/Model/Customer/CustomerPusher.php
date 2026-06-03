@@ -34,6 +34,8 @@ class CustomerPusher
     private array $countryCache = [];
     /** @var array<string, int|null> */
     private array $tagCache = [];
+    /** @var array<string, int|null> */
+    private array $stateCache = [];
 
     public function __construct(
         CustomerRepositoryInterface $customerRepository,
@@ -82,12 +84,20 @@ class CustomerPusher
             }
         }
 
-        // Billing country ISO code -> Odoo res.country id.
+        // Billing country ISO code -> Odoo res.country id; region -> res.country.state id.
         $countryCode = $this->pushMapper->billingCountryCode($customer);
+        $countryId = null;
         if ($countryCode !== null) {
             $countryId = $this->resolveCountryId($countryCode);
             if ($countryId !== null) {
                 $values['country_id'] = $countryId;
+            }
+        }
+        $regionCode = $this->pushMapper->billingRegionCode($customer);
+        if ($regionCode !== null && $countryId !== null) {
+            $stateId = $this->resolveStateId($regionCode, $countryId);
+            if ($stateId !== null) {
+                $values['state_id'] = $stateId;
             }
         }
 
@@ -189,6 +199,28 @@ class CustomerPusher
         return $this->countryCache[$isoCode] = $id;
     }
 
+    private function resolveStateId(string $regionCode, int $countryId): ?int
+    {
+        $regionCode = strtoupper($regionCode);
+        $key = $countryId . ':' . $regionCode;
+        if (array_key_exists($key, $this->stateCache)) {
+            return $this->stateCache[$key];
+        }
+        try {
+            $found = $this->odooClient->executeKw(
+                'res.country.state',
+                'search',
+                [[['code', '=', $regionCode], ['country_id', '=', $countryId]]],
+                ['limit' => 1]
+            );
+            $id = (is_array($found) && isset($found[0])) ? (int)$found[0] : null;
+        } catch (\Throwable $e) {
+            $id = null;
+        }
+
+        return $this->stateCache[$key] = $id;
+    }
+
     private function resolveGroupTagId(string $groupCode): ?int
     {
         $name = 'Magento: ' . $groupCode;
@@ -217,6 +249,13 @@ class CustomerPusher
                 $cid = $this->resolveCountryId($countryCode);
                 if ($cid !== null) {
                     $vals['country_id'] = $cid;
+                    $regionCode = $this->pushMapper->regionCode($shipping);
+                    if ($regionCode !== null) {
+                        $sid = $this->resolveStateId($regionCode, $cid);
+                        if ($sid !== null) {
+                            $vals['state_id'] = $sid;
+                        }
+                    }
                 }
             }
             $name = trim(($shipping->getFirstname() ?? '') . ' ' . ($shipping->getLastname() ?? ''));

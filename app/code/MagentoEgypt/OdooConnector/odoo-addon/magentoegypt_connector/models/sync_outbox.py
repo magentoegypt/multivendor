@@ -84,10 +84,14 @@ class MagentoSyncOutbox(models.Model):
                 'name': record.name or '',
                 'price': float(record.list_price or 0.0),
                 'description': record.description_sale or '',
+                'short_description': record.x_magento_short_description or '',
                 # Magento status: 1=enabled / 2=disabled (mirrors sale_ok).
                 'status': 1 if record.sale_ok else 2,
                 'visibility': int(record.x_magento_visibility or 4),
                 'special_price': float(record.x_magento_special_price or 0.0),
+                'cost': float(record.standard_price or 0.0),
+                'weight': float(record.weight or 0.0),
+                'barcode': record.barcode or '',
                 # base64 image (string) for O->M image sync; '' when none.
                 'image': image.decode('ascii') if image else '',
                 # primary category name -> Magento find/create + assign.

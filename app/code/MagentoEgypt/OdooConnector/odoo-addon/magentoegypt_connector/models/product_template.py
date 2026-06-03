@@ -19,3 +19,4 @@ class ProductTemplate(models.Model):
         string='Magento Attributes (JSON)',
         help='Curated Magento product attributes (color, material, brand, ...) as a JSON object.',
     )
+    x_magento_short_description = fields.Text(string='Magento Short Description')

@@ -59,6 +59,34 @@ class ProductPushMapper
             $values['x_magento_special_price'] = (float)$special;
         }
 
+        // Cost -> Odoo standard_price (margin reporting). Sourced from the Magento
+        // 'cost' attribute; kept out of x_magento_attributes via the skip list.
+        $cost = $this->attrValue($product, 'cost');
+        if ($cost !== null && is_numeric($cost)) {
+            $values['standard_price'] = (float)$cost;
+        }
+
+        // Weight -> Odoo weight (delivery/shipping). Only when set, so we never
+        // overwrite an existing Odoo weight with 0.
+        $weight = $product->getWeight();
+        if ($weight !== null && (float)$weight > 0.0) {
+            $values['weight'] = (float)$weight;
+        }
+
+        // Barcode/EAN -> Odoo barcode. Magento has no native barcode field, so we
+        // read a 'barcode' attribute when present. NOTE: Odoo enforces barcode
+        // uniqueness; duplicate values are rejected by Odoo on write.
+        $barcode = $this->attrValue($product, 'barcode');
+        if ($barcode !== null) {
+            $values['barcode'] = $barcode;
+        }
+
+        // Short description -> Odoo custom field (no native Odoo equivalent).
+        $shortDescription = $this->attrValue($product, 'short_description');
+        if ($shortDescription !== null) {
+            $values['x_magento_short_description'] = $shortDescription;
+        }
+
         $categId = $this->categoryResolver->resolvePrimaryCategId((array)$product->getCategoryIds());
         if ($categId !== null) {
             $values['categ_id'] = $categId;
@@ -102,7 +130,7 @@ class ProductPushMapper
         static $skip = [
             'description', 'short_description', 'image', 'small_image', 'thumbnail', 'media_gallery',
             'special_price', 'special_from_date', 'special_to_date', 'status', 'visibility', 'category_ids',
-            'price', 'cost', 'name', 'sku', 'url_key', 'url_path', 'meta_title', 'meta_description', 'meta_keyword',
+            'price', 'cost', 'weight', 'barcode', 'name', 'sku', 'url_key', 'url_path', 'meta_title', 'meta_description', 'meta_keyword',
             'tier_price', 'quantity_and_stock_status', 'options_container', 'gift_message_available',
             'custom_design', 'page_layout', 'swatch_image', 'required_options', 'has_options', 'image_label',
         ];

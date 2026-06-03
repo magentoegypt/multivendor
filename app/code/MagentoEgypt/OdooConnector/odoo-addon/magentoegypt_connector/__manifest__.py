@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'MagentoEgypt Odoo Connector',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.3.0',
     'summary': 'Pushes Odoo changes (products, customers, orders) to the Magento '
                'MagentoEgypt_OdooConnector inbound endpoint, HMAC-signed.',
     'description': """

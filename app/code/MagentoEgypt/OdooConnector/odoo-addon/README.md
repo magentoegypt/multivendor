@@ -36,6 +36,10 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `visibility` (1–4) | `x_magento_visibility` | int passthrough |
 | `description` | `description_sale` | only if set & non-empty |
 | `special_price` | `x_magento_special_price` | only if set, non-empty, numeric |
+| `cost` | `standard_price` | from the `cost` attribute, if numeric |
+| `weight` | `weight` | if set (> 0) |
+| `barcode` | `barcode` | from a `barcode` attribute, if present (Odoo enforces uniqueness) |
+| `short_description` | `x_magento_short_description` | if set & non-empty |
 | primary `category_ids` | `categ_id` | resolved via `CategoryResolver`; only if one resolves |
 | curated custom attrs | `x_magento_attributes` | JSON; excludes a skip-list (price/name/sku/status/image/…); scalar non-empty only |
 | main image file | `image_1920` | base64 of `catalog/product<image>`; only if file exists; push-only, excluded from echo checksum |
@@ -52,6 +56,10 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `sale_ok` | `status` | `setStatus()` (1/2) | if 1 or 2 |
 | `x_magento_visibility` | `visibility` | `setVisibility()` | if > 0 |
 | `x_magento_special_price` | `special_price` | `special_price` attr | if numeric > 0 |
+| `standard_price` | `cost` | `cost` attr | if numeric > 0 |
+| `weight` | `weight` | `setWeight()` | if numeric > 0 |
+| `barcode` | `barcode` | `barcode` attr | if non-empty |
+| `x_magento_short_description` | `short_description` | `short_description` attr | if non-empty |
 | `image_1920` | `image` | media image (`applyImage`) | if non-empty |
 | `categ_id.name` | `categories` | find/create + assign (`applyCategories`) | if non-empty |
 
@@ -63,7 +71,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo field | Transform / condition |
 |---|---|---|
-| `firstname` + `lastname` | `name` | trimmed concat; falls back to email if empty |
+| `prefix`+`firstname`+`middlename`+`lastname`+`suffix` | `name` | trimmed concat of present parts; falls back to email |
 | `email` | `email` | always |
 | — | `customer_rank` | constant `1` |
 | billing `telephone` | `phone` | if non-empty |
@@ -72,11 +80,13 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | billing `city` | `city` | if set |
 | billing `postcode` | `zip` | if set |
 | billing `country_id` (ISO) | `country_id` | resolved to `res.country` id; only if found |
+| billing `region` (code) | `state_id` | resolved to `res.country.state` within the country; only if found |
+| `taxvat` | `vat` | if non-empty |
 | customer group code | `x_magento_customer_group` | raw code |
 | customer group code | `category_id` | m2m tag `"Magento: <code>"` (find/create); only if resolves |
 | store→company | `company_id` | only if configured |
 
-**Shipping address → child `res.partner`** (`upsertShippingChild`, only if a default shipping address exists): `name` (concat, defaults "Shipping Address"), `phone`, `street`, `street2`, `city`, `zip`, `country_id` (same address logic), plus constants `type='delivery'` and `parent_id` = customer.
+**Shipping address → child `res.partner`** (`upsertShippingChild`, only if a default shipping address exists): `name` (concat, defaults "Shipping Address"), `phone`, `street`, `street2`, `city`, `zip`, `country_id`/`state_id` (same address logic), plus constants `type='delivery'` and `parent_id` = customer.
 
 **Odoo → Magento** — outbox (entity `customer_buyer`) → `InboundProcessor`
 
@@ -97,10 +107,16 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | resolved partner | `partner_id` | find res.partner by `customer_email`, else create; on create |
 | line items | `order_line` | see below; on create |
 | store→company | `company_id` | only if configured; on create |
+| `created_at` | `date_order` | on create |
+| `order_currency_code` | `currency_id` | resolved to `res.currency`; on create |
+| `customer_note` | `note` | if non-empty; on create |
+| billing address | `partner_invoice_id` | invoice child contact under the partner; on create |
+| shipping address | `partner_shipping_id` | delivery child contact under the partner; on create |
 | `status` | `x_magento_status` | every push |
 | `shipping_description` / `shipping_method` | `x_magento_shipping_method` | if non-empty |
 | payment method code | `x_magento_payment_method` | if payment exists |
 | `discount_amount` (abs) | `x_magento_discount_amount` | if > 0 |
+| `shipping_amount` | `x_magento_shipping_amount` | if > 0 |
 | first shipment track # | `x_magento_tracking` | if a track exists |
 | Magento state | `state` | processing/complete/closed→`action_confirm`; canceled→`action_cancel` |
 
@@ -128,9 +144,9 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 **Odoo custom fields defined by the addon** (all others above are standard Odoo fields):
 
-- `product.template`: `x_magento_visibility` (Int), `x_magento_special_price` (Float), `x_magento_attributes` (Text/JSON)
+- `product.template`: `x_magento_visibility` (Int), `x_magento_special_price` (Float), `x_magento_attributes` (Text/JSON), `x_magento_short_description` (Text)
 - `res.partner`: `x_magento_customer_group` (Char)
-- `sale.order`: `x_magento_status`, `x_magento_shipping_method`, `x_magento_payment_method`, `x_magento_discount_amount`, `x_magento_tracking`
+- `sale.order`: `x_magento_status`, `x_magento_shipping_method`, `x_magento_payment_method`, `x_magento_discount_amount`, `x_magento_shipping_amount`, `x_magento_tracking`
 
 ### Roadmap — not yet mapped
 
@@ -141,10 +157,6 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| `cost` | `standard_price` | cost for margin reporting; currently in the attribute skip-list, never sent |
-| `weight` | `weight` | enables Odoo delivery/shipping weight calc |
-| `barcode` / EAN / UPC | `barcode` | pull already *reads* barcode; push never *sets* it |
-| `short_description` | `x_magento_short_description` (new custom) | no native Odoo equivalent |
 | `media_gallery` (extra images) | `product_template_image_ids` | today only the main image (`image_1920`) syncs |
 | `tax_class_id` | `taxes_id` | product tax; today tax is cleared on order lines |
 | `meta_title` / `meta_description` / `meta_keyword` | `website_meta_title` / `_description` / `_keywords` | SEO — only if Odoo eCommerce is used |
@@ -156,11 +168,8 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| `region` / `region_id` (state) | `state_id` | address state/province; today only city/zip/country sync |
-| `taxvat` / VAT number | `vat` | B2B tax id |
-| `mobile` | `mobile` | distinct from `phone` |
 | address `company` | `is_company` / company partner | today every partner is created as an individual |
-| `prefix` / `middlename` / `suffix` | name composition | finer name handling |
+| `mobile` | `x_magento_mobile` (new custom) | this Odoo's `res.partner` has no native `mobile` field; needs a custom addon field |
 | `dob`, `gender` | custom fields | demographics |
 | billing address | `type='invoice'` child partner | mirror the existing shipping (`type='delivery'`) child pattern |
 | **O→M:** `phone`, address | back to Magento customer | O→M today carries only name+email; inbound applies only name |
@@ -169,12 +178,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| `shipping_amount` | shipping `sale.order.line` (delivery product) or `x_magento_shipping_amount` | today only the shipping method label syncs, not the cost |
 | per-line `tax_percent` / `tax_amount` | real `tax_id` | tax is currently cleared (`[[6,0,[]]]`); real mapping is a noted follow-up |
-| `order_currency_code` | `currency_id` / `pricelist_id` | multi-currency orders |
-| `created_at` | `date_order` | preserve the original Magento order date |
-| billing / shipping addresses | `partner_invoice_id` / `partner_shipping_id` | link the order to address contacts |
-| `customer_note` | `note` | order comment |
 | store / website | `team_id` | Odoo sales team / channel |
 | shipments | `stock.picking` | proper delivery docs; today only the first tracking # as a char field |
 | credit memos / refunds | `account.move` (out_refund) | today only invoices cascade to Odoo |

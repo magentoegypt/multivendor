@@ -41,6 +41,13 @@ class OrderPusher
     private Config $config;
     private OrderDocuments $orderDocuments;
 
+    /** @var array<string, int|null> */
+    private array $countryCache = [];
+    /** @var array<string, int|null> */
+    private array $stateCache = [];
+    /** @var array<string, int|null> */
+    private array $currencyCache = [];
+
     public function __construct(
         OrderRepositoryInterface $orderRepository,
         OdooClient $odooClient,
@@ -148,6 +155,30 @@ class OrderPusher
         if ($companyId !== null) {
             $createVals['company_id'] = $companyId;
         }
+        // Preserve the original Magento order date.
+        $createdAt = trim((string)$order->getCreatedAt());
+        if ($createdAt !== '') {
+            $createVals['date_order'] = $createdAt;
+        }
+        // Order currency -> Odoo res.currency.
+        $currencyId = $this->resolveCurrencyId((string)$order->getOrderCurrencyCode());
+        if ($currencyId !== null) {
+            $createVals['currency_id'] = $currencyId;
+        }
+        // Customer note -> Odoo order note.
+        $note = trim((string)$order->getCustomerNote());
+        if ($note !== '') {
+            $createVals['note'] = $note;
+        }
+        // Billing/shipping addresses -> Odoo invoice/delivery child contacts.
+        $invoicePartnerId = $this->resolveAddressPartner($partnerId, $order->getBillingAddress(), 'invoice');
+        if ($invoicePartnerId !== null) {
+            $createVals['partner_invoice_id'] = $invoicePartnerId;
+        }
+        $shippingPartnerId = $this->resolveAddressPartner($partnerId, $this->shippingAddress($order), 'delivery');
+        if ($shippingPartnerId !== null) {
+            $createVals['partner_shipping_id'] = $shippingPartnerId;
+        }
         $odooId = (int)$this->odooClient->executeKw(self::ODOO_MODEL, 'create', [$createVals]);
 
         $checksum = $this->checksum->hash([
@@ -201,6 +232,10 @@ class OrderPusher
         $discount = abs((float)$order->getDiscountAmount());
         if ($discount > 0.0) {
             $fields['x_magento_discount_amount'] = $discount;
+        }
+        $shipping = (float)$order->getShippingAmount();
+        if ($shipping > 0.0) {
+            $fields['x_magento_shipping_amount'] = $shipping;
         }
         $track = $this->firstTrackNumber($order);
         if ($track !== null) {
@@ -297,6 +332,157 @@ class OrderPusher
         }
 
         return (int)$this->odooClient->executeKw('res.partner', 'create', [['name' => $name, 'email' => $email !== '' ? $email : false]]);
+    }
+
+    /**
+     * Find/create the Odoo invoice (billing) or delivery (shipping) child contact for
+     * an order address under the order's partner. One child per type is reused.
+     *
+     * @param \Magento\Sales\Api\Data\OrderAddressInterface|null $address
+     */
+    private function resolveAddressPartner(int $parentId, $address, string $type): ?int
+    {
+        if ($address === null) {
+            return null;
+        }
+        try {
+            $vals = $this->addressVals($address);
+            $vals['type'] = $type;
+            $vals['parent_id'] = $parentId;
+            $existing = $this->odooClient->executeKw(
+                'res.partner',
+                'search',
+                [[['parent_id', '=', $parentId], ['type', '=', $type]]],
+                ['limit' => 1]
+            );
+            if (is_array($existing) && isset($existing[0])) {
+                $id = (int)$existing[0];
+                $this->odooClient->executeKw('res.partner', 'write', [[$id], $vals]);
+
+                return $id;
+            }
+
+            return (int)$this->odooClient->executeKw('res.partner', 'create', [$vals]);
+        } catch (\Throwable $e) {
+            return null; // non-fatal: the order still syncs against the main partner
+        }
+    }
+
+    /**
+     * res.partner values from a Magento order address (country/region resolved to Odoo ids).
+     *
+     * @param \Magento\Sales\Api\Data\OrderAddressInterface $address
+     * @return array<string, mixed>
+     */
+    private function addressVals($address): array
+    {
+        $name = trim(($address->getFirstname() ?? '') . ' ' . ($address->getLastname() ?? ''));
+        $vals = ['name' => $name !== '' ? $name : 'Address'];
+        $street = $address->getStreet();
+        if (is_array($street)) {
+            if (isset($street[0]) && $street[0] !== '') {
+                $vals['street'] = (string)$street[0];
+            }
+            if (isset($street[1]) && $street[1] !== '') {
+                $vals['street2'] = (string)$street[1];
+            }
+        }
+        if ($address->getCity()) {
+            $vals['city'] = (string)$address->getCity();
+        }
+        if ($address->getPostcode()) {
+            $vals['zip'] = (string)$address->getPostcode();
+        }
+        if ($address->getTelephone()) {
+            $vals['phone'] = (string)$address->getTelephone();
+        }
+        $countryCode = trim((string)$address->getCountryId());
+        if ($countryCode !== '') {
+            $countryId = $this->resolveCountryId($countryCode);
+            if ($countryId !== null) {
+                $vals['country_id'] = $countryId;
+                $regionCode = trim((string)$address->getRegionCode());
+                if ($regionCode !== '') {
+                    $stateId = $this->resolveStateId($regionCode, $countryId);
+                    if ($stateId !== null) {
+                        $vals['state_id'] = $stateId;
+                    }
+                }
+            }
+        }
+
+        return $vals;
+    }
+
+    private function shippingAddress(OrderInterface $order)
+    {
+        return method_exists($order, 'getShippingAddress') ? $order->getShippingAddress() : null;
+    }
+
+    private function resolveCountryId(string $isoCode): ?int
+    {
+        $isoCode = strtoupper(trim($isoCode));
+        if ($isoCode === '') {
+            return null;
+        }
+        if (array_key_exists($isoCode, $this->countryCache)) {
+            return $this->countryCache[$isoCode];
+        }
+        try {
+            $found = $this->odooClient->executeKw('res.country', 'search', [[['code', '=', $isoCode]]], ['limit' => 1]);
+            $id = (is_array($found) && isset($found[0])) ? (int)$found[0] : null;
+        } catch (\Throwable $e) {
+            $id = null;
+        }
+
+        return $this->countryCache[$isoCode] = $id;
+    }
+
+    private function resolveStateId(string $regionCode, int $countryId): ?int
+    {
+        $regionCode = strtoupper(trim($regionCode));
+        $key = $countryId . ':' . $regionCode;
+        if (array_key_exists($key, $this->stateCache)) {
+            return $this->stateCache[$key];
+        }
+        try {
+            $found = $this->odooClient->executeKw(
+                'res.country.state',
+                'search',
+                [[['code', '=', $regionCode], ['country_id', '=', $countryId]]],
+                ['limit' => 1]
+            );
+            $id = (is_array($found) && isset($found[0])) ? (int)$found[0] : null;
+        } catch (\Throwable $e) {
+            $id = null;
+        }
+
+        return $this->stateCache[$key] = $id;
+    }
+
+    private function resolveCurrencyId(string $code): ?int
+    {
+        $code = strtoupper(trim($code));
+        if ($code === '') {
+            return null;
+        }
+        if (array_key_exists($code, $this->currencyCache)) {
+            return $this->currencyCache[$code];
+        }
+        try {
+            // active_test=false so archived currencies still resolve.
+            $found = $this->odooClient->executeKw(
+                'res.currency',
+                'search',
+                [[['name', '=', $code]]],
+                ['limit' => 1, 'context' => ['active_test' => false]]
+            );
+            $id = (is_array($found) && isset($found[0])) ? (int)$found[0] : null;
+        } catch (\Throwable $e) {
+            $id = null;
+        }
+
+        return $this->currencyCache[$code] = $id;
     }
 
     private function resolveOdooProduct(OrderItemInterface $item): ?int

@@ -11,4 +11,5 @@ class SaleOrder(models.Model):
     x_magento_shipping_method = fields.Char(string='Magento Shipping Method')
     x_magento_payment_method = fields.Char(string='Magento Payment Method')
     x_magento_discount_amount = fields.Float(string='Magento Discount Amount')
+    x_magento_shipping_amount = fields.Float(string='Magento Shipping Amount')
     x_magento_tracking = fields.Char(string='Magento Tracking')

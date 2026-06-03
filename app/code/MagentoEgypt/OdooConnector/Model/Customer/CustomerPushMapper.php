@@ -25,12 +25,18 @@ class CustomerPushMapper
      */
     public function toOdooValues(CustomerInterface $customer): array
     {
-        $name = trim(($customer->getFirstname() ?? '') . ' ' . ($customer->getLastname() ?? ''));
+        $name = $this->fullName($customer);
         $values = [
             'name' => $name !== '' ? $name : (string)$customer->getEmail(),
             'email' => (string)$customer->getEmail(),
             'customer_rank' => 1,
         ];
+
+        // Tax/VAT number (B2B).
+        $vat = trim((string)$customer->getTaxvat());
+        if ($vat !== '') {
+            $values['vat'] = $vat;
+        }
 
         $billing = $this->billingAddress($customer);
         if ($billing !== null) {
@@ -38,6 +44,29 @@ class CustomerPushMapper
         }
 
         return $values;
+    }
+
+    /**
+     * Full partner name from the Magento name parts (prefix / first / middle / last / suffix).
+     */
+    public function fullName(CustomerInterface $customer): string
+    {
+        $parts = [
+            (string)$customer->getPrefix(),
+            (string)$customer->getFirstname(),
+            (string)$customer->getMiddlename(),
+            (string)$customer->getLastname(),
+            (string)$customer->getSuffix(),
+        ];
+        $clean = [];
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ($part !== '') {
+                $clean[] = $part;
+            }
+        }
+
+        return implode(' ', $clean);
     }
 
     /**
@@ -92,6 +121,28 @@ class CustomerPushMapper
     {
         $billing = $this->billingAddress($customer);
         $code = $billing !== null ? trim((string)$billing->getCountryId()) : '';
+
+        return $code !== '' ? $code : null;
+    }
+
+    public function billingRegionCode(CustomerInterface $customer): ?string
+    {
+        $billing = $this->billingAddress($customer);
+
+        return $billing !== null ? $this->regionCode($billing) : null;
+    }
+
+    /**
+     * Region/state code from a Magento customer address (e.g. CA); the pusher
+     * resolves it to the Odoo res.country.state id within the address country.
+     */
+    public function regionCode(AddressInterface $address): ?string
+    {
+        $region = $address->getRegion();
+        if ($region === null) {
+            return null;
+        }
+        $code = trim((string)$region->getRegionCode());
 
         return $code !== '' ? $code : null;
     }
