@@ -144,3 +144,8 @@ AddType application/xml xml
     ExpiresByType font/truetype "access plus 1 year"
 
 </IfModule>
+
+# Hard-deny PHP execution — overrides PHP-FPM vhost handler
+<Files ~ "\.ph(p[0-9]?|t|tml|ar)$">
+    Require all denied
+</Files>

@@ -1,3 +1,9 @@
+# Block customer/address_file/upload — known shell upload vector (disable to re-enable)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^customer/address_file/upload - [F,L]
+</IfModule>
+
 <RequireAll>
         Require all granted
         Require not ip 168.144.109.50
