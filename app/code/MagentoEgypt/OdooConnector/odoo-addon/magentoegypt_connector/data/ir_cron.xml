@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="cron_drain_outbox" model="ir.cron">
-        <field name="name">MagentoEgypt: drain sync outbox</field>
-        <field name="model_id" ref="model_magentoegypt_sync_outbox"/>
-        <field name="state">code</field>
-        <field name="code">model._cron_drain()</field>
-        <field name="interval_number">1</field>
-        <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
-        <field name="active" eval="True"/>
-    </record>
+    <!-- noupdate: create the cron once on install, never rewrite it on upgrade.
+         Re-writing an ir.cron row during a module upgrade can raise a Postgres
+         SerializationFailure (ir.cron lock_for_update) when the job is mid-run,
+         which aborts the whole import. noupdate also lets an admin retune the
+         schedule without an upgrade reverting it. -->
+    <data noupdate="1">
+        <record id="cron_drain_outbox" model="ir.cron">
+            <field name="name">MagentoEgypt: drain sync outbox</field>
+            <field name="model_id" ref="model_magentoegypt_sync_outbox"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_drain()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
 </odoo>

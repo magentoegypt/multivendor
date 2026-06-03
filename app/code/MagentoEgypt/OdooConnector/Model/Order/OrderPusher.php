@@ -74,9 +74,17 @@ class OrderPusher
         $map = $this->mapManager->findByNaturalKey(self::ENTITY_TYPE, $incrementId, 0);
         if ($map !== null && $map->getData('odoo_id')) {
             $odooId = (int)$map->getData('odoo_id');
-            $this->applyOrderFields($odooId, $order, $orderFields);
+            try {
+                $this->applyOrderFields($odooId, $order, $orderFields);
 
-            return ['action' => 'exists', 'increment_id' => $incrementId, 'odoo_id' => $odooId];
+                return ['action' => 'exists', 'increment_id' => $incrementId, 'odoo_id' => $odooId];
+            } catch (\MagentoEgypt\OdooConnector\Model\Api\OdooException $e) {
+                if (!$e->isMissingRecord()) {
+                    throw $e;
+                }
+                // Stale link (order gone after the Odoo migration) — fall through to
+                // re-attach by client_order_ref / recreate below.
+            }
         }
 
         // Re-attach to an existing Odoo sale.order by client_order_ref when the map has no link

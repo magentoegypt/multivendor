@@ -101,6 +101,27 @@ class MapManager
         $connection = $this->resourceConnection->getConnection();
         $table = $this->resourceConnection->getTableName(EntityMapResource::TABLE);
 
+        // Heal post-migration ID drift: if another mapping already holds this odoo_id
+        // for the same (entity_type, odoo_model, website) under a DIFFERENT natural
+        // key, release it (null its odoo_id, mark pending) so this row can claim the
+        // id. Otherwise the unique (entity_type, odoo_model, odoo_id, website_id)
+        // index aborts the upsert — the inventory/customer collision seen after the
+        // Odoo 16->19 migration reassigned record IDs. The released row re-attaches
+        // by natural key on its next push.
+        if (!empty($data['odoo_id']) && !empty($data['odoo_model'])) {
+            $connection->update(
+                $table,
+                ['odoo_id' => null, 'sync_status' => EntityMap::STATUS_PENDING],
+                [
+                    'entity_type = ?' => (string)$data['entity_type'],
+                    'odoo_model = ?' => (string)$data['odoo_model'],
+                    'odoo_id = ?' => (int)$data['odoo_id'],
+                    'website_id = ?' => (int)$data['website_id'],
+                    'magento_natural_key <> ?' => (string)$data['magento_natural_key'],
+                ]
+            );
+        }
+
         $updateFields = array_values(array_filter(
             self::UPDATABLE,
             static fn (string $column): bool => array_key_exists($column, $data)

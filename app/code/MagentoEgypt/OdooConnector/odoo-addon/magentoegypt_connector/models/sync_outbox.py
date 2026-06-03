@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import logging
+from datetime import timedelta
 
 try:
     import requests
@@ -16,6 +17,15 @@ _logger = logging.getLogger(__name__)
 PARAM_URL = 'magentoegypt.magento_url'
 PARAM_SECRET = 'magentoegypt.hmac_secret'
 PARAM_ENABLED = 'magentoegypt.enabled'
+# WAF User-Agent for the outbound POST to Magento. Some WAFs 403 the default
+# python-requests UA, so this is configurable — set it to the value your Magento
+# WAF allowlists. (Restored cutover fix.)
+PARAM_USER_AGENT = 'magentoegypt.user_agent'
+DEFAULT_USER_AGENT = 'MagentoEgypt-OdooConnector/19.0'
+# Outbox retention: delete processed (done) rows older than N days so the table
+# can't grow unbounded (previously leaked to ~48k rows / 427 MB). 0 disables.
+PARAM_RETENTION_DAYS = 'magentoegypt.outbox_retention_days'
+DEFAULT_RETENTION_DAYS = 7
 INBOUND_PATH = '/odooconnector/inbound/receive'
 
 
@@ -126,6 +136,7 @@ class MagentoSyncOutbox(models.Model):
             return
 
         endpoint = base_url + INBOUND_PATH
+        user_agent = icp.get_param(PARAM_USER_AGENT) or DEFAULT_USER_AGENT
         rows = self.sudo().search([('state', '=', 'pending')], limit=limit)
         for row in rows:
             envelope = {
@@ -143,7 +154,11 @@ class MagentoSyncOutbox(models.Model):
                 resp = requests.post(
                     endpoint,
                     data=body,
-                    headers={'Content-Type': 'application/json', 'X-Odoo-Signature': signature},
+                    headers={
+                        'Content-Type': 'application/json',
+                        'X-Odoo-Signature': signature,
+                        'User-Agent': user_agent,
+                    },
                     timeout=30,
                 )
                 if resp.status_code == 200:
@@ -160,3 +175,13 @@ class MagentoSyncOutbox(models.Model):
                     'attempts': row.attempts + 1,
                     'last_error': str(exc)[:500],
                 })
+
+        # Retention purge — delete processed rows so the outbox can't grow
+        # unbounded (restored cutover fix; previously leaked ~48k rows / 427 MB).
+        retention = int(icp.get_param(PARAM_RETENTION_DAYS) or DEFAULT_RETENTION_DAYS)
+        if retention > 0:
+            cutoff = fields.Datetime.to_string(fields.Datetime.now() - timedelta(days=retention))
+            stale = self.sudo().search([('state', '=', 'done'), ('write_date', '<', cutoff)])
+            if stale:
+                _logger.info('magentoegypt_connector: purging %s done outbox row(s) older than %s day(s)', len(stale), retention)
+                stale.unlink()

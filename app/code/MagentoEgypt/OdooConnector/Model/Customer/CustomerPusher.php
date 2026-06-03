@@ -108,8 +108,30 @@ class CustomerPusher
         }
 
         if ($odooId !== null) {
-            $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$odooId], $values]);
-            $action = 'update';
+            try {
+                $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$odooId], $values]);
+                $action = 'update';
+            } catch (\MagentoEgypt\OdooConnector\Model\Api\OdooException $e) {
+                if (!$e->isMissingRecord()) {
+                    throw $e;
+                }
+                // Stale link (partner gone after the Odoo migration) — re-resolve by
+                // email; create only if there is genuinely no Odoo partner.
+                $found = $this->odooClient->executeKw(
+                    self::ODOO_MODEL,
+                    'search',
+                    [[['email', '=', (string)$customer->getEmail()]]],
+                    ['limit' => 1]
+                );
+                if (is_array($found) && isset($found[0])) {
+                    $odooId = (int)$found[0];
+                    $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$odooId], $values]);
+                    $action = 'update';
+                } else {
+                    $odooId = (int)$this->odooClient->executeKw(self::ODOO_MODEL, 'create', [$values]);
+                    $action = 'create';
+                }
+            }
         } else {
             $odooId = (int)$this->odooClient->executeKw(self::ODOO_MODEL, 'create', [$values]);
             $action = 'create';

@@ -10,7 +10,7 @@ use MagentoEgypt\OdooConnector\Helper\Config;
 use MagentoEgypt\OdooConnector\Logger\Logger;
 
 /**
- * Thin Odoo 16 external-API client over JSON-RPC (/jsonrpc).
+ * Thin Odoo 19 external-API client over JSON-RPC (/jsonrpc).
  *
  * Magento -> Odoo writes call executeKw(); test/diagnostics call version().
  * Auth uses an Odoo API key (see Helper\Config::getApiKey) as the password

@@ -11,7 +11,7 @@ use MagentoEgypt\OdooConnector\Model\Mapping\MapManager;
 use MagentoEgypt\OdooConnector\Model\Sync\Checksum;
 
 /**
- * Pushes MSI on-hand (source_code + sku + qty) to Odoo on-hand via the Odoo 16
+ * Pushes MSI on-hand (source_code + sku + qty) to Odoo on-hand via the Odoo 19
  * inventory-adjustment flow (stock.quant.inventory_quantity + action_apply_inventory).
  * Only acts on SKUs that resolve to an Odoo product; idempotent (re-applying the
  * same quantity is a no-op adjustment).

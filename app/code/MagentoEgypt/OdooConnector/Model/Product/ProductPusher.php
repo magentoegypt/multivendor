@@ -81,9 +81,25 @@ class ProductPusher
         }
 
         if ($existingOdooId !== null) {
-            $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$existingOdooId], $values]);
-            $odooId = $existingOdooId;
-            $action = 'update';
+            try {
+                $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$existingOdooId], $values]);
+                $odooId = $existingOdooId;
+                $action = 'update';
+            } catch (\MagentoEgypt\OdooConnector\Model\Api\OdooException $e) {
+                if (!$e->isMissingRecord()) {
+                    throw $e;
+                }
+                // Stale link (product gone after the Odoo migration) — re-attach by SKU.
+                $found = $this->odooClient->executeKw(self::ODOO_MODEL, 'search', [[['default_code', '=', $sku]]], ['limit' => 1]);
+                if (is_array($found) && isset($found[0])) {
+                    $odooId = (int)$found[0];
+                    $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$odooId], $values]);
+                    $action = 'update';
+                } else {
+                    $odooId = (int)$this->odooClient->executeKw(self::ODOO_MODEL, 'create', [$values]);
+                    $action = 'create';
+                }
+            }
         } else {
             $odooId = (int)$this->odooClient->executeKw(self::ODOO_MODEL, 'create', [$values]);
             $action = 'create';

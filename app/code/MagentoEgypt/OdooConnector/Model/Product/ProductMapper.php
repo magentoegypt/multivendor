@@ -9,7 +9,7 @@ use MagentoEgypt\OdooConnector\Model\Sync\Checksum;
 /**
  * Maps an Odoo product.template record to Magento-side primitives.
  *
- * NOTE: field names follow standard Odoo 16 conventions (default_code = SKU,
+ * NOTE: field names follow standard Odoo 19 conventions (default_code = SKU,
  * list_price = sale price). Confirm against the live instance on first connect —
  * stores sometimes relocate the SKU to barcode or a custom field. Over JSON-RPC
  * Odoo returns `false` (not null) for empty values, hence the !== false guards.

@@ -35,7 +35,12 @@ class ProductPushMapper
             'name' => (string)$product->getName(),
             'default_code' => (string)$product->getSku(),
             'list_price' => (float)$product->getPrice(),
-            'type' => 'product',
+            // Odoo 18+ dropped the 'product' (storable) type: a storable good is now
+            // type='consu' (Goods) + is_storable=true. Sending type='product' is rejected
+            // by Odoo 19; is_storable keeps the product inventory-tracked so the MSI
+            // on-hand sync (stock.quant) still applies.
+            'type' => 'consu',
+            'is_storable' => true,
             // Product Status: Magento 1=enabled / 2=disabled -> Odoo sellable flag.
             // (sale_ok rather than active, so disabling never archives/hides the
             // record from our SKU re-attach search and never breaks idempotency.)
