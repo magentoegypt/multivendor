@@ -114,10 +114,11 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | line items | `order_line` | see below; on create |
 | store→company | `company_id` | only if configured; on create |
 | `created_at` | `date_order` | on create |
-| `order_currency_code` | `currency_id` | resolved to `res.currency` on create — but Odoo derives order currency from the pricelist, so it may be overridden (a `pricelist_id` map is the real fix) |
+| `order_currency_code` | `pricelist_id` → `currency_id` | per-currency pricelist (find/create `Magento <CUR>`) so the order currency sticks; falls back to `currency_id` if `pricelist_id` is unavailable; on create |
 | `customer_note` | `note` | if non-empty; on create |
 | billing address | `partner_invoice_id` | invoice child contact under the partner; on create |
 | shipping address | `partner_shipping_id` | delivery child contact under the partner; on create |
+| store / website | `team_id` | single "Magento" sales team (find/create); on create |
 | `status` | `x_magento_status` | every push |
 | `shipping_description` / `shipping_method` | `x_magento_shipping_method` | if non-empty |
 | payment method code | `x_magento_payment_method` | if payment exists |
@@ -181,8 +182,6 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | Magento source | Odoo target | Why / note |
 |---|---|---|
 | per-line `tax_percent` / `tax_amount` | real `tax_ids` | Odoo line tax is cleared (`tax_ids`, the Odoo 19 field; Magento is the authority); mapping Magento's actual per-rate taxes onto Odoo is the follow-up |
-| `order_currency_code` (effective) | `pricelist_id` | sale.order currency follows the pricelist; needs a currency→pricelist map to truly set order currency |
-| store / website | `team_id` | Odoo sales team / channel |
 | shipments (full) | `stock.picking` validation | tracking now synced to the picking's `carrier_tracking_ref`; auto-validating delivery (transfer/backorder wizards over RPC) is still deferred |
 | `coupon_code` | coupon / promotion | discount provenance |
 

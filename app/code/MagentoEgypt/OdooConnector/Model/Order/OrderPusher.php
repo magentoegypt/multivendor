@@ -51,6 +51,12 @@ class OrderPusher
     private bool $saleLineTaxFieldChecked = false;
     private ?int $shippingProductId = null;
     private bool $shippingProductChecked = false;
+    /** @var array<string, int|null> */
+    private array $pricelistCache = [];
+    private ?int $teamId = null;
+    private bool $teamChecked = false;
+    /** @var array<string, bool> */
+    private array $saleOrderFieldCache = [];
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -189,12 +195,21 @@ class OrderPusher
         if ($createdAt !== '') {
             $createVals['date_order'] = $createdAt;
         }
-        // Order currency -> Odoo res.currency. NOTE: sale.order.currency_id is derived
-        // from the pricelist in standard Odoo, so this can be overridden (verified: an
-        // EGP order landed as the pricelist's USD). A pricelist_id map is the real fix.
-        $currencyId = $this->resolveCurrencyId((string)$order->getOrderCurrencyCode());
-        if ($currencyId !== null) {
-            $createVals['currency_id'] = $currencyId;
+        // Order currency: sale.order.currency_id is derived from the pricelist, so set a
+        // per-currency pricelist_id (the real fix for the EGP->USD override). Falls back
+        // to currency_id when pricelist_id is unavailable. Field-guarded so a missing
+        // field never aborts the create.
+        $currencyCode = (string)$order->getOrderCurrencyCode();
+        if ($this->saleOrderHasField('pricelist_id')) {
+            $pricelistId = $this->resolvePricelistId($currencyCode);
+            if ($pricelistId !== null) {
+                $createVals['pricelist_id'] = $pricelistId;
+            }
+        } else {
+            $currencyId = $this->resolveCurrencyId($currencyCode);
+            if ($currencyId !== null) {
+                $createVals['currency_id'] = $currencyId;
+            }
         }
         // Customer note -> Odoo order note.
         $note = trim((string)$order->getCustomerNote());
@@ -209,6 +224,13 @@ class OrderPusher
         $shippingPartnerId = $this->resolveAddressPartner($partnerId, $this->shippingAddress($order), 'delivery');
         if ($shippingPartnerId !== null) {
             $createVals['partner_shipping_id'] = $shippingPartnerId;
+        }
+        // Sales team -> a single "Magento" Odoo team (field-guarded).
+        if ($this->saleOrderHasField('team_id')) {
+            $teamId = $this->resolveTeamId();
+            if ($teamId !== null) {
+                $createVals['team_id'] = $teamId;
+            }
         }
         $odooId = (int)$this->odooClient->executeKw(self::ODOO_MODEL, 'create', [$createVals]);
 
@@ -527,6 +549,76 @@ class OrderPusher
         }
 
         return $this->currencyCache[$code] = $id;
+    }
+
+    /**
+     * A sale pricelist in the order's currency (find or create) so sale.order.currency_id
+     * resolves to it. Cached per run; null on error.
+     */
+    private function resolvePricelistId(string $currencyCode): ?int
+    {
+        $code = strtoupper(trim($currencyCode));
+        if ($code === '') {
+            return null;
+        }
+        if (array_key_exists($code, $this->pricelistCache)) {
+            return $this->pricelistCache[$code];
+        }
+        try {
+            $currencyId = $this->resolveCurrencyId($code);
+            if ($currencyId === null) {
+                return $this->pricelistCache[$code] = null;
+            }
+            $found = $this->odooClient->executeKw('product.pricelist', 'search', [[['currency_id', '=', $currencyId]]], ['limit' => 1]);
+            if (is_array($found) && isset($found[0])) {
+                return $this->pricelistCache[$code] = (int)$found[0];
+            }
+            $id = (int)$this->odooClient->executeKw('product.pricelist', 'create', [['name' => 'Magento ' . $code, 'currency_id' => $currencyId]]);
+
+            return $this->pricelistCache[$code] = $id;
+        } catch (\Throwable $e) {
+            return $this->pricelistCache[$code] = null;
+        }
+    }
+
+    /**
+     * A single "Magento" Odoo sales team (find or create). Cached per run; null on error.
+     */
+    private function resolveTeamId(): ?int
+    {
+        if ($this->teamChecked) {
+            return $this->teamId;
+        }
+        $this->teamChecked = true;
+        try {
+            $found = $this->odooClient->executeKw('crm.team', 'search', [[['name', '=', 'Magento']]], ['limit' => 1]);
+            if (is_array($found) && isset($found[0])) {
+                return $this->teamId = (int)$found[0];
+            }
+            $this->teamId = (int)$this->odooClient->executeKw('crm.team', 'create', [['name' => 'Magento']]);
+        } catch (\Throwable $e) {
+            $this->teamId = null;
+        }
+
+        return $this->teamId;
+    }
+
+    /**
+     * Whether sale.order has the given field in this Odoo. Cached; false on error so a
+     * missing/optional field (e.g. pricelist_id, team_id) never aborts the create.
+     */
+    private function saleOrderHasField(string $name): bool
+    {
+        if (!array_key_exists($name, $this->saleOrderFieldCache)) {
+            try {
+                $fg = $this->odooClient->executeKw(self::ODOO_MODEL, 'fields_get', [[$name]], ['attributes' => []]);
+                $this->saleOrderFieldCache[$name] = is_array($fg) && array_key_exists($name, $fg);
+            } catch (\Throwable $e) {
+                $this->saleOrderFieldCache[$name] = false;
+            }
+        }
+
+        return $this->saleOrderFieldCache[$name];
     }
 
     /**
