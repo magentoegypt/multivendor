@@ -108,7 +108,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | line items | `order_line` | see below; on create |
 | store→company | `company_id` | only if configured; on create |
 | `created_at` | `date_order` | on create |
-| `order_currency_code` | `currency_id` | resolved to `res.currency`; on create |
+| `order_currency_code` | `currency_id` | resolved to `res.currency` on create — but Odoo derives order currency from the pricelist, so it may be overridden (a `pricelist_id` map is the real fix) |
 | `customer_note` | `note` | if non-empty; on create |
 | billing address | `partner_invoice_id` | invoice child contact under the partner; on create |
 | shipping address | `partner_shipping_id` | delivery child contact under the partner; on create |
@@ -178,7 +178,8 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| per-line `tax_percent` / `tax_amount` | real `tax_id` | tax is currently cleared (`[[6,0,[]]]`); real mapping is a noted follow-up |
+| per-line `tax_percent` / `tax_amount` | real `tax_id` | tax cleared only where sale.order.line has `tax_id` (no `account` module on this Odoo); real per-rate mapping is a follow-up |
+| `order_currency_code` (effective) | `pricelist_id` | sale.order currency follows the pricelist; needs a currency→pricelist map to truly set order currency |
 | store / website | `team_id` | Odoo sales team / channel |
 | shipments | `stock.picking` | proper delivery docs; today only the first tracking # as a char field |
 | credit memos / refunds | `account.move` (out_refund) | today only invoices cascade to Odoo |

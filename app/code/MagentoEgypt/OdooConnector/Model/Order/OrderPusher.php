@@ -47,6 +47,7 @@ class OrderPusher
     private array $stateCache = [];
     /** @var array<string, int|null> */
     private array $currencyCache = [];
+    private ?bool $saleLineHasTaxId = null;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -130,10 +131,14 @@ class OrderPusher
                 'product_uom_qty' => (float)$item->getQtyOrdered(),
                 'price_unit' => (float)$item->getPrice(),
                 'name' => (string)$item->getName(),
-                // Clear Odoo's default tax so it doesn't recompute/inflate the line;
-                // Magento remains the tax authority. (Full per-rate tax mapping is a config follow-up.)
-                'tax_id' => [[6, 0, []]],
             ];
+            // Clear Odoo's default tax so it doesn't recompute/inflate the line (Magento
+            // is the tax authority) — but only when sale.order.line actually has tax_id.
+            // This Odoo 19 has no `account` module, so the field is absent and sending it
+            // aborts the create. (Full per-rate tax mapping is a config follow-up.)
+            if ($this->saleLineHasTaxId()) {
+                $lineVals['tax_id'] = [[6, 0, []]];
+            }
             // Discounts -> Odoo per-line discount %.
             $discountPercent = (float)$item->getDiscountPercent();
             if ($discountPercent > 0) {
@@ -160,7 +165,9 @@ class OrderPusher
         if ($createdAt !== '') {
             $createVals['date_order'] = $createdAt;
         }
-        // Order currency -> Odoo res.currency.
+        // Order currency -> Odoo res.currency. NOTE: sale.order.currency_id is derived
+        // from the pricelist in standard Odoo, so this can be overridden (verified: an
+        // EGP order landed as the pricelist's USD). A pricelist_id map is the real fix.
         $currencyId = $this->resolveCurrencyId((string)$order->getOrderCurrencyCode());
         if ($currencyId !== null) {
             $createVals['currency_id'] = $currencyId;
@@ -253,6 +260,14 @@ class OrderPusher
         try {
             if ($fields !== []) {
                 $this->odooClient->executeKw(self::ODOO_MODEL, 'write', [[$odooId], $fields]);
+            }
+        } catch (\MagentoEgypt\OdooConnector\Model\Api\OdooException $e) {
+            // A stale map link (the Odoo record was removed — e.g. orders lost in the
+            // 16->19 migration) must bubble up so pushById can re-attach by
+            // client_order_ref or recreate the order (otherwise stale-mapped orders
+            // silently never self-heal). Other Odoo errors keep the refresh best-effort.
+            if ($e->isMissingRecord()) {
+                throw $e;
             }
         } catch (\Throwable $e) {
             // non-fatal: field refresh is best-effort
@@ -483,6 +498,25 @@ class OrderPusher
         }
 
         return $this->currencyCache[$code] = $id;
+    }
+
+    /**
+     * Whether sale.order.line has a tax_id field in this Odoo (the `account` module may
+     * not be installed). Cached per run; false on error so a missing field never aborts
+     * the order create.
+     */
+    private function saleLineHasTaxId(): bool
+    {
+        if ($this->saleLineHasTaxId === null) {
+            try {
+                $fg = $this->odooClient->executeKw('sale.order.line', 'fields_get', [['tax_id']], ['attributes' => []]);
+                $this->saleLineHasTaxId = is_array($fg) && array_key_exists('tax_id', $fg);
+            } catch (\Throwable $e) {
+                $this->saleLineHasTaxId = false;
+            }
+        }
+
+        return $this->saleLineHasTaxId;
     }
 
     private function resolveOdooProduct(OrderItemInterface $item): ?int
