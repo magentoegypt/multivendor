@@ -87,6 +87,20 @@ class ProductPushMapper
             $values['x_magento_short_description'] = $shortDescription;
         }
 
+        // SEO meta -> Odoo website fields (requires the website module; conditional on attrs).
+        $metaTitle = $this->attrValue($product, 'meta_title');
+        if ($metaTitle !== null) {
+            $values['website_meta_title'] = $metaTitle;
+        }
+        $metaDescription = $this->attrValue($product, 'meta_description');
+        if ($metaDescription !== null) {
+            $values['website_meta_description'] = $metaDescription;
+        }
+        $metaKeyword = $this->attrValue($product, 'meta_keyword');
+        if ($metaKeyword !== null) {
+            $values['website_meta_keywords'] = $metaKeyword;
+        }
+
         $categId = $this->categoryResolver->resolvePrimaryCategId((array)$product->getCategoryIds());
         if ($categId !== null) {
             $values['categ_id'] = $categId;
@@ -103,6 +117,17 @@ class ProductPushMapper
             // the resized variants itself. Push-only enrichment — intentionally kept out
             // of the echo checksum so name/price still drive echo detection on pull.
             $values['image_1920'] = $image;
+        }
+
+        // Extra gallery images -> product_template_image_ids. Replace-then-add (5,0,0)
+        // so re-pushes don't accumulate duplicates.
+        $gallery = $this->galleryImages($product);
+        if ($gallery !== []) {
+            $commands = [[5, 0, 0]];
+            foreach ($gallery as $img) {
+                $commands[] = [0, 0, $img];
+            }
+            $values['product_template_image_ids'] = $commands;
         }
 
         return $values;
@@ -171,6 +196,47 @@ class ProductPushMapper
         } catch (\Throwable $e) {
             return null;
         }
+    }
+
+    /**
+     * Base64 of the product's extra gallery images (excluding the main image), capped to
+     * keep the payload bounded. Each item is shaped for product_template_image_ids.
+     *
+     * @return array<int, array<string, string>>
+     */
+    private function galleryImages(ProductInterface $product, int $limit = 5): array
+    {
+        $entries = $product->getMediaGalleryEntries();
+        if (!is_array($entries) || $entries === []) {
+            return [];
+        }
+        $mainFile = (string)$product->getImage();
+        $out = [];
+        try {
+            $media = $this->filesystem->getDirectoryRead(DirectoryList::MEDIA);
+            foreach ($entries as $entry) {
+                if (count($out) >= $limit) {
+                    break;
+                }
+                $file = (string)$entry->getFile();
+                if ($file === '' || $file === $mainFile || (string)$entry->getMediaType() !== 'image') {
+                    continue;
+                }
+                $path = 'catalog/product' . $file;
+                if (!$media->isExist($path)) {
+                    continue;
+                }
+                $contents = $media->readFile($path);
+                if ($contents === '') {
+                    continue;
+                }
+                $out[] = ['name' => basename($file), 'image_1920' => base64_encode($contents)];
+            }
+        } catch (\Throwable $e) {
+            return $out;
+        }
+
+        return $out;
     }
 
     /**

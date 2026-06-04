@@ -40,6 +40,8 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `weight` | `weight` | if set (> 0) |
 | `barcode` | `barcode` | from a `barcode` attribute, if present (Odoo enforces uniqueness) |
 | `short_description` | `x_magento_short_description` | if set & non-empty |
+| `meta_title`/`meta_description`/`meta_keyword` | `website_meta_title`/`_description`/`_keywords` | if set (needs Odoo website module) |
+| extra gallery images | `product_template_image_ids` | up to 5, replace-then-add; excludes the main image |
 | primary `category_ids` | `categ_id` | resolved via `CategoryResolver`; only if one resolves |
 | curated custom attrs | `x_magento_attributes` | JSON; excludes a skip-list (price/name/sku/status/image/…); scalar non-empty only |
 | main image file | `image_1920` | base64 of `catalog/product<image>`; only if file exists; push-only, excluded from echo checksum |
@@ -135,7 +137,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | — | `tax_ids` | cleared `[[6,0,[]]]` — Odoo 19 field (renamed from `tax_id`); Magento is tax authority |
 | `discount_percent` | `discount` | if > 0 |
 
-*Invoiced orders also cascade to Odoo `account.move` via `OrderDocuments::syncInvoices` (best-effort).*
+*Invoiced orders cascade to Odoo `account.move` (out_invoice) via `OrderDocuments::syncInvoices`; credit memos → `account.move` (out_refund) via `syncCreditmemos`; shipment tracking → the delivery picking's `carrier_tracking_ref` via `syncShipmentTracking` (pickings are not auto-validated). All best-effort.*
 
 **Odoo → Magento** — outbox (entity `order`) → `InboundProcessor`, **additive only** (never overwrites the Magento order)
 
@@ -161,9 +163,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| `media_gallery` (extra images) | `product_template_image_ids` | today only the main image (`image_1920`) syncs |
-| `tax_class_id` | `taxes_id` | product tax; today tax is cleared on order lines |
-| `meta_title` / `meta_description` / `meta_keyword` | `website_meta_title` / `_description` / `_keywords` | SEO — only if Odoo eCommerce is used |
+| `tax_class_id` | `taxes_id` | product tax mapping; not yet mapped |
 | tier prices | pricelist items | volume / customer-group pricing |
 | `uom` / dimensions | `uom_id` / `uom_po_id` | unit of measure; today defaults |
 | configurable / variant products | `attribute_line_ids` + variants | today every product is forced to a single `consu`; no variant mapping |
@@ -183,8 +183,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | per-line `tax_percent` / `tax_amount` | real `tax_ids` | Odoo line tax is cleared (`tax_ids`, the Odoo 19 field; Magento is the authority); mapping Magento's actual per-rate taxes onto Odoo is the follow-up |
 | `order_currency_code` (effective) | `pricelist_id` | sale.order currency follows the pricelist; needs a currency→pricelist map to truly set order currency |
 | store / website | `team_id` | Odoo sales team / channel |
-| shipments | `stock.picking` | proper delivery docs; today only the first tracking # as a char field |
-| credit memos / refunds | `account.move` (out_refund) | today only invoices cascade to Odoo |
+| shipments (full) | `stock.picking` validation | tracking now synced to the picking's `carrier_tracking_ref`; auto-validating delivery (transfer/backorder wizards over RPC) is still deferred |
 | `coupon_code` | coupon / promotion | discount provenance |
 
 ## Install

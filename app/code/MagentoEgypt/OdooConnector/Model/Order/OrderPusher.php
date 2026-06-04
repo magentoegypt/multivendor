@@ -310,6 +310,11 @@ class OrderPusher
             if ($invoices !== null && $invoices->getSize() > 0) {
                 $this->orderDocuments->syncInvoices($order, $odooId);
             }
+            $creditmemos = $order->getCreditmemosCollection();
+            if ($creditmemos !== null && $creditmemos->getSize() > 0) {
+                $this->orderDocuments->syncCreditmemos($order, $odooId);
+            }
+            $this->orderDocuments->syncShipmentTracking($order, $odooId);
         } catch (\Throwable $e) {
             // non-fatal: document sync is best-effort
         }
