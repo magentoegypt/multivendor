@@ -28,6 +28,7 @@ class ProductPusher
     private MapManager $mapManager;
     private Config $config;
     private StoreManagerInterface $storeManager;
+    private VariantPusher $variantPusher;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -35,7 +36,8 @@ class ProductPusher
         ProductPushMapper $pushMapper,
         MapManager $mapManager,
         Config $config,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        VariantPusher $variantPusher
     ) {
         $this->productRepository = $productRepository;
         $this->odooClient = $odooClient;
@@ -43,6 +45,7 @@ class ProductPusher
         $this->mapManager = $mapManager;
         $this->config = $config;
         $this->storeManager = $storeManager;
+        $this->variantPusher = $variantPusher;
     }
 
     /**
@@ -58,6 +61,17 @@ class ProductPusher
      */
     public function push(ProductInterface $product, string $correlationId): array
     {
+        // Configurable product -> Odoo product.template with variants (its children
+        // become variants, not standalone templates).
+        if ((string)$product->getTypeId() === 'configurable') {
+            return $this->variantPusher->pushConfigurable($product, $correlationId);
+        }
+        // A simple product that is a configurable child is synced as a variant of its
+        // parent — never pushed as its own standalone template (would re-duplicate).
+        if ($this->variantPusher->isConfigurableChild($product)) {
+            return ['action' => 'skipped', 'odoo_id' => 0, 'sku' => (string)$product->getSku()];
+        }
+
         $sku = (string)$product->getSku();
         $companyId = $this->resolveCompanyId($product);
         $values = $this->pushMapper->toOdooValues($product);

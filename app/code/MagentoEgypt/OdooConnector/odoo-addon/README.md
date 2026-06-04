@@ -46,6 +46,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | curated custom attrs | `x_magento_attributes` | JSON; excludes a skip-list (price/name/sku/status/image/…); scalar non-empty only |
 | main image file | `image_1920` | base64 of `catalog/product<image>`; only if file exists; push-only, excluded from echo checksum |
 | website→company | `company_id` | int when websites agree on one company; else `false` (global/shared) |
+| configurable products | variant `product.template` | super-attributes → `attribute_line_ids`; children → variants (`VariantPusher`); child SKU → variant `default_code`; standalone child templates archived; simple children skipped on push |
 
 **Odoo → Magento** — outbox (`sync_outbox`, entity `product`) → `InboundProcessor` (update-only on SKU match)
 
@@ -167,7 +168,6 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `tax_class_id` | `taxes_id` | product tax mapping; not yet mapped |
 | tier prices | pricelist items | volume / customer-group pricing |
 | `uom` / dimensions | `uom_id` / `uom_po_id` | unit of measure; today defaults |
-| configurable / variant products | `attribute_line_ids` + variants | today every product is forced to a single `consu`; no variant mapping |
 
 #### Customers (→ res.partner)
 
