@@ -38,12 +38,51 @@ class CustomerPushMapper
             $values['vat'] = $vat;
         }
 
+        // Date of birth / gender / mobile -> Magento-origin custom fields (no native
+        // res.partner equivalents in this Odoo; mobile in particular has no native field).
+        $dob = trim((string)$customer->getDob());
+        if ($dob !== '') {
+            $values['x_magento_dob'] = $dob;
+        }
+        $gender = $this->genderLabel($customer);
+        if ($gender !== null) {
+            $values['x_magento_gender'] = $gender;
+        }
+        $mobileAttr = $customer->getCustomAttribute('mobile');
+        $mobile = $mobileAttr !== null ? trim((string)$mobileAttr->getValue()) : '';
+        if ($mobile !== '') {
+            $values['x_magento_mobile'] = $mobile;
+        }
+
         $billing = $this->billingAddress($customer);
         if ($billing !== null) {
             $values += $this->addressFields($billing);
+            // Company on the billing address -> partner company_name (free-text; we keep
+            // the partner an individual and don't flip is_company).
+            $company = trim((string)$billing->getCompany());
+            if ($company !== '') {
+                $values['company_name'] = $company;
+            }
         }
 
         return $values;
+    }
+
+    /**
+     * Magento gender option (1/2/3) -> label, or null when unset/custom.
+     */
+    private function genderLabel(CustomerInterface $customer): ?string
+    {
+        switch ((int)$customer->getGender()) {
+            case 1:
+                return 'Male';
+            case 2:
+                return 'Female';
+            case 3:
+                return 'Not Specified';
+            default:
+                return null;
+        }
     }
 
     /**

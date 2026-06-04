@@ -82,6 +82,10 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | billing `country_id` (ISO) | `country_id` | resolved to `res.country` id; only if found |
 | billing `region` (code) | `state_id` | resolved to `res.country.state` within the country; only if found |
 | `taxvat` | `vat` | if non-empty |
+| billing `company` | `company_name` | if non-empty (partner kept individual) |
+| `mobile` attr | `x_magento_mobile` | from a `mobile` customer attribute, if present |
+| `dob` | `x_magento_dob` | if set |
+| `gender` (1/2/3) | `x_magento_gender` | mapped to Male / Female / Not Specified |
 | customer group code | `x_magento_customer_group` | raw code |
 | customer group code | `category_id` | m2m tag `"Magento: <code>"` (find/create); only if resolves |
 | store→company | `company_id` | only if configured |
@@ -116,7 +120,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `shipping_description` / `shipping_method` | `x_magento_shipping_method` | if non-empty |
 | payment method code | `x_magento_payment_method` | if payment exists |
 | `discount_amount` (abs) | `x_magento_discount_amount` | if > 0 |
-| `shipping_amount` | `x_magento_shipping_amount` | if > 0 |
+| `shipping_amount` | `x_magento_shipping_amount` + a Shipping `order_line` | if > 0 — also added as a line (find/create `MAGENTO_SHIPPING` service product) so Odoo totals include shipping |
 | first shipment track # | `x_magento_tracking` | if a track exists |
 | Magento state | `state` | processing/complete/closed→`action_confirm`; canceled→`action_cancel` |
 
@@ -128,7 +132,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `qty_ordered` | `product_uom_qty` | float |
 | `price` | `price_unit` | float |
 | `name` | `name` | item name |
-| — | `tax_id` | cleared `[[6,0,[]]]` (Magento is tax authority) |
+| — | `tax_ids` | cleared `[[6,0,[]]]` — Odoo 19 field (renamed from `tax_id`); Magento is tax authority |
 | `discount_percent` | `discount` | if > 0 |
 
 *Invoiced orders also cascade to Odoo `account.move` via `OrderDocuments::syncInvoices` (best-effort).*
@@ -145,7 +149,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 **Odoo custom fields defined by the addon** (all others above are standard Odoo fields):
 
 - `product.template`: `x_magento_visibility` (Int), `x_magento_special_price` (Float), `x_magento_attributes` (Text/JSON), `x_magento_short_description` (Text)
-- `res.partner`: `x_magento_customer_group` (Char)
+- `res.partner`: `x_magento_customer_group`, `x_magento_mobile`, `x_magento_dob`, `x_magento_gender` (all Char)
 - `sale.order`: `x_magento_status`, `x_magento_shipping_method`, `x_magento_payment_method`, `x_magento_discount_amount`, `x_magento_shipping_amount`, `x_magento_tracking`
 
 ### Roadmap — not yet mapped
@@ -168,9 +172,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| address `company` | `is_company` / company partner | today every partner is created as an individual |
-| `mobile` | `x_magento_mobile` (new custom) | this Odoo's `res.partner` has no native `mobile` field; needs a custom addon field |
-| `dob`, `gender` | custom fields | demographics |
+| billing `company` | `is_company` / dedicated company partner | today stored as free-text `company_name`; not promoted to a company-type partner |
 | billing address | `type='invoice'` child partner | mirror the existing shipping (`type='delivery'`) child pattern |
 | **O→M:** `phone`, address | back to Magento customer | O→M today carries only name+email; inbound applies only name |
 
@@ -178,7 +180,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| per-line `tax_percent` / `tax_amount` | real `tax_id` | tax cleared only where sale.order.line has `tax_id` (no `account` module on this Odoo); real per-rate mapping is a follow-up |
+| per-line `tax_percent` / `tax_amount` | real `tax_ids` | Odoo line tax is cleared (`tax_ids`, the Odoo 19 field; Magento is the authority); mapping Magento's actual per-rate taxes onto Odoo is the follow-up |
 | `order_currency_code` (effective) | `pricelist_id` | sale.order currency follows the pricelist; needs a currency→pricelist map to truly set order currency |
 | store / website | `team_id` | Odoo sales team / channel |
 | shipments | `stock.picking` | proper delivery docs; today only the first tracking # as a char field |

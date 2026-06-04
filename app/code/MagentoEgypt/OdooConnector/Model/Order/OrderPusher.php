@@ -47,7 +47,10 @@ class OrderPusher
     private array $stateCache = [];
     /** @var array<string, int|null> */
     private array $currencyCache = [];
-    private ?bool $saleLineHasTaxId = null;
+    private ?string $saleLineTaxField = null;
+    private bool $saleLineTaxFieldChecked = false;
+    private ?int $shippingProductId = null;
+    private bool $shippingProductChecked = false;
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -132,12 +135,12 @@ class OrderPusher
                 'price_unit' => (float)$item->getPrice(),
                 'name' => (string)$item->getName(),
             ];
-            // Clear Odoo's default tax so it doesn't recompute/inflate the line (Magento
-            // is the tax authority) — but only when sale.order.line actually has tax_id.
-            // This Odoo 19 has no `account` module, so the field is absent and sending it
-            // aborts the create. (Full per-rate tax mapping is a config follow-up.)
-            if ($this->saleLineHasTaxId()) {
-                $lineVals['tax_id'] = [[6, 0, []]];
+            // Clear Odoo's line tax so it doesn't recompute/inflate the line (Magento is
+            // the tax authority). Odoo 17+ renamed sale.order.line.tax_id -> tax_ids, so we
+            // detect the actual field name and skip if neither exists (never abort create).
+            $taxField = $this->saleLineTaxField();
+            if ($taxField !== null) {
+                $lineVals[$taxField] = [[6, 0, []]];
             }
             // Discounts -> Odoo per-line discount %.
             $discountPercent = (float)$item->getDiscountPercent();
@@ -149,6 +152,27 @@ class OrderPusher
 
         if (empty($lines)) {
             return ['action' => 'skipped', 'increment_id' => $incrementId, 'reason' => 'no resolvable product lines'];
+        }
+
+        // Shipping -> a dedicated order line so the Odoo total includes shipping (Magento
+        // grand_total includes it; without a line Odoo would total the items only).
+        $shippingAmount = (float)$order->getShippingAmount();
+        if ($shippingAmount > 0.0) {
+            $shipProductId = $this->resolveShippingProductId();
+            if ($shipProductId !== null) {
+                $shipName = trim((string)$order->getShippingDescription());
+                $shipVals = [
+                    'product_id' => $shipProductId,
+                    'product_uom_qty' => 1.0,
+                    'price_unit' => $shippingAmount,
+                    'name' => $shipName !== '' ? $shipName : 'Shipping',
+                ];
+                $taxField = $this->saleLineTaxField();
+                if ($taxField !== null) {
+                    $shipVals[$taxField] = [[6, 0, []]];
+                }
+                $lines[] = [0, 0, $shipVals];
+            }
         }
 
         $partnerId = $this->resolvePartner($order);
@@ -501,22 +525,57 @@ class OrderPusher
     }
 
     /**
-     * Whether sale.order.line has a tax_id field in this Odoo (the `account` module may
-     * not be installed). Cached per run; false on error so a missing field never aborts
-     * the order create.
+     * The sale.order.line tax field name in this Odoo, or null if none. Odoo 17+ renamed
+     * tax_id -> tax_ids; sending the wrong/absent name aborts the create. Cached per run.
      */
-    private function saleLineHasTaxId(): bool
+    private function saleLineTaxField(): ?string
     {
-        if ($this->saleLineHasTaxId === null) {
+        if (!$this->saleLineTaxFieldChecked) {
+            $this->saleLineTaxFieldChecked = true;
             try {
-                $fg = $this->odooClient->executeKw('sale.order.line', 'fields_get', [['tax_id']], ['attributes' => []]);
-                $this->saleLineHasTaxId = is_array($fg) && array_key_exists('tax_id', $fg);
+                $fg = $this->odooClient->executeKw('sale.order.line', 'fields_get', [['tax_ids', 'tax_id']], ['attributes' => []]);
+                if (is_array($fg)) {
+                    $this->saleLineTaxField = array_key_exists('tax_ids', $fg)
+                        ? 'tax_ids'
+                        : (array_key_exists('tax_id', $fg) ? 'tax_id' : null);
+                }
             } catch (\Throwable $e) {
-                $this->saleLineHasTaxId = false;
+                $this->saleLineTaxField = null;
             }
         }
 
-        return $this->saleLineHasTaxId;
+        return $this->saleLineTaxField;
+    }
+
+    /**
+     * Find or create a reusable Odoo service product for Magento shipping charges, so
+     * shipping can be added as an order line. Cached per run; null on error (the order
+     * still syncs, just without a shipping line).
+     */
+    private function resolveShippingProductId(): ?int
+    {
+        if ($this->shippingProductChecked) {
+            return $this->shippingProductId;
+        }
+        $this->shippingProductChecked = true;
+        try {
+            $found = $this->odooClient->executeKw('product.product', 'search', [[['default_code', '=', 'MAGENTO_SHIPPING']]], ['limit' => 1]);
+            if (is_array($found) && isset($found[0])) {
+                return $this->shippingProductId = (int)$found[0];
+            }
+            $this->shippingProductId = (int)$this->odooClient->executeKw('product.product', 'create', [[
+                'name' => 'Shipping',
+                'default_code' => 'MAGENTO_SHIPPING',
+                'type' => 'service',
+                'list_price' => 0.0,
+                'sale_ok' => true,
+                'purchase_ok' => false,
+            ]]);
+        } catch (\Throwable $e) {
+            $this->shippingProductId = null;
+        }
+
+        return $this->shippingProductId;
     }
 
     private function resolveOdooProduct(OrderItemInterface $item): ?int
