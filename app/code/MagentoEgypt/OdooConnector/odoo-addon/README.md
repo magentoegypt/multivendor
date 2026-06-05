@@ -197,15 +197,20 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 4. The cron **“MagentoEgypt: drain sync outbox”** runs every minute (Settings →
    Technical → Scheduled Actions). Ensure the Odoo cron worker is running.
 
+**Current version: `19.0.1.5.0`.** To upgrade after new code, redeploy
+`magentoegypt_connector/` (or the built `magentoegypt_connector-<ver>.zip`) and run
+`odoo-bin -u magentoegypt_connector -d <db>` — the `x_magento_*` custom fields are
+(re)created automatically on install/upgrade.
+
 ## Notes / contract
 - **Loop prevention** is primarily the `magento_sync` context flag (set by the
   Magento `OdooClient` on every M→O call) — the addon skips those. The checksum
   additionally suppresses duplicate delivery of the same Odoo envelope.
 - Magento applies inbound **update-only to already-mapped records** (Magento is
   the master here); unmapped keys are skipped. Inbound today updates product
-  `name`/`price`/`description`/`status`/`visibility`/`special_price`/image/categories,
-  the customer name, and appends order state/tracking notes (orders stay
-  Magento-authoritative). See **Synced Fields** above for the full per-field contract.
+  `name`/`price`/`description`/`short_description`/`status`/`visibility`/`special_price`/`cost`/`weight`/`barcode`/image/categories,
+  the customer name + phone (→ billing address), and appends order state/tracking notes
+  (orders stay Magento-authoritative). See **Synced Fields** above for the full per-field contract.
 - The HMAC secret must match on both sides. The endpoint returns `401` on a bad
   signature, `200` with an outcome JSON otherwise.
 
