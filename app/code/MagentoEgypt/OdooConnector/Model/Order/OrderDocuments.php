@@ -226,6 +226,47 @@ class OrderDocuments
         }
     }
 
+    /**
+     * Best-effort: validate (mark "done") the sale order's outgoing delivery picking(s)
+     * when the Magento order has shipments. NOTE: Odoo's button_validate may return an
+     * immediate-transfer / backorder wizard action over RPC rather than completing — this
+     * is environment-dependent, so the whole thing is wrapped best-effort and never breaks
+     * the order sync (tracking is already on x_magento_tracking either way).
+     */
+    public function validateShippedPickings(OrderInterface $order, int $odooSaleOrderId): void
+    {
+        try {
+            $shipments = $order->getShipmentsCollection();
+            if ($shipments === null || $shipments->getSize() === 0) {
+                return;
+            }
+            $pickings = $this->odooClient->executeKw(
+                'stock.picking',
+                'search',
+                [[['sale_id', '=', $odooSaleOrderId], ['picking_type_code', '=', 'outgoing'], ['state', 'not in', ['done', 'cancel']]]],
+                ['limit' => 10]
+            );
+            if (!is_array($pickings)) {
+                return;
+            }
+            foreach ($pickings as $pickingId) {
+                try {
+                    $this->odooClient->executeKw('stock.picking', 'action_assign', [[(int)$pickingId]]);
+                    $this->odooClient->executeKw(
+                        'stock.picking',
+                        'button_validate',
+                        [[(int)$pickingId]],
+                        ['context' => ['skip_backorder' => true, 'skip_sms' => true]]
+                    );
+                } catch (\Throwable $e) {
+                    // per-picking best-effort: RPC validation may need a wizard we can't drive
+                }
+            }
+        } catch (\Throwable $e) {
+            // non-fatal
+        }
+    }
+
     private function partnerOfSaleOrder(int $saleOrderId): ?int
     {
         try {

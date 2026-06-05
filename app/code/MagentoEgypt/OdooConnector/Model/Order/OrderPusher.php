@@ -57,6 +57,8 @@ class OrderPusher
     private bool $teamChecked = false;
     /** @var array<string, bool> */
     private array $saleOrderFieldCache = [];
+    /** @var array<string, int|null> */
+    private array $taxCache = [];
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -141,12 +143,15 @@ class OrderPusher
                 'price_unit' => (float)$item->getPrice(),
                 'name' => (string)$item->getName(),
             ];
-            // Clear Odoo's line tax so it doesn't recompute/inflate the line (Magento is
-            // the tax authority). Odoo 17+ renamed sale.order.line.tax_id -> tax_ids, so we
-            // detect the actual field name and skip if neither exists (never abort create).
+            // Per-line tax: map Magento's tax_percent to an Odoo sale tax (find/create),
+            // else clear so Odoo adds none. ASSUMES tax-EXCLUSIVE prices (a tax-inclusive
+            // store would double-count — it should keep clearing instead). Odoo 17+ renamed
+            // sale.order.line.tax_id -> tax_ids; detect the field, skip if absent.
             $taxField = $this->saleLineTaxField();
             if ($taxField !== null) {
-                $lineVals[$taxField] = [[6, 0, []]];
+                $taxPercent = (float)$item->getTaxPercent();
+                $taxId = $taxPercent > 0.0 ? $this->resolveSaleTaxId($taxPercent) : null;
+                $lineVals[$taxField] = $taxId !== null ? [[6, 0, [$taxId]]] : [[6, 0, []]];
             }
             // Discounts -> Odoo per-line discount %.
             $discountPercent = (float)$item->getDiscountPercent();
@@ -337,6 +342,7 @@ class OrderPusher
                 $this->orderDocuments->syncCreditmemos($order, $odooId);
             }
             $this->orderDocuments->syncShipmentTracking($order, $odooId);
+            $this->orderDocuments->validateShippedPickings($order, $odooId);
         } catch (\Throwable $e) {
             // non-fatal: document sync is best-effort
         }
@@ -673,6 +679,40 @@ class OrderPusher
         }
 
         return $this->shippingProductId;
+    }
+
+    /**
+     * Find or create an Odoo sale tax for a Magento tax percent (e.g. 8.25). Cached per
+     * run; null on error so a tax mapping issue never aborts the order create.
+     */
+    private function resolveSaleTaxId(float $percent): ?int
+    {
+        $key = (string)$percent;
+        if (array_key_exists($key, $this->taxCache)) {
+            return $this->taxCache[$key];
+        }
+        try {
+            $found = $this->odooClient->executeKw(
+                'account.tax',
+                'search',
+                [[['amount', '=', $percent], ['type_tax_use', '=', 'sale'], ['amount_type', '=', 'percent']]],
+                ['limit' => 1]
+            );
+            if (is_array($found) && isset($found[0])) {
+                return $this->taxCache[$key] = (int)$found[0];
+            }
+            $label = rtrim(rtrim(number_format($percent, 2, '.', ''), '0'), '.');
+            $id = (int)$this->odooClient->executeKw('account.tax', 'create', [[
+                'name' => 'Magento ' . $label . '%',
+                'amount' => $percent,
+                'amount_type' => 'percent',
+                'type_tax_use' => 'sale',
+            ]]);
+
+            return $this->taxCache[$key] = $id;
+        } catch (\Throwable $e) {
+            return $this->taxCache[$key] = null;
+        }
     }
 
     private function resolveOdooProduct(OrderItemInterface $item): ?int

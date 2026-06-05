@@ -284,6 +284,20 @@ class InboundProcessor
                 $customer->setLastname($parts[1] ?? $parts[0]);
                 $changed[] = 'name';
             }
+            if (isset($payload['phone']) && (string)$payload['phone'] !== '') {
+                // Customers have no phone field in Magento — write it to the default
+                // billing address (saving the customer persists its addresses).
+                $billingId = (string)$customer->getDefaultBilling();
+                if ($billingId !== '') {
+                    foreach ((array)$customer->getAddresses() as $address) {
+                        if ((string)$address->getId() === $billingId) {
+                            $address->setTelephone((string)$payload['phone']);
+                            $changed[] = 'phone';
+                            break;
+                        }
+                    }
+                }
+            }
             if ($changed) {
                 $this->customerRepository->save($customer);
             }

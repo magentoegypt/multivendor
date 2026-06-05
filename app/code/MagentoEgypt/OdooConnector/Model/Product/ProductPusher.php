@@ -29,6 +29,8 @@ class ProductPusher
     private Config $config;
     private StoreManagerInterface $storeManager;
     private VariantPusher $variantPusher;
+    private ?int $tierPricelistId = null;
+    private bool $tierPricelistChecked = false;
 
     public function __construct(
         ProductRepositoryInterface $productRepository,
@@ -135,6 +137,8 @@ class ProductPusher
             'last_correlation_id' => $correlationId,
         ]);
 
+        $this->syncTierPrices($product, $odooId);
+
         return ['action' => $action, 'odoo_id' => $odooId, 'sku' => $sku];
     }
 
@@ -166,5 +170,63 @@ class ProductPusher
         }
 
         return count($companyIds) === 1 ? (int)reset($companyIds) : null;
+    }
+
+    private function tierPricelistId(): ?int
+    {
+        if ($this->tierPricelistChecked) {
+            return $this->tierPricelistId;
+        }
+        $this->tierPricelistChecked = true;
+        try {
+            $found = $this->odooClient->executeKw('product.pricelist', 'search', [[['name', '=', 'Magento Tier Pricing']]], ['limit' => 1]);
+            $this->tierPricelistId = (is_array($found) && isset($found[0]))
+                ? (int)$found[0]
+                : (int)$this->odooClient->executeKw('product.pricelist', 'create', [['name' => 'Magento Tier Pricing']]);
+        } catch (\Throwable $e) {
+            $this->tierPricelistId = null;
+        }
+
+        return $this->tierPricelistId;
+    }
+
+    /**
+     * Sync a product's Magento tier prices to Odoo pricelist items (under a shared
+     * "Magento Tier Pricing" pricelist). Idempotent: clears the product's existing items
+     * first. Best-effort; never aborts the product push.
+     */
+    private function syncTierPrices(ProductInterface $product, int $templateId): void
+    {
+        try {
+            $pricelistId = $this->tierPricelistId();
+            if ($pricelistId === null) {
+                return;
+            }
+            $existing = $this->odooClient->executeKw('product.pricelist.item', 'search', [[['pricelist_id', '=', $pricelistId], ['product_tmpl_id', '=', $templateId]]]);
+            if (is_array($existing) && $existing !== []) {
+                $this->odooClient->executeKw('product.pricelist.item', 'unlink', [array_map('intval', $existing)]);
+            }
+            $tiers = $product->getTierPrices();
+            if (!is_array($tiers) || $tiers === []) {
+                return;
+            }
+            foreach ($tiers as $tier) {
+                $qty = (float)$tier->getQty();
+                $price = (float)$tier->getValue();
+                if ($qty <= 0.0 || $price <= 0.0) {
+                    continue;
+                }
+                $this->odooClient->executeKw('product.pricelist.item', 'create', [[
+                    'pricelist_id' => $pricelistId,
+                    'applied_on' => '1_product',
+                    'product_tmpl_id' => $templateId,
+                    'min_quantity' => $qty,
+                    'compute_price' => 'fixed',
+                    'fixed_price' => $price,
+                ]]);
+            }
+        } catch (\Throwable $e) {
+            // non-fatal: tier pricing is best-effort enrichment
+        }
     }
 }

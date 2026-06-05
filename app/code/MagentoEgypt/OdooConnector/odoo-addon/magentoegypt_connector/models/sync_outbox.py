@@ -101,6 +101,7 @@ class MagentoSyncOutbox(models.Model):
             return ((record.email or '').strip().lower(), {
                 'name': record.name or '',
                 'email': record.email or '',
+                'phone': record.phone or '',
             })
         if entity_type == 'order':
             return (record.client_order_ref or record.name or '', {

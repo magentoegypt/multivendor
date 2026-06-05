@@ -47,6 +47,7 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | main image file | `image_1920` | base64 of `catalog/product<image>`; only if file exists; push-only, excluded from echo checksum |
 | website→company | `company_id` | int when websites agree on one company; else `false` (global/shared) |
 | configurable products | variant `product.template` | super-attributes → `attribute_line_ids`; children → variants (`VariantPusher`); child SKU → variant `default_code`; standalone child templates archived; simple children skipped on push |
+| tier prices | `product.pricelist.item` | per-tier items under a "Magento Tier Pricing" pricelist (`syncTierPrices`); replaced on each push |
 
 **Odoo → Magento** — outbox (`sync_outbox`, entity `product`) → `InboundProcessor` (update-only on SKU match)
 
@@ -101,8 +102,9 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 |---|---|---|---|
 | `email` | *(natural key)* | email match | always |
 | `name` | `name` | `setFirstname`/`setLastname` (split on first space) | if non-empty |
+| `phone` | default billing address `telephone` | written to the customer's default billing address | if non-empty |
 
-*Phone/address are **not** sent back O→M (outbox carries only name+email). Pull reads `id, name, email, phone, customer_rank, write_date` (filters `customer_rank>0`); checksum = email, name, phone.*
+*Outbox now carries name + email + **phone** O→M (phone → the customer's default billing address); other address fields are not synced back. Pull reads `id, name, email, phone, customer_rank, write_date` (filters `customer_rank>0`); checksum = email, name, phone.*
 
 #### Orders — `sale.order` (natural key: `increment_id` → `client_order_ref`; Magento-authoritative, create-once)
 
@@ -136,10 +138,10 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 | `qty_ordered` | `product_uom_qty` | float |
 | `price` | `price_unit` | float |
 | `name` | `name` | item name |
-| — | `tax_ids` | cleared `[[6,0,[]]]` — Odoo 19 field (renamed from `tax_id`); Magento is tax authority |
+| `tax_percent` | `tax_ids` | mapped to an Odoo sale tax (find/create by %); cleared when 0; assumes tax-EXCLUSIVE prices |
 | `discount_percent` | `discount` | if > 0 |
 
-*Invoiced orders cascade to Odoo `account.move` (out_invoice) via `OrderDocuments::syncInvoices`; credit memos → `account.move` (out_refund) via `syncCreditmemos`; shipment tracking → the delivery picking's `carrier_tracking_ref` via `syncShipmentTracking` (pickings are not auto-validated). All best-effort.*
+*Invoiced orders cascade to Odoo `account.move` (out_invoice) via `OrderDocuments::syncInvoices`; credit memos → `account.move` (out_refund) via `syncCreditmemos`; shipment tracking → the picking's `carrier_tracking_ref`; shipped orders also best-effort **validate** the outgoing picking (`validateShippedPickings` — may no-op if Odoo returns a transfer/backorder wizard over RPC). All best-effort.*
 
 **Odoo → Magento** — outbox (entity `order`) → `InboundProcessor`, **additive only** (never overwrites the Magento order)
 
@@ -165,9 +167,8 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| `tax_class_id` | `taxes_id` | product tax mapping; not yet mapped |
-| tier prices | pricelist items | volume / customer-group pricing |
-| `uom` / dimensions | `uom_id` / `uom_po_id` | unit of measure; today defaults |
+| `tax_class_id` | `taxes_id` | intentionally not mapped — `tax_class` is not a rate; actual tax flows via order lines (`tax_percent`→`tax_ids`) |
+| `uom` / dimensions | `uom_id` / `uom_po_id` | intentionally not mapped — Magento has no native unit-of-measure (products are "each") |
 
 #### Customers (→ res.partner)
 
@@ -175,14 +176,13 @@ What data moves between Magento and Odoo, per domain and direction. Two parts:
 |---|---|---|
 | billing `company` | `is_company` / dedicated company partner | today stored as free-text `company_name`; not promoted to a company-type partner |
 | billing address | `type='invoice'` child partner | mirror the existing shipping (`type='delivery'`) child pattern |
-| **O→M:** `phone`, address | back to Magento customer | O→M today carries only name+email; inbound applies only name |
+| **O→M:** address (beyond phone) | back to Magento customer | name+email+phone now sync O→M; full address sync-back not implemented |
 
 #### Orders (→ sale.order / sale.order.line)
 
 | Magento source | Odoo target | Why / note |
 |---|---|---|
-| per-line `tax_percent` / `tax_amount` | real `tax_ids` | Odoo line tax is cleared (`tax_ids`, the Odoo 19 field; Magento is the authority); mapping Magento's actual per-rate taxes onto Odoo is the follow-up |
-| shipments (full) | `stock.picking` validation | tracking now synced to the picking's `carrier_tracking_ref`; auto-validating delivery (transfer/backorder wizards over RPC) is still deferred |
+| shipments (full validation) | `stock.picking` done-state | `validateShippedPickings` now best-effort validates the outgoing picking; may still no-op when Odoo returns a transfer/backorder wizard over RPC (environment-dependent) |
 | `coupon_code` | coupon / promotion | discount provenance |
 
 ## Install
