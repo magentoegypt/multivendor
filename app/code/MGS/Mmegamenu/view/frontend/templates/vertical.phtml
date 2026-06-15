@@ -89,4 +89,85 @@
             display: none;
         }
     }
+    /* Magento Egypt Arabic desktop side menu fix */
+    @media (min-width: 992px) {
+        body.rtl-theme header.page-header .header-area.header3 .middle-header + .middle-header {
+            position: relative;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .middle-header + .middle-header:before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.35);
+            z-index: 998;
+            height: auto;
+            opacity: 1;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: auto;
+            width: 360px;
+            max-width: calc(100vw - 24px);
+            height: 100vh;
+            padding: 22px 24px 40px;
+            background: #06175d;
+            box-shadow: -14px 0 35px rgba(0,0,0,.28);
+            z-index: 999;
+            overflow-y: auto;
+            transform: translateX(0);
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .close-menu-site {
+            display: block;
+            color: #fff;
+            margin: 0 0 18px auto;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu > li.level0 {
+            display: block;
+            float: none;
+            width: 100%;
+            margin: 0;
+            border-bottom: 1px solid rgba(255,255,255,.12);
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu > li.level0 > a.level0 {
+            display: block;
+            padding: 13px 0 13px 34px;
+            color: #fff !important;
+            line-height: 1.4;
+            text-align: right;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu li .toggle-menu {
+            left: 0;
+            right: auto;
+            color: #fff;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu li.level0 > .dropdown-mega-menu,
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu li.level0.menu-1columns .dropdown-submenu > .dropdown-menu-ct {
+            position: static;
+            width: 100%;
+            min-width: 0;
+            opacity: 1;
+            visibility: visible;
+            transform: none;
+            box-shadow: none;
+            background: rgba(255,255,255,.06);
+            margin: 0 0 10px;
+            padding: 6px 14px;
+            display: none;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu li._show-child > .dropdown-mega-menu,
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu li._show-child > .dropdown-menu-ct {
+            display: block;
+        }
+        body.rtl-theme header.page-header.active-menu .header-area.header3 .horizontal-menu .mgs-megamenu--main .nav-main-menu li.level0 > .dropdown-mega-menu a {
+            color: rgba(255,255,255,.86) !important;
+            text-align: right;
+        }
+    }
 </style>

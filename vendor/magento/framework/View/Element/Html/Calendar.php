@@ -69,12 +69,14 @@ class Calendar extends \Magento\Framework\View\Element\Template
 
         // get days names
         $daysData = $localeData['calendar']['gregorian']['dayNames'];
+        $wideDays = $daysData['format']['wide'] ?? $daysData['stand-alone']['wide'] ?? [];
+        $abbreviatedDays = $daysData['format']['abbreviated'] ?? $daysData['stand-alone']['abbreviated'] ?? $wideDays;
         $this->assign(
             'days',
             [
-                'wide' => $this->encoder->encode(array_values(iterator_to_array($daysData['format']['wide']))),
+                'wide' => $this->encoder->encode(array_values($wideDays instanceof \Traversable ? iterator_to_array($wideDays) : (array) $wideDays)),
                 'abbreviated' => $this->encoder->encode(
-                    array_values(iterator_to_array($daysData['format']['abbreviated']))
+                    array_values($abbreviatedDays instanceof \Traversable ? iterator_to_array($abbreviatedDays) : (array) $abbreviatedDays)
                 ),
             ]
         );
@@ -92,18 +94,14 @@ class Calendar extends \Magento\Framework\View\Element\Template
          * @var \ResourceBundle $monthsData
          */
         $monthsData = $localeData['calendar']['gregorian']['monthNames'];
+        $wideMonths = $monthsData['format']['wide'] ?? $monthsData['stand-alone']['wide'] ?? [];
+        $abbreviatedMonths = $monthsData['format']['abbreviated'] ?? $monthsData['stand-alone']['abbreviated'] ?? $wideMonths;
         $this->assign(
             'months',
             [
-                'wide' => $this->encoder->encode(array_values(iterator_to_array($monthsData['format']['wide']))),
+                'wide' => $this->encoder->encode(array_values($wideMonths instanceof \Traversable ? iterator_to_array($wideMonths) : (array) $wideMonths)),
                 'abbreviated' => $this->encoder->encode(
-                    array_values(
-                        iterator_to_array(
-                            null !== $monthsData->get('format')->get('abbreviated')
-                            ? $monthsData['format']['abbreviated']
-                            : $monthsData['format']['wide']
-                        )
-                    )
+                    array_values($abbreviatedMonths instanceof \Traversable ? iterator_to_array($abbreviatedMonths) : (array) $abbreviatedMonths)
                 ),
             ]
         );
@@ -111,8 +109,9 @@ class Calendar extends \Magento\Framework\View\Element\Template
         $this->assignFieldsValues($localeData);
 
         // get "am" & "pm" words
-        $this->assign('am', $this->encoder->encode($localeData['calendar']['gregorian']['AmPmMarkers']['0']));
-        $this->assign('pm', $this->encoder->encode($localeData['calendar']['gregorian']['AmPmMarkers']['1']));
+        $amPmMarkers = $localeData['calendar']['gregorian']['AmPmMarkers'] ?? [];
+        $this->assign('am', $this->encoder->encode($amPmMarkers['0'] ?? $amPmMarkers[0] ?? 'AM'));
+        $this->assign('pm', $this->encoder->encode($amPmMarkers['1'] ?? $amPmMarkers[1] ?? 'PM'));
 
         // get first day of week and weekend days
         $this->assign(

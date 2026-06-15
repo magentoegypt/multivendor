@@ -246,9 +246,9 @@ define([
 
             for (var code in slider) {
                 if (slider.hasOwnProperty(code)) {
-                    var sliderConfig = slider[code],
+                    var sliderConfig = slider[code] || {},
                         sliderElement = self.element.find(this.options.sliderElementPrefix + code),
-                        priceFormat = sliderConfig.hasOwnProperty('priceFormat') ? JSON.parse(sliderConfig.priceFormat) : null;
+                        priceFormat = sliderConfig && sliderConfig.priceFormat ? JSON.parse(sliderConfig.priceFormat) : null;
 
                     if (sliderElement.length) {
                         sliderElement.slider({
