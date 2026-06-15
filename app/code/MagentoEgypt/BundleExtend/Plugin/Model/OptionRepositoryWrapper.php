@@ -87,6 +87,8 @@ class OptionRepositoryWrapper
         } catch (\Exception $e) {
             return false;
         }
-        return $parent->getTypeId() === BundleExtendHelper::NEW_BUNDLE_TYPE_CODE;
+        // Use getData() to read the raw type_id — getTypeId() is intercepted by
+        // OverrideTypeIdAsBundle and returns 'bundle' while the SaveHandler is active.
+        return $parent->getData('type_id') === BundleExtendHelper::NEW_BUNDLE_TYPE_CODE;
     }
 }
