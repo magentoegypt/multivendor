@@ -3,6 +3,8 @@ namespace MagentoEgypt\BundleExtend\Ui\DataProvider\Product\Form\Modifier;
 
 use Magento\Bundle\Model\Product\Type;
 use Magento\Bundle\Ui\DataProvider\Product\Form\Modifier\BundlePanel;
+use Magento\Catalog\Api\Data\ProductAttributeInterface;
+use Magento\Framework\Stdlib\ArrayManager;
 use Magento\Ui\DataProvider\Modifier\ModifierInterface;
 use MagentoEgypt\BundleExtend\Helper\Data as BundleExtendHelper;
 
@@ -30,6 +32,37 @@ class Composite extends \Magento\Bundle\Ui\DataProvider\Product\Form\Modifier\Co
                 );
             }
             $meta = $bundleModifier->modifyMeta($meta);
+        }
+
+        return $this->stripPhantomTierPrice($meta);
+    }
+
+    /**
+     * Remove a config-less "tier_price" node from the Advanced Pricing fieldset.
+     *
+     * Magento\Bundle\...\Modifier\BundleAdvancedPricing::modifyMeta() accesses
+     * $node['tier_price']['children'] by reference. For a real `bundle` the tier_price
+     * attribute is in apply_to so that node already exists; for `new_bundle` it is NOT,
+     * so the reference auto-vivifies a phantom ['tier_price' => ['children' => null]] with
+     * no `componentType`. UiComponentFactory::mergeMetadataItem() then throws
+     * "The componentType configuration parameter is required for the tier_price component"
+     * and the whole new_bundle product form errors out. Strip the phantom so the form renders.
+     */
+    private function stripPhantomTierPrice(array $meta): array
+    {
+        /** @var ArrayManager $arrayManager */
+        $arrayManager = $this->objectManager->get(ArrayManager::class);
+        $tierPricePath = $arrayManager->findPath(
+            ProductAttributeInterface::CODE_TIER_PRICE,
+            $meta,
+            null,
+            'children'
+        );
+
+        if ($tierPricePath
+            && !$arrayManager->get($tierPricePath . '/arguments/data/config/componentType', $meta)
+        ) {
+            $meta = $arrayManager->remove($tierPricePath, $meta);
         }
 
         return $meta;
