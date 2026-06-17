@@ -29,34 +29,47 @@ class LinkManagementPlugin
 
     public function beforeSaveChild(LinkManagement $subject, $sku, LinkInterface $linkedProduct)
     {
-        if ($this->isNewBundleParent($sku)) {
-            $this->bundleExtendHelper->setSkipComplexCheck(true);
-            $this->bundleExtendHelper->setOverrideTypeIdAsBundle(true);
-        }
+        $this->pushFlags($this->isNewBundleParent($sku));
         return [$sku, $linkedProduct];
     }
 
     public function afterSaveChild(LinkManagement $subject, $result)
     {
-        $this->bundleExtendHelper->setSkipComplexCheck(false);
-        $this->bundleExtendHelper->setOverrideTypeIdAsBundle(false);
+        $this->popFlags();
         return $result;
     }
 
     public function beforeAddChild(LinkManagement $subject, ProductInterface $product, $optionId, LinkInterface $linkedProduct)
     {
-        if ($product->getTypeId() === BundleExtendHelper::NEW_BUNDLE_TYPE_CODE) {
-            $this->bundleExtendHelper->setSkipComplexCheck(true);
-            $this->bundleExtendHelper->setOverrideTypeIdAsBundle(true);
-        }
+        $this->pushFlags($product->getData('type_id') === BundleExtendHelper::NEW_BUNDLE_TYPE_CODE);
         return [$product, $optionId, $linkedProduct];
     }
 
     public function afterAddChild(LinkManagement $subject, $result)
     {
-        $this->bundleExtendHelper->setSkipComplexCheck(false);
-        $this->bundleExtendHelper->setOverrideTypeIdAsBundle(false);
+        $this->popFlags();
         return $result;
+    }
+
+    /**
+     * Push the flags for one LinkManagement call. Always pushes (so the matching
+     * afterX() always pops) — when the parent is a new_bundle we force the flags on,
+     * otherwise we re-push whatever an outer scope already had so the pop is a no-op.
+     */
+    private function pushFlags(bool $isNewBundle): void
+    {
+        $this->bundleExtendHelper->pushSkipComplexCheck(
+            $isNewBundle ? true : $this->bundleExtendHelper->getSkipComplexCheck()
+        );
+        $this->bundleExtendHelper->pushOverrideTypeIdAsBundle(
+            $isNewBundle ? true : $this->bundleExtendHelper->getOverrideTypeIdAsBundle()
+        );
+    }
+
+    private function popFlags(): void
+    {
+        $this->bundleExtendHelper->popOverrideTypeIdAsBundle();
+        $this->bundleExtendHelper->popSkipComplexCheck();
     }
 
     private function isNewBundleParent($sku): bool

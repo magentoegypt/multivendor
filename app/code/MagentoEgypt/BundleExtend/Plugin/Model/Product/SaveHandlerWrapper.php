@@ -26,11 +26,20 @@ class SaveHandlerWrapper
             return $proceed($entity, $arguments);
         }
 
-        $this->helper->setOverrideTypeIdAsBundle(true);
+        // Keep both flags active for the WHOLE save. The bundle SaveHandler persists
+        // options and their selections via several core LinkManagement calls in sequence
+        // (saveChild, removeChild, addChildren). Each must see the parent as a 'bundle'
+        // (overrideTypeId) and must skip the composite-child guard so configurable
+        // selections survive. Without wrapping the whole save, the per-child plugin would
+        // pop the override off after the first saveChild and the subsequent addChildren()
+        // would throw "isn't a bundle product".
+        $this->helper->pushOverrideTypeIdAsBundle(true);
+        $this->helper->pushSkipComplexCheck(true);
         try {
             return $proceed($entity, $arguments);
         } finally {
-            $this->helper->setOverrideTypeIdAsBundle(false);
+            $this->helper->popSkipComplexCheck();
+            $this->helper->popOverrideTypeIdAsBundle();
         }
     }
 }

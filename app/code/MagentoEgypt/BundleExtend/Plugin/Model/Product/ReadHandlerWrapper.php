@@ -26,11 +26,11 @@ class ReadHandlerWrapper
             return $proceed($entity, $arguments);
         }
 
-        $this->helper->setOverrideTypeIdAsBundle(true);
+        $this->helper->pushOverrideTypeIdAsBundle(true);
         try {
             return $proceed($entity, $arguments);
         } finally {
-            $this->helper->setOverrideTypeIdAsBundle(false);
+            $this->helper->popOverrideTypeIdAsBundle();
         }
     }
 }

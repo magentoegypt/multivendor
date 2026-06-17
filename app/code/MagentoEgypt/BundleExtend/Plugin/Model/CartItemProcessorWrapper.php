@@ -32,11 +32,11 @@ class CartItemProcessorWrapper
         if ($cartItem instanceof DataObject) {
             $cartItem->setData('product_type', BundleType::TYPE_CODE);
         }
-        $this->helper->setOverrideTypeIdAsBundle(true);
+        $this->helper->pushOverrideTypeIdAsBundle(true);
         try {
             return $proceed($cartItem);
         } finally {
-            $this->helper->setOverrideTypeIdAsBundle(false);
+            $this->helper->popOverrideTypeIdAsBundle();
             if ($cartItem instanceof DataObject) {
                 $cartItem->setData('product_type', $origType);
             }

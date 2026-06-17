@@ -69,11 +69,11 @@ class OptionRepositoryWrapper
 
     private function withFlag(callable $proceed)
     {
-        $this->helper->setOverrideTypeIdAsBundle(true);
+        $this->helper->pushOverrideTypeIdAsBundle(true);
         try {
             return $proceed();
         } finally {
-            $this->helper->setOverrideTypeIdAsBundle(false);
+            $this->helper->popOverrideTypeIdAsBundle();
         }
     }
 

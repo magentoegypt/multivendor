@@ -27,11 +27,11 @@ class CopyConstructorWrapper
             return $proceed($product, $duplicate);
         }
 
-        $this->helper->setOverrideTypeIdAsBundle(true);
+        $this->helper->pushOverrideTypeIdAsBundle(true);
         try {
             return $proceed($product, $duplicate);
         } finally {
-            $this->helper->setOverrideTypeIdAsBundle(false);
+            $this->helper->popOverrideTypeIdAsBundle();
         }
     }
 }

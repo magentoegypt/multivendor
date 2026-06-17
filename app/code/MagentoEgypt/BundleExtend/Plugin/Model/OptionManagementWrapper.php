@@ -43,11 +43,11 @@ class OptionManagementWrapper
             return $proceed($option);
         }
 
-        $this->helper->setOverrideTypeIdAsBundle(true);
+        $this->helper->pushOverrideTypeIdAsBundle(true);
         try {
             return $proceed($option);
         } finally {
-            $this->helper->setOverrideTypeIdAsBundle(false);
+            $this->helper->popOverrideTypeIdAsBundle();
         }
     }
 }
