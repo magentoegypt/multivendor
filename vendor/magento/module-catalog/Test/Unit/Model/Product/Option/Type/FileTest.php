@@ -1,12 +1,13 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2015 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
 namespace Magento\Catalog\Test\Unit\Model\Product\Option\Type;
 
+use Magento\Catalog\Helper\Product\Validator\ProductOptionValidator;
 use Magento\Catalog\Model\Product\Configuration\Item\Option\OptionInterface;
 use Magento\Catalog\Model\Product\Option\Type\File;
 use Magento\Catalog\Model\Product\Option\UrlBuilder;
@@ -70,6 +71,11 @@ class FileTest extends TestCase
      */
     private $itemOptionFactoryMock;
 
+    /**
+     * @var ProductOptionValidator|MockObject
+     */
+    private $productOptionValidator;
+
     protected function setUp(): void
     {
         $this->objectManager = new ObjectManager($this);
@@ -88,7 +94,7 @@ class FileTest extends TestCase
 
         $this->serializer = $this->getMockBuilder(Json::class)
             ->disableOriginalConstructor()
-            ->setMethods(['serialize', 'unserialize'])
+            ->onlyMethods(['serialize', 'unserialize'])
             ->getMock();
 
         $this->urlBuilder = $this->getMockBuilder(UrlBuilder::class)
@@ -100,7 +106,7 @@ class FileTest extends TestCase
             ->getMock();
 
         $this->itemOptionFactoryMock = $this->getMockBuilder(OptionFactory::class)
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -108,6 +114,8 @@ class FileTest extends TestCase
             Database::class,
             ['copyFile', 'checkDbUsage']
         );
+
+        $this->productOptionValidator = $this->createMock(ProductOptionValidator::class);
 
         $this->serializer->expects($this->any())
             ->method('unserialize')
@@ -140,6 +148,7 @@ class FileTest extends TestCase
                 'urlBuilder' => $this->urlBuilder,
                 'escaper' => $this->escaper,
                 'itemOptionFactory' => $this->itemOptionFactoryMock,
+                'productOptionValidator' => $this->productOptionValidator,
             ]
         );
     }
@@ -182,7 +191,7 @@ class FileTest extends TestCase
     {
         $optionMock = $this->getMockBuilder(OptionInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getValue'])
+            ->onlyMethods(['getValue'])
             ->getMockForAbstractClass();
 
         $quotePath = '/quote/path/path/uploaded.file';
@@ -225,6 +234,10 @@ class FileTest extends TestCase
             ->method('copyFile')
             ->willReturn('true');
 
+        $this->productOptionValidator->expects($this->once())
+            ->method('validateOptionsFilePath')
+            ->with([$quotePath, $orderPath]);
+
         $fileObject = $this->getFileObject();
         $fileObject->setData('configuration_item_option', $optionMock);
 
@@ -238,7 +251,7 @@ class FileTest extends TestCase
     {
         $optionMock = $this->getMockBuilder(OptionInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getValue'])
+            ->onlyMethods(['getValue'])
             ->getMockForAbstractClass();
 
         $quotePath = '/quote/path/path/uploaded.file';
@@ -281,6 +294,10 @@ class FileTest extends TestCase
             ->method('copyFile')
             ->willReturn(false);
 
+        $this->productOptionValidator->expects($this->once())
+            ->method('validateOptionsFilePath')
+            ->with([$quotePath, $orderPath]);
+
         $fileObject = $this->getFileObject();
         $fileObject->setData('configuration_item_option', $optionMock);
 
@@ -314,7 +331,7 @@ class FileTest extends TestCase
             ->willReturn(json_encode($resultValue));
 
         $option = $this->getMockBuilder(Option::class)
-            ->setMethods(['setValue'])
+            ->addMethods(['setValue'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -338,7 +355,8 @@ class FileTest extends TestCase
         $configurationItemOption = $this->getMockBuilder(
             OptionInterface::class
         )->disableOriginalConstructor()
-            ->setMethods(['getId', 'getValue'])
+            ->addMethods(['getId'])
+            ->onlyMethods(['getValue'])
             ->getMock();
         $configurationItemOption->expects($this->once())
             ->method('getId')
@@ -378,7 +396,7 @@ class FileTest extends TestCase
 
         $itemMock = $this->getMockBuilder(Option::class)
             ->disableOriginalConstructor()
-            ->setMethods(['load', 'getValue'])
+            ->onlyMethods(['load', 'getValue'])
             ->getMock();
 
         $itemMock->expects($this->any())
@@ -404,7 +422,7 @@ class FileTest extends TestCase
 
         $itemMock = $this->getMockBuilder(Option::class)
             ->disableOriginalConstructor()
-            ->setMethods(['load', 'getValue'])
+            ->onlyMethods(['load', 'getValue'])
             ->getMock();
 
         $itemMock->expects($this->any())
@@ -430,7 +448,7 @@ class FileTest extends TestCase
 
         $itemMock = $this->getMockBuilder(Option::class)
             ->disableOriginalConstructor()
-            ->setMethods(['load', 'getValue'])
+            ->onlyMethods(['load', 'getValue'])
             ->getMock();
 
         $itemMock->expects($this->any())

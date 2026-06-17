@@ -1,8 +1,10 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2013 Adobe
+ * All Rights Reserved.
  */
+
+declare(strict_types=1);
 
 namespace Magento\User\Block\User;
 
@@ -10,14 +12,11 @@ namespace Magento\User\Block\User;
  * User edit page
  *
  * @api
- * @author      Magento Core Team <core@magentocommerce.com>
  * @since 100.0.2
  */
 class Edit extends \Magento\Backend\Block\Widget\Form\Container
 {
     /**
-     * Core registry
-     *
      * @var \Magento\Framework\Registry
      */
     protected $_coreRegistry = null;
@@ -73,7 +72,7 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
                     'label' => __('Force Sign-In'),
                     'class' => 'invalidate-token',
                     'onclick' => "deleteConfirm('" . $this->escapeJs($this->escapeHtml($deleteConfirmMsg)) .
-                        "', '" . $this->getInvalidateUrl() . "')",
+                        "', '" . $this->getInvalidateUrl() . "', {data:{{$this->_objectId}:{$objId}}})",
                 ]
             );
         }
@@ -121,6 +120,8 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
     }
 
     /**
+     * Get text to be used in the header
+     *
      * @return \Magento\Framework\Phrase
      */
     public function getHeaderText()
@@ -150,6 +151,6 @@ class Edit extends \Magento\Backend\Block\Widget\Form\Container
      */
     public function getInvalidateUrl()
     {
-        return $this->getUrl('adminhtml/*/invalidatetoken', ['_current' => true]);
+        return $this->getUrl('adminhtml/*/invalidatetoken');
     }
 }

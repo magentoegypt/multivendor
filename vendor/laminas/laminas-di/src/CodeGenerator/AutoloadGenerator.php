@@ -19,6 +19,11 @@ use function str_repeat;
 use function strtr;
 use function var_export;
 
+/**
+ * @deprecated Since 3.16.0, the code generator will be replaced by a separate package in version 4.0
+ *
+ * @final This class should not be extended and will be marked final in version 4.0
+ */
 class AutoloadGenerator
 {
     use GeneratorTrait;

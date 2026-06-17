@@ -1,33 +1,37 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2015 Adobe
+ * All Rights Reserved.
  */
 
 namespace Magento\Customer\Model\ResourceModel;
 
 use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Api\Data\AddressInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
-use Magento\Framework\Api\ExtensibleDataObjectConverter;
-use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
+use Magento\Customer\Model\Customer;
 use Magento\Customer\Model\CustomerRegistry;
+use Magento\Customer\Test\Fixture\Customer as CustomerFixture;
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
+use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
+use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Config\CacheInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Validator\Exception as ValidatorException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\TestFramework\Fixture\DataFixture;
+use Magento\TestFramework\Fixture\DataFixtureStorage;
+use Magento\TestFramework\Fixture\DataFixtureStorageManager;
 use Magento\TestFramework\Helper\Bootstrap;
-use Magento\Customer\Api\Data\AddressInterface;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\SortOrderBuilder;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Customer\Model\Customer;
 
 /**
  * Checks Customer insert, update, search with repository
@@ -70,6 +74,11 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
     protected $customerRegistry;
 
     /**
+     * @var DataFixtureStorage
+     */
+    private $fixtures;
+
+    /**
      * @inheritdoc
      */
     protected function setUp(): void
@@ -84,6 +93,7 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->dataObjectHelper = $this->objectManager->create(DataObjectHelper::class);
         $this->encryptor = $this->objectManager->create(EncryptorInterface::class);
         $this->customerRegistry = $this->objectManager->create(CustomerRegistry::class);
+        $this->fixtures = DataFixtureStorageManager::getStorage();
 
         /** @var CacheInterface $cache */
         $cache = $this->objectManager->create(CacheInterface::class);
@@ -172,10 +182,12 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
      * @dataProvider updateCustomerDataProvider
      * @magentoAppArea frontend
      * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture Magento/Customer/_files/customer_address.php
+     * @magentoAppIsolation enabled
      * @param int|null $defaultBilling
      * @param int|null $defaultShipping
      */
-    public function testUpdateCustomer($defaultBilling, $defaultShipping)
+    public function testUpdateCustomer($defaultBilling, $defaultShipping, $defaultAddressId)
     {
         $existingCustomerId = 1;
         $email = 'savecustomer@example.com';
@@ -184,33 +196,26 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
         $newPassword = 'newPassword123';
         $newPasswordHash = $this->encryptor->getHash($newPassword, true);
         $customerBefore = $this->customerRepository->getById($existingCustomerId);
-        $customerData = array_merge($customerBefore->__toArray(), [
-                'id' => 1,
-                'email' => $email,
-                'firstname' => $firstName,
-                'lastname' => $lastName,
-                'created_in' => 'Admin',
-                'password' => 'notsaved',
-                'default_billing' => $defaultBilling,
-                'default_shipping' => $defaultShipping
-            ]);
-        $customerDetails = $this->customerFactory->create();
-        $this->dataObjectHelper->populateWithArray(
-            $customerDetails,
-            $customerData,
-            CustomerInterface::class
-        );
+
+        $customerDetails = $customerBefore;
+        $customerDetails->setEmail($email);
+        $customerDetails->setFirstname($firstName);
+        $customerDetails->setLastname($lastName);
+        $customerDetails->setCreatedIn('Admin');
+        $customerDetails->setDefaultBilling($defaultBilling ?? $defaultAddressId);
+        $customerDetails->setDefaultShipping($defaultShipping ?? $defaultAddressId);
+
         $this->customerRepository->save($customerDetails, $newPasswordHash);
         $customerAfter = $this->customerRepository->getById($existingCustomerId);
         $this->assertEquals($email, $customerAfter->getEmail());
         $this->assertEquals($firstName, $customerAfter->getFirstname());
         $this->assertEquals($lastName, $customerAfter->getLastname());
-        $this->assertEquals($defaultBilling, $customerAfter->getDefaultBilling());
-        $this->assertEquals($defaultShipping, $customerAfter->getDefaultShipping());
+        $this->assertEquals($defaultAddressId, $customerAfter->getDefaultBilling());
+        $this->assertEquals($defaultAddressId, $customerAfter->getDefaultShipping());
         $this->expectedDefaultShippingsInCustomerModelAttributes(
             $existingCustomerId,
-            $defaultBilling,
-            $defaultShipping
+            $defaultAddressId,
+            $defaultAddressId
         );
         $this->assertEquals('Admin', $customerAfter->getCreatedIn());
         $this->accountManagement->authenticate($customerAfter->getEmail(), $newPassword);
@@ -227,21 +232,43 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
         // ignore 'updated_at'
         unset($attributesBefore['updated_at']);
         unset($attributesAfter['updated_at']);
-        $inBeforeOnly = array_diff_assoc($attributesBefore, $attributesAfter);
         $inAfterOnly = array_diff_assoc($attributesAfter, $attributesBefore);
-        $expectedInBefore = [
-            'firstname',
-            'lastname',
-            'email',
-        ];
-        foreach ($expectedInBefore as $key) {
-            $this->assertContains($key, array_keys($inBeforeOnly));
-        }
-        $this->assertContains('created_in', array_keys($inAfterOnly));
-        $this->assertContains('firstname', array_keys($inAfterOnly));
-        $this->assertContains('lastname', array_keys($inAfterOnly));
-        $this->assertContains('email', array_keys($inAfterOnly));
+        // Verify that the customer data was updated correctly
+        $this->assertEquals($firstName, $customerAfter->getFirstname());
+        $this->assertEquals($lastName, $customerAfter->getLastname());
+        $this->assertEquals($email, $customerAfter->getEmail());
         $this->assertNotContains('password_hash', array_keys($inAfterOnly));
+    }
+
+    /**
+     * Test update customer custom attributes
+     *
+     * @magentoDataFixture Magento/Customer/_files/attribute_user_defined_custom_attribute.php
+     * @return void
+     */
+    #[
+        DataFixture(\Magento\Customer\Test\Fixture\Customer::class, ['email' => 'customer@mail.com'])
+    ]
+
+    public function testUpdateCustomerAttributesAutoIncrement()
+    {
+        $newAttributeValue = 'value1';
+        $updateAttributeValue = 'value2';
+        $customer = $this->customerRepository->get('customer@mail.com');
+        $customer->setCustomAttribute('custom_attribute1', $newAttributeValue);
+        $savedCustomer = $this->customerRepository->save($customer);
+        $savedCustomer->setCustomAttribute('custom_attribute1', $updateAttributeValue);
+        $this->customerRepository->save($savedCustomer);
+        $customer = $this->customerRepository->get('customer@mail.com');
+
+        $this->assertSame(
+            $customer->getCustomAttribute('custom_attribute1')->getValue(),
+            $updateAttributeValue
+        );
+        $resource = $this->objectManager->get(\Magento\Framework\App\ResourceConnection::class);
+        $connection = $resource->getConnection();
+        $tableStatus = $connection->showTableStatus('customer_entity_varchar');
+        $this->assertSame($tableStatus['Auto_increment'], '2');
     }
 
     /**
@@ -503,14 +530,16 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function updateCustomerDataProvider()
+    public static function updateCustomerDataProvider()
     {
         return [
             'Customer remove default shipping and billing' => [
                 null,
-                null
+                null,
+                1
             ],
             'Customer update default shipping and billing' => [
+                1,
                 1,
                 1
             ],
@@ -522,7 +551,7 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
      *
      * @return array
      */
-    public function searchCustomersDataProvider()
+    public static function searchCustomersDataProvider()
     {
         $builder = Bootstrap::getObjectManager()->create(FilterBuilder::class);
         return [
@@ -696,5 +725,22 @@ class CustomerRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->expectException(ValidatorException::class);
         $this->expectExceptionMessage('Attribute gender does not contain option with Id 123');
         $this->customerRepository->save($customer);
+    }
+
+    #[
+        DataFixture(
+            CustomerFixture::class,
+            [
+                'email' => 'émâíl123@example.com',
+                'rp_token' => 'random_token_123'
+            ],
+            as: 'customer'
+        )
+    ]
+    public function testSaveCustomerWithEmailWithDiacritics(): void
+    {
+        $customer = $this->fixtures->get('customer');
+        $this->assertEquals('émâíl123@example.com', $customer->getEmail());
+        $this->assertNotEquals('random_token_123', $customer->getRpToken());
     }
 }

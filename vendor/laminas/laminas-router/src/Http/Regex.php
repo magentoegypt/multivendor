@@ -7,7 +7,8 @@ namespace Laminas\Router\Http;
 use Laminas\Router\Exception;
 use Laminas\Router\Exception\InvalidArgumentException;
 use Laminas\Stdlib\ArrayUtils;
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
+use Override;
 use Traversable;
 
 use function array_merge;
@@ -25,8 +26,10 @@ use function strlen;
 
 /**
  * Regex route.
+ *
+ * @final
  */
-class Regex implements RouteInterface
+class Regex implements HttpRouteInterface
 {
     /**
      * Default values.
@@ -73,14 +76,10 @@ class Regex implements RouteInterface
     }
 
     /**
-     * factory(): defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  iterable $options
-     * @return Regex
+     * @inheritDoc
      * @throws InvalidArgumentException
      */
+    #[Override]
     public static function factory($options = [])
     {
         if ($options instanceof Traversable) {
@@ -108,15 +107,14 @@ class Regex implements RouteInterface
     }
 
     /**
-     * match(): defined by RouteInterface interface.
-     *
-     * @param  int $pathOffset
-     * @return RouteMatch|null
+     * @inheritDoc
+     * @param int|null $pathOffset
      */
-    public function match(Request $request, $pathOffset = null)
+    #[Override]
+    public function match(RequestInterface $request, $pathOffset = null)
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         $uri  = $request->getUri();
@@ -129,7 +127,7 @@ class Regex implements RouteInterface
         }
 
         if (! $result) {
-            return;
+            return null;
         }
 
         $matchedLength = strlen($matches[0]);
@@ -142,16 +140,13 @@ class Regex implements RouteInterface
             }
         }
 
-        return new RouteMatch(array_merge($this->defaults, $matches), $matchedLength);
+        return new HttpRouteMatch(array_merge($this->defaults, $matches), $matchedLength);
     }
 
     /**
-     * assemble(): Defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
+     * @inheritDoc
      */
+    #[Override]
     public function assemble(array $params = [], array $options = [])
     {
         $url                   = $this->spec;
@@ -172,12 +167,9 @@ class Regex implements RouteInterface
     }
 
     /**
-     * getAssembledParams(): defined by RouteInterface interface.
-     *
-     * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
+     * @inheritDoc
      */
+    #[Override]
     public function getAssembledParams()
     {
         return $this->assembledParams;

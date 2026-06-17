@@ -8,9 +8,11 @@
 
 namespace Vnecoms\VendorsProductImportExport\Model\Import;
 
+use Magento\CatalogImportExport\Model\Import\Product\SkuStorage;
 use Magento\CatalogImportExport\Model\Import\Product\StatusProcessor;
 use Magento\CatalogImportExport\Model\Import\Product\StockProcessor;
 use Magento\CatalogImportExport\Model\StockItemImporterInterface;
+use Magento\CatalogImportExport\Model\StockItemProcessorInterface;
 use Magento\CatalogInventory\Api\Data\StockItemInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Intl\DateTimeFactory;
@@ -25,6 +27,7 @@ use Magento\Catalog\Model\Config as CatalogConfig;
 use Magento\Store\Model\Store;
 use Vnecoms\VendorsProduct\Model\Source\Approval;
 use Magento\Framework\App\ObjectManager;
+use Magento\MediaStorage\Service\ImageResizeScheduler;
 
 class Product extends \Magento\CatalogImportExport\Model\Import\Product
 {
@@ -51,6 +54,11 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
      * @var \Vnecoms\Vendors\Model\Vendor
      */
     protected $_vendor;
+
+    /**
+     * @var
+     */
+    protected $imageResizeProcessor;
 
     /**
      * Existing vendor products SKU-related information in form of array:
@@ -521,6 +529,9 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
             ->get(CatalogConfig::class);
         $bunch = [];
 
+        $this->imageResizeProcessor = \Magento\Framework\App\ObjectManager::getInstance()
+            ->get(ImageResizeScheduler::class);
+
         $utf8Attributes = $this->getImportHelper()->getUtf8Attribute();
 
         foreach ($source as $rowKey=>$row) {
@@ -538,7 +549,7 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
                     }
                 }
             }
-            
+
             $rowNum = $row->getQueueId();
             $bunch[$rowKey] = $rowData;
             if (!$this->validateRow($rowData, $rowNum)) {
@@ -571,7 +582,15 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
             } */
 
             $urlKey = $this->getUrlKey($rowData);
-            $bunch[$rowKey][self::URL_KEY] = $rowData[self::URL_KEY] = $urlKey;
+            if (!empty($rowData[self::URL_KEY])) {
+                // If url_key column and its value were in the CSV file
+                $rowData[self::URL_KEY] = $urlKey;
+            } elseif ($this->isNeedToChangeUrlKey($rowData)) {
+                // If url_key column was empty or even not declared in the CSV file but by the rules it is need to
+                // be setteed. In case when url_key is generating from name column we have to ensure that the bunch
+                // of products will pass for the event with url_key column.
+                $bunch[$rowKey][self::URL_KEY] = $rowData[self::URL_KEY] = $urlKey;
+            }
 
             $rowScope = $this->getRowScope($rowData);
 
@@ -768,6 +787,8 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
                                 'value' => $uploadedFile,
                             ];
                         }
+
+                        $this->imageResizeProcessor->schedule($uploadedFile);
                     }
                 }
             }
@@ -1240,6 +1261,7 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
         $stockData = [];
         $productIdsToReindex = [];
         $stockChangedProductIds = [];
+        $importedData = [];
 
         foreach ($source as $rowData) {
             $rowNum = $rowData->getQueueId();
@@ -1269,14 +1291,15 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
 
             if (!isset($stockData[$sku])) {
                 $stockData[$sku] = $row;
+                $importedData[$sku] = $rowData;
             }
         }
 
         // Insert rows
         if (!empty($stockData)) {
             $stockItemImporter = ObjectManager::getInstance()
-                ->create(StockItemImporterInterface::class);
-            $stockItemImporter->import($stockData);
+                ->create(StockItemProcessorInterface::class);
+            $stockItemImporter->process($stockData, $importedData);
         }
 
         $this->reindexStockStatus($stockChangedProductIds);
@@ -1309,10 +1332,19 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
     private function reindexStockStatus(array $productIds): void
     {
         if ($productIds) {
+
             $stockProcessor = ObjectManager::getInstance()
                 ->get(StockProcessor::class);
             $stockProcessor->reindexList($productIds);
+
+            $indexer = $this->indexerRegistry->get('cataloginventory_stock');
+            if (is_array($productIds) && count($productIds) > 0) {
+                $indexer->reindexList($productIds);
+            }
+
         }
+
+
     }
 
     /**
@@ -1344,10 +1376,17 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
         $stockItemDo = $this->stockRegistry->getStockItem($row['product_id'], $row['website_id']);
         $existStockData = $stockItemDo->getData();
 
-        if (isset($rowData['qty']) && $rowData['qty'] == 0 && !isset($rowData['is_in_stock'])) {
+        if (!isset($rowData['qty'])) {
+            $rowData['qty'] = 0;
+        }
+
+        if ((isset($rowData['qty']) && $rowData['qty'] == 0) || !isset($rowData['is_in_stock'])) {
             $rowData['is_in_stock'] = 0;
         }
 
+        if (isset($rowData['qty']) && $rowData['qty'] > 0) {
+            $rowData['is_in_stock'] = 1;
+        }
         $row = array_merge(
             $this->defaultStockData,
             array_intersect_key($existStockData, $this->defaultStockData),
@@ -1709,8 +1748,12 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
      */
     private function isSkuExist($sku)
     {
-        $sku = strtolower($sku);
-        return isset($this->_oldSku[$sku]);
+        if ($sku !== null) {
+            $skuStorage = ObjectManager::getInstance()
+                ->get(SkuStorage::class);
+            return $skuStorage->has($sku);
+        }
+        return false;
     }
 
     /**
@@ -1721,6 +1764,8 @@ class Product extends \Magento\CatalogImportExport\Model\Import\Product
      */
     private function getExistingSku($sku)
     {
-        return $this->_oldSku[strtolower($sku)];
+        $skuStorage = ObjectManager::getInstance()
+            ->get(SkuStorage::class);
+        return $skuStorage->get((string)$sku);
     }
 }

@@ -6,6 +6,8 @@ namespace Laminas\Router;
 
 /**
  * Register with a laminas-mvc application.
+ *
+ * @final
  */
 class Module
 {

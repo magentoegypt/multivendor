@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -89,10 +89,7 @@ class ImsReauthCallbackTest extends TestCase
         $this->context = $this->createMock(Context::class);
         $this->imsConfigMock = $this->createMock(ImsConfig::class);
         $this->loggerMock = $this->createMock(AdminAdobeImsLogger::class);
-        $this->messagesMock = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addErrorMessage'])
-            ->getMockForAbstractClass();
+        $this->messagesMock = $this->createPartialMock(Manager::class, ['addErrorMessage']);
     }
 
     /**
@@ -121,8 +118,10 @@ class ImsReauthCallbackTest extends TestCase
             ->with('form_key')
             ->willReturnSelf();
         $this->request->expects($this->any())->method('getParam')
-            ->withConsecutive(['state'], ['code'])
-            ->willReturnOnConsecutiveCalls(null, 'asdasdasdad');
+            ->willReturnCallback(fn($param) => match ([$param]) {
+                ['state'] => null,
+                ['code'] => 'asdasdasdad'
+            });
         $this->resultFactory->expects($this->once())
             ->method('create')
             ->with(ResultFactory::TYPE_RAW)

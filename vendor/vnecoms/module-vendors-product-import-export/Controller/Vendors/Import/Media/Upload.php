@@ -12,7 +12,7 @@ class Upload extends \Vnecoms\Vendors\Controller\Vendors\Action
      * @see _isAllowed()
      */
     protected $_aclResource = 'Vnecoms_Vendors::product_import_media';
-    
+
     /**
      * @var \Magento\Framework\Controller\Result\RawFactory
      */
@@ -35,17 +35,17 @@ class Upload extends \Vnecoms\Vendors\Controller\Vendors\Action
         $this->_localeDate = $localeDate;
         $this->resultRawFactory = $resultRawFactory;
     }
-    
+
     /**
      * @return void
      */
     public function execute()
     {
+        $uploader = $this->_objectManager->create(
+            'Magento\MediaStorage\Model\File\Uploader',
+            ['fileId' => 'impage_uploader']
+        );
         try {
-            $uploader = $this->_objectManager->create(
-                'Magento\MediaStorage\Model\File\Uploader',
-                ['fileId' => 'impage_uploader']
-            );
             $importHelper = $this->_objectManager->create('Vnecoms\VendorsProductImportExport\Helper\Data');
             $uploader->setAllowedExtensions($importHelper->getAllowedExtensions());
             /** @var \Magento\Framework\Image\Adapter\AdapterInterface $imageAdapter */
@@ -55,15 +55,15 @@ class Upload extends \Vnecoms\Vendors\Controller\Vendors\Action
             /** @var \Magento\Framework\Filesystem\Directory\Read $mediaDirectory */
             $mediaDirectory = $this->_objectManager->get('Magento\Framework\Filesystem')
                 ->getDirectoryRead(DirectoryList::MEDIA);
-            
+
             $path = 'vnecoms_import/'.$this->_session->getVendor()->getVendorId();
-            
+
             $result = $uploader->save($mediaDirectory->getAbsolutePath(
                 $path
             ));
 
             $fileName = ltrim($result['file'], "/");
-            
+
             $storeManager = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface');
             $result['url'] = $storeManager->getStore()
                 ->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) . $path.'/' . $fileName;
@@ -75,9 +75,9 @@ class Upload extends \Vnecoms\Vendors\Controller\Vendors\Action
             unset($result['tmp_name']);
             unset($result['path']);
         } catch (\Exception $e) {
-            $file = $uploader->validateFile();
-            $fileName = isset($file['name'])?$file['name']:'';
-            $result = ['name'=> $fileName,'error' => $e->getMessage(), 'errorcode' => $e->getCode()];
+            //$file = $uploader->validateFile();
+            //$fileName = isset($file['name'])?$file['name']:'';
+            $result = ['name'=> "",'error' => $e->getMessage(), 'errorcode' => $e->getCode()];
         }
 
         /** @var \Magento\Framework\Controller\Result\Raw $response */

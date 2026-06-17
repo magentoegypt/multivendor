@@ -26,6 +26,11 @@ class Menu extends \Magento\Backend\Block\Menu
      * @var AnchorRenderer
      */
     private $anchorRenderer;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
     
     /**
      * @param \Magento\Backend\Block\Template\Context $context
@@ -49,6 +54,7 @@ class Menu extends \Magento\Backend\Block\Menu
         \Magento\Framework\Locale\ResolverInterface $localeResolver,
         \Vnecoms\Vendors\Model\Session $vendorSession,
         \Vnecoms\Vendors\Model\Menu\Config $vendorMenuConfig,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         array $data = [],
         \Magento\Backend\Block\MenuItemChecker $menuItemChecker = null,
         \Magento\Backend\Block\AnchorRenderer $anchorRenderer = null
@@ -57,6 +63,7 @@ class Menu extends \Magento\Backend\Block\Menu
         $this->_vendorMenuConfig = $vendorMenuConfig;
         $this->menuItemChecker =  $menuItemChecker;
         $this->anchorRenderer = $anchorRenderer;
+        $this->storeManager = $storeManager;
         return parent::__construct(
             $context,
             $url,
@@ -78,11 +85,13 @@ class Menu extends \Magento\Backend\Block\Menu
      */
     public function getCacheKeyInfo()
     {
+        $storeCode       = $this->storeManager->getStore()->getCode();
         $cacheKeyInfo = [
             'vendors_top_nav',
             $this->getActive(),
             $this->_vendorSession->getCustomerId(),
             $this->_localeResolver->getLocale(),
+            $storeCode
         ];
         // Add additional key parameters if needed
         $newCacheKeyInfo = $this->getAdditionalCacheKeyInfo();

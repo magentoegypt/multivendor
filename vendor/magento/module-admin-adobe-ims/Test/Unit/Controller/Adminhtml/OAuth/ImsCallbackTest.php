@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -23,6 +23,7 @@ use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Message\Manager;
 use Magento\Framework\ObjectManager\ObjectManager;
 use Magento\Framework\Validator\Locale;
+use Magento\Framework\TestFramework\Unit\Helper\MockCreationTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -33,6 +34,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ImsCallbackTest extends TestCase
 {
+    use MockCreationTrait;
+
     /**
      * @var Validator|mixed|MockObject
      */
@@ -113,7 +116,7 @@ class ImsCallbackTest extends TestCase
             ->getMock();
         $responseMock = $this->getMockBuilder(\Magento\Framework\App\Response\Http::class)
             ->disableOriginalConstructor()
-            ->addMethods([])
+            ->onlyMethods([])
             ->getMock();
         $this->validatorMock = $this->getMockBuilder(Validator::class)
             ->disableOriginalConstructor()
@@ -121,14 +124,11 @@ class ImsCallbackTest extends TestCase
         $this->loggerMock = $this->getMockBuilder(AdminAdobeImsLogger::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->messagesMock = $this->getMockBuilder(Manager::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['addComplexErrorMessage'])
-            ->getMockForAbstractClass();
-        $this->authSessionMock = $this->getMockBuilder(Session::class)
-            ->disableOriginalConstructor()
-            ->addMethods(['setIsUrlNotice', 'getLocale'])
-            ->getMock();
+        $this->messagesMock = $this->createPartialMock(Manager::class, ['addComplexErrorMessage']);
+        $this->authSessionMock = $this->createPartialMockWithReflection(
+            Session::class,
+            ['setIsUrlNotice', 'getLocale']
+        );
         $this->authMock = $this->getMockBuilder(Session::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -157,9 +157,11 @@ class ImsCallbackTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $loginProcessServiceMock = $this->createMock(AdminLoginProcessService::class);
-        $contextMock = $this->getMockBuilder(Context::class)
-            ->addMethods(['getFrontController', 'getTranslator'])
-            ->onlyMethods([
+        $contextMock = $this->createPartialMockWithReflection(
+            Context::class,
+            [
+                'getFrontController',
+                'getTranslator',
                 'getRequest',
                 'getFormKeyValidator',
                 'getMessageManager',
@@ -169,9 +171,8 @@ class ImsCallbackTest extends TestCase
                 'getSession',
                 'getAuth',
                 'getObjectManager'
-            ])
-            ->disableOriginalConstructor()
-            ->getMock();
+            ]
+        );
         $contextMock->expects($this->once())->method('getObjectManager')->willReturn($this->objectManagerMock);
         $contextMock->expects($this->once())->method('getResponse')->willReturn($responseMock);
         $contextMock->expects($this->once())->method('getAuth')->willReturn($this->authMock);
@@ -230,8 +231,10 @@ class ImsCallbackTest extends TestCase
             ->with('form_key')
             ->willReturnSelf();
         $this->requestMock->expects($this->any())->method('getParam')
-            ->withConsecutive(['state'], ['locale'])
-            ->willReturnOnConsecutiveCalls('abc', 'en');
+            ->willReturnCallback(fn($param) => match ([$param]) {
+                ['state'] => 'abc',
+                ['locale'] => 'en'
+            });
         $this->authSessionMock->expects($this->any())->method('setIsUrlNotice')
             ->willReturnSelf();
         $this->authSessionMock->expects($this->any())->method('getLocale')
@@ -246,7 +249,9 @@ class ImsCallbackTest extends TestCase
         $this->authMock->expects($this->any())->method('isLoggedIn')->willReturn(false);
         $this->objectManagerMock
             ->method('get')
-            ->withConsecutive([Locale::class], [\Magento\Backend\Model\Locale\Manager::class])
-            ->willReturnOnConsecutiveCalls($this->localeMock, $this->managerMock);
+            ->willReturnCallback(fn($param) => match ([$param]) {
+                [Locale::class] => $this->localeMock,
+                [\Magento\Backend\Model\Locale\Manager::class] => $this->managerMock
+            });
     }
 }

@@ -5,6 +5,9 @@
  */
 namespace Vnecoms\VendorsProduct\Block\Vendors\Product\Helper\Form\Gallery;
 
+use Magento\Backend\Block\DataProviders\ImageUploadConfig as ImageUploadConfigDataProvider;
+use Magento\Framework\App\ObjectManager;
+
 class Content extends \Magento\Catalog\Block\Adminhtml\Product\Helper\Form\Gallery\Content
 {
     /**
@@ -12,13 +15,17 @@ class Content extends \Magento\Catalog\Block\Adminhtml\Product\Helper\Form\Galle
      */
     protected $_template = 'catalog/product/helper/gallery.phtml';
 
-    
+
     /**
      * @return AbstractBlock
      */
     protected function _prepareLayout()
     {
-        $this->addChild('uploader', 'Vnecoms\VendorsProduct\Block\Vendors\Product\Helper\Form\Gallery\Uploader');
+
+        $imageUploadConfigDataProvider =  ObjectManager::getInstance()->get(ImageUploadConfigDataProvider::class);
+        $this->addChild('uploader', \Vnecoms\VendorsProduct\Block\Vendors\Product\Helper\Form\Gallery\Uploader::class,
+            ['image_upload_config_data' => $imageUploadConfigDataProvider]
+        );
 
         $this->getUploader()->getConfig()->setUrl(
             $this->_urlBuilder->getUrl('catalog/product_gallery/upload')

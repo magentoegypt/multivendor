@@ -1,8 +1,9 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2015 Adobe
+ * All Rights Reserved.
  */
+
 declare(strict_types=1);
 
 namespace Magento\Customer\Test\Unit\Model\ResourceModel;
@@ -12,11 +13,13 @@ use Magento\Customer\Api\Data\AddressSearchResultsInterface;
 use Magento\Customer\Api\Data\AttributeMetadataInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Api\Data\CustomerSearchResultsInterfaceFactory;
+use Magento\Customer\Api\GroupRepositoryInterface;
 use Magento\Customer\Model\Customer\NotificationStorage;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\CustomerRegistry;
 use Magento\Customer\Model\Data\CustomerSecure;
 use Magento\Customer\Model\Data\CustomerSecureFactory;
+use Magento\Customer\Model\Delegation\Storage as DelegatedStorage;
 use Magento\Customer\Model\ResourceModel\AddressRepository;
 use Magento\Customer\Model\ResourceModel\Customer;
 use Magento\Customer\Model\ResourceModel\Customer\Collection;
@@ -125,6 +128,16 @@ class CustomerRepositoryTest extends TestCase
     private $model;
 
     /**
+     * @var DelegatedStorage|MockObject
+     */
+    private $delegatedStorage;
+
+    /**
+     * @var GroupRepositoryInterface|MockObject
+     */
+    private $groupRepository;
+
+    /**
      * @inheritDoc
      */
     protected function setUp(): void
@@ -194,6 +207,12 @@ class CustomerRepositoryTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->delegatedStorage = $this->getMockBuilder(DelegatedStorage::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->groupRepository = $this->getMockBuilder(GroupRepositoryInterface::class)
+            ->getMock();
+
         $this->model = new CustomerRepository(
             $this->customerFactory,
             $this->customerSecureFactory,
@@ -209,7 +228,9 @@ class CustomerRepositoryTest extends TestCase
             $this->imageProcessor,
             $this->extensionAttributesJoinProcessor,
             $this->collectionProcessorMock,
-            $this->notificationStorage
+            $this->notificationStorage,
+            $this->delegatedStorage,
+            $this->groupRepository
         );
     }
 
@@ -254,7 +275,9 @@ class CustomerRepositoryTest extends TestCase
                 'getWebsiteId',
                 'getAddresses',
                 'setAddresses',
-                'getGroupId'
+                'getGroupId',
+                'getDefaultBilling',
+                'getDefaultShipping'
             ]
         );
         $customerSecureData = $this->getMockBuilder(CustomerSecure::class)
@@ -278,10 +301,13 @@ class CustomerRepositoryTest extends TestCase
             ->willReturnOnConsecutiveCalls(['firstname' => 'firstname', 'group_id' => 1], []);
         $customerModel->expects($this->exactly(2))
             ->method('setOrigData')
-            ->withConsecutive(
-                ['firstname', 'firstname'],
-                ['group_id', 1]
-            );
+            ->willReturnCallback(function ($arg1, $arg2) {
+                if ($arg1 == 'firstname' && $arg2 == 'firstname') {
+                    return null;
+                } elseif ($arg1 == 'group_id' && $arg2 == 1) {
+                    return null;
+                }
+            });
         $this->customerRegistry->expects($this->atLeastOnce())
             ->method('retrieve')
             ->with($customerId)
@@ -440,7 +466,9 @@ class CustomerRepositoryTest extends TestCase
                 'getWebsiteId',
                 'getAddresses',
                 'setAddresses',
-                'getGroupId'
+                'getGroupId',
+                'getDefaultBilling',
+                'getDefaultShipping'
             ]
         );
         $customerModel->expects($this->atLeastOnce())
@@ -545,6 +573,7 @@ class CustomerRepositoryTest extends TestCase
     /**
      * @return void
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testGetList(): void
     {
@@ -619,57 +648,40 @@ class CustomerRepositoryTest extends TestCase
             ->method('addNameToSelect');
         $collection
             ->method('joinAttribute')
-            ->withConsecutive(
-                [
-                    'billing_postcode',
-                    'customer_address/postcode',
-                    'default_billing',
-                    null,
-                    'left'
-                ],
-                [
-                    'billing_city',
-                    'customer_address/city',
-                    'default_billing',
-                    null,
-                    'left'
-                ],
-                [
-                    'billing_telephone',
-                    'customer_address/telephone',
-                    'default_billing',
-                    null,
-                    'left'
-                ],
-                [
-                    'billing_region',
-                    'customer_address/region',
-                    'default_billing',
-                    null,
-                    'left'
-                ],
-                [
-                    'billing_country_id',
-                    'customer_address/country_id',
-                    'default_billing',
-                    null,
-                    'left'
-                ],
-                [
-                    'billing_company',
-                    'customer_address/company',
-                    'default_billing',
-                    null,
-                    'left'
-                ]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $collection,
-                $collection,
-                $collection,
-                $collection,
-                $collection,
-                $collection
+            ->willReturnCallback(
+                function ($arg1, $arg2, $arg3, $arg4, $arg5) use ($collection) {
+                    if ($arg1 == 'billing_postcode' &&
+                        $arg2 == 'customer_address/postcode' &&
+                        $arg3 == 'default_billing' &&
+                        $arg4 == null && $arg5 == 'left') {
+                        return $collection;
+                    } elseif ($arg1 == 'billing_city' &&
+                        $arg2 == 'customer_address/city' &&
+                        $arg3 == 'default_billing' &&
+                        $arg4 == null && $arg5 == 'left') {
+                        return $collection;
+                    } elseif ($arg1 == 'billing_telephone' &&
+                        $arg2 == 'customer_address/telephone' &&
+                        $arg3 == 'default_billing' &&
+                        $arg4 == null && $arg5 == 'left') {
+                        return $collection;
+                    } elseif ($arg1 == 'billing_region' &&
+                        $arg2 == 'customer_address/region' &&
+                        $arg3 == 'default_billing' &&
+                        $arg4 == null && $arg5 == 'left') {
+                        return $collection;
+                    } elseif ($arg1 == 'billing_country_id' &&
+                        $arg2 == 'customer_address/country_id' &&
+                        $arg3 == 'default_billing' &&
+                        $arg4 == null && $arg5 == 'left') {
+                        return $collection;
+                    } elseif ($arg1 == 'billing_company' &&
+                        $arg2 == 'customer_address/company' &&
+                        $arg3 == 'default_billing' &&
+                        $arg4 == null && $arg5 == 'left') {
+                        return $collection;
+                    }
+                }
             );
         $this->collectionProcessorMock->expects($this->once())
             ->method('process')

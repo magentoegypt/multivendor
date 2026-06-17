@@ -14152,3 +14152,26 @@ background: grey;
 .owl-carousel .owl-nav.disabled+.owl-dots {
     width: 100%;
 }
+
+// 2.4.8 upgrade fix: eliminate ~188px horizontal page scroll caused by the
+// owl-carousel/banner-slider RTL box extending past the viewport. overflow-x:clip
+// has no effect on vertical scroll and no sticky/fixed elements exist to break.
+html,
+body {
+    overflow-x: clip;
+}
+
+// Header search: fill the full width of its header division (was a fixed 374px
+// box parked at the right with empty space beside it). The category dropdown and
+// search button are absolutely positioned at the right, so they stay in place.
+.block-search {
+    .block-content,
+    #search_mini_form,
+    .minisearch,
+    .minisearch .field.search,
+    .minisearch .field.search .control,
+    #search {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}

@@ -18,9 +18,11 @@
     },
     "version": "2.4.8",
     "require": {
-        "amasty/module-one-step-checkout-pro-subscription-package": "2.4.3",
-        "amasty/module-one-step-checkout-core": "1.2.13",
         "amasty/base": "1.14.7",
+        "amasty/module-one-step-checkout-core": "1.2.13",
+        "amasty/module-one-step-checkout-pro-subscription-package": "2.4.3",
+        "laminas/laminas-mail": "^2.25",
+        "laminas/laminas-mime": "^2.12",
         "landofcoder/module-product-reviews": "^1.0",
         "magento/composer-dependency-version-audit-plugin": "~0.1",
         "magento/composer-root-update-plugin": "~2.0",
@@ -43,9 +45,9 @@
         "magento/module-theme-sample-data": "100.4.*",
         "magento/module-widget-sample-data": "100.4.*",
         "magento/module-wishlist-sample-data": "100.4.*",
-        "magento/product-community-edition": "2.4.8",
+        "magento/product-community-edition": "2.4.8-p5",
         "magento/sample-data-media": "100.4.*",
-		"mageplaza/module-core": "^1.5",
+        "mageplaza/module-core": "^1.5",
         "vnecoms/marketplace-standard": "2.4.*",
         "vnecoms/module-master-password": "2.0.*",
         "vnecoms/module-quotation": "^2.4",
@@ -177,20 +179,18 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
-    "repositories": {
-        "amasty": {
-            "type": "composer",
-            "url": "https://composer.amasty.com/community/"
+    "repositories": [
+        {
+            "vnecoms-repo": false
         },
-        "vnecoms-repo": {
-            "type": "composer",
-            "url": "https://repo.vnecoms.com"
+        {
+            "amasty": false
         },
-        "0": {
+        {
             "type": "composer",
             "url": "https://repo.magento.com/"
         }
-    },
+    ],
     "extra": {
         "magento-force": "override"
     }

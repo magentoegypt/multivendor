@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
  */
 
 declare(strict_types=1);
@@ -18,6 +18,7 @@ use Magento\AdobeStockAssetApi\Api\SaveAssetInterface;
 use Magento\MediaGalleryApi\Api\GetAssetsByPathsInterface;
 use Magento\MediaGalleryApi\Api\SaveAssetsInterface;
 use Magento\TestFramework\Helper\Bootstrap;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,18 +40,18 @@ class SaveAssetTest extends TestCase
     /**
      * @return array
      */
-    public function getAssetData(): array
+    public static function getAssetData(): array
     {
         return [
             'asset_save' => [
-                'data' => [
+                [
                     'media_gallery_path' => ['some/path.jpg'],
                     'category_id' => 42,
                     'creator_id' => 42,
                 ]
             ],
             'without_category' => [
-                'data' => [
+                [
                     'media_gallery_path' => ['some/path.jpg'],
                     'category_id' => null,
                     'creator_id' => 42,
@@ -73,11 +74,11 @@ class SaveAssetTest extends TestCase
      *
      * @param array $caseData
      *
-     * @dataProvider getAssetData
-     * @magentoDataFixture ../../../../app/code/Magento/AdobeStockAsset/Test/_files/media_asset.php
-     * @magentoDataFixture ../../../../app/code/Magento/AdobeStockAsset/Test/_files/category.php
-     * @magentoDataFixture ../../../../app/code/Magento/AdobeStockAsset/Test/_files/creator.php
-     */
+     * @magentoDataFixture Magento_AdobeStockAsset::Test/_files/media_asset.php
+     * @magentoDataFixture Magento_AdobeStockAsset::Test/_files/category.php
+     * @magentoDataFixture Magento_AdobeStockAsset::Test/_files/creator.php
+    */
+    #[DataProvider('getAssetData')]
     public function testExecute(array $caseData): void
     {
         $asset = $this->prepareAsset($caseData);

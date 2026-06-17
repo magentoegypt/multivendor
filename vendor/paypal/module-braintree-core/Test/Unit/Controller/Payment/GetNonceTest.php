@@ -1,10 +1,12 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2020 Adobe
+ * All Rights Reserved.
  */
+declare(strict_types=1);
 namespace PayPal\Braintree\Test\Unit\Controller\Payment;
 
+use Magento\Framework\Exception\NotFoundException;
 use PayPal\Braintree\Controller\Payment\GetNonce;
 use PayPal\Braintree\Gateway\Command\GetPaymentNonceCommand;
 use Magento\Customer\Model\Session;
@@ -16,52 +18,57 @@ use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Framework\Webapi\Exception;
 use Magento\Payment\Gateway\Command\ResultInterface as CommandResultInterface;
 use Magento\Framework\App\RequestInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
+#[CoversClass(GetNonce::class)]
+#[CoversFunction('execute')]
 class GetNonceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var GetNonce
      */
-    private $action;
+    private GetNonce $action;
 
     /**
-     * @var GetPaymentNonceCommand|\PHPUnit\Framework\MockObject\MockObject
+     * @var GetPaymentNonceCommand|MockObject
      */
-    private $command;
+    private GetPaymentNonceCommand|MockObject $command;
 
     /**
-     * @var Session|\PHPUnit\Framework\MockObject\MockObject
+     * @var Session|MockObject
      */
-    private $session;
+    private Session|MockObject $session;
 
     /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var LoggerInterface|MockObject
      */
-    private $logger;
+    private LoggerInterface|MockObject $logger;
 
     /**
-     * @var ResultFactory|\PHPUnit\Framework\MockObject\MockObject
+     * @var ResultFactory|MockObject
      */
-    private $resultFactory;
+    private ResultFactory|MockObject $resultFactory;
 
     /**
-     * @var ResultInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var ResultInterface|MockObject
      */
-    private $result;
+    private ResultInterface|MockObject $result;
 
     /**
-     * @var Http|\PHPUnit\Framework\MockObject\MockObject
+     * @var Http|MockObject
      */
-    private $request;
+    private Http|MockObject $request;
 
     /**
-     * @var CommandResultInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var CommandResultInterface|MockObject
      */
-    private $commandResult;
+    private CommandResultInterface|MockObject $commandResult;
 
     protected function setUp(): void
     {
@@ -69,21 +76,22 @@ class GetNonceTest extends \PHPUnit\Framework\TestCase
 
         $this->request = $this->getMockBuilder(RequestInterface::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getParam'])
+            ->onlyMethods(['getParam'])
             ->getMockForAbstractClass();
 
         $this->command = $this->getMockBuilder(GetPaymentNonceCommand::class)
             ->disableOriginalConstructor()
-            ->setMethods(['execute', '__wakeup'])
+            ->onlyMethods(['execute'])
+            ->addMethods(['__wakeup'])
             ->getMock();
 
         $this->commandResult = $this->getMockBuilder(CommandResultInterface::class)
-            ->setMethods(['get'])
+            ->onlyMethods(['get'])
             ->getMockForAbstractClass();
 
         $this->session = $this->getMockBuilder(Session::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getCustomerId'])
+            ->onlyMethods(['getCustomerId'])
             ->getMock();
 
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -108,7 +116,7 @@ class GetNonceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers \PayPal\Braintree\Controller\Payment\GetNonce::execute
+     * @throws NotFoundException
      */
     public function testExecuteWithException()
     {
@@ -141,13 +149,14 @@ class GetNonceTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @covers \PayPal\Braintree\Controller\Payment\GetNonce::execute
+     * @throws NotFoundException
      */
     public function testExecute()
     {
         $customerId = 1;
         $publicHash = '65b7bae0dcb690d93';
         $nonce = 'f1hc45';
+        $details = ['bin' => '41111'];
 
         $this->request->expects(static::once())
             ->method('getParam')
@@ -161,7 +170,8 @@ class GetNonceTest extends \PHPUnit\Framework\TestCase
         $this->commandResult->expects(static::once())
             ->method('get')
             ->willReturn([
-                'paymentMethodNonce' => $nonce
+                'paymentMethodNonce' => $nonce,
+                'details' => $details
             ]);
         $this->command->expects(static::once())
             ->method('execute')
@@ -169,7 +179,10 @@ class GetNonceTest extends \PHPUnit\Framework\TestCase
 
         $this->result->expects(static::once())
             ->method('setData')
-            ->with(['paymentMethodNonce' => $nonce]);
+            ->with([
+                'paymentMethodNonce' => $nonce,
+                'details' => $details
+            ]);
 
         $this->logger->expects(static::never())
             ->method('critical');
@@ -183,15 +196,16 @@ class GetNonceTest extends \PHPUnit\Framework\TestCase
     /**
      * Create mock for result factory object
      */
-    private function initResultFactoryMock()
+    private function initResultFactoryMock(): void
     {
         $this->result = $this->getMockBuilder(ResultInterface::class)
-            ->setMethods(['setHttpResponseCode', 'renderResult', 'setHeader', 'setData'])
+            ->onlyMethods(['setHttpResponseCode', 'renderResult', 'setHeader'])
+            ->addMethods(['setData'])
             ->getMockForAbstractClass();
 
         $this->resultFactory = $this->getMockBuilder(ResultFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
 
         $this->resultFactory->expects(static::once())

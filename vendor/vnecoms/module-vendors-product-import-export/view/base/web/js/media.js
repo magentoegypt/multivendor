@@ -11,7 +11,7 @@ define([
     'Magento_Ui/js/modal/modal',
     'Magento_Ui/js/modal/alert',
     'mage/translate',
-    'jquery/file-uploader',
+    'vnecoms/file-uploader',
     'domReady!'
 ], function (Component, $, _, utils, validator, uiModal, uiAlert, $t ) {
     'use strict';
@@ -62,9 +62,9 @@ define([
                 errorCount: 0,
                 selectedItems: []
             });
-            
+
         },
-        
+
         /**
          * Initializes file uploader plugin on provided input element.
          *
@@ -94,11 +94,11 @@ define([
             var count = 0;
             var curPage = this.currentPage();
             var pageSize = this.pageSize();
-            
+
             for (var x in uploadedImages) {
                 if ((count >= (curPage - 1)*pageSize) && (count < curPage*pageSize)) {
                     result.push(uploadedImages[x]); }
-    
+
                 if (count > (curPage +1)*pageSize) {
 break; }
                 count ++;
@@ -158,7 +158,7 @@ return; }
                 autoOpen: true,
                 innerScroll: true,
                 buttons: [
-                    
+
                 ],
                 closed: function () {
                     // on close
@@ -258,7 +258,7 @@ result.push(file);}
                     return false;/*Break out of foreach*/
                 }
             });
-            
+
             return result && this.getTotalPages() >1;
         },
         /**
@@ -286,7 +286,7 @@ result.push(file);}
                     return false; /*Break out of foreach*/
                 }
             });
-            
+
             return result && selectedItems.length && this.getTotalPages() >1;
         },
         /**
@@ -359,7 +359,7 @@ return; }
                 if (!file.isUploaded && !file.errorMsg) {
 uploadFile = file;break;}
             };
-            
+
             if (!uploadFile) {
                 this.uploading(false);
                 this.fileUploading('');
@@ -509,7 +509,7 @@ console.log('file choosed'); }
          */
         onBeforeFileUpload: function (e, data) {
             var self = this;
-            
+
             if (this.enableLog) {
                 console.log('Before file upload');
                 console.log(e);
@@ -517,13 +517,13 @@ console.log('file choosed'); }
             }
             var file     = data.files[0],
                 allowed  = this.isFileAllowed(file);
-            
+
             if (allowed.passed) {
                 $(e.target).fileupload('process', data).done(function () {
                     var uploadFiles = self.uploadFiles();
                     uploadFiles[file.name] = {file: file, isUploaded:false,errorMsg: '', data:data};
                     self.uploadFiles(uploadFiles);
-                    
+
                     /*data.submit();*/
                 });
             } else {
@@ -545,14 +545,14 @@ console.log('file choosed'); }
             }
             var file    = data.result,
                 error   = file.error;
-            
+
             var uploadFiles = this.uploadFiles();
             if (uploadFiles[file.name]) {
                 uploadFiles[file.name].isUploaded = !error;
                 uploadFiles[file.name].errorMsg = error;
                 this.uploadFiles(uploadFiles);
             }
-            
+
             error ?
                     this.notifyError(error, $t('Error: %1').replace('%1',file.name)) :
                     this.addFile(file);

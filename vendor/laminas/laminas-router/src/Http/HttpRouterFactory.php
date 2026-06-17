@@ -10,6 +10,9 @@ use Laminas\ServiceManager\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @final
+ */
 class HttpRouterFactory implements FactoryInterface
 {
     use RouterConfigTrait;

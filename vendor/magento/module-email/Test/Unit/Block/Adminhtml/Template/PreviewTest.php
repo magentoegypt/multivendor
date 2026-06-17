@@ -1,13 +1,14 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2011 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
 namespace Magento\Email\Test\Unit\Block\Adminhtml\Template;
 
 use Magento\Backend\Block\Template\Context;
+use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Email\Block\Adminhtml\Template\Preview;
 use Magento\Email\Model\AbstractTemplate;
 use Magento\Email\Model\Template;
@@ -18,6 +19,7 @@ use Magento\Framework\App\State;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Filter\Input\MaliciousCode;
+use Magento\Framework\Json\Helper\Data as JsonHelper;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Framework\View\DesignInterface;
 use Magento\Store\Model\Store;
@@ -35,7 +37,7 @@ class PreviewTest extends TestCase
      */
     protected $objectManagerHelper;
 
-    const MALICIOUS_TEXT = 'test malicious';
+    public const MALICIOUS_TEXT = 'test malicious';
 
     /**
      * @var Http|MockObject
@@ -68,42 +70,35 @@ class PreviewTest extends TestCase
     protected function setUp(): void
     {
         $this->objectManagerHelper = new ObjectManager($this);
-
         $storeId = 1;
         $designConfigData = [];
 
         $this->template = $this->getMockBuilder(Template::class)
-            ->setMethods(
+            ->addMethods(['getAppState'])
+            ->onlyMethods(
                 [
                     'setDesignConfig',
                     'getDesignConfig',
                     'getProcessedTemplate',
-                    'getAppState',
                     'revertDesign'
                 ]
             )
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->storeManager = $this->getMockBuilder(StoreManagerInterface::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-
         $this->request = $this->createMock(Http::class);
-
         $this->maliciousCode = $this->createPartialMock(
             MaliciousCode::class,
             ['filter']
         );
-
         $this->template->expects($this->once())
             ->method('getProcessedTemplate')
             ->with([])
             ->willReturn(self::MALICIOUS_TEXT);
-
         $this->template->method('getDesignConfig')
             ->willReturn(new DataObject($designConfigData));
-
         $emailFactory = $this->createPartialMock(TemplateFactory::class, ['create']);
         $emailFactory->expects($this->any())
             ->method('create')
@@ -113,7 +108,6 @@ class PreviewTest extends TestCase
         $scopeConfig = $this->getMockForAbstractClass(ScopeConfigInterface::class);
         $design = $this->getMockForAbstractClass(DesignInterface::class);
         $store = $this->createPartialMock(Store::class, ['getId']);
-
         $store->expects($this->any())
             ->method('getId')
             ->willReturn($storeId);
@@ -129,7 +123,7 @@ class PreviewTest extends TestCase
                     $scopeConfig
                 ]
             )
-            ->setMethods(['emulateAreaCode'])
+            ->onlyMethods(['emulateAreaCode'])
             ->disableOriginalConstructor()
             ->getMock();
         $appState->expects($this->any())
@@ -150,6 +144,17 @@ class PreviewTest extends TestCase
         $context->expects($this->any())->method('getDesignPackage')->willReturn($design);
         $context->expects($this->any())->method('getStoreManager')->willReturn($this->storeManager);
         $context->expects($this->once())->method('getAppState')->willReturn($appState);
+        $objects = [
+            [
+                JsonHelper::class,
+                $this->createMock(JsonHelper::class)
+            ],
+            [
+                DirectoryHelper::class,
+                $this->createMock(DirectoryHelper::class)
+            ]
+        ];
+        $this->objectManagerHelper->prepareObjectManager($objects);
 
         /** @var Preview $preview */
         $this->preview = $this->objectManagerHelper->getObject(
@@ -178,7 +183,7 @@ class PreviewTest extends TestCase
             ->method('getDesignConfig');
         $this->storeManager->expects($this->atLeastOnce())
             ->method('getDefaultStoreView');
-        $this->maliciousCode->expects($this->once())
+        $this->maliciousCode->expects($this->any())
             ->method('filter')
             ->with($requestParamMap[1][2])
             ->willReturn(self::MALICIOUS_TEXT);
@@ -191,10 +196,10 @@ class PreviewTest extends TestCase
      *
      * @return array
      */
-    public function toHtmlDataProvider()
+    public static function toHtmlDataProvider()
     {
         return [
-            ['data 1' => [
+            ['requestParamMap' => [
                 ['type', null, ''],
                 ['text', null, self::MALICIOUS_TEXT],
                 ['styles', null, ''],

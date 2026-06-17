@@ -5,6 +5,7 @@
  */
 namespace Vnecoms\VendorsShipping\Model\SalesRule;
 
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\SalesRule\Model\Quote\ChildrenValidationLocator;
 use Magento\Framework\App\ObjectManager;
 
@@ -39,21 +40,21 @@ class RulesApplier extends \Magento\SalesRule\Model\RulesApplier
     /**
      * Apply rules to current order item
      *
-     * @param \Magento\Quote\Model\Quote\Item\AbstractItem $item
-     * @param \Magento\SalesRule\Model\ResourceModel\Rule\Collection $rules
+     * @param AbstractItem $item
+     * @param array $rules
      * @param bool $skipValidation
-     * @param mixed $couponCode
+     * @param string $couponCodes
      * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function applyRules($item, $rules, $skipValidation, $couponCode)
+    public function applyRules($item, $rules, $skipValidation, array $couponCodes = [])
     {
         $address = $item->getAddress();
         $appliedRuleIds = [];
         $vendorId = $item->getProduct()->getVendorId();
-        
+
         if (!$vendorId) {
-            return parent::applyRules($item, $rules, $skipValidation, $couponCode);
+            return parent::applyRules($item, $rules, $skipValidation, $couponCodes);
         }
         $rules = $this->_getAvailableRulesByVendor($vendorId, $rules);
 
@@ -82,7 +83,7 @@ class RulesApplier extends \Magento\SalesRule\Model\RulesApplier
                 }
             }
 
-            $this->applyRule($item, $rule, $address, $couponCode);
+            $this->applyRule($item, $rule, $address, $couponCodes);
             $appliedRuleIds[$rule->getRuleId()] = $rule->getRuleId();
 
             if ($rule->getStopRulesProcessing() || $rule->getStopRulesProcessingVendor()) {

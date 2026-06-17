@@ -66,6 +66,10 @@ class Shipping extends \Magento\Sales\Model\Order\Creditmemo\Total\Shipping
         $object_manager = \Magento\Framework\App\ObjectManager::getInstance();
         $vendorOrder = $object_manager->get('\Vnecoms\VendorsSales\Model\Order')->load($creditmemo->getVendorOrderId());
 
+        if (!$vendorOrder->getId()) {
+            return parent::collect($creditmemo);
+        }
+
         $allowedAmount = $vendorOrder->getShippingAmount() - $vendorOrder->getShippingRefunded();
         $baseAllowedAmount = $vendorOrder->getBaseShippingAmount() - $vendorOrder->getBaseShippingRefunded();
 

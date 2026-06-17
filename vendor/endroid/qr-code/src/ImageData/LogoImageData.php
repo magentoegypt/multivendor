@@ -6,15 +6,15 @@ namespace Endroid\QrCode\ImageData;
 
 use Endroid\QrCode\Logo\LogoInterface;
 
-class LogoImageData
+final readonly class LogoImageData
 {
     private function __construct(
         private string $data,
-        private \GdImage|null $image,
+        private ?\GdImage $image,
         private string $mimeType,
         private int $width,
         private int $height,
-        private bool $punchoutBackground
+        private bool $punchoutBackground,
     ) {
     }
 
@@ -45,6 +45,10 @@ class LogoImageData
             return new self($data, null, $mimeType, $width, $height, $logo->getPunchoutBackground());
         }
 
+        if (!function_exists('imagecreatefromstring')) {
+            throw new \Exception('Function "imagecreatefromstring" does not exist: check your GD installation');
+        }
+
         error_clear_last();
         $image = @imagecreatefromstring($data);
 
@@ -59,12 +63,12 @@ class LogoImageData
         }
 
         // Only target width specified: calculate height
-        if (null !== $width && null === $height) {
+        if (null !== $width) {
             return new self($data, $image, $mimeType, $width, intval(imagesy($image) * $width / imagesx($image)), $logo->getPunchoutBackground());
         }
 
         // Only target height specified: calculate width
-        if (null === $width && null !== $height) {
+        if (null !== $height) {
             return new self($data, $image, $mimeType, intval(imagesx($image) * $height / imagesy($image)), $height, $logo->getPunchoutBackground());
         }
 
@@ -114,11 +118,17 @@ class LogoImageData
     {
         $headers = get_headers($url, true);
 
-        if (!is_array($headers) || !isset($headers['Content-Type'])) {
+        if (!is_array($headers)) {
+            throw new \Exception(sprintf('Could not retrieve headers to determine content type for logo URL "%s"', $url));
+        }
+
+        $headers = array_combine(array_map('strtolower', array_keys($headers)), $headers);
+
+        if (!isset($headers['content-type'])) {
             throw new \Exception(sprintf('Content type could not be determined for logo URL "%s"', $url));
         }
 
-        return is_array($headers['Content-Type']) ? $headers['Content-Type'][1] : $headers['Content-Type'];
+        return is_array($headers['content-type']) ? $headers['content-type'][1] : $headers['content-type'];
     }
 
     private static function detectMimeTypeFromPath(string $path): string

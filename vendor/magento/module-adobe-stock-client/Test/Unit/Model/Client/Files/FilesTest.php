@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -20,6 +20,7 @@ use Magento\AdobeStockClient\Model\FilesRequestFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -120,9 +121,8 @@ class FilesTest extends TestCase
      * @param string $apiKey
      * @param string $accessToken
      * @param array $columns
-     *
-     * @dataProvider curlRequestHeaders
      */
+    #[DataProvider('curlRequestHeaders')]
     public function testResultContainsEmptyFiles(
         array $ids,
         string $locale,
@@ -192,9 +192,8 @@ class FilesTest extends TestCase
      * @param string $apiKey
      * @param string $accessToken
      * @param array $columns
-     *
-     * @dataProvider curlRequestHeaders
      */
+    #[DataProvider('curlRequestHeaders')]
     public function testResultContainsFiles(
         array $ids,
         string $locale,
@@ -276,19 +275,18 @@ class FilesTest extends TestCase
      *
      * @return array
      */
-    public function curlRequestHeaders(): array
+    public static function curlRequestHeaders(): array
     {
-        return
-            [
-                [
-                    [1],
-                    'en',
-                    'Magento/dev-2.3-develop',
-                    'target-environment',
-                    '75y87d439eqweqw4f4asde64ae42060fc571c456sdfsdqwe',
-                    'Bearer ' . base64_encode('Magento/dev-2.3-develop'),
-                    []
-                ]
-            ];
+        return [
+            'default test case' => [
+                [1],
+                'en',
+                'Magento/dev-2.3-develop',
+                'target-environment',
+                '75y87d439eqweqw4f4asde64ae42060fc571c456sdfsdqwe',
+                'Bearer ' . base64_encode('Magento/dev-2.3-develop'),
+                []
+            ]
+        ];
     }
 }

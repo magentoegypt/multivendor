@@ -6,7 +6,8 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Stdlib\ArrayUtils;
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
+use Override;
 use Traversable;
 
 use function is_array;
@@ -14,8 +15,10 @@ use function sprintf;
 
 /**
  * Placeholder route.
+ *
+ * @final
  */
-class Placeholder implements RouteInterface
+class Placeholder implements HttpRouteInterface
 {
     /**
      * @internal
@@ -30,14 +33,10 @@ class Placeholder implements RouteInterface
     }
 
     /**
-     * factory(): defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  iterable $options
-     * @return Placeholder
+     * @inheritDoc
      * @throws Exception\InvalidArgumentException
      */
+    #[Override]
     public static function factory($options = [])
     {
         if ($options instanceof Traversable) {
@@ -63,37 +62,28 @@ class Placeholder implements RouteInterface
     }
 
     /**
-     * match(): defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @param  integer|null $pathOffset
-     * @return RouteMatch|null
+     * @inheritDoc
+     * @param int|null $pathOffset
      */
-    public function match(Request $request, $pathOffset = null)
+    #[Override]
+    public function match(RequestInterface $request, $pathOffset = null)
     {
-        return new RouteMatch($this->defaults);
+        return new HttpRouteMatch($this->defaults);
     }
 
     /**
-     * assemble(): Defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
+     * @inheritDoc
      */
+    #[Override]
     public function assemble(array $params = [], array $options = [])
     {
         return '';
     }
 
     /**
-     * getAssembledParams(): defined by RouteInterface interface.
-     *
-     * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
+     * @inheritDoc
      */
+    #[Override]
     public function getAssembledParams()
     {
         return [];

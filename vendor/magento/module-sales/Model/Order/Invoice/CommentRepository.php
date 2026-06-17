@@ -1,8 +1,11 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2017 Adobe
+ * All Rights Reserved.
  */
+
+declare(strict_types=1);
+
 namespace Magento\Sales\Model\Order\Invoice;
 
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
@@ -73,9 +76,9 @@ class CommentRepository implements InvoiceCommentRepositoryInterface
         InvoiceCommentInterfaceFactory $commentFactory,
         InvoiceCommentSearchResultInterfaceFactory $searchResultFactory,
         CollectionProcessorInterface $collectionProcessor,
-        InvoiceCommentSender $invoiceCommentSender = null,
-        InvoiceRepositoryInterface $invoiceRepository = null,
-        LoggerInterface $logger = null
+        ?InvoiceCommentSender $invoiceCommentSender = null,
+        ?InvoiceRepositoryInterface $invoiceRepository = null,
+        ?LoggerInterface $logger = null
     ) {
         $this->commentResource = $commentResource;
         $this->commentFactory = $commentFactory;

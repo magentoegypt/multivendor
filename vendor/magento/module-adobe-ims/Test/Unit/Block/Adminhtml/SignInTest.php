@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -15,10 +15,13 @@ use Magento\AdobeImsApi\Api\UserAuthorizedInterface;
 use Magento\AdobeImsApi\Api\UserProfileRepositoryInterface;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Backend\Block\Template\Context;
+use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Json\Helper\Data as JsonHelper;
 use Magento\Framework\Serialize\Serializer\JsonHexTag;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Framework\UrlInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -85,6 +88,17 @@ class SignInTest extends TestCase
         $this->jsonHexTag = $this->createMock(JsonHexTag::class);
 
         $objectManager = new ObjectManager($this);
+        $objects = [
+            [
+                JsonHelper::class,
+                $this->createMock(JsonHelper::class)
+            ],
+            [
+                DirectoryHelper::class,
+                $this->createMock(DirectoryHelper::class)
+            ]
+        ];
+        $objectManager->prepareObjectManager($objects);
         $this->signInBlock = $objectManager->getObject(
             SignInBlock::class,
             [
@@ -99,13 +113,13 @@ class SignInTest extends TestCase
     }
 
     /**
-     * @dataProvider userDataProvider
      * @param int $userId
      * @param bool $userExists
      * @param array $userData
      * @param array $configProviderData
      * @param array $expectedData
      */
+    #[DataProvider('userDataProvider')]
     public function testGetComponentJsonConfig(
         int $userId,
         bool $userExists,
@@ -126,13 +140,17 @@ class SignInTest extends TestCase
             ->method('getUserId')
             ->willReturn($userId);
 
-        $userRepositoryWillReturn = $userExists
-            ? $this->returnValue($userProfile)
-            : $this->throwException(new NoSuchEntityException());
-        $this->userProfileRepositoryMock
-            ->method('getByUserId')
-            ->with($userId)
-            ->will($userRepositoryWillReturn);
+        if ($userExists) {
+            $this->userProfileRepositoryMock
+                ->method('getByUserId')
+                ->with($userId)
+                ->willReturn($userProfile);
+        } else {
+            $this->userProfileRepositoryMock
+                ->method('getByUserId')
+                ->with($userId)
+                ->willThrowException(new NoSuchEntityException());
+        }
 
         $configProviderMock = $this->createMock(ConfigProviderInterface::class);
         $configProviderMock->expects($this->any())
@@ -155,7 +173,7 @@ class SignInTest extends TestCase
      * @param array $userData
      * @return array
      */
-    private function getDefaultComponentConfig(array $userData): array
+    private static function getDefaultComponentConfig(array $userData): array
     {
         return [
             'component' => 'Magento_AdobeIms/js/signIn',
@@ -182,7 +200,7 @@ class SignInTest extends TestCase
      *
      * @return array
      */
-    private function getConfigProvideConfig(): array
+    private static function getConfigProvideConfig(): array
     {
         return [
             'component' => 'Magento_AdobeIms/js/test',
@@ -208,7 +226,7 @@ class SignInTest extends TestCase
      *
      * @return array
      */
-    private function getDefaultUserData(): array
+    private static function getDefaultUserData(): array
     {
         return [
             'isAuthorized' => false,
@@ -221,7 +239,7 @@ class SignInTest extends TestCase
     /**
      * @return array
      */
-    public function userDataProvider(): array
+    public static function userDataProvider(): array
     {
         return [
             'Existing authorized user' => [
@@ -234,7 +252,7 @@ class SignInTest extends TestCase
                     'image' => 'image.png'
                 ],
                 [],
-                $this->getDefaultComponentConfig([
+                self::getDefaultComponentConfig([
                     'isAuthorized' => true,
                     'name' => 'John',
                     'email' => 'john@email.com',
@@ -251,7 +269,7 @@ class SignInTest extends TestCase
                     'image' => 'image.png'
                 ],
                 [],
-                $this->getDefaultComponentConfig($this->getDefaultUserData()),
+                self::getDefaultComponentConfig(self::getDefaultUserData()),
             ],
             'Non-existing user' => [
                 13,
@@ -263,7 +281,7 @@ class SignInTest extends TestCase
                     'image' => 'image.png'
                 ],
                 [],
-                $this->getDefaultComponentConfig($this->getDefaultUserData()),
+                self::getDefaultComponentConfig(self::getDefaultUserData()),
             ],
             'Existing user with additional config provider' => [
                 14,
@@ -274,10 +292,10 @@ class SignInTest extends TestCase
                     'email' => 'john@email.com',
                     'image' => 'image.png'
                 ],
-                $this->getConfigProvideConfig(),
+                self::getConfigProvideConfig(),
                 array_replace_recursive(
-                    $this->getDefaultComponentConfig($this->getDefaultUserData()),
-                    $this->getConfigProvideConfig()
+                    self::getDefaultComponentConfig(self::getDefaultUserData()),
+                    self::getConfigProvideConfig()
                 )
             ]
         ];

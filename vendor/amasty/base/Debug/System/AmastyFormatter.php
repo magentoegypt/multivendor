@@ -10,15 +10,15 @@ namespace Amasty\Base\Debug\System;
 class AmastyFormatter extends \Monolog\Formatter\LineFormatter
 {
     /**
-     * @param array $record
+     * @param \Monolog\LogRecord $record
      *
      * @return string
      */
-    public function format(array $record): string
+    public function format(\Monolog\LogRecord $record): string
     {
         $output = $this->format;
         $output = str_replace('%datetime%', date('H:i d/m/Y'), $output);
-        $output = str_replace('%message%', $record['message'], $output);
+        $output = str_replace('%message%', $record->message, $output);
         return $output;
     }
 }

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
+use Laminas\Router\RouteInterface;
 use Laminas\Stdlib\ArrayUtils;
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
 use Traversable;
 
 use function array_merge;
@@ -31,7 +32,7 @@ use function substr;
  * Misuse of this route type can lead to potential security issues.
  * Use the `Segment` route type instead.
  */
-class Wildcard implements RouteInterface
+class Wildcard implements HttpRouteInterface
 {
     /**
      * Default values.
@@ -70,7 +71,7 @@ class Wildcard implements RouteInterface
     /**
      * factory(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::factory()
+     * @see    RouteInterface::factory()
      *
      * @param  iterable $options
      * @return Wildcard
@@ -105,12 +106,12 @@ class Wildcard implements RouteInterface
     /**
      * match(): defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::match()
+     * @see    RouteInterface::match()
      *
      * @param  integer|null $pathOffset
-     * @return RouteMatch|null
+     * @return HttpRouteMatch|null
      */
-    public function match(Request $request, $pathOffset = null)
+    public function match(RequestInterface $request, $pathOffset = null)
     {
         if (! method_exists($request, 'getUri')) {
             return null;
@@ -154,13 +155,13 @@ class Wildcard implements RouteInterface
             }
         }
 
-        return new RouteMatch(array_merge($this->defaults, $matches), strlen($path));
+        return new HttpRouteMatch(array_merge($this->defaults, $matches), strlen($path));
     }
 
     /**
      * assemble(): Defined by RouteInterface interface.
      *
-     * @see    \Laminas\Router\RouteInterface::assemble()
+     * @see    RouteInterface::assemble()
      *
      * @return mixed
      */
@@ -189,9 +190,9 @@ class Wildcard implements RouteInterface
     }
 
     /**
-     * getAssembledParams(): defined by RouteInterface interface.
+     * getAssembledParams(): defined by HttpRouteInterface interface.
      *
-     * @see    RouteInterface::getAssembledParams
+     * @see    HttpRouteInterface::getAssembledParams
      *
      * @return array
      */

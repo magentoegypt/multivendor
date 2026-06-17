@@ -29,6 +29,7 @@ use function sprintf;
  * @template InstanceType of RouteInterface
  * @extends AbstractPluginManager<InstanceType>
  * @psalm-import-type ServiceManagerConfiguration from ServiceManager
+ * @final
  */
 class RoutePluginManager extends AbstractPluginManager
 {

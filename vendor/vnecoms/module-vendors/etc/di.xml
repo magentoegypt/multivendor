@@ -10,7 +10,7 @@
     <preference for="Magento\Framework\App\Request\PathInfoProcessorInterface" type="Vnecoms\Vendors\App\Request\PathInfoProcessor" />
 	<preference for="Vnecoms\Vendors\App\ConfigInterface" type="Vnecoms\Vendors\App\Config" />
     <preference for="Magento\Framework\Module\ModuleListInterface" type="Magento\Framework\Module\ModuleList" />
-    
+
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">
@@ -18,7 +18,7 @@
             </argument>
         </arguments>
     </type>
-    
+
     <type name="Magento\Framework\App\AreaList">
         <arguments>
             <argument name="areas" xsi:type="array">
@@ -30,7 +30,7 @@
             </argument>
         </arguments>
     </type>
-    
+
 	<type name="Vnecoms\Vendors\App\Router">
         <arguments>
             <argument name="routerId" xsi:type="string">vendors</argument>
@@ -48,7 +48,7 @@
 
         </arguments>
     </type>
-    
+
     <type name="Magento\Framework\App\Router\NoRouteHandlerList">
         <arguments>
             <argument name="handlerClassesList" xsi:type="array">
@@ -59,13 +59,13 @@
             </argument>
         </arguments>
     </type>
-    
+
     <type name="Vnecoms\Vendors\Model\Url\ScopeResolver">
         <arguments>
             <argument name="areaCode" xsi:type="string">vendors</argument>
         </arguments>
     </type>
-    
+
     <type name="Vnecoms\Vendors\Model\Url">
         <arguments>
             <argument name="scopeResolver" xsi:type="object">Vnecoms\Vendors\Model\Url\ScopeResolver</argument>
@@ -76,7 +76,7 @@
         </arguments>
     </type>
 
-    
+
     <type name="Magento\Theme\Model\View\Design">
         <arguments>
             <argument name="themes" xsi:type="array">
@@ -84,7 +84,7 @@
             </argument>
         </arguments>
     </type>
-    
+
     <!-- Add a attribute mapper -->
     <type name="Magento\Eav\Model\Entity\Setup\PropertyMapper\Composite">
         <arguments>
@@ -118,9 +118,13 @@
             <argument name="mediaConfig" xsi:type="object">Vnecoms\Vendors\Model\Media\Config</argument>
         </arguments>
     </type>
-    
+
     <type name="Magento\Framework\App\Action\AbstractAction">
         <plugin name="customer-session-data-to-context" type="Vnecoms\Vendors\Plugin\CustomerSessionContext" sortOrder="15"/>
+    </type>
+
+    <type name="Magento\Framework\App\AreaList">
+        <plugin name="custom-vendor-domain" type="Vnecoms\Vendors\Plugin\App\AreaList" sortOrder="15"/>
     </type>
 
 	<!--<preference for="Magento\Framework\Stdlib\DateTime\Filter\DateTime" type="Vnecoms\Vendors\Plugin\DateTime\Filter\DateTime" />-->

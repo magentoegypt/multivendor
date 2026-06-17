@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -12,6 +12,7 @@ use Magento\AdobeImsApi\Api\ConfigInterface;
 use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\HTTP\Client\CurlFactory;
 use Magento\Framework\Serialize\Serializer\Json;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -67,10 +68,10 @@ class GetImageTest extends TestCase
     /**
      * Test save.
      *
-     * @dataProvider imagesDataProvider
      * @param array $expectedResult
      * @param string $expectedImageUrl
      */
+    #[DataProvider('imagesDataProvider')]
     public function testExecute(array $expectedResult, string $expectedImageUrl): void
     {
         $curl = $this->createMock(Curl::class);
@@ -112,11 +113,11 @@ class GetImageTest extends TestCase
      *
      * @return array
      */
-    public function imagesDataProvider(): array
+    public static function imagesDataProvider(): array
     {
         return [
             [
-                'expected_result' => [
+                'expectedResult' => [
                     'user' => [
                         'images' => [
                             50 => 'https://mir-s3-cdn-cf.behance.net/user/50/61269e393218159.5d8e3b72bcfb9.jpg',
@@ -129,7 +130,7 @@ class GetImageTest extends TestCase
                     ],
                     'http_code' => 200,
                 ],
-                'expected_image_url' => 'https://mir-s3-cdn-cf.behance.net/user/276/61269e393218159.5d8e3b72bcfb9.jpg'
+                'expectedImageUrl' => 'https://mir-s3-cdn-cf.behance.net/user/276/61269e393218159.5d8e3b72bcfb9.jpg'
             ]
         ];
     }

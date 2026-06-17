@@ -3,7 +3,6 @@
  * See COPYING.txt for license details.
  */
 /*browser:true*/
-/*global define*/
 
 define([
     'jquery',
@@ -39,7 +38,7 @@ define([
          * @returns {Object}
          */
         getCcAvailableTypes: function () {
-            var availableTypes = validator.getAvailableCardTypes(),
+            let availableTypes = validator.getAvailableCardTypes(),
                 billingCountryId;
 
             billingCountryId = $('#multishipping_billing_country_id').val();
@@ -56,16 +55,19 @@ define([
         /**
          * @override
          */
-        handleNonce: function (data) {
-            var self = this;
-            this.setPaymentMethodNonce(data.nonce);
+        handleNonce: function (payload) {
+            let self = this;
+
+            this.setPaymentMethodNonce(payload.nonce);
+            this.setCreditCardBin(payload.details.bin);
 
             // place order on success validation
             self.validatorManager.validate(self, function () {
                 return self.setPaymentInformation();
-            }, function() {
+            }, function () {
                 self.isProcessing = false;
                 self.paymentMethodNonce = null;
+                self.creditCardBin = null;
             });
         },
 
@@ -73,16 +75,25 @@ define([
          * @override
          */
         placeOrder: function () {
-            var self = this;
-
             if (this.isProcessing) {
                 return false;
-            } else {
-                this.isProcessing = true;
             }
+            this.isProcessing = true;
+
 
             braintree.tokenizeHostedFields();
             return false;
+        },
+
+        /**
+         * @override
+         */
+        getData: function () {
+            let data = this._super();
+
+            data['additional_data']['is_active_payment_token_enabler'] = true;
+
+            return data;
         },
 
         /**
@@ -115,7 +126,7 @@ define([
          */
         done: function () {
             fullScreenLoader.stopLoader();
-            $('#multishipping-billing-form').submit();
+            $('#multishipping-billing-form').trigger('submit');
 
             return this;
         }

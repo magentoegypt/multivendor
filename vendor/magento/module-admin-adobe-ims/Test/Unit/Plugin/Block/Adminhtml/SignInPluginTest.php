@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -17,6 +17,7 @@ use Magento\AdobeImsApi\Api\UserAuthorizedInterface;
 use Magento\Framework\Serialize\Serializer\JsonHexTag;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\User\Model\User;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -88,12 +89,12 @@ class SignInPluginTest extends TestCase
     }
 
     /**
-     * @dataProvider userDataProvider
      * @param array $userData
      * @param array $configProviderData
      * @param array $expectedData
      * @param bool $isAuthorized
      */
+    #[DataProvider('userDataProvider')]
     public function testAroundGetComponentJsonConfig(
         array $userData,
         array $configProviderData,
@@ -138,7 +139,7 @@ class SignInPluginTest extends TestCase
      * @param array $userData
      * @return array
      */
-    private function getDefaultComponentConfig(array $userData): array
+    private static function getDefaultComponentConfig(array $userData): array
     {
         return [
             'component' => 'Magento_AdobeIms/js/signIn',
@@ -163,7 +164,7 @@ class SignInPluginTest extends TestCase
     /**
      * @return array
      */
-    public function userDataProvider(): array
+    public static function userDataProvider(): array
     {
         return [
             'Existing authorized user' => [
@@ -173,7 +174,7 @@ class SignInPluginTest extends TestCase
                     'email' => 'john@email.com',
                 ],
                 [],
-                $this->getDefaultComponentConfig([
+                self::getDefaultComponentConfig([
                     'isAuthorized' => true,
                     'name' => 'John Doe',
                     'email' => 'john@email.com',
@@ -189,7 +190,7 @@ class SignInPluginTest extends TestCase
                     'image' => 'image.png'
                 ],
                 [],
-                $this->getDefaultComponentConfig($this->getDefaultUserData()),
+                self::getDefaultComponentConfig(self::getDefaultUserData()),
                 false
             ],
         ];
@@ -200,7 +201,7 @@ class SignInPluginTest extends TestCase
      *
      * @return array
      */
-    private function getDefaultUserData(): array
+    private static function getDefaultUserData(): array
     {
         return [
             'isAuthorized' => false,

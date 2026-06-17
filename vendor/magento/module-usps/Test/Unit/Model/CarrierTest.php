@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2025 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -90,11 +90,13 @@ class CarrierTest extends TestCase
     private $config = [
         'carriers/usps/allowed_methods' => '0_FCLE,0_FCL,0_FCP,1,2,3,4,6,7,13,16,17,22,23,25,27,28,33,' .
             '34,35,36,37,42,43,53,55,56,57,61,INT_1,INT_2,INT_4,INT_6,INT_7,INT_8,INT_9,INT_10,INT_11,' .
-            'INT_12,INT_13,INT_14,INT_15,INT_16,INT_20,INT_26',
+            'INT_12,INT_13,INT_14,INT_15,INT_16,INT_20,INT_26,1058,4058,6058,2058,4096,' .
+            '1096,2096,6096',
         'carriers/usps/showmethod' => 1,
         'carriers/usps/debug' => 1,
         'carriers/usps/userid' => 'test',
         'carriers/usps/mode' => 0,
+        'carriers/usps/usps_type' => 'USPS_XML',
     ];
 
     /**
@@ -122,12 +124,12 @@ class CarrierTest extends TestCase
         $data = ['id' => 'usps', 'store' => '1'];
 
         $this->error = $this->getMockBuilder(Error::class)
-            ->setMethods(['setCarrier', 'setCarrierTitle', 'setErrorMessage'])
+            ->addMethods(['setCarrier', 'setCarrierTitle', 'setErrorMessage'])
             ->getMock();
 
         $this->errorFactory = $this->getMockBuilder(ErrorFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
 
         $this->errorFactory->expects($this->any())->method('create')->willReturn($this->error);
@@ -135,6 +137,11 @@ class CarrierTest extends TestCase
         $carrierHelper = $this->getCarrierHelper();
         $productCollectionFactory = $this->getProductCollectionFactory();
         $this->proxyDeferredFactory = $this->createMock(ProxyDeferredFactory::class);
+
+        $this->dataHelper = $this->getMockBuilder(DataHelper::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['displayGirthValue'])
+            ->getMock();
         $arguments = [
             'scopeConfig' => $this->scope,
             'xmlSecurity' => new Security(),
@@ -149,12 +156,6 @@ class CarrierTest extends TestCase
             'dataHelper' => $this->dataHelper,
             'proxyDeferredFactory' => $this->proxyDeferredFactory
         ];
-
-        $this->dataHelper = $this->getMockBuilder(DataHelper::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['displayGirthValue'])
-            ->getMock();
-
         $this->carrier = $this->objectManager->getObject(Carrier::class, $arguments);
     }
 
@@ -238,7 +239,7 @@ class CarrierTest extends TestCase
     /**
      * @return array
      */
-    public function codeDataProvider()
+    public static function codeDataProvider()
     {
         return [['container'], ['machinable'], ['method'], ['size']];
     }
@@ -283,7 +284,7 @@ class CarrierTest extends TestCase
     /**
      * Get list of variations
      */
-    public function logDataProvider()
+    public static function logDataProvider()
     {
         return [
             [
@@ -323,7 +324,7 @@ class CarrierTest extends TestCase
     /**
      * @return array
      */
-    public function isGirthAllowedDataProvider()
+    public static function isGirthAllowedDataProvider()
     {
         return [
             ['US', 'usps_1', true, false],
@@ -374,7 +375,7 @@ class CarrierTest extends TestCase
         $this->assertEquals($expected, $rates);
     }
 
-    public function updateFreeMethodQuoteDataProvider(): array
+    public static function updateFreeMethodQuoteDataProvider(): array
     {
         $result1 = [
             ['method' => '1', 'method_title' => 'Priority Mail 3-Day', 'cost' => 70, 'price' => 70],
@@ -493,7 +494,7 @@ class CarrierTest extends TestCase
     {
         $xmlElFactory = $this->getMockBuilder(ElementFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
         $xmlElFactory->method('create')
             ->willReturnCallback(
@@ -517,11 +518,10 @@ class CarrierTest extends TestCase
     {
         $rateFactory = $this->getMockBuilder(ResultFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
         $rateResult = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
             ->getMock();
         $rateFactory->method('create')
             ->willReturn($rateResult);
@@ -536,11 +536,11 @@ class CarrierTest extends TestCase
     {
         $rateMethodFactory = $this->getMockBuilder(MethodFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
         $rateMethod = $this->getMockBuilder(Method::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setPrice'])
+            ->onlyMethods(['setPrice'])
             ->getMock();
         $rateMethod->method('setPrice')
             ->willReturnSelf();
@@ -557,7 +557,7 @@ class CarrierTest extends TestCase
     {
         $this->httpResponse = $this->getMockBuilder(Response::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getBody'])
+            ->onlyMethods(['getBody'])
             ->getMock();
         $this->httpClient = $this->getMockBuilder(LaminasClient::class)
             ->getMock();

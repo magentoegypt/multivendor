@@ -6,6 +6,7 @@
 
 use Magento\Composer\MagentoComposerApplication;
 use Magento\Composer\InfoCommand;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class InfoCommandTest extends \PHPUnit\Framework\TestCase
@@ -42,6 +43,7 @@ php >=5.4.11
     /**
      * @dataProvider getCommandOutputDataProvider
      */
+    #[DataProvider('getCommandOutputDataProvider')]
     public function testRun($input, $output)
     {
         $this->application->expects($this->once())->method('runComposerCommand')->willReturn($input);

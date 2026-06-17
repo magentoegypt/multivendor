@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 
 declare(strict_types=1);
@@ -50,7 +50,7 @@ class AdminAdobeImsDisableCommand extends Command
     /**
      * @inheritdoc
      */
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
             $this->adminImsConfig->disableModule();

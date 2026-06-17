@@ -25,7 +25,19 @@ define(
                 serviceUrl, false
             ).done(
                 function (response) {
-                	discountModel.setDiscountDetail($.parseJSON(response));
+                    // Resilient parse: endpoint may return empty/non-JSON (e.g. no vendor coupon).
+                    // Must not throw, or the deferred never resolves and checkout hangs on the spinner.
+                    var detail = {};
+                    try {
+                        if (response && typeof response === 'string') {
+                            detail = $.parseJSON(response);
+                        } else if (response && typeof response === 'object') {
+                            detail = response;
+                        }
+                    } catch (e) {
+                        detail = {};
+                    }
+                    discountModel.setDiscountDetail(detail);
                     deferred.resolve();
                 }
             ).fail(

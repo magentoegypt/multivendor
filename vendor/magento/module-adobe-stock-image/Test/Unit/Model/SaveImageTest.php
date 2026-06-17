@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -16,6 +16,7 @@ use Magento\AdobeStockImage\Model\SaveMediaGalleryAsset;
 use Magento\Framework\Api\Search\Document;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -73,14 +74,15 @@ class SaveImageTest extends TestCase
     /**
      * Verify that image from the Adobe Stock can be saved.
      *
-     * @dataProvider imageDataProvider
-     * @param Document $document
+     * @param \Closure $document
      * @param string $url
      * @param string $destinationPath
      * @throws LocalizedException
      */
-    public function testExecute(Document $document, string $url, string $destinationPath): void
+    #[DataProvider('imageDataProvider')]
+    public function testExecute(\Closure $document, string $url, string $destinationPath): void
     {
+        $document = $document($this);
         $assetId = 42;
         $asset = $this->createMock(AssetInterface::class);
 
@@ -110,35 +112,42 @@ class SaveImageTest extends TestCase
      *
      * @return array[]
      */
-    public function imageDataProvider(): array
+    public static function imageDataProvider(): array
     {
+        $document = static fn (self $testCase) => $testCase->getMockForDocumentClass();
         return [
             [
-                $this->createMock(Document::class),
+                $document,
                 'https://as2.ftcdn.net/jpg/500_FemVonDcttCeKiOXFk.jpg',
                 'path'
             ]
         ];
     }
 
+    protected function getMockForDocumentClass()
+    {
+        return $this->createMock(Document::class);
+    }
+
     /**
      * @return array
      */
-    public function getInvalidPathValues(): array
+    public static function getInvalidPathValues(): array
     {
+        $document = static fn (self $testCase) => $testCase->getMockForDocumentClass();
         return [
             [
-                $this->createMock(Document::class),
+                $document,
                 'https://as2.ftcdn.net/jpg/500_FemVonDcttCeKiOXFk.jpg',
                 '\\invalid chars\\'
             ],
             [
-                $this->createMock(Document::class),
+                $document,
                 'https://as2.ftcdn.net/jpg/500_FemVonDcttCeKiOXFk.jpg',
                 '{*invalid_path/\'chars}'
             ],
             [
-                $this->createMock(Document::class),
+                $document,
                 'https://as2.ftcdn.net/jpg/500_FemVonDcttCeKiOXFk.jpg',
                 '<img src=\"\" onerror=\"alert(0)\">'
             ]
@@ -148,14 +157,15 @@ class SaveImageTest extends TestCase
     /**
      * Verify that path validation works if invalid characters are passed.
      *
-     * @dataProvider getInvalidPathValues
-     * @param Document $document
+     * @param \Closure $document
      * @param string $url
      * @param string $destinationPath
      * @throws LocalizedException
      */
-    public function testExecuteInvalidPath(Document $document, string $url, string $destinationPath): void
+    #[DataProvider('getInvalidPathValues')]
+    public function testExecuteInvalidPath(\Closure $document, string $url, string $destinationPath): void
     {
+        $document = $document($this);
         $this->expectException('Magento\Framework\Exception\LocalizedException');
         $this->saveImage->execute($document, $url, $destinationPath);
     }

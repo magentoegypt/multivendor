@@ -25,7 +25,7 @@ class DefaultPath implements \Magento\Framework\App\DefaultPathInterface
         } else {
             $pathParts = [];
         }
-        
+
         $this->_parts = [
             'area' => isset($pathParts[0]) ? $pathParts[0] : '',
             'module' => isset($pathParts[1]) ? $pathParts[1] : 'vendors',

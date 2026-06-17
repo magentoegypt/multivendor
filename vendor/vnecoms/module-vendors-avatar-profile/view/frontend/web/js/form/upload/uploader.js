@@ -33,6 +33,26 @@ define(
                 return this;
             },
 
+            /**
+             * Replace Input type File with Span
+             * and bind click event
+             */
+            replaceInputTypeFile: function (fileInput) {
+
+                let fileId = fileInput.id, fileName = fileInput.name,
+                    spanElement = '<span id=\'' + fileId + '\'></span>';
+
+                $('#' + fileId).closest('.file-uploader-area').attr('upload-area-id', fileName);
+                $(fileInput).replaceWith(spanElement);
+                $('#' + fileId).closest('.file-uploader-area').find('.file-uploader-button:first').on('click', function () {
+                    $('#' + fileId).closest('.file-uploader-area').find('.uppy-Dashboard-browse').trigger('click');
+                });
+
+                $('.file-uploader-preview-box').on('click', function () {
+                    $('#' + fileId).closest('.file-uploader-area').find('.uppy-Dashboard-browse').trigger('click');
+                });
+
+            },
 
             /**
              * Retrieve data to authorized user.

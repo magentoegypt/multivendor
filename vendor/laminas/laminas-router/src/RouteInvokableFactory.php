@@ -19,6 +19,8 @@ use function sprintf;
  *
  * Can be mapped directly to specific route plugin names, or used as an
  * abstract factory to map FQCN services to invokables.
+ *
+ * @internal
  */
 class RouteInvokableFactory implements
     AbstractFactoryInterface,

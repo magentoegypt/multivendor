@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -13,6 +13,7 @@ use Magento\AdobeImsApi\Api\UserProfileRepositoryInterface;
 use Magento\Authorization\Model\UserContextInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -61,8 +62,8 @@ class GetAccessTokenTest extends TestCase
      * Test save.
      *
      * @param string|null $token
-     * @dataProvider expectedDataProvider
      */
+    #[DataProvider('expectedDataProvider')]
     public function testExecute(?string $token): void
     {
         $this->userContext->expects($this->once())->method('getUserId')->willReturn(1);
@@ -100,7 +101,7 @@ class GetAccessTokenTest extends TestCase
      *
      * @return array
      */
-    public function expectedDataProvider(): array
+    public static function expectedDataProvider(): array
     {
         return
             [
@@ -108,7 +109,7 @@ class GetAccessTokenTest extends TestCase
                     'token' => 'kladjflakdjf3423rfzddsf'
                 ],
                 [
-                    'null_token' => null
+                    'token' => null
                 ]
             ];
     }

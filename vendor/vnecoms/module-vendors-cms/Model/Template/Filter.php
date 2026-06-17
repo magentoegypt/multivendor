@@ -108,6 +108,7 @@ class Filter extends \Magento\Framework\Filter\Template
      */
     public function filter($value)
     {
+        if (!$value) return '';
         // "depend", "if", and "template" directives should be first
         foreach ([
                      self::CONSTRUCTION_DEPEND_PATTERN => 'dependDirective',

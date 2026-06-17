@@ -35,7 +35,7 @@ class Index extends AbstractAction implements HttpGetActionInterface
     protected function _isAllowed(){
         return true;
     }
-    
+
     /**
      * Noroute action
      *

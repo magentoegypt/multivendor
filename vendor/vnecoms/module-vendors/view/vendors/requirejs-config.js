@@ -32,6 +32,7 @@ var config = {
     },
     "shim": {
         "jquery/bootstrap": ["jquery","jquery/ui"],
+        "vnecoms/file-uploader": ["jquery","jquery/ui"],
         "adminlte": ["jquery","jquery/bootstrap"],
         "jquery/adminlte": ["jquery","jquery/bootstrap"],
         "jquery/slimscroll": ["jquery"],
@@ -51,6 +52,7 @@ var config = {
         "jquery/bootstrap": "Vnecoms_Vendors/js/bootstrap",
         "jquery/slimscroll": 'Vnecoms_Vendors/js/jquery.slimscroll',
         "jquery/adminlte": "Vnecoms_Vendors/js/adminlte",
-        "jquery/fix_prototype_bootstrap": "Vnecoms_Vendors/js/fix_prototype_bootstrap"
+        "jquery/fix_prototype_bootstrap": "Vnecoms_Vendors/js/fix_prototype_bootstrap",
+        'vnecoms/file-uploader': 'Vnecoms_Vendors/js/fileUploader/jquery.fileuploader'
     }
 };

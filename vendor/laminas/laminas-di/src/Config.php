@@ -77,6 +77,8 @@ use function is_string;
  * @see \Laminas\Di\Resolver\ValueInjection A container to force injection of a value
  * @see \Laminas\Di\Resolver\TypeInjection  A container to force looking up a specific type instance for injection
  *
+ * @final
+ *
  * @psalm-type TypeConfigArray = array{
  *  typeOf?: class-string|null,
  *  preferences?: array<string, string>|null,
@@ -186,7 +188,7 @@ class Config implements ConfigInterface
      *
      * @see \Laminas\Di\ConfigInterface::getTypePreferencesForClass()
      */
-    private function getTypePreferenceForClass(string $type, ?string $context): ?string
+    private function getTypePreferenceForClass(string $type, string $context): ?string
     {
         if (! isset($this->types[$context]['preferences'][$type])) {
             return null;

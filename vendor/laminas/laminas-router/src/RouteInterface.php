@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Laminas\Router;
 
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
 
 /**
  * RouteInterface interface.
@@ -31,7 +31,7 @@ interface RouteInterface
      *
      * @return RouteMatch|null
      */
-    public function match(Request $request);
+    public function match(RequestInterface $request);
 
     /**
      * Assemble the route.

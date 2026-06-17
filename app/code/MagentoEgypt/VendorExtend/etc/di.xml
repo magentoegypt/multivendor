@@ -8,15 +8,11 @@
     <type name="MGS\Lookbook\Model\Lookbook">
         <plugin name="phpfixlookbook" type="MagentoEgypt\VendorExtend\Plugin\Lookbook"/>
     </type>
-    <type name="Magento\Catalog\Model\Layer">
-        <plugin name="createSortOrdersOnPrepareFrontCollection" type="MagentoEgypt\VendorExtend\Plugin\LayerPlugin"/>
-    </type>
+    <!-- LayerPlugin + VendorsSearch Elasticsuite Collection override removed during
+         2.4.8 upgrade: Elasticsuite was retired in favour of native OpenSearch, so
+         vendor search falls back to vnecoms' own SearchCollection virtualType.
+         Original Elasticsuite-coupled files preserved in _disabled_modules/. -->
     <preference for="Vnecoms\BannerManager\Block\Banner" type="MagentoEgypt\VendorExtend\Block\BannerManager\Banner"/>
-    <virtualType name="Vnecoms\VendorsSearch\Model\ResourceModel\Fulltext\SearchCollection" type="MagentoEgypt\VendorExtend\Model\ResourceModel\VendorsSearch\Fulltext\Collection">
-        <arguments>
-            <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
-        </arguments>
-    </virtualType>
     <type name="Vnecoms\VendorsPriceComparison\Helper\Data">
         <arguments>
             <argument name="allowedAttributes" xsi:type="array">

@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
  */
 
 declare(strict_types=1);
@@ -17,6 +17,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Framework\Phrase;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -134,13 +135,12 @@ class SaveLicensedTest extends TestCase
     /**
      * Testing the behavior if some exceptions are thrown
      *
-     * @dataProvider exceptionsDataProvider
-     *
      * @param \Exception $exception
      * @param int $responseCode
      * @param array $result
      * @throws NotFoundException
      */
+    #[DataProvider('exceptionsDataProvider')]
     public function testNotFoundAsset(\Exception $exception, int $responseCode, array $result): void
     {
         $mediaId = 283415387;
@@ -169,7 +169,7 @@ class SaveLicensedTest extends TestCase
      *
      * @return array
      */
-    public function exceptionsDataProvider(): array
+    public static function exceptionsDataProvider(): array
     {
         return [
             "Test the thrown exception if the asset couldn't be found" => [

@@ -73,8 +73,8 @@ class AdvancedInventory extends AbstractModifier
         StockRegistryInterface $stockRegistry,
         ArrayManager $arrayManager,
         StockConfigurationInterface $stockConfiguration,
-        Json $serializer = null,
-        JsonValidator $jsonValidator = null
+        ?Json $serializer = null,
+        ?JsonValidator $jsonValidator = null
     ) {
         $this->locator = $locator;
         $this->stockRegistry = $stockRegistry;
@@ -193,7 +193,7 @@ class AdvancedInventory extends AbstractModifier
                     'label' => __('Stock Status'),
                     'value' => '1',
                     'dataScope' => $fieldCode . '.is_in_stock',
-                    'scopeLabel' => __('[GLOBAL]'),
+                    'scopeLabel' => '[GLOBAL]',
                     'imports' => [
                         'visible' => '${$.provider}:data.product.stock_data.manage_stock',
                         '__disableTmpl' => ['visible' => false],
@@ -205,7 +205,7 @@ class AdvancedInventory extends AbstractModifier
                 $this->meta,
                 [
                     'label' => __('Stock Status'),
-                    'scopeLabel' => __('[GLOBAL]'),
+                    'scopeLabel' => '[GLOBAL]',
                 ]
             );
             $container['arguments']['data']['config'] = [
@@ -232,7 +232,7 @@ class AdvancedInventory extends AbstractModifier
                 'require' => '0',
                 'additionalClasses' => 'admin__field-small',
                 'label' => __('Quantity'),
-                'scopeLabel' => __('[GLOBAL]'),
+                'scopeLabel' => '[GLOBAL]',
                 'dataScope' => 'qty',
                 'validation' => [
                     'validate-number' => true,

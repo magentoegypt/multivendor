@@ -1,6 +1,9 @@
 <div class="user-panel">
     <div class="pull-left image" id="vendor-avatar">
-          <each args="data: value, as: '$file'" render="$parent.getPreviewTmpl($file)"></each>
+        <div class="file-uploader" data-role="drop-zone" css="_loading: isLoading">
+            <div class="file-uploader-preview-box">
+                <each args="data: value, as: '$file'" render="$parent.getPreviewTmpl($file)"></each>
+            </div>
           <div class="file-uploader-area">
               <input type="file" afterRender="onElementRender" id = "vendor-avatar-upload"
                      attr="name: inputName, multiple: isMultipleFiles" disable="disabled" />
@@ -10,6 +13,7 @@
               <span html="notice"></span>
           </div>
           <label class="admin__field-error" if="error" attr="for: uid" text="error"></label>
+        </div>
     </div>
     <div class="pull-left info">
         <p text="getVendorName()"></p>

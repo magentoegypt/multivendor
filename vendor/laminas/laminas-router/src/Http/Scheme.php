@@ -6,7 +6,8 @@ namespace Laminas\Router\Http;
 
 use Laminas\Router\Exception;
 use Laminas\Stdlib\ArrayUtils;
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
+use Override;
 use Traversable;
 
 use function is_array;
@@ -15,8 +16,10 @@ use function sprintf;
 
 /**
  * Scheme route.
+ *
+ * @final
  */
-class Scheme implements RouteInterface
+class Scheme implements HttpRouteInterface
 {
     /**
      * Default values.
@@ -49,14 +52,10 @@ class Scheme implements RouteInterface
     }
 
     /**
-     * factory(): defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::factory()
-     *
-     * @param  iterable $options
-     * @return Scheme
+     * @inheritDoc
      * @throws Exception\InvalidArgumentException
      */
+    #[Override]
     public static function factory($options = [])
     {
         if ($options instanceof Traversable) {
@@ -80,35 +79,29 @@ class Scheme implements RouteInterface
     }
 
     /**
-     * match(): defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @return RouteMatch|null
+     * @inheritDoc
      */
-    public function match(Request $request)
+    #[Override]
+    public function match(RequestInterface $request)
     {
         if (! method_exists($request, 'getUri')) {
-            return;
+            return null;
         }
 
         $uri    = $request->getUri();
         $scheme = $uri->getScheme();
 
         if ($scheme !== $this->scheme) {
-            return;
+            return null;
         }
 
-        return new RouteMatch($this->defaults);
+        return new HttpRouteMatch($this->defaults);
     }
 
     /**
-     * assemble(): Defined by RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
+     * @inheritDoc
      */
+    #[Override]
     public function assemble(array $params = [], array $options = [])
     {
         if (isset($options['uri'])) {
@@ -120,12 +113,9 @@ class Scheme implements RouteInterface
     }
 
     /**
-     * getAssembledParams(): defined by RouteInterface interface.
-     *
-     * @see    RouteInterface::getAssembledParams
-     *
-     * @return array
+     * @inheritDoc
      */
+    #[Override]
     public function getAssembledParams()
     {
         return [];

@@ -47,6 +47,15 @@ class NoRouteHandler implements \Magento\Framework\App\Router\NoRouteHandlerInte
             $moduleName = $this->routeConfig->getRouteFrontName('account');
             $actionNamespace = 'noroute';
             $actionName = 'index';
+
+            if ((isset($requestPathParams[0]) && $requestPathParams[0] == "customer")
+                && (isset($requestPathParams[1]) && $requestPathParams[1] == "account")
+            ) {
+                $moduleName = "dashboard";
+                $actionNamespace = 'index';
+                $actionName = 'index';
+            }
+
             $request->setModuleName($moduleName)->setControllerName($actionNamespace)->setActionName($actionName);
             return true;
         }

@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Laminas\Router\Http;
 
 use Laminas\Router\RouteMatch as BaseRouteMatch;
+use Override;
 
 use function array_merge;
 
 /**
  * Part route match.
+ *
+ * @deprecated This class will become an interface in version 4 with
+ *              `Laminas\Router\HttpRouteMatch` as a final implementation
  */
 class RouteMatch extends BaseRouteMatch
 {
@@ -29,13 +33,9 @@ class RouteMatch extends BaseRouteMatch
     }
 
     /**
-     * setMatchedRouteName(): defined by BaseRouteMatch.
-     *
-     * @see    BaseRouteMatch::setMatchedRouteName()
-     *
-     * @param  string $name
-     * @return RouteMatch
+     * @inheritDoc
      */
+    #[Override]
     public function setMatchedRouteName($name)
     {
         if ($this->matchedRouteName === null) {

@@ -13,7 +13,7 @@ define([
     'Magento_Ui/js/lib/collapsible',
     'mage/template',
     'Magento_Ui/js/modal/alert',
-    'jquery/file-uploader',
+    'vnecoms/file-uploader',
     'mage/translate',
     'Magento_ConfigurableProduct/js/variations/variations'
 ], function (Component, $, ko, _, Collapsible, mageTemplate, alert) {

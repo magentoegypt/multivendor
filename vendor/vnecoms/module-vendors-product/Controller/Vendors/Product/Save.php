@@ -125,7 +125,12 @@ class Save extends \Vnecoms\VendorsProduct\Controller\Vendors\Product
     public function execute()
     {
         $storeId = $this->getRequest()->getParam('store', 0);
+        $currentStoreCodeWebsite       = $this->storeManager->getStore()->getCode();
+        $currentWebsiteId = $this->storeManager->getStore($currentStoreCodeWebsite)->getWebsiteId();
+        
         $currentStore = $this->storeManager->getStore($storeId);
+        $this->storeManager->setCurrentStore($currentStore->getCode());
+
         $redirectBack = $this->getRequest()->getParam('back', false);
         $productAttributeSetId = $this->getRequest()->getParam('set');
         $productTypeId = $this->getRequest()->getParam('type');
@@ -152,13 +157,13 @@ class Save extends \Vnecoms\VendorsProduct\Controller\Vendors\Product
 
                 if(!$this->vendorProductHelper->canVendorSetWebsite()){
                     /*Set the curent website id*/
-                    $product->setWebsiteIds([$this->storeManager->getWebsite()->getId() => $this->storeManager->getWebsite()->getId()]);
+                    $product->setWebsiteIds([$currentWebsiteId => $currentWebsiteId]);
                     $post = $this->getRequest()->getPost();
                     $productData = $post->get('product', []);
                     if(!isset($productData['category_ids'])){
                         $productData['category_ids'] = $product->getCategoryIds(); /*If the category attribute is hidden from vendor panel,  use current saved value.*/
                     }
-                    $productData['website_ids'] = $this->storeManager->getWebsite()->getId();
+                    $productData['website_ids'] = $currentWebsiteId;
                     $post->set('product', $productData);
                     $this->getRequest()->setPost($post);
                 }
@@ -268,6 +273,7 @@ class Save extends \Vnecoms\VendorsProduct\Controller\Vendors\Product
                 } else {
                     $tmpProduct = $this->_objectManager->create('Magento\Catalog\Model\Product')
                         ->load($product->getId())->setStoreId($this->getRequest()->getParam('store', 0));
+                    $tmpProduct->setStockData($product->getStockData());
                     $oldData = $tmpProduct->getData();
                     $productData = $this->getRequest()->getPost('product', []);
 
@@ -304,7 +310,7 @@ class Save extends \Vnecoms\VendorsProduct\Controller\Vendors\Product
                     $websiteIds = isset($productData['website_ids'])?$productData['website_ids']:[];
                     if(!$this->vendorProductHelper->canVendorSetWebsite()){
                         /*Set the curent website id*/
-                        $websiteIds = [$this->storeManager->getWebsite()->getId() => $this->storeManager->getWebsite()->getId()];
+                        $websiteIds = [$currentWebsiteId => $currentWebsiteId];
                     }
                     $tmpProduct->setWebsiteIds($websiteIds);
 
@@ -365,6 +371,7 @@ class Save extends \Vnecoms\VendorsProduct\Controller\Vendors\Product
             return $resultRedirect;
         }
 
+        $this->storeManager->setCurrentStore($currentStoreCodeWebsite);
         if($currentStore->getId()){
             $this->_url->setData('scope', $currentStore);
         }

@@ -9,6 +9,11 @@ use Psr\Container\ContainerInterface;
 use function class_exists;
 use function sprintf;
 
+/**
+ * @internal
+ *
+ * @final
+ */
 trait RouterConfigTrait
 {
     /**

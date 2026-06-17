@@ -133,22 +133,41 @@ class ProcessUpdateAttribute
             } else {
                 switch ($attrType) {
                     case "decimal":
+                        if (is_array($originData) && is_array($data)) {
+                            $data = $this->serializer->serialize($data);
+                            $originData = $this->serializer->serialize($originData);
 
-                        if ($originData) {
-                            $originData = str_replace(',', '', $originData);
-                            if (is_numeric($originData)) {
-                                $originData = number_format($originData, 2, '.', ',');
+                            if ($data) {
+                                $data = trim($data);
                             }
+                            if ($originData) {
+                                $originData = trim($originData);
+                            }
+                            if ($data && $originData) {
+                                $isCheck = strcmp($data, $originData) > self::IGNORE_TEXT_LENGTH || strcmp($originData, $data) > self::IGNORE_TEXT_LENGTH;
+                            } else {
+                                $isCheck = true;
+                            }
+                            $result = ($data !== false) && ($data !== null) && $isCheck;
+
+                        } else {
+                            if ($originData) {
+                                $originData = str_replace(',', '', $originData);
+                                if (is_numeric($originData)) {
+                                    $originData = number_format($originData, 2, '.', ',');
+                                }
+                            }
+
+                            if ($data) {
+                                $data = str_replace(',', '', $data);
+                                if (is_numeric($data)) {
+                                    $data = number_format($data, 2, '.', ',');
+                                }
+                            }
+
+                            $result = ($data !== false) && ($data !== null) && ($data != $originData);
                         }
 
-                        if ($data) {
-                            $data = str_replace(',', '', $data);
-                            if (is_numeric($data)) {
-                                $data = number_format($data, 2, '.', ',');
-                            }
-                        }
-
-                        $result = ($data !== false) && ($data !== null) && ($data != $originData);
                         break;
                     case "text":
                         if (is_array($data)) {

@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -90,7 +90,7 @@ class ImsWebapiRepositoryTest extends TestCase
         $this->loggerMock = $this->createMock(LoggerInterface::class);
         $this->entityCollectionFactory = $this->getMockBuilder(CollectionFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['create'])
+            ->onlyMethods(['create'])
             ->getMock();
 
         $this->collectionProcessor = $this->createMock(CollectionProcessorInterface::class);
@@ -190,9 +190,7 @@ class ImsWebapiRepositoryTest extends TestCase
     protected function initCollection(): array
     {
         $collectionSize = 1;
-        $searchCriteriaMock = $this->getMockBuilder(SearchCriteriaInterface::class)
-            ->setMethods(['getPageSize'])
-            ->getMockForAbstractClass();
+        $searchCriteriaMock = $this->createMock(SearchCriteriaInterface::class);
 
         $searchCriteriaMock->expects($this->any())
             ->method('getPageSize')
@@ -283,8 +281,7 @@ class ImsWebapiRepositoryTest extends TestCase
     protected function createSearchResultsMock($searchCriteriaMock, $imsWebapiMock, $collectionSize = 1): MockObject
     {
         /** @var MockObject $searchResultsMock */
-        $searchResultsMock = $this->getMockBuilder(ImsWebapiSearchResultsInterface::class)
-            ->getMockForAbstractClass();
+        $searchResultsMock = $this->createMock(ImsWebapiSearchResultsInterface::class);
 
         $searchResultsMock->expects($this->once())
             ->method('setSearchCriteria')

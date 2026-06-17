@@ -1,11 +1,8 @@
 <?php
-namespace Gt\Dom;
+namespace GT\Dom;
 
 use DOMDocumentType;
 
-/**
- * Represents a Node containing a doctype.
- */
 class DocumentType extends DOMDocumentType {
-	use ChildNode;
+	use RegisteredNodeClass;
 }

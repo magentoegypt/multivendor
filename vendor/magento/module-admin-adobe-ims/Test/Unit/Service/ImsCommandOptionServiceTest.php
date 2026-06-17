@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2022 Adobe
+ * All Rights Reserved.
  */
 
 declare(strict_types=1);
@@ -12,6 +12,7 @@ use Magento\AdminAdobeIms\Service\ImsCommandOptionService;
 use Magento\AdminAdobeIms\Service\ImsCommandValidationService;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager as ObjectManagerHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -57,11 +58,9 @@ class ImsCommandOptionServiceTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->inputMock = $this->getMockBuilder(InputInterface::class)
-            ->getMockForAbstractClass();
+        $this->inputMock = $this->createMock(InputInterface::class);
 
-        $this->outputMock = $this->getMockBuilder(OutputInterface::class)
-            ->getMockForAbstractClass();
+        $this->outputMock = $this->createMock(OutputInterface::class);
 
         $this->imsCommandOptionService = $objectManagerHelper->getObject(
             ImsCommandOptionService::class,
@@ -72,13 +71,13 @@ class ImsCommandOptionServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider validInput
      * @param string $argument
      * @param string $value
      * @param string $validatorMethod
      * @return void
      * @throws LocalizedException
      */
+    #[DataProvider('validInput')]
     public function testValidInputWillBeReturned(string $argument, string $value, string $validatorMethod): void
     {
         $helperMock = $this->getMockBuilder(QuestionHelper::class)
@@ -103,13 +102,13 @@ class ImsCommandOptionServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider validInput
      * @param string $argument
      * @param string $value
      * @param string $validatorMethod
      * @return void
      * @throws LocalizedException
      */
+    #[DataProvider('validInput')]
     public function testOrganizationIdPromptReturnsOrgId(
         string $argument,
         string $value,
@@ -140,13 +139,13 @@ class ImsCommandOptionServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider validInput
      * @param string $argument
      * @param string $value
      * @param string $validatorMethod
      * @return void
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+    #[DataProvider('validInput')]
     public function testEmptyOrganizationIdThrowsException(
         string $argument,
         string $value,
@@ -173,13 +172,13 @@ class ImsCommandOptionServiceTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidInput
      * @param $argument
      * @param $value
      * @param $validatorMethod
      * @param $exceptionMessage
      * @return void
      */
+    #[DataProvider('invalidInput')]
     public function testInvalidOrganizationIdThrowsException(
         $argument,
         $value,
@@ -255,7 +254,7 @@ class ImsCommandOptionServiceTest extends TestCase
      *
      * @return string[][]
      */
-    public function validInput(): array
+    public static function validInput(): array
     {
         return [
             [
@@ -290,7 +289,7 @@ class ImsCommandOptionServiceTest extends TestCase
      *
      * @return string[][]
      */
-    public function invalidInput(): array
+    public static function invalidInput(): array
     {
         return [
             [

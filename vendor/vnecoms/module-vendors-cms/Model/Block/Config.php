@@ -57,6 +57,7 @@ class Config
                 $this->getBlocksWysiwygActionUrl().
                 '\', \'{{html_id}}\');',
         ];
+        /*
         $blockWysiwyg = [
             [
                 'name' => 'blockwidget',
@@ -68,9 +69,9 @@ class Config
                     'class' => 'add-block plugin',
                 ],
             ],
-        ];
+        ]; */
         $configPlugins = $config->getData('plugins');
-        $blockConfig['plugins'] = array_merge($configPlugins, $blockWysiwyg);
+        //$blockConfig['plugins'] = array_merge($configPlugins, $blockWysiwyg);
 
         return $blockConfig;
     }

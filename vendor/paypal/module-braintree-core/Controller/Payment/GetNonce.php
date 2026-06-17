@@ -1,11 +1,15 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2020 Adobe
+ * All Rights Reserved.
  */
+declare(strict_types=1);
 namespace PayPal\Braintree\Controller\Payment;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ActionInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Json;
 use PayPal\Braintree\Gateway\Command\GetPaymentNonceCommand;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -15,22 +19,22 @@ use Magento\Framework\Session\SessionManagerInterface;
 use Magento\Framework\Webapi\Exception;
 use Psr\Log\LoggerInterface;
 
-class GetNonce extends Action implements HttpGetActionInterface
+class GetNonce extends Action implements ActionInterface, HttpGetActionInterface
 {
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
     /**
      * @var SessionManagerInterface
      */
-    private $session;
+    private SessionManagerInterface $session;
 
     /**
      * @var GetPaymentNonceCommand
      */
-    private $command;
+    private GetPaymentNonceCommand $command;
 
     /**
      * @param Context $context
@@ -53,7 +57,7 @@ class GetNonce extends Action implements HttpGetActionInterface
     /**
      * @inheritdoc
      */
-    public function execute()
+    public function execute(): Json|ResultInterface|ResponseInterface
     {
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
@@ -61,7 +65,10 @@ class GetNonce extends Action implements HttpGetActionInterface
             $publicHash = $this->getRequest()->getParam('public_hash');
             $customerId = $this->session->getCustomerId();
             $result = $this->command->execute(['public_hash' => $publicHash, 'customer_id' => $customerId])->get();
-            $response->setData(['paymentMethodNonce' => $result['paymentMethodNonce']]);
+            $response->setData([
+                'paymentMethodNonce' => $result['paymentMethodNonce'],
+                'details' => $result['details']
+            ]);
         } catch (\Exception $e) {
             $this->logger->critical($e);
             return $this->processBadRequest($response);
@@ -79,7 +86,9 @@ class GetNonce extends Action implements HttpGetActionInterface
     private function processBadRequest(ResultInterface $response): ResultInterface
     {
         $response->setHttpResponseCode(Exception::HTTP_BAD_REQUEST);
-        $response->setData(['message' => __('Sorry, but something went wrong')]);
+        $response->setData([
+            'message' => __('Sorry, but something went wrong')
+        ]);
 
         return $response;
     }

@@ -1,9 +1,26 @@
 <?php
+/**
+ * ADOBE CONFIDENTIAL
+ *
+ * Copyright 2020 Adobe
+ * All Rights Reserved.
+ *
+ * NOTICE: All information contained herein is, and remains
+ * the property of Adobe and its suppliers, if any. The intellectual
+ * and technical concepts contained herein are proprietary to Adobe
+ * and its suppliers and are protected by all applicable intellectual
+ * property laws, including trade secret and copyright laws.
+ * Dissemination of this information or reproduction of this material
+ * is strictly forbidden unless prior written permission is obtained
+ * from Adobe.
+ */
+
 declare(strict_types=1);
 
 namespace PayPal\Braintree\Console;
 
 use Braintree\Exception\NotFound;
+use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use PayPal\Braintree\Model\Adapter\BraintreeAdapter;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\ResourceConnection\ConnectionFactory;
@@ -25,19 +42,21 @@ use Symfony\Component\Console\Question\Question;
 
 /**
  * This class aims to migrate Magento 1 stored cards to Magento 2
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class VaultMigrate extends Command
 {
-    const HOST = 'host';
-    const DBNAME = 'dbname';
-    const USERNAME = 'username';
-    const PASSWORD = 'password';
-    const EAV_ATTRIBUTE_TABLE = 'eav_attribute';
-    const ATTRIBUTE_ID = 'attribute_id';
-    const ATTRIBUTE_CODE = 'attribute_code';
-    const CUSTOMER_ENTITY_TABLE = 'customer_entity_varchar';
-    const VALUE = 'value';
-    const CC_MAPPER = [
+    public const HOST = 'host';
+    private const DBNAME = 'dbname';
+    private const USERNAME = 'username';
+    private const PASSWORD = 'password';
+    private const EAV_ATTRIBUTE_TABLE = 'eav_attribute';
+    private const ATTRIBUTE_ID = 'attribute_id';
+    private const ATTRIBUTE_CODE = 'attribute_code';
+    private const CUSTOMER_ENTITY_TABLE = 'customer_entity_varchar';
+    private const VALUE = 'value';
+    private const CC_MAPPER = [
         'american-express' => 'AE',
         'discover' => 'DI',
         'jcb' => 'JCB',
@@ -49,41 +68,9 @@ class VaultMigrate extends Command
     ];
 
     /**
-     * @var $customers
+     * @var array
      */
-    private $customers;
-    /**
-     * @var ConnectionFactory
-     */
-    private $connectionFactory;
-    /**
-     * @var BraintreeAdapter
-     */
-    private $braintreeAdapter;
-    /**
-     * @var CustomerRepositoryInterface
-     */
-    private $customerRepository;
-    /**
-     * @var PaymentTokenFactory
-     */
-    private $paymentToken;
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-    /**
-     * @var SerializerInterface
-     */
-    private $json;
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
+    private array $customers;
 
     /**
      * VaultMigrate constructor.
@@ -98,31 +85,22 @@ class VaultMigrate extends Command
      * @param StoreManagerInterface $storeManager
      */
     public function __construct(
-        ConnectionFactory $connectionFactory,
-        BraintreeAdapter $braintreeAdapter,
-        CustomerRepositoryInterface $customerRepository,
-        PaymentTokenFactory $paymentToken,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        EncryptorInterface $encryptor,
-        SerializerInterface $json,
-        StoreManagerInterface $storeManager
+        private readonly ConnectionFactory $connectionFactory,
+        private readonly BraintreeAdapter $braintreeAdapter,
+        private readonly CustomerRepositoryInterface $customerRepository,
+        private readonly PaymentTokenFactory $paymentToken,
+        private readonly PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private readonly EncryptorInterface $encryptor,
+        private readonly SerializerInterface $json,
+        private readonly StoreManagerInterface $storeManager
     ) {
-        $this->connectionFactory = $connectionFactory;
-        $this->braintreeAdapter = $braintreeAdapter;
-        $this->customerRepository = $customerRepository;
-        $this->paymentToken = $paymentToken;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->encryptor = $encryptor;
-        $this->json = $json;
-        $this->storeManager = $storeManager;
-
         parent::__construct();
     }
 
     /**
      * @inheritDoc
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('braintree:migrate');
         $this->setDescription('Migrate stored cards from a Magento 1 database');
@@ -132,10 +110,12 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Interact with DB
+     *
      * @param InputInterface $input
      * @param OutputInterface $output
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
+    protected function interact(InputInterface $input, OutputInterface $output): void
     {
         /** @var QuestionHelper $questionHelper */
         $questionHelper = $this->getHelper('question');
@@ -164,12 +144,14 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Execute to get tokens
+     *
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|void|null
+     * @return int
      * @throws NotFound
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $host = $input->getOption(self::HOST);
         $databaseName = $input->getOption(self::DBNAME);
@@ -184,7 +166,7 @@ class VaultMigrate extends Command
 
         if (!$eavAttributeId) {
             $output->writeln('<error>Could not find `braintree_customer_id` attribute.</error>');
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         // Find all instances of `braintree_customer_id` in the customer entity table
@@ -192,7 +174,7 @@ class VaultMigrate extends Command
 
         if (!$storedCards) {
             $output->writeln('<error>Could not find any stored cards.</error>');
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         // For each record, look up the Braintree ID
@@ -200,14 +182,14 @@ class VaultMigrate extends Command
 
         if (!$braintreeCustomers) {
             $output->writeln('<error>Could not find any matching customers in Magento 2.</error>');
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         $this->customers = $this->remapCustomerData($braintreeCustomers);
 
         if (!$this->customers) {
             $output->writeln('<error>Could not remap Customer data.</error>');
-            return;
+            return Cli::RETURN_FAILURE;
         }
 
         // For each customer, locate them in the M2 database and save their stored cards
@@ -217,6 +199,8 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Get options list
+     *
      * @return array
      */
     public function getOptionsList(): array
@@ -235,6 +219,8 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Get DB connection
+     *
      * @param string $host
      * @param string $databaseName
      * @param string $username
@@ -256,7 +242,9 @@ class VaultMigrate extends Command
     }
 
     /**
-     * @param $db
+     * Get Eav attribute id
+     *
+     * @param AdapterInterface $db
      * @return string
      */
     private function getEavAttributeId(AdapterInterface $db): string
@@ -268,13 +256,18 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Get stored cards
+     *
      * @param AdapterInterface $db
      * @param OutputInterface $output
-     * @param $eavAttributeId
-     * @return mixed
+     * @param string $eavAttributeId
+     * @return array|false
      */
-    private function getStoredCards(AdapterInterface $db, OutputInterface $output, $eavAttributeId)
-    {
+    private function getStoredCards(
+        AdapterInterface $db,
+        OutputInterface $output,
+        string $eavAttributeId
+    ): false|array {
         $select = $db->select()
             ->join('customer_entity', 'customer_entity.entity_id = customer_entity_varchar.entity_id')
             ->where(self::ATTRIBUTE_ID . ' = ?', $eavAttributeId)
@@ -290,12 +283,14 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Find braintree customers
+     *
      * @param OutputInterface $output
-     * @param $storedCards
+     * @param array $storedCards
      * @return array
      * @throws NotFound
      */
-    private function findBraintreeCustomers(OutputInterface $output, $storedCards): array
+    private function findBraintreeCustomers(OutputInterface $output, array $storedCards): array
     {
         $customers = [];
         foreach ($storedCards as $storedCard) {
@@ -307,10 +302,12 @@ class VaultMigrate extends Command
     }
 
     /**
-     * @param $customers
+     * Remap customer data
+     *
+     * @param array $customers
      * @return array
      */
-    public function remapCustomerData($customers): array
+    public function remapCustomerData(array $customers): array
     {
         $remappedCustomerData = [];
 
@@ -341,10 +338,12 @@ class VaultMigrate extends Command
     }
 
     /**
+     * Migrate stored cards
+     *
      * @param OutputInterface $output
      * @param array $customers
      */
-    private function migrateStoredCards(OutputInterface $output, array $customers)
+    private function migrateStoredCards(OutputInterface $output, array $customers): void
     {
         $websites = $this->storeManager->getWebsites();
 
@@ -359,7 +358,9 @@ class VaultMigrate extends Command
 
                     foreach ($customer['storedCards'] as $storedCard) {
                         // Create new vault payment token.
-                        $vaultPaymentToken = $this->paymentToken->create(PaymentTokenFactory::TOKEN_TYPE_CREDIT_CARD);
+                        $vaultPaymentToken = $this->paymentToken->create(
+                            PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD
+                        );
                         $vaultPaymentToken->setCustomerId($m2Customer->getId());
                         $vaultPaymentToken->setPaymentMethodCode('braintree');
                         $vaultPaymentToken->setExpiresAt(

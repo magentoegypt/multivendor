@@ -7,13 +7,15 @@ namespace Laminas\Router\Http;
 use Laminas\I18n\Translator\TranslatorAwareInterface;
 use Laminas\I18n\Translator\TranslatorInterface as Translator;
 use Laminas\Router\Exception;
-use Laminas\Stdlib\RequestInterface as Request;
+use Laminas\Stdlib\RequestInterface;
+use Override;
 
 /**
  * Translator aware tree route stack.
  *
- * @template TRoute of RouteInterface
+ * @template TRoute of HttpRouteInterface
  * @template-extends TreeRouteStack<TRoute>
+ * @final
  */
 class TranslatorAwareTreeRouteStack extends TreeRouteStack implements TranslatorAwareInterface
 {
@@ -39,14 +41,11 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
     protected $translatorTextDomain = 'default';
 
     /**
-     * match(): defined by \Laminas\Router\RouteInterface
-     *
-     * @see    \Laminas\Router\RouteInterface::match()
-     *
-     * @param  integer|null $pathOffset
-     * @return RouteMatch|null
+     * @inheritDoc
+     * @param int|null $pathOffset
      */
-    public function match(Request $request, $pathOffset = null, array $options = [])
+    #[Override]
+    public function match(RequestInterface $request, $pathOffset = null, array $options = [])
     {
         if ($this->hasTranslator() && $this->isTranslatorEnabled() && ! isset($options['translator'])) {
             $options['translator'] = $this->getTranslator();
@@ -60,14 +59,11 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
     }
 
     /**
-     * assemble(): defined by \Laminas\Router\RouteInterface interface.
-     *
-     * @see    \Laminas\Router\RouteInterface::assemble()
-     *
-     * @return mixed
+     * @inheritDoc
      * @throws Exception\InvalidArgumentException
      * @throws Exception\RuntimeException
      */
+    #[Override]
     public function assemble(array $params = [], array $options = [])
     {
         if ($this->hasTranslator() && $this->isTranslatorEnabled() && ! isset($options['translator'])) {
@@ -89,6 +85,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      * @param  string     $textDomain
      * @return TreeRouteStack
      */
+    #[Override]
     public function setTranslator(?Translator $translator = null, $textDomain = null)
     {
         $this->translator = $translator;
@@ -107,6 +104,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      *
      * @return Translator
      */
+    #[Override]
     public function getTranslator()
     {
         return $this->translator;
@@ -119,6 +117,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      *
      * @return bool
      */
+    #[Override]
     public function hasTranslator()
     {
         return $this->translator !== null;
@@ -132,6 +131,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      * @param  bool $enabled
      * @return TreeRouteStack
      */
+    #[Override]
     public function setTranslatorEnabled($enabled = true)
     {
         $this->translatorEnabled = $enabled;
@@ -145,6 +145,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      *
      * @return bool
      */
+    #[Override]
     public function isTranslatorEnabled()
     {
         return $this->translatorEnabled;
@@ -158,6 +159,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      * @param  string $textDomain
      * @return self
      */
+    #[Override]
     public function setTranslatorTextDomain($textDomain = 'default')
     {
         $this->translatorTextDomain = $textDomain;
@@ -172,6 +174,7 @@ class TranslatorAwareTreeRouteStack extends TreeRouteStack implements Translator
      *
      * @return string
      */
+    #[Override]
     public function getTranslatorTextDomain()
     {
         return $this->translatorTextDomain;

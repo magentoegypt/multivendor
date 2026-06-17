@@ -17,6 +17,7 @@ use Laminas\ServiceManager\ConfigInterface;
  * @see ConfigInterface
  *
  * @psalm-import-type ServiceManagerConfigurationType from ConfigInterface
+ * @final
  */
 class ConfigProvider
 {

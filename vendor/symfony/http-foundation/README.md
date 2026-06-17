@@ -7,10 +7,7 @@ specification.
 Sponsor
 -------
 
-The HttpFoundation component for Symfony 5.4/6.0 is [backed][1] by [Laravel][2].
-
-Laravel is a PHP web development framework that is passionate about maximum developer
-happiness. Laravel is built using a variety of bespoke and Symfony based components.
+This package is looking for a [backer][1].
 
 Help Symfony by [sponsoring][3] its development!
 
@@ -24,5 +21,4 @@ Resources
    in the [main Symfony repository](https://github.com/symfony/symfony)
 
 [1]: https://symfony.com/backers
-[2]: https://laravel.com/
 [3]: https://symfony.com/sponsor

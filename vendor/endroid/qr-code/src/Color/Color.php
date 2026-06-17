@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Endroid\QrCode\Color;
 
-final class Color implements ColorInterface
+final readonly class Color implements ColorInterface
 {
     public function __construct(
+        /** @var int<0, 255> */
         private int $red,
+        /** @var int<0, 255> */
         private int $green,
+        /** @var int<0, 255> */
         private int $blue,
-        private int $alpha = 0
+        /** @var int<0, 127> */
+        private int $alpha = 0,
     ) {
     }
 

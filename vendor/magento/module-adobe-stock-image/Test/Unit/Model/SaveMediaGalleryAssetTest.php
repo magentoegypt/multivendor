@@ -1,7 +1,7 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Copyright 2024 Adobe
+ * All Rights Reserved.
  */
 declare(strict_types=1);
 
@@ -19,6 +19,7 @@ use Magento\MediaGalleryApi\Api\Data\AssetInterface;
 use Magento\MediaGalleryApi\Api\GetAssetsByPathsInterface;
 use Magento\MediaGalleryApi\Api\SaveAssetsInterface;
 use Magento\MediaGallerySynchronizationApi\Api\SynchronizeFilesInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -90,14 +91,15 @@ class SaveMediaGalleryAssetTest extends TestCase
     /**
      * Verify successful save of a media gallery asset id.
      *
-     * @dataProvider imageDataProvider
-     * @param Document $document
+     * @param \Closure $document
      * @param string $path
      * @throws CouldNotSaveException
      * @throws LocalizedException
      */
-    public function testExecute(Document $document, string $path): void
+    #[DataProvider('imageDataProvider')]
+    public function testExecute(\Closure $document, string $path): void
     {
+        $document = $document($this);
         $asset = $this->createMock(AssetInterface::class);
         $assetId = 42;
 
@@ -132,16 +134,22 @@ class SaveMediaGalleryAssetTest extends TestCase
         );
     }
 
+    protected function getMockForDocumentClass()
+    {
+        return $this->createMock(Document::class);
+    }
+
     /**
      * Data provider for testExecute
      *
      * @return array[]
      */
-    public function imageDataProvider(): array
+    public static function imageDataProvider(): array
     {
+        $document = static fn (self $testCase) => $testCase->getMockForDocumentClass();
         return [
             [
-                $this->createMock(Document::class),
+                $document,
                 'catalog/test-image.jpeg'
             ]
         ];

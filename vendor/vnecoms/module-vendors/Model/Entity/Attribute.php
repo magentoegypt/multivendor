@@ -5,7 +5,7 @@
  */
 namespace Vnecoms\Vendors\Model\Entity;
 
-class Attribute extends \Magento\Eav\Model\Attribute
+class Attribute extends \Magento\Eav\Model\Entity\Attribute
 {
     /**
      * Detect backend storage type using frontend input type
