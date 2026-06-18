@@ -7,7 +7,11 @@
           indexPriority="40"
           sortOrder="55">
         <priceModel instance="Magento\Bundle\Model\Product\Price"/>
-        <indexerModel instance="Magento\Bundle\Model\ResourceModel\Indexer\Price"/>
+        <!-- Custom price indexer: the core bundle indexer hard-filters type_id='bundle' and skips
+             new_bundle, leaving these products with no catalog_product_index_price rows (which the
+             frontend product collection INNER JOINs), so they never appear in listings/search.
+             This copy filters type_id='new_bundle'. -->
+        <indexerModel instance="MagentoEgypt\BundleExtend\Model\ResourceModel\Indexer\Price"/>
         <stockIndexerModel instance="Magento\Bundle\Model\ResourceModel\Indexer\Stock"/>
         <allowedSelectionTypes>
             <type name="simple"/>

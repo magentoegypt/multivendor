@@ -80,4 +80,23 @@
     <type name="Magento\Quote\Model\Quote\Item\AbstractItem">
         <plugin name="bundle_discount_cart_final" type="MagentoEgypt\BundleExtend\Plugin\Model\QuoteItemPrice"/>
     </type>
+
+    <!-- Composite-product batch handling for new_bundle price reindex (mirrors core 'bundle' registration). -->
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Indexer\Price\BatchSizeCalculator">
+        <arguments>
+            <argument name="estimators" xsi:type="array">
+                <item name="new_bundle" xsi:type="object">Magento\Catalog\Model\Indexer\Price\CompositeProductBatchSizeManagement</item>
+            </argument>
+            <argument name="batchSizeAdjusters" xsi:type="array">
+                <item name="new_bundle" xsi:type="object">Magento\Catalog\Model\ResourceModel\Product\Indexer\Price\CompositeProductBatchSizeAdjuster</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\CatalogInventory\Model\Indexer\Stock\Action\Full">
+        <arguments>
+            <argument name="batchRowsCount" xsi:type="array">
+                <item name="new_bundle" xsi:type="number">136</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
