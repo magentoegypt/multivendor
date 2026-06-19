@@ -61,6 +61,133 @@ class Otp extends AbstractHelper
         return $customer->getId() ?? null;
     }
 
+    /**
+     * Canonical Egyptian E.164 form (+20XXXXXXXXXX) of a value, or null when it is
+     * not recognisable as an Egyptian mobile (national = 10 digits starting with "1").
+     *
+     * @param string $raw
+     * @return string|null
+     */
+    public function normalizeEgyptianMobile($raw)
+    {
+        $digits = preg_replace('/\D+/', '', (string)$raw);
+        if ($digits === '') {
+            return null;
+        }
+
+        $national = $digits;
+        if (strlen($digits) === 12 && strpos($digits, '20') === 0) {
+            $national = substr($digits, 2);            // 20XXXXXXXXXX
+        } elseif (strlen($digits) === 13 && strpos($digits, '020') === 0) {
+            $national = substr($digits, 3);            // 020XXXXXXXXXX
+        } elseif (strlen($digits) === 11 && $digits[0] === '0') {
+            $national = substr($digits, 1);            // 0XXXXXXXXXX
+        }
+
+        if (strlen($national) === 10 && $national[0] === '1') {
+            return '+20' . $national;
+        }
+
+        return null;
+    }
+
+    /**
+     * Build the set of stored mobilenumber strings considered equivalent to the
+     * supplied number, to cope with the inconsistent formats in
+     * customer_entity.mobilenumber (+20XXXXXXXXXX / 20XXXXXXXXXX / 0XXXXXXXXXX / XXXXXXXXXX).
+     *
+     * Country-aware: a value given in explicit international form for a NON-Egyptian
+     * country (leading "+" and not +20) is matched exactly only — it is never folded
+     * into an Egyptian national number, so e.g. "+1001234567" cannot resolve an
+     * Egyptian "+201001234567" account.
+     *
+     * @param string $input
+     * @return string[]
+     */
+    public function normalizeMobileCandidates($input)
+    {
+        $input  = trim((string)$input);
+        $digits = preg_replace('/\D+/', '', $input);
+        if ($digits === '') {
+            return [];
+        }
+
+        // Explicit foreign E.164 (+, but not Egypt): exact match only.
+        if (isset($input[0]) && $input[0] === '+' && strpos($digits, '20') !== 0) {
+            return ['+' . $digits, $digits];
+        }
+
+        $candidates = [];
+        $eg = $this->normalizeEgyptianMobile($input);
+        if ($eg !== null) {
+            $national = substr($eg, 3); // drop the leading "+20"
+            $candidates['+20' . $national] = true;
+            $candidates['20' . $national]  = true;
+            $candidates['0' . $national]   = true;
+            $candidates[$national]         = true;
+        } else {
+            $candidates[$digits]       = true;
+            $candidates['+' . $digits] = true;
+        }
+
+        return array_keys($candidates);
+    }
+
+    /**
+     * Canonical, deliverable number for sending an OTP to a resolved customer.
+     * Returns Egyptian E.164 when derivable, an already-international number as-is,
+     * otherwise null (the caller must refuse to send rather than guess a destination).
+     *
+     * @param string $stored
+     * @return string|null
+     */
+    public function canonicalizeMobileForDelivery($stored)
+    {
+        $stored = trim((string)$stored);
+        if ($stored === '') {
+            return null;
+        }
+
+        $eg = $this->normalizeEgyptianMobile($stored);
+        if ($eg !== null) {
+            return $eg;
+        }
+
+        if ($stored[0] === '+') {
+            $digits = preg_replace('/\D+/', '', $stored);
+            return $digits !== '' ? '+' . $digits : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve every customer whose stored mobile number matches the supplied
+     * number (any of the equivalent formats). Returns the matched customer
+     * models. More than one result means the number is ambiguous and the caller
+     * must NOT log anyone in.
+     *
+     * @param string $input
+     * @return \Magento\Customer\Model\Customer[]
+     */
+    public function getCustomersByMobile($input)
+    {
+        $candidates = $this->normalizeMobileCandidates($input);
+        if (!$candidates) {
+            return [];
+        }
+
+        $collection = $this->customerCollectionFactory->create();
+        $collection->addAttributeToFilter('mobilenumber', ['in' => $candidates]);
+
+        $customers = [];
+        foreach ($collection as $customer) {
+            $customers[$customer->getId()] = $customer;
+        }
+
+        return array_values($customers);
+    }
+
     public function generateToken($customerId)
     {
         return $this->tokenFactory->create()->createCustomerToken($customerId)->getToken();

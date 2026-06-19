@@ -121,6 +121,7 @@ define([
                     mobile : this.mobileNumber,
                     secure_key: this.secureKey,
                     resend : isResend,
+                    form_key: $('#login-form input[name="form_key"]').val()
                 },
                 dataType: "json"
             }).done(function( response ){
@@ -183,7 +184,8 @@ define([
                 data: {
                     mobile : this.mobileNumber,
                     secure_key: this.secureKey,
-                    otp: otp
+                    otp: otp,
+                    form_key: $('#login-form input[name="form_key"]').val()
                 },
                 dataType: "json"
             }).done(function( response ){

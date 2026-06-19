@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!--
+        Make the storefront "Mobile" login tab resolve the account from the typed
+        mobile number instead of the (empty) e-mail field.
+    -->
+    <preference for="Vnecoms\Sms\Controller\Login\LoginPost"
+                type="MagentoEgypt\SmsExtend\Controller\Login\LoginPost"/>
+
+    <!-- Brute-force protection for the OTP-login verify endpoint. -->
+    <type name="Vnecoms\Sms\Controller\Otp\Login\Verify">
+        <plugin name="megp_otp_login_verify_rate_limit"
+                type="MagentoEgypt\SmsExtend\Plugin\OtpLoginVerifyRateLimit"/>
+    </type>
+</config>
