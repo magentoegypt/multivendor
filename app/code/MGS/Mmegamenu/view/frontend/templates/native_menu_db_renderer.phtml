@@ -1,0 +1,318 @@
+<?php
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$resource = $objectManager->get(\Magento\Framework\App\ResourceConnection::class);
+$storeManager = $objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
+$connection = $resource->getConnection();
+$store = $storeManager->getStore();
+$storeId = (int) $store->getId();
+$rootId = (int) $store->getRootCategoryId();
+
+$categoryTable = $resource->getTableName('catalog_category_entity');
+$varcharTable = $resource->getTableName('catalog_category_entity_varchar');
+$intTable = $resource->getTableName('catalog_category_entity_int');
+$urlRewriteTable = $resource->getTableName('url_rewrite');
+
+$entityTypeId = (int) $connection->fetchOne(
+    "SELECT entity_type_id FROM eav_entity_type WHERE entity_type_code = 'catalog_category'"
+);
+$attributes = $connection->fetchPairs(
+    "SELECT attribute_code, attribute_id FROM eav_attribute
+     WHERE entity_type_id = ? AND attribute_code IN ('name', 'is_active', 'include_in_menu')",
+    [$entityTypeId]
+);
+
+if (empty($attributes['name']) || empty($attributes['is_active'])) {
+    return;
+}
+
+$hiddenCategoryIds = [3, 7, 9, 29, 37];
+$categories = $connection->fetchAll(
+    "SELECT c.entity_id, c.parent_id, c.position,
+            COALESCE(name_store.value, name_default.value) AS name,
+            COALESCE(active_store.value, active_default.value, 1) AS is_active,
+            COALESCE(menu_store.value, menu_default.value, 1) AS include_in_menu,
+            ur.request_path
+     FROM {$categoryTable} c
+     LEFT JOIN {$varcharTable} name_default
+        ON name_default.entity_id = c.entity_id
+        AND name_default.attribute_id = ?
+        AND name_default.store_id = 0
+     LEFT JOIN {$varcharTable} name_store
+        ON name_store.entity_id = c.entity_id
+        AND name_store.attribute_id = ?
+        AND name_store.store_id = ?
+     LEFT JOIN {$intTable} active_default
+        ON active_default.entity_id = c.entity_id
+        AND active_default.attribute_id = ?
+        AND active_default.store_id = 0
+     LEFT JOIN {$intTable} active_store
+        ON active_store.entity_id = c.entity_id
+        AND active_store.attribute_id = ?
+        AND active_store.store_id = ?
+     LEFT JOIN {$intTable} menu_default
+        ON menu_default.entity_id = c.entity_id
+        AND menu_default.attribute_id = ?
+        AND menu_default.store_id = 0
+     LEFT JOIN {$intTable} menu_store
+        ON menu_store.entity_id = c.entity_id
+        AND menu_store.attribute_id = ?
+        AND menu_store.store_id = ?
+     LEFT JOIN {$urlRewriteTable} ur
+        ON ur.entity_type = 'category'
+        AND ur.entity_id = c.entity_id
+        AND ur.store_id = ?
+        AND ur.redirect_type = 0
+     WHERE (c.parent_id = ? OR c.parent_id IN (
+         SELECT entity_id FROM {$categoryTable} WHERE parent_id = ?
+     ))
+        AND c.entity_id NOT IN (?)
+     ORDER BY c.parent_id ASC, c.position ASC, c.entity_id ASC",
+    [
+        (int) $attributes['name'],
+        (int) $attributes['name'],
+        $storeId,
+        (int) $attributes['is_active'],
+        (int) $attributes['is_active'],
+        $storeId,
+        (int) ($attributes['include_in_menu'] ?? 0),
+        (int) ($attributes['include_in_menu'] ?? 0),
+        $storeId,
+        $storeId,
+        $rootId,
+        $rootId,
+        $hiddenCategoryIds,
+    ]
+);
+
+$baseUrl = $store->getBaseUrl();
+$byParent = [];
+foreach ($categories as $category) {
+    if (
+        !(int) $category['is_active']
+        || !(int) $category['include_in_menu']
+        || trim((string) $category['name']) === ''
+    ) {
+        continue;
+    }
+
+    $url = !empty($category['request_path'])
+        ? $baseUrl . ltrim((string) $category['request_path'], '/')
+        : $baseUrl . 'catalog/category/view/id/' . (int) $category['entity_id'];
+
+    $byParent[(int) $category['parent_id']][] = [
+        'id' => (int) $category['entity_id'],
+        'name' => (string) $category['name'],
+        'url' => $url,
+    ];
+}
+
+$topItems = $byParent[$rootId] ?? [];
+$nativeMenuId = (string) ($block->getData('native_menu_id') ?: 'me-main-category-menu');
+$nativeMenuClass = (string) ($block->getData('native_menu_class') ?: 'me-category-menu');
+$localeCode = (string) $objectManager->get(\Magento\Framework\Locale\ResolverInterface::class)->getLocale();
+$isRtl = strpos($localeCode, 'ar') === 0;
+$directionClass = $isRtl ? 'me-menu-rtl' : 'me-menu-ltr';
+?>
+<?php if (!empty($topItems)): ?>
+    <style>
+        .megamenu_action,
+        .megamenu_action_mb,
+        .close-menu-site {
+            display: none !important;
+        }
+        .me-native-menu-wrapper {
+            background: #061b5f !important;
+            clear: both !important;
+            height: 56px !important;
+            min-height: 56px !important;
+            overflow: visible !important;
+            position: relative !important;
+            z-index: 400 !important;
+        }
+        .me-native-menu-wrapper *,
+        .me-native-menu-wrapper *:before,
+        .me-native-menu-wrapper *:after {
+            box-sizing: border-box !important;
+        }
+        .me-native-menu-wrapper .me-category-menu {
+            align-items: stretch !important;
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            height: 56px !important;
+            justify-content: flex-start !important;
+            list-style: none !important;
+            margin: 0 !important;
+            overflow: visible !important;
+            padding: 0 18px !important;
+            position: relative !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+        }
+        .me-native-menu-wrapper .me-category-menu li {
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .me-native-menu-wrapper .me-nav-item {
+            flex: 0 0 auto !important;
+            height: 56px !important;
+            position: relative !important;
+        }
+        .me-native-menu-wrapper .me-nav-link {
+            align-items: center !important;
+            color: #ffffff !important;
+            display: flex !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            height: 56px !important;
+            line-height: 1.2 !important;
+            padding: 0 12px !important;
+            text-decoration: none !important;
+        }
+        .me-native-menu-wrapper .me-nav-item:hover > .me-nav-link,
+        .me-native-menu-wrapper .me-nav-item:focus-within > .me-nav-link,
+        .me-native-menu-wrapper .me-nav-item.me-open > .me-nav-link {
+            background: rgba(255, 255, 255, .13) !important;
+            color: #ffffff !important;
+        }
+        .me-native-menu-wrapper .me-sub-panel {
+            background: #ffffff !important;
+            border: 1px solid rgba(6, 27, 95, .08) !important;
+            box-shadow: 0 16px 34px rgba(6, 27, 95, .22) !important;
+            display: none !important;
+            min-width: 230px !important;
+            opacity: 0 !important;
+            padding: 8px 0 !important;
+            position: absolute !important;
+            top: 56px !important;
+            visibility: hidden !important;
+            z-index: 99999 !important;
+        }
+        .me-native-menu-wrapper .me-nav-item:hover > .me-sub-panel,
+        .me-native-menu-wrapper .me-nav-item:focus-within > .me-sub-panel,
+        .me-native-menu-wrapper .me-nav-item.me-open > .me-sub-panel {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        .me-native-menu-wrapper .me-sub-link {
+            color: #10203f !important;
+            display: block !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            line-height: 1.35 !important;
+            padding: 10px 15px !important;
+            text-decoration: none !important;
+            white-space: nowrap !important;
+        }
+        .me-native-menu-wrapper .me-sub-link:hover,
+        .me-native-menu-wrapper .me-sub-link:focus {
+            background: #f3f6fb !important;
+            color: #061b5f !important;
+        }
+        .me-native-menu-wrapper.me-menu-rtl .me-category-menu {
+            direction: rtl !important;
+        }
+        .me-native-menu-wrapper.me-menu-rtl .me-sub-panel {
+            direction: rtl !important;
+            left: auto !important;
+            right: 0 !important;
+            text-align: right !important;
+        }
+        .me-native-menu-wrapper.me-menu-rtl .me-sub-link {
+            direction: rtl !important;
+            text-align: right !important;
+        }
+        .me-native-menu-wrapper.me-menu-ltr .me-category-menu {
+            direction: ltr !important;
+        }
+        .me-native-menu-wrapper.me-menu-ltr .me-sub-panel {
+            direction: ltr !important;
+            left: 0 !important;
+            right: auto !important;
+            text-align: left !important;
+        }
+        .me-native-menu-wrapper.me-menu-ltr .me-sub-link {
+            direction: ltr !important;
+            text-align: left !important;
+        }
+        @media (max-width: 991px) {
+            .me-native-menu-wrapper {
+                height: auto !important;
+                min-height: 56px !important;
+            }
+            .me-native-menu-wrapper .me-category-menu {
+                overflow-x: auto !important;
+                overflow-y: visible !important;
+                padding-bottom: 0 !important;
+                scrollbar-width: none !important;
+            }
+            .me-native-menu-wrapper .me-category-menu::-webkit-scrollbar {
+                display: none !important;
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            var currentScript = document.currentScript;
+            if (currentScript && currentScript.parentElement) {
+                currentScript.parentElement.classList.add('<?php echo $directionClass; ?>');
+                currentScript.parentElement.setAttribute('dir', '<?php echo $isRtl ? 'rtl' : 'ltr'; ?>');
+            }
+        })();
+    </script>
+    <ul id="<?php echo htmlspecialchars($nativeMenuId, ENT_QUOTES, 'UTF-8'); ?>"
+        class="<?php echo htmlspecialchars($nativeMenuClass, ENT_QUOTES, 'UTF-8'); ?>">
+        <?php foreach ($topItems as $item): ?>
+            <?php $children = $byParent[$item['id']] ?? []; ?>
+            <li class="me-nav-item<?php echo !empty($children) ? ' me-has-children' : ''; ?>">
+                <a class="me-nav-link" href="<?php echo htmlspecialchars($item['url'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <span><?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?></span>
+                </a>
+                <?php if (!empty($children)): ?>
+                    <div class="me-sub-panel" dir="<?php echo $isRtl ? 'rtl' : 'ltr'; ?>">
+                        <?php foreach ($children as $child): ?>
+                            <a class="me-sub-link" href="<?php echo htmlspecialchars($child['url'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <?php echo htmlspecialchars($child['name'], ENT_QUOTES, 'UTF-8'); ?>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+    <script>
+        (function () {
+            var menu = document.getElementById('<?php echo addslashes($nativeMenuId); ?>');
+            if (!menu || menu.dataset.meDropdownReady === '1') {
+                return;
+            }
+            menu.dataset.meDropdownReady = '1';
+            menu.addEventListener('click', function (event) {
+                var item = event.target.closest('.me-has-children');
+                if (!item || !menu.contains(item)) {
+                    return;
+                }
+                if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+                    return;
+                }
+                if (!item.classList.contains('me-open')) {
+                    event.preventDefault();
+                    Array.prototype.forEach.call(menu.querySelectorAll('.me-open'), function (openItem) {
+                        if (openItem !== item) {
+                            openItem.classList.remove('me-open');
+                        }
+                    });
+                    item.classList.add('me-open');
+                }
+            });
+            document.addEventListener('click', function (event) {
+                if (!menu.contains(event.target)) {
+                    Array.prototype.forEach.call(menu.querySelectorAll('.me-open'), function (openItem) {
+                        openItem.classList.remove('me-open');
+                    });
+                }
+            });
+        })();
+    </script>
+<?php endif; ?>

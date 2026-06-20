@@ -1,11 +1,12 @@
-<?php $megaMenu = $this->getMegamenuItems(); ?>
-<?php $helper = $this->helper('MGS\Mmegamenu\Helper\Data') ?>
-<?php if($megaMenu->getSize()>0):?>
-	<ul id="horizontal-menu-<?php echo $this->getMenuId()?>" class="horizontal-menu nav nav-pills nav-main">
-		<?php $i=0; foreach($megaMenu as $item): $i++ ?>
-			<li class="<?php echo $this->getClass($item) ?>">
-				<?php echo $helper->generateContentFilter($item->getSubContent()); ?>
-			</li>
-		<?php endforeach ?>
-	</ul>
-<?php endif ?>
+<?php
+/**
+ * Magento Egypt stable storefront menu.
+ *
+ * Keep horizontal menu output aligned with the main navigation renderer.
+ */
+$block->setData('native_menu_id', 'me-horizontal-category-menu');
+$block->setData('native_menu_class', 'me-category-menu');
+?>
+<nav class="navigation mgs-megamenu--main me-native-menu-wrapper" role="navigation" aria-label="Category menu">
+    <?php include $block->getTemplateFile('MGS_Mmegamenu::native_menu_db_renderer.phtml'); ?>
+</nav>

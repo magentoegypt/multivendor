@@ -61,7 +61,6 @@
 		<?php endif ?>
 
 		<div class="middle-header">
-			<div class="megamenu_action mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 			<?= $block->getChildHtml('logo') ?>
 
 			<div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
@@ -127,7 +126,6 @@
 							</div>
 						<?php endif ?>
 					<?php endif ?>
-				<div class="megamenu_action tablet"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 			</div>
 			<?php endif ?>
 		</div>
@@ -205,7 +203,6 @@
                                 </div>
                             <?php endif ?>
                         <?php endif ?>
-                    <div class="megamenu_action deskop"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
                 </div>
                 <?php endif ?>
             </div>
@@ -221,7 +218,6 @@
         <?php endif ?>
 		<div class="frame">
             <div class="middle-header">
-                <div class="megamenu_action mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
                 <?= $block->getChildHtml('logo') ?>
 
                 <?php if(in_array('minicart', $blockEnable) || in_array('wishlist', $blockEnable) || in_array('search', $blockEnable) || in_array('account', $blockEnable) || in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
@@ -278,12 +274,10 @@
                                 </div>
                             <?php endif ?>
                         <?php endif ?>
-                    <div class="megamenu_action tablet"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
                 </div>
                 <?php endif ?>
             </div>
             <div class="middle-header">
-                <div class="megamenu_action deskop"><button class="megamenu_action_mb" type="button"><span><?= __('Menu');?></span><i class="icon-menu"></i><i class="icon-cross"></i></button></div>
                 <?= $this->getLayout()->createBlock('MGS\Mmegamenu\Block\Vertical')->setData('menu_id',2)->setTemplate('MGS_Mmegamenu::vertical.phtml')->toHtml(); ?>
                 <div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
                     <button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
@@ -366,7 +360,6 @@
                             </div>
                         <?php endif ?>
                     <?php endif ?>
-                <div class="megamenu_action deskop"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
             </div>
             <?php endif ?>
         </div>
@@ -399,7 +392,6 @@
 			</div>
 		</div>
 		<div class="middle-header">
-			<div class="megamenu_action mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 			<?= $block->getChildHtml('logo') ?>
 
 			<div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
@@ -436,7 +428,6 @@
 						<?= $block->getChildHtml('quotation') ?>
 					<?php endif ?>
 
-				<div class="megamenu_action tablet"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 
 				<?php if(in_array('store', $blockEnable) || in_array('curency', $blockEnable) || in_array('static1', $blockEnable) || in_array('static2', $blockEnable)): ?>
 					<?php if($settingContentCondition): ?>
@@ -545,7 +536,6 @@
                             </div>
                         <?php endif ?>
                     <?php endif ?>
-                    <div class="megamenu_action deskop"><button class="megamenu_action_mb" type="button"><span><?= __('Menu');?></span><i class="icon-menu"></i></button></div>
             </div>
             <?php endif ?>
         </div>
@@ -599,7 +589,6 @@
 						</div>
 					</div>
 					<?php endif ?>
-					<div class="megamenu_action tablet  mobile"><button class="megamenu_action_mb" type="button"><span class="icon-menu"></span></button></div>
 				</div>
 			<?php endif ?>
 		</div>

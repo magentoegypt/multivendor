@@ -14,7 +14,8 @@ class ProductSections
 	protected $productLinks = [];
 	protected $linkedSkus = [];
 	protected $rootCats = [];
-	
+	protected $storeId = null;
+
 	protected $productCollectionFactory;
 	protected $productRepository;
 	protected $productVisibility;
@@ -39,9 +40,30 @@ class ProductSections
 		$this->storeManager = $storeManager;
 	}
 
+	/**
+	 * Resolve a valid storefront store id. In a cron context the current store
+	 * defaults to the admin store (0), which has no catalog_category_product_index_store0
+	 * table and makes every storefront product collection query fail. Bind the
+	 * collections to a real store view instead.
+	 */
+	protected function resolveStoreId()
+	{
+		$store = $this->storeManager->getDefaultStoreView();
+		if (!$store) {
+			foreach ($this->storeManager->getStores() as $candidate) {
+				$store = $candidate;
+				break;
+			}
+		}
+		return $store ? (int) $store->getId() : \Magento\Store\Model\Store::DEFAULT_STORE_ID;
+	}
+
 	public function execute()
 	{
+		$this->storeId = $this->resolveStoreId();
+
 		$collection = $this->productCollectionFactory->create();
+		$collection->setStoreId($this->storeId);
 		$collection->addAttributeToFilter('sku', 'test item');
 		$collection->addAttributeToFilter('status', ['in' => $this->productStatus->getVisibleStatusIds()]);
     	$collection->setVisibility($this->productVisibility->getVisibleInSiteIds());
@@ -65,6 +87,7 @@ class ProductSections
 		$this->linkedSkus = [];
 
 		$collection = $this->productCollectionFactory->create();
+		$collection->setStoreId($this->storeId);
 		$collection->addAttributeToFilter('status', ['in' => $this->productStatus->getVisibleStatusIds()]);
 		$collection->addAttributeToFilter('approval', ProductApproval::STATUS_APPROVED);
     	$collection->setVisibility($this->productVisibility->getVisibleInSiteIds());
@@ -94,6 +117,7 @@ class ProductSections
 	protected function addUpsell($isNotVendor = 0)
 	{
 		$collection = $this->productCollectionFactory->create();
+		$collection->setStoreId($this->storeId);
 		$collection->addAttributeToFilter('status', ['in' => $this->productStatus->getVisibleStatusIds()]);
 		$collection->addAttributeToFilter('approval', ProductApproval::STATUS_APPROVED);
     	$collection->setVisibility($this->productVisibility->getVisibleInSiteIds());
@@ -121,6 +145,7 @@ class ProductSections
 	protected function addCrossSell($isNotVendor = 0)
 	{
 		$collection = $this->productCollectionFactory->create();
+		$collection->setStoreId($this->storeId);
 		$collection->addAttributeToFilter('status', ['in' => $this->productStatus->getVisibleStatusIds()]);
 		$collection->addAttributeToFilter('approval', ProductApproval::STATUS_APPROVED);
     	$collection->setVisibility($this->productVisibility->getVisibleInSiteIds());
