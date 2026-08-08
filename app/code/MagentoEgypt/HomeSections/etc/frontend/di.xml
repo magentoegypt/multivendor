@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--
+        sortOrder 100 so this runs AFTER Magento_ConfigurableProduct's
+        `configurable_product_widget_product_list` plugin, which is declared at
+        sortOrder 2 and is what overruns the count. See the plugin class for the
+        measurements.
+    -->
+    <type name="Magento\CatalogWidget\Block\Product\ProductsList">
+        <plugin name="magentoegypt_enforce_products_count"
+                type="MagentoEgypt\HomeSections\Plugin\CatalogWidget\EnforceProductsCount"
+                sortOrder="100"/>
+    </type>
+</config>

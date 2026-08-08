@@ -89,10 +89,16 @@
     margin: 0;
 }
 
-.hm-rail--hm-home-rail-grocery,
-.hm-rail--hm-home-rail-fashion,
-.hm-rail--hm-home-rail-beauty,
-.hm-rail--hm-home-rail-furniture {
+//  SPECIFICITY, and it is a trap worth naming: `.block.widget .block-title h2`
+//  above is (0,3,1), because `.block.widget` is TWO classes on one compound. A
+//  rail override written as `.hm-rail--… .block-title h2` is only (0,2,1) and
+//  loses silently — these four headings stayed at 20px through a whole pass
+//  before the computed styles were read back. Every per-rail override in this
+//  file therefore carries `.block.widget` as well.
+.block.widget.hm-rail--hm-home-rail-grocery,
+.block.widget.hm-rail--hm-home-rail-fashion,
+.block.widget.hm-rail--hm-home-rail-beauty,
+.block.widget.hm-rail--hm-home-rail-furniture {
     .block-title h2 { font-size: 1.8rem; }
 }
 
@@ -619,6 +625,14 @@
         padding-block-start: var(--hm-space-2);
     }
 
+    //  NAVY, not the accent. Figma prices its cards `text-[#0f2144]` and keeps
+    //  orange for the badge, the vendor line and the cart button — with an orange
+    //  price the card had three competing accents and none of them read as the
+    //  primary one. It is also the more accessible of the two: --hm-price is
+    //  #c2410c at 5.18:1, --hm-foreground is 15.89:1.
+    //
+    //  Scoped to the card rather than changed at the token, because --hm-price is
+    //  shared with the cart and checkout totals, which are not part of this pass.
     .price-box {
         align-items: baseline;
         display: flex;
@@ -626,8 +640,13 @@
         gap: var(--hm-space-1);
         min-inline-size: 0;
 
-        .price { font-size: 1.6rem; }
-        .old-price .price { font-size: 1.2rem; text-decoration: line-through; }
+        .price { color: var(--hm-foreground); font-size: 1.6rem; }
+        .old-price .price {
+            color: var(--hm-price-was);
+            font-size: 1.2rem;
+            font-weight: 400;
+            text-decoration: line-through;
+        }
     }
 
     //  Magento prints "Regular Price" / "Special Price" in front of each amount.
@@ -788,12 +807,18 @@
 
 //  Best Selling is the one six-across rail in the reference; Popular Products is
 //  four across over two rows, like everything else.
-.hm-rail--hm-home-bestsellers .product-items {
+//
+//  `.block.widget` in the selector for the same reason as the headings above:
+//  the generic rule is (0,3,0) and a bare `.hm-rail--…` override is (0,2,0), so
+//  this rail rendered four 303px columns over two rows instead of six 198px
+//  columns in one — 593px of extra page height, and the single largest remaining
+//  difference from the reference once the product counts were fixed.
+.block.widget.hm-rail--hm-home-bestsellers .product-items {
     grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 @media (max-width: 1199px) {
-    .hm-rail--hm-home-bestsellers .product-items { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .block.widget.hm-rail--hm-home-bestsellers .product-items { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 @media (max-width: 767px) {

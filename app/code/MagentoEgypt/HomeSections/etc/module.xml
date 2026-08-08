@@ -12,6 +12,15 @@
     <module name="MagentoEgypt_HomeSections">
         <sequence>
             <module name="Magento_Catalog"/>
+            <!--
+                Magento_ConfigurableProduct must load FIRST. Plugin\CatalogWidget\
+                EnforceProductsCount runs after that module's own
+                ProductsListPlugin and undoes its overrun; without the sequence,
+                the relative order of two plugins on the same method is not
+                guaranteed and the fix would apply intermittently.
+            -->
+            <module name="Magento_ConfigurableProduct"/>
+            <module name="Magento_CatalogWidget"/>
         </sequence>
     </module>
 </config>
