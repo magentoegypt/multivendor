@@ -217,10 +217,26 @@
                 </arguments>
             </block>
 
-            <!-- 6. Bundle deals promo -->
-            <block class="Magento\Cms\Block\Block" name="hm.home.bundles" after="hm.home.rail.furniture">
+            <!--
+                6. Bundle Deals — the navy band, now with real bundle CARDS.
+
+                It was a CMS block (`hm_home_bundles`) rendering a heading and a
+                "Browse bundles" button: an empty promotional band where Figma
+                shows four merchandised bundles. The block reads the catalog's own
+                bundle products, so the rail cannot advertise a bundle that has
+                been disabled or has fallen out of the price index.
+
+                Both `bundle` and `new_bundle` are collected — new_bundle is this
+                project's own type and keeps its options in the core bundle tables.
+
+                The CMS block stays in the database, unreferenced, so the previous
+                copy is recoverable.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\BundleDeals"
+                   name="hm.home.bundles" after="hm.home.rail.furniture"
+                   template="MagentoEgypt_HomeSections::bundle-deals.phtml">
                 <arguments>
-                    <argument name="block_id" xsi:type="string">hm_home_bundles</argument>
+                    <argument name="limit" xsi:type="number">4</argument>
                 </arguments>
             </block>
 

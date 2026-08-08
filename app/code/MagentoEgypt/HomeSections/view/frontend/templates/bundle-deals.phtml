@@ -1,0 +1,136 @@
+<?php
+/**
+ * Hub Market — Bundle Deals rail (Figma: the navy band with four bundle cards).
+ *
+ * The card is one anchor, not an anchor containing a button. The reference nests
+ * its "Add Bundle" <button> inside the card's <a>, which is invalid HTML and
+ * leaves the button unreachable by keyboard in the order a user expects. Here the
+ * CTA is a styled <span> inside the single link, the same pattern the store cards
+ * use — one tab stop, one destination, no nested interactive elements.
+ *
+ * The CTA reads "View Bundle" rather than Figma's "Add Bundle" because it cannot
+ * add: every bundle in this catalog has at least one required option, so Magento
+ * must send the customer to the product page to choose before anything can go in
+ * the cart. Labelling a navigation link "Add" is the kind of small lie that turns
+ * into a support ticket.
+ *
+ * @var \MagentoEgypt\HomeSections\Block\BundleDeals $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$bundles = $block->getBundles();
+if (!$bundles) {
+    return;
+}
+$headingId = 'hm-bundles-title';
+?>
+<section class="hm-bundles" aria-labelledby="<?= $escaper->escapeHtmlAttr($headingId) ?>">
+    <div class="hm-section__head">
+        <div class="hm-section__heading">
+            <h2 class="hm-section__title hm-section__title--bundles" id="<?= $escaper->escapeHtmlAttr($headingId) ?>">
+                <?= $escaper->escapeHtml(__('Bundle Deals')) ?>
+            </h2>
+            <p class="hm-section__sub">
+                <?= $escaper->escapeHtml(__('Buy together, save more — curated multi-item bundles')) ?>
+            </p>
+        </div>
+        <a class="hm-section__more" href="<?= $escaper->escapeUrl($block->getMoreUrl()) ?>">
+            <?= $escaper->escapeHtml(__('All Bundles')) ?>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
+        </a>
+    </div>
+
+    <ul class="hm-bundles__list">
+        <?php foreach ($bundles as $b): ?>
+            <li class="hm-bundles__item">
+                <a class="hm-bundle" href="<?= $escaper->escapeUrl($b['url']) ?>">
+
+                    <span class="hm-bundle__media">
+                        <?php /* alt="" — the title below is the link's accessible text. */ ?>
+                        <img class="hm-bundle__img" src="<?= $escaper->escapeUrl($b['image']) ?>"
+                             alt="" loading="lazy" width="600" height="338"/>
+
+                        <?php if ($b['discount'] > 0 || $b['saving']): ?>
+                            <span class="hm-bundle__badges">
+                                <?php if ($b['discount'] > 0): ?>
+                                    <span class="hm-bundle__badge hm-bundle__badge--pct">
+                                        <?= $escaper->escapeHtml(__('-%1%% Bundle', $b['discount'])) ?>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($b['saving']): ?>
+                                    <span class="hm-bundle__badge hm-bundle__badge--save">
+                                        <?= $escaper->escapeHtml(__('Save %1', $b['saving'])) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </span>
+                        <?php endif; ?>
+
+                        <span class="hm-bundle__count">
+                            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-package"/></svg>
+                            <?php /*
+                                "N items" only when each required option contributes one
+                                product. A single-option bundle is a pick-one, so it says
+                                what it is instead of overcounting sevenfold.
+                            */ ?>
+                            <?= $b['is_kit']
+                                ? $escaper->escapeHtml(__('%1 items', $b['item_count']))
+                                : $escaper->escapeHtml(__('Choose from %1', $b['item_count'])) ?>
+                        </span>
+                    </span>
+
+                    <span class="hm-bundle__body">
+                        <?php if ($b['vendor']): ?>
+                            <span class="hm-bundle__vendor"><?= $escaper->escapeHtml($b['vendor']) ?></span>
+                        <?php endif; ?>
+
+                        <span class="hm-bundle__title"><?= $escaper->escapeHtml($b['name']) ?></span>
+
+                        <?php if ($b['description']): ?>
+                            <span class="hm-bundle__text"><?= $escaper->escapeHtml($b['description']) ?></span>
+                        <?php endif; ?>
+
+                        <?php if ($b['thumbs']): ?>
+                            <span class="hm-bundle__thumbs" aria-hidden="true">
+                                <?php foreach ($b['thumbs'] as $thumb): ?>
+                                    <span class="hm-bundle__thumb">
+                                        <img src="<?= $escaper->escapeUrl($thumb) ?>" alt=""
+                                             loading="lazy" width="48" height="48"/>
+                                    </span>
+                                <?php endforeach; ?>
+                                <?php if ($b['extra'] > 0): ?>
+                                    <span class="hm-bundle__thumb hm-bundle__thumb--more">+<?= (int) $b['extra'] ?></span>
+                                <?php endif; ?>
+                            </span>
+                        <?php endif; ?>
+
+                        <span class="hm-bundle__foot">
+                            <span class="hm-bundle__prices">
+                                <span class="hm-bundle__price">
+                                    <?php /*
+                                        A dynamic bundle has a range, so the cheapest
+                                        configuration is quoted as "From X" — quoting it
+                                        bare would understate what most baskets cost.
+                                    */ ?>
+                                    <?= $b['price_from']
+                                        ? $escaper->escapeHtml(__('From %1', $b['price']))
+                                        : $escaper->escapeHtml($b['price']) ?>
+                                </span>
+                                <?php if ($b['regular']): ?>
+                                    <span class="hm-bundle__was"><?= $escaper->escapeHtml($b['regular']) ?></span>
+                                <?php endif; ?>
+                                <?php if ($b['saving']): ?>
+                                    <span class="hm-bundle__saving">
+                                        <?= $escaper->escapeHtml(__('You save %1', $b['saving'])) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </span>
+                            <span class="hm-bundle__cta">
+                                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-bundle"/></svg>
+                                <?= $escaper->escapeHtml(__('View Bundle')) ?>
+                            </span>
+                        </span>
+                    </span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>

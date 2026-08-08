@@ -153,7 +153,8 @@
 .hm-promos,
 .hm-trust,
 .hm-app,
-.hm-bundle-band {
+.hm-bundle-band,
+.hm-bundles {
     .hm-band();
 }
 
@@ -261,9 +262,261 @@
 //
 //  Bundle band + New Stores — the two navy panels
 //  ---------------------------------------------
-.hm-bundle-band {
+.hm-bundle-band,
+.hm-bundles {
     background: linear-gradient(135deg, @hm-navy 0%, #1a3a6a 100%);
     padding-block: var(--hm-space-8);
+}
+
+//
+//  Bundle cards  (Figma: four white cards on the navy band)
+//  ---------------------------------------------
+//  Same card language as the product rails — white, 16px radius, hairline border,
+//  image scaling on hover — but a 16:9 crop rather than a square, because a
+//  bundle's hero image is a scene rather than a cut-out product.
+.hm-bundles {
+    .hm-section__title { color: var(--hm-on-inverse); }
+    .hm-section__sub   { color: var(--hm-on-inverse-muted); }   // 10.56:1 on navy
+    //  Fill orange, not the text orange: on navy that pairing inverts. 5.04:1.
+    .hm-section__more  { color: var(--hm-accent); }
+}
+
+//  auto-fit rather than four fixed tracks: this catalog has three enabled
+//  bundles, and a hard 4-column grid would leave a conspicuous empty cell. With
+//  auto-fit the three stretch to fill the row, and a fourth bundle drops the
+//  layout back to Figma's four columns on its own.
+.hm-bundles__list {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-bundles__item { margin: 0; }
+
+.hm-bundle {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-lg);
+    block-size: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-decoration: none;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible {
+        border-color: var(--hm-accent);
+        box-shadow: var(--hm-shadow-lg);
+    }
+}
+
+.hm-bundle__media {
+    aspect-ratio: 16 / 9;
+    background: var(--hm-neutral-50);
+    display: block;
+    overflow: hidden;
+    position: relative;
+}
+
+.hm-bundle__img {
+    block-size: 100%;
+    inline-size: 100%;
+    object-fit: cover;
+    transition: transform 500ms var(--hm-ease);
+}
+
+.hm-bundle:hover .hm-bundle__img { transform: scale(1.05); }
+
+//  Stacked, because a bundle can carry both a percentage and an amount.
+.hm-bundle__badges {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    inset-block-start: var(--hm-space-2);
+    inset-inline-start: var(--hm-space-2);
+    position: absolute;
+    z-index: 2;
+}
+
+.hm-bundle__badge {
+    border-radius: var(--hm-radius-full);
+    box-shadow: var(--hm-shadow-sm);
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: .4rem var(--hm-space-2);
+}
+
+//  Navy on the fill orange (5.04:1) — white on #f26522 is 3.15:1 and fails.
+.hm-bundle__badge--pct  { background: var(--hm-accent); color: var(--hm-on-accent); }
+.hm-bundle__badge--save { background: var(--hm-surface-inverse); color: var(--hm-on-inverse); }
+
+//  OPAQUE, not Figma's `bg-black/50 backdrop-blur-sm`.
+//
+//  This chip sits on merchandiser-uploaded photography, and a ratio measured
+//  against one photo says nothing about the next one — the same reasoning the
+//  hero kicker pill is built on. A translucent background also cannot be scored
+//  at all: the parity harness walks up for the first background with alpha > .95
+//  and, finding none, measured white-on-#fafbfd at 1.04:1. That was a false
+//  reading, but the thing it was complaining about is real, so the fix is to make
+//  the chip's contrast independent of the image rather than to exempt it.
+//
+//  White on @hm-navy is 15.89:1, whatever is behind it. The blur is kept for the
+//  soft edge where the chip meets the photo.
+.hm-bundle__count {
+    align-items: center;
+    backdrop-filter: blur(4px);
+    background: var(--hm-surface-inverse);
+    border-radius: var(--hm-radius-full);
+    color: #ffffff;
+    display: inline-flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    gap: .4rem;
+    inset-block-end: var(--hm-space-2);
+    inset-inline-end: var(--hm-space-2);
+    padding: .4rem var(--hm-space-2);
+    position: absolute;
+    z-index: 2;
+
+    .hm-icon { block-size: 1.2rem; inline-size: 1.2rem; }
+}
+
+.hm-bundle__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: .6rem;
+    padding: var(--hm-space-4);
+}
+
+.hm-bundle__vendor {
+    color: var(--hm-accent-strong);
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hm-bundle__title {
+    color: var(--hm-foreground);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-family: var(--hm-font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow: hidden;
+
+    .hm-bundle:hover & { color: var(--hm-accent-strong); }
+}
+
+.hm-bundle__text {
+    color: var(--hm-neutral-600);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    overflow: hidden;
+}
+
+//  What is in the bundle, at a glance. Figma overlaps these slightly; they are
+//  laid out flat here because an overlap hides part of every thumbnail but the
+//  first, and on a four-item kit that is most of the information.
+.hm-bundle__thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem;
+    margin-block: .2rem;
+}
+
+.hm-bundle__thumb {
+    align-items: center;
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-sm);
+    block-size: 3.6rem;
+    box-sizing: border-box;
+    color: var(--hm-foreground-muted);
+    display: flex;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    inline-size: 3.6rem;
+    justify-content: center;
+    overflow: hidden;
+
+    img { block-size: 100%; inline-size: 100%; object-fit: cover; }
+}
+
+.hm-bundle__foot {
+    align-items: flex-end;
+    display: flex;
+    gap: var(--hm-space-2);
+    justify-content: space-between;
+    margin-block-start: auto;
+    padding-block-start: var(--hm-space-2);
+}
+
+.hm-bundle__prices {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    min-inline-size: 0;
+}
+
+.hm-bundle__price {
+    color: var(--hm-price);
+    font-size: 1.8rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hm-bundle__was {
+    color: var(--hm-price-was);
+    font-size: 1.2rem;
+    text-decoration: line-through;
+}
+
+//  --hm-success is 5.35:1 on white; Figma's green-600 is 3.9:1.
+.hm-bundle__saving {
+    color: var(--hm-success);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.hm-bundle__cta {
+    align-items: center;
+    background: var(--hm-accent);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-on-accent);      // navy on orange, 5.04:1
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    gap: .4rem;
+    min-block-size: 3.4rem;
+    padding-inline: var(--hm-space-3);
+    white-space: nowrap;
+
+    .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
+
+    .hm-bundle:hover & { background: var(--hm-accent-hover); }
+}
+
+@media (max-width: 767px) {
+    .hm-bundles__list { grid-template-columns: minmax(0, 1fr); }
 }
 
 .hm-stores--hm-home-newstores {
