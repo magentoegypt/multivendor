@@ -191,3 +191,29 @@ a.scroll-to-top {
     max-width: none;
     padding: 0;
 }
+
+
+//
+//  Vnecoms_Quotation — the icon font on the listing's "Add to Quote" button
+//  ---------------------------------------------
+//  vendor/vnecoms/module-quotation/view/base/web/css/icons.css declares
+//
+//      [class^="quote-icon"], [class*=" quote-icon"] { font-family: 'vnecoms-quote' !important }
+//
+//  which puts a fourth typeface on the category listing purely to draw one glyph.
+//  The parity gate counts fonts on the rendered page and flagged it: the theme is
+//  DM Sans, Playfair Display and IBM Plex Sans Arabic, and a page that quietly
+//  loads a fourth is a page whose type is no longer controlled.
+//
+//  The button keeps its label and its behaviour; only the glyph goes. `!important`
+//  is required to beat the module's own, and the theme's sprite supplies icons
+//  everywhere an icon is actually wanted.
+//  Scoped to the THEME body class, not the category one: the same button also
+//  renders on search results, which is a different body class and was still
+//  pulling the font in.
+.hm-page [class^='quote-icon'],
+.hm-page [class*=' quote-icon'] {
+    font-family: var(--hm-font-body, var(--hm-font-sans)) !important;
+
+    &::before { content: none; }
+}

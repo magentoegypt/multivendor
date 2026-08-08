@@ -1,0 +1,25 @@
+<?php
+/**
+ * Hub Market — "SAVE 29%" chip beside the product price.
+ *
+ * Renders nothing unless there is a real saving; see ViewModel\ProductSavings for
+ * why it is computed from the price model rather than from special_price.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \MagentoEgypt\HomeSections\ViewModel\ProductSavings $savings */
+$savings = $block->getData('savings');
+if (!$savings) {
+    return;
+}
+$percent = $savings->getPercent();
+if ($percent < 1) {
+    return;
+}
+$amount = $savings->getAmount();
+?>
+<span class="hm-pdp__save"
+      <?php if ($amount): ?>title="<?= $escaper->escapeHtmlAttr(__('You save %1', $amount)) ?>"<?php endif; ?>>
+    <?= $escaper->escapeHtml(__('SAVE %1%', $percent)) ?>
+</span>

@@ -1,0 +1,65 @@
+<?php
+/**
+ * Hub Market — category hero band (Figma: the navy strip above a listing).
+ *
+ * Replaces three separate pieces of Magento chrome that the design shows as one:
+ * the breadcrumb trail, the page title, and the category image — which core
+ * renders as a ~300px full-width banner and Figma renders as a 96x64 thumbnail
+ * in the corner of this band.
+ *
+ * The <h1> lives HERE, and Magento's own page title is clipped in CSS rather than
+ * removed, so the document still has exactly one h1 and the parity gate still
+ * passes. See _hm-plp.less.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/** @var \MagentoEgypt\HomeSections\ViewModel\CategoryHero $hero */
+$hero = $block->getData('category_hero');
+if (!$hero || !$hero->getCategory()) {
+    return;
+}
+
+$trail = $hero->getTrail();
+$count = $hero->getProductCount();
+$image = $hero->getImageUrl();
+?>
+<section class="hm-cat-hero">
+    <div class="hm-cat-hero__inner">
+        <?php if ($trail): ?>
+            <nav class="hm-cat-hero__trail" aria-label="<?= $escaper->escapeHtmlAttr(__('Breadcrumb')) ?>">
+                <ol>
+                    <li>
+                        <a href="<?= $escaper->escapeUrl($block->getBaseUrl()) ?>"><?= $escaper->escapeHtml(__('Home')) ?></a>
+                    </li>
+                    <?php foreach ($trail as $crumb): ?>
+                        <li>
+                            <?php if ($crumb['url']): ?>
+                                <a href="<?= $escaper->escapeUrl($crumb['url']) ?>"><?= $escaper->escapeHtml($crumb['name']) ?></a>
+                            <?php else: ?>
+                                <span aria-current="page"><?= $escaper->escapeHtml($crumb['name']) ?></span>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            </nav>
+        <?php endif; ?>
+
+        <div class="hm-cat-hero__body">
+            <div class="hm-cat-hero__text">
+                <h1 class="hm-cat-hero__title"><?= $escaper->escapeHtml($hero->getName()) ?></h1>
+                <?php if ($count > 0): ?>
+                    <p class="hm-cat-hero__meta">
+                        <?= $escaper->escapeHtml(__('%1 products from verified sellers', $count)) ?>
+                    </p>
+                <?php endif; ?>
+            </div>
+            <?php if ($image): ?>
+                <?php /* Decorative: the h1 beside it already names the category. */ ?>
+                <span class="hm-cat-hero__thumb" aria-hidden="true">
+                    <img src="<?= $escaper->escapeUrl($image) ?>" alt="" loading="lazy" width="192" height="128"/>
+                </span>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>

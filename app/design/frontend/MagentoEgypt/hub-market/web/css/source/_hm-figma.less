@@ -681,14 +681,20 @@
 
     .actions-primary { flex: 0 0 auto; }
 
+    //  NO `width: auto` here. It sat after `inline-size` in this same block and
+    //  therefore won — physical and logical forms set the same property, so the
+    //  later declaration takes it whichever spelling it uses. The button
+    //  collapsed to its icon: measured 18x32 instead of 32x32, on the homepage
+    //  rails as well as the listing.
     .action.tocart {
         border-radius: var(--hm-radius-sm);
         block-size: 3.2rem;
+        flex: 0 0 auto;
         gap: 0;
         inline-size: 3.2rem;
         min-block-size: 0;
+        min-inline-size: 3.2rem;
         padding: 0;
-        width: auto;
 
         .hm-icon { block-size: 1.6rem; inline-size: 1.6rem; }
 
@@ -1609,3 +1615,526 @@
 .product-item .action.towishlist:before,
 .product-item .action.tocompare:before,
 .hm-card__wish:before { content: none; }
+
+//
+//  ===========================================================================
+//  CATEGORY LISTING (PLP)
+//  ===========================================================================
+//  Measured against https://doze-coyote-58038022.figma.site/category/fashion.
+//  The grid itself already inherits the card from the rails; everything here is
+//  the shell around it, which had no design applied at all.
+//
+
+//  Figma runs the whole listing on #f5f7fa with white cards floating on it. Ours
+//  was white-on-white, so the filter rail and the product grid had no edges.
+.hm-plp .page-main,
+.hm-plp .columns { background: transparent; }
+
+.hm-plp .page-wrapper { background: var(--hm-surface-muted); }
+
+//  The band is full-bleed; `main` is the 1280 container, so it uses the same
+//  breakout as the homepage sections.
+.hm-cat-hero {
+    background: var(--hm-surface-inverse);
+    box-sizing: border-box;
+    color: var(--hm-on-inverse);
+    margin-block: 0 var(--hm-space-6);
+    margin-inline: calc(50% - 50vw);
+    padding-block: var(--hm-space-8);
+    padding-inline: calc(50vw - 50%);
+}
+
+.hm-cat-hero__trail {
+    margin-block-end: var(--hm-space-3);
+
+    ol {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    //  Figma separates crumbs with "/". Generated content rather than markup so
+    //  it is not announced, and suppressed on the first item.
+    li + li::before {
+        color: var(--hm-neutral-400);
+        content: '/';
+        margin-inline-end: var(--hm-space-2);
+    }
+
+    li { align-items: center; display: flex; font-size: 1.2rem; }
+
+    //  Figma's white/50 is 3.2:1 on navy. --hm-neutral-400 is the dimmest value
+    //  that still clears AA here (4.89:1).
+    a { color: var(--hm-neutral-400); text-decoration: none; }
+    a:hover { color: var(--hm-on-inverse); text-decoration: underline; }
+    span { color: var(--hm-on-inverse-muted); }
+}
+
+.hm-cat-hero__body {
+    align-items: flex-end;
+    display: flex;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+}
+
+.hm-cat-hero__title {
+    color: var(--hm-on-inverse);
+    font-family: var(--hm-font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 .4rem;
+}
+
+.hm-cat-hero__meta {
+    color: var(--hm-on-inverse-muted);   // 10.56:1; Figma's white/50 is 3.2:1
+    font-size: 1.4rem;
+    margin: 0;
+}
+
+//  Figma: `w-24 h-16 rounded-xl overflow-hidden opacity-60`. The opacity is
+//  dropped — it exists there to stop the thumbnail competing with the headline,
+//  and a 96x64 image at this distance does not need help.
+.hm-cat-hero__thumb {
+    block-size: 6.4rem;
+    border-radius: var(--hm-radius);
+    display: block;
+    flex-shrink: 0;
+    inline-size: 9.6rem;
+    overflow: hidden;
+
+    img { block-size: 100%; inline-size: 100%; object-fit: cover; }
+}
+
+@media (max-width: 767px) {
+    .hm-cat-hero__thumb { display: none; }
+    .hm-cat-hero__title { font-size: 2.4rem; }
+}
+
+//  Magento's breadcrumbs still render — the band above replaces them visually,
+//  but removing the block would drop the BreadcrumbList structured data the rest
+//  of the site emits. Clipped, not hidden, so it stays in the accessibility tree.
+//
+//  The page TITLE block is removed in layout instead of clipped: the band carries
+//  the h1, and clipping left two h1 elements on every category page.
+.hm-plp .breadcrumbs {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+}
+
+//
+//  Filter rail — Figma draws each filter as its own white card
+//  ---------------------------------------------
+.hm-plp .sidebar-main {
+    inline-size: 22.4rem;      // Figma w-56
+}
+
+.hm-plp .sidebar .block.filter,
+.hm-plp .sidebar .block-compare,
+.hm-plp .sidebar .block-wishlist {
+    background: transparent;
+    margin-block-end: var(--hm-space-4);
+}
+
+//  The "Shopping Options" heading is a label for the rail, not a card of its own.
+.hm-plp .filter-options-title,
+.hm-plp .block-compare .block-title,
+.hm-plp .block-wishlist .block-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.hm-plp .filter-options-item,
+.hm-plp .block-compare,
+.hm-plp .block-wishlist {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-lg);
+    box-sizing: border-box;
+    margin-block-end: var(--hm-space-4);
+    padding: var(--hm-space-4);
+}
+
+.hm-plp .filter-options-item {
+    border-block-end: 1px solid var(--hm-border-subtle);   // undo blank's divider-only rule
+}
+
+.hm-plp .filter-options-title {
+    color: var(--hm-foreground);
+    margin: 0 0 var(--hm-space-3);
+    padding: 0;
+}
+
+.hm-plp .filter-options-content { padding: 0; }
+
+//
+//  Toolbar — Figma puts the count on the lead edge, sort and view on the trailing
+//  ---------------------------------------------
+//  Ours had the view switcher first, the count centred and the sort last, which
+//  is Magento/blank's order, not the design's.
+.hm-plp .toolbar-products {
+    align-items: center;
+    background: transparent;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+    margin: 0 0 var(--hm-space-4);
+    padding: 0;
+}
+
+.hm-plp .toolbar-products .toolbar-amount { margin: 0; order: 1; }
+.hm-plp .toolbar-products .toolbar-sorter { margin-inline-start: auto; order: 2; }
+.hm-plp .toolbar-products .modes { margin: 0; order: 3; }
+.hm-plp .toolbar-products .field.limiter { order: 4; }
+
+//  The bottom toolbar repeats the pager; Figma centres it and shows nothing else.
+.hm-plp .toolbar-products ~ .toolbar-products,
+.hm-plp .products ~ .toolbar-products {
+    justify-content: center;
+
+    .toolbar-amount,
+    .toolbar-sorter,
+    .modes { display: none; }
+
+    .pages { margin-inline: auto; }
+}
+
+//
+//  PLP card actions — the listing's markup is not the rails' markup
+//  ---------------------------------------------
+//  Magento/blank styles the listing's action row with `font-size: 0` (its old
+//  inline-block spacing hack) and leaves it `display: block`, at a specificity
+//  the rails never had to fight because the widget template emits different
+//  classes. On the listing the result was the cart button stacked ABOVE the
+//  wishlist and compare buttons instead of beside them, and the whole row
+//  detached from the price.
+//
+//  `.product.actions.product-item-actions` is the listing's own class list, which
+//  gives (0,3,0) and settles it without !important.
+.hm-plp .product-item .product.actions.product-item-actions {
+    align-items: center;
+    display: flex;
+    font-size: 1.4rem;
+    gap: var(--hm-space-1);
+}
+
+.hm-plp .product-item .actions-primary {
+    display: flex;
+    flex: 0 0 auto;
+}
+
+//
+//  Layered navigation — collapsed by default
+//  ---------------------------------------------
+//  MGS_Ajaxlayernavigation renders each filter with an inline `display: none` and
+//  `aria-expanded="false"`, so the rail is a column of bare titles. Figma shows
+//  them open, but the accordion is a real affordance on a catalog with six
+//  attribute filters — the defect is that a collapsed filter looked like an empty
+//  card rather than a control. A chevron keyed off the ARIA state fixes that
+//  without fighting the module's JS for control of `display`.
+.hm-plp .filter-options-title {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+
+    &::after {
+        border-block-end: 2px solid var(--hm-icon);
+        border-inline-end: 2px solid var(--hm-icon);
+        block-size: .7rem;
+        content: '';
+        inline-size: .7rem;
+        margin-inline-start: var(--hm-space-2);
+        transform: rotate(45deg) translateY(-25%);
+        transition: transform var(--hm-duration) var(--hm-ease);
+    }
+
+    &[aria-expanded='true']::after { transform: rotate(-135deg) translateY(-25%); }
+}
+
+//  "Shopping Options" duplicates what the cards below it already say, and Figma
+//  has no equivalent. Clipped rather than removed — it is the filter rail's
+//  accessible heading.
+.hm-plp .filter-subtitle {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
+
+//  The listing carries a fourth action the rails do not: Vnecoms' "Add to Quote".
+//  Price plus four 32px buttons does not fit a 303px card, so the row broke
+//  unpredictably — on some cards the cart button ended up ABOVE the price.
+//  Wrapping deliberately, price on its own line and the actions right-aligned
+//  under it, is predictable at any button count and keeps every control.
+.hm-plp .hm-card__foot {
+    flex-wrap: wrap;
+    row-gap: var(--hm-space-2);
+
+    .price-box { flex: 1 1 100%; }
+    .product-item-inner { flex: 1 1 auto; }
+}
+
+.hm-plp .product-item .product.actions.product-item-actions { justify-content: flex-end; }
+
+//
+//  ===========================================================================
+//  PRODUCT DETAIL (PDP)
+//  ===========================================================================
+//  Measured against https://doze-coyote-58038022.figma.site/product/3.
+//
+
+.hm-pdp .page-wrapper { background: var(--hm-surface-muted); }
+
+//  Figma runs the breadcrumb as a quiet line on the page tint, not as a band.
+.hm-pdp .breadcrumbs {
+    margin: 0;
+    padding-block: var(--hm-space-4);
+
+    li, a, strong { font-size: 1.2rem; }
+    a { color: var(--hm-neutral-600); }
+}
+
+//  Both columns sit on white cards floating on the tint.
+.hm-pdp .product.media,
+.hm-pdp .product-info-main {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-lg);
+    box-sizing: border-box;
+    padding: var(--hm-space-6);
+}
+
+//  TITLE. Moved into the info column in layout; here it takes Figma's treatment —
+//  the display serif at 30px, tight, directly above the rating row. As a page
+//  heading it was 48px and sat above both columns.
+.hm-pdp .product-info-main .page-title-wrapper {
+    margin: 0 0 var(--hm-space-2);
+
+    .page-title { margin: 0; }
+
+    h1 {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-display);
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0;
+    }
+}
+
+//
+//  Price row
+//  ---------------------------------------------
+//  Figma: a large price, the struck original beside it, then the savings chip —
+//  all on one baseline. Magento stacks them as two labelled lines,
+//  "Regular Price: X" over "Special Price: Y", which buries the number the
+//  customer is looking for under the one they are not.
+//
+//  The labels are CLIPPED rather than removed: they are what tells a screen-reader
+//  user which of the two amounts they actually pay.
+.hm-pdp .product-info-price {
+    border: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--hm-space-2);
+    margin: 0 0 var(--hm-space-4);
+    padding: 0;
+}
+
+.hm-pdp .product-info-price .price-box {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    margin: 0;
+}
+
+.hm-pdp .product-info-price .price-label {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
+
+.hm-pdp .product-info-price .special-price { order: 1; }
+.hm-pdp .product-info-price .old-price { order: 2; }
+
+.hm-pdp .product-info-price .price {
+    color: var(--hm-foreground);
+    font-size: 3.2rem;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.hm-pdp .product-info-price .old-price .price {
+    color: var(--hm-price-was);
+    font-size: 1.8rem;
+    font-weight: 400;
+    text-decoration: line-through;
+}
+
+//  White on --hm-discount-bg is 6.54:1. Figma's chip is `bg-[#f26522]` with white
+//  on it, which is 3.15:1 and fails.
+.hm-pdp__save {
+    background: var(--hm-discount-bg);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-discount-fg);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    order: 3;
+    padding: .4rem var(--hm-space-2);
+    white-space: nowrap;
+}
+
+//
+//  Stock, SKU and the review link — Figma's quiet meta row
+//  ---------------------------------------------
+.hm-pdp .product-info-main .product-info-stock-sku {
+    color: var(--hm-foreground-muted);
+    font-size: 1.2rem;
+    padding: 0;
+}
+
+.hm-pdp .product-info-main .product.attribute.sku { font-size: 1.2rem; }
+
+//
+//  Add to cart row
+//  ---------------------------------------------
+.hm-pdp .box-tocart .fieldset {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+}
+
+.hm-pdp .box-tocart .field.qty { margin: 0; }
+
+.hm-pdp .box-tocart .actions { flex: 1 1 24rem; margin: 0; padding: 0; }
+
+.hm-pdp .box-tocart .action.tocart {
+    border-radius: var(--hm-radius);
+    font-size: 1.5rem;
+    font-weight: 700;
+    min-block-size: 4.8rem;
+    width: 100%;
+}
+
+//  Figma renders these two as icon buttons beside the cart, not as text links
+//  stacked under it.
+.hm-pdp .product-social-links {
+    display: flex;
+    gap: var(--hm-space-2);
+    margin: var(--hm-space-3) 0 0;
+    text-align: start;
+
+    .action {
+        align-items: center;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        display: inline-flex;
+        font-size: 1.3rem;
+        gap: var(--hm-space-2);
+        min-block-size: 4rem;
+        padding-inline: var(--hm-space-4);
+        text-decoration: none;
+
+        &:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
+    }
+}
+
+//
+//  Assurances
+//  ---------------------------------------------
+.hm-pdp__assurances {
+    border-block-start: 1px solid var(--hm-border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    list-style: none;
+    margin: var(--hm-space-6) 0 0;
+    padding: var(--hm-space-4) 0 0;
+
+    li {
+        align-items: center;
+        color: var(--hm-neutral-600);
+        display: flex;
+        font-size: 1.3rem;
+        gap: var(--hm-space-2);
+        margin: 0;
+    }
+
+    .hm-icon { color: var(--hm-accent-strong); flex-shrink: 0; }
+}
+
+//  The vendor card Vnecoms renders under the buy box: Figma puts the seller ABOVE
+//  the title as a single accent line. Reordering that block is a Vnecoms template
+//  change; this at least stops it reading as a second, competing panel.
+.hm-pdp .product-info-main .seller-info-block,
+.hm-pdp .product-info-main .vendor-info {
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    margin-block-start: var(--hm-space-6);
+    padding: var(--hm-space-4);
+}
+
+//  The savings chip drifted to the far right edge: blank leaves `.price-box` as a
+//  block that fills the row, so the chip beside it got whatever was left. Figma
+//  sets all three on one baseline, hard against the price.
+.hm-pdp .product-info-price {
+    justify-content: flex-start;
+
+    .price-box { flex: 0 1 auto; }
+    > .price-box + * { margin-inline-start: var(--hm-space-1); }
+}
+
+//  Stock, SKU and the review link sit directly under the title in Figma, as one
+//  quiet line. Blank spreads them across the full column width with the review
+//  link pinned to the trailing edge.
+.hm-pdp .product-info-main .product-info-stock-sku {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+    justify-content: flex-start;
+    margin: 0 0 var(--hm-space-3);
+    text-align: start;
+}
+
+.hm-pdp .product-info-main .product-reviews-summary {
+    margin: 0 0 var(--hm-space-3);
+
+    .reviews-actions a { font-size: 1.2rem; }
+}
+
+//  NO `order` REWRITE HERE, and the reason is worth keeping.
+//
+//  An attempt to reorder this column with flex `order` made it worse, in a way
+//  that is obvious in hindsight: an unlisted flex child defaults to `order: 0`,
+//  which sorts BEFORE anything given a positive order. Vnecoms' seller card and
+//  every other block this theme does not enumerate jumped to the top of the
+//  column, above the product title. Reordering a container whose children come
+//  from modules you do not control is only safe if you enumerate all of them,
+//  and on a PDP you cannot.
+//
+//  The column therefore keeps Magento's own order (title, stock/SKU, price, form,
+//  social links, then whatever modules append). The two things Figma really
+//  changes — the price row and the meta line — are fixed in place above.

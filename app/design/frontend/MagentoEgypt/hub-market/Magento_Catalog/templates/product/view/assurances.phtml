@@ -1,0 +1,27 @@
+<?php
+/**
+ * Hub Market — the three assurances under the add-to-cart row.
+ *
+ * Figma lists "Free shipping on orders over $50 / 30-day return policy / Secure
+ * payment & buyer protection". Two of those three are claims this store cannot
+ * make: there is no free-shipping threshold configured, and the returns window
+ * here is 14 days, not 30 — both verified against the copy already vetted for the
+ * homepage trust row, which is the single source these repeat.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$items = [
+    ['icon' => 'hm-delivery', 'text' => __('Nationwide delivery, with tracking from your account.')],
+    ['icon' => 'hm-refresh',  'text' => __('Most items returnable within 14 days.')],
+    ['icon' => 'hm-lock',     'text' => __('Cash on delivery, Visa and Mastercard.')],
+];
+?>
+<ul class="hm-pdp__assurances">
+    <?php foreach ($items as $item): ?>
+        <li>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#<?= /* @noEscape */ $item['icon'] ?>"/></svg>
+            <span><?= $escaper->escapeHtml($item['text']) ?></span>
+        </li>
+    <?php endforeach; ?>
+</ul>

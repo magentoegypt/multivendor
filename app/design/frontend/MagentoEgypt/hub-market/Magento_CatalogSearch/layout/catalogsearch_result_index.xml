@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+    Search results render through the same list.phtml as the category listing, so
+    they need the same view model or every card there loses its seller line.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="search_result_list">
+            <arguments>
+                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

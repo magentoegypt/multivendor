@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — product detail page.
+ *
+ * Measured against https://doze-coyote-58038022.figma.site/product/3.
+ *
+ * The reference stacks the info column in this order: seller, title, rating,
+ * price with a savings chip, description, options, quantity, add-to-cart, then
+ * three assurances. Magento renders the title OUTSIDE that column entirely — as
+ * a page heading above both columns — which is the one structural difference; the
+ * rest is styling and two small additions.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="hm-pdp"/>
+
+        <!--
+            The title belongs to the info column, not to the page.
+            `move` rather than remove-and-recreate: it keeps the same block, so it
+            stays the document's one <h1> and keeps whatever other modules have
+            attached to it.
+        -->
+        <move element="page.main.title" destination="product.info.main" before="-"/>
+
+        <!--
+            Savings chip, immediately after the price. Renders nothing when the
+            product is not discounted.
+        -->
+        <referenceBlock name="product.info.price">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.pdp.savings"
+                   after="-"
+                   template="Magento_Catalog::product/view/savings.phtml">
+                <arguments>
+                    <argument name="savings" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\ProductSavings</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+
+        <!-- Delivery, returns and payment, under the add-to-cart row. -->
+        <referenceContainer name="product.info.main">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.pdp.assurances"
+                   after="product.info.form"
+                   template="Magento_Catalog::product/view/assurances.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

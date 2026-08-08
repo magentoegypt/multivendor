@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — category listing.
+ *
+ * The seller's name on a listing card is the one piece of information that tells
+ * two otherwise identical marketplace listings apart, and it was missing here.
+ * The view model is the same batch map the homepage rails use: one query for
+ * every vendor on the install, not one lookup per card.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="hm-plp"/>
+
+        <referenceBlock name="category.products.list">
+            <arguments>
+                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+            </arguments>
+        </referenceBlock>
+
+        <!--
+            Category hero band. `before="-"` puts it at the very top of main, above
+            the toolbar and the grid, which is where Figma draws it.
+
+            The band supplies the page's <h1>, so Magento's own title block is
+            REMOVED rather than clipped. Clipping it first was the wrong call and
+            the parity gate caught it: two h1 elements on every category page, one
+            of them invisible. Breadcrumbs stay (clipped in CSS) because removing
+            them would drop the BreadcrumbList structured data the rest of the site
+            emits; a duplicated breadcrumb is not a document-outline problem.
+        -->
+        <referenceBlock name="page.main.title" remove="true"/>
+        <!--
+            `columns.top`, NOT `main`. The container called `main` is the CONTENT
+            COLUMN inside `.columns` — putting the band there placed it beside the
+            filter rail, and its full-bleed negative margins then dragged the navy
+            back across the sidebar, which rendered its headings in dark text on
+            navy. `columns.top` is the "Before Main Columns" slot: inside
+            `.page-main`, above the two columns, which is where Figma draws it.
+        -->
+        <referenceContainer name="columns.top">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.category.hero"
+                   before="-"
+                   template="Magento_Catalog::category/hero.phtml">
+                <arguments>
+                    <argument name="category_hero" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\CategoryHero</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!--
+            The full-width category image banner. Figma shows this as a 96x64
+            thumbnail inside the hero band, which hero.phtml renders; left in
+            place it also drew a ~300px banner immediately below, so the same
+            image appeared twice at wildly different sizes.
+        -->
+        <referenceBlock name="category.image" remove="true"/>
+    </body>
+</page>
