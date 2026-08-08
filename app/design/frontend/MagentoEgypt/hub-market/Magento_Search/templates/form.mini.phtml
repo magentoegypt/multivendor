@@ -1,0 +1,106 @@
+<?php
+/**
+ * Hub Market — header search.
+ *
+ * Overrides Magento_Search::form.mini.phtml.
+ *
+ * Two things this fixes versus what was rendering before:
+ *   1. A third-party "search in category" widget was injected with an inline
+ *      `position:absolute; top:0; right:35px` — a physical offset, so it landed
+ *      on the wrong edge in RTL, and it overlapped the input and pushed the page
+ *      into horizontal overflow. It is not rendered here.
+ *   2. The label is properly associated and visually hidden rather than absent;
+ *      the Figma build had `label[for]` zero times in the entire bundle.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Magento\Search\ViewModel\ConfigProvider $searchViewModel
+ */
+declare(strict_types=1);
+
+/** @var \Magento\Search\Helper\Data $helper */
+$helper = $this->helper(\Magento\Search\Helper\Data::class);
+$searchViewModel = $block->getData('configProvider');
+$isSuggestionsAllowed = $searchViewModel && $searchViewModel->isSuggestionsAllowed();
+?>
+<div class="block block-search">
+    <div class="block block-title"><strong><?= $escaper->escapeHtml(__('Search')) ?></strong></div>
+    <div class="block block-content">
+        <form class="form minisearch hm-search"
+              id="search_mini_form"
+              action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>"
+              method="get"
+              role="search">
+            <?php
+            /*
+             * "All Categories" selector — Figma attaches one to the left of the field.
+             *
+             * A REAL filter, not decoration: the option value is a category id and the
+             * control posts as `cat`, which Magento's catalog search layer
+             * (CatalogSearch\Model\Layer\Filter\Category) reads to scope results.
+             *
+             * Rendered only when the view model is present AND returns categories, so
+             * a missing argument or an empty catalogue degrades to the plain search
+             * bar rather than an empty dropdown.
+             */
+            $hmCatVm = $block->getData('search_categories');
+            $hmCats = $hmCatVm ? $hmCatVm->getCategories() : [];
+            $hmActiveCat = (int) $block->getRequest()->getParam('cat');
+            ?>
+            <?php if ($hmCats): ?>
+                <div class="field hm-search__cat">
+                    <label class="label hm-sr-only" for="hm-search-cat">
+                        <span><?= $escaper->escapeHtml(__('Search in category')) ?></span>
+                    </label>
+                    <select id="hm-search-cat" name="cat" class="hm-search__cat-select">
+                        <option value=""><?= $escaper->escapeHtml(__('All Categories')) ?></option>
+                        <?php foreach ($hmCats as $hmCat): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($hmCat['id']) ?>"
+                                <?= $hmActiveCat === $hmCat['id'] ? ' selected="selected"' : '' ?>>
+                                <?= $escaper->escapeHtml($hmCat['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+            <div class="field search">
+                <label class="label hm-sr-only" for="search">
+                    <span><?= $escaper->escapeHtml(__('Search products, brands and vendors')) ?></span>
+                </label>
+                <div class="control">
+                    <input id="search"
+                           type="search"
+                           dir="auto"
+                           name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+                           value="<?= /* @noEscape */ $helper->getEscapedQueryText() ?>"
+                           placeholder="<?= $escaper->escapeHtmlAttr(__('Search products, brands, vendors across all categories…')) ?>"
+                           class="input-text"
+                           maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+                           autocomplete="off"
+                        <?php if ($isSuggestionsAllowed): ?>
+                           role="combobox"
+                           aria-haspopup="listbox"
+                           aria-expanded="false"
+                           aria-autocomplete="both"
+                           aria-controls="search_autocomplete"
+                           data-mage-init='{"quickSearch":{
+                                "formSelector":"#search_mini_form",
+                                "url":"<?= $escaper->escapeJs($helper->getSuggestUrl()) ?>",
+                                "destinationSelector":"#search_autocomplete",
+                                "minSearchLength":"<?= $escaper->escapeJs($helper->getMinQueryLength()) ?>"}}'
+                        <?php endif; ?>
+                    />
+                    <div id="search_autocomplete" class="search-autocomplete"></div>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"
+                        class="action search">
+                    <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-search"/></svg>
+                    <span class="hm-search__label"><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

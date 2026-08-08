@@ -1,0 +1,166 @@
+//
+//  Hub Market — token emission (CSS custom properties) + RTL
+//  _____________________________________________
+//
+//  Kept separate from _hm-tokens.less because that file is imported into
+//  _theme.less, which by Magento's contract must declare variables only and
+//  emit no CSS. This file is pulled in from _extend.less instead.
+//
+//  Values come from the @hm-* LESS variables, so the two forms cannot drift.
+//
+
+//  Emit the same values as custom properties
+//  ---------------------------------------------
+:root {
+    --hm-primary: @hm-primary;
+    --hm-primary-hover: @hm-primary-hover;
+    --hm-on-primary: @hm-on-primary;
+
+    --hm-accent: @hm-accent;
+    --hm-accent-hover: @hm-accent-hover;
+    --hm-accent-strong: @hm-accent-strong;
+    --hm-accent-strong-hover: @hm-accent-strong-hover;
+    --hm-on-accent: @hm-on-accent;
+    --hm-accent-subtle: @hm-accent-subtle;
+
+    --hm-neutral-0: @hm-neutral-0;
+    --hm-neutral-50: @hm-neutral-50;
+    --hm-neutral-100: @hm-neutral-100;
+    --hm-neutral-200: @hm-neutral-200;
+    --hm-neutral-300: @hm-neutral-300;
+    --hm-neutral-400: @hm-neutral-400;
+    --hm-neutral-500: @hm-neutral-500;
+    --hm-neutral-600: @hm-neutral-600;
+    --hm-neutral-700: @hm-neutral-700;
+    --hm-neutral-900: @hm-neutral-900;
+
+    --hm-background: @hm-background;
+    --hm-surface: @hm-surface;
+    --hm-surface-muted: @hm-surface-muted;
+    --hm-surface-inverse: @hm-surface-inverse;
+    --hm-surface-input: @hm-surface-input;
+
+    --hm-foreground: @hm-foreground;
+    --hm-foreground-muted: @hm-foreground-muted;
+    --hm-placeholder: @hm-placeholder;
+    --hm-foreground-disabled: @hm-foreground-disabled;
+    --hm-on-inverse: @hm-on-inverse;
+    --hm-on-inverse-muted: @hm-on-inverse-muted;
+
+    --hm-border-subtle: @hm-border-subtle;
+    --hm-border-strong: @hm-border-strong;
+    --hm-icon: @hm-icon;
+    --hm-icon-muted: @hm-icon-muted;
+
+    --hm-focus-ring: @hm-focus-ring;
+    --hm-focus-ring-inverse: @hm-focus-ring-inverse;
+    --hm-focus-ring-width: @hm-focus-ring-width;
+    --hm-focus-ring-offset: @hm-focus-ring-offset;
+
+    --hm-price: @hm-price;
+    --hm-price-was: @hm-price-was;
+    --hm-price-inverse: @hm-price-inverse;
+    --hm-discount-bg: @hm-discount-bg;
+    --hm-discount-fg: @hm-discount-fg;
+    --hm-rating-star: @hm-rating-star;
+    --hm-rating-star-empty: @hm-rating-star-empty;
+    --hm-stock-in: @hm-stock-in;
+    --hm-stock-low: @hm-stock-low;
+    --hm-stock-out: @hm-stock-out;
+    --hm-vendor-verified: @hm-vendor-verified;
+    --hm-bundle-badge-bg: @hm-bundle-badge-bg;
+    --hm-bundle-badge-fg: @hm-bundle-badge-fg;
+
+    --hm-success: @hm-success;
+    --hm-success-hover: @hm-success-hover;
+    --hm-warning: @hm-warning;
+    --hm-danger: @hm-danger;
+    --hm-info: @hm-info;
+    --hm-on-status: @hm-on-status;
+    --hm-success-subtle: @hm-success-subtle;
+    --hm-warning-subtle: @hm-warning-subtle;
+    --hm-danger-subtle: @hm-danger-subtle;
+    --hm-info-subtle: @hm-info-subtle;
+
+    --hm-font-sans: @hm-font-sans;
+    --hm-font-display: @hm-font-display;
+    --hm-font-arabic: @hm-font-arabic;
+    --hm-font-body: @hm-font-sans;
+    --hm-font-heading: @hm-font-display;
+
+    --hm-leading-tight: @hm-leading-tight;
+    --hm-leading-snug: @hm-leading-snug;
+    --hm-leading-base: @hm-leading-base;
+
+    --hm-space-1: @hm-space-1;  --hm-space-2: @hm-space-2;
+    --hm-space-3: @hm-space-3;  --hm-space-4: @hm-space-4;
+    --hm-space-5: @hm-space-5;  --hm-space-6: @hm-space-6;
+    --hm-space-8: @hm-space-8;  --hm-space-10: @hm-space-10;
+    --hm-space-12: @hm-space-12; --hm-space-16: @hm-space-16;
+
+    --hm-radius-xs: @hm-radius-xs;
+    --hm-radius-sm: @hm-radius-sm;
+    --hm-radius: @hm-radius;
+    --hm-radius-lg: @hm-radius-lg;
+    --hm-radius-full: @hm-radius-full;
+
+    --hm-shadow-sm: @hm-shadow-sm;
+    --hm-shadow: @hm-shadow;
+    --hm-shadow-lg: @hm-shadow-lg;
+
+    --hm-duration-fast: @hm-duration-fast;
+    --hm-duration: @hm-duration;
+    --hm-ease: @hm-ease;
+
+    --hm-container: @hm-container;
+}
+
+//
+//  Arabic / RTL
+//  ---------------------------------------------
+//  Magento serves a separate RTL-compiled stylesheet per locale, but doing the
+//  swap with custom properties means it also works if the direction is ever
+//  toggled client-side, and it keeps one stylesheet honest for both locales.
+//  Magento renders `<html lang="ar">` but does NOT add `dir="rtl"` — that is why
+//  themes like Smartwave/porto ship a whole separate `porto_rtl` theme. This
+//  theme serves both locales from one stylesheet, so direction is set from the
+//  language instead. Logical properties respond to the computed `direction`, not
+//  to the attribute, so this is all the mirroring needs.
+html:lang(ar),
+html:lang(ar-SA),
+html[dir='rtl'] {
+    direction: rtl;
+}
+
+:root:lang(ar),
+[dir='rtl'] {
+    --hm-font-body: @hm-font-arabic;
+    --hm-font-heading: @hm-font-arabic;   // no Arabic serif pairs with Playfair;
+                                          // use weight for hierarchy instead
+    --hm-leading-base: @hm-leading-arabic-body;
+}
+
+//  Letter-spacing breaks Arabic cursive joining and uppercase is meaningless in
+//  Arabic, so both are neutralised — but ONLY on text-bearing elements, not as a
+//  blanket inherited rule. A blanket `[dir=rtl] { letter-spacing: normal }` does
+//  not actually win against component rules (inheritance loses to any explicit
+//  declaration), and a blanket `text-transform: none` would also kill legitimate
+//  uses. Components in this theme should use @hm-tracking-* rather than raw
+//  letter-spacing, which keeps this list short.
+[dir='rtl'],
+:lang(ar) {
+    h1, h2, h3, h4, h5, h6,
+    .hm-eyebrow,
+    .hm-section__title,
+    button, .action, a.action {
+        letter-spacing: normal;
+        text-transform: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --hm-duration-fast: 0ms;
+        --hm-duration: 0ms;
+    }
+}

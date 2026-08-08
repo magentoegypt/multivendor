@@ -1,0 +1,220 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — global layout.
+ *
+ * Restructures the header into THREE bands, not the design's four. In the Figma
+ * build "Bundle Deals" occupied an entire ~40px band on its own, right-aligned,
+ * and the header stood ~190px tall with ~145px of it sticky. That row is folded
+ * into the category nav as a highlighted item instead.
+ *
+ * Magento's own header.panel.wrapper is removed; its contents (account links,
+ * store switcher) move into the utility bar.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="hm-page"/>
+
+        <!--
+            The icon sprite is inlined into the document rather than referenced
+            as an external file: Safari does not support cross-file <use href>,
+            so an external sprite would silently render nothing there.
+        -->
+        <referenceContainer name="after.body.start">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.icon.sprite"
+                   before="-"
+                   template="Magento_Theme::html/icons.phtml"/>
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.skip.link"
+                   after="hm.icon.sprite"
+                   template="Magento_Theme::html/skip-link.phtml"/>
+        </referenceContainer>
+
+        <!-- Magento's default panel is replaced by the utility bar -->
+        <referenceContainer name="header.panel.wrapper" remove="true"/>
+
+        <referenceContainer name="header.container">
+            <container name="hm.header" label="Hub Market Header"
+                       htmlTag="header" htmlClass="hm-header" before="-">
+
+                <!-- band 1: utility -->
+                <block class="Magento\Framework\View\Element\Template"
+                       name="hm.header.utility"
+                       template="Magento_Theme::html/header/utility.phtml">
+                    <block class="Magento\Customer\Block\Account\Navigation"
+                           name="hm.top.links" as="topLinks">
+                        <arguments>
+                            <argument name="css_class" xsi:type="string">hm-header__utility-links</argument>
+                        </arguments>
+                    </block>
+
+                    <!--
+                        Language switcher.
+
+                        THE view_model ARGUMENT IS MANDATORY. switch/languages.phtml
+                        line 28 calls
+
+                            $block->getViewModel()->getTargetStoreRedirectUrl($_lang)
+
+                        and Magento\Store\Block\Switcher does NOT default it. Declaring
+                        this block without the argument returns null there and fatals
+                        with "Call to a member function getTargetStoreRedirectUrl() on
+                        null" — which took the ENTIRE storefront down once (624
+                        exceptions), because the header renders on every page.
+
+                        Core's own layout passes it the same way; see
+                        module-store/view/frontend/layout/default.xml.
+                    -->
+                    <block class="Magento\Store\Block\Switcher"
+                           name="hm.store.switcher"
+                           as="store_switcher"
+                           template="Magento_Store::switch/languages.phtml">
+                        <arguments>
+                            <argument name="view_model" xsi:type="object">Magento\Store\ViewModel\SwitcherUrlProvider</argument>
+                        </arguments>
+                    </block>
+                </block>
+
+                <!-- band 2: logo, search, actions -->
+                <container name="hm.header.main" htmlTag="div" htmlClass="hm-header__main">
+                    <container name="hm.header.inner" htmlTag="div" htmlClass="hm-header__inner">
+                        <!--
+                            logoPathResolver IS REQUIRED, and its absence is silent.
+
+                            In 2.4.8 Logo::_getLogoUrl() reads the resolver from BLOCK
+                            DATA, not from config:
+
+                                $logoPathResolver = $this->getData('logoPathResolver');
+                                if ($logoPathResolver instanceof LogoPathResolverInterface) {
+                                    $path = $logoPathResolver->getPath();
+                                }
+                                if ($path !== null && $this->_isFile($path)) { ... }
+
+                            With no resolver, $path stays null, the configured logo is
+                            never even looked at, and it falls through to Magento's own
+                            images/logo.svg. That is exactly what happened here: this
+                            block was declared fresh rather than referenced, so it lost
+                            the arguments core passes in module-theme's default.xml, and
+                            the store shipped with the Magento logo despite a correctly
+                            configured and present Magento Egypt logo in pub/media.
+                        -->
+                        <block class="Magento\Theme\Block\Html\Header\Logo" name="hm.logo"
+                               template="Magento_Theme::html/header/logo.phtml">
+                            <arguments>
+                                <argument name="logoPathResolver" xsi:type="object">Magento\Theme\ViewModel\Block\Html\Header\LogoPathResolver</argument>
+                                <argument name="logo_width" xsi:type="number">70</argument>
+                                <argument name="logo_height" xsi:type="number">56</argument>
+                            </arguments>
+                        </block>
+                        <block class="Magento\Framework\View\Element\Template"
+                               name="hm.header.actions"
+                               after="-"
+                               template="Magento_Theme::html/header/actions.phtml"/>
+                    </container>
+                </container>
+
+                <!-- band 3: category nav (Bundle Deals folded in) -->
+                <block class="HubMarket\DynamicMenu\Block\Topmenu"
+                       name="hub.market.topnav"
+                       template="Magento_Theme::html/topmenu.phtml"
+                       ttl="3600"/>
+            </container>
+        </referenceContainer>
+
+        <!--
+            The header search gets the category selector's data source. Passed as a
+            view model rather than fetched in the template so the query is testable
+            and the template degrades to a plain search bar if it is ever absent.
+        -->
+        <referenceBlock name="top.search">
+            <arguments>
+                <argument name="search_categories" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\SearchCategories</argument>
+            </arguments>
+        </referenceBlock>
+
+        <!-- search and mini-cart move into the header actions row -->
+        <move element="top.search" destination="hm.header.inner" after="hm.logo"/>
+        <move element="minicart" destination="hm.header.actions"/>
+
+        <!-- Magento's own header block and wrapper are no longer rendered -->
+        <referenceContainer name="header-wrapper" remove="true"/>
+
+        <!--
+            navigation.sections is Magento's mobile nav-sections wrapper. It is
+            also where MGS_Mmegamenu injects its own menu (.me-native-menu-wrapper
+            / .me-sub-panel), which rendered a SECOND full-width category strip
+            below our nav and pushed the page into horizontal overflow.
+            This theme renders its own nav via hub.market.topnav, so both go.
+        -->
+        <referenceBlock name="navigation.sections" remove="true"/>
+        <referenceBlock name="store.menu" remove="true"/>
+        <referenceBlock name="catalog.topnav" remove="true"/>
+
+        <!--
+            MGS_Mmegamenu declares `megamenu` into page.top (see
+            app/code/MGS/Mmegamenu/view/frontend/layout/default.xml), which is a
+            different container from the header — removing navigation.sections
+            alone did not stop it. Both it and its script go.
+        -->
+        <referenceBlock name="megamenu" remove="true"/>
+        <referenceBlock name="megamenu.script" remove="true"/>
+
+        <!--
+            MGS_Fbuilder's editor panel, declared into after.body.start by
+            app/code/MGS/Fbuilder/view/frontend/layout/default.xml.
+
+            It has to go, and not for cosmetic reasons. The panel instantiates
+            Fbuilder section preview blocks (products\category_N,
+            widget\owlcarousel_N) whose templates — products/grid.phtml and
+            widget/owl_banner.phtml — exist ONLY inside app/design/frontend/Mgs/supro.
+            On a Magento/blank-based theme they cannot resolve, so every single
+            page render logged five
+
+                CRITICAL: Invalid template file: 'products/grid.phtml' …
+
+            lines to system.log. Measured after go-live: 5 per render on the
+            homepage, the category page AND the Arabic homepage alike. On a live
+            store that is unbounded log growth on every page view, and this
+            install has already had a runaway log fill the disk to 96% once.
+
+            It also emitted a hidden admin toggle (#active-fbuilder, 0x0) into
+            anonymous storefront HTML, which goes away with it.
+        -->
+        <referenceBlock name="builder_panel" remove="true"/>
+
+        <!--
+            Magento's own footer blocks render IN ADDITION to hm.footer, which
+            produced a second footer underneath ours: the default link list,
+            "Copyright (c) 2013-present Magento, Inc." and "Report All Bugs".
+            hm.footer supplies all of that, so the originals go.
+            store_switcher is also removed here because the utility bar renders
+            its own copy (hm.store.switcher).
+        -->
+        <referenceBlock name="footer_links" remove="true"/>
+        <referenceBlock name="copyright" remove="true"/>
+        <referenceBlock name="report.bugs" remove="true"/>
+        <referenceBlock name="store_switcher" remove="true"/>
+
+        <!-- footer -->
+        <referenceContainer name="footer">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.footer"
+                   before="-"
+                   template="Magento_Theme::html/footer.phtml">
+                <block class="Magento\Framework\View\Element\Html\Links" name="hm.footer.links">
+                    <arguments>
+                        <argument name="css_class" xsi:type="string">hm-footer__links</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+
+        <!--
+            No override needed for the skip-link target: Magento's main container
+            already renders <main id="maincontent">, which skip-link.phtml points at.
+        -->
+    </body>
+</page>

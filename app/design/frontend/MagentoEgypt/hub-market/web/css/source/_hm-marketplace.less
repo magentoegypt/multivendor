@@ -1,0 +1,263 @@
+//
+//  Hub Market — Vnecoms marketplace customer routes
+//  _____________________________________________
+//
+//  Covers the customer-facing marketplace features the Figma design never drew:
+//
+//    /vrma/guest/index      RMA lookup for guests        (public)
+//    /vrma/customer/index   RMA list for customers       (auth)
+//    /vstorecredit          store credit balance         (auth)
+//    /quotation             quote / RFQ basket           (public)
+//
+//  NOTE ON /vrma: the route 404s at its ROOT. Vnecoms ships only Customer/, Guest/
+//  and Adminhtml/ controller namespaces — there is no Index/ — so /vrma alone is
+//  correct Magento routing behaviour, not a bug to chase. The real entry points are
+//  the two above.
+//
+//  These pages are the oldest markup on the storefront. Vnecoms carries Magento 1
+//  era conventions — `.form-list`, `.input-box`, `.buttons-set`, and buttons with
+//  `class="button"` rather than `.action.primary`. That last one is why the RMA
+//  submit rendered as a bare grey UA button while every other button on the site
+//  was themed: `_hm-base.less` styles `.action.primary`, which this markup never
+//  uses. Styling the legacy hooks here fixes buttons across all four routes at once.
+//
+
+//
+//  Legacy buttons
+//  ---------------------------------------------
+//  Scoped to these page types rather than global: `button.button` is generic enough
+//  that a global rule would repaint third-party widgets elsewhere.
+.vrma-guest-index,
+.vrma-customer-index,
+.vstorecredit-index-index,
+.quotation-index-index {
+    button.button,
+    .buttons-set button,
+    .buttons-set .button {
+        align-items: center;
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: var(--hm-on-accent);
+        cursor: pointer;
+        display: inline-flex;
+        font-family: var(--hm-font-body);
+        font-size: 1.4rem;
+        font-weight: 600;
+        gap: var(--hm-space-2);
+        justify-content: center;
+        line-height: 1.4;
+        min-block-size: 4.4rem;
+        padding: var(--hm-space-3) var(--hm-space-6);
+        text-decoration: none;
+        transition: background-color var(--hm-duration) var(--hm-ease),
+                    border-color var(--hm-duration) var(--hm-ease);
+
+        &:hover:not(:disabled) {
+            background: var(--hm-accent-hover);
+            border-color: var(--hm-accent-hover);
+        }
+
+        &:disabled { cursor: not-allowed; opacity: .55; }
+    }
+
+    //  .buttons-set is a SIBLING of the form card, not a child, so it needs the
+    //  same measure or the submit hangs off the card's right edge.
+    //  .buttons-set sits INSIDE the form card and is FLOATED by the legacy
+    //  stylesheet. A floated box shrink-wraps — measured 134px against the card's
+    //  720px — and, being out of flow, it did not contribute to the card's height,
+    //  so the button rendered visually BELOW the card's bottom border. Clearing the
+    //  float fixes both: the button returns inside the card and fills the row so
+    //  `justify-content: flex-end` can right-align it. `max-inline-size` alone does
+    //  nothing to a shrink-wrapped box, which is why the first attempt missed.
+    .buttons-set {
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        float: none;
+        gap: var(--hm-space-3);
+        inline-size: 100%;
+        justify-content: flex-end;
+        margin-block-start: var(--hm-space-4);
+        max-inline-size: 72rem;
+    }
+}
+
+//
+//  Legacy forms
+//  ---------------------------------------------
+//  The RMA request form ran the full 1440px width because nothing constrained it —
+//  two fields stretched edge to edge and the submit floated off on its own. Give it
+//  a readable measure and card it, matching the login form's treatment.
+.vrma-guest-index,
+.vrma-customer-index,
+.quotation-index-index {
+    .request-new-form,
+    .form-list-wrapper {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        box-sizing: border-box;
+        margin-block: var(--hm-space-6);
+        max-inline-size: 72rem;
+        padding: var(--hm-space-6);
+    }
+
+    //  .form-list is an M1-era <ul>. Reset it and lay the fields out on a grid.
+    .form-list,
+    .form-list > .fields {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .form-list {
+        display: grid;
+        gap: var(--hm-space-5);
+        grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+    }
+
+    //  `.fields.left` is a float hook in the original markup. Floats inside a grid
+    //  item collapse the track — the same failure that broke the login field — so
+    //  neutralise it explicitly rather than trusting the grid to win.
+    .fields,
+    .fields.left,
+    .fields.right {
+        box-sizing: border-box;
+        float: none;
+        inline-size: auto;
+        width: auto;
+    }
+
+    label {
+        color: var(--hm-foreground-muted);
+        display: block;
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-block-end: .4rem;
+    }
+
+    .input-box { box-sizing: border-box; display: block; inline-size: 100%; }
+
+    input.input-text,
+    select,
+    textarea {
+        background: var(--hm-surface-input);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        box-sizing: border-box;
+        font-size: 1.6rem;
+        inline-size: 100%;
+        min-block-size: 4.8rem;
+        padding-inline: var(--hm-space-4);
+    }
+
+    textarea { min-block-size: 12rem; padding-block: var(--hm-space-3); }
+
+    //  The required marker is an em on this markup, not the usual .required span.
+    .required em,
+    em.required { color: var(--hm-danger); font-style: normal; }
+}
+
+//
+//  Empty states
+//  ---------------------------------------------
+//  /quotation with nothing in it rendered two bare sentences against white. Give it
+//  the same treatment the rest of the theme uses for empty lists.
+.quotation-index-index .cart-empty,
+.vrma-customer-index .empty,
+.vstorecredit-index-index .empty {
+    background: var(--hm-surface-muted);
+    border: 1px dashed var(--hm-border-strong);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    color: var(--hm-foreground-muted);
+    font-size: 1.5rem;
+    margin-block: var(--hm-space-6);
+    padding: var(--hm-space-8) var(--hm-space-5);
+    text-align: center;
+
+    p { margin: 0 0 var(--hm-space-2); }
+    a { color: var(--hm-accent-strong); font-weight: 600; }
+}
+
+//
+//  Legacy tables (RMA list, store credit ledger)
+//  ---------------------------------------------
+//  Vnecoms uses `.data-table`, not Magento 2's `.data.table`. Both are covered so
+//  the ledger and the RMA list read consistently with the account tables.
+.vrma-customer-index,
+.vstorecredit-index-index {
+    .data-table,
+    .data.table {
+        border-collapse: collapse;
+        inline-size: 100%;
+
+        th,
+        td {
+            border-block-end: 1px solid var(--hm-border-subtle);
+            padding: var(--hm-space-3) var(--hm-space-4);
+            text-align: start;
+            vertical-align: top;
+        }
+
+        thead th {
+            background: var(--hm-surface-muted);
+            font-size: 1.3rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        tbody td { color: var(--hm-foreground-muted); font-size: 1.4rem; }
+
+        //  Credit amounts are figures, not prose.
+        .amount,
+        .price { color: var(--hm-foreground); font-weight: 700; }
+    }
+
+    //  Same rule as the account area: a wide table scrolls in its own box rather
+    //  than pushing the document into horizontal overflow at 390px.
+    .table-wrapper,
+    .data-table-wrapper {
+        box-sizing: border-box;
+        max-inline-size: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+//
+//  RMA type / status chips
+//  ---------------------------------------------
+//  Vnecoms_Rma ships a plain rma.css (not LESS, so no variables reach it) which
+//  hardcodes `font-family: Arial,sans-serif` and white text on light fills. Both
+//  were invisible to every earlier check because the route is behind login and the
+//  parity sweep runs as a guest.
+//
+//  Measured on /vrma/customer/index:
+//    "Refund"   #ffffff on #ffa800 = 1.93:1   (AA needs 4.5)
+//    "Resolved" #ffffff on #60a653 = 2.97:1   (AA needs 4.5)
+//
+//  Repainted with the theme's status tokens, which are already contrast-checked
+//  against --hm-on-status. Arial was also the only off-family font left anywhere
+//  on the storefront.
+.hm-page {
+
+    .type,
+    .status {
+        border-radius: var(--hm-radius-sm);
+        font-family: var(--hm-font-sans);
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .type-refund   { background-color: var(--hm-warning); border-color: var(--hm-warning); color: var(--hm-on-status); }
+    .type-replace  { background-color: var(--hm-info);    border-color: var(--hm-info);    color: var(--hm-on-status); }
+
+    .status-pending,
+    .status-approval      { background-color: var(--hm-info);    border-color: var(--hm-info);    color: var(--hm-on-status); }
+    .status-package_sent  { background-color: var(--hm-info);    border-color: var(--hm-info);    color: var(--hm-on-status); }
+    .status-resolved,
+    .status-complete      { background-color: var(--hm-success); border-color: var(--hm-success); color: var(--hm-on-status); }
+    .status-canceled      { background-color: var(--hm-danger);  border-color: var(--hm-danger);  color: var(--hm-on-status); }
+}

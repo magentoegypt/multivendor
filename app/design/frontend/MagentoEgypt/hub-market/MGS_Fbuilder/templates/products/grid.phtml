@@ -1,0 +1,31 @@
+<?php
+/**
+ * Hub Market — deliberate no-op stub for MGS_Fbuilder's product grid.
+ *
+ * WHY THIS FILE EXISTS
+ *
+ * MGS ships products/grid.phtml and widget/owl_banner.phtml ONLY inside
+ * app/design/frontend/Mgs/supro (and Mgs/mgsmobile) — never in the module. On a
+ * Magento/blank-based theme they cannot resolve through the fallback, so every
+ * Fbuilder section that Magento instantiates logged
+ *
+ *     CRITICAL: Invalid template file: 'products/grid.phtml'
+ *               in module: 'MGS_Fbuilder' block's name: 'products\category_0'
+ *
+ * Measured immediately after go-live: FIVE such lines on every render of the
+ * homepage and every category page (three products\category_N, two
+ * widget\owlcarousel_N). At any real traffic level that is unbounded growth in
+ * system.log, and a runaway log has already filled this server's disk to 96% once.
+ *
+ * The blocks are instantiated by Fbuilder widget directives embedded in the Luma
+ * demo CMS blocks that the "Home Page" and "<x> Category Content" widget
+ * instances render. Those are demo content which is to be left in place, so the
+ * fix is not to delete them — it is to give the block a template that resolves
+ * and outputs nothing. The section is suppressed, no content is destroyed, and
+ * the log stays clean.
+ *
+ * This becomes unnecessary when MGS_Fbuilder is decommissioned in Phase L.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>

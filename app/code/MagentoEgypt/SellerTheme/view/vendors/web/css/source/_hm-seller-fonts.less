@@ -1,0 +1,72 @@
+//
+//  Hub Market — seller panel webfonts
+//  _____________________________________________
+//
+//  Same families and the same SIL OFL 1.1 licence as the storefront, but the font
+//  files are a SEPARATE COPY under this module. They have to be: the vendors area
+//  deploys to pub/static/vendors/… while the storefront theme deploys to
+//  pub/static/frontend/…, and a stylesheet in one cannot reliably reach the other
+//  (the locale segment and the version segment both differ).
+//
+//  PATH DIFFERENCE from the storefront theme, and the easy thing to get wrong:
+//  these fonts ship from a MODULE, not a theme, so Magento deploys them to
+//
+//      pub/static/vendors/Vnecoms/vendor/<locale>/MagentoEgypt_SellerTheme/fonts/…
+//
+//  while the compiled stylesheet lands in
+//
+//      pub/static/vendors/Vnecoms/vendor/<locale>/css/styles-m.css
+//
+//  so the relative URL is '../MagentoEgypt_SellerTheme/fonts/…', NOT '../fonts/…'
+//  as in the theme. Using the theme's path here yields a silent 404 and a
+//  system-font fallback that looks almost right.
+//
+//  Playfair Display is deliberately absent. It is a storefront display face; a
+//  serif at 13–14px in a data grid is harder to scan, not easier. Skipping it
+//  keeps 68 KB out of the panel.
+//
+//  Unicode ranges are escaped with ~"" so LESS does not try arithmetic on the
+//  hex ranges.
+//
+
+@hm-range-latin: ~"U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
+@hm-range-latin-ext: ~"U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF";
+@hm-range-arabic: ~"U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC, U+102E0-102FB, U+10E60-10E7E, U+10EC2-10EC4, U+10EFC-10EFF, U+1EE00-1EE03, U+1EE05-1EE1F, U+1EE21-1EE22, U+1EE24, U+1EE27, U+1EE29-1EE32, U+1EE34-1EE37, U+1EE39, U+1EE3B, U+1EE42, U+1EE47, U+1EE49, U+1EE4B, U+1EE4D-1EE4F, U+1EE51-1EE52, U+1EE54, U+1EE57, U+1EE59, U+1EE5B, U+1EE5D, U+1EE5F, U+1EE61-1EE62, U+1EE64, U+1EE67-1EE6A, U+1EE6C-1EE72, U+1EE74-1EE77, U+1EE79-1EE7C, U+1EE7E, U+1EE80-1EE89, U+1EE8B-1EE9B, U+1EEA1-1EEA3, U+1EEA5-1EEA9, U+1EEAB-1EEBB, U+1EEF0-1EEF1";
+
+.hm-seller-face(@family; @file; @weight; @range) {
+    @font-face {
+        font-family: @family;
+        font-style: normal;
+        font-weight: @weight;
+        font-display: swap;
+        src: url('../MagentoEgypt_SellerTheme/fonts/@{file}.woff2') format('woff2');
+        unicode-range: @range;
+    }
+}
+
+//
+//  DM Sans — the whole UI — VARIABLE font
+//  ---------------------------------------------
+//  One file per subset covering the entire 100–1000 axis. Declaring it as four
+//  fixed weights ships four byte-identical copies under four URLs, which the
+//  browser then caches four times — verified by md5 during the storefront build.
+.hm-seller-face('DM Sans'; 'dm-sans/latin';     ~"100 1000"; @hm-range-latin);
+.hm-seller-face('DM Sans'; 'dm-sans/latin-ext'; ~"100 1000"; @hm-range-latin-ext);
+
+//
+//  IBM Plex Sans Arabic — the Arabic face
+//  ---------------------------------------------
+//  Not variable (Google will not serve a wght range for it), so one file per
+//  weight. It ships a latin subset as well as an arabic one, which is why it was
+//  chosen: SKUs, order numbers, prices and brand names embedded in Arabic copy
+//  stay in the same family instead of falling back mid-sentence. In a seller
+//  panel that matters more than on the storefront — nearly every screen mixes
+//  Arabic labels with latin identifiers.
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-400'; 400; @hm-range-arabic);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-500'; 500; @hm-range-arabic);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-600'; 600; @hm-range-arabic);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-700'; 700; @hm-range-arabic);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-400';  400; @hm-range-latin);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-500';  500; @hm-range-latin);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-600';  600; @hm-range-latin);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-700';  700; @hm-range-latin);

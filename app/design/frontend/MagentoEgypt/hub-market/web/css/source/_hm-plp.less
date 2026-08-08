@@ -1,0 +1,332 @@
+//
+//  Hub Market — product listing (PLP)
+//  _____________________________________________
+//
+//  The product grid itself is already handled by _hm-product-item.less, written
+//  in Phase D for the homepage rails. Magento uses identical `.product-item`
+//  markup in both places, so the listing inherits the card for free — which is
+//  the payoff for collapsing the design's 12 card renderings into one.
+//
+//  What is left is everything AROUND the grid: toolbar, layered navigation,
+//  pager, swatches and the empty state.
+//
+
+//
+//  Category header
+//  ---------------------------------------------
+.catalog-category-view,
+.catalogsearch-result-index {
+    .page-title-wrapper { margin-block-end: var(--hm-space-6); }
+
+    .page-title {
+        font-family: var(--hm-font-heading);
+        font-size: 3.6rem;
+        font-weight: 700;
+        line-height: 1.15;
+    }
+
+    .category-description {
+        color: var(--hm-foreground-muted);
+        margin-block-end: var(--hm-space-6);
+        max-inline-size: 70ch;
+    }
+}
+
+//
+//  Toolbar
+//  ---------------------------------------------
+.toolbar-products {
+    align-items: center;
+    border-block-end: 1px solid var(--hm-border-subtle);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    margin-block-end: var(--hm-space-6);
+    padding: 0 0 var(--hm-space-4);
+
+    .toolbar-amount {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        margin: 0;
+        padding: 0;
+        position: static;
+    }
+
+    .toolbar-sorter,
+    .field.limiter {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-2);
+        margin: 0;
+    }
+
+    .sorter-label,
+    .limiter-label,
+    .limiter-text {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        white-space: nowrap;
+    }
+
+    select {
+        background-color: var(--hm-surface-input);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-sans);
+        font-size: 1.4rem;
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-3);
+    }
+
+    //  Sort-direction toggle: an icon-only control, so it needs a real name.
+    .sorter-action {
+        align-items: center;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        color: var(--hm-icon);
+        display: flex;
+        justify-content: center;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+
+        &:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
+    }
+}
+
+//  Grid / list view switcher
+.modes {
+    display: flex;
+    gap: var(--hm-space-1);
+    margin: 0;
+
+    .modes-mode {
+        align-items: center;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius-sm);
+        color: var(--hm-icon);
+        display: flex;
+        justify-content: center;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+
+        &.active {
+            background: var(--hm-primary);
+            border-color: var(--hm-primary);
+            color: var(--hm-on-primary);
+        }
+    }
+}
+
+//
+//  Pager
+//  ---------------------------------------------
+.pages {
+    margin-block-start: var(--hm-space-8);
+
+    .items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-1);
+        justify-content: center;
+    }
+
+    .item {
+        margin: 0;
+
+        strong.page,
+        a.page,
+        .action {
+            align-items: center;
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius);
+            color: var(--hm-foreground);
+            display: flex;
+            justify-content: center;
+            min-block-size: 4.4rem;
+            min-inline-size: 4.4rem;
+            padding-inline: var(--hm-space-2);
+            text-decoration: none;
+        }
+
+        strong.page {
+            background: var(--hm-primary);
+            border-color: var(--hm-primary);
+            color: var(--hm-on-primary);
+        }
+
+        a.page:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
+    }
+}
+
+//
+//  Layered navigation
+//  ---------------------------------------------
+.sidebar {
+    .block {
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        margin-block-end: var(--hm-space-5);
+        padding: var(--hm-space-5);
+    }
+
+    .block-title,
+    .filter-title {
+        margin: 0 0 var(--hm-space-4);
+
+        strong {
+            color: var(--hm-foreground);
+            font-family: var(--hm-font-sans);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+    }
+}
+
+.filter-options-title {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-sans);
+    font-size: 1.5rem;
+    font-weight: 600;
+    padding-block: var(--hm-space-3);
+    text-align: start;
+
+    &:hover { color: var(--hm-accent-strong); }
+}
+
+.filter-options-item {
+    border-block-end: 1px solid var(--hm-border-subtle);
+
+    &:last-child { border-block-end: 0; }
+}
+
+.filter-options-content {
+    padding-block-end: var(--hm-space-3);
+
+    .item { margin-block-end: var(--hm-space-2); }
+
+    a {
+        color: var(--hm-foreground-muted);
+        display: block;
+        font-size: 1.4rem;
+        padding-block: .4rem;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+
+    .count {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+}
+
+//  Active filters
+.filter-current {
+    .item { margin-block-end: var(--hm-space-2); }
+
+    .filter-label { color: var(--hm-foreground-muted); font-size: 1.3rem; }
+    .filter-value { color: var(--hm-foreground); font-weight: 600; }
+}
+
+.filter-actions a {
+    color: var(--hm-accent-strong);
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+//
+//  Swatches
+//  ---------------------------------------------
+//  Magento/blank's swatch CSS is removed in this theme, so these are styled
+//  from scratch. The selected state must not rely on colour alone.
+.swatch-attribute {
+    margin-block: var(--hm-space-2);
+}
+
+.swatch-option {
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius-xs);
+    min-block-size: 3.2rem;
+    min-inline-size: 3.2rem;
+    outline-offset: 2px;
+
+    &.selected {
+        border-color: var(--hm-primary);
+        box-shadow: 0 0 0 2px var(--hm-primary);
+    }
+
+    &.text {
+        background: var(--hm-surface);
+        color: var(--hm-foreground);
+        font-size: 1.3rem;
+        padding-inline: var(--hm-space-3);
+    }
+
+    &.disabled {
+        opacity: .4;
+        pointer-events: none;
+    }
+}
+
+//  The `.text` rule above is (0,2,0) and LOSES. Magento_Swatches ships
+//
+//      .swatch-attribute.size .swatch-option,
+//      .swatch-attribute.manufacturer .swatch-option { background:#f0f0f0; color:#949494 }
+//
+//  at (0,3,0), so every size and manufacturer swatch rendered #949494 on #f0f0f0 —
+//  measured **2.66:1**, failing AA, on 31 nodes on the homepage alone. That was the
+//  single largest real contrast defect left on the storefront.
+//
+//  The `.hm-page` body class takes this to (0,4,0) so it wins outright rather than
+//  depending on source order.
+.hm-page .swatch-attribute.size .swatch-option,
+.hm-page .swatch-attribute.manufacturer .swatch-option {
+    background: var(--hm-surface);
+    color: var(--hm-foreground);        // #1a1a2e on #fff — far clear of 4.5:1
+}
+
+//
+//  Empty state
+//  ---------------------------------------------
+//  Magento renders this natively; the design never drew it.
+.message.notice,
+.message.info {
+    background: var(--hm-info-subtle);
+    border-inline-start: 3px solid var(--hm-info);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-foreground);
+    padding: var(--hm-space-5);
+}
+
+//
+//  Blank hides rail/grid actions behind hover and fades them with opacity.
+//  On touch they simply never appear — the exact defect the Figma build had.
+//  ---------------------------------------------
+.products-grid .product-item-inner,
+.block.widget .product-item-inner {
+    opacity: 1;
+}
+
+.product-item-actions .actions-primary .action.tocart,
+.products-grid .product-item .action.tocart {
+    opacity: 1;
+}
+
+//  Some modules append an empty secondary action slot; hide it rather than
+//  leaving an empty 44px box next to wishlist and compare.
+.product-item .actions-secondary > a.action:empty { display: none; }
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 767px) {
+    .toolbar-products {
+        .toolbar-amount { flex-basis: 100%; }
+    }
+
+    .catalog-category-view .page-title { font-size: 2.8rem; }
+}

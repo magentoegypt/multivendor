@@ -1,0 +1,8 @@
+<div class="logo-container">
+	<!-- ko if: getHomepageUrl(item) -->
+		<a data-bind="attr:{href: getHomepageUrl(item), title:getVendorTitle(item)}"><img data-bind="attr:{src: getLogoUrl(item), width: getLogoWidth(item), height: getLogoHeight(item), alt: getVendorTitle(item)}" /></a>
+	<!-- /ko -->
+	<!-- ko ifnot: getHomepageUrl(item) -->
+		<img data-bind="attr:{src: getLogoUrl(item), width: getLogoWidth(item), height: getLogoHeight(item), alt: getVendorTitle(item)}" />
+	<!-- /ko -->
+</div>

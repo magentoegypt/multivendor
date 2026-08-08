@@ -1,0 +1,165 @@
+//
+//  Hub Market — interaction states
+//  _____________________________________________
+//
+//  Loading, skeleton, empty, error, no-results and out-of-stock do not exist
+//  anywhere in the Figma build. Magento renders all of them natively, so they
+//  will appear on the storefront whether or not they were designed — which is
+//  exactly why they need styling rather than being left to default.
+//
+
+//
+//  Skeleton / loading
+//  ---------------------------------------------
+.hm-skeleton {
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius-sm);
+    display: block;
+    position: relative;
+    overflow: hidden;
+
+    //  The shimmer is decorative. It is disabled under reduced-motion below,
+    //  which the design never did for any of its animations.
+    &::after {
+        animation: hm-shimmer 1.4s infinite;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            fade(#ffffff, 60%) 50%,
+            transparent 100%
+        );
+        content: '';
+        inset: 0;
+        position: absolute;
+        transform: translateX(-100%);
+    }
+}
+
+//  In RTL the shimmer must travel the other way, or it reads as scrolling
+//  against the text direction.
+[dir='rtl'] .hm-skeleton::after,
+:lang(ar) .hm-skeleton::after {
+    animation-name: hm-shimmer-rtl;
+}
+
+@keyframes hm-shimmer {
+    100% { transform: translateX(100%); }
+}
+
+@keyframes hm-shimmer-rtl {
+    100% { transform: translateX(-200%); }
+}
+
+.hm-skeleton--text  { block-size: 1.4rem; margin-block-end: var(--hm-space-2); }
+.hm-skeleton--title { block-size: 2rem; inline-size: 60%; }
+.hm-skeleton--media { aspect-ratio: 1 / 1; inline-size: 100%; }
+
+//  Busy regions. Pair with aria-busy="true" so the state is announced —
+//  `aria-live` appeared zero times in the design, so every dynamic change
+//  was silent.
+[aria-busy='true'] {
+    cursor: progress;
+}
+
+.hm-loading {
+    align-items: center;
+    color: var(--hm-foreground-muted);
+    display: flex;
+    gap: var(--hm-space-3);
+    justify-content: center;
+    padding: var(--hm-space-10);
+}
+
+.hm-spinner {
+    animation: hm-spin 700ms linear infinite;
+    block-size: 2.4rem;
+    border: 2px solid var(--hm-border-subtle);
+    border-block-start-color: var(--hm-accent-strong);
+    border-radius: var(--hm-radius-full);
+    inline-size: 2.4rem;
+}
+
+@keyframes hm-spin {
+    100% { transform: rotate(360deg); }
+}
+
+//
+//  Empty / no-results / error
+//  ---------------------------------------------
+.hm-empty {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-4);
+    padding: var(--hm-space-12) var(--hm-space-4);
+    text-align: center;
+}
+
+.hm-empty__icon {
+    block-size: 4.8rem;
+    color: var(--hm-icon-muted);
+    inline-size: 4.8rem;
+}
+
+.hm-empty__title {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.hm-empty__text {
+    color: var(--hm-foreground-muted);
+    font-size: 1.5rem;
+    max-inline-size: 46rem;
+}
+
+.hm-error {
+    background: var(--hm-danger-subtle);
+    border-inline-start: 3px solid var(--hm-danger);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-danger);
+    padding: var(--hm-space-4);
+}
+
+//
+//  Stock
+//  ---------------------------------------------
+//  Never colour alone — each modifier is paired with a text label in the
+//  template, and the icon carries an accessible name.
+.hm-stock {
+    align-items: center;
+    display: inline-flex;
+    font-size: 1.4rem;
+    font-weight: 600;
+    gap: var(--hm-space-2);
+}
+
+.hm-stock--in  { color: var(--hm-stock-in); }
+.hm-stock--low { color: var(--hm-stock-low); }
+.hm-stock--out { color: var(--hm-stock-out); }
+
+.hm-product-card--out-of-stock {
+    .hm-product-card__media { opacity: .55; }
+}
+
+//
+//  Reduced motion — the design ran three infinite animations and twelve
+//  hover-scale transforms with no guard at all.
+//  ---------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+    .hm-skeleton::after { animation: none; }
+
+    .hm-spinner {
+        animation-duration: 2s;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+    }
+}

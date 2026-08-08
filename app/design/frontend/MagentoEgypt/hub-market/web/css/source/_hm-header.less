@@ -1,0 +1,623 @@
+//
+//  Hub Market — header
+//  _____________________________________________
+//
+//  THREE bands, not the design's four. In the Figma build the header stood
+//  ~190px with ~145px of it sticky, and "Bundle Deals" occupied an entire band
+//  alone, right-aligned. That row is folded into the nav.
+//
+//  Only the search + nav rows stick; the utility bar scrolls away.
+//
+
+@hm-navy-deep: darken(#0f2144, 4%);
+
+.hm-header {
+    background: var(--hm-primary);
+    color: var(--hm-on-inverse);
+    position: relative;
+}
+
+//  box-sizing matters here. Without it these are width:100% (of the viewport)
+//  PLUS padding-inline, so at exactly 1440px the container computes to 1472 and
+//  the trailing item — "Bundle Deals" — gets clipped. It looked like a layout
+//  overflow bug; it was only the box model.
+.hm-header__inner,
+.hm-header__utility-inner,
+.hm-nav__inner,
+.hm-footer__inner {
+    box-sizing: border-box;
+    margin-inline: auto;
+    max-inline-size: var(--hm-container);
+    padding-inline: var(--hm-space-4);
+    width: 100%;
+}
+
+//
+//  Band 1 — utility
+//  ---------------------------------------------
+.hm-header__utility {
+    background: @hm-navy-deep;
+    font-size: 1.3rem;
+}
+
+.hm-header__utility-inner {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    min-block-size: 3.6rem;
+}
+
+.hm-header__promise {
+    align-items: center;
+    color: var(--hm-on-inverse);
+    display: flex;
+    gap: var(--hm-space-2);
+    margin: 0;
+
+    p { margin: 0; }
+}
+
+.hm-header__utility-right {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-4);
+}
+
+.hm-header__utility-links,
+.hm-header__utility-right ul {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-4);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    a {
+        color: var(--hm-on-inverse);
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent); text-decoration: underline; }
+    }
+}
+
+//
+//  Band 2 — logo, search, actions
+//  ---------------------------------------------
+.hm-header__main {
+    background: var(--hm-primary);
+}
+
+.hm-header__inner {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-5);
+    min-block-size: 7.2rem;
+}
+
+//  The wordmark never mirrors — see logo.phtml.
+.hm-logo {
+    flex-shrink: 0;
+    line-height: 0;
+
+    //  Bound by HEIGHT, not width. The band is a fixed height and the uploaded
+    //  logo is 150x120 (5:4, near-square), so `max-inline-size: 18rem` alone made
+    //  it 144px tall and it overflowed the header. Constraining the block size
+    //  keeps any future asset — wide wordmark or square emblem — inside the band.
+    &__img {
+        block-size: auto;
+        inline-size: auto;
+        max-block-size: 5.6rem;
+        max-inline-size: 18rem;
+        object-fit: contain;
+
+        //  STOPGAP, not a design choice. The uploaded logo is a JPG, so it has an
+        //  opaque WHITE background and sits on the navy header as a bare white
+        //  rectangle. Rounding it reads as a deliberate chip instead of a
+        //  rendering artefact.
+        //
+        //  The real fix is a transparent asset (SVG preferred, PNG acceptable) —
+        //  at which point this radius should be removed, not kept.
+        border-radius: var(--hm-radius-sm);
+    }
+}
+
+.hm-header__actions {
+    align-items: center;
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--hm-space-2);
+    //  NO `margin-inline-start: auto`. That pushed the actions to the trailing edge
+    //  by absorbing ALL the free space in the row, which left the search field at
+    //  314px against Figma's ~930px. The search is the flex-grow item (see
+    //  .block-search below), so it takes the slack and the actions still land on
+    //  the trailing edge — without starving the field.
+}
+
+.hm-header__action {
+    align-items: center;
+    color: var(--hm-on-inverse);
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    justify-content: center;
+    min-block-size: 4.4rem;
+    min-inline-size: 4.4rem;
+    padding: var(--hm-space-1) var(--hm-space-2);
+    text-decoration: none;
+
+    &:hover { color: var(--hm-accent); }
+}
+
+.hm-header__action-label {
+    //  12px is the theme's documented type floor (see PHASE-M-REPORT, step 3).
+    //  This was 1.1rem — the smallest text on the storefront and the only rule in
+    //  the whole theme below the floor. "Account" and "Wishlist" are navigation
+    //  labels, not fine print; they do not need to be the smallest thing on screen.
+    font-size: 1.2rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+//
+//  Search — the block that grows
+//  ---------------------------------------------
+.block-search {
+    flex: 1 1 auto;
+    margin: 0;
+    max-inline-size: 76rem;
+    padding: 0;
+    width: auto;
+
+    //  blank renders a "Search" heading above the form; the field is labelled.
+    > .block-title { .hm-sr-only-mixin(); }
+
+    //  The block GROWS to 900px, but the form only used 374 of it — measured.
+    //  `.form.minisearch` is `width: 100%` of `.block-content`, and blank leaves
+    //  that wrapper at its shrink-to-fit content width, so 100% resolved against
+    //  the wrong box. Both need to fill for the field to reach Figma's width.
+    .block-content { margin: 0; width: 100%; }
+    .label { .hm-sr-only-mixin(); }
+
+    //  The form is the flex row: field grows, button hugs.
+    .form.minisearch {
+        display: flex;
+        width: 100%;
+    }
+
+    .field.search {
+        flex: 1 1 auto;
+        margin: 0;
+        min-width: 0;      // lets the input actually shrink inside flex
+    }
+
+    .control {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        position: relative;
+    }
+
+    input {
+        background: var(--hm-surface);
+        border: 0;
+        border-start-start-radius: var(--hm-radius-sm);
+        border-end-start-radius: var(--hm-radius-sm);
+        block-size: 4.4rem;
+        color: var(--hm-foreground);
+        font-size: 1.6rem;        // 16px — below this iOS zooms on focus
+        margin: 0;
+        padding-inline: var(--hm-space-4);
+        position: static;
+        width: 100%;
+
+        &::placeholder { color: var(--hm-placeholder); }
+    }
+
+    .actions { display: block; flex: 0 0 auto; }
+
+    //  Logical border-radius: the rounded corners must be on the trailing edge,
+    //  which swaps sides in RTL. Physical `0 6px 6px 0` would put them on the
+    //  wrong end of the Arabic search bar.
+    //  Specificity note: something later in the cascade (blank's mobile-first
+    //  pattern plus the Vnecoms search-by-vendor module) sets
+    //  `.block-search .action.search { display: none }`. Matching that
+    //  specificity is not enough — it wins on source order. `.actions` in the
+    //  selector takes this to (0,3,0) and settles it without !important.
+    .actions .action.search {
+        align-items: center;
+        background: var(--hm-accent);
+        border: 0;
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+        border-start-end-radius: var(--hm-radius-sm);
+        border-end-end-radius: var(--hm-radius-sm);
+        color: var(--hm-on-accent);   // navy on orange = 5.04:1
+        cursor: pointer;
+        display: flex;
+        font-weight: 600;
+        gap: var(--hm-space-2);
+        min-block-size: 4.4rem;
+        opacity: 1;
+        padding-inline: var(--hm-space-5);
+        position: static;
+
+        &:before { content: none; }   // blank's icon-font glyph
+        &:hover { background: var(--hm-accent-hover); }
+        &:focus-visible { outline: 2px solid var(--hm-focus-ring-inverse); outline-offset: -3px; }
+
+        //  Magento's quickSearch widget disables this button until the field has
+        //  content — that is deliberate (it blocks empty searches), not a bug.
+        //  But blank renders the disabled state at opacity .5, which over the
+        //  navy header composites to #814332 and reads as broken rather than as
+        //  "type something first". Verified by sampling the rendered pixel.
+        &:disabled {
+            opacity: .85;
+        }
+    }
+
+    input {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+    }
+}
+
+//  Magento/blank hides the search button's text with its own visually-hidden
+//  mixin (`.action.search span`), which is why the button rendered icon-only at
+//  every width — measured 1x1 absolute — even though the template has always
+//  emitted the word "Search". Figma shows the label, so it is restored above the
+//  mobile breakpoint. The selector carries `.actions .action.search` to out-specify
+//  blank, the same reason that specificity is spelled out for the button itself.
+@media (min-width: 768px) {
+    .block-search .actions .action.search .hm-search__label {
+        block-size: auto;
+        clip-path: none;
+        inline-size: auto;
+        overflow: visible;
+        position: static;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 767px) {
+    .block-search .hm-search__label { .hm-sr-only-mixin(); }
+}
+
+//  Mixin so .label can be visually hidden without duplicating the rule.
+.hm-sr-only-mixin() {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+//
+//  Mini-cart trigger
+//  ---------------------------------------------
+.minicart-wrapper {
+    margin: 0;
+
+    .action.showcart {
+        align-items: center;
+        color: var(--hm-on-inverse);
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+
+        &:before { content: none; }   // kill blank's icon font glyph
+        &:hover { color: var(--hm-accent); }
+
+        //  The icon comes from the inlined sprite now (see the minicart template).
+        //  Killing the glyph without replacing it left this button EMPTY.
+        .hm-icon { block-size: 2.2rem; inline-size: 2.2rem; }
+
+        //  Match the Account / Wishlist labels beside it.
+        .text {
+            clip-path: none;
+            font-size: 1.2rem;
+            inline-size: auto;
+            block-size: auto;
+            overflow: visible;
+            position: static;
+            white-space: nowrap;
+        }
+
+        .counter.qty {
+            background: var(--hm-accent);
+            border-radius: var(--hm-radius-full);
+            color: var(--hm-on-accent);
+            font-weight: 700;
+            inset-block-start: 0;
+            inset-inline-end: 0;
+            min-inline-size: 2rem;
+            position: absolute;
+        }
+    }
+}
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 991px) {
+    .hm-header__utility { display: none; }   // promise + links move to the footer
+
+    .hm-header__inner {
+        flex-wrap: wrap;
+        gap: var(--hm-space-3);
+        padding-block: var(--hm-space-3);
+    }
+
+    .block-search {
+        max-inline-size: none;
+        order: 3;
+        flex-basis: 100%;
+    }
+
+    .hm-header__action-label { .hm-sr-only-mixin(); }
+}
+
+//
+//  Utility rail  (Figma: the links on the right of the top bar)
+//  ---------------------------------------------
+//  This container existed but rendered empty: store_switcher was removed during
+//  the header rebuild and no topLinks child was ever declared, so both
+//  getChildHtml() calls returned nothing.
+.hm-header__utility-right {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+}
+
+.hm-utility__link {
+    align-items: center;
+    color: var(--hm-on-inverse-muted);   // #cbd3e2 on navy = 10.56:1
+    display: inline-flex;
+    font-size: 1.2rem;
+    gap: .4rem;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible { color: var(--hm-on-inverse); text-decoration: underline; }
+
+    .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
+}
+
+//
+//  Auth links (Knockout-swapped — see utility.phtml)
+//  ---------------------------------------------
+//  The rail is a flex row, so wrapping two links in a <span> would collapse them
+//  into ONE flex item and break the spacing. `display: contents` on the scope
+//  container lets the inner groups participate in the rail's flex directly.
+//
+//  The inner groups keep their own matching gap rather than also using
+//  `display: contents`, because Knockout's `visible` binding toggles
+//  `style.display` — it must have a display value of its own to restore to.
+.hm-utility__auth { display: contents; }
+
+.hm-utility__guest,
+.hm-utility__member {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--hm-space-4);
+}
+
+//  "Sell with us" is the one acquisition link in the rail, so it gets the accent
+//  treatment. @hm-accent is 5.04:1 on navy — safe as text here, unlike on white.
+.hm-utility__link--sell {
+    color: var(--hm-accent);
+    font-weight: 700;
+
+    &:hover, &:focus-visible { color: var(--hm-accent); }
+}
+
+@media (max-width: 767px) {
+    //  The promise line and five links will not co-exist on a phone. Keep the
+    //  two that convert; the rest live in the account menu and footer anyway.
+    .hm-utility__link { display: none; }
+    .hm-utility__link--sell { display: inline-flex; }
+}
+
+//
+//  Language switcher  (Figma: عربي in the utility rail)
+//  ---------------------------------------------
+//  Magento's Store\Block\Switcher markup, restyled in place rather than forked:
+//  .switcher-trigger / .switcher-options / .switcher-dropdown are its own
+//  classes, so this survives a Magento upgrade that changes the template.
+.hm-utility__lang {
+    .switcher,
+    .switcher-store { margin: 0; }
+
+    .switcher-label { .hm-sr-only-mixin(); }
+
+    .switcher-trigger strong,
+    .switcher-trigger > strong {
+        color: var(--hm-on-inverse-muted);   // 10.56:1 on navy
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .switcher-trigger:hover strong { color: var(--hm-on-inverse); }
+
+    //  The dropdown MUST be hidden until opened, and MUST be taken out of flow.
+    //  Neither is inherited here: something in the cascade computes it to
+    //  `display: flex`, so it rendered permanently open — a 118px-tall panel
+    //  sitting inside the utility rail, which grew the rail to 118px and the
+    //  whole header to 246px. `mage/dropdown` (wired by the template's
+    //  data-mage-init) toggles `.active` on .switcher-options, so that is the
+    //  hook; absolute positioning keeps the open panel from resizing the bar.
+    .switcher-options { position: relative; }
+
+    .switcher-options .switcher-dropdown { display: none; }
+    .switcher-options.active .switcher-dropdown { display: block; }
+
+    .switcher-dropdown {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius-sm);
+        box-shadow: var(--hm-shadow);
+        inset-block-start: calc(100% + var(--hm-space-1));
+        inset-inline-end: 0;
+        list-style: none;
+        margin: 0;
+        min-inline-size: 12rem;
+        padding: var(--hm-space-1);
+        position: absolute;
+        z-index: 30;
+    }
+
+    .switcher-option a {
+        color: var(--hm-foreground);
+        display: block;
+        font-size: 1.3rem;
+        min-block-size: 3.6rem;
+        padding: var(--hm-space-2) var(--hm-space-3);
+        text-decoration: none;
+
+        &:hover { background: var(--hm-surface-muted); color: var(--hm-accent-strong); }
+    }
+}
+
+//  Mixin used above — clipped, not display:none, so it stays announced.
+.hm-sr-only-mixin() {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
+
+//
+//  Search band width — the full chain
+//  ---------------------------------------------
+//  Measured, not guessed. `.block-search` grows to 900px correctly, but its
+//  descendants did not follow:
+//
+//    .block-search    106 -> 1006  (900 wide)  <- grows
+//    .block-content   246 ->  1006 (760 wide)  <- shrink-to-fit, right-aligned
+//    .form.minisearch 632 -> 1006 (374 wide)   <- shrink-to-fit, right-aligned
+//    .field.search                 (261 wide)
+//
+//  So the field ended up 261px against Figma's ~930px. Magento/blank sizes these
+//  wrappers itself and its rules land after _extend.less, so a plain
+//  `.block-search .block-content { width: 100% }` (0,2,0) lost. The `.hm-page`
+//  body class takes each one to (0,3,0)+ and settles it.
+.hm-page .block-search {
+    box-sizing: border-box;
+    //  The 76rem cap is why the band never filled: block-search grew to its cap
+    //  and stopped, leaving ~335px of empty navy to the right of the actions.
+    //  Figma's field spans the full space between logo and actions, so the cap goes.
+    max-inline-size: none;
+    padding: 0;
+
+    //  FLEX, not block. `width: 100%` on a block child resolves against the
+    //  parent's CONTENT box, which was itself shrink-to-fit — so 100% kept
+    //  resolving to the wrong number and both wrappers stayed narrow and
+    //  right-aligned (measured: content 620 inside 760, form 374 inside 620).
+    //  Making each wrapper a flex container with a growing child sidesteps
+    //  percentage resolution entirely.
+    display: flex;
+
+    .block-content {
+        box-sizing: border-box;
+        display: flex;
+        flex: 1 1 auto;
+        margin: 0;
+        max-inline-size: none;
+        min-inline-size: 0;
+        width: auto;
+    }
+
+    .form.minisearch {
+        box-sizing: border-box;
+        display: flex;
+        flex: 1 1 auto;
+        margin: 0;
+        max-inline-size: none;
+        min-inline-size: 0;
+        width: auto;
+    }
+
+    .field.search {
+        box-sizing: border-box;
+        flex: 1 1 auto;
+        inline-size: auto;
+        min-inline-size: 0;
+        width: auto;
+    }
+}
+
+//
+//  Search category selector  (Figma: "All Categories" attached to the field)
+//  ---------------------------------------------
+//  Sits at the START of the search row and carries the leading radius, so the
+//  three controls read as one segmented bar: [ selector | field | Search ].
+//  Logical properties throughout — in RTL the selector moves to the right-hand end
+//  and the radius follows it, which physical `border-radius: 6px 0 0 6px` would not.
+.hm-page .block-search .hm-search__cat {
+    flex: 0 0 auto;
+    margin: 0;
+    min-inline-size: 0;
+}
+
+.hm-search__cat-select {
+    background: var(--hm-surface-muted);
+    border: 0;
+    border-inline-end: 1px solid var(--hm-border-subtle);
+    border-start-start-radius: var(--hm-radius-sm);
+    border-end-start-radius: var(--hm-radius-sm);
+    //  The end-side corners must be squared EXPLICITLY. A bare `select` rule in
+    //  the form styles sets the `border-radius` SHORTHAND, so rounding only the
+    //  start pair here leaves the end pair at 6px — putting a notch where this
+    //  control butts against the search input. Measured as 6px on all four
+    //  corners before this pair was added.
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+    block-size: 4.4rem;
+    color: var(--hm-foreground);
+    cursor: pointer;
+    font-family: var(--hm-font-sans);
+    font-size: 1.4rem;
+    max-inline-size: 18rem;
+    padding-inline: var(--hm-space-4);
+
+    &:focus-visible {
+        outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring-inverse);
+        outline-offset: -3px;
+    }
+}
+
+//  With the selector present the FIELD no longer starts the bar, so it must not
+//  keep the leading radius or there is a visible notch between the two controls.
+.hm-page .block-search .hm-search__cat + .field.search input {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+}
+
+//  On a phone the selector would eat the field. Drop it — the plain search still
+//  works, and the category filter is available from the results page facets.
+@media (max-width: 767px) {
+    .hm-page .block-search .hm-search__cat { display: none; }
+    .hm-page .block-search .hm-search__cat + .field.search input {
+        border-start-start-radius: var(--hm-radius-sm);
+        border-end-start-radius: var(--hm-radius-sm);
+    }
+}
+
+//  Globe + language sit as one unit.
+.hm-utility__lang {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-1);
+
+    .hm-icon { color: var(--hm-on-inverse-muted); flex-shrink: 0; }
+}

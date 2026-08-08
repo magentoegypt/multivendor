@@ -1,0 +1,305 @@
+//
+//  Hub Market — seller panel controls (buttons, forms, inputs)
+//  _____________________________________________
+//
+//  TWO control vocabularies coexist in this panel and both have to be covered:
+//
+//    Bootstrap 3 / AdminLTE  — .btn, .btn-primary, .form-control, .input-group
+//        used by the hand-written .phtml screens (dashboard, order view, login,
+//        config, shipping, most of the older Vnecoms screens)
+//
+//    Magento admin UI library — .action-primary, .admin__control-text,
+//        .admin__field, .admin__control-select
+//        used by the UI-component screens (product listing, product form, order
+//        grid). custom.css is where those live; it is 153 KB of the Magento admin
+//        palette (#007bdb, #514943, #e3e3e3), which is what makes the panel look
+//        like stock Magento admin rather than like Hub Market.
+//
+//  Styling only one vocabulary leaves half the panel off-brand, which is the trap
+//  here.
+//
+
+//
+//  Buttons — Bootstrap 3 / AdminLTE
+//  ---------------------------------------------
+.btn {
+    border: 1px solid transparent;
+    border-radius: var(--hm-radius-sm);
+    font-family: var(--hm-font-ui);
+    font-size: @hm-text-base;
+    font-weight: @hm-weight-semibold;
+    line-height: @hm-leading-snug;
+    min-block-size: var(--hm-control-height);
+    padding: @hm-space-2 @hm-space-4;
+    transition: background-color var(--hm-duration) var(--hm-ease),
+                border-color var(--hm-duration) var(--hm-ease),
+                color var(--hm-duration) var(--hm-ease);
+
+    &:focus-visible {
+        outline: @hm-focus-ring-width solid var(--hm-focus-ring);
+        outline-offset: @hm-focus-ring-offset;
+    }
+}
+
+//  Primary = accent FILL with a NAVY label. Not white: white on #f26522 is
+//  3.15:1 and fails. Navy on #f26522 is 5.04:1. This is the same primary button
+//  as the storefront, deliberately.
+.btn-primary,
+.btn.btn-primary {
+    background: var(--hm-accent);
+    border-color: var(--hm-accent);
+    color: var(--hm-on-accent);
+
+    &:hover,
+    &:focus,
+    &:active,
+    &.active {
+        background: var(--hm-accent-hover);   // navy on it 4.55:1
+        border-color: var(--hm-accent-hover);
+        color: var(--hm-on-accent);
+    }
+}
+
+//  Default/secondary = white with a real border. @hm-border-strong is 3.61:1,
+//  which clears the 3:1 that 1.4.11 asks of a control boundary; the #e3e3e3
+//  Magento admin uses is 1.29:1 and does not.
+.btn-default,
+.btn.btn-default {
+    background: var(--hm-surface);
+    border-color: var(--hm-border-strong);
+    color: var(--hm-foreground);
+
+    &:hover,
+    &:focus {
+        background: var(--hm-surface-muted);
+        border-color: var(--hm-accent-strong);
+        color: var(--hm-accent-strong);
+    }
+}
+
+.btn-link {
+    color: var(--hm-accent-strong);
+    &:hover { color: @hm-accent-strong-hover; }
+}
+
+//  Status buttons. Each pairs white with a colour that clears 4.5:1 against it.
+.btn-success { background: var(--hm-success); border-color: var(--hm-success); color: var(--hm-on-status); }
+.btn-info    { background: var(--hm-info);    border-color: var(--hm-info);    color: var(--hm-on-status); }
+.btn-warning { background: var(--hm-warning); border-color: var(--hm-warning); color: var(--hm-on-status); }
+.btn-danger  { background: var(--hm-danger);  border-color: var(--hm-danger);  color: var(--hm-on-status); }
+
+.btn-lg { font-size: @hm-text-lg; min-block-size: var(--hm-control-height-lg); padding: @hm-space-3 @hm-space-6; }
+.btn-sm,
+.btn-xs { font-size: @hm-text-sm; min-block-size: 3rem; padding: @hm-space-1 @hm-space-3; }
+
+.btn[disabled],
+.btn.disabled {
+    background: var(--hm-surface-muted);
+    border-color: var(--hm-border-subtle);
+    color: var(--hm-foreground-disabled);
+    opacity: 1;   // Bootstrap's .65 opacity stacks with the muted colour and
+                  // drops the label under 3:1
+}
+
+//
+//  Buttons — Magento admin UI library
+//  ---------------------------------------------
+.action-primary,
+.admin__action-multiselect-menu-inner .action-primary,
+button.action-primary {
+    background: var(--hm-accent);
+    border: 1px solid var(--hm-accent);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-on-accent);
+    font-family: var(--hm-font-ui);
+    font-size: @hm-text-base;
+    font-weight: @hm-weight-semibold;
+    min-block-size: var(--hm-control-height);
+
+    &:hover,
+    &:focus {
+        background: var(--hm-accent-hover);
+        border-color: var(--hm-accent-hover);
+        color: var(--hm-on-accent);
+    }
+}
+
+.action-secondary,
+.action-default,
+button.action-default {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-ui);
+    font-size: @hm-text-base;
+    font-weight: @hm-weight-semibold;
+    min-block-size: var(--hm-control-height);
+
+    &:hover,
+    &:focus {
+        background: var(--hm-surface-muted);
+        border-color: var(--hm-accent-strong);
+        color: var(--hm-accent-strong);
+    }
+}
+
+//
+//  Form fields — Bootstrap 3
+//  ---------------------------------------------
+.form-control {
+    background: var(--hm-surface-input);
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius-sm);
+    box-shadow: none;
+    color: var(--hm-foreground);
+    //  16px is the iOS zoom threshold, but this is a desktop-first back office
+    //  and 14px is the panel's base. Kept at 14px for density; the login form
+    //  raises it to 16px because that one IS used on phones.
+    font-size: @hm-text-base;
+    min-block-size: var(--hm-control-height);
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &::placeholder { color: var(--hm-placeholder); opacity: 1; }
+
+    &:focus {
+        border-color: var(--hm-accent-strong);
+        box-shadow: 0 0 0 3px fade(#c2410c, 18%);
+        outline: none;   // replaced by the ring above, not removed
+    }
+
+    &[disabled],
+    &[readonly] {
+        background: var(--hm-surface-muted);
+        color: var(--hm-foreground-disabled);
+    }
+}
+
+textarea.form-control { min-block-size: 9rem; }
+
+label,
+.control-label {
+    color: var(--hm-foreground);
+    font-size: @hm-text-sm;
+    font-weight: @hm-weight-semibold;
+    margin-block-end: @hm-space-1;
+}
+
+.help-block {
+    color: var(--hm-foreground-muted);
+    font-size: @hm-text-sm;
+}
+
+//  Validation states. Bootstrap 3 colours the label AND the border; both are
+//  retoned so the error red is the palette's, not Bootstrap's #a94442.
+.has-error {
+    .control-label,
+    .help-block { color: var(--hm-danger); }
+    .form-control {
+        border-color: var(--hm-danger);
+        &:focus { box-shadow: 0 0 0 3px fade(#c0392b, 20%); }
+    }
+}
+
+.has-success {
+    .control-label { color: var(--hm-success); }
+    .form-control  { border-color: var(--hm-success); }
+}
+
+//  Magento's own validation message, which the UI-component screens emit.
+.mage-error,
+div.mage-error {
+    color: var(--hm-danger);
+    font-size: @hm-text-sm;
+    font-weight: @hm-weight-medium;
+    margin-block-start: @hm-space-1;
+}
+
+.input-group-addon {
+    background: var(--hm-surface-muted);
+    border-color: var(--hm-border-strong);
+    color: var(--hm-foreground-muted);
+}
+
+//
+//  Form fields — Magento admin UI library
+//  ---------------------------------------------
+.admin__control-text,
+.admin__control-select,
+.admin__control-textarea,
+input.admin__control-text,
+select.admin__control-select {
+    background: var(--hm-surface-input);
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-ui);
+    font-size: @hm-text-base;
+    min-block-size: var(--hm-control-height);
+
+    &::placeholder { color: var(--hm-placeholder); opacity: 1; }
+
+    &:focus {
+        border-color: var(--hm-accent-strong);
+        box-shadow: 0 0 0 3px fade(#c2410c, 18%);
+    }
+}
+
+.admin__field > .admin__field-label,
+.admin__field-label span {
+    color: var(--hm-foreground);
+    font-size: @hm-text-sm;
+    font-weight: @hm-weight-semibold;
+}
+
+//  Required marker — Magento renders it as a red asterisk. #e02b27 on white is
+//  4.15:1 and fails; the palette's danger is 5.44:1.
+.admin__field.required > .admin__field-label span::after,
+.admin__field._required > .admin__field-label span::after,
+.required em,
+.required-entry ~ label em { color: var(--hm-danger); }
+
+//
+//  Checkboxes / radios / toggles
+//  ---------------------------------------------
+//  accent-color does the work in every engine that matters and avoids rebuilding
+//  the control. The accent fill is what a checked box is, so @hm-accent is the
+//  right token here rather than @hm-accent-strong.
+input[type='checkbox'],
+input[type='radio'] {
+    accent-color: var(--hm-accent);
+    block-size: 1.6rem;
+    inline-size: 1.6rem;
+}
+
+//
+//  Tabs — used by the order view and the dashboard graphs
+//  ---------------------------------------------
+.nav-tabs {
+    border-block-end: 1px solid var(--hm-border-subtle);
+
+    > li > a {
+        border: 0;
+        border-block-end: 2px solid transparent;
+        border-radius: 0;
+        color: var(--hm-foreground-muted);
+        font-size: @hm-text-base;
+        font-weight: @hm-weight-semibold;
+        margin: 0;
+        padding: @hm-space-3 @hm-space-4;
+
+        &:hover { background: transparent; color: var(--hm-foreground); }
+    }
+
+    > li.active > a {
+        &,
+        &:hover,
+        &:focus {
+            background: transparent;
+            border: 0;
+            border-block-end: 2px solid var(--hm-accent);
+            color: var(--hm-foreground);
+        }
+    }
+}

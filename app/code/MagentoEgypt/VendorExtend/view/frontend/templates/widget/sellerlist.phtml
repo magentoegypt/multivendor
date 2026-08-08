@@ -8,6 +8,18 @@ $rtl = $themeSettingConfig->getStoreConfig('themesettings/general/rtl_theme') ? 
 		$blockId = rand() . time();
 		$showBrandName = $this->getConfig('show_name');
 	?>
+	<?php /* Section heading. Figma titles this rail "Featured Stores"; the block
+	   rendered the cards with no heading at all, which is why a heading-based
+	   section audit did not even see it. Driven by a layout argument so the widget
+	   stays reusable elsewhere without a title. */ ?>
+	<?php /* This widget reads its params through getConfig(), not getData() — every
+	   other option on it (show_name, autoplay, items) is read that way. Falling
+	   back across both means the title works whether it arrives as a layout
+	   argument or as a widget instance parameter. */ ?>
+	<?php $sectionTitle = $block->getConfig('title') ?: $block->getData('title'); ?>
+	<?php if ($sectionTitle): ?>
+		<h2 class="hm-section__title hm-section__title--stores"><?= $block->escapeHtml(__($sectionTitle)) ?></h2>
+	<?php endif; ?>
 	<div class="block widget ves-sellerlist-inner">
 		<div class="block-content">
 			<div class="owl-carousel ves-sellerlist-<?= $blockId; ?>">
@@ -58,10 +70,14 @@ $rtl = $themeSettingConfig->getStoreConfig('themesettings/general/rtl_theme') ? 
     }
     ?>
     <script type="text/javascript">
+        <?php /* `mgsowlcarousel` removed - the alias died with MGS_ThemeSettings /
+           MGS_Fbuilder in the Phase L decommission and 404'd on every page rendering
+           this widget. The require failure meant this callback never ran, so the
+           carousel was ALREADY inert; the guard makes that explicit, not noisy. */ ?>
         require([
-			'jquery',
-			'mgsowlcarousel'
+			'jquery'
 		], function ($) {
+            if (typeof $.fn.owlCarousel !== 'function') { return; }
             var owl = $('.ves-sellerlist-<?= $blockId ?>');
             owl.owlCarousel({
                 items: <?= $this->getConfig('mobile_items', 2); ?>,
@@ -84,10 +100,11 @@ $rtl = $themeSettingConfig->getStoreConfig('themesettings/general/rtl_theme') ? 
 <?php endif; ?>
 
 <script type="text/javascript">
+    <?php /* `mgsowlcarousel` removed - see the note on the first require block. */ ?>
     require([
-        'jquery',
-        'mgsowlcarousel'
+        'jquery'
     ], function ($) {
+        if (typeof $.fn.owlCarousel !== 'function') { return; }
         var owlBm = $('.section-builder.banner-modern .line .line, .section-builder.section-builder-full > div > .line');
 
         var owlBmWinResize = function() {

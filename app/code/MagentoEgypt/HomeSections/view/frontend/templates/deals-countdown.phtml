@@ -1,0 +1,41 @@
+<?php
+/**
+ * Countdown to the earliest real special_to_date among the deals shown.
+ *
+ * Renders nothing without a genuine deadline. A countdown that resets or has no
+ * expiry is a dark pattern; this one is derived from the prices themselves, so
+ * it cannot disagree with what the customer is charged.
+ *
+ * @var \MagentoEgypt\HomeSections\Block\DealsCountdown $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$deadline = $block->getDeadline();
+if (!$deadline) { return; }
+$id = 'hm-cd-' . uniqid();
+?>
+<span class="hm-countdown" id="<?= $escaper->escapeHtmlAttr($id) ?>"
+      data-deadline="<?= $escaper->escapeHtmlAttr($deadline) ?>">
+    <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-clock"/></svg>
+    <time datetime="<?= $escaper->escapeHtmlAttr($deadline) ?>" class="hm-countdown__value">&nbsp;</time>
+    <span class="hm-countdown__label"><?= $escaper->escapeHtml(__('remaining')) ?></span>
+</span>
+<script>
+(function () {
+    var el = document.getElementById(<?= json_encode($id) ?>);
+    if (!el) { return; }
+    var out = el.querySelector('.hm-countdown__value');
+    var end = new Date(el.getAttribute('data-deadline')).getTime();
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+    function tick() {
+        var ms = end - Date.now();
+        if (ms <= 0) { el.hidden = true; return; }
+        var d = Math.floor(ms / 86400000);
+        var h = Math.floor(ms / 3600000) % 24;
+        var m = Math.floor(ms / 60000) % 60;
+        var s = Math.floor(ms / 1000) % 60;
+        out.textContent = (d > 0 ? d + 'd ' : '') + pad(h) + ':' + pad(m) + ':' + pad(s);
+        setTimeout(tick, 1000);
+    }
+    tick();
+}());
+</script>

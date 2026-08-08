@@ -1,0 +1,196 @@
+//
+//  Hub Market — design tokens
+//  _____________________________________________
+//
+//  Single source of truth. Mirrors docs/design/tokens.css 1:1, with one
+//  difference: custom properties are prefixed `--hm-` here. Unprefixed names
+//  like --accent / --primary / --border would collide with Amasty, Vnecoms and
+//  MGS, all of which ship their own. Mapping is mechanical: --accent -> --hm-accent.
+//
+//  Both forms exist on purpose:
+//    - LESS vars (@hm-*)  feed _theme.less, so Magento's own components inherit
+//      the design instead of being restyled by hand
+//    - CSS custom props (--hm-*) feed our components and allow the RTL swap to
+//      happen at runtime without a second stylesheet
+//  The custom properties are emitted FROM the LESS vars below, so they cannot drift.
+//
+//  Every colour pairing quoted here was contrast-checked with a real WCAG
+//  relative-luminance calculation. Ratios are not estimates.
+//
+
+//
+//  Brand
+//  ---------------------------------------------
+@hm-navy:              #0f2144;  // white on it 15.89:1
+@hm-navy-hover:        #16305f;
+@hm-orange:            #f26522;  // FILL ONLY — 3.15:1 on white
+
+@hm-primary:           @hm-navy;
+@hm-primary-hover:     @hm-navy-hover;
+@hm-on-primary:        #ffffff;
+
+//
+//  Accent  — the single most important correction to the generated design
+//  ---------------------------------------------
+//  #f26522 on white is 3.15:1. Fine for a fill or icon (1.4.11 needs 3:1),
+//  but it FAILS the 4.5:1 required of normal text — which is exactly how the
+//  Figma build used it: prices, vendor names and button labels.
+//
+//  Labels on an accent fill use @hm-on-accent (navy, 5.04:1). NOT white —
+//  white on #f26522 is 3.15:1 and fails.
+@hm-accent:            #f26522;  // fill.  vs white 3.15:1 (UI ok)
+@hm-accent-hover:      #e85d18;  // navy label on it 4.55:1 — do not go darker
+@hm-accent-strong:     #c2410c;  // TEXT.  vs white 5.18:1
+@hm-accent-strong-hover:#9a3412; //        vs white 7.31:1
+@hm-on-accent:         #0f2144;  // navy on #f26522 5.04:1
+@hm-accent-subtle:     #fff4ef;
+
+//
+//  Neutrals — ONE ramp (cool). The warm shadcn `sidebar` ramp is retired.
+//  ---------------------------------------------
+@hm-neutral-0:         #ffffff;
+@hm-neutral-50:        #fafbfd;
+@hm-neutral-100:       #f5f7fa;
+@hm-neutral-200:       #e8ecf3;  // decorative dividers (exempt from 1.4.11)
+@hm-neutral-300:       #cbd3e2;
+@hm-neutral-400:       #9aa5bb;  // disabled text only
+@hm-neutral-500:       #6b7280;  // vs white 4.83:1
+@hm-neutral-600:       #535d70;  // vs white 6.63:1
+@hm-neutral-700:       #3d4759;  // vs white 9.36:1
+@hm-neutral-900:       #1a1a2e;  // vs white 17.06:1
+
+//
+//  Semantic roles
+//  ---------------------------------------------
+@hm-background:        @hm-neutral-0;
+@hm-surface:           @hm-neutral-0;
+@hm-surface-muted:     @hm-neutral-100;
+@hm-surface-inverse:   @hm-navy;
+@hm-surface-input:     @hm-neutral-0;
+
+@hm-foreground:        @hm-neutral-900;
+@hm-foreground-muted:  @hm-neutral-500;
+@hm-placeholder:       @hm-neutral-600;  // #6b7280 on a tinted input was 4.4:1
+@hm-foreground-disabled:@hm-neutral-400;
+@hm-on-inverse:        @hm-neutral-0;
+@hm-on-inverse-muted:  @hm-neutral-300;  // on navy 10.56:1
+
+//  Two border roles. A decorative divider is exempt from 1.4.11; the boundary
+//  of an actual control is not.
+@hm-border-subtle:     @hm-neutral-200;
+@hm-border-strong:     #7d879c;          // vs white 3.61:1 — form controls
+@hm-icon:              @hm-neutral-500;  // 4.83:1
+@hm-icon-muted:        #7d879c;          // 3.61:1 — the floor
+
+@hm-focus-ring:        @hm-accent-strong;
+@hm-focus-ring-inverse:@hm-neutral-0;
+@hm-focus-ring-width:  2px;
+@hm-focus-ring-offset: 2px;
+
+//
+//  Commerce semantics — absent entirely from the generated theme
+//  ---------------------------------------------
+@hm-price:             @hm-accent-strong; // 5.18:1 (was 3.15:1)
+@hm-price-was:         @hm-neutral-500;
+@hm-price-inverse:     @hm-accent;        // on navy 5.04:1
+@hm-discount-bg:       #b3261e;           // white on it 6.54:1
+@hm-discount-fg:       #ffffff;
+@hm-rating-star:       #d97706;           // vs white 3.19:1
+@hm-rating-star-empty: @hm-neutral-300;
+@hm-stock-in:          #0f7b3f;           // vs white 5.35:1
+@hm-stock-low:         #b45309;           // vs white 5.02:1
+@hm-stock-out:         @hm-neutral-500;
+@hm-vendor-verified:   #1d4ed8;           // vs white 6.70:1
+@hm-bundle-badge-bg:   @hm-navy;
+@hm-bundle-badge-fg:   #ffffff;
+
+//
+//  Feedback
+//  ---------------------------------------------
+@hm-success:           #0f7b3f;
+//  Hover pair for the success green. Added when the hero CTA moved to green:
+//  white on #0f7b3f is 5.35:1, on #0c6633 it is 7.09:1, so the hover state gets
+//  MORE contrast rather than less — the usual failure mode for a darker hover.
+@hm-success-hover: #0c6633;
+@hm-warning:           #b45309;
+@hm-danger:            #c0392b;
+@hm-info:              #1d4ed8;
+@hm-on-status:         #ffffff;
+@hm-success-subtle:    #eaf6ef;
+@hm-warning-subtle:    #fdf3e7;
+@hm-danger-subtle:     #fbecea;
+@hm-info-subtle:       #eaf0fd;
+
+//
+//  Typography
+//  ---------------------------------------------
+@hm-font-sans:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+@hm-font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+@hm-font-arabic:  'IBM Plex Sans Arabic', 'Tajawal', 'Noto Sans Arabic', sans-serif;
+
+@hm-text-xs:   1.2rem;   // 12px — the floor for decorative text
+@hm-text-sm:   1.4rem;   // 14px — the floor for anything carrying commerce data
+@hm-text-base: 1.6rem;
+@hm-text-lg:   1.8rem;
+@hm-text-xl:   2rem;
+@hm-text-2xl:  2.4rem;
+@hm-text-3xl:  3rem;
+@hm-text-4xl:  3.6rem;
+@hm-text-5xl:  4.8rem;
+
+//  Magento interop scale — the SAME scale expressed in px.
+//
+//  Magento's own typography variables (@font-size__*, @h*__font-size,
+//  @button__line-height, @*__padding) must be px: the UI library performs
+//  arithmetic on them (`@font-size__l + 4`, `@font-size__base * 1.85`) and then
+//  converts the result to rem itself, because @font-size-unit-convert is true.
+//  Feeding it a rem value silently produces nonsense — `1.8rem + 4` compiled to
+//  `5.8rem`, which the converter then emitted as `line-height:.58rem`.
+//
+//  So: use @hm-fs-* when overriding a Magento variable, @hm-text-* everywhere else.
+@hm-fs-xs:   12px;
+@hm-fs-sm:   14px;
+@hm-fs-base: 16px;
+@hm-fs-lg:   18px;
+@hm-fs-xl:   20px;
+@hm-fs-2xl:  24px;
+@hm-fs-3xl:  30px;
+@hm-fs-4xl:  36px;
+@hm-fs-5xl:  48px;
+
+@hm-leading-tight: 1.2;
+@hm-leading-snug:  1.35;
+@hm-leading-base:  1.5;
+@hm-leading-arabic-body:    1.8;
+@hm-leading-arabic-heading: 1.5;
+
+@hm-weight-regular:  400;
+@hm-weight-medium:   500;
+@hm-weight-semibold: 600;
+@hm-weight-bold:     700;
+
+//
+//  Spacing / radius / shadow / motion / layers
+//  ---------------------------------------------
+@hm-space-1: .4rem;  @hm-space-2: .8rem;  @hm-space-3: 1.2rem;
+@hm-space-4: 1.6rem; @hm-space-5: 2rem;   @hm-space-6: 2.4rem;
+@hm-space-8: 3.2rem; @hm-space-10: 4rem;  @hm-space-12: 4.8rem;
+@hm-space-16: 6.4rem;
+
+@hm-radius-xs:   .2rem;
+@hm-radius-sm:   .6rem;
+@hm-radius:      1.2rem;
+@hm-radius-lg:   1.6rem;
+@hm-radius-full: 9999px;
+
+@hm-shadow-sm: 0 1px 2px rgba(15, 33, 68, .06);
+@hm-shadow:    0 4px 12px rgba(15, 33, 68, .08);
+@hm-shadow-lg: 0 12px 32px rgba(15, 33, 68, .12);
+
+@hm-duration-fast: 120ms;
+@hm-duration:      200ms;
+@hm-ease: cubic-bezier(.4, 0, .2, 1);
+
+@hm-container: 1440px;
+
+//

@@ -1,0 +1,47 @@
+<?php
+/**
+ * Cart-only variant of Magento_Theme::html/title.phtml.
+ *
+ * Appends the item count to the heading — "Shopping Cart (3 items)" — to match
+ * the Figma cart reference.
+ *
+ * Bound to the cart handle ALONE rather than overriding html/title.phtml
+ * globally: that template renders the <h1> of every page on the storefront, and
+ * a bug there would be a site-wide bug. The blast radius here is one route.
+ *
+ * The `base` span, its data-ui-id and the aria wiring are kept byte-identical to
+ * core — Magento's own JS and functional tests target them.
+ *
+ * @var $block \Magento\Theme\Block\Html\Title
+ * @var $viewModel \MagentoEgypt\CheckoutExtend\ViewModel\CartTitle
+ */
+$viewModel = $block->getViewModel();
+$cssClass  = $block->getCssClass() ? ' ' . $block->getCssClass() : '';
+$suffix    = $viewModel ? $viewModel->getCountSuffix() : '';
+
+$titleHtml = '';
+if (trim($block->getPageHeading())) {
+    $titleHtml = '<span class="base" data-ui-id="page-title-wrapper" '
+        . $block->getAddBaseAttribute()
+        . '>'
+        . $block->escapeHtml($block->getPageHeading())
+        . '</span>';
+    if ($suffix !== '') {
+        $titleHtml .= ' <span class="hm-page-title__count">'
+            . $block->escapeHtml($suffix)
+            . '</span>';
+    }
+}
+?>
+<?php if ($titleHtml) : ?>
+<div class="page-title-wrapper<?= $block->escapeHtmlAttr($cssClass) ?>">
+    <h1 class="page-title"
+        <?php if ($block->getId()) : ?> id="<?= $block->escapeHtmlAttr($block->getId()) ?>" <?php endif; ?>
+        <?php if ($block->getAddBaseAttributeAria()) : ?>
+            aria-labelledby="<?= $block->escapeHtmlAttr($block->getAddBaseAttributeAria()) ?>"
+        <?php endif; ?>>
+        <?= /* @noEscape */ $titleHtml ?>
+    </h1>
+    <?= $block->getChildHtml() ?>
+</div>
+<?php endif; ?>

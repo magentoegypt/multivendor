@@ -1,0 +1,422 @@
+//
+//  Hub Market — seller directory and vendor microsite
+//  _____________________________________________
+//
+//  Scope note: the Figma covers the seller directory (/sellerlist) and the
+//  vendor microsite (/shop/<key>). It does NOT cover seller registration,
+//  seller login or the seller dashboard, and those are deliberately left on
+//  default Magento styling until they are designed.
+//
+//  All markup here belongs to Vnecoms modules, so it is matched by their class
+//  names rather than forked into theme templates. Same approach as the vendor
+//  rail on the homepage.
+//
+//  Known, pre-existing and NOT caused by this theme: the microsite's item list
+//  under-reports. The nav says "Items (7)" while the grid renders 3. Verified
+//  identical on Mgs/supro, so it is a Vnecoms collection issue, not a styling
+//  one.
+//
+
+//
+//  Seller directory  (/sellerlist)
+//  ---------------------------------------------
+.sellerlist-index-index {
+
+    //  The directory centred its title while every other page on the site
+    //  aligns to the start. Brought into line.
+    .page-title-wrapper .page-title {
+        font-family: var(--hm-font-heading);
+        //  48px: the directory is a landing page in Figma, and its title is the
+        //  largest on the site there. Ours sat at the ordinary 36px.
+        font-size: 4.8rem;
+        font-weight: 700;
+        text-align: start;
+    }
+}
+
+//  Directory subtitle (CMS block `hm_sellerlist_subtitle`).
+//
+//  Figma: 16px / 400 / 26px line-height, muted, held to a 448px measure under a
+//  48px heading. The colour comes from `--hm-foreground-muted` (#6b7280) rather
+//  than Figma's #6b6560 — the two are visually indistinguishable, ours is already
+//  the palette token, and introducing a near-duplicate grey would trip the
+//  off-palette gate in the parity sweep for no visible gain.
+//
+//  `max-inline-size` in ch rather than Figma's fixed 448px, so the cap is stated
+//  in the font's own metrics instead of one face's pixels. 41ch resolves to 449px
+//  in DM Sans 16px — the reference measure — and to 394px in IBM Plex Sans Arabic,
+//  whose zero glyph is narrower. Both hold the same number of character widths,
+//  which is what a measure is for; a hard 448px would instead give the Arabic face
+//  a longer character count than the Latin one.
+//
+//  Was 52ch (569px) on the first pass — a visibly longer line than the design.
+.hm-page-subtitle {
+    color: var(--hm-foreground-muted);
+    font-size: 1.6rem;
+    line-height: 1.625;
+    margin-block: 0 var(--hm-space-6);
+    max-inline-size: 41ch;
+}
+
+.seller-search-inner {
+    margin-block-end: var(--hm-space-8);
+    max-inline-size: 48rem;
+
+    .vendor-search-input,
+    .input-text {
+        background: var(--hm-surface-input);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        block-size: 4.8rem;
+        color: var(--hm-foreground);
+        font-size: 1.6rem;      // 16px — below this iOS zooms on focus
+        inline-size: 100%;
+        padding-inline: var(--hm-space-4);
+
+        &::placeholder { color: var(--hm-placeholder); }
+    }
+}
+
+//  ONLY ul.seller-list is the card grid. `.sellers.wrapper` holds the search
+//  box, the list and the load-more button, and `.seller-wrapper` is the
+//  page-level container — measured, 1408px wide with a single child. Making
+//  either of those a grid or flex container turned .ves-sellerlist-inner into a
+//  shrink-to-fit item 216px wide, which collapsed the grid to one column.
+.seller-list {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+//  One card, equal height, whole card reacts to hover. Previously the cards
+//  sized to their content, so a longer store name pushed one card taller than
+//  its neighbours and the row lost its baseline.
+//  li.item is the real per-card wrapper (ten of them).
+.seller-list > li {
+    display: flex;
+    margin: 0;
+}
+
+.seller-info {
+    //  box-sizing matters here: Magento/blank sets no global border-box, so
+    //  `inline-size: 100%` plus 32px of padding overflowed the grid track and
+    //  pushed the document to scrollWidth 1468 against a 1440 viewport. The
+    //  Phase I sweep caught it at 1440, 768 AND 390, in both locales — the same
+    //  box-model trap as the header containers in Phase C.
+    box-sizing: border-box;
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    inline-size: 100%;
+    padding: var(--hm-space-6) var(--hm-space-4);
+    text-align: center;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-within {
+        border-color: var(--hm-border-strong);
+        box-shadow: var(--hm-shadow);
+    }
+}
+
+.seller-thumbnail-container {
+    img {
+        background: var(--hm-surface);
+        block-size: 8rem;
+        border-radius: var(--hm-radius-full);
+        inline-size: 8rem;
+        object-fit: contain;
+    }
+}
+
+.seller-details {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-sans);
+    font-size: 1.5rem;
+    font-weight: 600;
+
+    a { color: inherit; text-decoration: none; }
+}
+
+//  "View Collection" was plain text pretending to be an action. It is the
+//  card's only call to action, so it gets a real button affordance.
+.seller-items-link {
+    margin-block-start: auto;
+    padding-block-start: var(--hm-space-2);
+
+    a {
+        align-items: center;
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        display: inline-flex;
+        font-size: 1.3rem;
+        font-weight: 600;
+        justify-content: center;
+        min-block-size: 4rem;
+        padding-inline: var(--hm-space-4);
+        text-decoration: none;
+
+        &:hover {
+            background: var(--hm-surface-muted);
+            border-color: var(--hm-accent);
+            color: var(--hm-accent-strong);
+        }
+    }
+}
+
+.sellerlist-loadmore {
+    display: flex;
+    justify-content: center;
+    margin-block-start: var(--hm-space-8);
+
+    button, .action {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        font-size: 1.5rem;
+        font-weight: 600;
+        min-block-size: 4.8rem;
+        padding-inline: var(--hm-space-8);
+
+        &:hover { background: var(--hm-surface-muted); border-color: var(--hm-accent); }
+    }
+}
+
+//
+//  Vendor microsite  (/shop/<key>)
+//  ---------------------------------------------
+.vendor-page {
+
+    .vendor-home-banner,
+    .banner-widget {
+        margin-block-end: var(--hm-space-6);
+
+        img {
+            border-radius: var(--hm-radius);
+            display: block;
+            inline-size: 100%;
+            object-fit: cover;
+        }
+    }
+}
+
+//  Shop nav: Items / About / Shipping / Refund, plus in-shop search.
+.vendor-menu-wrapper {
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius);
+    margin-block-end: var(--hm-space-8);
+    padding: var(--hm-space-2) var(--hm-space-4);
+}
+
+.vendor-menu,
+.vendor-nav {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    justify-content: space-between;
+
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-1);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        border-block-end: 2px solid transparent;
+        color: var(--hm-foreground-muted);
+        display: inline-flex;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-3);
+        text-decoration: none;
+
+        &:hover { color: var(--hm-foreground); }
+    }
+
+    .active > a,
+    a.active {
+        border-block-end-color: var(--hm-accent);
+        color: var(--hm-foreground);
+    }
+}
+
+//  In-shop search: the input and its icon were overlapping the field border.
+.block-search-by-vendor,
+.minisearch-vendor {
+    .minisearch-vendor-input,
+    .input-text {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        block-size: 4.4rem;
+        font-size: 1.6rem;
+        min-inline-size: 24rem;
+        padding-inline: var(--hm-space-4);
+    }
+
+    .action.search-icon {
+        inset-inline-end: var(--hm-space-2);
+        inset-inline-start: auto;
+    }
+}
+
+//
+//  Microsite sidebar
+//  ---------------------------------------------
+.profile-sidebar,
+.vendor-categories-wrapper {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    margin-block-end: var(--hm-space-5);
+    padding: var(--hm-space-5);
+}
+
+.vendor-categories-wrapper {
+    .block-title strong,
+    > strong {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-sans);
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+    }
+
+    ul { list-style: none; margin: var(--hm-space-3) 0 0; padding: 0; }
+
+    a {
+        color: var(--hm-foreground-muted);
+        display: block;
+        font-size: 1.4rem;
+        padding-block: var(--hm-space-2);
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+}
+
+//
+//  Microsite section headings (Items / About / Shipping / Refund)
+//  ---------------------------------------------
+.vendor-home-items,
+.vendor-home-about,
+.vendor-home-shipping,
+.vendor-home-refund {
+    margin-block-end: var(--hm-space-10);
+
+    > h2,
+    .vendor-about-title {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-heading);
+        font-size: 2.4rem;
+        font-weight: 700;
+        margin: 0 0 var(--hm-space-5);
+        padding-block-end: var(--hm-space-3);
+    }
+}
+
+//  Arabic store descriptions are common here, so isolate the direction rather
+//  than letting a mixed-script paragraph reorder.
+.vendor-home-about p,
+.vendor-headline {
+    unicode-bidi: isolate;
+}
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 767px) {
+    .sellerlist-index-index .page-title-wrapper .page-title { font-size: 2.8rem; }
+
+    .vendor-menu,
+    .vendor-nav { justify-content: flex-start; }
+}
+
+//
+//  Vendor microsite navigation
+//  ---------------------------------------------
+//  Vnecoms ships the microsite nav links (Items / About / Shipping Policies /
+//  Refund Policies) at #888888 on the #f5f5f1 nav band — measured **3.24:1**,
+//  failing AA at 15px. This is the same class of defect Phase I fixed for vendor
+//  meta text; the nav was simply never covered.
+//
+//  The links are the primary navigation of the whole microsite, so they get full
+//  foreground weight rather than a muted tone.
+.vendor-nav-container .vendor-menu-item > a,
+.vendor-menu .vendor-menu-item > a {
+    color: var(--hm-foreground);
+
+    &:hover,
+    &:focus-visible { color: var(--hm-accent-strong); }
+}
+
+//  The active item needs a non-colour cue as well as the colour change.
+.vendor-nav-container .vendor-menu-item.active > a,
+.vendor-menu .vendor-menu-item.active > a {
+    color: var(--hm-accent-strong);
+    font-weight: 700;
+}
+
+//
+//  Microsite sidebar — RTL overflow at 768
+//  ---------------------------------------------
+//  The Phase M sweep caught `microsite-ar-768` pushing the document to 812px in a
+//  768px viewport. Traced with CDP rather than guessed: the chain is
+//  main.page-main (812/768) -> .columns (796/736) -> .sidebar-additional
+//  (**251 content in a 190px track**).
+//
+//  Cause: vendor_page.xml declares the left profile logo at a FIXED 200px
+//  (`logo_width` 200), which simply does not fit the sidebar track at this
+//  breakpoint. It only surfaced in RTL because that is the layout the sweep
+//  happened to measure; the constraint is direction-agnostic.
+//
+//  Nothing here is direction-specific — a fixed-width child overflowing a narrower
+//  track is the same bug in both directions.
+//  UPDATE after bisecting: hiding .sidebar-additional dropped the document
+//  scrollWidth from 812 to exactly 768, so the sidebar is the culprit — but NO
+//  descendant element's box exceeded the 190px track. That rules out a wide child
+//  and points at an unbreakable TEXT run: a text node has no element box to
+//  measure, so it overflows invisibly to every rect-based check while still
+//  inflating the parent's scrollWidth (measured 251 against a 190 clientWidth).
+//  Hence overflow-wrap, not just max-inline-size.
+.sidebar.sidebar-additional,
+.sidebar.sidebar-main {
+    box-sizing: border-box;
+    max-inline-size: 100%;
+    min-inline-size: 0;      // lets the grid/flex track actually shrink
+    overflow-wrap: anywhere; // long vendor names / URLs must not push the document
+    word-break: break-word;
+
+    img {
+        block-size: auto;
+        max-inline-size: 100%;
+    }
+
+    //  Vendor profile blocks carry their own fixed widths from Vnecoms.
+    .vendor-profile-container,
+    .vendor-profile-logo,
+    .vendor-profile-description {
+        box-sizing: border-box;
+        inline-size: auto;
+        max-inline-size: 100%;
+    }
+}

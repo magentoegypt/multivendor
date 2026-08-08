@@ -1,0 +1,61 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/**
+ * Product list toolbar
+ *
+ * @var \Magento\Catalog\Block\Product\ProductList\Toolbar $block
+ * @var \Magento\Framework\Locale\LocaleFormatter $localeFormatter
+ */
+?>
+<?php
+/*
+ * Hub Market: ONE change from core — the live-region attributes below.
+ *
+ * This element is the only feedback a shopper gets that a layered-navigation
+ * filter, a sort, or a page change actually did anything ("Items 1-12 of 47").
+ * On a screen reader it changed silently, because core ships no live region here.
+ *
+ * `polite` not `assertive`: a result count is not an emergency, and assertive
+ * would interrupt whatever the user is reading mid-sentence. `aria-atomic` makes
+ * the whole sentence re-announce rather than just the digits that changed, which
+ * on their own are meaningless ("47").
+ *
+ * Note the global message containers already carry role="alert" (2 per page), so
+ * add-to-cart and error feedback was ALREADY announced — this fills the gap that
+ * genuinely existed rather than blanket-adding regions.
+ */
+?>
+<p class="toolbar-amount" id="toolbar-amount" aria-live="polite" aria-atomic="true">
+    <?php if ($block->getLastPageNum() > 1):?>
+        <?= $block->escapeHtml(
+            __(
+                'Items %1-%2 of %3',
+                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getFirstNum()) . '</span>',
+                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getLastNum()) . '</span>',
+                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getTotalNum()) . '</span>'
+            ),
+            ['span']
+        ) ?>
+    <?php elseif ($block->getTotalNum() == 1):?>
+        <?= $block->escapeHtml(
+            __(
+                '%1 Item',
+                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getTotalNum()) . '</span>'
+            ),
+            ['span']
+        ) ?>
+    <?php else:?>
+        <?= $block->escapeHtml(
+            __(
+                '%1 Items',
+                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getTotalNum()) . '</span>'
+            ),
+            ['span']
+        ) ?>
+    <?php endif; ?>
+</p>

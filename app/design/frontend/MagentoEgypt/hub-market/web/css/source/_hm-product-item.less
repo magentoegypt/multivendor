@@ -1,0 +1,208 @@
+//
+//  Hub Market — Magento product-item → card component
+//  _____________________________________________
+//
+//  Magento renders product rails and listings as `.product-item` with a fixed
+//  internal structure (`.product-item-info`, `.product-item-photo`,
+//  `.product-item-name`, `.price-box`, `.product-item-actions`). Rather than
+//  fork those templates, this maps that markup onto the same visual component
+//  as `.hm-product-card`.
+//
+//  Written here in Phase D because the homepage rails need it, but it is
+//  deliberately generic — the category listing in Phase E uses the identical
+//  markup, so PLP inherits this for free rather than restyling it a second time.
+//  That is the whole point of collapsing the design's 12 card renderings to one.
+//
+
+.products-grid .product-items,
+.block.widget .product-items {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.product-item {
+    margin: 0 !important;   // blank sizes rails with percentage margins
+    padding: 0;
+    width: auto !important;
+
+    .product-item-info {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        display: flex;
+        flex-direction: column;
+        block-size: 100%;
+        overflow: hidden;
+        position: relative;
+        transition: border-color var(--hm-duration) var(--hm-ease),
+                    box-shadow var(--hm-duration) var(--hm-ease);
+        width: auto;
+
+        &:hover,
+        &:focus-within {
+            border-color: var(--hm-border-strong);
+            box-shadow: var(--hm-shadow);
+        }
+    }
+
+    .product-item-photo {
+        aspect-ratio: 1 / 1;
+        background: var(--hm-surface-muted);
+        display: block;
+        overflow: hidden;
+    }
+
+    .product-image-container { width: 100% !important; }
+
+    .product-image-photo {
+        block-size: 100%;
+        inline-size: 100%;
+        object-fit: cover;
+        position: static;
+    }
+
+    .product-item-details {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        gap: var(--hm-space-2);
+        padding: var(--hm-space-4);
+    }
+
+    //  Product titles are DM Sans, never the display serif, and never below 14px.
+    .product-item-name {
+        margin: 0;
+
+        a.product-item-link {
+            color: var(--hm-foreground);
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            font-family: var(--hm-font-sans);
+            font-size: 1.5rem;
+            font-weight: 500;
+            line-height: 1.45;
+            overflow: hidden;
+            text-align: start;
+            text-decoration: none;
+
+            &:hover { color: var(--hm-accent-strong); }
+        }
+    }
+
+    //  Price uses the accessible orange (5.18:1), not the fill orange (3.15:1),
+    //  and tabular figures so a rail of prices aligns.
+    .price-box {
+        font-variant-numeric: tabular-nums;
+        margin: 0;
+
+        .price {
+            color: var(--hm-price);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .old-price .price {
+            color: var(--hm-price-was);
+            font-size: 1.4rem;
+            font-weight: 400;
+        }
+    }
+
+    //  Rating: Magento paints these with a background sprite. Recolour to the
+    //  accessible star token; the numeric value comes from .reviews-actions.
+    .rating-summary .rating-result > span:before { color: var(--hm-rating-star); }
+    .reviews-actions { color: var(--hm-foreground-muted); font-size: 1.3rem; }
+
+    //  Actions are ALWAYS visible. Magento/blank hides them until hover, which
+    //  is exactly the defect the Figma build had — on touch they never appear.
+    .product-item-inner {
+        margin: auto 0 0;
+        position: static;
+        visibility: visible;
+    }
+
+    //  min-width:0 on the flex children is what stops the secondary actions
+    //  being pushed outside the card: without it "Add to Cart" refuses to
+    //  shrink below its text width and the wishlist/compare buttons overflow.
+    .product-item-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+        margin: 0;
+        padding-block-start: var(--hm-space-2);
+    }
+
+    .actions-primary { flex: 1 1 12rem; min-width: 0; }
+
+    .action.tocart {
+        align-items: center;
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: var(--hm-on-accent);      // navy on orange = 5.04:1
+        display: flex;
+        font-size: 1.3rem;
+        font-weight: 600;
+        justify-content: center;
+        min-block-size: 4.4rem;
+        width: 100%;
+
+        &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+    }
+
+    .actions-secondary {
+        display: flex;
+        gap: var(--hm-space-1);
+
+        > a.action {
+            align-items: center;
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius);
+            color: var(--hm-icon);
+            display: flex;
+            justify-content: center;
+            min-block-size: 4.4rem;
+            min-inline-size: 4.4rem;
+
+            &:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
+            span { .hm-visually-hidden(); }
+        }
+    }
+}
+
+//  blank hides rail actions behind :hover on desktop; undo that.
+.product-item:hover .product-item-inner,
+.product-item .product-item-inner {
+    box-shadow: none;
+    border: 0;
+}
+
+.hm-visually-hidden() {
+    border: 0;
+    clip-path: inset(50%);
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+//
+//  Widget rail headings
+//  ---------------------------------------------
+.block.widget .block-title strong,
+.block.widget .block-title h2 {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-heading);
+    font-size: 2.4rem;
+    font-weight: 700;
+}
+
+.block.widget {
+    margin-block-end: var(--hm-space-12);
+}

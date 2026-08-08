@@ -1,0 +1,34 @@
+<?php
+/**
+ * Hub Market — Top Brands row (Figma: "Top Brands on MECommerce").
+ *
+ * Renders nothing when there are no brands, so the section disappears cleanly if
+ * MGS_Brand is decommissioned again rather than leaving an empty heading.
+ *
+ * @var \MagentoEgypt\HomeSections\Block\TopBrands $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$brands = $block->getBrands();
+if (!$brands) {
+    return;
+}
+?>
+<section class="hm-brands" aria-labelledby="hm-brands-title">
+    <div class="hm-section__head">
+        <h2 class="hm-section__title" id="hm-brands-title"><?= $escaper->escapeHtml(__('Top Brands')) ?></h2>
+    </div>
+    <ul class="hm-brands__list">
+        <?php foreach ($brands as $b): ?>
+            <li class="hm-brands__item">
+                <a class="hm-brands__link" href="<?= $escaper->escapeUrl($b['url']) ?>">
+                    <?php if ($b['image']): ?>
+                        <img class="hm-brands__img" src="<?= $escaper->escapeUrl($b['image']) ?>"
+                             alt="<?= $escaper->escapeHtmlAttr($b['name']) ?>"
+                             loading="lazy" width="64" height="64"/>
+                    <?php endif; ?>
+                    <span class="hm-brands__name"><?= $escaper->escapeHtml($b['name']) ?></span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>

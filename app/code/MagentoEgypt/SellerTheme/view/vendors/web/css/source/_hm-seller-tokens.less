@@ -1,0 +1,181 @@
+//
+//  Hub Market — seller panel tokens
+//  _____________________________________________
+//
+//  SOURCE OF TRUTH is docs/design/tokens.css, mirrored in the storefront theme at
+//  app/design/frontend/MagentoEgypt/hub-market/web/css/source/_hm-tokens.less.
+//  This file is a deliberate, documented COPY: the vendors area is a different
+//  Magento area, so LESS here cannot @import across into a frontend theme's
+//  directory. Any change to a brand colour must be made in both places.
+//
+//  Only the tokens the back office actually uses are carried over, plus a small
+//  number of back-office-only additions at the bottom (sidebar, data tables)
+//  which have no storefront equivalent.
+//
+//  MEASURED FACTS about this area — verified in the live page, not assumed:
+//    html font-size .............. 10px   (so 1rem = 10px, same as the storefront)
+//    body font-size .............. 14px   (denser than the storefront's 16px)
+//    box-sizing on body .......... border-box  (Bootstrap 3 sets it globally, so the
+//                                 percentage-width + padding trap that bit the
+//                                 storefront three times does NOT apply here)
+//
+
+//
+//  Brand
+//  ---------------------------------------------
+@hm-navy:               #0f2144;   // white on it 15.89:1
+@hm-navy-hover:         #16305f;   // white on it 12.94:1
+@hm-orange:             #f26522;
+
+@hm-primary:            @hm-navy;
+@hm-primary-hover:      @hm-navy-hover;
+@hm-on-primary:         #ffffff;
+
+//
+//  Accent — the split is the whole point. Do not collapse it back.
+//  ---------------------------------------------
+//  #f26522 is 3.15:1 on white: fine as a FILL or an icon (1.4.11 wants 3:1),
+//  but it FAILS the 4.5:1 that normal text needs. Text uses @hm-accent-strong.
+//  A label sitting ON an accent fill is navy, never white (white on #f26522 is
+//  3.15:1 and fails).
+@hm-accent:             #f26522;   // fill only
+@hm-accent-hover:       #e85d18;   // navy label on it 4.55:1 — do not darken further
+@hm-accent-strong:      #c2410c;   // text — 5.18:1 on white
+@hm-accent-strong-hover:#9a3412;   //        7.31:1 on white
+@hm-on-accent:          #0f2144;   // navy on #f26522 = 5.04:1
+@hm-accent-subtle:      #fff4ef;
+
+//
+//  Neutrals — one cool ramp
+//  ---------------------------------------------
+@hm-neutral-0:          #ffffff;
+@hm-neutral-50:         #fafbfd;
+@hm-neutral-100:        #f5f7fa;
+@hm-neutral-200:        #e8ecf3;   // decorative dividers (exempt from 1.4.11)
+@hm-neutral-300:        #cbd3e2;
+@hm-neutral-400:        #9aa5bb;   // disabled text only
+@hm-neutral-500:        #6b7280;   // 4.83:1 on white
+@hm-neutral-600:        #535d70;   // 6.63:1
+@hm-neutral-700:        #3d4759;   // 9.36:1
+@hm-neutral-900:        #1a1a2e;   // 17.06:1
+
+//
+//  Semantic roles
+//  ---------------------------------------------
+@hm-background:         @hm-neutral-100;  // the panel canvas is tinted, not white
+@hm-surface:            @hm-neutral-0;
+@hm-surface-muted:      @hm-neutral-100;
+@hm-surface-inverse:    @hm-navy;
+@hm-surface-input:      @hm-neutral-0;
+
+@hm-foreground:         @hm-neutral-900;  // 15.89:1 on @hm-background
+@hm-foreground-muted:   @hm-neutral-500;
+@hm-placeholder:        @hm-neutral-600;
+@hm-foreground-disabled:@hm-neutral-400;
+@hm-on-inverse:         @hm-neutral-0;
+@hm-on-inverse-muted:   @hm-neutral-300;  // on navy 10.56:1
+
+@hm-border-subtle:      @hm-neutral-200;
+@hm-border-strong:      #7d879c;          // 3.61:1 on white — control boundaries
+@hm-icon:               @hm-neutral-500;
+@hm-icon-muted:         #7d879c;
+
+//  Focus rings come in a pair and the pair is not optional. @hm-accent-strong
+//  measures 5.18:1 on white but only 3.07:1 on navy — technically a 1.4.11 pass,
+//  visually a ring you have to hunt for. Anything sitting on a navy surface (the
+//  sidebar, the top bar, the login card's backdrop) must use the inverse ring.
+@hm-focus-ring:         @hm-accent-strong;   // on light surfaces — 5.18:1 on white
+@hm-focus-ring-inverse: @hm-neutral-0;       // on navy — 15.89:1
+@hm-focus-ring-width:   2px;
+@hm-focus-ring-offset:  2px;
+
+//
+//  Feedback
+//  ---------------------------------------------
+@hm-success:            #0f7b3f;   // 5.35:1 on white
+@hm-warning:            #b45309;   // 5.02:1
+@hm-danger:             #c0392b;
+@hm-info:               #1d4ed8;   // 6.70:1
+@hm-on-status:          #ffffff;
+@hm-success-subtle:     #eaf6ef;
+@hm-warning-subtle:     #fdf3e7;
+@hm-danger-subtle:      #fbecea;
+@hm-info-subtle:        #eaf0fd;
+
+//
+//  Typography
+//  ---------------------------------------------
+@hm-font-sans:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+@hm-font-arabic:  'IBM Plex Sans Arabic', 'Tajawal', 'Noto Sans Arabic', sans-serif;
+
+//  Playfair is a storefront display face. It is deliberately NOT used in the
+//  back office: a data-dense admin reads better in one family, and a serif
+//  display face at 13-14px is worse, not better.
+
+//  1rem = 10px here, same as the storefront.
+@hm-text-xs:    1.2rem;
+@hm-text-sm:    1.3rem;   // the panel's dense default (storefront floor is 1.4)
+@hm-text-base:  1.4rem;   // matches the measured body size
+@hm-text-lg:    1.6rem;
+@hm-text-xl:    1.8rem;
+@hm-text-2xl:   2.2rem;
+@hm-text-3xl:   2.8rem;
+
+@hm-leading-tight: 1.2;
+@hm-leading-snug:  1.35;
+@hm-leading-base:  1.5;
+@hm-leading-arabic-body: 1.8;
+
+@hm-weight-regular:  400;
+@hm-weight-medium:   500;
+@hm-weight-semibold: 600;
+@hm-weight-bold:     700;
+
+//
+//  Spacing / radius / shadow / motion
+//  ---------------------------------------------
+//  Tighter than the storefront on purpose. A back office trades whitespace for
+//  rows-per-screen; the storefront scale would push a 10-row grid below the fold.
+@hm-space-1: .4rem;  @hm-space-2: .8rem;  @hm-space-3: 1.2rem;
+@hm-space-4: 1.6rem; @hm-space-5: 2rem;   @hm-space-6: 2.4rem;
+@hm-space-8: 3.2rem; @hm-space-10: 4rem;
+
+@hm-radius-xs:   .2rem;
+@hm-radius-sm:   .4rem;
+@hm-radius:      .8rem;   // storefront uses 1.2rem — too round for dense chrome
+@hm-radius-lg:   1.2rem;
+@hm-radius-full: 9999px;
+
+@hm-shadow-sm: 0 1px 2px rgba(15, 33, 68, .06);
+@hm-shadow:    0 4px 12px rgba(15, 33, 68, .08);
+@hm-shadow-lg: 0 12px 32px rgba(15, 33, 68, .12);
+
+@hm-duration-fast: 120ms;
+@hm-duration:      200ms;
+@hm-ease: cubic-bezier(.4, 0, .2, 1);
+
+//
+//  Back-office-only additions
+//  ---------------------------------------------
+//  These have no storefront counterpart. Ratios computed, not estimated.
+@hm-sidebar-bg:          @hm-navy;
+@hm-sidebar-fg:          @hm-on-inverse-muted;   // #cbd3e2 on navy = 10.56:1
+@hm-sidebar-fg-active:   @hm-neutral-0;          // #ffffff on navy = 15.89:1
+@hm-sidebar-hover-bg:    @hm-navy-hover;         // white on it  = 12.94:1
+@hm-sidebar-active-bg:   @hm-navy-hover;
+@hm-sidebar-active-mark: @hm-accent;             // 4px fill bar, not text
+@hm-sidebar-header-fg:   #9aa5bb;                // section captions, on navy 6.41:1
+
+@hm-topbar-bg:           @hm-navy;
+@hm-topbar-fg:           @hm-neutral-0;
+@hm-topbar-border:       fade(#ffffff, 10%);
+
+@hm-table-header-bg:     @hm-neutral-100;
+@hm-table-header-fg:     @hm-neutral-700;        // #3d4759 on #f5f7fa = 8.72:1
+@hm-table-border:        @hm-neutral-200;
+@hm-table-row-hover:     @hm-neutral-50;
+@hm-table-stripe:        @hm-neutral-50;
+
+@hm-row-height:          4rem;    // 40px — comfortable dense row
+@hm-control-height:      3.6rem;  // 36px inputs/buttons
+@hm-control-height-lg:   4.4rem;  // 44px — the 2.5.5 target floor for primary actions

@@ -1,0 +1,144 @@
+//
+//  Hub Market — third-party markup we do not own
+//  _____________________________________________
+//
+//  Styles for widgets rendered by modules outside this theme (owl-carousel,
+//  MGS_AjaxCart, MGS_Amp). On Mgs/supro these were styled by mgs_theme.less;
+//  on Magento/blank nothing styles them, so they arrive raw.
+//
+//  Everything here is a stopgap that disappears when the MGS modules are
+//  retired. Kept in one file so it is obvious what to delete.
+//
+
+//
+//  owl-carousel navigation
+//  ---------------------------------------------
+//  The prev/next buttons are rendered OUTSIDE the carousel box and nothing
+//  clips them, so they extended the document by exactly 30px on each side —
+//  measured via CDP: owl-next at left 1440 / right 1470 against a 1440
+//  viewport, owl-prev at left -30. That was the whole RTL horizontal offset.
+//  It affected LTR identically; RTL just made it visible, because the browser
+//  anchors an overflowing RTL document to the opposite edge.
+//
+//  They also rendered as missing-glyph boxes, because the MGS icon font that
+//  supplied their arrows is not loaded here. The chevron below is drawn with
+//  logical borders, so it mirrors in RTL for free.
+
+.owl-carousel {
+    position: relative;
+
+    .owl-nav {
+        button.owl-prev,
+        button.owl-next {
+            align-items: center;
+            background: var(--hm-surface);
+            block-size: 4rem;
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius-full);
+            box-shadow: var(--hm-shadow-sm);
+            color: var(--hm-primary);
+            display: flex;
+            inline-size: 4rem;
+            inset-block-start: 50%;
+            justify-content: center;
+            margin: 0;
+            position: absolute;
+            transform: translateY(-50%);
+            z-index: 2;
+
+            &:hover {
+                background: var(--hm-accent);
+                border-color: var(--hm-accent);
+                color: var(--hm-on-accent);
+            }
+
+            &:focus-visible {
+                outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring);
+                outline-offset: 2px;
+            }
+
+            //  Whatever glyph the module tried to render is suppressed; the
+            //  chevron is drawn below.
+            span {
+                display: none;
+            }
+
+            &::before {
+                block-size: .9rem;
+                border-block-start: 2px solid currentColor;
+                border-inline-start: 2px solid currentColor;
+                content: '';
+                display: block;
+                inline-size: .9rem;
+            }
+        }
+
+        //  Positioned on the LOGICAL edges, so "previous" stays on the leading
+        //  side of the reading direction in both locales.
+        button.owl-prev {
+            inset-inline-start: var(--hm-space-3);
+
+            &::before { transform: rotate(-45deg); margin-inline-start: .3rem; }
+        }
+
+        button.owl-next {
+            inset-inline-end: var(--hm-space-3);
+
+            &::before { transform: rotate(135deg); margin-inline-end: .3rem; }
+        }
+    }
+
+    //  Belt and braces: even if a module adds another absolutely-positioned
+    //  control, it cannot extend the document from inside the carousel.
+    .owl-stage-outer {
+        overflow: hidden;
+    }
+}
+
+//
+//  MGS_AjaxCart floating cart
+//  ---------------------------------------------
+//  A fixed 45x45 puck at z-index 101 in rgb(246,136,114) — #f68872, the accent
+//  this theme retired. The mini-cart in the header already covers it.
+.cart-footer-actions,
+.fixed-mini-cart,
+.fixed-cart-col {
+    display: none;
+}
+
+//
+//  MGS_Amp scroll-to-top
+//  ---------------------------------------------
+//  Useful control, but it arrived unstyled (plain white, no icon) and sat over
+//  the header. Kept, and brought onto the palette.
+a.scroll-to-top {
+    align-items: center;
+    background: var(--hm-primary);
+    block-size: 4.4rem;
+    border-radius: var(--hm-radius-full);
+    box-shadow: var(--hm-shadow);
+    color: var(--hm-on-primary);
+    display: flex;
+    inline-size: 4.4rem;
+    inset-inline-end: var(--hm-space-5);
+    justify-content: center;
+    inset-inline-start: auto;
+
+    &:hover {
+        background: var(--hm-accent);
+        color: var(--hm-on-accent);
+    }
+
+    &::before {
+        block-size: .9rem;
+        border-block-start: 2px solid currentColor;
+        border-inline-start: 2px solid currentColor;
+        content: '';
+        display: block;
+        inline-size: .9rem;
+        margin-block-start: .4rem;
+        transform: rotate(45deg);
+    }
+
+    span, img { display: none; }
+}

@@ -1,0 +1,127 @@
+//
+//  Hub Market — vendors-area login screen
+//  _____________________________________________
+//
+//  SCOPE WARNING, because this is genuinely confusing in this install:
+//  there are TWO seller login screens.
+//
+//    1. /en/marketplace/seller/login   — FRONTEND area, storefront theme.
+//       This is the real one. Every protected panel URL 302-redirects here.
+//       It is themed in app/design/frontend/MagentoEgypt/hub-market, NOT here,
+//       because a vendors-area stylesheet never loads on a frontend page.
+//
+//    2. /en/vendors/account/login      — VENDORS area, this stylesheet.
+//       Controller/Vendors/Login/Index.php, template Vnecoms_Vendors::login.phtml.
+//       Live and returning 200, but nothing links to it and no redirect targets it.
+//
+//  This file styles #2 so the two do not visibly diverge if anyone reaches it.
+//
+//  CASCADE TRAP specific to this screen: Vnecoms_Vendors/css/login.css loads
+//  AFTER styles-m.css but BEFORE styles-l.css. So below 768px — where styles-l
+//  does not apply — login.css wins over anything here at equal specificity. Its
+//  two rules are `.login-page, .register-page {…}` and
+//  `.has-feedback label ~ .form-control-feedback {…}`. The body-class prefix on
+//  the rules below is what beats it; it is not decoration.
+//
+
+//  AdminLTE paints the login backdrop #d2d6de and skin-blue darkens it. Navy
+//  makes it the same product as the storefront.
+body.login-page,
+body.register-page {
+    background: var(--hm-surface-inverse);
+    color: var(--hm-foreground);
+}
+
+body.login-page .login-box,
+body.register-page .register-box {
+    inline-size: 100%;
+    margin-block: 8vh auto;
+    max-inline-size: 40rem;
+    padding-inline: @hm-space-4;
+}
+
+//  Logo lockup above the card.
+body.login-page .login-logo,
+body.register-page .register-logo {
+    margin-block-end: @hm-space-6;
+    text-align: center;
+
+    a { color: var(--hm-on-inverse); }
+
+    .logo-img { max-block-size: 4.8rem; inline-size: auto; }
+}
+
+body.login-page .login-box-body,
+body.register-page .register-box-body {
+    background: var(--hm-surface);
+    border: 0;
+    border-radius: var(--hm-radius-lg);
+    box-shadow: var(--hm-shadow-lg);
+    color: var(--hm-foreground);
+    padding: @hm-space-8 @hm-space-6;
+}
+
+//  The template renders this as a <p>, so it carries no heading semantics. It is
+//  the page's only title and the screen has no <h1> at all — noted in the Phase K
+//  report as a template-level fix, since CSS cannot add semantics.
+body.login-page .login-box-msg,
+body.register-page .register-box-msg {
+    color: var(--hm-foreground);
+    font-size: @hm-text-xl;
+    font-weight: @hm-weight-bold;
+    line-height: @hm-leading-snug;
+    margin: 0 0 @hm-space-6;
+    padding: 0;
+    text-align: center;
+}
+
+//  16px here, unlike the 14px used elsewhere in the panel: this form IS opened on
+//  phones, and iOS zooms the viewport on focus for anything under 16px.
+body.login-page .form-control,
+body.register-page .form-control {
+    font-size: @hm-text-lg;
+    min-block-size: var(--hm-control-height-lg);
+}
+
+body.login-page .form-group,
+body.register-page .form-group { margin-block-end: @hm-space-4; }
+
+//  The field icon. login.css positions it via .form-control-feedback; only the
+//  colour is changed so the positioning logic is left intact.
+body.login-page .form-control-feedback,
+body.register-page .form-control-feedback {
+    color: var(--hm-icon);
+    line-height: var(--hm-control-height-lg);
+}
+
+//  Full-width primary action at the 44px target size.
+body.login-page .btn-primary,
+body.register-page .btn-primary {
+    font-size: @hm-text-lg;
+    inline-size: 100%;
+    min-block-size: var(--hm-control-height-lg);
+}
+
+//  The template wraps the button in a right-floated Bootstrap column, which
+//  leaves it stranded at half width once the button goes full-width.
+body.login-page .login-box-body .row > [class^='col-'],
+body.register-page .register-box-body .row > [class^='col-'] {
+    float: none;
+    inline-size: 100%;
+}
+
+//  Focus rings on this screen sit on the white card, so the light inverse ring
+//  from _hm-seller-base would vanish. Restored to the dark ring for anything
+//  inside the card, while the backdrop keeps the inverse.
+body.login-page .login-box-body :focus-visible,
+body.register-page .register-box-body :focus-visible {
+    outline-color: var(--hm-focus-ring);
+}
+
+@media (max-width: 767px) {
+    body.login-page .login-box,
+    body.register-page .register-box { margin-block-start: 4vh; }
+
+    body.login-page .login-box-body,
+    body.register-page .register-box-body { padding: @hm-space-6 @hm-space-5; }
+}

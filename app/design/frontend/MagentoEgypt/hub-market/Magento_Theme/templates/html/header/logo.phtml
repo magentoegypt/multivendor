@@ -1,0 +1,28 @@
+<?php
+/**
+ * Hub Market — logo.
+ *
+ * dir="ltr" is the important part. In the Figma build the wordmark was two flex
+ * siblings, so RTL reversed "MECommerce" into "CommerceME". A wordmark is a
+ * single indivisible object and must never mirror, whatever the page direction.
+ *
+ * @var \Magento\Theme\Block\Html\Header\Logo $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+?>
+<a class="hm-logo"
+   dir="ltr"
+   href="<?= $escaper->escapeUrl($block->getUrl('')) ?>"
+   aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
+    <img class="hm-logo__img"
+         src="<?= $escaper->escapeUrl($block->getLogoSrc()) ?>"
+         alt="<?= $escaper->escapeHtmlAttr($block->getLogoAlt()) ?>"
+        <?php if ($block->getLogoWidth()): ?>
+         width="<?= $escaper->escapeHtmlAttr($block->getLogoWidth()) ?>"
+        <?php endif; ?>
+        <?php if ($block->getLogoHeight()): ?>
+         height="<?= $escaper->escapeHtmlAttr($block->getLogoHeight()) ?>"
+        <?php endif; ?>
+    />
+</a>

@@ -1,0 +1,29 @@
+<!--
+/**
+ * Hub Market override of Magento_Checkout summary/totals.html.
+ *
+ * Adds the checkout's only live region. The checkout page uses the minimal
+ * header, so it never inherits the minicart counter's `aria-live` that covers
+ * every other page on the site — the parity sweep measured zero live regions
+ * here across both locales and all three breakpoints.
+ *
+ * Scoped to the totals TABLE rather than `.opc-block-summary`, because the
+ * summary block also holds the item list: a live region there would re-announce
+ * every product name on each recalculation. The table is `aria-atomic` so the
+ * whole set is read together — subtotal, shipping, tax and grand total move as
+ * one, and hearing only the changed row is more confusing than hearing all four.
+ *
+ * ONLY the two ARIA attributes are added; the markup is otherwise byte-identical
+ * to core so a Magento upgrade diff stays readable.
+ */
+-->
+<!-- ko if: isDisplayed() -->
+<table class="data table table-totals" aria-live="polite" aria-atomic="true">
+    <caption class="table-caption" data-bind="i18n: 'Order Summary'"></caption>
+    <tbody>
+    <!-- ko foreach: elems() -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+    </tbody>
+</table>
+<!-- /ko -->

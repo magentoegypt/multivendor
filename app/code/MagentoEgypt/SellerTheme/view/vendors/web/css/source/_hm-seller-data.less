@@ -1,0 +1,258 @@
+//
+//  Hub Market — seller panel data surfaces
+//  _____________________________________________
+//
+//  Tables, grids, pagination, status labels, alerts and modals. This is where a
+//  seller spends nearly all their time, so density and legibility matter more
+//  here than anywhere else in the panel.
+//
+//  Three grid implementations are in play, all of which need covering:
+//    .table                — Bootstrap 3, used by the hand-written screens
+//    .data-grid            — Magento UI component listing (product list, order grid)
+//    table.grid / .grid    — the legacy adminhtml grid the dashboard AJAX panels use
+//
+
+//
+//  Tables
+//  ---------------------------------------------
+.table,
+.data-grid,
+table.grid {
+    background: var(--hm-surface);
+    color: var(--hm-foreground);
+    font-size: @hm-text-base;
+    inline-size: 100%;
+
+    > thead > tr > th,
+    > thead > tr > td,
+    .data-grid-th,
+    thead th {
+        background: var(--hm-table-header-bg);
+        border-block-end: 1px solid var(--hm-table-border);
+        color: var(--hm-table-header-fg);          // 8.72:1 on the header tint
+        font-size: @hm-text-sm;
+        font-weight: @hm-weight-bold;
+        letter-spacing: .02em;
+        padding: @hm-space-3 @hm-space-4;
+        text-align: start;                          // logical: flips under RTL
+        text-transform: uppercase;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    > tbody > tr > td,
+    .data-grid-td,
+    tbody td {
+        border-block-start: 1px solid var(--hm-table-border);
+        min-block-size: var(--hm-row-height);
+        padding: @hm-space-3 @hm-space-4;
+        vertical-align: middle;
+    }
+
+    > tbody > tr:hover > td,
+    tbody tr:hover td {
+        background: var(--hm-table-row-hover);
+    }
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) { background: @hm-table-stripe; }
+
+//  Sortable column headers.
+.data-grid th._sortable,
+table.grid th a,
+.table th a {
+    color: var(--hm-table-header-fg);
+
+    &:hover { color: var(--hm-accent-strong); text-decoration: none; }
+}
+
+.data-grid th._ascend,
+.data-grid th._descend { color: var(--hm-accent-strong); }
+
+//  Empty state — Magento's "We couldn't find any records." row.
+.data-grid-tr-no-data td,
+.empty-text {
+    color: var(--hm-foreground-muted);
+    font-size: @hm-text-base;
+    padding: @hm-space-10 @hm-space-4;
+    text-align: center;
+}
+
+//
+//  Grid toolbar and pagination
+//  ---------------------------------------------
+.admin__data-grid-header,
+.admin__data-grid-pager-wrap,
+.grid-actions {
+    background: var(--hm-surface);
+    color: var(--hm-foreground);
+    font-size: @hm-text-sm;
+}
+
+.pagination {
+    > li > a,
+    > li > span {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        color: var(--hm-foreground);
+        font-size: @hm-text-sm;
+        font-weight: @hm-weight-semibold;
+        min-inline-size: var(--hm-control-height);
+        padding: @hm-space-2 @hm-space-3;
+        text-align: center;
+
+        &:hover { background: var(--hm-surface-muted); border-color: var(--hm-border-strong); }
+    }
+
+    //  The current page is a FILL, so the accent is legitimate here and the label
+    //  on it is navy — 5.04:1.
+    > .active > a,
+    > .active > span {
+        &,
+        &:hover,
+        &:focus {
+            background: var(--hm-accent);
+            border-color: var(--hm-accent);
+            color: var(--hm-on-accent);
+        }
+    }
+
+    > .disabled > span { color: var(--hm-foreground-disabled); }
+}
+
+//
+//  Status labels and badges
+//  ---------------------------------------------
+//  Order states are the highest-frequency status in the panel. Bootstrap 3's
+//  .label-* defaults are all white-on-saturated and several fail 4.5:1, so each
+//  is repainted from the palette.
+.label,
+.badge {
+    border-radius: var(--hm-radius-full);
+    font-family: var(--hm-font-ui);
+    font-size: @hm-text-xs;
+    font-weight: @hm-weight-bold;
+    letter-spacing: .02em;
+    padding: .3rem @hm-space-2;
+}
+
+//  @hm-foreground-muted on the muted surface computes to exactly 4.50:1 — a pass
+//  with no margin at all. A status pill is not the place for that, so the neutral
+//  one step darker is used instead: 6.18:1.
+.label-default { background: var(--hm-surface-muted); color: @hm-neutral-600; }
+.label-primary { background: var(--hm-primary); color: var(--hm-on-primary); }
+.label-success { background: var(--hm-success); color: var(--hm-on-status); }
+.label-info    { background: var(--hm-info);    color: var(--hm-on-status); }
+.label-warning { background: var(--hm-warning); color: var(--hm-on-status); }
+.label-danger  { background: var(--hm-danger);  color: var(--hm-on-status); }
+
+.badge { background: var(--hm-accent); color: var(--hm-on-accent); }
+
+//  The sidebar's unread-notification counter sits on navy.
+.sidebar-menu .badge,
+.sidebar-menu .label { background: var(--hm-accent); color: var(--hm-on-accent); }
+
+//
+//  Alerts and messages
+//  ---------------------------------------------
+//  Subtle tinted background + saturated text. The text colour is the one that has
+//  to clear 4.5:1, and each does against its own tint.
+.alert,
+.message {
+    border: 1px solid transparent;
+    border-radius: var(--hm-radius-sm);
+    font-size: @hm-text-base;
+    padding: @hm-space-4 @hm-space-5;
+}
+
+.alert-success, .message-success, .message.success {
+    background: var(--hm-success-subtle); border-color: fade(#0f7b3f, 30%); color: #0b5c2f;
+}
+.alert-info, .message-notice, .message.notice {
+    background: var(--hm-info-subtle);    border-color: fade(#1d4ed8, 30%); color: #1a44b8;
+}
+.alert-warning, .message-warning, .message.warning {
+    background: var(--hm-warning-subtle); border-color: fade(#b45309, 30%); color: #8f4207;
+}
+.alert-danger, .message-error, .message.error {
+    background: var(--hm-danger-subtle);  border-color: fade(#c0392b, 30%); color: #a02a1e;
+}
+
+//
+//  Modals
+//  ---------------------------------------------
+.modal-content,
+.modal-inner-wrap {
+    background: var(--hm-surface);
+    border: 0;
+    border-radius: var(--hm-radius-lg);
+    box-shadow: var(--hm-shadow-lg);
+}
+
+.modal-header,
+.modal-slide .modal-header {
+    border-block-end: 1px solid var(--hm-border-subtle);
+    padding: @hm-space-5 @hm-space-6;
+
+    .modal-title {
+        color: var(--hm-foreground);
+        font-size: @hm-text-xl;
+        font-weight: @hm-weight-bold;
+    }
+}
+
+.modal-body   { padding: @hm-space-6; }
+.modal-footer {
+    border-block-start: 1px solid var(--hm-border-subtle);
+    padding: @hm-space-4 @hm-space-6;
+}
+
+//
+//  Dashboard stat tiles
+//  ---------------------------------------------
+//  AdminLTE's .small-box / .info-box are the dashboard's headline numbers. The
+//  stock skins paint them in saturated aqua/green/yellow/red with white text,
+//  several of which fail. These are repainted as light surfaces with a coloured
+//  icon, which is both on-palette and higher contrast.
+.small-box,
+.info-box {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-shadow: var(--hm-shadow-sm);
+    color: var(--hm-foreground);
+
+    h3, .info-box-number {
+        color: var(--hm-foreground);
+        font-size: @hm-text-3xl;
+        font-weight: @hm-weight-bold;
+    }
+
+    p, .info-box-text {
+        color: var(--hm-foreground-muted);
+        font-size: @hm-text-sm;
+        font-weight: @hm-weight-medium;
+    }
+
+    .icon,
+    .info-box-icon { color: var(--hm-accent); opacity: .9; }
+}
+
+//  AdminLTE applies bg-* utility classes to those tiles inline in the template,
+//  so the surface has to be reasserted or the saturated fill survives.
+.small-box.bg-aqua,   .small-box.bg-green,  .small-box.bg-yellow,
+.small-box.bg-red,    .small-box.bg-blue,   .small-box.bg-navy,
+.info-box .info-box-icon.bg-aqua,  .info-box .info-box-icon.bg-green,
+.info-box .info-box-icon.bg-yellow, .info-box .info-box-icon.bg-red {
+    background: var(--hm-surface);
+    color: var(--hm-foreground);
+}
+
+.small-box .small-box-footer {
+    background: var(--hm-surface-muted);
+    color: var(--hm-accent-strong);
+    font-size: @hm-text-sm;
+    font-weight: @hm-weight-semibold;
+
+    &:hover { background: var(--hm-accent-subtle); color: @hm-accent-strong-hover; }
+}

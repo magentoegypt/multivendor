@@ -1,0 +1,621 @@
+//
+//  Hub Market — cart, checkout and customer account
+//  _____________________________________________
+//
+//  CHECKOUT IS AMASTY ONE STEP CHECKOUT PRO, not Magento's native Knockout
+//  checkout. Confirmed from the rendered DOM: the page is wrapped in
+//  .amcheckout-wrapper with .amcheckout-header / .amcheckout-title /
+//  .amcheckout-items.
+//
+//  That means: RESTYLE, do not restructure. Amasty renders its columns from its
+//  own layout builder and its own admin "Style Switcher", so anything that
+//  moves blocks around here would be undone by an Amasty update or an admin
+//  toggle. Everything below is presentational only.
+//
+//  The design drew checkout as a THREE-STEP WIZARD. Amasty is one-step by
+//  definition. The wizard is not reproduced — that was flagged as a
+//  design-versus-platform conflict rather than something to force.
+//
+
+//
+//  Checkout heading
+//  ---------------------------------------------
+//  The one-step checkout inherited a 48px title from blank/Amasty — the loudest
+//  h1 on the storefront, on the page that should be calmest. Figma sets 30px,
+//  the same size as the cart it follows.
+//  Amasty does NOT use Magento's `.page-title-wrapper > .page-title` here — it
+//  renders its own `h1.title` inside `.checkout-header`. A rule written against
+//  the core selector compiles fine and matches nothing, which is exactly what
+//  happened on the first attempt.
+.checkout-index-index {
+
+    .checkout-header h1.title {
+        font-family: var(--hm-font-heading);
+        font-size: 3rem;
+        font-weight: 700;
+    }
+}
+
+//
+//  Cart
+//  ---------------------------------------------
+.checkout-cart-index {
+
+    //  30px, matching the Figma cart heading. Was 3.6rem, which read a step
+    //  louder than the reference at every breakpoint.
+    .page-title-wrapper .page-title {
+        font-family: var(--hm-font-heading);
+        font-size: 3rem;
+        font-weight: 700;
+    }
+
+    //  Magento renders the cart as a real <table>. Left alone on desktop; the
+    //  responsive collapse is handled at the bottom of this file.
+    .cart.table-wrapper {
+        border-block-end: 1px solid var(--hm-border-subtle);
+
+        thead th {
+            border-block-end: 1px solid var(--hm-border-subtle);
+            color: var(--hm-foreground-muted);   // was inheriting the price accent
+            font-family: var(--hm-font-sans);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: .06em;
+            padding-block: var(--hm-space-3);
+            text-align: start;
+            text-transform: uppercase;
+        }
+
+        .cart.item { border-block-end: 1px solid var(--hm-border-subtle); }
+
+        .col { padding-block: var(--hm-space-5); vertical-align: top; }
+    }
+
+    .product-item-photo {
+        display: block;
+        inline-size: 9rem;
+
+        img {
+            background: var(--hm-surface-muted);
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius-sm);
+        }
+    }
+
+    .product-item-name a {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-sans);
+        font-size: 1.6rem;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+
+    .cart-price .price,
+    .col.subtotal .price {
+        color: var(--hm-price);
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+    }
+
+    .col.qty input.qty {
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        block-size: 4.4rem;
+        inline-size: 6.4rem;
+        text-align: center;
+    }
+
+    //  Edit / Remove: icon-adjacent text actions, given real hit areas.
+    .item-actions .actions-toolbar > .action {
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground-muted);
+        display: inline-flex;
+        align-items: center;
+        font-size: 1.3rem;
+        min-block-size: 4rem;
+        margin-inline-end: var(--hm-space-2);
+        padding-inline: var(--hm-space-4);
+
+        &:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
+    }
+}
+
+//  Summary panel
+.cart-summary {
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    padding: var(--hm-space-5);
+
+    > .title {
+        font-family: var(--hm-font-heading);
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-block-end: var(--hm-space-4);
+    }
+
+    .cart-totals {
+        border-block-start: 1px solid var(--hm-border-subtle);
+        font-variant-numeric: tabular-nums;
+
+        th, td { padding-block: var(--hm-space-2); }
+        .grand .amount, .grand .mark { font-size: 1.8rem; font-weight: 700; }
+        .grand .amount { color: var(--hm-price); }
+    }
+
+    //  Collapsible "Estimate Shipping and Tax" / "Apply Discount Code"
+    .title[role='tab'],
+    .block > .title {
+        border-block-start: 1px solid var(--hm-border-subtle);
+        cursor: pointer;
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        min-block-size: 4.4rem;
+        padding-block: var(--hm-space-3);
+    }
+
+    .checkout.methods .action.primary.checkout {
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: var(--hm-on-accent);       // navy on orange = 5.04:1
+        font-size: 1.6rem;
+        font-weight: 700;
+        min-block-size: 5.2rem;
+        width: 100%;
+
+        &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+    }
+
+    .multicheckout { color: var(--hm-accent-strong); font-size: 1.4rem; }
+}
+
+//
+//  Amasty one-step checkout
+//  ---------------------------------------------
+//  Presentational only. Amasty renders these from Knockout templates, so the
+//  markup can appear after first paint — every rule here is written to be safe
+//  whether or not the node exists yet.
+//  Root in the rendered DOM:
+//    <div id="checkout" class="checkout-container am-checkout -classic -layout-2columns">
+//  Namespaced under it so these rules cannot leak onto any other page, and
+//  written by CLASS only — Amasty injects all of this via Knockout at runtime,
+//  so structural selectors across KO comment nodes would be unreliable.
+.am-checkout,
+.amcheckout-wrapper {
+    font-family: var(--hm-font-sans);
+
+    .amcheckout-title,
+    .amcheckout-header {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-heading);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    //  Amasty draws each step as a panel. The real panel class is
+    //  `.checkout-block` (4 in the rendered DOM) — `.amcheckout-block` and
+    //  `.amcheckout-step-container` do NOT exist here and were a guess.
+    //  Verified against a post-JS DOM capture of the real checkout.
+    .checkout-block,
+    .amcheckout-content,
+    .amcheckout-items {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+    }
+
+    //  Form controls: 44px targets, 16px text so iOS does not zoom on focus.
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='number'],
+    input[type='password'],
+    select,
+    textarea {
+        background: var(--hm-surface-input);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-sans);
+        font-size: 1.6rem;
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-3);
+
+        &:focus-visible {
+            outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring);
+            outline-offset: 1px;
+        }
+    }
+
+    label { color: var(--hm-foreground-muted); font-size: 1.4rem; }
+
+    .amcheckout-summary-container,
+    .opc-block-summary {
+        font-variant-numeric: tabular-nums;
+
+        .grand.totals .price { color: var(--hm-price); font-size: 1.8rem; font-weight: 700; }
+    }
+
+    //  Place Order is the one primary CTA on the page.
+    .amcheckout-button.-place-order,
+    .action.primary.checkout,
+    button.checkout {
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: var(--hm-on-accent);
+        font-size: 1.6rem;
+        font-weight: 700;
+        min-block-size: 5.2rem;
+
+        &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+    }
+}
+
+//  Checkout deliberately drops the full site chrome; keep the logo bar on brand.
+.checkout-index-index {
+    .page-header { background: var(--hm-primary); }
+    .page-main { max-inline-size: var(--hm-container); }
+}
+
+//
+//  Customer login  (Magento core + Vnecoms SMS OTP)
+//  ---------------------------------------------
+//  Vnecoms adds a mobile-OTP path alongside the email path: .sms-login-field,
+//  .send-otp-btn, .resend-otp-btn and a second toolbar, .actions-toolbar-otp.
+//  Both paths are styled the same so neither reads as the "real" one.
+//  Measured: .login-container was already my grid at 1408px, but blank gives
+//  its .block children `float: left/right; width: 48%` inside a .media-width()
+//  mixin. Grid items still honour their own width, so both boxes collapsed to
+//  160px. Same failure mode as .product-info-main on the PDP — the body-class
+//  prefix is needed to out-specify a rule emitted after _extend.less.
+.customer-account-login .login-container,
+.customer-account-create .login-container,
+.login-container {
+    display: grid;
+    gap: var(--hm-space-8);
+    grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
+
+    > .block {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        float: none;
+        margin: 0;
+        padding: var(--hm-space-6);
+        width: auto;
+    }
+
+    .block-title strong {
+        font-family: var(--hm-font-heading);
+        font-size: 2.2rem;
+        font-weight: 700;
+    }
+}
+
+.form-login,
+.form.create.account {
+    .field { margin-block-end: var(--hm-space-4); }
+
+    .label {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-block-end: .4rem;
+    }
+
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='password'] {
+        background: var(--hm-surface-input);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        block-size: 4.8rem;
+        font-size: 1.6rem;
+        inline-size: 100%;
+        padding-inline: var(--hm-space-4);
+    }
+}
+
+//  The email-versus-mobile switch. It is a genuine choice, so it reads as a
+//  segmented control rather than as a link.
+//  .sms-login-field-ctrl is the <a> ITSELF, not a wrapper, and the active class
+//  is `selected`, not `active`:
+//    <a class="sms-login-field-ctrl selected" href="#by_email"><span>Email</span></a>
+//
+//  THE PILLS LIVE INSIDE THE <label>, NOT BESIDE IT. Vnecoms emits:
+//
+//    <div class="field email required">
+//      <label class="label" for="email">
+//        <a class="sms-login-field-ctrl selected" href="#by_email">Email</a>
+//        or
+//        <a class="sms-login-field-ctrl" href="#by_mobile">Mobile</a>
+//      </label>
+//      <div id="by_mobile" class="control sms-login-field">…</div>
+//      <div id="by_email"  class="control sms-login-field">…</div>
+//    </div>
+//
+//  A <label> is `display: inline` by default, so two 4.4rem-tall inline-flex
+//  children could not build a line box that contained them — the "Email" pill
+//  overlapped its own input and "Mobile" dropped below it. An earlier comment here
+//  claimed the pills "sit side by side without needing a parent element"; that was
+//  the bug. The label has to become the flex row.
+//  THE CONTROLS ARE FLOATED. Magento/blank floats `.control` left inside the login
+//  fieldset. Floated children are out of flow, so the parent `.field` collapses —
+//  measured via CDP as width **0**, and the label with it. A zero-width flex
+//  container wraps every item, which is why the pills stacked as Email / or /
+//  Mobile no matter what was done to the label alone. Un-float first; the label
+//  rule below only works once the field has real width.
+//  SPECIFICITY MATTERS HERE, and a plain `.form-login .field > .control` is not
+//  enough. Magento/blank ships
+//
+//      .fieldset > .field:not(.choice) > .control { width: 74.2%; float: left }
+//
+//  which is (0,4,0) — the :not() argument counts — and is emitted AFTER
+//  _extend.less. A (0,3,0) override silently loses; measured, the control stayed
+//  floated and .field stayed 0px wide. The body-class prefix takes this to (0,5,0).
+//  Same trick, same reason, as the .login-container fix above.
+.customer-account-login,
+.customer-account-create,
+.customer-account-forgotpassword {
+    .fieldset > .field:not(.choice) > .control,
+    .fieldset > .field > .control {
+        float: none;
+        inline-size: auto;
+        width: auto;
+    }
+
+    .fieldset > .field:not(.choice) > .label,
+    .fieldset > .field > .label {
+        float: none;
+        inline-size: auto;
+        text-align: start;
+        width: auto;
+    }
+
+    //  Declared last and at the same (0,5,0) weight so it beats the generic label
+    //  rule immediately above it rather than relying on source order alone.
+    .fieldset > .field.email > .label {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+        margin-block-end: var(--hm-space-3);
+    }
+}
+
+a.sms-login-field-ctrl {
+    align-items: center;
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-foreground-muted);
+    display: inline-flex;
+    font-size: 1.4rem;
+    font-weight: 600;
+    justify-content: center;
+    //  No margins: the label above is now a flex row and supplies the spacing via
+    //  `gap`. Keeping these would double it and reintroduce the ragged layout.
+    margin: 0;
+    min-block-size: 4.4rem;
+    padding-inline: var(--hm-space-5);
+    text-decoration: none;
+
+    &:hover { border-color: var(--hm-border-strong); color: var(--hm-foreground); }
+
+    &.selected {
+        background: var(--hm-primary);
+        border-color: var(--hm-primary);
+        color: var(--hm-on-primary);
+    }
+}
+
+//  Magento's floated label/control pattern clipped the inputs; make the login
+//  fields a simple stacked block.
+.form-login .field,
+.form.create.account .field {
+    > .label { display: block; float: none; text-align: start; width: auto; }
+    > .control { width: 100%; }
+}
+
+.action.login.primary,
+.action.primary.send-otp-btn {
+    background: var(--hm-accent);
+    border: 1px solid var(--hm-accent);
+    border-radius: var(--hm-radius);
+    color: var(--hm-on-accent);
+    font-size: 1.5rem;
+    font-weight: 700;
+    min-block-size: 4.8rem;
+    padding-inline: var(--hm-space-6);
+
+    &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+}
+
+.resend-otp-btn {
+    background: none;
+    border: 0;
+    color: var(--hm-accent-strong);
+    font-size: 1.4rem;
+    font-weight: 600;
+    min-block-size: 4.4rem;
+}
+
+//
+//  Account shell
+//  ---------------------------------------------
+//  Scope note: the account SHELL is styled (sidebar nav, page cards, tables).
+//  Order history with the Vnecoms per-vendor split, RMA, store credit and the
+//  address book were never drawn in the design and are deliberately left on
+//  default styling until they are.
+.block-collapsible-nav {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    padding: var(--hm-space-4);
+
+    .item {
+        margin: 0;
+
+        a, strong {
+            border-inline-start: 2px solid transparent;
+            color: var(--hm-foreground-muted);
+            display: block;
+            font-size: 1.4rem;
+            padding: var(--hm-space-3) var(--hm-space-4);
+            text-decoration: none;
+        }
+
+        a:hover { color: var(--hm-accent-strong); }
+
+        &.current {
+            a, strong {
+                border-inline-start-color: var(--hm-accent);
+                color: var(--hm-foreground);
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.account {
+    .column.main .block {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        margin-block-end: var(--hm-space-6);
+        padding-block-end: var(--hm-space-6);
+    }
+
+    .block-title strong,
+    .legend span {
+        font-family: var(--hm-font-heading);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .table-wrapper table {
+        inline-size: 100%;
+
+        th {
+            color: var(--hm-foreground-muted);
+            font-size: 1.2rem;
+            letter-spacing: .06em;
+            text-align: start;
+            text-transform: uppercase;
+        }
+
+        th, td {
+            border-block-end: 1px solid var(--hm-border-subtle);
+            padding: var(--hm-space-3);
+        }
+    }
+}
+
+//
+//  Responsive
+//  ---------------------------------------------
+//  The cart is a real <table>, so below 768px it is collapsed to stacked rows
+//  rather than left to scroll sideways. Magento/blank ships the data-th
+//  attributes this relies on.
+@media (max-width: 767px) {
+    .checkout-cart-index {
+        .cart.table-wrapper {
+            thead { .hm-visually-hidden(); }
+
+            .cart.item {
+                border: 1px solid var(--hm-border-subtle);
+                border-radius: var(--hm-radius);
+                display: block;
+                margin-block-end: var(--hm-space-4);
+                padding: var(--hm-space-4);
+            }
+
+            .col {
+                display: flex;
+                justify-content: space-between;
+                padding-block: var(--hm-space-2);
+
+                &:before {
+                    color: var(--hm-foreground-muted);
+                    content: attr(data-th);
+                    font-size: 1.3rem;
+                    font-weight: 600;
+                }
+            }
+
+            .col.item { display: block; }
+        }
+
+        .page-title-wrapper .page-title { font-size: 2.8rem; }
+    }
+
+    .login-container { grid-template-columns: 1fr; }
+}
+
+//
+//  Checkout contrast
+//  ---------------------------------------------
+//  Found by the Phase M sweep, which could measure /checkout/ for the FIRST time —
+//  every previous run had an empty cart, so Magento redirected to the cart page and
+//  the sweep silently scored that instead. Two failures, on all six checkout
+//  captures:
+//
+//    span.value  #999999 on #ffffff  = 2.85:1   (Amasty's muted summary values)
+//    span        #c2410c on #eaeaea  = 4.30:1   (our accent-strong on a grey band)
+//
+//  The second is ours and the more interesting one: --hm-accent-strong is chosen to
+//  clear AA on WHITE (5.9:1), but Amasty puts it on an #eaeaea band, which costs
+//  just enough to drop it under. Darkened to --hm-accent-strong-hover (#9a3412),
+//  which holds 5.7:1 on that grey.
+.checkout-index-index {
+    .opc-block-summary .value,
+    .am-checkout span.value,
+    span.value { color: var(--hm-foreground-muted); }   // 2.85 -> 4.6:1 on white
+
+    //  Scoped to the grey bands rather than applied globally, so the accent keeps
+    //  its intended weight everywhere it already passes.
+    .am-checkout .amcheckout-summary-container span,
+    .opc-block-summary span,
+    [class*='amcheckout'] span { &[style*='c2410c'] { color: var(--hm-accent-strong-hover); } }
+}
+
+//  The grey-band case. Identified by probing the live checkout rather than
+//  guessing: it is the SHIPPING METHOD price, `span.price` inside
+//  `tr.row.amcheckout-method`, whose row band is #eaeaea. Two earlier selector
+//  guesses (summary container, opc-block-summary) missed it entirely.
+.checkout-index-index {
+    .amcheckout-method .col-price .price,
+    tr.amcheckout-method .price,
+    .amcheckout-summary-container .price,
+    .opc-block-summary .price {
+        color: var(--hm-accent-strong-hover);           // 4.30 -> 5.7:1 on #eaeaea
+    }
+}
+
+//  The checkout "Sign In" toggle. Identified by probing the live DOM: it is
+//  `span` inside `button.action-auth-toggle`, sitting directly on the
+//  .checkout-container background (#eaeaea). It inherited --hm-accent-strong
+//  (#c2410c) = **4.30:1**, just under AA.
+//
+//  Amasty styles this button only for its `-modern` layout
+//  (.am-checkout.-modern .authentication-wrapper .action-auth-toggle), and this
+//  store runs `-classic`, so it had no button treatment at all — it read as bare
+//  coloured text. Giving it a real button shell fixes the contrast and the affordance
+//  together.
+.checkout-index-index .authentication-wrapper .action-auth-toggle {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius);
+    color: var(--hm-accent-strong-hover);   // 5.7:1 on #eaeaea, 6.9:1 on white
+    font-weight: 600;
+    min-block-size: 4.4rem;
+    padding-inline: var(--hm-space-5);
+
+    span { color: inherit; }
+
+    &:hover { border-color: var(--hm-accent); }
+}

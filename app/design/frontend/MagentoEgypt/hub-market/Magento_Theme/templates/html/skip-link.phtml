@@ -1,0 +1,13 @@
+<?php
+/**
+ * Hub Market — skip link.
+ *
+ * The Figma build had no skip link at all, and its category bar was not a nav
+ * landmark, so keyboard users had to tab the whole header on every page.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+?>
+<a class="hm-skip-link" href="#maincontent"><?= $escaper->escapeHtml(__('Skip to main content')) ?></a>

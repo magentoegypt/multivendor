@@ -1,0 +1,189 @@
+//
+//  Hub Market — footer
+//  _____________________________________________
+//
+//  The design's footer was its strongest section — properly localised, with
+//  per-country chips and Gulf payment methods. The defect was contrast: its
+//  legal links and copyright sat at ~2.2:1 on navy, the lowest real text
+//  contrast anywhere in the build.
+//
+//  Here nothing on the navy ground goes below --hm-on-inverse-muted, which is
+//  10.56:1.
+//
+
+.hm-footer {
+    background: var(--hm-surface-inverse);
+    color: var(--hm-on-inverse);
+    margin-block-start: var(--hm-space-16);
+    padding-block: var(--hm-space-12) var(--hm-space-6);
+}
+
+.hm-footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-10);
+}
+
+.hm-footer__brand {
+    max-inline-size: 40rem;
+
+    p { color: var(--hm-on-inverse-muted); }
+}
+
+.hm-footer__cols {
+    display: grid;
+    gap: var(--hm-space-8);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.hm-footer__col {
+    //  CMS blocks supply the markup; these rules cover whatever they emit.
+    h3, h4, strong:first-child {
+        color: var(--hm-on-inverse);
+        font-family: var(--hm-font-sans);
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        margin: 0 0 var(--hm-space-4);
+        text-transform: uppercase;
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-3);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        color: var(--hm-on-inverse-muted);   // 10.56:1 on navy
+        font-size: 1.4rem;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-on-inverse); text-decoration: underline; }
+    }
+}
+
+//  Country / payment chips
+.hm-footer__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    margin-block-start: var(--hm-space-4);
+}
+
+.hm-footer__chip {
+    background: fade(#ffffff, 10%);
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-on-inverse);
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: .4rem var(--hm-space-2);
+}
+
+.hm-footer__bottom {
+    align-items: center;
+    border-block-start: 1px solid fade(#ffffff, 12%);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    padding-block-start: var(--hm-space-6);
+}
+
+.hm-footer__copyright {
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.hm-footer__legal {
+    ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-5);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        color: var(--hm-on-inverse-muted);
+        font-size: 1.3rem;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-on-inverse); text-decoration: underline; }
+    }
+}
+
+//  Magento's own footer bits that survive
+.page-footer {
+    background: var(--hm-surface-inverse);
+    margin: 0;
+}
+
+.copyright {
+    background: var(--hm-surface-inverse);
+    color: var(--hm-on-inverse-muted);
+    padding: 0 0 var(--hm-space-6);
+    text-align: start;
+}
+
+//
+//  Footer social
+//  ---------------------------------------------
+//  Only channels that genuinely exist get a link. No social URL is configured on
+//  this install, so WhatsApp (whose widget block IS live) is the only entry —
+//  a dead social icon is worse than an absent one.
+.hm-footer__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+    margin-block-start: var(--hm-space-4);
+}
+
+.hm-footer__social-link {
+    align-items: center;
+    border: 1px solid fade(#ffffff, 22%);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-on-inverse);         // 15.89:1 on navy
+    display: inline-flex;
+    font-size: 1.3rem;
+    font-weight: 600;
+    gap: var(--hm-space-2);
+    min-block-size: 4rem;
+    padding-inline: var(--hm-space-4);
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible { background: fade(#ffffff, 10%); color: var(--hm-on-inverse); }
+
+    .hm-icon { block-size: 1.6rem; inline-size: 1.6rem; }
+}
+
+//
+//  Newsletter subscribe
+//  ---------------------------------------------
+//  Blank hardcodes `border-radius: 3px` here — a value on no scale, and the only
+//  button on the storefront still off the 12px button radius after the Figma
+//  radius pass.
+//
+//  Blank sets it that way because its newsletter is a JOINED field: input and
+//  button share an edge, so the button's inner corners are squared and the outer
+//  ones nearly so. Ours is not joined — measured live, there is a 4px gap between
+//  the input's right edge and the button's left — so the composite treatment does
+//  not apply and it is simply a button.
+//
+//  Matching blank's own `.block.newsletter .action.subscribe` (0,3,0) is NOT
+//  enough. Blank declares it through `.media-width('min', @screen__m)`, which
+//  Magento emits into styles-l.css — a separate sheet loaded AFTER styles-m.css,
+//  with the desktop rules at the very end. An unconditional `_extend` rule is
+//  compiled into styles-l.css too, but near the top, so at equal specificity
+//  blank still wins on order. Verified by locating both rules in the built file.
+//
+//  The `.hm-page` body class takes it to (0,4,0), which wins on specificity and
+//  is therefore immune to where either sheet places it.
+.hm-page .block.newsletter .action.subscribe {
+    border-radius: var(--hm-radius);
+}

@@ -148,26 +148,47 @@ $canItemsAddToCart = false;
     <?php endif;?>
 </div>
 <script type="text/javascript">
+    <?php
+    /*
+     * The two MGS carousel/lazyload aliases were REMOVED from this require list.
+     *
+     * Both were mapped by MGS_ThemeSettings / MGS_Fbuilder, disabled in the Phase L
+     * decommission (19 of 20 MGS modules are off; only MGS_GDPR and MGS_Brand
+     * remain). They are no longer in the deployed requirejs-config.js, so RequireJS
+     * resolved them against baseUrl, 404'd, and threw a "Script error" on EVERY
+     * storefront page.
+     *
+     * That was not just console noise: a failed dependency means this whole callback
+     * never runs, so add-to-cart inside the mini-cart cross-sell was dead too.
+     *
+     * unveil() is replaced by a native data-src fallback - harmless if no image uses
+     * it (none do now that the MGS lazy renderer is off) and still correct if one
+     * ever does. owlCarousel is called only if something actually provides it.
+     *
+     * Kept as a PHP comment, not a JS one: this rationale should live in the source,
+     * not ship to every visitor inside a <script> tag.
+     */
+    ?>
     require([
         'jquery',
         'mage/url',
-        'catalogAddToCart',
-        'mlazyload',
-        'mgsowlcarousel'
+        'catalogAddToCart'
     ], function ($, url, catalogAddToCart) {
         function initOwlCrossSellMini() {
-            $("img.lazy").unveil(25, function(){
-                var self = $(this);
-                setTimeout(function(){
-                    self.removeClass('lazy');
-                    self.parents('.parent_lazy').addClass('lazy_loaded');
-                }, 0);
+            $('#crosssell-wrap img[data-src]').each(function () {
+                var img = $(this);
+                img.attr('src', img.attr('data-src')).removeAttr('data-src').removeClass('lazy');
+                img.parents('.parent_lazy').addClass('lazy_loaded');
             });
-            
+
             var widget = $("#product-slider-<?= $class ?> [data-role=tocart-form]").catalogAddToCart({});
             // widget.catalogAddToCart('submitForm', $("#product-slider-<?= $class ?> [data-role=tocart-form]"));
 
             <?php if($useSlider): ?>
+            // Guarded: owlCarousel came from the now-disabled MGS bundle. Without it
+            // the items simply render as a static grid, which the theme already
+            // styles — a silent degrade beats a TypeError that kills add-to-cart.
+            if (typeof $.fn.owlCarousel !== 'function') { return; }
             $('#product-slider-<?= $class ?>').owlCarousel({
                 items: <?= $perRowDefault; ?>,
                 autoplay: <?= $autoPlay ? 'true' : 'false' ?>,

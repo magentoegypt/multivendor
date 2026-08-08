@@ -1,0 +1,368 @@
+//
+//  Hub Market — seller panel shell (header, sidebar, content, footer)
+//  _____________________________________________
+//
+//  AdminLTE v2.3.0 + Bootstrap 3. The markup belongs to Vnecoms, so it is matched
+//  by AdminLTE's class names rather than forked into template overrides — the same
+//  approach used for the Vnecoms storefront blocks in Phase E.
+//
+//  EVERYTHING HERE IS WRAPPED IN `body.hm-seller`, AND THAT IS LOAD-BEARING.
+//
+//  AdminLTE's skin sheet prefixes ~80 colour rules with `.skin-blue`, a body class
+//  this panel carries. `.skin-blue .main-sidebar` is (0,2,0); a bare
+//  `.main-sidebar` is (0,1,0) and loses on specificity regardless of source order.
+//  Wrapping adds one class and one element, so each mirrored rule lands exactly
+//  one element ahead of its skin counterpart:
+//
+//      body.hm-seller .main-header .navbar .nav .open > a:hover   (0,6,2)
+//      .skin-blue     .main-header .navbar .nav .open > a:hover   (0,6,1)
+//
+//  The class is stamped by view/vendors/layout/default.xml. This was NOT visible
+//  on the login screen — that layout renders no header and no sidebar — so it
+//  would have surfaced only after a seller logged in.
+//
+//  MEASURED geometry this file relies on (from AdminLTE.css, not assumed):
+//    .main-sidebar / .left-side ........ position:absolute; left:0; width:230px
+//    .content-wrapper/.right-side/
+//    .main-footer ...................... margin-left:230px
+//    .main-header .logo ................ float:left; width:230px
+//    collapsed (.sidebar-mini.sidebar-collapse):
+//      .main-sidebar ................... width:50px !important
+//      .content-wrapper ................ margin-left:50px !important
+//
+//  All of that is PHYSICAL (left / margin-left / float), which does not flip under
+//  `direction: rtl`. The mirroring lives in _hm-seller-rtl.less.
+//
+//  Cascade note: this compiles into styles-m.css AND styles-l.css (both entry
+//  points carry the same //@magento_import directives), and both load after
+//  AdminLTE.css, _all-skins.min.css and custom.css. Source order plus the body
+//  class is enough — there is no !important anywhere in this file.
+//
+
+body.hm-seller {
+
+    //
+    //  Top bar
+    //  ---------------------------------------------
+    //  skin-blue paints the navbar #3c8dbc and the logo #367fa9. Both go navy so
+    //  the panel reads as the same product as the storefront.
+    .main-header {
+        .navbar {
+            background-color: var(--hm-topbar-bg);
+            border: 0;
+            border-block-end: 1px solid var(--hm-topbar-border);
+            min-block-size: 5rem;
+
+            .nav > li > a {
+                color: var(--hm-on-inverse);
+                font-size: @hm-text-sm;
+                font-weight: @hm-weight-medium;
+                transition: background-color var(--hm-duration) var(--hm-ease);
+
+                &:hover,
+                &:focus,
+                &:active {
+                    background: fade(#ffffff, 10%);
+                    color: var(--hm-on-inverse);
+                }
+            }
+
+            .nav > .active > a {
+                background: fade(#ffffff, 14%);
+                color: var(--hm-on-inverse);
+            }
+
+            //  Mirrors .skin-blue … .nav .open > a{,:hover,:focus} at (0,6,2).
+            .nav .open > a {
+                &,
+                &:hover,
+                &:focus {
+                    background: fade(#ffffff, 14%);
+                    border-color: transparent;
+                    color: var(--hm-on-inverse);
+                }
+            }
+
+            .sidebar-toggle {
+                color: var(--hm-on-inverse);
+
+                &:hover {
+                    background-color: fade(#ffffff, 10%);
+                    color: var(--hm-on-inverse);
+                }
+            }
+
+            .dropdown-menu {
+                background: var(--hm-surface);
+                border: 1px solid var(--hm-border-subtle);
+                border-radius: var(--hm-radius-sm);
+                box-shadow: var(--hm-shadow);
+
+                li a {
+                    color: var(--hm-foreground);
+
+                    &:hover { background: var(--hm-surface-muted); color: var(--hm-accent-strong); }
+                }
+
+                li.divider { background-color: var(--hm-border-subtle); }
+            }
+        }
+
+        //  The logo cell sits above the sidebar and must match its width exactly,
+        //  otherwise the header seam shows against the sidebar edge.
+        .logo {
+            background-color: var(--hm-sidebar-bg);
+            color: var(--hm-on-inverse);
+            font-family: var(--hm-font-ui);
+            font-size: @hm-text-lg;
+            font-weight: @hm-weight-bold;
+            transition: background-color var(--hm-duration) var(--hm-ease);
+
+            &:hover { background-color: var(--hm-sidebar-hover-bg); }
+
+            .logo-img { max-block-size: 3.4rem; inline-size: auto; }
+        }
+
+        li.user-header { background-color: var(--hm-topbar-bg); }
+    }
+
+    //
+    //  Sidebar
+    //  ---------------------------------------------
+    //  skin-blue sets `.wrapper, .main-sidebar, .left-side { background: #222d32 }`
+    //  in one rule, so .wrapper is included here too — otherwise the dark slate
+    //  shows through wherever .content-wrapper does not cover.
+    .wrapper,
+    .main-sidebar,
+    .left-side {
+        background-color: var(--hm-sidebar-bg);
+    }
+
+    .sidebar { padding-block-end: @hm-space-8; }
+
+    .sidebar a { color: var(--hm-sidebar-fg); }
+
+    //  Vendor identity block at the top of the sidebar.
+    .user-panel {
+        border-block-end: 1px solid fade(#ffffff, 10%);
+        padding: @hm-space-4 @hm-space-3;
+
+        > .image img {
+            border: 2px solid fade(#ffffff, 20%);
+            block-size: 4rem;
+            inline-size: 4rem;
+            object-fit: cover;
+        }
+
+        > .info {
+            color: var(--hm-sidebar-fg-active);
+            font-size: @hm-text-sm;
+            font-weight: @hm-weight-semibold;
+            padding-block: @hm-space-1;
+            padding-inline: @hm-space-3 @hm-space-2;
+
+            > p { color: var(--hm-sidebar-fg-active); margin-block-end: @hm-space-1; }
+            > a { color: var(--hm-sidebar-fg); font-size: @hm-text-xs; font-weight: @hm-weight-regular; }
+        }
+    }
+
+    .sidebar-menu {
+        //  Section captions ("MAIN NAVIGATION").
+        > li.header {
+            background: transparent;
+            color: var(--hm-sidebar-header-fg);      // 6.41:1 on navy
+            font-size: @hm-text-xs;
+            font-weight: @hm-weight-bold;
+            letter-spacing: .08em;
+            padding: @hm-space-5 @hm-space-4 @hm-space-2;
+            text-transform: uppercase;
+        }
+
+        > li > a {
+            border-inline-start: 4px solid transparent;
+            color: var(--hm-sidebar-fg);             // 10.56:1 on navy
+            font-size: @hm-text-base;
+            font-weight: @hm-weight-medium;
+            padding: @hm-space-3 @hm-space-4;
+            transition: background-color var(--hm-duration) var(--hm-ease),
+                        color var(--hm-duration) var(--hm-ease);
+
+            > .fa,
+            > .glyphicon,
+            > .ion { inline-size: 2rem; }
+        }
+
+        > li:hover > a,
+        > li.active > a,
+        > li.menu-open > a {
+            background: var(--hm-sidebar-hover-bg);
+            color: var(--hm-sidebar-fg-active);      // 12.95:1 on navy-hover
+        }
+
+        //  The active marker is a FILL, not text — which is exactly what
+        //  @hm-accent is for. As text on navy it would be 5.04:1; as a 4px bar
+        //  the 1.4.11 threshold of 3:1 applies, and it clears it.
+        > li.active > a {
+            border-inline-start-color: var(--hm-sidebar-active-mark);
+            font-weight: @hm-weight-semibold;
+        }
+
+        > li > .treeview-menu { background: fade(#000000, 14%); }
+    }
+
+    //  Second level.
+    .treeview-menu {
+        padding-inline-start: @hm-space-4;
+
+        > li > a {
+            color: var(--hm-sidebar-fg);
+            font-size: @hm-text-sm;
+            padding-block: @hm-space-2;
+
+            &:hover { color: var(--hm-sidebar-fg-active); }
+        }
+
+        > li.active > a { color: var(--hm-sidebar-fg-active); font-weight: @hm-weight-semibold; }
+    }
+
+    //  Sidebar search, if a skin enables it.
+    .sidebar-form {
+        background: fade(#ffffff, 8%);
+        border: 0;
+        border-radius: var(--hm-radius-sm);
+
+        input[type='text'] {
+            background: transparent;
+            border: 0;
+            color: var(--hm-on-inverse);
+
+            &::placeholder { color: var(--hm-on-inverse-muted); }
+        }
+
+        .btn { background: transparent; border: 0; color: var(--hm-on-inverse-muted); }
+    }
+
+    //
+    //  Content
+    //  ---------------------------------------------
+    .content-wrapper,
+    .right-side {
+        background-color: var(--hm-background);
+    }
+
+    //  Page title band.
+    .content-header {
+        background: transparent;
+        padding: @hm-space-6 @hm-space-6 0;
+
+        > h1 {
+            color: var(--hm-foreground);
+            font-size: @hm-text-2xl;
+            font-weight: @hm-weight-bold;
+            line-height: @hm-leading-tight;
+
+            > small {
+                color: var(--hm-foreground-muted);
+                display: block;
+                font-size: @hm-text-base;
+                font-weight: @hm-weight-regular;
+                margin-block-start: @hm-space-1;
+            }
+        }
+
+        //  Breadcrumbs.
+        > .breadcrumb {
+            background: transparent;
+            font-size: @hm-text-sm;
+            padding: 0;
+
+            > li + li::before { color: var(--hm-foreground-muted); }
+            > li > a          { color: var(--hm-foreground-muted); }
+            > li > a:hover    { color: var(--hm-accent-strong); }
+            > .active         { color: var(--hm-foreground); }
+        }
+    }
+
+    .content { padding: @hm-space-6; }
+
+    //
+    //  Boxes / panels — the workhorse container of the panel
+    //  ---------------------------------------------
+    .box,
+    .panel {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-block-start: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        box-shadow: var(--hm-shadow-sm);
+        margin-block-end: @hm-space-5;
+    }
+
+    .box-header,
+    .panel-heading {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        padding: @hm-space-4 @hm-space-5;
+
+        .box-title,
+        .panel-title {
+            color: var(--hm-foreground);
+            font-size: @hm-text-lg;
+            font-weight: @hm-weight-semibold;
+            line-height: @hm-leading-snug;
+        }
+    }
+
+    .box-body,
+    .panel-body { padding: @hm-space-5; }
+
+    .box-footer,
+    .panel-footer {
+        background: var(--hm-surface-muted);
+        border-block-start: 1px solid var(--hm-border-subtle);
+        padding: @hm-space-4 @hm-space-5;
+    }
+
+    //  AdminLTE's coloured box variants, retoned. The 3px stripe is AdminLTE's own
+    //  status signal and worth keeping — the plain .box above drops to 1px exactly
+    //  so a coloured stripe reads as meaningful rather than decorative. All five
+    //  clear 3:1 on the white box surface, the 1.4.11 bar for a non-text indicator.
+    .box.box-primary,
+    .box.box-info,
+    .box.box-success,
+    .box.box-warning,
+    .box.box-danger { border-block-start-width: 3px; }
+
+    .box.box-primary { border-block-start-color: var(--hm-primary); }   // 15.89:1
+    .box.box-info    { border-block-start-color: var(--hm-info); }      //  6.70:1
+    .box.box-success { border-block-start-color: var(--hm-success); }   //  5.35:1
+    .box.box-warning { border-block-start-color: var(--hm-warning); }   //  5.02:1
+    .box.box-danger  { border-block-start-color: var(--hm-danger); }    //  5.44:1
+
+    //
+    //  Footer
+    //  ---------------------------------------------
+    .main-footer {
+        background: var(--hm-surface);
+        border-block-start: 1px solid var(--hm-border-subtle);
+        color: var(--hm-foreground-muted);
+        font-size: @hm-text-sm;
+        padding: @hm-space-4 @hm-space-6;
+
+        a { color: var(--hm-accent-strong); }
+    }
+
+    //
+    //  Small-viewport shell
+    //  ---------------------------------------------
+    //  Below 768px AdminLTE slides the sidebar off-canvas by transform, and
+    //  styles-l.css does not apply — so this block is only ever served from
+    //  styles-m.css.
+    @media (max-width: 767px) {
+        .content-header,
+        .content { padding: @hm-space-4; }
+
+        .content-header > h1 { font-size: @hm-text-xl; }
+
+        .main-header .logo { inline-size: 100%; }
+    }
+}

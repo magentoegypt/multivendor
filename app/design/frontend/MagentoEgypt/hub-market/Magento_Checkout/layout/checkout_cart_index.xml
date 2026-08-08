@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market cart heading semantics.
+ *
+ * Core renders the cart summary title through Magento_Theme::text.phtml as
+ * `<strong class="summary title">Summary</strong>` — visually a section heading,
+ * semantically nothing. text.phtml already takes the tag as an argument, so this
+ * needs no template override at all.
+ *
+ * The class is kept so every existing rule that targets `.summary.title` still
+ * applies; only the tag and the wording change. "Order Summary" matches the Figma
+ * reference and already has an Arabic translation shipped in VendorExtend's
+ * ar_SA.csv, so /ar/ renders it too.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="checkout.cart.summary.title">
+            <arguments>
+                <argument translate="true" name="text" xsi:type="string">Order Summary</argument>
+                <argument name="tag" xsi:type="string">h2</argument>
+                <argument name="css_class" xsi:type="string">summary title</argument>
+            </arguments>
+        </referenceBlock>
+
+        <referenceBlock name="page.main.title" template="Magento_Theme::html/title-cart.phtml">
+            <arguments>
+                <argument name="view_model" xsi:type="object">MagentoEgypt\CheckoutExtend\ViewModel\CartTitle</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

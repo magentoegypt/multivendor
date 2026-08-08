@@ -1,0 +1,203 @@
+//
+//  Hub Market — base layer
+//  _____________________________________________
+//
+//  Foundational element styling only. Component styles belong in per-module
+//  _module.less files (collected by //@magento_import), not here.
+//
+//  Deliberately narrow: the Figma build's global reset zeroed all borders and
+//  restyled bare h1-h4, which dropped into Magento would re-skin core markup it
+//  was never designed for. This does not do that.
+//
+
+body {
+    font-family: var(--hm-font-body);
+    color: var(--hm-foreground);
+    background-color: var(--hm-background);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+//
+//  Focus — the one accessibility default that must not be overridable by
+//  accident. The generated design painted a 1.6:1 ring; this is 5.18:1.
+//  ---------------------------------------------
+:focus-visible {
+    outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring);
+    outline-offset: var(--hm-focus-ring-offset);
+}
+
+.hm-surface-inverse,
+.page-footer {
+    :focus-visible {
+        outline-color: var(--hm-focus-ring-inverse);
+    }
+}
+
+//  Windows High Contrast: box-shadow rings are not painted, so keep a real
+//  outline. The Figma build lost every focus indicator in forced-colors mode.
+@media (forced-colors: active) {
+    :focus-visible {
+        outline: 2px solid CanvasText;
+    }
+}
+
+//
+//  Links
+//  ---------------------------------------------
+a {
+    color: var(--hm-accent-strong);
+
+    &:hover {
+        color: var(--hm-accent-strong-hover);
+    }
+}
+
+//
+//  Money — tabular figures so decimal columns align in cart and checkout.
+//  `font-variant-numeric` was never applied anywhere in the Figma build.
+//  ---------------------------------------------
+.price,
+.price-container,
+.cart-totals,
+.opc-block-summary {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+}
+
+//
+//  Prices carry the accessible orange, never the fill orange.
+//  ---------------------------------------------
+.price {
+    color: var(--hm-price);
+}
+
+.old-price .price,
+.price-was {
+    color: var(--hm-price-was);
+}
+
+//
+//  Bidi isolation helper. Any LTR-locked value rendered inside Arabic copy —
+//  prices, SKUs, order IDs, phone numbers, Latin brand names — must be wrapped
+//  so it does not reorder. The Figma build had zero isolation anywhere, which
+//  is what produced "...Search products" and a leading full stop in RTL.
+//  ---------------------------------------------
+.hm-ltr {
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+//
+//  Screen-reader-only text. Needed constantly for icon-only controls; the
+//  Figma build had exactly one sr-only and zero aria-labels.
+//  ---------------------------------------------
+.hm-sr-only {
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+//
+//  Skip link — absent from the design entirely.
+//  ---------------------------------------------
+.hm-skip-link {
+    background: var(--hm-surface);
+    color: var(--hm-accent-strong);
+    inset-inline-start: var(--hm-space-4);
+    padding: var(--hm-space-3) var(--hm-space-4);
+    position: absolute;
+    top: -100px;
+    z-index: 1000;
+
+    &:focus {
+        top: var(--hm-space-4);
+    }
+}
+
+//
+//  Touch targets. WCAG 2.2 floor is 24px; 44px is the usable target. Fourteen
+//  controls in the Figma build computed below 44px, four below 24px.
+//  ---------------------------------------------
+button,
+.action,
+[role='button'] {
+    min-height: 4.4rem;
+}
+
+//
+//  Images — the design shipped 132 remote images with no lazy-loading and no
+//  intrinsic dimensions. Templates in this theme must set width/height and
+//  loading="lazy"; this only stops the layout collapsing when they do.
+//  ---------------------------------------------
+img {
+    height: auto;
+    max-width: 100%;
+}
+
+//
+//  Container
+//  ---------------------------------------------
+.page-main,
+.hm-container {
+    max-width: var(--hm-container);
+}
+
+//
+//  Disabled primary actions
+//  ---------------------------------------------
+//  Magento renders the add-to-cart button WITH a `disabled` attribute and
+//  enables it from JS once the add-to-cart widget initialises — verified in the
+//  server HTML:
+//    <button ... id="product-addtocart-button" disabled>
+//  That is deliberate (it blocks submits before validation is wired), but
+//  blank draws the disabled state at opacity .5, which over the accent
+//  composites to #f8b18f — sampled from a render — and reads as broken in the
+//  moment before JS runs. Same treatment as the search submit.
+.action.primary:disabled,
+.action.tocart:disabled {
+    opacity: .85;
+}
+
+//
+//  Form controls inherit the type stack
+//  ---------------------------------------------
+//  Browsers do NOT inherit font-family into input/select/textarea/button — they
+//  fall back to the UA default, which is Arial here. That is the entire source of
+//  the "residual Arial x90" the parity sweep has reported since Phase I: probing
+//  the PDP found 14 Arial elements, ALL of them <input>, and ALL of them hidden
+//  (visible count 0). So it was never visible text — but inheriting is correct
+//  regardless, and it clears the gate honestly instead of explaining it away.
+input,
+select,
+textarea,
+button {
+    font-family: inherit;
+}
+
+//
+//  Inline icon sprite
+//  ---------------------------------------------
+//  The sprite is injected into after.body.start as a real <svg> carrying 40
+//  <symbol> definitions. Nothing ever styled it, so it rendered at the SVG DEFAULT
+//  INTRINSIC SIZE — 300x150 — as the first thing in the body, pushing the header
+//  (and therefore every page) down by ~157px of blank white.
+//
+//  Zero-size + absolute rather than `display: none`: hiding a sprite with
+//  display:none has historically broken `<use>` references in some browsers, and
+//  this sprite is the icon system for the whole storefront. This idiom removes it
+//  from layout while keeping every symbol resolvable.
+.hm-sprite {
+    block-size: 0;
+    inline-size: 0;
+    overflow: hidden;
+    position: absolute;
+    visibility: hidden;   // belt and braces; <use> still resolves from it
+}

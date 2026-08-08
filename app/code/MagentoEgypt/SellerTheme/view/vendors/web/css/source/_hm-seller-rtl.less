@@ -1,0 +1,238 @@
+//
+//  Hub Market — seller panel RTL
+//  _____________________________________________
+//
+//  WHY THIS FILE IS PHYSICAL, NOT LOGICAL
+//
+//  Everywhere else in this module new rules use logical properties
+//  (inline-start / block-end), which flip by themselves. That does NOT work when
+//  the goal is to override somebody else's physical declaration.
+//
+//  AdminLTE sets `.content-wrapper { margin-left: 230px }`. Declaring
+//  `margin-inline-start: 230px` after it does not replace it — under RTL the
+//  logical property resolves to margin-RIGHT, so the element ends up with 230px
+//  on BOTH sides. The physical declaration has to be explicitly zeroed and the
+//  opposite one set. Hence every rule below is physical and scoped to RTL.
+//
+//  Magento emits `<html lang="ar">` with NO dir attribute (measured), so :lang()
+//  is the selector that actually engages. [dir='rtl'] is carried alongside it so
+//  an explicit attribute keeps working if one is ever added.
+//
+//  MEASURED AdminLTE geometry being mirrored:
+//    .main-sidebar ......................... left:0; width:230px
+//    .content-wrapper/.right-side/
+//    .main-footer .......................... margin-left:230px
+//    .main-header .logo .................... float:left; width:230px
+//    .sidebar-collapse .main-sidebar ....... transform: translate(-230px, 0)
+//    .sidebar-mini.sidebar-collapse
+//      .content-wrapper .................... margin-left:50px !important
+//      .main-header .navbar ................ margin-left:50px
+//      .main-sidebar ....................... width:50px !important
+//
+//  The !important below is not reflexive — it matches an !important AdminLTE
+//  already declared on the very same property. Without it the LTR value survives.
+//
+
+@hm-sidebar-w: 230px;
+@hm-sidebar-w-mini: 50px;
+
+html:lang(ar),
+[dir='rtl'] {
+
+    //
+    //  Sidebar to the right
+    //  ---------------------------------------------
+    .main-sidebar,
+    .left-side {
+        left: auto;
+        right: 0;
+    }
+
+    .content-wrapper,
+    .right-side,
+    .main-footer {
+        margin-left: 0;
+        margin-right: @hm-sidebar-w;
+    }
+
+    .main-header .logo {
+        float: right;
+    }
+
+    .main-header .navbar {
+        float: left;
+    }
+
+    //
+    //  Collapsed / off-canvas states
+    //  ---------------------------------------------
+    .sidebar-collapse {
+        .main-sidebar,
+        .left-side { transform: translate(@hm-sidebar-w, 0); }
+
+        .content-wrapper,
+        .right-side,
+        .main-footer { margin-right: 0; }
+    }
+
+    &.sidebar-mini.sidebar-collapse,
+    .sidebar-mini.sidebar-collapse {
+        .content-wrapper,
+        .right-side,
+        .main-footer {
+            margin-left: 0 !important;
+            margin-right: @hm-sidebar-w-mini !important;
+        }
+
+        .main-sidebar { transform: translate(0, 0); }
+
+        .main-header .navbar {
+            margin-left: 0;
+            margin-right: @hm-sidebar-w-mini;
+        }
+
+        .main-header .logo > .logo-mini {
+            margin-left: 0;
+            margin-right: -15px;
+        }
+
+        .sidebar-menu > li:hover > a > span { margin-left: 0; margin-right: -3px; }
+        .sidebar-menu > li:hover > .treeview-menu { margin-right: 0; }
+    }
+
+    //
+    //  Bootstrap float helpers
+    //  ---------------------------------------------
+    //  .pull-left / .pull-right are used structurally by the user panel, the
+    //  footer version string and several toolbars, so they have to swap.
+    .pull-left  { float: right; }
+    .pull-right { float: left; }
+
+    .navbar-nav          { float: right; }
+    .navbar-nav > li     { float: right; }
+    .navbar-right        { float: left !important; }   // matches Bootstrap's own !important
+
+    //
+    //  Text and list direction
+    //  ---------------------------------------------
+    .text-left  { text-align: right; }
+    .text-right { text-align: left; }
+
+    .sidebar-menu > li > a,
+    .treeview-menu > li > a { text-align: right; }
+
+    //  AdminLTE indents the second level with padding-left.
+    .treeview-menu { padding-left: 0; padding-right: 5px; }
+
+    //  The caret that marks an expandable branch.
+    .sidebar-menu .treeview-menu > li > a > .fa-angle-double-right,
+    .sidebar-menu > li > a > .pull-right-container { transform: scaleX(-1); }
+
+    //
+    //  Dropdowns
+    //  ---------------------------------------------
+    .dropdown-menu {
+        left: auto;
+        right: 0;
+        text-align: right;
+    }
+
+    .navbar-right .dropdown-menu {
+        left: 0;
+        right: auto;
+    }
+
+    //
+    //  Tables
+    //  ---------------------------------------------
+    //  The header cells above already use `text-align: start`, which flips on its
+    //  own. Bootstrap's own th default is `text-align: left`, so it is reset here
+    //  for tables this module does not otherwise touch.
+    .table > thead > tr > th,
+    table.grid thead th { text-align: right; }
+
+    //
+    //  Mixed-script isolation
+    //  ---------------------------------------------
+    //  Nearly every screen in this panel mixes Arabic labels with latin
+    //  identifiers — SKUs, order increment ids, tracking numbers, currency codes.
+    //  Without isolation the bidi algorithm reorders a trailing "#100000123" or
+    //  "EGP" relative to the Arabic around it and the number appears to move.
+    .table td,
+    .data-grid td,
+    .order-number,
+    .increment-id,
+    .sku,
+    .price,
+    .info-box-number,
+    .small-box h3 {
+        unicode-bidi: isolate;
+    }
+}
+
+//
+//  Compatibility with Vnecoms' own RTL sheet
+//  ---------------------------------------------
+//  Vnecoms_VendorsLanguage ships a 252-line layout-rtl.css and an observer
+//  (Observer/LayoutLoadBefore.php) that adds the `vendors_panel_layout_rtl`
+//  handle plus a `layout-rtl` body class. The observer fires only when
+//
+//      core_config_data → vendors/design/rtl_language
+//
+//  contains the current locale. In this install that row DOES NOT EXIST, so the
+//  handle never fires, layout-rtl.css never loads, and the Arabic panel rendered
+//  left-to-right — which is what the :lang() rules above actually fix. Verified:
+//  the body class on /ar/vendors/account/login carries no `layout-rtl`.
+//
+//  If that setting is ever switched on, their sheet loads AFTER styles-m.css and
+//  their structural rules are equivalent to the ones above (same properties, same
+//  values), so nothing double-flips. Two things would break though, because their
+//  selectors out-specify the base rules in _hm-seller-shell.less:
+//
+//    .layout-rtl .sidebar-menu > li > a { border-right: 3px solid transparent }
+//        (0,2,2) — kills the accent active marker, which resolves to
+//        border-right-color under RTL
+//    .layout-rtl .sidebar-menu > li > a { padding: 12px 15px 12px 5px }
+//        (0,2,2) — replaces the token spacing with hard-coded pixels
+//
+//  Both are re-asserted here at (0,3,2) / (0,2,2)-plus-later-source-order so the
+//  panel looks the same whichever mechanism is driving RTL.
+.layout-rtl {
+    .sidebar-menu > li > a {
+        border-inline-end: 0;
+        border-inline-start: 4px solid transparent;
+        padding: @hm-space-3 @hm-space-4;
+    }
+
+    .sidebar-menu > li.active > a {
+        border-inline-start: 4px solid var(--hm-sidebar-active-mark);
+        border-inline-end: 0;
+    }
+
+    //  Their user-panel rule positions .info absolutely at right:55px. The token
+    //  spacing above assumes the default float flow, so it is restored.
+    .user-panel > .info {
+        left: auto;
+        position: static;
+        right: auto;
+    }
+}
+
+//
+//  Login screen
+//  ---------------------------------------------
+//  The login page has no sidebar, so it only needs the card centred and the
+//  field icon moved to the opposite edge. login.css positions the icon with
+//  `right: 0`, which in RTL has to become `left: 0`.
+html:lang(ar) body.login-page,
+html:lang(ar) body.register-page,
+[dir='rtl'] body.login-page,
+[dir='rtl'] body.register-page {
+    .form-control-feedback {
+        left: 0;
+        right: auto;
+    }
+
+    .login-box-msg,
+    .register-box-msg { text-align: center; }
+}

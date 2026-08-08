@@ -1,0 +1,516 @@
+//
+//  Hub Market — product detail (PDP)
+//  _____________________________________________
+//
+//  Layout note: the markup for the info column is present and correct
+//  (product-info-main, price-box, box-tocart, product-add-form all render), but
+//  Magento/blank lays the two columns out with FLOATS, only in styles-l.css, and
+//  the result collapsed here — the gallery took the full width and the info
+//  column rendered with no height.
+//
+//  This uses an explicit grid on .column.main instead. Every direct child spans
+//  both columns by default; only the gallery and the info column are placed.
+//  That is robust against modules appending blocks (Vnecoms price comparison,
+//  crosssell, Tamara), which a float-based layout is not.
+//
+//  Note also that MagentoEgypt_VendorExtend ships an Amazon-style three-column
+//  PDP (catalog_product_view_amazon_three.xml), but nothing triggers that
+//  handle — the page renders as page-layout-1column. It is left alone rather
+//  than wired up, because turning it on is a merchandising decision.
+//
+
+.catalog-product-view {
+
+    .column.main {
+        align-items: start;
+        column-gap: var(--hm-space-10);
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+        row-gap: var(--hm-space-8);
+
+        > * { grid-column: 1 / -1; min-width: 0; }
+        > .product.media { grid-column: 1; grid-row: 1; }
+        > .product-info-main { grid-column: 2; grid-row: 1; }
+
+        //  Blank ALSO floats these and gives them percentage widths
+        //  (.product-info-main { float: right; width: 40% }), so inside a grid
+        //  cell they shrank to 255px instead of filling it — and everything
+        //  downstream was squeezed proportionally, which is what crushed
+        //  "Add to Quote" to 85px. Grid placement alone is not enough; the
+        //  float and width have to go too.
+        > .product.media,
+        > .product-info-main {
+            float: none;
+            margin: 0;
+            width: auto;
+        }
+    }
+
+    .page-title-wrapper .page-title {
+        font-family: var(--hm-font-heading);
+        font-size: 3.6rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-block-end: var(--hm-space-5);
+    }
+}
+
+//  Figma sizes a bundle's detail page a step BELOW an ordinary product (30px vs
+//  36px) — the bundle name shares the page with the option builder, so it is not
+//  the only thing competing for attention. Magento serves both through
+//  catalog-product-view, so `page-product-bundle` is what separates them.
+.page-product-bundle .page-title-wrapper .page-title {
+    font-size: 3rem;
+}
+
+//
+//  Gallery
+//  ---------------------------------------------
+//  Constrained: it was rendering at the full column width with no ceiling.
+.product.media {
+    .fotorama__stage,
+    .gallery-placeholder {
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        overflow: hidden;
+    }
+
+    img {
+        block-size: auto;
+        max-inline-size: 100%;
+    }
+
+    .fotorama__thumb-border { border-color: var(--hm-accent); }
+}
+
+//
+//  Info column
+//  ---------------------------------------------
+.product-info-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-4);
+
+    .product-info-price {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-4);
+        justify-content: space-between;
+        margin: 0;
+        padding-block-end: var(--hm-space-4);
+    }
+
+    //  Price uses the accessible orange (5.18:1). The design set the PDP price
+    //  in Playfair Display — the only serif price in the funnel — which is not
+    //  reproduced here.
+    .price-box {
+        font-variant-numeric: tabular-nums;
+        margin: 0;
+
+        .price {
+            color: var(--hm-price);
+            font-family: var(--hm-font-sans);
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .old-price .price {
+            color: var(--hm-price-was);
+            font-size: 1.6rem;
+            font-weight: 400;
+        }
+    }
+
+    //  Stock never relies on colour alone — Magento renders the word too.
+    .stock {
+        align-items: center;
+        display: inline-flex;
+        font-size: 1.4rem;
+        font-weight: 600;
+        gap: var(--hm-space-2);
+
+        &.available { color: var(--hm-stock-in); }
+        &.unavailable { color: var(--hm-stock-out); }
+    }
+
+    .product.attribute.sku {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+
+        .value { color: var(--hm-foreground); }
+    }
+
+    .product.attribute.overview {
+        color: var(--hm-foreground-muted);
+        font-size: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .product-reviews-summary {
+        margin: 0;
+
+        .reviews-actions a {
+            color: var(--hm-accent-strong);
+            font-size: 1.4rem;
+        }
+    }
+}
+
+//
+//  Add to cart
+//  ---------------------------------------------
+//  Specificity note: blank's styles-l.css declares
+//    .product-info-main .box-tocart { display: table }
+//    .product-info-main .box-tocart .field.qty { display: table-cell }
+//    .product-info-main .box-tocart .actions { display: table-cell; padding-top: 30px }
+//  at (0,2,0). A bare `.box-tocart` rule is (0,1,0) and loses no matter where it
+//  sits in the cascade — which is why the whole box shrink-to-fit to 240px and
+//  squeezed "Add to Quote" down to 85px, wrapping it onto three lines.
+//  Measured from the live DOM via CDP, not guessed.
+//
+//  Matching (0,2,0) is NOT enough either: blank's desktop rules live inside
+//  .media-width() mixins, which _responsive.less emits at the very END of
+//  styles-l.css — after //@magento_import 'source/_extend.less'. So an
+//  equal-specificity rule loses on source order. Prefixing with the body class
+//  takes this to (0,3,0) and settles it without !important.
+//  The real row is the .fieldset, not .box-tocart — the DOM is
+//    .box-tocart > .fieldset > (.field.qty, .actions, .quote-actions)
+//  so flexing .box-tocart only ever laid out a single child and everything
+//  inside stayed shrink-to-fit. Confirmed by measuring the chain.
+.catalog-product-view .product-info-main .box-tocart,
+.catalog-product-view .product-options-bottom .box-tocart {
+    display: block;
+    margin: 0;
+    width: 100%;
+
+    > .fieldset {
+        align-items: flex-end;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-3);
+        margin: 0;
+        width: 100%;
+    }
+
+    .field.qty { display: block; flex: 0 0 auto; margin: 0; }
+
+    .actions {
+        display: block;
+        flex: 1 1 20rem;
+        padding-block-start: 0;
+        text-align: start;
+        vertical-align: baseline;
+    }
+
+    .label span {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+
+    input.qty {
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        block-size: 5.2rem;
+        font-size: 1.6rem;
+        inline-size: 7rem;
+        text-align: center;
+    }
+
+
+    .action.tocart {
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: var(--hm-on-accent);      // navy on orange = 5.04:1
+        font-size: 1.6rem;
+        font-weight: 700;
+        min-block-size: 5.2rem;
+        width: 100%;
+
+        &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+    }
+}
+
+.product-social-links {
+    display: flex;
+    gap: var(--hm-space-4);
+    margin: 0;
+    text-align: start;
+
+    a { color: var(--hm-accent-strong); font-size: 1.4rem; }
+}
+
+//
+//  Sold by / vendor
+//  ---------------------------------------------
+//  MagentoEgypt_VendorExtend renders soldby.phtml and title.phtml; the Vnecoms
+//  price-comparison block renders "Sold by N other sellers" — the marketplace's
+//  defining feature, which the design never drew.
+.product-vendor-title,
+.product-vendor-soldby,
+.price-comparison,
+.other-sellers {
+    a { color: var(--hm-accent-strong); font-weight: 600; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+}
+
+//
+//  Tabs
+//  ---------------------------------------------
+.product.info.detailed {
+    margin-block-start: var(--hm-space-10);
+
+    .product.data.items {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-1);
+        margin: 0 0 var(--hm-space-6);
+        padding: 0;
+    }
+
+    .data.item.title {
+        margin: 0;
+
+        > .switch {
+            background: transparent;
+            border: 0;
+            border-block-end: 2px solid transparent;
+            color: var(--hm-foreground-muted);
+            font-family: var(--hm-font-sans);
+            font-size: 1.5rem;
+            font-weight: 600;
+            min-block-size: 4.4rem;
+            padding: var(--hm-space-3) var(--hm-space-4);
+            text-decoration: none;
+
+            &:hover { color: var(--hm-foreground); }
+        }
+
+        &.active > .switch {
+            border-block-end-color: var(--hm-accent);
+            color: var(--hm-foreground);
+        }
+    }
+
+    .data.item.content {
+        border: 0;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+//  Attribute table
+#product-attribute-specs-table {
+    inline-size: 100%;
+
+    th, td {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        padding: var(--hm-space-3) 0;
+        text-align: start;
+    }
+
+    th {
+        color: var(--hm-foreground-muted);
+        font-weight: 600;
+        inline-size: 30%;
+    }
+}
+
+//
+//  Reviews
+//  ---------------------------------------------
+.review-list {
+    .review-title {
+        font-family: var(--hm-font-heading);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .review-item { border-block-end: 1px solid var(--hm-border-subtle); padding-block: var(--hm-space-5); }
+    .review-details-value { color: var(--hm-foreground-muted); font-size: 1.3rem; }
+}
+
+.rating-summary .rating-result > span:before,
+.review-control-vote label:before { color: var(--hm-rating-star); }
+
+//
+//  Related / upsell rails inherit the card component from _hm-product-item.less
+//  ---------------------------------------------
+.block.related,
+.block.upsell,
+.block.crosssell {
+    margin-block-start: var(--hm-space-12);
+
+    .block-title strong {
+        font-family: var(--hm-font-heading);
+        font-size: 2.4rem;
+        font-weight: 700;
+    }
+}
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 991px) {
+    .catalog-product-view .column.main {
+        grid-template-columns: minmax(0, 1fr);
+
+        > .product.media,
+        > .product-info-main { grid-column: 1 / -1; grid-row: auto; }
+    }
+
+    .catalog-product-view .page-title-wrapper .page-title { font-size: 2.4rem; }
+
+    .product-info-main .price-box .price { font-size: 2.4rem; }
+}
+
+//
+//  Vendor profile block (Vnecoms)
+//  ---------------------------------------------
+//  Rendered by Vnecoms_Vendors profile/*.phtml. Two problems, both confirmed
+//  from the markup rather than guessed:
+//
+//   1. It ships Bootstrap grid classes — .col-xs-3 / .col-xs-8 — and this theme
+//      has no Bootstrap. There are ZERO col-xs-* rules in the compiled CSS, so
+//      the logo and the details stacked and wrapped arbitrarily.
+//   2. Several fields are genuinely empty for most vendors (vendor-headline,
+//      vendor-location and vendor-operation-time are all blank on the test
+//      vendor), which left orphan icons sitting on empty rows.
+//
+//  This lays it out with flex and hides rows that carry no value.
+
+.vendor-profile-container {
+    align-items: center;
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    gap: var(--hm-space-4);
+    margin-block-start: var(--hm-space-5);
+    padding: var(--hm-space-4);
+
+    //  Neutralise the Bootstrap grid classes the template depends on.
+    [class^='col-xs-'],
+    [class*=' col-xs-'] {
+        float: none;
+        margin: 0;
+        padding: 0;
+        width: auto;
+    }
+}
+
+.vendor-profile-logo {
+    flex: 0 0 auto;
+
+    img {
+        background: var(--hm-surface);
+        block-size: 6.4rem;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius-full);
+        inline-size: 6.4rem;
+        object-fit: cover;
+    }
+}
+
+.vendor-profile-description {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: .4rem;
+    min-width: 0;
+
+    > a {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-sans);
+        font-size: 1.6rem;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+}
+
+.vendor-headline {
+    color: var(--hm-foreground);
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+//  Vnecoms ships the vendor meta at #888888 — 3.3:1 on the muted surface and
+//  3.43:1 on white, both failing AA. The Phase I sweep flagged
+//  vendor-sales-count and vendor-joined-date specifically, 40 failures across
+//  the microsite captures.
+.vendor-info span,
+.vendor-sales-count,
+.vendor-joined-date,
+.vendor-location,
+.vendor-operation-time {
+    color: var(--hm-foreground-muted);   // 4.83:1 on white, 4.5:1 on muted
+}
+
+.vendor-info {
+    align-items: center;
+    color: var(--hm-foreground-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1.3rem;
+    gap: var(--hm-space-3);
+    margin: 0;
+}
+
+//  Drop empty fields and the icons that would otherwise be left stranded.
+//  :has() is the clean way to express "this row carries no value"; every
+//  browser this storefront targets supports it.
+.vendor-info span:empty { display: none; }
+.vendor-info:not(:has(span:not(:empty))) { display: none; }
+
+//
+//  Add to Quote (Vnecoms quotation)
+//  ---------------------------------------------
+//  The template renders it as a SECOND `.action.primary`, in its own
+//  .quote-actions div outside .box-tocart — so it inherited the accent fill and
+//  competed with Add to Cart for the primary call to action, overlapping it.
+//
+//  A page gets one primary CTA. This demotes it to the secondary treatment and
+//  gives it its own row.
+//  Its own full-width row beneath the primary CTA, never beside it.
+.quote-actions {
+    flex: 1 0 100%;
+    inline-size: 100%;
+    margin-block-start: var(--hm-space-3);
+
+    .action.primary.toquote,
+    .action.toquote {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        font-size: 1.5rem;
+        font-weight: 600;
+        min-block-size: 4.8rem;
+        padding-inline: var(--hm-space-6);
+        white-space: nowrap;
+        width: 100%;
+
+        &:hover {
+            background: var(--hm-surface-muted);
+            border-color: var(--hm-foreground-muted);
+            color: var(--hm-foreground);
+        }
+
+        &:focus-visible {
+            outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring);
+            outline-offset: 2px;
+        }
+    }
+}
+
+//  Wishlist / compare sit together on one row under the CTAs.
+.product-social-links .product-addto-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    margin: 0;
+}

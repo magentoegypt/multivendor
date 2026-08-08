@@ -1,0 +1,254 @@
+//
+//  Hub Market — CMS pages
+//  _____________________________________________
+//
+//  Covers the editorial pages (About, Customer Service, Privacy, Enable
+//  Cookies), the 404, and the PageBuilder content types merchandisers will use.
+//
+//  Every real CMS page on this install is `1column` (one is `2columns-right`),
+//  so a single readable measure is the whole job. The rest of the 81 pages are
+//  Porto/MGS demo content that does not need styling.
+//
+
+//
+//  Editorial page shell
+//  ---------------------------------------------
+.cms-page-view {
+
+    .page-title-wrapper .page-title {
+        font-family: var(--hm-font-heading);
+        font-size: 3.6rem;
+        font-weight: 700;
+        line-height: 1.15;
+        margin-block-end: var(--hm-space-6);
+    }
+
+    //  Long-form copy gets a real measure. Without this it runs the full 1440px
+    //  container, which is unreadable for prose.
+    .column.main > *:not(.hm-hero):not(.hm-bundle-hero):not(section) {
+        max-inline-size: 72ch;
+    }
+
+    .cms-content,
+    .column.main {
+        color: var(--hm-foreground);
+        font-size: 1.6rem;
+        line-height: 1.7;
+
+        h2 {
+            font-family: var(--hm-font-heading);
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-block: var(--hm-space-10) var(--hm-space-4);
+        }
+
+        h3 {
+            font-family: var(--hm-font-sans);
+            font-size: 1.9rem;
+            font-weight: 600;
+            margin-block: var(--hm-space-8) var(--hm-space-3);
+        }
+
+        p { margin-block-end: var(--hm-space-4); }
+
+        ul, ol {
+            margin-block-end: var(--hm-space-4);
+            padding-inline-start: var(--hm-space-6);
+        }
+
+        li { margin-block-end: var(--hm-space-2); }
+
+        a {
+            color: var(--hm-accent-strong);
+            text-decoration: underline;
+        }
+
+        //  Arabic policy pages are common on this store; isolate direction so a
+        //  mixed-script paragraph does not reorder.
+        p, li, td { unicode-bidi: isolate; }
+
+        blockquote {
+            border-inline-start: 3px solid var(--hm-accent);
+            color: var(--hm-foreground-muted);
+            margin-inline: 0;
+            padding-inline-start: var(--hm-space-5);
+        }
+
+        table {
+            border-collapse: collapse;
+            inline-size: 100%;
+
+            th, td {
+                border-block-end: 1px solid var(--hm-border-subtle);
+                padding: var(--hm-space-3);
+                text-align: start;
+            }
+
+            th { color: var(--hm-foreground-muted); font-weight: 600; }
+        }
+
+        img { block-size: auto; border-radius: var(--hm-radius); max-inline-size: 100%; }
+    }
+
+    //  Wide content must scroll inside its own box, never the page body.
+    .table-wrapper,
+    .cms-content pre {
+        overflow-x: auto;
+    }
+}
+
+//
+//  404 / no-route
+//  ---------------------------------------------
+//  Magento serves the `no-route` CMS page here. Reuses the empty-state
+//  component so a dead URL looks deliberate rather than broken.
+.cms-noroute-index {
+
+    .page-title-wrapper .page-title {
+        font-family: var(--hm-font-heading);
+        font-size: 4.2rem;
+        text-align: center;
+    }
+
+    .column.main {
+        margin-inline: auto;
+        max-inline-size: 60ch;
+        padding-block: var(--hm-space-10);
+        text-align: center;
+
+        ul { display: inline-block; text-align: start; }
+    }
+}
+
+//
+//  PageBuilder content types
+//  ---------------------------------------------
+//  Magento_PageBuilder is enabled and is what merchandisers get in admin, so its
+//  output is brought onto the token system rather than left on PageBuilder's own
+//  defaults.
+[data-content-type='heading'] {
+    font-family: var(--hm-font-heading);
+    font-weight: 700;
+}
+
+//  PageBuilder's `_module.less` hardcodes `font-family: 'Open Sans', ...` as a
+//  literal, not through `@font-family-name__base`, so overriding the theme's font
+//  variables cannot reach it — this callout was the only Open Sans left on the
+//  site. Same collector trick as everywhere else here: `_extend` loads after
+//  `_module`, so an equal-specificity selector wins.
+.cms-content-important {
+    background-color: var(--hm-surface-muted);
+    border-radius: var(--hm-radius);
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-sans);
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-inline-start: 0;    // PageBuilder pulls it -20px into the gutter
+    padding: var(--hm-space-5);
+}
+
+[data-content-type='text'] {
+    line-height: 1.7;
+}
+
+[data-content-type='buttons'] {
+    margin-block: var(--hm-space-5);
+}
+
+[data-content-type='button-item'] {
+
+    .pagebuilder-button-primary {
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: var(--hm-on-accent);      // navy on orange = 5.04:1
+        font-family: var(--hm-font-sans);
+        font-size: 1.5rem;
+        font-weight: 700;
+        min-block-size: 4.8rem;
+        padding-inline: var(--hm-space-6);
+
+        &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+    }
+
+    .pagebuilder-button-secondary {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        font-weight: 600;
+        min-block-size: 4.8rem;
+        padding-inline: var(--hm-space-6);
+
+        &:hover { background: var(--hm-surface-muted); border-color: var(--hm-accent); }
+    }
+}
+
+[data-content-type='divider'] .pagebuilder-divider {
+    border-block-start-color: var(--hm-border-subtle);
+}
+
+[data-content-type='banner'] .pagebuilder-banner-wrapper {
+    border-radius: var(--hm-radius);
+
+    .pagebuilder-poster-content { color: inherit; }
+}
+
+[data-content-type='row'][data-appearance='contained'] {
+    margin-inline: auto;
+    max-inline-size: var(--hm-container);
+}
+
+//  PageBuilder ships its own slider/tab widgets; keep them on-palette.
+[data-content-type='slide'] .pagebuilder-slide-wrapper { border-radius: var(--hm-radius); }
+
+[data-content-type='tabs'] {
+
+    .tabs-navigation li.tab-header {
+        background: transparent;
+        border: 0;
+        border-block-end: 2px solid transparent;
+
+        a.tab-title {
+            color: var(--hm-foreground-muted);
+            font-family: var(--hm-font-sans);
+            font-weight: 600;
+            min-block-size: 4.4rem;
+        }
+
+        &.ui-state-active {
+            border-block-end-color: var(--hm-accent);
+
+            a.tab-title { color: var(--hm-foreground); }
+        }
+    }
+
+    .tabs-content { border: 1px solid var(--hm-border-subtle); border-radius: var(--hm-radius); }
+}
+
+//
+//  Bundle Deals landing page
+//  ---------------------------------------------
+//  Figma titles this page "🎁 Bundle Deals". The glyph goes in via ::before
+//  rather than into the CMS page title itself, so it stays out of the <title>
+//  tag and search results, and so both store views get it without maintaining a
+//  second Arabic copy of the string.
+//
+//  `.hm-section-emoji` is defined in _hm-home.less, which _extend.less imports
+//  ahead of this file — that ordering is what puts the mixin in scope here.
+//  The heading on this page is NOT Magento's page title — the CMS content opens
+//  with its own `h1.hm-bundle-hero__title` inside the hero section, and the core
+//  title block is suppressed. Writing this against `.page-title` compiled
+//  cleanly and matched nothing.
+.cms-bundles .hm-bundle-hero__title {
+    .hm-section-emoji("🎁");
+}
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 767px) {
+    .cms-page-view .page-title-wrapper .page-title { font-size: 2.8rem; }
+    .cms-noroute-index .page-title-wrapper .page-title { font-size: 3rem; }
+}

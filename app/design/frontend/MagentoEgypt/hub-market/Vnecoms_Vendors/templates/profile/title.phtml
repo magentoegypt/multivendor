@@ -1,0 +1,60 @@
+<?php
+/**
+ * Vendor store name.
+ *
+ * Hub Market fork of Vnecoms_Vendors::profile/title.phtml. Core hard-codes <h3>,
+ * which left the vendor microsite with NO <h1> at all — carried over unresolved
+ * from Phase I and confirmed again in Phase M (`/shop/<vendor>` rendered h3s for
+ * Items / About / Shipping / Refund under no h1, a broken heading hierarchy as well
+ * as a missing page title).
+ *
+ * THE TAG IS A PARAMETER, NOT A BLANKET CHANGE. This same template is rendered by
+ * TWO different layouts:
+ *
+ *   vendor_page.xml          -> vendor.profile.top.title, vendor.profile.left.title
+ *   catalog_product_view.xml -> vendor.profile.title        (the PDP!)
+ *
+ * The PDP already has an <h1> for the product name, and the microsite renders the
+ * title twice (top banner + left column). Promoting the tag unconditionally would
+ * produce two <h1> on every product page and two on the microsite, breaking the
+ * "exactly 1 <h1>" parity gate in the opposite direction.
+ *
+ * So the default stays <h3> — identical to core everywhere it is not opted in — and
+ * only `vendor.profile.top.title` is given heading_tag="h1", in
+ * Vnecoms_VendorsPage/layout/vendor_page.xml.
+ *
+ * @var $block \Vnecoms\VendorsPage\Block\Profile\Content
+ */
+
+// Whitelisted: this comes from layout, but an unvalidated tag would be an HTML
+// injection point the moment someone passes it a computed value.
+$allowed = ['h1', 'h2', 'h3', 'h4', 'span', 'div'];
+$tag = (string) $block->getData('heading_tag');
+$tag = in_array($tag, $allowed, true) ? $tag : 'h3';
+
+/*
+ * NEVER let this be empty. getStoreName() reads the `store_name` vendor
+ * attribute, which DOES NOT EXIST on this install — only `dispatch_time` is
+ * defined on the vendor entity type — so it returns '' for everyone, and
+ * `company` is itself blank on 3 of the 22 approved vendors.
+ *
+ * Promoting the tag to <h1> without this fallback produced a literally empty
+ * `<h1 class="vendor-title"> </h1>` on /shop/test_1, which is WORSE for a screen
+ * reader than the missing heading it replaced: an empty heading is announced as a
+ * heading with no name. Fall back through company to the vendor's URL key, which
+ * always exists because it is what routed us to this page.
+ */
+$storeName = trim((string) $block->getStoreName());
+if ($storeName === '') {
+    $vendor = $block->getVendor();
+    $storeName = trim((string) $vendor->getCompany()) ?: trim((string) $vendor->getVendorId());
+}
+?>
+<<?= /* @noEscape */ $tag ?> class="vendor-title">
+    <?php if ($block->getVendorUrl()): ?>
+        <a href="<?= $block->escapeUrl($block->getVendorUrl()) ?>"
+           title="<?= $block->escapeHtmlAttr($storeName) ?>"><?= $block->escapeHtml($storeName) ?></a>
+    <?php else: ?>
+        <?= $block->escapeHtml($storeName) ?>
+    <?php endif; ?>
+</<?= /* @noEscape */ $tag ?>>

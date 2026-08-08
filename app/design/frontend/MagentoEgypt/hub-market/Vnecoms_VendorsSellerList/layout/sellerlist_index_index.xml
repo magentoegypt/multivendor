@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Subtitle under the seller directory heading, matching the Figma /vendors header.
+ *
+ * NOT placed through Vnecoms' own `vendors/sellerlist/top_static_block` config,
+ * even though that hook exists and is empty: that block sits in `content` with
+ * `before="-"`, while the module MOVES `page.main.title` down into
+ * `sellers.container` — so the hook renders ABOVE the heading, not beneath it.
+ *
+ * Declared as a plain block and then MOVED, rather than declared with
+ * `after="page.main.title"`. A first attempt did the latter and the subtitle
+ * rendered at the very bottom of the container, below the seller search: at the
+ * time the block declaration is resolved, `page.main.title` still lives in
+ * `content` and the module's own `<move>` has not run, so the anchor does not
+ * exist and the block falls through to the end. `<move>` directives are applied
+ * after all blocks are placed and in document order, so ours lands after theirs
+ * and the anchor is there by then.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Cms\Block\Block" name="hm.sellerlist.subtitle">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">hm_sellerlist_subtitle</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <move element="hm.sellerlist.subtitle" destination="sellers.container" after="page.main.title"/>
+    </body>
+</page>

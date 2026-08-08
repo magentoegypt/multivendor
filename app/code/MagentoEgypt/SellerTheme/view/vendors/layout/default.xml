@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Stamps a single body class on every vendors-area page.
+ *
+ * This exists for ONE reason: specificity. AdminLTE's skin sheet
+ * (css/skins/_all-skins.min.css) prefixes ~80 colour rules with `.skin-blue`,
+ * which the panel carries as a body class. Measured examples:
+ *
+ *     .skin-blue .main-sidebar                        (0,2,0)
+ *     .skin-blue .main-header .navbar                 (0,3,0)
+ *     .skin-blue .main-header .navbar .nav>li>a       (0,4,2)
+ *     .skin-blue .main-header .navbar .nav .open>a:hover  (0,6,1)
+ *
+ * An unprefixed `.main-sidebar { background: navy }` is (0,1,0) and LOSES to
+ * `.skin-blue .main-sidebar` on specificity no matter how late it is in the
+ * cascade. Source order cannot rescue it. That is invisible on the login screen —
+ * which has no header or sidebar — and would only have shown up once a seller
+ * logged in.
+ *
+ * Prefixing with `body.hm-seller` adds one class AND one element, so every
+ * mirrored rule lands one element ahead of its skin counterpart and wins the tie:
+ *
+ *     body.hm-seller .main-header .navbar .nav .open>a:hover  (0,6,2)  >  (0,6,1)
+ *
+ * A body class was chosen over !important precisely because the skin system is
+ * legitimate — a seller can pick a skin at /vendors/theme/index/customize — and
+ * !important would make future overrides impossible rather than merely harder.
+ *
+ * Layout XML costs nothing at deploy time: it is read at runtime, so this needs
+ * a cache flush and NOT setup:di:compile.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="hm-seller"/>
+    </body>
+</page>

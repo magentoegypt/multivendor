@@ -1,0 +1,106 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Checkout\Block\Cart\Sidebar */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+
+<div data-block="minicart" class="minicart-wrapper">
+    <a class="action showcart" href="<?= $block->escapeUrl($block->getShoppingCartUrl()) ?>"
+       data-bind="scope: 'minicart_content'">
+        <?php
+        /*
+         * Hub Market: the cart ICON.
+         *
+         * Magento draws this glyph with an icon FONT via `.action.showcart:before`.
+         * This theme dropped those fonts, and _hm-header.less kills the pseudo-
+         * element (`&:before { content: none }`) — but never supplied a
+         * replacement, so the cart button rendered as an EMPTY 44x44 box. It was
+         * present in the DOM and invisible on screen, which is why it read as a
+         * missing feature rather than a broken one.
+         *
+         * Uses the theme's inlined sprite (see Magento_Theme::html/icons.phtml),
+         * matching the Account and Wishlist controls beside it.
+         */
+        ?>
+        <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-cart"/></svg>
+        <span class="text"><?= $block->escapeHtml(__('My Cart')) ?></span>
+        <?php
+        /*
+         * Hub Market: ONE change from core — the live-region attributes below.
+         *
+         * The cart counter is updated by Knockout from the `cart` customer-data
+         * section after an add-to-cart, with no page load. Without a live region
+         * that change is completely silent to a screen reader: the user activates
+         * "Add to Cart", the number goes 2 -> 3, and nothing is announced.
+         *
+         * `polite` so it waits for a pause rather than interrupting; `aria-atomic`
+         * so the count is announced with its label ("3 items") instead of a bare
+         * digit. The visible label span is inside this element, which is why the
+         * attributes go here rather than on .counter-number.
+         */
+        ?>
+        <span class="counter qty empty"
+              aria-live="polite"
+              aria-atomic="true"
+              data-bind="css: { empty: !!getCartParam('summary_count') == false && !isLoading() },
+               blockLoader: isLoading">
+            <span class="counter-number">
+                <!-- ko if: getCartParam('summary_count') -->
+                <!-- ko text: getCartParam('summary_count').toLocaleString(window.LOCALE) --><!-- /ko -->
+                <!-- /ko -->
+            </span>
+            <span class="counter-label">
+            <!-- ko if: getCartParam('summary_count') -->
+                <!-- ko text: getCartParam('summary_count').toLocaleString(window.LOCALE) --><!-- /ko -->
+                <!-- ko i18n: 'items' --><!-- /ko -->
+            <!-- /ko -->
+            </span>
+        </span>
+    </a>
+    <?php if ($block->getIsNeedToDisplaySideBar()):?>
+        <div class="block block-minicart"
+             data-role="dropdownDialog"
+             data-mage-init='{"dropdownDialog":{
+                "appendTo":"[data-block=minicart]",
+                "triggerTarget":".showcart",
+                "timeout": "2000",
+                "closeOnMouseLeave": false,
+                "closeOnEscape": true,
+                "triggerClass":"active",
+                "parentClass":"active",
+                "buttons":[]}}'>
+            <div id="minicart-content-wrapper" data-bind="scope: 'minicart_content'">
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            </div>
+            <?= $block->getChildHtml('minicart.addons') ?>
+        </div>
+    <?php else: ?>
+        <?php $scriptString = <<<script
+            require(['jquery'], function ($) {
+                $('a.action.showcart').on('click', function() {
+                    $(document.body).trigger('processStart');
+                });
+            });
+script;
+        ?>
+        <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?>
+    <?php endif ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], 'window.checkout = ' .
+     /* @noEscape */ $block->getSerializedConfig(), false); ?>
+    <script type="text/x-magento-init">
+    {
+        "[data-block='minicart']": {
+            "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>
+        },
+        "*": {
+            "Magento_Ui/js/block-loader": "<?= $block->escapeJs(
+                $block->escapeUrl($block->getViewFileUrl('images/loader-1.gif'))
+            ) ?>"
+        }
+    }
+    </script>
+</div>

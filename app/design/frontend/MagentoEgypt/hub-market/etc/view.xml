@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — image dimensions.
+ *
+ * view.xml MERGES up the theme fallback chain, so only the ids that actually
+ * change are declared here; everything else is inherited from Magento/blank.
+ *
+ * Magento/blank ships 240x300 (4:5 portrait) for product listings. This theme
+ * uses 1:1 square instead: the catalogue spans grocery, electronics, fashion,
+ * pharmacy and home appliances, and a portrait crop letterboxes or crops badly
+ * across that mix. Square is also what the design's product card renders.
+ *
+ * Sizes are ~2x the rendered CSS box so the images stay sharp on high-DPI
+ * screens (the card renders about 300 CSS px wide inside the 1440px container).
+ */
+-->
+<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
+    <media>
+        <images module="Magento_Catalog">
+
+            <!-- Product listing: category grid, list and search results -->
+            <image id="category_page_grid" type="small_image">
+                <width>400</width>
+                <height>400</height>
+            </image>
+            <image id="category_page_list" type="small_image">
+                <width>400</width>
+                <height>400</height>
+            </image>
+
+            <!-- Product detail gallery -->
+            <image id="product_page_main_image" type="image">
+                <width>800</width>
+                <height>800</height>
+            </image>
+            <image id="product_page_main_image_default" type="image">
+                <width>800</width>
+                <height>800</height>
+            </image>
+            <image id="product_page_image_medium" type="image">
+                <width>800</width>
+                <height>800</height>
+            </image>
+            <image id="product_page_more_views" type="thumbnail">
+                <width>100</width>
+                <height>100</height>
+            </image>
+            <image id="product_page_image_small" type="thumbnail">
+                <width>100</width>
+                <height>100</height>
+            </image>
+
+            <!-- Cart and mini-cart -->
+            <image id="mini_cart_product_thumbnail" type="thumbnail">
+                <width>120</width>
+                <height>120</height>
+            </image>
+            <image id="cart_page_product_thumbnail" type="small_image">
+                <width>160</width>
+                <height>160</height>
+            </image>
+            <image id="cart_cross_sell_products" type="small_image">
+                <width>300</width>
+                <height>300</height>
+            </image>
+
+            <!-- Related / upsell rails -->
+            <image id="related_products_list" type="small_image">
+                <width>300</width>
+                <height>300</height>
+            </image>
+            <image id="upsell_products_list" type="small_image">
+                <width>300</width>
+                <height>300</height>
+            </image>
+
+            <!-- Widgets used on the homepage rails -->
+            <image id="new_products_content_widget_grid" type="small_image">
+                <width>400</width>
+                <height>400</height>
+            </image>
+            <image id="recently_viewed_products_grid_content_widget" type="small_image">
+                <width>400</width>
+                <height>400</height>
+            </image>
+
+            <!-- Wishlist -->
+            <image id="wishlist_thumbnail" type="small_image">
+                <width>300</width>
+                <height>300</height>
+            </image>
+            <image id="wishlist_small_image" type="small_image">
+                <width>160</width>
+                <height>160</height>
+            </image>
+
+            <!-- Swatches -->
+            <image id="product_swatch_image_medium" type="image">
+                <width>400</width>
+                <height>400</height>
+            </image>
+
+        </images>
+    </media>
+</view>

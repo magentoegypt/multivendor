@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Makes this store's LOGIN actions invalidate customer private content.
+ *
+ * THE BUG THIS FIXES
+ *
+ * Vnecoms ships (module-sms/etc/frontend/sections.xml):
+ *
+ *     <action name="vsms/otp_login/verify">
+ *         <section name="checkout-data"/>
+ *         <section name="cart"/>
+ *     </action>
+ *
+ * It never invalidates the `customer` section. Magento populates customer-data
+ * sections ONLY when an action invalidates them, so a shopper who logs in through
+ * the mobile-OTP path — the primary login on this store — ends up authenticated on
+ * the server with NO `customer` section in localStorage. Observed live:
+ * section_data_ids was {"cart":1786103505} for a fully logged-in customer.
+ *
+ * Anything reading customer-data then behaves as if the visitor were a guest. That
+ * is not cosmetic: the header renders auth-dependent links from this section
+ * (see Magento_Theme/templates/html/header/utility.phtml), because the header sits
+ * inside full-page cache and CANNOT branch server-side.
+ *
+ * Core treats a login as invalidating everything — module-customer's own
+ * sections.xml uses <section name="*"/> for customer/account/loginPost. These two
+ * actions authenticate exactly the same way, so they get the same treatment:
+ *
+ *   vsms/otp_login/verify  -> Controller/Otp/Login/Verify.php   (mobile OTP tab)
+ *   vsms/login/loginPost   -> Controller/Login/LoginPost.php    (email tab)
+ *
+ * MagentoEgypt_SmsExtend already sequences after Vnecoms_Sms (see module.xml), so
+ * this merges over the vendor file rather than racing it.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+
+    <action name="vsms/otp_login/verify">
+        <section name="*"/>
+    </action>
+
+    <action name="vsms/login/loginPost">
+        <section name="*"/>
+    </action>
+</config>

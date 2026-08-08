@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * No setup_version on purpose. This module ships block classes and templates
+ * only: no schema, no data patches, nothing for setup:upgrade to do. Declaring a
+ * version it never applies makes DbStatusValidator report the schema out of date
+ * and 500 the entire storefront.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HomeSections">
+        <sequence>
+            <module name="Magento_Catalog"/>
+        </sequence>
+    </module>
+</config>

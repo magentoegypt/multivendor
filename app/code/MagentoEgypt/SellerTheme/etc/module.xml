@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Deliberately NO setup_version attribute.
+ *
+ * This module has no schema and no data patches — it ships LESS and nothing else.
+ * Declaring setup_version on a module that never runs setup:upgrade makes
+ * DbStatusValidator report the schema as out of date, which 500s the ENTIRE
+ * storefront, not just this module. That has already happened once on this install.
+ *
+ * Equally deliberate: no di.xml, no plugins, no preferences. Anything that touches
+ * dependency injection would force setup:di:compile, and compiling on a live
+ * production site means clearing generated/ and taking the site down for the
+ * duration — for a change that is purely CSS.
+ *
+ * No <sequence> either. The CSS is injected through the theme's LAST collector
+ * (source/_extend.less), which is emitted after every module's _module.less
+ * regardless of module load order, so ordering does not need to be forced.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_SellerTheme"/>
+</config>

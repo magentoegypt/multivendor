@@ -1,0 +1,493 @@
+//
+//  Hub Market — customer account
+//  _____________________________________________
+//
+//  Covers everything behind /customer/account: dashboard, order history, address
+//  book, wishlist, compare, reviews, newsletter.
+//
+//  The Figma design has ONE `/profile` page with four client-side tabs. Magento
+//  serves eight-plus separate routes, each a full page load, so this is built as
+//  sidebar-plus-page rather than as tabs. That is a deliberate divergence from the
+//  design, not an omission — see docs/design/PHASE-M-REPORT.md finding on `/profile`.
+//
+//  These pages already inherited the token layer (Playfair headings, DM Sans body,
+//  accent links) before this file existed. What was missing was component treatment:
+//  spacing, table framing, card surfaces and empty states. So this deliberately does
+//  NOT restate colours and families that already cascade correctly.
+//
+//  BOX-SIZING IS SET EXPLICITLY on anything with a percentage width plus padding.
+//  Magento/blank sets no global `border-box`, and that exact trap has now caused
+//  three separate overflow bugs in this build (Phase I seller directory being the
+//  worst). Do not assume it.
+//
+
+//
+//  Shell
+//  ---------------------------------------------
+.account {
+    .columns { padding-block-start: var(--hm-space-6); }
+
+    .column.main { min-inline-size: 0; }   // lets wide tables shrink instead of pushing the page
+}
+
+//
+//  Sidebar navigation
+//  ---------------------------------------------
+//  Magento renders this as .block-collapsible-nav with a .item per link and
+//  .current on the active one. On mobile it collapses behind a toggle, which is
+//  Magento's own JS — only the presentation is restyled here.
+.block-collapsible-nav {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    overflow: hidden;
+    padding: var(--hm-space-2);
+
+    .content { background: transparent; padding: 0; }
+
+    .item {
+        margin: 0;
+
+        > a,
+        > strong {
+            border-radius: var(--hm-radius-sm);
+            display: block;
+            font-size: 1.4rem;
+            line-height: var(--hm-leading-snug);
+            padding: var(--hm-space-3) var(--hm-space-4);
+            text-decoration: none;
+        }
+
+        > a {
+            color: var(--hm-foreground-muted);
+
+            &:hover,
+            &:focus-visible {
+                background: var(--hm-surface-muted);
+                color: var(--hm-foreground);
+            }
+        }
+
+        //  Magento marks the active entry with .current and renders it as <strong>,
+        //  NOT as a link — so the active state has to be styled on both.
+        &.current > strong,
+        &.current > a {
+            background: var(--hm-accent-subtle);
+            color: var(--hm-accent-strong);
+            font-weight: 700;
+        }
+    }
+
+    .delimiter {
+        border-block-start: 1px solid var(--hm-border-subtle);
+        margin-block: var(--hm-space-2);
+    }
+}
+
+//
+//  Boxes (dashboard panels, address cards)
+//  ---------------------------------------------
+//  BOTH naming forms are needed — core is inconsistent and uses each in a
+//  different template:
+//    box-billing-address  -> address/book.phtml AND account/dashboard/address.phtml
+//    box-address-billing  -> address/book.phtml only
+//  Styling one form leaves the other unstyled on a page the customer will see.
+.account .box,
+.box-billing-address,
+.box-shipping-address,
+.box-address-billing,
+.box-address-shipping {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    margin-block-end: var(--hm-space-5);
+    padding: var(--hm-space-5);
+}
+
+.account .box-title,
+.block-dashboard-info .block-title,
+.block-dashboard-addresses .block-title {
+    display: block;
+    margin-block-end: var(--hm-space-3);
+
+    > span,
+    > strong {
+        font-family: var(--hm-font-heading);
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+}
+
+.account .box-content {
+    color: var(--hm-foreground-muted);
+    font-size: 1.4rem;
+    line-height: var(--hm-leading-base);
+
+    p { margin-block-end: var(--hm-space-2); }
+}
+
+//  THE RUN-TOGETHER LINKS.
+//  Magento emits the box actions as bare adjacent <a> with no separator and no
+//  layout, so "Edit" and "Change Password" rendered as the single string
+//  "EditChange Password" (computed gap was `normal`). Measured live before this fix.
+.account .box-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    margin-block-start: var(--hm-space-4);
+
+    .action {
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+}
+
+//
+//  Tables — orders, order items, reviews, downloadables
+//  ---------------------------------------------
+//  EVERY wide table scrolls inside its OWN container. Letting one push the page
+//  produces horizontal overflow on the whole document at 390px, which is a parity
+//  gate failure, not a cosmetic one.
+.table-wrapper {
+    box-sizing: border-box;
+    margin-block-end: var(--hm-space-6);
+    max-inline-size: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.account .data.table,
+.table-order-items,
+.table-comparison {
+    border-collapse: collapse;
+    inline-size: 100%;
+
+    caption.table-caption { .hm-sr-only-account(); }
+
+    th,
+    td {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        padding: var(--hm-space-3) var(--hm-space-4);
+        text-align: start;
+        vertical-align: top;
+    }
+
+    thead th {
+        background: var(--hm-surface-muted);
+        color: var(--hm-foreground);
+        font-size: 1.3rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    tbody td {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+    }
+
+    //  Amounts and totals read as figures, not prose.
+    .price,
+    .col.subtotal,
+    .col.total,
+    tfoot .amount { color: var(--hm-foreground); font-weight: 700; }
+
+    tfoot {
+        th,
+        td { border-block-end: 0; padding-block: var(--hm-space-2); }
+
+        .grand_total {
+            th, td { border-block-start: 2px solid var(--hm-border-strong); font-size: 1.6rem; }
+        }
+    }
+}
+
+//  Order status reads as a badge. Reuses the .hm-badge scale from
+//  _hm-components.less rather than inventing a second pill treatment.
+.account .order-status {
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius-full);
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: .2rem var(--hm-space-3);
+}
+
+//  Vnecoms splits order items BY VENDOR on this install (module-vendors-sales
+//  overrides the order views), so a flat table rule would strand the per-vendor
+//  group header. Give it a visible band.
+.table-order-items {
+    .vendor-title,
+    .order-vendor-name,
+    tbody.vendor-group > tr:first-child > td {
+        background: var(--hm-surface-muted);
+        font-weight: 700;
+    }
+}
+
+//
+//  Order history toolbar
+//  ---------------------------------------------
+.account .toolbar {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    margin-block: var(--hm-space-4);
+}
+
+//
+//  Address book
+//  ---------------------------------------------
+//  .block-addresses-list is address/grid.phtml — the "Additional Address Entries"
+//  grid, which renders ONLY when the customer has addresses beyond the two
+//  defaults. It is therefore absent from a rendered-empty account, which is why a
+//  markup assertion cannot see it; confirmed against the core template instead.
+.block-addresses-list,
+.block-addresses-default {
+    .items.addresses {
+        display: grid;
+        gap: var(--hm-space-5);
+        grid-template-columns: repeat(auto-fill, minmax(26rem, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        > .item {
+            background: var(--hm-surface);
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius);
+            box-sizing: border-box;
+            padding: var(--hm-space-5);
+        }
+    }
+}
+
+.form-address-edit {
+    .fieldset { margin-block-end: var(--hm-space-6); }
+
+    //  Two columns from the tablet up; the address fields are short and a single
+    //  column wastes the width badly on desktop.
+    @media (min-width: 768px) {
+        .fieldset > .field {
+            box-sizing: border-box;
+            display: inline-block;
+            inline-size: 48%;
+            margin-inline-end: 2%;
+            vertical-align: top;
+        }
+
+        .fieldset > .field.street,
+        .fieldset > .field.wide { display: block; inline-size: 100%; }
+    }
+}
+
+//
+//  Wishlist
+//  ---------------------------------------------
+//  The product cards themselves come from _hm-product-item.less; this only lays
+//  them out and handles the wishlist-specific comment box and actions.
+.products-grid.wishlist {
+    .product-items {
+        display: grid;
+        gap: var(--hm-space-5);
+        grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .product-item { box-sizing: border-box; margin: 0; inline-size: auto; }
+
+    .product-item-comment {
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius-sm);
+        box-sizing: border-box;
+        display: block;
+        inline-size: 100%;
+        margin-block: var(--hm-space-2);
+        min-block-size: 6rem;
+        padding: var(--hm-space-2);
+    }
+
+    .box-tocart {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-2);
+        margin-block: var(--hm-space-2);
+
+        .qty { inline-size: 6rem; }
+    }
+}
+
+//
+//  Compare
+//  ---------------------------------------------
+.table-comparison {
+    .cell.label { background: var(--hm-surface-muted); font-weight: 700; white-space: nowrap; }
+
+    .cell.product.info,
+    .cell.product.attribute { min-inline-size: 20rem; }
+
+    .product-item-photo { display: block; margin-block-end: var(--hm-space-2); }
+}
+
+//
+//  Empty states
+//  ---------------------------------------------
+//  Magento renders a bare <span class="empty"> or a .message.info for every empty
+//  list here (no orders, no addresses, empty wishlist, nothing to compare). Give
+//  them the same treatment as the theme's own .hm-empty component so an empty
+//  account does not look broken.
+.account .message.info.empty,
+.account .empty,
+.wishlist-index-index .message.info.empty,
+.catalog-product_compare-index .message.info.empty {
+    background: var(--hm-surface-muted);
+    border: 1px dashed var(--hm-border-strong);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    color: var(--hm-foreground-muted);
+    display: block;
+    font-size: 1.5rem;
+    padding: var(--hm-space-8) var(--hm-space-5);
+    text-align: center;
+}
+
+//
+//  Forms and toolbars shared across the account
+//  ---------------------------------------------
+.account .actions-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+    margin-block-start: var(--hm-space-5);
+
+    .primary,
+    .secondary { margin: 0; }
+}
+
+//
+//  Narrow screens
+//  ---------------------------------------------
+@media (max-width: 767px) {
+    .account .box,
+    .block-addresses-list .items.addresses > .item { padding: var(--hm-space-4); }
+
+    //  Order tables collapse to stacked rows on phones — Magento already emits a
+    //  data-th attribute per cell for exactly this, so use it as the label.
+    .account .table-order-items,
+    .account .data.table.orders-history {
+        thead { .hm-sr-only-account(); }
+
+        tbody tr {
+            border-block-end: 1px solid var(--hm-border-subtle);
+            display: block;
+            padding-block: var(--hm-space-3);
+        }
+
+        tbody td {
+            border: 0;
+            display: flex;
+            gap: var(--hm-space-4);
+            justify-content: space-between;
+            padding-block: var(--hm-space-1);
+
+            &::before {
+                color: var(--hm-foreground);
+                content: attr(data-th);
+                font-weight: 700;
+            }
+        }
+    }
+}
+
+//  Local sr-only. _hm-header.less defines .hm-sr-only-mixin() but LESS mixins are
+//  file-scoped once imported at different points; duplicating the four lines is
+//  cheaper than reordering the collector and risking a cascade change elsewhere.
+.hm-sr-only-account() {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
+
+//
+//  Account page titles
+//  ---------------------------------------------
+//  These were never brought onto the type scale: with no rule at all they fell
+//  through to blank's 48px, making "My Account" / "My Orders" / "Address Book"
+//  the loudest headings on the storefront — louder than any product page — on the
+//  most utilitarian screens there are. Only visible when signed in, which is why
+//  the parity sweep (guest-only) never showed it.
+//
+//  30px matches the cart and checkout, the site's other utility pages. Figma's
+//  account screen is 24px, but its heading is the customer's NAME inside a single
+//  tabbed page; ours are per-route page titles, and dropping below the cart would
+//  add a fifth heading size to the scale for no gain.
+.account .page-title-wrapper .page-title,
+.vstorecredit-index-index .page-title-wrapper .page-title,
+.vrma-customer-index .page-title-wrapper .page-title {
+    font-family: var(--hm-font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+}
+
+//
+//  Order history pager
+//  ---------------------------------------------
+//  Blank's desktop sheet ships `.account .toolbar .pages { position: absolute;
+//  width: 100% }`. That is a Luma idiom: the toolbar is the positioned ancestor
+//  and the pager's static position is its left edge, so `100%` lands exactly.
+//
+//  Our toolbar is flex and the pager sits as a flex child at x=754 inside a 354px
+//  box. Absolute + `width: 100%` therefore resolves against the 1066px toolbar but
+//  paints from 754 — running to 1820 against a 1536 viewport, i.e. the whole page
+//  scrolled sideways. Measured on /sales/order/history/ with a two-page order list.
+//
+//  Returning it to the flow is the fix; the flex parent already centres it.
+//  `.hm-page` is needed because blank's rule is (0,3,0) and lives in styles-l.css,
+//  which loads after styles-m.css — equal specificity would lose on order.
+//
+//  COMPOUND, not descendant: `hm-page` and `account` are both classes on <body>,
+//  so `.hm-page .account` asks for an `.account` inside an `.hm-page` and matches
+//  nothing. Written with a space first time round and the pager stayed absolute.
+.hm-page.account .toolbar .pages {
+    position: static;
+    width: auto;
+}
+
+//
+//  Two-column layouts must mirror in Arabic
+//  ---------------------------------------------
+//  The account area (and every other `2columns-left` page) did NOT mirror in RTL:
+//  measured on /ar/customer/account/, the sidebar sat at x=56 and main at x=370 —
+//  pixel-identical to /en/. An Arabic customer got a left-hand sidebar.
+//
+//  Cause: blank positions these columns with PHYSICAL floats —
+//    .page-layout-2columns-left .sidebar-main { float: left  }
+//    .page-layout-2columns-left .column.main  { float: right }
+//  `float` has no logical behaviour, so it pins the columns regardless of
+//  direction.
+//
+//  Fixed by making only the DIRECTION logical and leaving blank's float layout
+//  otherwise intact. A first attempt instead turned `.columns` into a flex
+//  container — tempting, because blank already ships `order: 1/2` on these and
+//  they are inert while `.columns` is `display: block`. That failed: blank's flex
+//  model also sets `flex-basis: 100%` on both columns as a mobile default, and
+//  `flex-basis` outranks `width`, so the desktop 16.67%/83.33% widths were ignored
+//  and the columns stacked full-width. Reproducing blank's proportions by hand
+//  would have been a far larger change than this one.
+//
+//  (0,3,0) to clear blank's (0,2,0), which is emitted into the later styles-l.css.
+.hm-page.page-layout-2columns-left,
+.hm-page.page-layout-2columns-right {
+
+    .sidebar-main { float: inline-start; }
+
+    .column.main { float: inline-end; }
+}

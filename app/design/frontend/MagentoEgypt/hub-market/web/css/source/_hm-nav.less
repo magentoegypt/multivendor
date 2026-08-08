@@ -1,0 +1,253 @@
+//
+//  Hub Market — category navigation (header band 3)
+//  _____________________________________________
+//
+//  Ported from Mgs/supro's hub-market-menu.css. On Magento/blank every
+//  `!important` and every `body .header-area.header3 …` selector from that file
+//  is gone — they existed only to out-specify MGS's navigation rules.
+//
+//  Colours are tokens now. The original hard-coded #06195b for the bar and
+//  #f47d6b for hover, neither of which matched the theme's own accent.
+//
+//  Markup is Magento's Topmenu tree:
+//    ul.hm-nav__grid > li.level0 > a.level-top + ul.submenu > li.level1 > a
+//
+
+.hm-nav {
+    background: var(--hm-primary);
+    border-block-start: 1px solid fade(#ffffff, 8%);
+}
+
+.hm-nav__inner {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    min-block-size: 5.6rem;
+}
+
+//
+//  Trigger
+//  ---------------------------------------------
+.hm-nav__menu {
+    position: relative;
+
+    //  Hide the native disclosure marker in every engine.
+    > summary {
+        list-style: none;
+
+        &::-webkit-details-marker { display: none; }
+        &::marker { content: ''; }
+    }
+
+    &[open] .hm-nav__chevron { transform: rotate(180deg); }
+}
+
+.hm-nav__trigger {
+    align-items: center;
+    color: var(--hm-on-inverse);
+    cursor: pointer;
+    display: flex;
+    font-size: 1.5rem;
+    font-weight: 700;
+    gap: var(--hm-space-2);
+    min-block-size: 4.4rem;
+    padding-inline: var(--hm-space-3);
+    user-select: none;
+
+    &:hover { background: fade(#ffffff, 8%); }
+
+    &:focus-visible {
+        outline: 2px solid var(--hm-focus-ring-inverse);
+        outline-offset: -2px;
+    }
+}
+
+.hm-nav__chevron { transition: transform var(--hm-duration) var(--hm-ease); }
+
+//  Bundle Deals — folded into this row instead of occupying a band of its own.
+.hm-nav__promo {
+    align-items: center;
+    color: var(--hm-accent);
+    display: flex;
+    font-weight: 700;
+    gap: var(--hm-space-2);
+    min-block-size: 4.4rem;
+    padding-inline: var(--hm-space-3);
+    text-decoration: none;
+
+    &:hover { color: var(--hm-accent); text-decoration: underline; }
+}
+
+//
+//  Panel
+//  ---------------------------------------------
+.hm-nav__panel {
+    background: var(--hm-surface);
+    border-radius: 0 0 var(--hm-radius) var(--hm-radius);
+    box-shadow: var(--hm-shadow-lg);
+    color: var(--hm-foreground);
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    max-block-size: ~"calc(100vh - 200px)";
+    min-inline-size: 92rem;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 100;
+}
+
+.hm-nav__panel-inner { padding: var(--hm-space-6); }
+
+//  CSS multi-column, as in the original. break-inside keeps a category and its
+//  children together.
+.hm-nav__grid {
+    column-count: 4;
+    column-gap: var(--hm-space-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li {
+        break-inside: avoid;
+        margin-block-end: var(--hm-space-4);
+        padding: var(--hm-space-3) var(--hm-space-4);
+        border: 1px solid transparent;
+        border-radius: var(--hm-radius-sm);
+
+        &:hover { border-color: var(--hm-border-subtle); }
+    }
+
+    a {
+        display: block;
+        text-align: start;
+        text-decoration: none;
+    }
+
+    //  Top-level category.
+    //  The body-class prefix is needed: blank declares
+    //  `.navigation .level0 > .level-top { color: #575757 }` inside a
+    //  .media-width() mixin, which _responsive.less emits after _extend.less —
+    //  so equal specificity loses on source order. The sweep caught #575757
+    //  rendering on 10 pages.
+    .hm-page & > li > a.level-top,
+    > li > a.level-top {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        color: var(--hm-foreground);
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1.45;
+        margin-block-end: var(--hm-space-2);
+        padding-block-end: var(--hm-space-2);
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+
+    //  Children
+    ul.submenu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: static !important;   // Magento's menu JS absolutely positions these
+        box-shadow: none;
+        border: 0;
+        min-width: 0;
+
+        a {
+            color: var(--hm-foreground-muted);
+            font-size: 1.3rem;
+            line-height: 1.45;
+            padding-block: .3rem;
+
+            &:hover { color: var(--hm-accent-strong); }
+        }
+    }
+
+    //  Only two levels are shown; deeper trees collapse.
+    ul.level1 { display: none; }
+    .ui-menu-icon { display: none; }
+}
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 1439px) { .hm-nav__grid { column-count: 3; } }
+@media (max-width: 1199px) { .hm-nav__grid { column-count: 2; } }
+
+@media (max-width: 991px) {
+    .hm-nav__inner { min-block-size: 4.8rem; }
+
+    .hm-nav__panel {
+        border-radius: 0;
+        inset-inline: 0;
+        min-inline-size: 0;
+        max-block-size: ~"calc(100vh - 150px)";
+        position: fixed;
+        inset-block-start: auto;
+    }
+
+    .hm-nav__grid {
+        column-count: 1;
+
+        > li { border-block-end: 1px solid var(--hm-border-subtle); border-radius: 0; margin-block-end: 0; }
+    }
+}
+
+//
+//  Inline category links  (Figma: the category row in the nav bar)
+//  ---------------------------------------------
+//  Read from the same menu tree as the dropdown panel, so the two cannot drift.
+.hm-nav__inline {
+    align-items: center;
+    display: flex;
+    flex: 1;
+    flex-wrap: nowrap;
+    gap: var(--hm-space-1);
+    list-style: none;
+    margin: 0;
+    overflow-x: auto;
+    padding: 0;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+}
+
+.hm-nav__inline-item { margin: 0; }
+
+.hm-nav__inline-link {
+    align-items: center;
+    border-block-end: 2px solid transparent;
+    color: var(--hm-on-inverse-muted);   // 10.56:1 on navy
+    display: inline-flex;
+    font-size: 1.4rem;
+    font-weight: 500;
+    min-block-size: 4.4rem;              // 2.5.5 target size
+    padding-inline: var(--hm-space-3);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+        border-block-end-color: var(--hm-accent);
+        color: var(--hm-on-inverse);
+        text-decoration: none;
+    }
+}
+
+//  Below the panel breakpoint the dropdown carries navigation; a scrolling row
+//  of eight categories competes with it and eats the whole bar.
+@media (max-width: 991px) {
+    .hm-nav__inline { display: none; }
+}
+
+//  Category emoji in the inline nav (Figma parity). Sized down slightly so the
+//  glyph reads as an icon beside the label rather than competing with it.
+.hm-nav__inline-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    margin-inline-end: .4rem;
+}
+
+.hm-nav__inline-link {
+    align-items: center;
+    display: inline-flex;
+}

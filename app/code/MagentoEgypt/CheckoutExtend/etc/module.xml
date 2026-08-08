@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * View-model-only module for cart/checkout presentation.
+ *
+ * Deliberately declares NO setup_version: it ships no schema and no data
+ * scripts, and declaring one without ever running setup:upgrade makes
+ * DbStatusValidator 500 the entire storefront.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_CheckoutExtend">
+        <sequence>
+            <module name="Magento_Checkout"/>
+        </sequence>
+    </module>
+</config>

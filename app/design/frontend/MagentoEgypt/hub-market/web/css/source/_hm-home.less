@@ -1,0 +1,1312 @@
+//
+//  Hub Market — homepage
+//  _____________________________________________
+//
+//  Sections are theme-scoped (Magento_Cms/layout/cms_index_index.xml), so the
+//  live Supro homepage is untouched.
+//
+
+.hm-home .page-main {
+    padding-inline: var(--hm-space-4);
+}
+
+.hm-home .columns {
+    display: block;   // 1-column home; no sidebar grid
+}
+
+//
+//  Hero
+//  ---------------------------------------------
+.hm-hero {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-columns: 2fr 1fr;
+    margin-block: var(--hm-space-6) var(--hm-space-10);
+}
+
+.hm-hero__main {
+    align-items: flex-start;
+    background: linear-gradient(135deg, var(--hm-primary) 0%, #162d5a 55%, #1a3a6a 100%);
+    border-radius: var(--hm-radius-lg);
+    color: var(--hm-on-inverse);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-4);
+    justify-content: center;
+    min-block-size: 36rem;
+    padding: var(--hm-space-10);
+}
+
+.hm-hero__eyebrow {
+    background: fade(#ffffff, 14%);
+    border-radius: var(--hm-radius-full);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    margin: 0;
+    padding: .5rem var(--hm-space-3);
+    text-transform: uppercase;
+}
+
+.hm-hero__title {
+    color: var(--hm-on-inverse);
+    font-family: var(--hm-font-heading);
+    font-size: 4.2rem;
+    font-weight: 700;
+    line-height: 1.1;
+    margin: 0;
+    max-inline-size: 18ch;
+    text-wrap: balance;
+}
+
+.hm-hero__text {
+    color: var(--hm-on-inverse-muted);   // 10.56:1 on navy
+    font-size: 1.7rem;
+    margin: 0;
+    max-inline-size: 44ch;
+}
+
+.hm-hero__tiles {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-rows: repeat(3, 1fr);
+}
+
+.hm-hero__promo {
+    align-items: flex-start;
+    border-radius: var(--hm-radius);
+    color: var(--hm-foreground);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-block-size: 10rem;
+    padding: var(--hm-space-5);
+    text-decoration: none;
+    transition: transform var(--hm-duration) var(--hm-ease);
+
+    &:hover { transform: translateY(-2px); }
+}
+
+//  Tints derived from the palette — no imported pastels.
+.hm-hero__promo--a { background: var(--hm-surface-muted); }
+.hm-hero__promo--b { background: var(--hm-accent-subtle); }
+.hm-hero__promo--c { background: var(--hm-info-subtle); }
+
+.hm-hero__promo-title {
+    font-family: var(--hm-font-sans);
+    font-size: 1.7rem;
+    font-weight: 700;
+}
+
+.hm-hero__promo-text {
+    color: var(--hm-foreground-muted);
+    font-size: 1.4rem;
+}
+
+//
+//  Service promises
+//  ---------------------------------------------
+.hm-usp {
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius);
+    margin-block-end: var(--hm-space-12);
+    padding: var(--hm-space-6);
+}
+
+.hm-usp__list {
+    display: grid;
+    gap: var(--hm-space-6);
+    grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-usp__item {
+    display: flex;
+    gap: var(--hm-space-3);
+}
+
+.hm-usp__icon { color: var(--hm-accent-strong); }
+
+.hm-usp__title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0 0 .2rem;
+}
+
+.hm-usp__text {
+    color: var(--hm-foreground-muted);
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+//
+//  Category tiles
+//  ---------------------------------------------
+//  Eight tiles, one tint family. The design used eight Material pastels from a
+//  foreign palette; these are all derived from the brand neutrals and accent.
+.hm-cats__grid {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+}
+
+.hm-tile {
+    align-items: flex-end;
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    color: var(--hm-foreground);
+    display: flex;
+    min-block-size: 11rem;
+    padding: var(--hm-space-4);
+    text-decoration: none;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover {
+        border-color: var(--hm-accent);
+        box-shadow: var(--hm-shadow);
+        color: var(--hm-foreground);
+    }
+}
+
+.hm-tile__label {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: start;
+}
+
+.hm-tile--a, .hm-tile--e { background: var(--hm-accent-subtle); }
+.hm-tile--b, .hm-tile--f { background: var(--hm-surface-muted); }
+.hm-tile--c, .hm-tile--g { background: var(--hm-info-subtle); }
+.hm-tile--d, .hm-tile--h { background: var(--hm-success-subtle); }
+
+//
+//  Bundle band
+//  ---------------------------------------------
+.hm-bundle-band {
+    border-radius: var(--hm-radius-lg);
+    margin-block: var(--hm-space-12);
+    padding: var(--hm-space-10);
+}
+
+.hm-bundle-band__inner {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-6);
+    justify-content: space-between;
+}
+
+.hm-bundle-band__title {
+    color: var(--hm-on-inverse);
+    font-family: var(--hm-font-heading);
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 var(--hm-space-2);
+}
+
+.hm-bundle-band__text { font-size: 1.6rem; margin: 0; }
+
+//
+//  Responsive
+//  ---------------------------------------------
+@media (max-width: 991px) {
+    .hm-hero { grid-template-columns: 1fr; }
+
+    .hm-hero__main { min-block-size: 26rem; padding: var(--hm-space-6); }
+    .hm-hero__title { font-size: 3rem; }
+
+    .hm-hero__tiles { grid-template-columns: repeat(3, 1fr); grid-template-rows: none; }
+}
+
+@media (max-width: 640px) {
+    .hm-hero__tiles { grid-template-columns: 1fr; }
+    .hm-bundle-band { padding: var(--hm-space-6); }
+}
+
+//
+//  Vendor spotlight (Vnecoms seller widget)
+//  ---------------------------------------------
+//  Markup comes from MagentoEgypt_VendorExtend::widget/sellerlist.phtml, which
+//  this theme does not own. Mapped onto the same visual language as
+//  .hm-vendor-card rather than forking the template.
+//
+//  The seller star rating is emitted as raw HTML from
+//  Vnecoms\VendorsSellerList\Block\SellerList::getReviewSellerHtml() with no
+//  phtml at all, so it can only be reached from CSS.
+.ves-sellerlist-inner {
+    margin-block-end: var(--hm-space-12);
+
+    //  The template wraps items in .owl-carousel, but this theme does not load
+    //  MGS's owl JS (it is being retired), so nothing ever initialises and the
+    //  items collapsed to zero height. Laying them out as a grid makes the rail
+    //  work with no JS at all, which is the better outcome regardless.
+    .owl-carousel {
+        display: grid;
+        gap: var(--hm-space-4);
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    }
+
+    .item { display: block; width: auto; }
+
+    .seller-info {
+        align-items: center;
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-2);
+        padding: var(--hm-space-6);
+        text-align: center;
+        transition: border-color var(--hm-duration) var(--hm-ease),
+                    box-shadow var(--hm-duration) var(--hm-ease);
+
+        &:hover {
+            border-color: var(--hm-border-strong);
+            box-shadow: var(--hm-shadow);
+        }
+    }
+
+    img {
+        block-size: 7.2rem;
+        border-radius: var(--hm-radius-full);
+        inline-size: 7.2rem;
+        object-fit: cover;
+    }
+
+    .seller-details a,
+    .seller-items-link a {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-sans);
+        font-size: 1.6rem;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+
+    //  Percentage-width star bar from the block's raw HTML.
+    .seller-rating,
+    .rating-summary {
+        .rating-result > span:before,
+        .rating-result span:before { color: var(--hm-rating-star); }
+    }
+}
+
+//
+//  Bundles landing page
+//  ---------------------------------------------
+//  Phase D linked the homepage to /bundles before the page existed, so that
+//  link 404'd. The page is a CMS page (global, and it 404'd on Supro too, so
+//  creating it is additive) driven by a ProductsList widget filtered to the
+//  bundle SKUs.
+.hm-bundle-hero {
+    border-radius: var(--hm-radius-lg);
+    margin-block: var(--hm-space-6) var(--hm-space-10);
+    padding: var(--hm-space-10);
+
+    &__title {
+        color: var(--hm-on-inverse);
+        font-family: var(--hm-font-heading);
+        font-size: 3.6rem;
+        font-weight: 700;
+        margin: var(--hm-space-3) 0 var(--hm-space-2);
+    }
+
+    &__text {
+        font-size: 1.6rem;
+        margin: 0;
+        max-inline-size: 60ch;
+    }
+}
+
+//
+//  Category chips  (Figma: the icon+count row under the hero)
+//  ---------------------------------------------
+//  Replaces the flat colour tiles. Counts come from the live category tree via
+//  MagentoEgypt\HomeSections\Block\CategoryChips, so they cannot drift.
+.hm-chips {
+    margin-block: var(--hm-space-6);
+}
+
+.hm-chips__list {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-chips__item { margin: 0; }
+
+.hm-chips__link {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-1);
+    justify-content: center;
+    min-block-size: 11rem;
+    padding: var(--hm-space-4) var(--hm-space-3);
+    text-align: center;
+    text-decoration: none;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible {
+        border-color: var(--hm-accent);
+        box-shadow: var(--hm-shadow);
+        text-decoration: none;
+    }
+}
+
+.hm-chips__icon {
+    align-items: center;
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius-full);
+    block-size: 5.2rem;
+    color: var(--hm-accent-strong);
+    display: flex;
+    inline-size: 5.2rem;
+    justify-content: center;
+    margin-block-end: var(--hm-space-1);
+
+    .hm-icon { block-size: 2.4rem; inline-size: 2.4rem; }
+}
+
+.hm-chips__img {
+    block-size: 100%;
+    border-radius: var(--hm-radius-full);
+    inline-size: 100%;
+    object-fit: cover;
+}
+
+.hm-chips__name {
+    color: var(--hm-foreground);
+    font-size: var(--hm-text-sm, 1.4rem);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+//  #6b7280 on white is 4.83:1 — the count is small text, so it needs the muted
+//  foreground rather than a lighter grey.
+.hm-chips__count {
+    color: var(--hm-foreground-muted);
+    font-size: 1.2rem;
+}
+
+@media (max-width: 767px) {
+    .hm-chips__list { grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); }
+    .hm-chips__link { min-block-size: 9.5rem; }
+    .hm-chips__icon { block-size: 4rem; inline-size: 4rem; }
+}
+
+//
+//  Section header  (Figma: title on the left, "See All ->" on the right)
+//  ---------------------------------------------
+.hm-section__head {
+    align-items: baseline;
+    display: flex;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    margin-block: var(--hm-space-8) var(--hm-space-4);
+}
+
+.hm-section__title {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-heading);
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+}
+
+//  @hm-accent-strong, not @hm-accent: this is TEXT, and #f26522 is 3.15:1.
+.hm-section__more {
+    color: var(--hm-accent-strong);
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover { text-decoration: underline; }
+}
+
+//
+//  Top Brands
+//  ---------------------------------------------
+.hm-brands__list {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-brands__item { margin: 0; }
+
+.hm-brands__link {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    justify-content: center;
+    min-block-size: 10rem;
+    padding: var(--hm-space-4) var(--hm-space-2);
+    text-align: center;
+    text-decoration: none;
+    transition: border-color var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible { border-color: var(--hm-accent); text-decoration: none; }
+}
+
+.hm-brands__img {
+    block-size: 4.8rem;
+    inline-size: auto;
+    max-inline-size: 100%;
+    object-fit: contain;
+}
+
+.hm-brands__name {
+    color: var(--hm-foreground);
+    font-size: 1.3rem;
+    font-weight: 600;
+    //  Brand names here are Arabic; isolate so a latin name inside an Arabic
+    //  run does not reorder.
+    unicode-bidi: isolate;
+}
+
+//
+//  New Stores
+//  ---------------------------------------------
+.hm-stores__list {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-stores__item { margin: 0; }
+
+.hm-stores__link {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-1);
+    padding: var(--hm-space-6) var(--hm-space-4);
+    text-align: center;
+    text-decoration: none;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible {
+        border-color: var(--hm-accent);
+        box-shadow: var(--hm-shadow);
+        text-decoration: none;
+    }
+}
+
+.hm-stores__avatar {
+    align-items: center;
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius-full);
+    block-size: 5.6rem;
+    color: var(--hm-icon);
+    display: flex;
+    inline-size: 5.6rem;
+    justify-content: center;
+    margin-block-end: var(--hm-space-2);
+    overflow: hidden;
+
+    img { block-size: 100%; inline-size: 100%; object-fit: cover; }
+    .hm-icon { block-size: 2.4rem; inline-size: 2.4rem; }
+}
+
+.hm-stores__name {
+    color: var(--hm-foreground);
+    font-size: 1.5rem;
+    font-weight: 600;
+    unicode-bidi: isolate;
+}
+
+.hm-stores__meta {
+    color: var(--hm-foreground-muted);   // 4.83:1
+    font-size: 1.3rem;
+}
+
+//
+//  Promo tiles  (Figma: the three coloured banners)
+//  ---------------------------------------------
+.hm-promos {
+    display: grid;
+    gap: var(--hm-space-4);
+    grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr));
+    margin-block: var(--hm-space-10);
+}
+
+.hm-promo {
+    border-radius: var(--hm-radius-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-1);
+    min-block-size: 14rem;
+    padding: var(--hm-space-6);
+    text-decoration: none;
+    transition: transform var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible {
+        box-shadow: var(--hm-shadow-lg);
+        text-decoration: none;
+        transform: translateY(-2px);
+    }
+}
+
+//  Each tile pairs a tinted surface with a text colour measured against it.
+//  No white-on-saturated: that is where the Figma's badges fail contrast.
+.hm-promo--a { background: var(--hm-surface-inverse); }          // navy
+.hm-promo--a .hm-promo__title,
+.hm-promo--a .hm-promo__kicker { color: var(--hm-on-inverse); }  // 15.89:1
+.hm-promo--a .hm-promo__text   { color: var(--hm-on-inverse-muted); } // 10.56:1
+
+.hm-promo--b { background: var(--hm-success-subtle); }
+.hm-promo--b .hm-promo__title  { color: #0b5c2f; }               // 7.32:1
+//  --hm-foreground-muted (#6b7280) is 4.83:1 on WHITE, but these promo panels sit
+//  on TINTED backgrounds, which cost enough contrast to drop it under AA —
+//  measured 4.36:1 on the mint panel and 4.48:1 on the peach one. --hm-neutral-600
+//  (#535d70) restores the margin (5.77:1) at the same visual weight.
+.hm-promo--b .hm-promo__kicker,
+.hm-promo--b .hm-promo__text   { color: var(--hm-neutral-600); }   // 4.36 -> 5.9:1
+
+.hm-promo--c { background: var(--hm-accent-subtle); }
+.hm-promo--c .hm-promo__title  { color: var(--hm-accent-strong-hover); } // 6.76:1
+.hm-promo--c .hm-promo__kicker,
+.hm-promo--c .hm-promo__text   { color: var(--hm-neutral-600); }   // 4.48 -> 6.0:1
+
+.hm-promo__kicker {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.hm-promo__title {
+    font-family: var(--hm-font-heading);
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.hm-promo__text { font-size: 1.4rem; }
+
+//
+//  Trust row  (Figma: the badge strip)
+//  ---------------------------------------------
+.hm-trust {
+    border-block: 1px solid var(--hm-border-subtle);
+    display: grid;
+    gap: var(--hm-space-5);
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    margin-block: var(--hm-space-10);
+    padding-block: var(--hm-space-8);
+}
+
+.hm-trust__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-1);
+}
+
+.hm-trust__title {
+    color: var(--hm-foreground);
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.hm-trust__text {
+    color: var(--hm-foreground-muted);   // 4.83:1
+    font-size: 1.3rem;
+    line-height: 1.5;
+}
+
+//
+//  Hero carousel  (Figma: the image hero with arrows and dots)
+//  ---------------------------------------------
+//  CSS scroll-snap, not a slider library. Gives native touch swipe, keyboard
+//  scrolling and correct RTL behaviour for free, and degrades to a scrollable
+//  list of real links with JS off. No auto-advance: self-moving carousels fail
+//  WCAG 2.2.2 without a pause control.
+.hm-hero-carousel {
+    border-radius: var(--hm-radius-lg);
+    margin-block-end: var(--hm-space-6);
+    overflow: hidden;
+    position: relative;
+}
+
+.hm-hero-carousel__viewport { overflow: hidden; }
+
+.hm-hero-carousel__track {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    overflow-x: auto;
+    padding: 0;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+}
+
+.hm-hero-carousel__slide {
+    flex: 0 0 100%;
+    margin: 0;
+    scroll-snap-align: start;
+}
+
+.hm-hero-carousel__link {
+    display: block;
+    position: relative;
+    text-decoration: none;
+
+    &:focus-visible {
+        outline: var(--hm-focus-ring-width, 2px) solid var(--hm-focus-ring-inverse);
+        outline-offset: -4px;
+    }
+}
+
+.hm-hero-carousel__img {
+    aspect-ratio: 24 / 10;
+    display: block;
+    inline-size: 100%;
+    object-fit: cover;
+}
+
+//  The scrim is what makes white text legible over an arbitrary merchandiser
+//  photo. Without it contrast depends on whatever image was uploaded, which is
+//  not something a design system can guarantee.
+.hm-hero-carousel__body {
+    background: linear-gradient(90deg, rgba(15, 33, 68, .88) 0%, rgba(15, 33, 68, .70) 45%, rgba(15, 33, 68, 0) 85%);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    inset: 0;
+    justify-content: center;
+    padding-inline: var(--hm-space-10);
+    position: absolute;
+}
+
+[dir='rtl'] .hm-hero-carousel__body,
+html:lang(ar) .hm-hero-carousel__body {
+    background: linear-gradient(270deg, rgba(15, 33, 68, .88) 0%, rgba(15, 33, 68, .70) 45%, rgba(15, 33, 68, 0) 85%);
+}
+
+//  Figma renders this kicker as a filled PILL above the headline (its copy is
+//  "SAME-DAY DELIVERY"; ours is the live item count, which is real data rather
+//  than a fixed marketing claim). Same treatment, honest content.
+//
+//  The pill needs its own background because the kicker sits on PHOTOGRAPHY — the
+//  scrim alone cannot guarantee contrast across every category image, and a
+//  measured ratio against one photo says nothing about the next one.
+.hm-hero-carousel__kicker {
+    background: var(--hm-success);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-on-status);             // white on #0f7b3f = 5.3:1, fixed
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    margin-block-end: var(--hm-space-3);
+    padding: .5rem var(--hm-space-4);
+    text-transform: uppercase;
+
+    //  The hero content is a FLEX COLUMN, whose default `align-items: stretch`
+    //  overrides inline-block and stretched the pill across the whole hero.
+    //  align-self returns it to its content width; width:fit-content covers the
+    //  case where this markup is ever used outside a flex parent.
+    align-self: flex-start;
+    inline-size: fit-content;
+}
+
+.hm-hero-carousel__title {
+    color: var(--hm-on-inverse);
+    font-family: var(--hm-font-heading);
+    font-size: 4rem;
+    font-weight: 700;
+    line-height: 1.1;
+    max-inline-size: 18ch;
+    unicode-bidi: isolate;
+}
+
+.hm-hero-carousel__cta {
+    align-items: center;
+    align-self: flex-start;
+    //  GREEN, matching Figma's hero CTA — a deliberate exception to the accent-orange
+    //  button rule, not a stray override. The hero is the one place the design uses a
+    //  "go" colour, and the kicker pill directly above it is already this green, so
+    //  the two now read as one unit instead of clashing.
+    //
+    //  Every other CTA on the site stays on --hm-accent; this does NOT change the
+    //  button component.
+    background: var(--hm-success);
+    border-radius: var(--hm-radius);
+    color: var(--hm-on-status);             // white on #0f7b3f = 5.35:1
+    display: inline-flex;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-block-start: var(--hm-space-3);
+    min-block-size: 4.4rem;                 // 2.5.5 target size
+    padding-inline: var(--hm-space-6);
+}
+
+.hm-hero-carousel__link:hover .hm-hero-carousel__cta { background: var(--hm-success-hover); }   // 7.09:1
+
+//
+//  Controls
+//  ---------------------------------------------
+.hm-hero-carousel__nav {
+    align-items: center;
+    background: fade(#ffffff, 92%);
+    border: 0;
+    border-radius: var(--hm-radius-full);
+    block-size: 4.4rem;
+    color: var(--hm-foreground);
+    cursor: pointer;
+    display: flex;
+    inline-size: 4.4rem;
+    inset-block-start: 50%;
+    justify-content: center;
+    position: absolute;
+    transform: translateY(-50%);
+    z-index: 2;
+
+    &:hover { background: #ffffff; }
+
+    &:focus-visible {
+        outline: var(--hm-focus-ring-width, 2px) solid var(--hm-focus-ring);
+        outline-offset: 2px;
+    }
+
+    .hm-icon { block-size: 2rem; inline-size: 2rem; }
+}
+
+//  Logical inset so the arrows swap sides under RTL without extra rules.
+.hm-hero-carousel__nav--prev { inset-inline-start: var(--hm-space-4); }
+.hm-hero-carousel__nav--next { inset-inline-end: var(--hm-space-4); }
+
+//  The chevrons are directional, so mirror them in RTL.
+[dir='rtl'] .hm-hero-carousel__nav .hm-icon,
+html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
+
+.hm-hero-carousel__dots {
+    display: flex;
+    gap: var(--hm-space-2);
+    inset-block-end: var(--hm-space-4);
+    inset-inline-start: var(--hm-space-10);
+    position: absolute;
+    z-index: 2;
+}
+
+.hm-hero-carousel__dot {
+    background: fade(#ffffff, 45%);
+    border: 0;
+    border-radius: var(--hm-radius-full);
+    block-size: 1rem;
+    cursor: pointer;
+    inline-size: 1rem;
+    padding: 0;
+    transition: background var(--hm-duration) var(--hm-ease), inline-size var(--hm-duration) var(--hm-ease);
+
+    &[aria-selected='true'] { background: var(--hm-accent); inline-size: 2.4rem; }
+
+    &:focus-visible {
+        outline: 2px solid var(--hm-focus-ring-inverse);
+        outline-offset: 2px;
+    }
+}
+
+@media (max-width: 767px) {
+    .hm-hero-carousel__img   { aspect-ratio: 4 / 3; }
+    .hm-hero-carousel__body  { padding-inline: var(--hm-space-5); }
+    .hm-hero-carousel__title { font-size: 2.4rem; }
+    .hm-hero-carousel__nav   { display: none; }   // swipe instead
+    .hm-hero-carousel__dots  { inset-inline-start: var(--hm-space-5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hm-hero-carousel__track { scroll-behavior: auto; }
+}
+
+//
+//  Hero band: carousel + promo tiles side by side (Figma layout)
+//  ---------------------------------------------
+//  The carousel and the three tiles form one band. On the homepage body class
+//  only, so it cannot affect the same blocks elsewhere.
+.hm-home .hm-hero-carousel { margin-block-end: 0; }
+
+@media (min-width: 992px) {
+    .hm-home .hm-hero-carousel,
+    .hm-home .hm-hero-tiles {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    //  Grid rather than floats so the two columns share a row height.
+    .hm-home .column.main > .hm-hero-carousel { inline-size: calc(70% - .8rem); }
+    .hm-home .column.main > .hm-hero-tiles    { inline-size: calc(30% - .8rem); margin-inline-start: 1.6rem; }
+}
+
+//  The tile column must MATCH THE HERO'S HEIGHT, not exceed it. Figma runs a 454px
+//  hero beside three 145px tiles; ours rendered 3 x 225 = 711px against a 399px hero,
+//  so the column ran far past the carousel. `1fr` rows divide whatever height the
+//  hero sets, so the two stay aligned at any breakpoint without hard-coding either.
+.hm-hero-tiles {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-auto-rows: 1fr;
+    margin-block-end: var(--hm-space-6);
+    min-block-size: 0;
+}
+
+.hm-hero-tile {
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--hm-space-1);
+    justify-content: center;
+    min-block-size: 9rem;
+    padding: var(--hm-space-5);
+    text-decoration: none;
+    transition: box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover, &:focus-visible { box-shadow: var(--hm-shadow); text-decoration: none; }
+}
+
+//  DARK fallback, not the old light tints. These tiles now carry white text over a
+//  photo; if a category image is removed or 404s, white-on-#f5f7fa is 1.07:1 and
+//  completely unreadable. A navy base means the tile degrades to the same treatment
+//  as the scrim rather than to an invisible label.
+.hm-hero-tile--a,
+.hm-hero-tile--b,
+.hm-hero-tile--c { background: var(--hm-surface-inverse); }
+
+.hm-hero-tile__title {
+    color: var(--hm-foreground);       // 15.89:1 on every tint above
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+
+.hm-hero-tile__text {
+    //  WHITE now, not a muted grey: these tiles carry a PHOTO behind the text
+    //  (Figma parity), so the earlier tinted-surface fix no longer applies. The
+    //  scrim below guarantees the ratio rather than the flat background doing it.
+    color: var(--hm-on-inverse);
+    font-size: 1.3rem;
+}
+
+//
+//  Keep the hero copy clear of the arrows.
+//  ---------------------------------------------
+//  The prev arrow sits at inset-inline-start: 1.6rem and is 4.4rem wide, so
+//  copy padded to 4rem collided with it - the title rendered underneath the
+//  button. Padding now clears the control plus a gutter.
+@media (min-width: 768px) {
+    .hm-hero-carousel__body { padding-inline: 8rem; }
+    .hm-hero-carousel__dots { inset-inline-start: 8rem; }
+}
+
+//
+//  Hero band, corrected.
+//  ---------------------------------------------
+//  The earlier attempt set display:inline-block inside a media query, then the
+//  base `.hm-hero-tiles { display: flex }` rule below it re-declared display at
+//  equal specificity and won on source order — so the tiles stacked under the
+//  carousel instead of sitting beside it. This block is last, so it settles it.
+@media (min-width: 992px) {
+    .hm-home .column.main > .hm-hero-carousel {
+        display: inline-block;
+        inline-size: calc(70% - 1.6rem);
+        vertical-align: top;
+    }
+
+    .hm-home .column.main > .hm-hero-tiles {
+        display: inline-flex;          // inline-flex, not flex: it must sit in-line
+        flex-direction: column;
+        inline-size: 30%;
+        margin-inline-start: 1.2rem;
+        vertical-align: top;
+    }
+}
+
+//
+//  Hero band, settled.
+//  ---------------------------------------------
+//  inline-block did not work and the reason is worth recording: the two blocks
+//  measured 970px and 422px inside a 1408px column, which fits — but
+//  inline-block honours the whitespace BETWEEN the elements in the HTML source,
+//  and that extra ~4px pushed the pair over the container width so the second
+//  one wrapped. Measured in the live DOM; the CSS was applying correctly the
+//  whole time.
+//
+//  Floats ignore inter-element whitespace, which removes the failure mode
+//  entirely. Magento/blank uses floats for exactly this kind of two-column band.
+@media (min-width: 992px) {
+    .hm-home .column.main > .hm-hero-carousel,
+    .hm-home .column.main > .hm-hero-tiles {
+        box-sizing: border-box;   // blank sets no global border-box
+        float: left;
+        margin-inline-start: 0;
+    }
+
+    .hm-home .column.main > .hm-hero-carousel { inline-size: 68%; }
+    .hm-home .column.main > .hm-hero-tiles    { inline-size: 30%; margin-left: 2%; }
+
+    [dir='rtl'] .hm-home .column.main > .hm-hero-carousel,
+    [dir='rtl'] .hm-home .column.main > .hm-hero-tiles,
+    html:lang(ar) .hm-home .column.main > .hm-hero-carousel,
+    html:lang(ar) .hm-home .column.main > .hm-hero-tiles { float: right; }
+
+    [dir='rtl'] .hm-home .column.main > .hm-hero-tiles,
+    html:lang(ar) .hm-home .column.main > .hm-hero-tiles { margin-left: 0; margin-right: 2%; }
+
+    //  The service-promise strip is the next sibling, so it clears the band.
+    .hm-home .column.main > .hm-usp { clear: both; }
+
+    //  Match the tile column height to the carousel so the band reads as one row.
+    .hm-home .column.main > .hm-hero-tiles { margin-block-end: var(--hm-space-6); }
+}
+
+//
+//  Today's Deals countdown
+//  ---------------------------------------------
+.hm-countdown {
+    align-items: center;
+    background: var(--hm-danger-subtle);
+    border-radius: var(--hm-radius-full);
+    color: #a02a1e;                       // 6.43:1 on the tint
+    display: inline-flex;
+    font-size: 1.3rem;
+    font-weight: 700;
+    gap: var(--hm-space-2);
+    margin-inline-start: var(--hm-space-3);
+    padding: .4rem var(--hm-space-3);
+    vertical-align: middle;
+
+    .hm-icon { block-size: 1.6rem; inline-size: 1.6rem; }
+}
+
+//  Tabular figures stop the timer jittering as digits change width.
+.hm-countdown__value { font-variant-numeric: tabular-nums; unicode-bidi: isolate; }
+
+.hm-countdown__label { font-weight: 500; }
+
+//
+//  Store rating stars
+//  ---------------------------------------------
+//  A CSS-mask-free two-layer bar: grey stars underneath, gold clipped to the
+//  score. Uses one glyph run so it scales with font-size and needs no images.
+//  aria-label on the wrapper carries the real value; the stars are aria-hidden.
+.hm-stores__rating {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--hm-space-1);
+    margin-block-start: var(--hm-space-1);
+}
+
+.hm-stars {
+    color: var(--hm-neutral-300);
+    display: inline-block;
+    font-size: 1.3rem;
+    letter-spacing: .1em;
+    line-height: 1;
+    position: relative;
+
+    &::before { content: '★★★★★'; }
+}
+
+.hm-stars__fill {
+    color: var(--hm-rating-star, #d97706);   // 3.19:1 on white - a non-text indicator
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+
+    &::before { content: '★★★★★'; }
+}
+
+.hm-stores__score {
+    color: var(--hm-foreground);
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.hm-stores__reviews {
+    color: var(--hm-foreground-muted);   // 4.83:1
+    font-size: 1.2rem;
+}
+
+//
+//  App / mobile banner
+//  ---------------------------------------------
+.hm-app {
+    background: var(--hm-surface-inverse);
+    border-radius: var(--hm-radius-lg);
+    margin-block: var(--hm-space-10);
+    padding: var(--hm-space-10) var(--hm-space-8);
+}
+
+.hm-app__body { max-inline-size: 62ch; }
+
+.hm-app__kicker {
+    color: var(--hm-on-inverse-muted);      // 10.56:1 on navy
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.hm-app__title {
+    color: var(--hm-on-inverse);            // 15.89:1
+    font-family: var(--hm-font-heading);
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    margin: var(--hm-space-2) 0;
+}
+
+.hm-app__text {
+    color: var(--hm-on-inverse-muted);
+    font-size: 1.6rem;
+    line-height: 1.6;
+    margin: 0 0 var(--hm-space-5);
+}
+
+.hm-app__actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+}
+
+.hm-app__cta {
+    align-items: center;
+    background: var(--hm-accent);
+    border-radius: var(--hm-radius);
+    color: var(--hm-on-accent);             // navy on accent, 5.04:1
+    display: inline-flex;
+    font-size: 1.5rem;
+    font-weight: 700;
+    min-block-size: 4.4rem;                 // 2.5.5 target size
+    padding-inline: var(--hm-space-6);
+    text-decoration: none;
+
+    &:hover { background: var(--hm-accent-hover); color: var(--hm-on-accent); }
+}
+
+.hm-app__link {
+    color: var(--hm-on-inverse);
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: underline;
+
+    &:hover { color: var(--hm-on-inverse); }
+}
+
+@media (max-width: 767px) {
+    .hm-app       { padding: var(--hm-space-8) var(--hm-space-5); }
+    .hm-app__title{ font-size: 2.4rem; }
+}
+
+//
+//  Store dispatch time
+//  ---------------------------------------------
+.hm-stores__dispatch {
+    align-items: center;
+    color: var(--hm-success);        // 5.35:1 on white — a positive service fact
+    display: inline-flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    gap: .4rem;
+    margin-block-start: var(--hm-space-1);
+
+    .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
+}
+
+//
+//  Homepage page-title band
+//  ---------------------------------------------
+//  Figma has NO title row on the homepage — the hero starts directly under the
+//  nav. Ours rendered a 1408x106 band above it, which was the single biggest
+//  structural difference between the two headers.
+//
+//  CLIPPED, NOT REMOVED. The document still needs exactly one <h1> — for the
+//  parity gate and, more importantly, so a screen reader can announce what the
+//  page is. `display: none` would strip it from the accessibility tree; the
+//  clip idiom keeps it announced while giving the hero the space Figma shows.
+//
+//  Scoped to the CMS home page only: every other page shows its title.
+.cms-index-index .page-title-wrapper {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+}
+
+//
+//  Section emoji  (Figma parity)
+//  ---------------------------------------------
+//  Figma prefixes twelve section titles with an emoji. These are attached in CSS
+//  rather than written into the title strings, for two concrete reasons:
+//
+//  1. IT WOULD BREAK THE ARABIC TRANSLATIONS. i18n/ar_SA.csv keys on the exact
+//     English string — "Today's Deals" -> "عروض اليوم". Prefixing the key with an
+//     emoji stops it matching, and every translated heading would silently fall
+//     back to English. Verified: all twelve titles are translated in that file.
+//
+//  2. Screen readers ANNOUNCE emoji as words. 🏷️ reads "label", 🏪 reads
+//     "convenience store", 🆕 reads "new button". Inside a heading that is noise
+//     bolted onto the section's accessible name.
+//
+//  The `content: "…" / ""` syntax supplies an EMPTY alternative text, which marks
+//  the generated content decorative. Where that is unsupported the emoji is
+//  announced — the same as if it were in the string — so this degrades to no worse
+//  than the naive approach.
+//
+//  ::before sits at the CONTENT start, so it moves to the right-hand side in RTL
+//  automatically; margin-inline-end keeps the gap on the correct side too.
+.hm-section-emoji(@glyph) {
+    &::before {
+        content: @glyph / "";
+        margin-inline-end: var(--hm-space-2);
+    }
+}
+
+//  CatalogWidget rails. These all render identical markup, so the hook is the
+//  per-instance slug class emitted by the grid.phtml override.
+.hm-rail--hm-home-deals          .block-title h2 { .hm-section-emoji("🏷️"); }
+.hm-rail--hm-home-rail-grocery   .block-title h2 { .hm-section-emoji("🛒"); }
+.hm-rail--hm-home-rail-fashion   .block-title h2 { .hm-section-emoji("👗"); }
+.hm-rail--hm-home-rail-beauty    .block-title h2 { .hm-section-emoji("✨"); }
+.hm-rail--hm-home-rail-furniture .block-title h2 { .hm-section-emoji("🛋️"); }
+.hm-rail--hm-home-bestsellers    .block-title h2 { .hm-section-emoji("🏆"); }
+.hm-rail--hm-home-featured       .block-title h2 { .hm-section-emoji("🔥"); }
+//  "Picked For You" carries NO emoji in Figma — deliberately absent here.
+
+//  Vendor rails — same template, two instances, distinguished by slug.
+.hm-stores--hm-home-topvendors .hm-section__title { .hm-section-emoji("⭐"); }
+.hm-stores--hm-home-newstores  .hm-section__title { .hm-section-emoji("🆕"); }
+
+//  One-off sections.
+.hm-section__title--stores { .hm-section-emoji("🏪"); }   // Featured Stores
+#hm-brands-title           { .hm-section-emoji("🏷️"); }   // Top Brands
+.hm-bundle-band__title     { .hm-section-emoji("🎁"); }   // Bundle Deals
+
+//
+//  Hero side tiles — PHOTO cards (Figma parity)
+//  ---------------------------------------------
+//  Figma renders these as 305x145 image cards, radius 16px, overflow hidden, with
+//  white overlay text. Ours were flat tinted rectangles with dark text.
+//
+//  The scrim is NOT optional. White text sits directly on category photography, and
+//  a ratio measured against one photo says nothing about the next one — a merchant
+//  can swap the category image at any time. The gradient guarantees the contrast
+//  regardless of what is behind it, the same reasoning as the hero kicker pill.
+.hm-hero-tile {
+    border-radius: var(--hm-radius-lg);   // 16px, matching Figma
+    display: block;
+    isolation: isolate;                   // keeps the scrim under the text, above the img
+    min-block-size: 0;                    // the grid row sets the height
+    overflow: hidden;
+    position: relative;
+    text-decoration: none;
+
+    &__img {
+        block-size: 100%;
+        inline-size: 100%;
+        inset: 0;
+        object-fit: cover;
+        position: absolute;
+        z-index: 0;
+    }
+
+    //  Scrim. Stronger at the start edge where the text sits, so the photo stays
+    //  readable on the other side. Logical direction so it flips under RTL.
+    &::after {
+        background: linear-gradient(to var(--hm-scrim-dir, right),
+                    rgba(15, 33, 68, .78) 0%, rgba(15, 33, 68, .45) 55%, rgba(15, 33, 68, .18) 100%);
+        content: '';
+        inset: 0;
+        position: absolute;
+        z-index: 1;
+    }
+
+    &__body {
+        display: flex;
+        flex-direction: column;
+        gap: .2rem;
+        block-size: 100%;
+        box-sizing: border-box;
+        justify-content: center;
+        padding: var(--hm-space-5);
+        position: relative;
+        z-index: 2;
+    }
+
+    &:hover &__img,
+    &:focus-visible &__img { transform: scale(1.04); }
+
+    &__img { transition: transform var(--hm-duration) var(--hm-ease); }
+
+    &:focus-visible {
+        outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring);
+        outline-offset: 2px;
+    }
+}
+
+//  The gradient must start on the INLINE-START edge in both directions. CSS
+//  gradients take no logical keyword, so the direction is a custom property the
+//  RTL block below flips — physical `to right` would put the dark end on the wrong
+//  side of the Arabic tile and strand the text on the bright part of the photo.
+.hm-hero-tiles { --hm-scrim-dir: right; }
+[dir='rtl'] .hm-hero-tiles,
+.hm-rtl .hm-hero-tiles { --hm-scrim-dir: left; }
+
+.hm-hero-tile__title { color: var(--hm-on-inverse); }
+
+//  Hero subtext (Figma: the line under the headline). White on the hero scrim,
+//  capped to a readable measure so it does not run the full width of the photo.
+.hm-hero-carousel__text {
+    color: var(--hm-on-inverse);
+    display: block;
+    font-size: 1.6rem;
+    line-height: var(--hm-leading-snug);
+    margin-block: var(--hm-space-2) var(--hm-space-4);
+    max-inline-size: 46ch;
+}

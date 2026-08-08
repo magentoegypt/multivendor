@@ -1,0 +1,123 @@
+<?php
+/**
+ * Hub Market — header utility bar (band 1 of 3).
+ *
+ * Carries the delivery promise, the store/language switcher and the account
+ * links. Magento's own header.panel.wrapper is removed in favour of this.
+ *
+ * The delivery promise is deliberately a CMS block (`hm_delivery_promise`) and
+ * not hard-coded copy: the Figma build hard-coded "Free delivery on orders over
+ * AED 150" in one place and three different thresholds in two currencies
+ * elsewhere. One editable source avoids repeating that.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+?>
+<div class="hm-header__utility">
+    <div class="hm-header__utility-inner">
+        <?php
+        /*
+         * A <div>, NOT a <p>.
+         *
+         * The CMS block below outputs its own <p>. A <p> inside a <p> is invalid
+         * HTML, so the browser auto-closes the outer one — and the promise text
+         * stopped being a child of this element and became a SIBLING flex item of
+         * the utility row. With `justify-content: space-between` and three items
+         * instead of two, that pushed the text into the middle of the bar.
+         *
+         * Measured before the fix: .hm-header__promise was 16px wide — the truck
+         * icon alone. Figma left-aligns this text; it was never a CSS alignment
+         * problem, it was invalid nesting.
+         */
+        ?>
+        <div class="hm-header__promise">
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-delivery"/></svg>
+            <?= /* @noEscape */ $block->getLayout()
+                ->createBlock(\Magento\Cms\Block\Block::class)
+                ->setBlockId('hm_delivery_promise')
+                ->toHtml() ?>
+        </div>
+
+        <div class="hm-header__utility-right">
+            <?php
+            /*
+             * Auth-dependent links.
+             *
+             * THIS CANNOT BE A PHP `if`. The header is inside Magento's full-page
+             * cache, so a server-rendered branch would bake ONE visitor's state into
+             * the cached page and serve it to everyone — the first guest to warm the
+             * cache would hand every logged-in customer a "Login" link, or worse.
+             *
+             * Both states therefore ship in the cached HTML and Knockout picks one
+             * from the `customer` customer-data section, which is per-visitor and
+             * lives in localStorage. This is the same mechanism the minicart uses,
+             * and mirrors core's own header.phtml (module-theme, .greet.welcome).
+             *
+             * The member branch carries an inline `display:none` so a GUEST never
+             * sees a flash of "Sign Out" before Knockout binds — the cached HTML is
+             * guest-shaped and guests are the common case. A logged-in customer may
+             * still see a brief guest state; core has the same behaviour.
+             */
+            ?>
+            <span class="hm-utility__auth" data-bind="scope: 'customer'">
+                <span class="hm-utility__guest" data-bind="visible: !customer().fullname">
+                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login')) ?>">
+                        <?= $escaper->escapeHtml(__('Login')) ?>
+                    </a>
+                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
+                        <?= $escaper->escapeHtml(__('Register')) ?>
+                    </a>
+                </span>
+                <span class="hm-utility__member" style="display: none" data-bind="visible: customer().fullname">
+                    <?php /* Label is server-rendered as well as bound, so the link is
+                             never empty if Knockout is slow, blocked or errors. KO
+                             replaces it with the customer's first name once bound. */ ?>
+                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
+                        <span data-bind="text: customer().firstname || '<?= $escaper->escapeJs(__('My Account')) ?>'"><?= $escaper->escapeHtml(__('My Account')) ?></span>
+                    </a>
+                    <?php /* Logout accepts GET in 2.4.8 (Controller\Account\Logout
+                             implements HttpGetActionInterface AND HttpPostActionInterface),
+                             so a plain link avoids baking a form key into cached HTML. */ ?>
+                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/logout')) ?>">
+                        <?= $escaper->escapeHtml(__('Sign Out')) ?>
+                    </a>
+                </span>
+            </span>
+            <script type="text/x-magento-init">
+                {
+                    "*": {
+                        "Magento_Ui/js/core/app": {
+                            "components": {
+                                "customer": {
+                                    "component": "Magento_Customer/js/view/customer"
+                                }
+                            }
+                        }
+                    }
+                }
+            </script>
+            <a class="hm-utility__link hm-utility__link--sell" href="<?= $escaper->escapeUrl($block->getUrl('marketplace/seller/register')) ?>">
+                <?= $escaper->escapeHtml(__('Sell with us')) ?>
+            </a>
+            <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('sales/guest/form')) ?>">
+                <?= $escaper->escapeHtml(__('Track Order')) ?>
+            </a>
+            <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('contact')) ?>">
+                <?= $escaper->escapeHtml(__('Help')) ?>
+            </a>
+
+            <?php /* Language switcher — renders only when >1 store view is active. */ ?>
+            <?php $switcher = $block->getChildHtml('store_switcher'); ?>
+            <?php if (trim((string) $switcher) !== ''): ?>
+                <div class="hm-utility__lang">
+                    <?php /* Globe icon, as Figma shows. Decorative — the switcher's
+                             own "Language" label already names the control. */ ?>
+                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-globe"/></svg>
+                    <?= /* @noEscape */ $switcher ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

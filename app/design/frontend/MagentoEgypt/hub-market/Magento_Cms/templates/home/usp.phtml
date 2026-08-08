@@ -1,0 +1,52 @@
+<?php
+/**
+ * Hub Market — homepage service promises.
+ *
+ * A template rather than a CMS block because every string here is translatable
+ * and must differ between the English and Arabic store views. CMS blocks are
+ * per-store content; these are per-locale strings, which belongs in i18n.
+ *
+ * Icons come from the theme sprite, so they inherit currentColor and mirror in
+ * RTL where they are directional.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+//  These strings state facts about the shop, so they are checked against the
+//  store's own configuration rather than copied from the design.
+//
+//  The Figma framed this marketplace as Gulf-region and listed Mada / Tap /
+//  Tabby / STC Pay. Neither is true here:
+//    currency/options/base .......... EGP
+//    payment methods actually enabled  cashondelivery, online (Visa/Mastercard),
+//                                      paypal_billing_agreement
+//  Mada, Tap, Tabby and STC Pay are NOT configured, and there is no Gulf
+//  shipping setup. Advertising unavailable payment methods and a delivery region
+//  the shop does not serve is a promise the checkout cannot keep, so both strings
+//  were corrected when the theme went live.
+//
+//  If new methods are enabled, update this list — do not let it drift.
+$items = [
+    ['icon' => 'delivery', 'title' => __('Nationwide delivery'),  'text' => __('Shipping across Egypt, with tracking from your account.')],
+    ['icon' => 'refresh',  'title' => __('Easy returns'),         'text' => __('Return most items within 14 days, straight from your account.')],
+    ['icon' => 'lock',     'title' => __('Secure payment'),       'text' => __('Cash on delivery, Visa and Mastercard.')],
+    ['icon' => 'store',    'title' => __('Verified sellers'),     'text' => __('Every seller is reviewed and approved before going live.')],
+];
+?>
+<section class="hm-usp" aria-label="<?= $escaper->escapeHtmlAttr(__('Why shop with us')) ?>">
+    <ul class="hm-usp__list">
+        <?php foreach ($items as $item): ?>
+            <li class="hm-usp__item">
+                <svg class="hm-icon hm-icon--lg hm-usp__icon" aria-hidden="true" focusable="false">
+                    <use href="#hm-<?= $escaper->escapeHtmlAttr($item['icon']) ?>"/>
+                </svg>
+                <div>
+                    <p class="hm-usp__title"><?= $escaper->escapeHtml($item['title']) ?></p>
+                    <p class="hm-usp__text"><?= $escaper->escapeHtml($item['text']) ?></p>
+                </div>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>

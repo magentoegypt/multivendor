@@ -1,0 +1,148 @@
+<?php
+/**
+ * Hub Market — category navigation (header band 3 of 3).
+ *
+ * Ported from the Mgs/supro override. That version was already the right shape:
+ * a native <details>/<summary> disclosure with no jQuery UI menu, and RTL-aware.
+ * What changes here is that on Magento/blank it no longer needs the `!important`
+ * overrides and long `body .header-area.header3 …` selectors it used to need to
+ * beat MGS's navigation rules — the styling lives in _hm-nav.less against tokens.
+ *
+ * The tree still comes from HubMarket\DynamicMenu\Block\Topmenu, which invokes
+ * the catalog plugin manually because MGS_Amp replaces Magento's Topmenu via a
+ * DI preference and stops the tree being populated. Once MGS is retired that
+ * block can revert to the core one.
+ *
+ * "Bundle Deals" is folded into this row rather than occupying a band of its
+ * own, as it did in the design.
+ *
+ * @var \Magento\Theme\Block\Html\Topmenu $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+$columnsLimit = $block->getColumnsLimit() ?: 0;
+$menuHtml = trim($block->getHtml('level-top', 'submenu', $columnsLimit));
+$bundlesUrl = $block->getUrl('bundles');
+?>
+<?php if ($menuHtml !== ''): ?>
+<nav class="hm-nav" aria-label="<?= $escaper->escapeHtmlAttr(__('Category navigation')) ?>">
+    <div class="hm-nav__inner">
+
+        <details class="hm-nav__menu" data-mage-init='{"HubMarket_DynamicMenu/js/category-menu":{}}'>
+            <summary class="hm-nav__trigger" aria-controls="hm-category-panel">
+                <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-menu"/></svg>
+                <span class="hm-nav__trigger-label"><?= $escaper->escapeHtml(__('All Categories')) ?></span>
+                <svg class="hm-icon hm-icon--sm hm-nav__chevron" aria-hidden="true" focusable="false">
+                    <use href="#hm-chevron-down"/>
+                </svg>
+            </summary>
+
+            <div class="hm-nav__panel" id="hm-category-panel">
+                <div class="hm-nav__panel-inner">
+                    <ul class="hm-nav__grid navigation" data-action="navigation">
+                        <?= /* @noEscape */ $menuHtml ?>
+                        <?= $block->getChildHtml() ?>
+                    </ul>
+                </div>
+            </div>
+        </details>
+
+        <?php
+        /*
+         * Inline category links (Figma: the row of categories in the nav bar).
+         * Read from the SAME menu tree the panel renders, so they cannot drift
+         * from it, and capped so the bar does not wrap on a laptop. Categories
+         * with no children still appear — the cap is about width, not depth.
+         */
+        /*
+         * Category emoji, as Figma shows in this bar.
+         *
+         * Figma's categories are NOT this store's categories — it draws Grocery,
+         * Pharmacy, FMCG, Kids & Toys, Cosmetics; this catalogue has clothes, bags,
+         * shoes, mobile&tablet, sports. So four glyphs are Figma's exact choices for
+         * the concepts that do overlap (furniture, computer, home appliances,
+         * fashion) and the rest are picked to match its visual vocabulary.
+         *
+         * Matched on a NORMALISED name so an admin renaming "computer" to
+         * "Computers" does not silently drop the icon. Unknown categories simply get
+         * no emoji rather than a wrong one.
+         */
+        $hmEmojiMap = [
+            'clothes'    => "\u{1F457}",  // 👗  Figma: Fashion
+            'fashion'    => "\u{1F457}",  // 👗
+            'bags'       => "\u{1F45C}",  // 👜
+            'shoes'      => "\u{1F45F}",  // 👟
+            'furniture'  => "\u{1F6CB}\u{FE0F}", // 🛋️  Figma exact
+            'mobile'     => "\u{1F4F1}",  // 📱
+            'computer'   => "\u{1F4BB}",  // 💻  Figma exact
+            'sports'     => "\u{26BD}",   // ⚽
+            'home'       => "\u{1F3E0}",  // 🏠  Figma exact
+            'grocery'    => "\u{1F6D2}",  // 🛒  Figma exact
+            'beauty'     => "\u{2728}",   // ✨  Figma: Cosmetics
+            'toys'       => "\u{1F9F8}",  // 🧸
+            'pharmacy'   => "\u{1F48A}",  // 💊
+        ];
+        /*
+         * MATCH ON THE URL, NOT THE DISPLAY NAME.
+         *
+         * The first version matched the category name, which meant the icons
+         * appeared in English and vanished entirely on /ar/ — the Arabic names are
+         * "ملابس", "حقائب", "أحذية", none of which contain "clothes" or "bags".
+         *
+         * URL keys are NOT localised on this install (verified: both locales emit
+         * /clothes.html, /bags.html, /mobile-tablet.html), so the URL is the stable
+         * identifier across store views. The name is still checked as a fallback so
+         * a category whose url-key does not match can still be mapped.
+         */
+        $hmCategoryEmoji = static function (string $name, string $url) use ($hmEmojiMap): string {
+            $haystack = strtolower(trim($url) . ' ' . trim($name));
+            foreach ($hmEmojiMap as $needle => $glyph) {
+                if (str_contains($haystack, $needle)) {
+                    return $glyph;
+                }
+            }
+            return '';
+        };
+
+        $inline = [];
+        foreach ($block->getMenu()->getChildren() as $child) {
+            // NOT filtered on getIsActive(): on a menu node that flag means
+            // "the current page is inside this branch", not "this category is
+            // enabled". Filtering on it returned an empty row on every page
+            // except the one you were already in.
+            $inline[] = [
+                'name'  => (string) $child->getName(),
+                'url'   => (string) $child->getUrl(),
+                'emoji' => $hmCategoryEmoji((string) $child->getName(), (string) $child->getUrl()),
+            ];
+            if (count($inline) >= 8) {
+                break;
+            }
+        }
+        ?>
+        <?php if ($inline): ?>
+            <ul class="hm-nav__inline">
+                <?php foreach ($inline as $item): ?>
+                    <li class="hm-nav__inline-item">
+                        <a class="hm-nav__inline-link" href="<?= $escaper->escapeUrl($item['url']) ?>">
+                            <?php /* aria-hidden: a screen reader would otherwise read
+                                     "womans clothes clothes" — the glyph is decoration,
+                                     the link text already names the category. */ ?>
+                            <?php if ($item['emoji'] !== ''): ?>
+                                <span class="hm-nav__inline-icon" aria-hidden="true"><?= $escaper->escapeHtml($item['emoji']) ?></span>
+                            <?php endif; ?>
+                            <?= $escaper->escapeHtml($item['name']) ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <a class="hm-nav__promo" href="<?= $escaper->escapeUrl($bundlesUrl) ?>">
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-bundle"/></svg>
+            <?= $escaper->escapeHtml(__('Bundle Deals')) ?>
+        </a>
+    </div>
+</nav>
+<?php endif; ?>

@@ -1,0 +1,39 @@
+//
+//  Hub Market — seller panel entry point
+//  _____________________________________________
+//
+//  WHY _extend.less AND NOT _module.less
+//
+//  vendor/vnecoms/theme-vendors-default/web/css/styles-m.less ends with three
+//  collector directives, in this order:
+//
+//      //@magento_import 'source/_module.less';    <- modules' _module.less
+//      //@magento_import 'source/_widgets.less';
+//      //@magento_import 'source/_extend.less';    <- modules' _extend.less  (LAST)
+//
+//  _extend.less is therefore emitted after every module's _module.less, whatever
+//  order the modules load in. Vnecoms_VendorsPageBuilder occupies the _module.less
+//  slot; the _extend.less slot was unoccupied. Taking the last slot is what lets
+//  this module win on source order without a <sequence> in module.xml and without
+//  reaching for !important.
+//
+//  COMPILED TWICE, ON PURPOSE-ISH: styles-l.less carries the identical directives,
+//  so everything here lands in styles-m.css (media="all") AND styles-l.css
+//  (media="screen and (min-width: 768px)"). The two copies are identical, so the
+//  later one simply re-wins. The one place it matters is below 768px, where
+//  styles-l does not apply and Vnecoms_Vendors/css/login.css — which loads between
+//  the two — would otherwise beat the login rules. _hm-seller-login.less carries a
+//  body-class prefix for exactly that reason.
+//
+//  Order below is load-bearing: variables before anything that reads them, and RTL
+//  last so its physical overrides land after the rules they mirror.
+//
+
+@import '_hm-seller-tokens.less';    // LESS variables only — emits no CSS
+@import '_hm-seller-fonts.less';     // @font-face
+@import '_hm-seller-base.less';      // custom properties, typography, focus, direction
+@import '_hm-seller-shell.less';     // header, sidebar, content, boxes, footer
+@import '_hm-seller-controls.less';  // buttons and forms, both vocabularies
+@import '_hm-seller-data.less';      // tables, grids, labels, alerts, modals, tiles
+@import '_hm-seller-login.less';     // the vendors-area login card
+@import '_hm-seller-rtl.less';       // mirroring — must stay last

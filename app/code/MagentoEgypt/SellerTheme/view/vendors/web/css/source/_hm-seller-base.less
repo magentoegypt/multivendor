@@ -1,0 +1,214 @@
+//
+//  Hub Market — seller panel base layer
+//  _____________________________________________
+//
+//  Emits the token layer as CSS custom properties, sets typography, and fixes the
+//  direction bug. Component partials consume the custom properties so that the RTL
+//  and locale switches can happen at runtime without a second stylesheet.
+//
+
+//
+//  Custom properties
+//  ---------------------------------------------
+//  Prefixed --hm- deliberately. Unprefixed names (--accent, --primary, --border)
+//  collide with Bootstrap, AdminLTE and the Magento UI library, all of which are
+//  present in this area.
+:root {
+    --hm-navy:            @hm-navy;
+    --hm-primary:         @hm-primary;
+    --hm-primary-hover:   @hm-primary-hover;
+    --hm-on-primary:      @hm-on-primary;
+
+    --hm-accent:          @hm-accent;
+    --hm-accent-hover:    @hm-accent-hover;
+    --hm-accent-strong:   @hm-accent-strong;
+    --hm-accent-strong-hover: @hm-accent-strong-hover;
+    --hm-on-accent:       @hm-on-accent;
+    --hm-accent-subtle:   @hm-accent-subtle;
+
+    --hm-background:      @hm-background;
+    --hm-surface:         @hm-surface;
+    --hm-surface-muted:   @hm-surface-muted;
+    --hm-surface-inverse: @hm-surface-inverse;
+
+    --hm-foreground:      @hm-foreground;
+    --hm-foreground-muted:@hm-foreground-muted;
+    --hm-placeholder:     @hm-placeholder;
+    --hm-foreground-disabled: @hm-foreground-disabled;
+    --hm-on-inverse:      @hm-on-inverse;
+    --hm-on-inverse-muted:@hm-on-inverse-muted;
+
+    --hm-border-subtle:   @hm-border-subtle;
+    --hm-border-strong:   @hm-border-strong;
+    --hm-icon:            @hm-icon;
+
+    --hm-focus-ring:         @hm-focus-ring;
+    --hm-focus-ring-inverse: @hm-focus-ring-inverse;
+
+    --hm-success:         @hm-success;
+    --hm-warning:         @hm-warning;
+    --hm-danger:          @hm-danger;
+    --hm-info:            @hm-info;
+    --hm-on-status:       @hm-on-status;
+    --hm-success-subtle:  @hm-success-subtle;
+    --hm-warning-subtle:  @hm-warning-subtle;
+    --hm-danger-subtle:   @hm-danger-subtle;
+    --hm-info-subtle:     @hm-info-subtle;
+
+    --hm-sidebar-bg:        @hm-sidebar-bg;
+    --hm-sidebar-fg:        @hm-sidebar-fg;
+    --hm-sidebar-fg-active: @hm-sidebar-fg-active;
+    --hm-sidebar-hover-bg:  @hm-sidebar-hover-bg;
+    --hm-sidebar-active-mark: @hm-sidebar-active-mark;
+    --hm-sidebar-header-fg: @hm-sidebar-header-fg;
+
+    --hm-topbar-bg:       @hm-topbar-bg;
+    --hm-topbar-fg:       @hm-topbar-fg;
+    --hm-topbar-border:   @hm-topbar-border;
+
+    --hm-table-header-bg: @hm-table-header-bg;
+    --hm-table-header-fg: @hm-table-header-fg;
+    --hm-table-border:    @hm-table-border;
+    --hm-table-row-hover: @hm-table-row-hover;
+
+    --hm-radius-xs:  @hm-radius-xs;
+    --hm-radius-sm:  @hm-radius-sm;
+    --hm-radius:     @hm-radius;
+    --hm-radius-lg:  @hm-radius-lg;
+    --hm-radius-full:@hm-radius-full;
+
+    --hm-shadow-sm: @hm-shadow-sm;
+    --hm-shadow:    @hm-shadow;
+    --hm-shadow-lg: @hm-shadow-lg;
+
+    --hm-duration: @hm-duration;
+    --hm-ease:     @hm-ease;
+
+    --hm-font-sans:   @hm-font-sans;
+    --hm-font-arabic: @hm-font-arabic;
+    --hm-font-ui:     @hm-font-sans;   // reassigned to the Arabic face below
+
+    --hm-control-height:    @hm-control-height;
+    --hm-control-height-lg: @hm-control-height-lg;
+    --hm-row-height:        @hm-row-height;
+}
+
+//
+//  Direction
+//  ---------------------------------------------
+//  Magento emits `<html lang="ar">` with NO dir attribute — measured on the live
+//  page, same as the storefront. Without this the Arabic panel renders Arabic text
+//  in a left-to-right layout. Keying off :lang() rather than [dir] is what makes
+//  RTL actually engage; the [dir='rtl'] form is kept so that an explicit attribute
+//  still works if one is ever added.
+html:lang(ar) {
+    direction: rtl;
+}
+
+//
+//  Typography
+//  ---------------------------------------------
+//  The root is already 62.5% in this area (measured: html font-size = 10px), so
+//  rem values match the storefront's scale and are NOT re-declared here. Setting
+//  it again would risk compounding if Vnecoms ever changes it.
+body {
+    background: var(--hm-background);
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-ui);
+    font-size: @hm-text-base;
+    line-height: @hm-leading-base;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+//  Arabic gets its own family and a looser line-height: the script has taller
+//  ascenders and descenders, and 1.5 crowds it.
+html:lang(ar) body,
+[dir='rtl'] body {
+    --hm-font-ui: @hm-font-arabic;
+    line-height: @hm-leading-arabic-body;
+}
+
+//  AdminLTE and Bootstrap both hard-code font-family on a long list of elements,
+//  so inheriting from body is not enough.
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+button, input, optgroup, select, textarea,
+.btn, .form-control, .nav, .navbar, .dropdown-menu,
+.table, .panel, .box, .modal, .label, .badge,
+.content-header > h1,
+.login-box-msg {
+    font-family: var(--hm-font-ui);
+}
+
+h1, .h1, .content-header > h1 {
+    color: var(--hm-foreground);
+    font-size: @hm-text-2xl;
+    font-weight: @hm-weight-bold;
+    line-height: @hm-leading-tight;
+    margin: 0;
+}
+
+h2, .h2 { font-size: @hm-text-xl;  font-weight: @hm-weight-bold;     line-height: @hm-leading-snug; }
+h3, .h3 { font-size: @hm-text-lg;  font-weight: @hm-weight-semibold; line-height: @hm-leading-snug; }
+h4, .h4 { font-size: @hm-text-base;font-weight: @hm-weight-semibold; line-height: @hm-leading-snug; }
+h5, .h5,
+h6, .h6 { font-size: @hm-text-sm;  font-weight: @hm-weight-semibold; line-height: @hm-leading-snug; }
+
+//
+//  Links
+//  ---------------------------------------------
+//  @hm-accent (#f26522) is 3.15:1 and FAILS as text. Links use @hm-accent-strong.
+a {
+    color: var(--hm-accent-strong);
+    text-decoration: none;
+    transition: color var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus {
+        color: @hm-accent-strong-hover;
+        text-decoration: underline;
+    }
+}
+
+//
+//  Focus
+//  ---------------------------------------------
+//  AdminLTE and Bootstrap 3 both remove outlines in places. A keyboard user in a
+//  back office navigates by tab far more than a shopper does, so this is restored
+//  globally rather than per component.
+//
+//  :focus-visible only — a mouse click on a button should not leave a ring.
+:focus-visible {
+    outline: @hm-focus-ring-width solid var(--hm-focus-ring);
+    outline-offset: @hm-focus-ring-offset;
+}
+
+//  On navy surfaces the light ring is the only legible one: @hm-accent-strong
+//  measures 3.07:1 against navy, which passes 1.4.11 on paper and is hard to find
+//  in practice.
+.main-header :focus-visible,
+.main-sidebar :focus-visible,
+.login-page :focus-visible {
+    outline-color: var(--hm-focus-ring-inverse);
+}
+
+//  Screen-reader-only helper. Clipped rather than display:none so it is still
+//  announced. Matches the storefront's implementation exactly, including the
+//  clip-path the parity harness keys off when skipping hidden text.
+.hm-sr-only {
+    block-size: 1px;
+    clip-path: inset(50%);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
+
+//
+//  Selection + scrollbar polish
+//  ---------------------------------------------
+::selection {
+    background: var(--hm-accent);
+    color: var(--hm-on-accent);
+}

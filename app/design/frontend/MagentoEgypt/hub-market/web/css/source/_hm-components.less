@@ -1,0 +1,450 @@
+//
+//  Hub Market — component library
+//  _____________________________________________
+//
+//  One component per role. The Figma build had 12 product-card renderings,
+//  9 vendor cards, 11 star-rating implementations, 19 price treatments,
+//  ~20 badges, 74 raw buttons across 7 primary fills and ~12 section headers.
+//  Each of those collapses to exactly one class here, with declared modifiers.
+//
+//  Rules this file follows throughout:
+//    - colour comes from tokens only, never a literal
+//    - direction uses LOGICAL properties (inline-start/end), never left/right,
+//      because the Arabic store view is live
+//    - interactive targets are >= 44px
+//    - nothing conveys meaning by colour alone
+//
+
+//
+//  Icons
+//  ---------------------------------------------
+//  Sprite lives at web/images/hm-icons.svg (40 Lucide symbols, ISC).
+//    <svg class="hm-icon" aria-hidden="true"><use href="...#hm-cart"/></svg>
+//  Icon-only controls MUST carry a label; see .hm-btn--icon.
+
+.hm-icon {
+    display: inline-block;
+    fill: none;
+    flex-shrink: 0;
+    height: 2rem;
+    stroke: currentColor;
+    vertical-align: middle;
+    width: 2rem;
+}
+
+.hm-icon--sm { height: 1.6rem; width: 1.6rem; }
+.hm-icon--lg { height: 2.4rem; width: 2.4rem; }
+
+//  Directional icons (chevrons, arrows) must mirror in RTL. Unicode does not
+//  bidi-mirror these shapes, which is why the design's `←`/`→` literals broke.
+[dir='rtl'] .hm-icon--dir,
+:lang(ar) .hm-icon--dir {
+    transform: scaleX(-1);
+}
+
+//
+//  Buttons
+//  ---------------------------------------------
+//  Primary is the accent FILL with a NAVY label. White on #f26522 is 3.15:1 and
+//  fails AA for normal text — which is what the design shipped.
+
+.hm-btn {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: var(--hm-radius);
+    cursor: pointer;
+    display: inline-flex;
+    font-family: var(--hm-font-body);
+    font-size: 1.4rem;
+    font-weight: 600;
+    gap: var(--hm-space-2);
+    justify-content: center;
+    line-height: 1.4;
+    min-height: 4.4rem;
+    padding: var(--hm-space-3) var(--hm-space-6);
+    text-align: center;
+    text-decoration: none;
+    transition: background-color var(--hm-duration) var(--hm-ease),
+                border-color var(--hm-duration) var(--hm-ease);
+
+    &:disabled,
+    &[aria-disabled='true'] {
+        cursor: not-allowed;
+        opacity: .5;
+    }
+}
+
+.hm-btn--primary {
+    background: var(--hm-accent);
+    border-color: var(--hm-accent);
+    color: var(--hm-on-accent);      // navy on orange = 5.04:1
+
+    &:hover:not(:disabled) {
+        background: var(--hm-accent-hover);   // navy still clears 4.55:1
+        border-color: var(--hm-accent-hover);
+        color: var(--hm-on-accent);
+    }
+}
+
+.hm-btn--secondary {
+    background: var(--hm-surface);
+    border-color: var(--hm-border-strong);
+    color: var(--hm-foreground);
+
+    &:hover:not(:disabled) {
+        background: var(--hm-surface-muted);
+        border-color: var(--hm-foreground-muted);
+    }
+}
+
+.hm-btn--inverse {
+    background: transparent;
+    border-color: var(--hm-on-inverse);
+    color: var(--hm-on-inverse);
+
+    &:hover:not(:disabled) {
+        background: var(--hm-on-inverse);
+        color: var(--hm-primary);
+    }
+}
+
+.hm-btn--ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--hm-accent-strong);
+
+    &:hover:not(:disabled) {
+        background: var(--hm-accent-subtle);
+    }
+}
+
+//  Icon-only. Always needs .hm-sr-only text or aria-label — the design shipped
+//  19 unnamed icon buttons and zero aria-labels.
+.hm-btn--icon {
+    min-width: 4.4rem;
+    padding: var(--hm-space-2);
+}
+
+.hm-btn--sm { font-size: 1.3rem; min-height: 3.6rem; padding: var(--hm-space-2) var(--hm-space-4); }
+.hm-btn--lg { font-size: 1.6rem; min-height: 5.2rem; padding: var(--hm-space-4) var(--hm-space-8); }
+.hm-btn--block { display: flex; width: 100%; }
+
+//
+//  Badges
+//  ---------------------------------------------
+.hm-badge {
+    align-items: center;
+    border-radius: var(--hm-radius-full);
+    display: inline-flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    gap: var(--hm-space-1);
+    line-height: 1.4;
+    padding: .4rem var(--hm-space-3);
+    white-space: nowrap;
+}
+
+.hm-badge--discount { background: var(--hm-discount-bg);   color: var(--hm-discount-fg); }
+.hm-badge--bundle   { background: var(--hm-bundle-badge-bg); color: var(--hm-bundle-badge-fg); }
+.hm-badge--verified { background: var(--hm-info-subtle);   color: var(--hm-vendor-verified); }
+.hm-badge--new      { background: var(--hm-accent-subtle); color: var(--hm-accent-strong); }
+.hm-badge--stock-in { background: var(--hm-success-subtle); color: var(--hm-stock-in); }
+.hm-badge--stock-low{ background: var(--hm-warning-subtle); color: var(--hm-stock-low); }
+.hm-badge--stock-out{ background: var(--hm-surface-muted);  color: var(--hm-stock-out); }
+
+//
+//  Rating
+//  ---------------------------------------------
+//  The design's stars were 1.35:1 filled-vs-empty and carried no text
+//  alternative. Here the numeric value is part of the component, so colour is
+//  never the sole carrier (WCAG 1.4.1).
+
+.hm-rating {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--hm-space-1);
+}
+
+.hm-rating__stars {
+    color: var(--hm-rating-star);
+    display: inline-flex;
+    gap: .2rem;
+}
+
+.hm-rating__star--empty { color: var(--hm-rating-star-empty); }
+
+.hm-rating__value {
+    color: var(--hm-foreground);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.hm-rating__count {
+    color: var(--hm-foreground-muted);
+    font-size: 1.3rem;
+}
+
+//
+//  Price
+//  ---------------------------------------------
+//  Never Playfair. Tabular figures so columns align. Currency and amount are
+//  bidi-isolated so they do not reorder inside Arabic copy.
+
+.hm-price {
+    align-items: baseline;
+    display: inline-flex;
+    flex-wrap: wrap;
+    font-family: var(--hm-font-sans);
+    font-variant-numeric: tabular-nums;
+    gap: var(--hm-space-2);
+}
+
+.hm-price__current {
+    color: var(--hm-price);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.hm-price__was {
+    color: var(--hm-price-was);
+    font-size: 1.4rem;
+    text-decoration: line-through;
+}
+
+.hm-price__save {
+    color: var(--hm-stock-in);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+//  On the navy surfaces the accessible orange drops to 3.07:1, so the fill
+//  orange is used there instead (5.04:1 on navy).
+.hm-surface-inverse .hm-price__current { color: var(--hm-price-inverse); }
+.hm-surface-inverse .hm-price__was     { color: var(--hm-on-inverse-muted); }
+
+//
+//  Product card — one component, replacing 12 renderings
+//  ---------------------------------------------
+.hm-product-card {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-within {
+        border-color: var(--hm-border-strong);
+        box-shadow: var(--hm-shadow);
+    }
+}
+
+.hm-product-card__media {
+    aspect-ratio: 1 / 1;
+    background: var(--hm-surface-muted);
+    display: block;
+    overflow: hidden;
+    position: relative;
+
+    img { height: 100%; object-fit: cover; width: 100%; }
+}
+
+//  Overlay badges pin to the logical start edge so they mirror in RTL. The
+//  design pinned them physically, so nothing swapped.
+.hm-product-card__badges {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-1);
+    inset-block-start: var(--hm-space-3);
+    inset-inline-start: var(--hm-space-3);
+    position: absolute;
+}
+
+.hm-product-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    padding: var(--hm-space-4);
+}
+
+.hm-product-card__vendor {
+    color: var(--hm-accent-strong);
+    font-size: 1.3rem;
+    font-weight: 500;
+    text-align: start;
+}
+
+//  Product titles are DM Sans, never the display serif, and never below 14px.
+.hm-product-card__title {
+    color: var(--hm-foreground);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-family: var(--hm-font-sans);
+    font-size: 1.5rem;
+    font-weight: 500;
+    line-height: 1.45;
+    overflow: hidden;
+    text-align: start;
+
+    a { color: inherit; text-decoration: none; }
+}
+
+//  Actions are always visible. In the design they were opacity:0 until hover,
+//  so they did not exist on touch at all.
+.hm-product-card__actions {
+    display: flex;
+    gap: var(--hm-space-2);
+    margin-block-start: auto;
+    padding-block-start: var(--hm-space-2);
+}
+
+.hm-product-card__wishlist {
+    inset-block-start: var(--hm-space-3);
+    inset-inline-end: var(--hm-space-3);
+    position: absolute;
+}
+
+//
+//  Vendor card — one component, replacing 9 renderings
+//  ---------------------------------------------
+.hm-vendor-card {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    padding: var(--hm-space-6);
+    text-align: center;
+}
+
+.hm-vendor-card__avatar {
+    block-size: 7.2rem;
+    border-radius: var(--hm-radius-full);
+    inline-size: 7.2rem;
+    object-fit: cover;
+    position: relative;
+}
+
+.hm-vendor-card__name {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-sans);
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.hm-vendor-card__meta {
+    color: var(--hm-foreground-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1.3rem;
+    gap: var(--hm-space-3);
+    justify-content: center;
+}
+
+//
+//  Section header — one component, replacing ~12 configurations
+//  ---------------------------------------------
+.hm-section {
+    margin-block-end: var(--hm-space-8);
+}
+
+.hm-section__head {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+    justify-content: space-between;
+    margin-block-end: var(--hm-space-5);
+}
+
+//  Playfair lives here — display headings only.
+.hm-section__title {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-heading);
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: start;
+}
+
+.hm-section__subtitle {
+    color: var(--hm-foreground-muted);
+    font-size: 1.4rem;
+    text-align: start;
+}
+
+//  One label, one arrow, mirrored in RTL. The design had 7 different
+//  "see all" labels.
+.hm-section__link {
+    align-items: center;
+    color: var(--hm-accent-strong);
+    display: inline-flex;
+    font-size: 1.4rem;
+    font-weight: 600;
+    gap: var(--hm-space-1);
+    text-decoration: none;
+
+    &:hover { text-decoration: underline; }
+}
+
+//
+//  Chips (filters, categories, country/payment tags)
+//  ---------------------------------------------
+.hm-chip {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 1.4rem;
+    gap: var(--hm-space-2);
+    min-height: 4.4rem;
+    padding: var(--hm-space-2) var(--hm-space-4);
+    text-decoration: none;
+
+    &:hover { border-color: var(--hm-border-strong); }
+
+    &[aria-pressed='true'],
+    &.active {
+        background: var(--hm-primary);
+        border-color: var(--hm-primary);
+        color: var(--hm-on-primary);
+    }
+}
+
+//
+//  Inverse surface (footer, hero, dark bands)
+//  ---------------------------------------------
+//  The design's dark band ran text at 1.54:1. Everything here clears AA.
+.hm-surface-inverse {
+    background: var(--hm-surface-inverse);
+    color: var(--hm-on-inverse);
+
+    //  BUTTONS MUST BE EXCLUDED. `.hm-surface-inverse a` is (0,2,0) and beats
+    //  `.hm-btn--primary` (0,1,0), so a primary button rendered as an <a> inside a
+    //  dark band had its navy-on-orange repainted WHITE on orange — measured
+    //  3.15:1, failing AA.
+    //
+    //  This is the same defect Phase I recorded as fixed on the hero CTA. It was
+    //  fixed there by changing that one instance; the underlying rule was never
+    //  scoped, so it came back the moment another primary <a> landed on an inverse
+    //  band (the "Browse bundles" CTA). Scoping it at the source ends the class of
+    //  bug rather than the instance.
+    //
+    //  Safe because EVERY .hm-btn variant sets its own colour: --primary uses
+    //  --hm-on-accent, --ghost uses --hm-accent-strong, --inverse uses
+    //  --hm-on-inverse. None relies on inheriting from this rule.
+    a:not(.hm-btn) { color: var(--hm-on-inverse); }
+
+    .hm-muted { color: var(--hm-on-inverse-muted); }   // 10.56:1 on navy
+}

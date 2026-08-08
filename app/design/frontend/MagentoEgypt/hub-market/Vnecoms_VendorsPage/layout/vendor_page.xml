@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Gives the vendor microsite its missing top-level heading.
+ *
+ * `vendor_page` is the shared handle every microsite screen pulls in (home, items,
+ * about, shipping policy, refund policy, search, category), so opting in here
+ * covers all of them from one place.
+ *
+ * BOTH the top and left titles are promoted, and that is deliberate rather than
+ * sloppy — they are MUTUALLY EXCLUSIVE. Vnecoms renders whichever matches the
+ * `vendors/vendorspage/profile_position` setting and the other returns an empty
+ * string:
+ *
+ *   Block\Profile\Top::_toHtml()  -> '' unless position == POSITION_TOP
+ *   Block\Profile\Left::_toHtml() -> '' unless position == POSITION_LEFT
+ *
+ * This store is set to `left`, which is why targeting only the top title changed
+ * nothing on the first attempt. Setting both means the h1 survives an admin
+ * flipping that setting, without ever producing two.
+ *
+ * The PDP's third copy (catalog_product_view.xml -> vendor.profile.title) is NOT
+ * touched — that page already has an h1 for the product name.
+ * See Vnecoms_Vendors/templates/profile/title.phtml for why the tag is a parameter.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="vendor.profile.top.title">
+            <arguments>
+                <argument name="heading_tag" xsi:type="string">h1</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="vendor.profile.left.title">
+            <arguments>
+                <argument name="heading_tag" xsi:type="string">h1</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,45 @@
+<?php
+/**
+ * Hub Market — homepage category chips.
+ *
+ * Matches the Figma reference's chip row: an icon tile, the category name, and a
+ * live item count. The count is read from the real category tree, so it cannot
+ * drift from the catalog the way a hand-written CMS block would.
+ *
+ * Categories with zero products are filtered out in the block — this catalog has
+ * empty scaffolding categories (Promotions, Sale) that would otherwise render as
+ * chips leading nowhere.
+ *
+ * @var \MagentoEgypt\HomeSections\Block\CategoryChips $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$categories = $block->getCategories();
+if (!$categories) {
+    return;
+}
+?>
+<section class="hm-chips" aria-label="<?= $escaper->escapeHtmlAttr(__('Shop by category')) ?>">
+    <ul class="hm-chips__list">
+        <?php foreach ($categories as $c): ?>
+            <li class="hm-chips__item">
+                <a class="hm-chips__link" href="<?= $escaper->escapeUrl($c['url']) ?>">
+                    <span class="hm-chips__icon" aria-hidden="true">
+                        <?php if ($c['image']): ?>
+                            <img class="hm-chips__img"
+                                 src="<?= $escaper->escapeUrl($c['image']) ?>"
+                                 alt="" loading="lazy" width="40" height="40"/>
+                        <?php else: ?>
+                            <svg class="hm-icon" aria-hidden="true" focusable="false">
+                                <use href="#hm-store"/>
+                            </svg>
+                        <?php endif; ?>
+                    </span>
+                    <span class="hm-chips__name"><?= $escaper->escapeHtml($c['name']) ?></span>
+                    <span class="hm-chips__count">
+                        <?= $escaper->escapeHtml(__('%1 items', $c['count'])) ?>
+                    </span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>

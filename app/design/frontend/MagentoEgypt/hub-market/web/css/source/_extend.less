@@ -1,0 +1,36 @@
+//
+//  Hub Market — theme entry point
+//  _____________________________________________
+//
+//  Collected by `//@magento_import 'source/_extend.less'` in styles-m.less /
+//  styles-l.less, so this is ADDITIVE — it does not replace Magento/blank's
+//  anything. (_theme.less, by contrast, replaces blank's via plain fallback.)
+//
+//  Import order matters:
+//    1. fonts  — @font-face must be declared before anything references a family
+//    2. root   — emits the --hm-* custom properties the rest of the theme reads
+//    3. base   — foundational element styling
+//
+//  The @hm-* LESS variables are already in scope here: _theme.less imports
+//  _hm-tokens.less and is evaluated at root scope before this file.
+//
+
+@import '_hm-fonts.less';
+@import '_hm-root.less';
+@import '_hm-base.less';
+@import '_hm-components.less';
+@import '_hm-states.less';
+@import '_hm-header.less';
+@import '_hm-nav.less';
+@import '_hm-footer.less';
+@import '_hm-product-item.less';
+@import '_hm-home.less';
+@import '_hm-plp.less';
+@import '_hm-pdp.less';
+@import '_hm-vendor.less';
+@import '_hm-seller-onboarding.less';
+@import '_hm-checkout.less';
+@import '_hm-account.less';
+@import '_hm-marketplace.less';
+@import '_hm-cms.less';
+@import '_hm-thirdparty.less';

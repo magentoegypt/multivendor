@@ -1,0 +1,56 @@
+<?php
+/**
+ * Hub Market — footer.
+ *
+ * The Figma footer was the strongest part of the design — genuinely localised,
+ * with per-country chips and Gulf payment methods (Mada, Tap, Tabby, STC Pay).
+ * Two things are corrected here:
+ *
+ *   1. Contrast. Its legal links and copyright ran at ~2.2:1 on navy, the
+ *      lowest real text contrast in the build. Everything here uses
+ *      --hm-on-inverse / --hm-on-inverse-muted (10.56:1 on navy).
+ *   2. Destinations. Ten distinct footer links all resolved to /about. These
+ *      are driven by CMS blocks so each can point somewhere real.
+ *
+ * Column content is editable via CMS blocks rather than hard-coded, because the
+ * link sets differ per store view (the Arabic store has different policy pages).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+$layout  = $block->getLayout();
+$columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', 'hm_footer_platform'];
+?>
+<div class="hm-footer hm-surface-inverse">
+    <div class="hm-footer__inner">
+
+        <div class="hm-footer__brand">
+            <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)
+                ->setBlockId('hm_footer_brand')->toHtml() ?>
+        </div>
+
+        <div class="hm-footer__cols">
+            <?php foreach ($columns as $blockId): ?>
+                <div class="hm-footer__col">
+                    <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)
+                        ->setBlockId($blockId)->toHtml() ?>
+                </div>
+            <?php endforeach; ?>
+            <?php if ($block->getChildHtml('hm.footer.links')): ?>
+                <div class="hm-footer__col"><?= $block->getChildHtml('hm.footer.links') ?></div>
+            <?php endif; ?>
+        </div>
+
+        <div class="hm-footer__bottom">
+            <p class="hm-footer__copyright hm-muted">
+                <?= $escaper->escapeHtml(__('Copyright © %1 MECommerce. All rights reserved.', date('Y'))) ?>
+            </p>
+            <div class="hm-footer__legal">
+                <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)
+                    ->setBlockId('hm_footer_legal')->toHtml() ?>
+            </div>
+        </div>
+    </div>
+</div>

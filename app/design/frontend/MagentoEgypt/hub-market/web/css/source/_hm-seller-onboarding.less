@@ -1,0 +1,142 @@
+//
+//  Hub Market — seller onboarding (frontend area)
+//  _____________________________________________
+//
+//  These two screens are the front door to the seller panel, and they are
+//  FRONTEND pages even though everything they lead to is in the `vendors` area:
+//
+//    /marketplace/seller/login/     — every protected panel URL 302s here
+//    /marketplace/seller/register/  — the multi-step registration wizard
+//
+//  That is why they are styled here and not in MagentoEgypt_SellerTheme: a
+//  vendors-area stylesheet never loads on a frontend page. Confirmed by following
+//  the redirect from /en/vendors/dashboard.
+//
+//  The login screen needs nothing extra — it reuses the core customer-login
+//  markup (.login-container / .block-customer-login / .form-login), which
+//  _hm-components.less and _hm-states.less already cover.
+//
+//  The registration wizard does. It comes from Vnecoms_VendorsCustomRegister,
+//  whose register.css paints the step indicator in a coral (#fb6b5b) that belongs
+//  to no palette here — and pairs it with white text at 2.85:1, a straight WCAG
+//  1.4.3 failure on the one control that tells a seller where they are in a
+//  five-step form.
+//
+
+//
+//  Step indicator
+//  ---------------------------------------------
+//  Stock, measured:
+//    .cr-nav-step.current  .cr-nav-step-number   #FFF on #fb6b5b   2.85:1  FAIL
+//    .cr-nav-step.complete .cr-nav-step-number   #222 on #92cf5c   8.56:1  pass
+//    .cr-nav-step-number (idle)                  #666 on #e6e6e6   4.60:1  pass
+//
+//  Replaced with the palette. The current step is an accent FILL carrying a navy
+//  label — the same pairing as every primary button on the site — and the
+//  completed step uses the semantic success colour rather than a lime green.
+.cr-nav-step-number {
+    background: var(--hm-neutral-200);
+    border: 1px solid var(--hm-border-strong);
+    color: var(--hm-neutral-700);              // 7.90:1 on the idle fill
+    font-family: var(--hm-font-sans);
+    font-weight: var(--hm-weight-bold, 700);
+}
+
+.cr-nav-step.current .cr-nav-step-number {
+    background: var(--hm-accent);
+    border-color: var(--hm-accent);
+    color: var(--hm-on-accent);                // 5.04:1  (was 2.85:1)
+}
+
+.cr-nav-step.complete .cr-nav-step-number {
+    background: var(--hm-success);
+    border-color: var(--hm-success);
+    color: #ffffff;                            // 5.35:1
+
+    &:hover { color: #ffffff; }
+}
+
+//  The connector bars either side of each step marker. These are decorative
+//  rather than informational — the number carries the state — so the 3:1 UI
+//  threshold is what applies, not 4.5:1.
+.cr-nav-step::before,
+.cr-nav-step::after {
+    background: var(--hm-neutral-200);
+    border-block-start-color: var(--hm-border-subtle);
+    border-block-end-color: var(--hm-border-subtle);
+}
+
+.cr-nav-step.current::before,
+.cr-nav-step.current::after {
+    background: var(--hm-accent);
+    border-color: var(--hm-accent);
+}
+
+.cr-nav-step.complete::before,
+.cr-nav-step.complete::after {
+    background: var(--hm-success);
+    border-color: var(--hm-success);
+}
+
+.cr-nav-step-title {
+    color: var(--hm-foreground-muted);
+    font-size: var(--hm-text-sm, 1.4rem);
+    font-weight: 600;
+}
+
+.cr-nav-step.current .cr-nav-step-title { color: var(--hm-foreground); }
+
+//
+//  Step panels
+//  ---------------------------------------------
+//  register.css gives these a #f2f7f9 tint with a #dce5e9 border and a 5px
+//  radius — close to, but not, the token surface. Brought onto the ramp.
+.cr-steps-container {
+    border-block-start-color: var(--hm-border-subtle);
+}
+
+.cr-step .cr-step-content {
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+}
+
+.cr-step-title {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-heading);
+    font-weight: 700;
+}
+
+.cr-nav-container { border-block-end-color: var(--hm-border-subtle); }
+
+//
+//  Two-column step body
+//  ---------------------------------------------
+//  register.css floats these at `calc(50% - 10px)` with physical margins, which
+//  do not mirror. Under RTL the columns keep their order but the gutters land on
+//  the wrong sides, so they are re-expressed logically.
+[dir='rtl'] .cr-step-content-col1,
+html:lang(ar) .cr-step-content-col1 { float: right; margin-left: 0; margin-right: 0; margin-inline-end: 1rem; }
+
+[dir='rtl'] .cr-step-content-col2,
+html:lang(ar) .cr-step-content-col2 { float: right; margin-left: 0; margin-right: 0; margin-inline-start: 1rem; }
+
+//  Below the breakpoint the 50% floats are unusable on a phone.
+@media (max-width: 767px) {
+    .cr-step-content-col1,
+    .cr-step-content-col2 {
+        float: none;
+        margin-inline: 0;
+        inline-size: 100%;
+    }
+
+    //  Five 20%-wide steps at 390px is 78px each. Let the rail scroll instead of
+    //  crushing the labels.
+    .cr-nav {
+        display: flex;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .cr-nav-step { flex: 0 0 12rem; float: none; inline-size: 12rem; }
+}

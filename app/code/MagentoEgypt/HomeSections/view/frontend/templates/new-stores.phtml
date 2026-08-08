@@ -1,0 +1,73 @@
+<?php
+/**
+ * Hub Market — New Stores row (Figma: "New Stores on MECommerce").
+ *
+ * Only APPROVED vendors appear — the block filters on status = 1. Of the 25
+ * vendor rows in this install only 3 are approved, and surfacing unvetted
+ * applicants would contradict the homepage's own "reviewed and approved before
+ * going live" promise.
+ *
+ * @var \MagentoEgypt\HomeSections\Block\NewStores $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$stores = $block->getStores();
+if (!$stores) {
+    return;
+}
+?>
+<?php
+/*
+ * Heading and id are PARAMETERS because this template now renders TWICE on the
+ * homepage — "New Stores" (by join date) and "Top Vendors This Month" (by rating).
+ * Hard-coding them produced two identical headings AND a duplicate element id,
+ * which breaks the aria-labelledby association: both sections would point at the
+ * same node, so a screen reader announces the wrong name for one of them.
+ */
+$heading  = (string) ($block->getData('heading') ?: __('New Stores'));
+$headingId = 'hm-stores-title-' . substr(md5($block->getNameInLayout() ?: $heading), 0, 8);
+?>
+<?php $hmStoresSlug = preg_replace('/[^a-z0-9]+/', '-', strtolower((string) $block->getNameInLayout())); ?>
+<section class="hm-stores hm-stores--<?= $escaper->escapeHtmlAttr($hmStoresSlug) ?>" aria-labelledby="<?= $escaper->escapeHtmlAttr($headingId) ?>">
+    <div class="hm-section__head">
+        <h2 class="hm-section__title" id="<?= $escaper->escapeHtmlAttr($headingId) ?>"><?= $escaper->escapeHtml($heading) ?></h2>
+        <a class="hm-section__more" href="<?= $escaper->escapeUrl($block->getUrl('sellerlist')) ?>">
+            <?= $escaper->escapeHtml(__('All stores')) ?>
+        </a>
+    </div>
+    <ul class="hm-stores__list">
+        <?php foreach ($stores as $s): ?>
+            <li class="hm-stores__item">
+                <a class="hm-stores__link" href="<?= $escaper->escapeUrl($s['url']) ?>">
+                    <span class="hm-stores__avatar">
+                        <?php if ($s['logo']): ?>
+                            <img src="<?= $escaper->escapeUrl($s['logo']) ?>" alt=""
+                                 loading="lazy" width="56" height="56"/>
+                        <?php else: ?>
+                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-store"/></svg>
+                        <?php endif; ?>
+                    </span>
+                    <span class="hm-stores__name"><?= $escaper->escapeHtml($s['name']) ?></span>
+                    <?php if ($s['stars'] !== null && $s['reviews'] > 0): ?>
+                        <span class="hm-stores__rating"
+                              aria-label="<?= $escaper->escapeHtmlAttr(__('Rated %1 out of 5 from %2 reviews', $s['stars'], $s['reviews'])) ?>">
+                            <span class="hm-stars" aria-hidden="true">
+                                <span class="hm-stars__fill" style="inline-size: <?= (float) $s['stars'] * 20 ?>%"></span>
+                            </span>
+                            <span class="hm-stores__score"><?= $escaper->escapeHtml(number_format((float) $s['stars'], 1)) ?></span>
+                            <span class="hm-stores__reviews">(<?= (int) $s['reviews'] ?>)</span>
+                        </span>
+                    <?php endif; ?>
+                    <?php if (!empty($s['dispatch'])): ?>
+                        <span class="hm-stores__dispatch">
+                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-clock"/></svg>
+                            <?= $escaper->escapeHtml($s['dispatch']) ?>
+                        </span>
+                    <?php endif; ?>
+                    <span class="hm-stores__meta">
+                        <?= $escaper->escapeHtml(__('%1 products', $s['products'])) ?>
+                    </span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>

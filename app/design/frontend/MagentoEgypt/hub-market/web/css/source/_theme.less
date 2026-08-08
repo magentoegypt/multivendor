@@ -1,0 +1,209 @@
+//
+//  Hub Market — Magento UI library variable overrides
+//  _____________________________________________
+//
+//  This file REPLACES Magento/blank's _theme.less via theme fallback (it is a
+//  plain @import in styles-m.less, not a //@magento_import collector), so
+//  blank's own declaration is carried forward below rather than inherited.
+//
+//  Only EXISTING Magento variables may be redeclared here — that is the
+//  contract that keeps this theme available for further nesting. New tokens
+//  live in _hm-tokens.less.
+//
+//  LESS resolves variables lazily and last-declaration-wins at root scope, so
+//  these override lib/web/css/source/lib/variables/* even though _theme.less is
+//  imported after the styles that consume them.
+//
+
+@import '_hm-tokens.less';
+
+//
+//  Carried over from Magento/blank's _theme.less
+//  ---------------------------------------------
+@form-field-note-icon-font__content: false;
+
+//
+//  Colours
+//  ---------------------------------------------
+@primary__color:                    @hm-primary;
+@secondary__color:                  @hm-neutral-100;
+@page__background-color:            @hm-background;
+@panel__background-color:           @hm-surface-muted;
+@active__color:                     @hm-accent-strong;
+@error__color:                      @hm-danger;
+@border-color__base:                @hm-border-subtle;
+
+@text__color:                       @hm-foreground;
+@text__color__intense:              @hm-neutral-900;
+@text__color__muted:                @hm-foreground-muted;
+
+//
+//  Typography
+//  ---------------------------------------------
+//  @root__font-size stays at Magento's 62.5% — it is a percentage, so it still
+//  honours the visitor's browser font-size preference. (The Figma build pinned
+//  html{font-size:16px}, which does not.)
+@font-family__sans-serif:           @hm-font-sans;
+@font-family__serif:                @hm-font-display;
+@font-family__base:                 @hm-font-sans;
+
+//  These MUST be px — see the @hm-fs-* note in _hm-tokens.less. Magento does
+//  arithmetic on them and converts to rem itself.
+@font-size__base:                   @hm-fs-base;
+@font-size__xs:                     @hm-fs-xs;
+@font-size__s:                      @hm-fs-sm;
+@font-size__l:                      @hm-fs-lg;
+@font-size__xl:                     @hm-fs-xl;
+
+@font-weight__regular:              @hm-weight-regular;
+@font-weight__heavier:              @hm-weight-medium;
+@font-weight__semibold:             @hm-weight-semibold;
+@font-weight__bold:                 @hm-weight-bold;
+
+@line-height__base:                 @hm-leading-base;
+@line-height__l:                    1.6;
+@line-height__s:                    1.4;
+
+@link__color:                       @hm-accent-strong;
+@link__hover__color:                @hm-accent-strong-hover;
+@link__visited__color:              @hm-accent-strong;
+@link__active__color:               @hm-accent-strong-hover;
+@link__text-decoration:             none;
+@link__hover__text-decoration:      underline;
+
+//  Focus. The generated design shipped a 1.6:1 ring, which is effectively
+//  invisible; this is 5.18:1 on white.
+@focus__color:                      @hm-focus-ring;
+@focus__box-shadow:                 0 0 0 @hm-focus-ring-width @hm-focus-ring;
+
+//
+//  Headings — Playfair for display levels only.
+//  h4-h6 stay on DM Sans: a display serif at these sizes slows scanning, and
+//  Playfair has no Arabic counterpart.
+//  ---------------------------------------------
+@heading__font-family__base:        @hm-font-display;
+@heading__font-weight__base:        @hm-weight-bold;
+@heading__color__base:              @hm-neutral-900;
+@heading__line-height__base:        @hm-leading-snug;
+
+//  px — Magento multiplies these by ratios before converting to rem.
+@h1__font-size:                     @hm-fs-4xl;
+@h1__font-size-desktop:             @hm-fs-5xl;
+@h1__line-height:                   @hm-leading-tight;  // unitless is correct here
+@h2__font-size:                     @hm-fs-3xl;
+@h3__font-size:                     @hm-fs-2xl;
+@h4__font-size:                     @hm-fs-lg;
+@h4__font-family:                   @hm-font-sans;
+@h4__font-weight:                   @hm-weight-semibold;
+@h5__font-size:                     @hm-fs-base;
+@h5__font-family:                   @hm-font-sans;
+@h5__font-weight:                   @hm-weight-semibold;
+@h6__font-size:                     @hm-fs-sm;
+@h6__font-family:                   @hm-font-sans;
+@h6__font-weight:                   @hm-weight-semibold;
+
+//
+//  Buttons
+//  ---------------------------------------------
+//  Primary is the accent FILL with a NAVY label (5.04:1). White on #f26522 is
+//  3.15:1 and fails AA for normal-size text, which is what the design did.
+@button__font-family:               @hm-font-sans;
+@button__font-weight:               @hm-weight-semibold;
+//  12px, matching the Figma reference. Measured across the published build: real
+//  CTAs ("Shop Grocery", "Add Bundle") are 12px; the fully-rounded values belong
+//  to filter chips and the 0s to the two halves of the composite search field,
+//  so 12 is the button radius rather than one option among three.
+//
+//  This is the blank-framework variable, so it reaches every core `.action` and
+//  `button` at once — the 19 explicit `.hm-btn` / `.action.tocart` style rules in
+//  _hm-*.less were moved to `var(--hm-radius)` alongside it. `@hm-radius-sm` (6px)
+//  is deliberately left in place for inputs, chips, toggles and skeletons, which
+//  Figma does not round like buttons.
+@button__border-radius:             @hm-radius;
+//  px — Magento derives @button__line-height__l/__s from these by addition.
+//  12 + 20 + 12 = 44px, the touch-target floor.
+@button__padding:                   12px 24px;
+@button__font-size:                 @hm-fs-sm;
+@button__line-height:               20px;
+
+@button__background:                @hm-neutral-100;
+@button__border:                    1px solid @hm-border-subtle;
+@button__color:                     @hm-foreground;
+@button__hover__background:         @hm-neutral-200;
+@button__hover__border:             1px solid @hm-border-strong;
+@button__hover__color:              @hm-foreground;
+@button__active__background:        @hm-neutral-200;
+@button__active__border:            1px solid @hm-border-strong;
+@button__active__color:             @hm-foreground;
+
+@button-primary__background:            @hm-accent;
+@button-primary__border:                1px solid @hm-accent;
+@button-primary__color:                 @hm-on-accent;
+@button-primary__hover__background:     @hm-accent-hover;
+@button-primary__hover__border:         1px solid @hm-accent-hover;
+@button-primary__hover__color:          @hm-on-accent;
+@button-primary__active__background:    @hm-accent-hover;
+@button-primary__active__border:        1px solid @hm-accent-hover;
+@button-primary__active__color:         @hm-on-accent;
+
+//
+//  Forms
+//  ---------------------------------------------
+@form-element-input__background:          @hm-surface-input;
+@form-element-input__border-color:        @hm-border-strong;
+@form-element-input__border-radius:       @hm-radius-sm;
+@form-element-input__height:              44px;      // touch-target floor
+@form-element-input__padding:             10px 14px;
+@form-element-input__font-size:           @hm-fs-base; // 16px — below this iOS zooms on focus
+@form-element-input__font-family:         @hm-font-sans;
+@form-element-input__color:               @hm-foreground;
+@form-element-input-placeholder__color:   @hm-placeholder;
+@form-element-input__focus__border:       1px solid @hm-focus-ring;
+
+@input-text-placeholder__color:           @hm-placeholder;
+@select__background:                      @hm-surface-input;
+@select__border:                          1px solid @hm-border-strong;
+@select__border-radius:                   @hm-radius-sm;
+@select__font-size:                       @hm-fs-base;
+@select__font-family:                     @hm-font-sans;
+@select__color:                           @hm-foreground;
+@textarea__border:                        1px solid @hm-border-strong;
+@textarea__border-radius:                 @hm-radius-sm;
+@textarea__font-family:                   @hm-font-sans;
+@textarea__font-size:                     @hm-fs-base;
+
+@form-validation-note__color-error:       @hm-danger;
+@form-element-validation__border-error:   1px solid @hm-danger;
+
+//
+//  Layout
+//  ---------------------------------------------
+@layout__max-width:                 @hm-container;
+@layout-indent__width:              16px;
+
+//
+//  Rating — the design's stars were 1.35:1 filled-vs-empty. This is 3.19:1,
+//  and components must still render the numeric value alongside (WCAG 1.4.1).
+//  ---------------------------------------------
+@rating-icon__active__color:        @hm-rating-star;
+@rating-icon__color:                @hm-rating-star-empty;
+
+//
+//  Messages
+//  ---------------------------------------------
+@message-error__background:         @hm-danger-subtle;
+@message-error__color:              @hm-danger;
+@message-success__background:       @hm-success-subtle;
+@message-success__color:            @hm-success;
+@message-warning__background:       @hm-warning-subtle;
+@message-warning__color:            @hm-warning;
+@message-notice__background:        @hm-info-subtle;
+@message-notice__color:             @hm-info;
+
+//
+//  Breadcrumbs
+//  ---------------------------------------------
+@breadcrumbs__color:                @hm-foreground-muted;
+@breadcrumbs-link__color:           @hm-foreground-muted;
+@breadcrumbs-link__hover__color:    @hm-accent-strong;
+@breadcrumbs-current__color:        @hm-foreground;

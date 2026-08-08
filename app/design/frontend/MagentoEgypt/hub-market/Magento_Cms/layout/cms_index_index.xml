@@ -1,0 +1,471 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — homepage.
+ *
+ * Deliberately built as THEME layout rather than as CMS page content.
+ *
+ * CMS pages are theme-independent: the `home` page renders on whichever theme
+ * is active. There are two of them — page_id 2 (Arabic, live and populated) and
+ * page_id 84 (English, currently rendering empty "dash" placeholders) — and both
+ * are still served to real visitors by Mgs/supro. Editing either would change
+ * the live storefront before this theme is ready.
+ *
+ * Scoping the homepage here means it renders ONLY under MagentoEgypt/hub-market.
+ * Supro keeps its existing homepage untouched, and switching the theme back
+ * restores it exactly.
+ *
+ * Content is still editable: each static section reads from a CMS block, so
+ * merchandisers change copy and imagery in admin without touching layout. The
+ * product and vendor rails are live widgets.
+ *
+ * This also retires the last real MGS Fbuilder dependency: the homepage was
+ * the only genuine one; the other 15 Fbuilder pages are MGS demo content.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!--
+            Set here because the block that would normally supply it (cms_page) is
+            removed above. Without this the homepage renders <title></title>.
+
+            TRADE-OFF, stated plainly: this takes the homepage title out of the
+            admin. It is the same string for both store views today, so nothing is
+            lost right now — but if the title needs to differ per store view or be
+            merchant-editable, the better fix is to point web/default/cms_home_page
+            at a new, EMPTY CMS page. The cms_page block would then supply the
+            title and meta from admin while rendering no content, and this line
+            would come out. That change also has to be undone on rollback, which is
+            why it was not done during go-live.
+        -->
+        <title>Magento Egypt Multi-Vendors Marketplace</title>
+    </head>
+    <body>
+        <attribute name="class" value="hm-home"/>
+
+        <referenceContainer name="content">
+
+            <!--
+                The legacy CMS body (Fbuilder markup on the Arabic page, empty
+                dash placeholders on the English one) must not render here.
+
+                NOTE: a literal double-hyphen is illegal inside an XML comment.
+                Writing the placeholders out as punctuation here is what made this
+                exact file malformed once before; Magento then ignores the file
+                SILENTLY, with nothing in the log, and the homepage quietly loses
+                every section. docs/design/validate-theme-xml.sh exists for this.
+
+                Note what removing this block ALSO removes, because it is not
+                obvious: Magento\Cms\Block\Page::_prepareLayout() is what sets the
+                page title, meta description, meta keywords and the
+                cms-IDENTIFIER body class. Removing the block shipped an empty
+                title element on the homepage.
+
+                Pointing the block at an empty template does NOT work — its
+                _toHtml() filters $page->getContent() directly and ignores the
+                template entirely (module-cms/Block/Page.php:164). So the block
+                really does have to go, and the title is set explicitly below.
+            -->
+            <referenceBlock name="cms_page" remove="true"/>
+
+            <!--
+                1. Hero carousel.
+
+                Slides are REAL top-level categories that have both a category
+                image on disk and products behind them - 15 categories qualify
+                here - ordered by product count so the hero leads somewhere
+                stocked. Headline, image and destination all come from the
+                category itself, so nothing is invented and merchandisers change
+                it in admin by editing the category.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\HeroCarousel"
+                   name="hm.home.hero.carousel" before="-"
+                   template="MagentoEgypt_HomeSections::hero-carousel.phtml">
+                <arguments>
+                    <argument name="limit" xsi:type="number">4</argument>
+                    <!--
+                        Per-slide hero copy, in Figma's register: a kicker pill, a
+                        headline, a subtext line and a specific CTA.
+
+                        Keyed by category URL KEY, which is stable across store views
+                        (verified: both locales emit /clothes.html, /bags.html), so one
+                        entry serves both languages. Every string is translatable — the
+                        template runs them through __() and ar_SA.csv carries the Arabic.
+
+                        A category with no entry here keeps the data-driven fallback:
+                        live item count as the kicker, category name as the headline.
+                        That matters because slides are chosen by product count, so
+                        which categories appear changes as stock does.
+
+                        The `super-market` entry is Figma's own slide-1 copy verbatim.
+                    -->
+                    <argument name="slide_copy" xsi:type="array">
+                        <item name="super-market" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Same-Day Delivery</item>
+                            <item name="headline" xsi:type="string" translate="true">Fresh Groceries From Local Vendors</item>
+                            <item name="subtext" xsi:type="string" translate="true">Organic produce, dairy, and pantry essentials — delivered in hours.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Grocery</item>
+                        </item>
+                        <item name="bags" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">New Season</item>
+                            <item name="headline" xsi:type="string" translate="true">Bags For Every Journey</item>
+                            <item name="subtext" xsi:type="string" translate="true">Totes, backpacks and travel bags from verified Egyptian sellers.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Bags</item>
+                        </item>
+                        <item name="clothes" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Fresh Arrivals</item>
+                            <item name="headline" xsi:type="string" translate="true">Everyday Style, Delivered</item>
+                            <item name="subtext" xsi:type="string" translate="true">New-season clothing from local vendors, shipped nationwide.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Fashion</item>
+                        </item>
+                        <item name="shoes" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Step Out</item>
+                            <item name="headline" xsi:type="string" translate="true">Shoes For Every Step</item>
+                            <item name="subtext" xsi:type="string" translate="true">Trainers, formal and casual — sized, stocked and ready to ship.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Shoes</item>
+                        </item>
+                        <item name="computer" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Built To Work</item>
+                            <item name="headline" xsi:type="string" translate="true">Computers And Accessories</item>
+                            <item name="subtext" xsi:type="string" translate="true">Laptops, desktops and peripherals with nationwide delivery.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Computers</item>
+                        </item>
+                        <item name="mobile-tablet" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Always Connected</item>
+                            <item name="headline" xsi:type="string" translate="true">Phones And Tablets</item>
+                            <item name="subtext" xsi:type="string" translate="true">The latest handsets and tablets from trusted Egyptian sellers.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Mobiles</item>
+                        </item>
+                        <item name="home-appliances" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">For Every Home</item>
+                            <item name="headline" xsi:type="string" translate="true">Appliances That Last</item>
+                            <item name="subtext" xsi:type="string" translate="true">Kitchen and home appliances, delivered and ready to use.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Appliances</item>
+                        </item>
+                        <item name="furniture" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Make It Yours</item>
+                            <item name="headline" xsi:type="string" translate="true">Furniture For Real Homes</item>
+                            <item name="subtext" xsi:type="string" translate="true">Sofas, storage and workspaces from local makers.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Furniture</item>
+                        </item>
+                        <item name="sports" xsi:type="array">
+                            <item name="kicker" xsi:type="string" translate="true">Keep Moving</item>
+                            <item name="headline" xsi:type="string" translate="true">Sports And Fitness Gear</item>
+                            <item name="subtext" xsi:type="string" translate="true">Equipment and kit for training at home or outdoors.</item>
+                            <item name="cta" xsi:type="string" translate="true">Shop Sports</item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+
+            <!-- 1b. Promo tiles that sat beside the old static hero. -->
+            <block class="Magento\Cms\Block\Block" name="hm.home.hero" after="hm.home.hero.carousel">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">hm_home_hero</argument>
+                </arguments>
+            </block>
+
+            <!-- 2. Service promises -->
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.home.usp"
+                   after="hm.home.hero"
+                   template="Magento_Cms::home/usp.phtml"/>
+
+            <!--
+                3. Shop by category — chips with LIVE item counts.
+
+                Replaces the static CMS block (hm_home_categories), whose tiles
+                carried no counts and would have gone stale against the catalog.
+                The block filters out categories with zero products, which this
+                catalog has several of (Promotions, Sale).
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\CategoryChips"
+                   name="hm.home.categories" after="hm.home.usp"
+                   template="MagentoEgypt_HomeSections::category-chips.phtml">
+                <arguments>
+                    <argument name="limit" xsi:type="number">8</argument>
+                </arguments>
+            </block>
+
+            <!-- 4. Featured products (live) -->
+            <block class="Magento\CatalogWidget\Block\Product\ProductsList"
+                   name="hm.home.featured"
+                   after="hm.home.bestsellers">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Popular Products</argument>
+                    <argument name="products_count" xsi:type="number">8</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <!-- "all products", newest first -->
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
+                </arguments>
+            </block>
+
+            <!-- 5. Vendor spotlight (live) — reuses the existing widget block -->
+            <block class="MagentoEgypt\VendorExtend\Block\Widget\Seller"
+                   name="hm.home.vendors"
+                   after="hm.home.pickedforyou">
+                <arguments>
+                    <!--
+                        The block's _toHtml() calls setTemplate(getConfig('template')),
+                        so with no template argument it renders nothing at all.
+                    -->
+                    <argument name="template" xsi:type="string">MagentoEgypt_VendorExtend::widget/sellerlist.phtml</argument>
+                    <!--
+                        Without seller_ids the collection filters on is_home = 1.
+                        That is an EAV attribute no vendor here has set, so the
+                        rail came back empty. Curated ids are also editorially
+                        right for a "Featured Stores" rail. ves_vendor_entity has BOTH entity_id and a separate
+                        vendor_id, and vendor_id is a string url-key, not the
+                        numeric id. These are approved stores that have products.
+                    -->
+                    <argument name="title" xsi:type="string" translate="true">Featured Stores</argument>
+                    <argument name="seller_ids" xsi:type="string">seno,ronza,loly,MIA</argument>
+                    <argument name="items" xsi:type="number">4</argument>
+                    <argument name="show_name" xsi:type="number">1</argument>
+                    <argument name="autoplay" xsi:type="number">0</argument>
+                    <argument name="navigation" xsi:type="number">1</argument>
+                </arguments>
+            </block>
+
+            <!-- 6. Bundle deals promo -->
+            <block class="Magento\Cms\Block\Block" name="hm.home.bundles" after="hm.home.rail.furniture">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">hm_home_bundles</argument>
+                </arguments>
+            </block>
+
+            <!--
+                7-10. Category rails, matching the Figma reference's
+                Grocery Essentials / Fashion Trends / Beauty & Cosmetics /
+                Furniture Picks sections.
+
+                Mapped onto categories that actually exist in this catalog rather
+                than the Figma's invented ones, with the product counts measured
+                today:
+                    Supermarket        id 101   8 products
+                    clothes            id 140  40 products
+                    Beauty & Perfumes  id 103  16 products
+                    furniture          id  74  11 products
+
+                All four are plain CatalogWidget blocks filtered on category_ids,
+                so they need no new module and no setup:di:compile — and the
+                titles are translate="true", so the Arabic store view picks up
+                i18n/ar_SA.csv instead of showing English.
+            -->
+            <block class="Magento\CatalogWidget\Block\Product\ProductsList"
+                   name="hm.home.rail.grocery" after="hm.home.vendors">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Grocery Essentials</argument>
+                    <argument name="products_count" xsi:type="number">4</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`category_ids`,`operator`:`==`,`value`:`101`^]^]</argument>
+                </arguments>
+            </block>
+
+            <block class="Magento\CatalogWidget\Block\Product\ProductsList"
+                   name="hm.home.rail.fashion" after="hm.home.rail.grocery">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Fashion Trends</argument>
+                    <argument name="products_count" xsi:type="number">4</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`category_ids`,`operator`:`==`,`value`:`140`^]^]</argument>
+                </arguments>
+            </block>
+
+            <block class="Magento\CatalogWidget\Block\Product\ProductsList"
+                   name="hm.home.rail.beauty" after="hm.home.rail.fashion">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Beauty and Perfumes</argument>
+                    <argument name="products_count" xsi:type="number">4</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`category_ids`,`operator`:`==`,`value`:`103`^]^]</argument>
+                </arguments>
+            </block>
+
+            <block class="Magento\CatalogWidget\Block\Product\ProductsList"
+                   name="hm.home.rail.furniture" after="hm.home.rail.beauty">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Furniture Picks</argument>
+                    <argument name="products_count" xsi:type="number">4</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^],`1--1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Product`,`attribute`:`category_ids`,`operator`:`==`,`value`:`74`^]^]</argument>
+                </arguments>
+            </block>
+
+
+            <!--
+                11. Top Brands (Figma: "Top Brands on MECommerce").
+                Backed by the real MGS_Brand catalogue - 29 brands, 190 product
+                links. MGS_Brand was decommissioned in Phase L and re-enabled
+                specifically for this section; its data survived because
+                disabling a module never drops its tables.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\TopBrands"
+                   name="hm.home.brands" after="hm.home.featured"
+                   template="MagentoEgypt_HomeSections::top-brands.phtml">
+                <arguments>
+                    <argument name="limit" xsi:type="number">10</argument>
+                </arguments>
+            </block>
+
+            <!--
+                12. New Stores (Figma: "New Stores on MECommerce").
+                Approved vendors only - 3 of the 25 vendor rows. Showing unvetted
+                applicants would contradict the "reviewed and approved before
+                going live" promise made in the USP strip above.
+            -->
+            <!--
+                12b. Top Vendors This Month (Figma places this between Top Brands
+                and New Stores).
+
+                Same block as New Stores, ranked by REAL customer rating instead of
+                join date. The star value is derived from review_entity_summary in a
+                second query, so it cannot be an SQL ORDER BY — the block fetches a
+                wider pool and re-sorts in PHP. See NewStores::isRatingOrder().
+
+                `order_by` is part of the block's cache key, or this rail and New
+                Stores would collide on one entry and render identical HTML.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\NewStores"
+                   name="hm.home.topvendors" after="hm.home.brands"
+                   template="MagentoEgypt_HomeSections::new-stores.phtml">
+                <arguments>
+                    <argument name="limit" xsi:type="number">4</argument>
+                    <argument name="order_by" xsi:type="string">rating</argument>
+                    <argument name="heading" xsi:type="string" translate="true">Top Vendors This Month</argument>
+                </arguments>
+            </block>
+
+            <block class="MagentoEgypt\HomeSections\Block\NewStores"
+                   name="hm.home.newstores" after="hm.home.topvendors"
+                   template="MagentoEgypt_HomeSections::new-stores.phtml">
+                <arguments>
+                    <argument name="limit" xsi:type="number">4</argument>
+                </arguments>
+            </block>
+
+
+            <!--
+                13. Best Selling Items (Figma: "Best Selling Items").
+
+                Ranked from REAL sales. Magento's own bestseller aggregate holds
+                seven rows covering only three products on this install because
+                the report cron has not been running; the raw order lines show 12
+                products have actually sold. The block therefore reads
+                sales_order_item directly and inherits CatalogWidget's card
+                rendering so the row is visually identical to the category rails.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\BestSellers"
+                   name="hm.home.bestsellers" after="hm.home.bundles">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Best Selling Items</argument>
+                    <argument name="products_count" xsi:type="number">6</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <!-- Fallback rule, used only if nothing has sold yet. -->
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
+                </arguments>
+            </block>
+
+            <!--
+                14. Picked For You (Figma: the "AI ENGINE / Picked For You" panel).
+
+                Backed by Magento's own recently-viewed tracking, which is REAL
+                per-visitor personalisation that populates itself as people
+                browse — not a fabricated recommendation engine. There is no ML
+                model here and the section does not pretend otherwise.
+
+                report_viewed_product_index is currently empty (no real traffic
+                yet), so this renders nothing until visitors browse. That is the
+                correct behaviour for a personalised row: an empty state beats
+                showing strangers a fake "picked for you".
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\PickedForYou"
+                   name="hm.home.pickedforyou" after="hm.home.deals">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Picked For You</argument>
+                    <argument name="products_count" xsi:type="number">4</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
+                </arguments>
+            </block>
+
+
+            <!--
+                15. Promo tiles (Figma: the three coloured banners).
+                Every destination is a page that exists here. The Figma's third
+                tile advertises "Split in 4 with Tabby" - Tabby is NOT a
+                configured payment method on this store, so that tile points at
+                seller registration instead. Advertising an unavailable payment
+                method is the same mistake the Gulf USP copy made.
+            -->
+            <block class="Magento\Cms\Block\Block" name="hm.home.promos" after="hm.home.newstores">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">hm_home_promos</argument>
+                </arguments>
+            </block>
+
+            <!--
+                16. Trust row (Figma: the badges strip above the app banner).
+                Five claims, each checkable against this install rather than
+                copied from the design.
+            -->
+            <block class="Magento\Cms\Block\Block" name="hm.home.trust" after="hm.home.promos">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">hm_home_trust</argument>
+                </arguments>
+            </block>
+
+
+
+
+            <!--
+                Today's Deals: products whose special_price is live right now,
+                deepest discount first. Renders nothing when no offer is active,
+                so it cannot invent a sale.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\TodaysDeals"
+                   name="hm.home.deals" after="hm.home.categories">
+                <arguments>
+                    <argument name="title" xsi:type="string" translate="true">Today's Deals</argument>
+                    <argument name="products_count" xsi:type="number">4</argument>
+                    <argument name="show_pager" xsi:type="number">0</argument>
+                    <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                    <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
+                </arguments>
+            </block>
+
+
+            <!--
+                Deals countdown. STANDALONE, deliberately: as a child of
+                hm.home.deals it inherited ProductsList's need for a
+                conditions_encoded argument it never received, and fataled the
+                whole homepage. It extends plain Template and reads one date.
+            -->
+            <block class="MagentoEgypt\HomeSections\Block\DealsCountdown"
+                   name="hm.home.deals.countdown" after="hm.home.deals"
+                   template="MagentoEgypt_HomeSections::deals-countdown.phtml"/>
+
+
+            <!--
+                App / mobile banner. Ships WITHOUT App Store or Google Play
+                badges: no such URL exists anywhere on this install, and a badge
+                that links nowhere costs a tap and returns a 404. Add two anchors
+                to .hm-app__actions in the CMS block when real URLs exist.
+            -->
+            <block class="Magento\Cms\Block\Block" name="hm.home.app" after="hm.home.trust">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">hm_home_app</argument>
+                </arguments>
+            </block>
+
+        </referenceContainer>
+    </body>
+</page>

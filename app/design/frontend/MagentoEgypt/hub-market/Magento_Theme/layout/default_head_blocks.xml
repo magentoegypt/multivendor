@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — head assets.
+ *
+ * The Phase I parity sweep found the ENTIRE storefront rendering in Cairo, not
+ * DM Sans: 472 elements per page, 28,487 across the sweep, with
+ * `font-family: Cairo, "Open Sans", "Helvetica Neue"` set on .page-wrapper.
+ *
+ * The source is MGS. Forty-one stylesheets load on a page, and MGS_Fbuilder
+ * injects a GENERATED file from media (/media/mgs/fbuilder/css/3/
+ * fbuilder_config.min.css) via a head block, not a <css src>, so it cannot be
+ * removed with <remove src>. It carries the theme-settings typography from the
+ * old Supro theme and overrides the token layer.
+ *
+ * These modules are all being retired, and this theme supplies its own
+ * typography, navigation, brand and quick-view styling. Removing their assets
+ * restores the design system AND cuts a substantial amount of dead CSS.
+ *
+ * Anything still in use is deliberately left alone: intlTelInput (SMS/OTP),
+ * quotation, miniquote, gallery, calendar, gdpr.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- MGS theme-settings CSS: colours and type from the retired Supro theme -->
+        <remove src="MGS_ThemeSettings::css/theme_setting.css"/>
+
+        <!-- megamenu is replaced by hub.market.topnav; its block is already removed -->
+        <remove src="MGS_Mmegamenu::css/megamenu.css"/>
+
+        <!-- brand styling is provided by the token layer -->
+        <remove src="MGS_Brand::css/mgs_brand.css"/>
+    </head>
+    <body>
+        <!--
+            fbuilder.head.init renders MGS_Fbuilder::html/head.phtml, which is
+            what emits the Cairo font-family and the generated
+            fbuilder_config.min.css link. It is a BLOCK, so <remove src> does
+            not reach it.
+        -->
+        <referenceBlock name="fbuilder.head.init" remove="true"/>
+
+        <!-- MGS ThemeSettings inline config block, same story -->
+        <referenceBlock name="themesetting_config" remove="true"/>
+    </body>
+</page>
