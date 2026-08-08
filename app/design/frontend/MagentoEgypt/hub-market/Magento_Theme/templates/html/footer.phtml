@@ -27,6 +27,29 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
     <div class="hm-footer__inner">
 
         <div class="hm-footer__brand">
+            <?php
+            /*
+             * Brand lockup. Figma opens the footer with the wordmark; this column
+             * previously started with a bare sentence and carried no mark at all,
+             * so the footer had no brand anchor on any page.
+             *
+             * Same two assets as the header (see Magento_Theme/templates/html/
+             * header/logo.phtml) so the two lockups cannot drift apart.
+             */
+            ?>
+            <a class="hm-footer__logo hm-logo--lockup" dir="ltr"
+               href="<?= $escaper->escapeUrl($block->getBaseUrl()) ?>"
+               aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
+                <img class="hm-logo__mark"
+                     src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-mark.png')) ?>"
+                     alt="" aria-hidden="true" width="248" height="148"/>
+                <span class="hm-logo__word" aria-hidden="true">
+                    <?php /* Not translated - see header/logo.phtml. */ ?>
+                    <span class="hm-logo__word-lead">Magento</span><span
+                          class="hm-logo__word-rest">Egypt</span>
+                </span>
+            </a>
+
             <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)
                 ->setBlockId('hm_footer_brand')->toHtml() ?>
         </div>
@@ -42,6 +65,13 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
                 <div class="hm-footer__col"><?= $block->getChildHtml('hm.footer.links') ?></div>
             <?php endif; ?>
         </div>
+
+        <?php /* Newsletter — moved here from the footer container, see default.xml. */ ?>
+        <?php if ($block->getChildHtml('newsletter')): ?>
+            <div class="hm-footer__newsletter">
+                <?= $block->getChildHtml('newsletter') ?>
+            </div>
+        <?php endif; ?>
 
         <div class="hm-footer__bottom">
             <p class="hm-footer__copyright hm-muted">

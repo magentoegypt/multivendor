@@ -38,12 +38,27 @@ $headingId = 'hm-stores-title-' . substr(md5($block->getNameInLayout() ?: $headi
         <?php foreach ($stores as $s): ?>
             <li class="hm-stores__item">
                 <a class="hm-stores__link" href="<?= $escaper->escapeUrl($s['url']) ?>">
-                    <span class="hm-stores__avatar">
+                    <?php
+                    /*
+                     * Avatar fallback: the store's INITIAL, not a generic glyph.
+                     *
+                     * No vendor on this install has uploaded a logo, so the fallback
+                     * is what actually renders — four identical grey shop icons in a
+                     * row, which reads as four broken images rather than as a design.
+                     * An initial in a tinted disc is the standard avatar fallback and
+                     * distinguishes the four cards from each other.
+                     *
+                     * mb_substr, not substr: an Arabic store name is multi-byte and
+                     * substr would slice it mid-codepoint and emit a broken glyph.
+                     */
+                    $initial = mb_strtoupper(mb_substr(trim((string) $s['name']), 0, 1, 'UTF-8'), 'UTF-8');
+                    ?>
+                    <span class="hm-stores__avatar" aria-hidden="true">
                         <?php if ($s['logo']): ?>
                             <img src="<?= $escaper->escapeUrl($s['logo']) ?>" alt=""
                                  loading="lazy" width="56" height="56"/>
                         <?php else: ?>
-                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-store"/></svg>
+                            <?= $escaper->escapeHtml($initial) ?>
                         <?php endif; ?>
                     </span>
                     <span class="hm-stores__name"><?= $escaper->escapeHtml($s['name']) ?></span>
@@ -66,6 +81,16 @@ $headingId = 'hm-stores-title-' . substr(md5($block->getNameInLayout() ?: $headi
                     <span class="hm-stores__meta">
                         <?= $escaper->escapeHtml(__('%1 products', $s['products'])) ?>
                     </span>
+                    <?php
+                    /*
+                     * Figma's "Visit Store" pill. Rendered on EVERY card, not only
+                     * those with a rating: it is what makes four cards carrying
+                     * different optional lines (rating, dispatch time) end on the
+                     * same baseline. Not a nested <a> — the whole card is the link,
+                     * and an anchor inside an anchor is invalid and unfocusable.
+                     */
+                    ?>
+                    <span class="hm-stores__cta"><?= $escaper->escapeHtml(__('Visit Store')) ?></span>
                 </a>
             </li>
         <?php endforeach; ?>

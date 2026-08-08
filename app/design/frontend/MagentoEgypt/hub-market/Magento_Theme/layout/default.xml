@@ -213,6 +213,22 @@
         </referenceContainer>
 
         <!--
+            Newsletter signup, moved INSIDE hm.footer.
+
+            Magento_Newsletter declares form.subscribe as a direct child of the
+            `footer` container, so it rendered as a SIBLING after hm.footer — i.e.
+            after the copyright rule, outside the footer's own container. Once
+            .footer.content stopped constraining width (see _hm-thirdparty.less,
+            where blank's border and padding on that wrapper are removed so the
+            footer grid can align with the header), the block had nothing left to
+            size it and its input ran off the right edge of the viewport.
+
+            Moving rather than restyling in place: the block belongs in the footer's
+            grid, and footer.phtml renders it as its own row above the bottom rule.
+        -->
+        <move element="form.subscribe" destination="hm.footer" as="newsletter"/>
+
+        <!--
             No override needed for the skip-link target: Magento's main container
             already renders <main id="maincontent">, which skip-link.phtml points at.
         -->

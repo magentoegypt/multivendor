@@ -1,131 +1,112 @@
 <?php
+/**
+ * Featured Stores rail.
+ *
+ * REBUILT onto the shared store-card markup (`.hm-stores`), the same structure
+ * MagentoEgypt_HomeSections::new-stores.phtml renders for "Top Vendors This
+ * Month" and "New Stores". Three vendor rails on one page previously used two
+ * completely different components: two of them were compact cards in a four-up
+ * grid, this one was three wide MGS carousel slides with a "View Collection"
+ * button. Figma draws all three the same way.
+ *
+ * WHAT WENT, AND WHY
+ * ------------------
+ * - The owl-carousel wrapper and its two init scripts. `mgsowlcarousel` died with
+ *   MGS_ThemeSettings in the Phase L decommission, so `$.fn.owlCarousel` has not
+ *   existed on this storefront since; both callbacks already returned at their
+ *   own guard clause. The markup they targeted was therefore a plain stack of
+ *   divs pretending to be a carousel. It is a CSS grid now, like its two
+ *   siblings.
+ * - MGS\ThemeSettings\Helper\Config, which supplied nothing but the carousel's
+ *   `rtl` flag. That module is decommissioned; the helper call was the last
+ *   reference to it in this template and would fatal the moment the class is
+ *   removed from the codebase. Direction comes from the document now, as it does
+ *   everywhere else in this theme.
+ * - `rand() . time()` as an element id. It defeated full-page cache validation
+ *   (every render produced different HTML for identical content) and the id had
+ *   no remaining consumer once the carousel went.
+ *
+ * The heading moves INSIDE the section. It used to be a sibling emitted before
+ * `.block.widget`, which put it outside the section band and left it visually
+ * detached from the cards it names.
+ *
+ * @var \MagentoEgypt\VendorExtend\Block\Widget\Seller $block
+ */
 $sellerCollection = $block->getRegisteredSellerCollection();
-$themeSettingConfig = $this->helper('MGS\ThemeSettings\Helper\Config');
-$rtl = $themeSettingConfig->getStoreConfig('themesettings/general/rtl_theme') ? 'true' : 'false';
+if (!$sellerCollection || $sellerCollection->getSize() < 1) {
+    return;
+}
+
+/*
+ * This widget reads its params through getConfig(), not getData() — every other
+ * option on it (show_name, autoplay, items) is read that way. Falling back
+ * across both means the title works whether it arrives as a layout argument or
+ * as a widget instance parameter.
+ */
+$sectionTitle = $block->getConfig('title') ?: $block->getData('title');
+$subtitle     = $block->getConfig('subtitle') ?: $block->getData('subtitle');
+$headingId    = 'hm-stores-title-' . substr(md5((string) ($block->getNameInLayout() ?: $sectionTitle)), 0, 8);
+$allStoresUrl = $block->getUrl('sellerlist');
 ?>
-<?php if ($sellerCollection->getSize()>0): ?>
-	<?php
-		$blockId = rand() . time();
-		$showBrandName = $this->getConfig('show_name');
-	?>
-	<?php /* Section heading. Figma titles this rail "Featured Stores"; the block
-	   rendered the cards with no heading at all, which is why a heading-based
-	   section audit did not even see it. Driven by a layout argument so the widget
-	   stays reusable elsewhere without a title. */ ?>
-	<?php /* This widget reads its params through getConfig(), not getData() — every
-	   other option on it (show_name, autoplay, items) is read that way. Falling
-	   back across both means the title works whether it arrives as a layout
-	   argument or as a widget instance parameter. */ ?>
-	<?php $sectionTitle = $block->getConfig('title') ?: $block->getData('title'); ?>
-	<?php if ($sectionTitle): ?>
-		<h2 class="hm-section__title hm-section__title--stores"><?= $block->escapeHtml(__($sectionTitle)) ?></h2>
-	<?php endif; ?>
-	<div class="block widget ves-sellerlist-inner">
-		<div class="block-content">
-			<div class="owl-carousel ves-sellerlist-<?= $blockId; ?>">
-				<?php foreach ($sellerCollection as $seller): ?>
-                    <div class="item <?php echo $seller->getVendorId() ?>">
-                        <div class="info seller-info">
-                            <div class="info-inner text-center">
-                                <div class="seller-thumbnail-container">
-                                    <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
-                                        <img class="s-logo img-logo" src="<?php echo $block->getSellerImageUrl($seller) ?>" title="<?php echo "Go to ".$seller->getVendorId() ?>" alt="vendor-logo" />
-                                    </a>
-                                </div>
-                                <div class="seller-details">
-                                    <?php $sellerName = $block->getSellerStoreName($seller);?>
-                                    <a href="<?php echo $block->getSellerPageUrl($seller) ?>">
-                                        <strong class="s-name"><?php echo (!empty($sellerName) ? $sellerName : $seller->getVendorId()); ?></strong>
-                                    </a>
-                                </div>
-                                <div class="clearer additional-data">
-                                    <?php echo $block->getReviewSellerHtml($seller) ?>
-                                    <div class="additional-data-bottom">
-                                        <div class="total-items-count"><?php echo __("%1 product(s)",$block->getProductCount($seller))?></div>
-                                        <div class="seller-items-link"><a href="<?php echo $block->getSellerItemsUrl($seller) ?>"><?php echo __('View Collection') ?></a></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach;  ?>
-			</div>
-		</div>
-	</div>
-	<?php
-    if ($this->getConfig('autoplay')) {
-        $autoplay = 'true';
-    } else {
-        $autoplay = 'false';
-    }
-    if ($this->getConfig('stop_on_hover')) {
-        $stopOnHover = 'true';
-    } else {
-        $stopOnHover = 'false';
-    }
-    if ($this->getConfig('navigation')) {
-        $navigation = 'true';
-    } else {
-        $navigation = 'false';
-    }
-    ?>
-    <script type="text/javascript">
-        <?php /* `mgsowlcarousel` removed - the alias died with MGS_ThemeSettings /
-           MGS_Fbuilder in the Phase L decommission and 404'd on every page rendering
-           this widget. The require failure meant this callback never ran, so the
-           carousel was ALREADY inert; the guard makes that explicit, not noisy. */ ?>
-        require([
-			'jquery'
-		], function ($) {
-            if (typeof $.fn.owlCarousel !== 'function') { return; }
-            var owl = $('.ves-sellerlist-<?= $blockId ?>');
-            owl.owlCarousel({
-                items: <?= $this->getConfig('mobile_items', 2); ?>,
-                autoPlay: <?= $autoplay; ?>,
-                stopOnHover: <?= $stopOnHover; ?>,
-                rtl: <?= $rtl ?>,
-                margin: 20,
-                navigation: <?= $navigation; ?>,
-                responsive : {
-                	768: {
-                		items: <?= $this->getConfig('tab_items', 4); ?>
-                	},
-                	1140: {
-                		items: <?= $this->getConfig('items', 5); ?>
-                	}
-                }
-            });
-        });
-    </script>
-<?php endif; ?>
+<section class="hm-stores hm-stores--featured"
+    <?php if ($sectionTitle): ?>aria-labelledby="<?= $block->escapeHtmlAttr($headingId) ?>"<?php endif; ?>>
 
-<script type="text/javascript">
-    <?php /* `mgsowlcarousel` removed - see the note on the first require block. */ ?>
-    require([
-        'jquery'
-    ], function ($) {
-        if (typeof $.fn.owlCarousel !== 'function') { return; }
-        var owlBm = $('.section-builder.banner-modern .line .line, .section-builder.section-builder-full > div > .line');
+    <?php if ($sectionTitle): ?>
+        <div class="hm-section__head">
+            <div class="hm-section__heading">
+                <h2 class="hm-section__title hm-section__title--stores" id="<?= $block->escapeHtmlAttr($headingId) ?>">
+                    <?= $block->escapeHtml(__($sectionTitle)) ?>
+                </h2>
+                <?php if ($subtitle): ?>
+                    <p class="hm-section__sub"><?= $block->escapeHtml(__($subtitle)) ?></p>
+                <?php endif; ?>
+            </div>
+            <a class="hm-section__more" href="<?= $block->escapeUrl($allStoresUrl) ?>">
+                <?= $block->escapeHtml(__('All Stores')) ?>
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
+            </a>
+        </div>
+    <?php endif; ?>
 
-        var owlBmWinResize = function() {
-            if($(window).width() < 758){
-                owlBm.addClass('owl-carousel');
-                owlBm.owlCarousel({
-                    items: 1,
-                    autoPlay: false,
-                    stopOnHover: false,
-                    rtl: <?= $rtl ?>,
-                    margin: 20,
-                    autoHeight:true,
-                    navigation: true
-                });
-            } else {
-                owlBm.removeClass('owl-carousel');
-                owlBm.trigger('destroy.owl.carousel');
-            }
-        }
+    <ul class="hm-stores__list">
+        <?php foreach ($sellerCollection as $seller): ?>
+            <?php
+            $sellerName = $block->getSellerStoreName($seller);
+            $sellerName = $sellerName !== null && $sellerName !== '' ? $sellerName : (string) $seller->getVendorId();
+            $logo       = $block->getSellerImageUrl($seller);
 
-        $(window).resize(owlBmWinResize);
-        owlBmWinResize();
-    });
-</script>
+            /*
+             * mb_substr, not substr: an Arabic store name is multi-byte and substr
+             * would slice it mid-codepoint and emit a replacement glyph.
+             */
+            $initial = mb_strtoupper(mb_substr(trim($sellerName), 0, 1, 'UTF-8'), 'UTF-8');
+            ?>
+            <li class="hm-stores__item">
+                <a class="hm-stores__link" href="<?= $block->escapeUrl($block->getSellerPageUrl($seller)) ?>">
+                    <span class="hm-stores__avatar" aria-hidden="true">
+                        <?php if ($logo): ?>
+                            <img src="<?= $block->escapeUrl($logo) ?>" alt="" loading="lazy" width="56" height="56"/>
+                        <?php else: ?>
+                            <?= $block->escapeHtml($initial) ?>
+                        <?php endif; ?>
+                    </span>
+                    <span class="hm-stores__name"><?= $block->escapeHtml($sellerName) ?></span>
+                    <?php
+                    /*
+                     * Rating comes back as raw HTML from
+                     * Vnecoms\VendorsSellerList\Block\SellerList::getReviewSellerHtml()
+                     * — there is no phtml behind it, which is why it can only be
+                     * reached from CSS (see _hm-vendor.less). Empty for a vendor
+                     * with no reviews, and the card is built to absorb that.
+                     */
+                    ?>
+                    <?= /* @noEscape */ $block->getReviewSellerHtml($seller) ?>
+                    <span class="hm-stores__meta">
+                        <?= $block->escapeHtml(__('%1 products', $block->getProductCount($seller))) ?>
+                    </span>
+                    <span class="hm-stores__cta"><?= $block->escapeHtml(__('Visit Store')) ?></span>
+                </a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</section>

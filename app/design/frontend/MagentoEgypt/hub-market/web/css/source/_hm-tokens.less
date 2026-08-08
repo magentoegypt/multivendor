@@ -191,6 +191,32 @@
 @hm-duration:      200ms;
 @hm-ease: cubic-bezier(.4, 0, .2, 1);
 
-@hm-container: 1440px;
+//  Figma's shell is Tailwind `max-w-7xl` (80rem = 1280px) with `px-4`, measured
+//  on the reference build at a 1440 viewport: content spans 1280px with an 80px
+//  margin each side. This theme shipped 1440px, so every band ran 1408px wide —
+//  128px wider than the design at the same viewport. Nothing else lined up while
+//  that was true: the rails fitted a different number of cards, the hero was
+//  wider than its art direction, and the section gutters read as too tight.
+//
+//  It feeds @layout__max-width as well, so page-main follows on every page, not
+//  just the homepage.
+@hm-container: 1280px;
+
+//
+//  Header bands — Figma paints THREE navies, not one
+//  ---------------------------------------------
+//  Measured off the reference build: the utility bar is darker than the header
+//  and the category nav is LIGHTER than it. Rendering all three at @hm-navy is
+//  what made our header read as one flat slab against the design's stepped one.
+@hm-navy-deep:  #091830;   // utility bar. white/65 on it = 6.05:1
+@hm-navy-nav:   #162d5a;   // category nav. white on it = 12.16:1
+
+//  Accent for text on the LIGHTER nav navy.
+//
+//  @hm-accent (#f26522) is 5.04:1 on @hm-navy and safe there, but only 4.28:1 on
+//  @hm-navy-nav — the nav band being a step lighter is enough to push the one
+//  accent-coloured link on it ("Bundle Deals") under AA. Measured, not assumed.
+//  #f9884a is the same hue two steps lighter and reaches 5.54:1 on that band.
+@hm-accent-on-nav: #f9884a;
 
 //

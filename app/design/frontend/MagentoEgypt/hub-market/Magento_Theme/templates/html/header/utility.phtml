@@ -43,6 +43,28 @@ declare(strict_types=1);
         <div class="hm-header__utility-right">
             <?php
             /*
+             * Language switcher — FIRST in the rail, as Figma orders it
+             * (globe + عربي, then Login / Register / Sell / Track Order / Help).
+             * It was last here, which put the one control the Arabic-speaking
+             * majority reaches for at the far end of the row.
+             *
+             * Being first also anchors the divider rules in _hm-header.less: every
+             * rail item draws a leading hairline and the first one suppresses it.
+             * Renders only when more than one store view is active.
+             */
+            ?>
+            <?php $switcher = $block->getChildHtml('store_switcher'); ?>
+            <?php if (trim((string) $switcher) !== ''): ?>
+                <div class="hm-utility__lang">
+                    <?php /* Globe icon, as Figma shows. Decorative — the switcher's
+                             own "Language" label already names the control. */ ?>
+                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-globe"/></svg>
+                    <?= /* @noEscape */ $switcher ?>
+                </div>
+            <?php endif; ?>
+
+            <?php
+            /*
              * Auth-dependent links.
              *
              * THIS CANNOT BE A PHP `if`. The header is inside Magento's full-page
@@ -105,19 +127,9 @@ declare(strict_types=1);
                 <?= $escaper->escapeHtml(__('Track Order')) ?>
             </a>
             <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('contact')) ?>">
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-phone"/></svg>
                 <?= $escaper->escapeHtml(__('Help')) ?>
             </a>
-
-            <?php /* Language switcher — renders only when >1 store view is active. */ ?>
-            <?php $switcher = $block->getChildHtml('store_switcher'); ?>
-            <?php if (trim((string) $switcher) !== ''): ?>
-                <div class="hm-utility__lang">
-                    <?php /* Globe icon, as Figma shows. Decorative — the switcher's
-                             own "Language" label already names the control. */ ?>
-                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-globe"/></svg>
-                    <?= /* @noEscape */ $switcher ?>
-                </div>
-            <?php endif; ?>
         </div>
     </div>
 </div>

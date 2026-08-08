@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * One table for BOTH halves of the hero band, distinguished by `slot`.
+ *
+ * Two tables would have been the obvious split, but the two halves share every
+ * field they have — image, kicker, title, subtitle, link, sort order, schedule —
+ * and the admin grid is far more useful when it shows the whole band in one
+ * list. `slot` is a two-value enum in practice, validated by the source model.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="magentoegypt_hero_banner" resource="default" engine="innodb"
+           comment="Hub Market homepage hero band: carousel slides and side tiles">
+
+        <column xsi:type="int" name="banner_id" unsigned="true" nullable="false" identity="true"
+                comment="Banner ID"/>
+
+        <column xsi:type="varchar" name="slot" nullable="false" length="16" default="hero"
+                comment="hero = carousel slide, tile = side promo tile"/>
+
+        <column xsi:type="varchar" name="title" nullable="false" length="255"
+                comment="Headline"/>
+        <column xsi:type="varchar" name="kicker" nullable="true" length="120"
+                comment="Small pill above the headline"/>
+        <column xsi:type="varchar" name="subtitle" nullable="true" length="512"
+                comment="Supporting line"/>
+        <column xsi:type="varchar" name="cta_label" nullable="true" length="120"
+                comment="Button label; carousel slides only"/>
+
+        <!--
+            Stored as a path relative to pub/media, e.g. "hero/hero-grocery.jpg".
+            Not a full URL: the base URL differs between environments and between
+            the secure and unsecure scopes, so baking one in breaks on every copy
+            of the database.
+        -->
+        <column xsi:type="varchar" name="image" nullable="true" length="255"
+                comment="Image path relative to pub/media"/>
+
+        <!--
+            Also a relative path ("clothes.html", "bundles"). Absolute URLs are
+            accepted and passed through untouched, for the occasional external
+            campaign target.
+        -->
+        <column xsi:type="varchar" name="url" nullable="true" length="512"
+                comment="Destination, relative to base URL unless it starts with http"/>
+
+        <column xsi:type="smallint" name="sort_order" unsigned="true" nullable="false" default="0"
+                comment="Position within its slot"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" default="1"
+                comment="Enabled"/>
+
+        <!--
+            0 means "all store views". A per-store row wins over the 0 row for the
+            same slot and position, which is how the Arabic band overrides copy
+            without duplicating the whole set.
+        -->
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0"
+                comment="Store view, 0 = all"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Created"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Updated"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="banner_id"/>
+        </constraint>
+
+        <!-- The frontend query is always (slot, is_active, store) ordered by position. -->
+        <index referenceId="MAGENTOEGYPT_HERO_BANNER_SLOT_IS_ACTIVE_STORE_ID_SORT_ORDER" indexType="btree">
+            <column name="slot"/>
+            <column name="is_active"/>
+            <column name="store_id"/>
+            <column name="sort_order"/>
+        </index>
+    </table>
+</schema>

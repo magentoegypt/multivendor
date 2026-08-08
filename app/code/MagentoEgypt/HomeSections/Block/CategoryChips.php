@@ -21,6 +21,9 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class CategoryChips extends Template
 {
+    /** Used when layout supplies no glyph for a category's URL key. */
+    private const FALLBACK_ICON = '🏷️';
+
     private CollectionFactory $collectionFactory;
     private StoreManagerInterface $storeManager;
 
@@ -50,7 +53,7 @@ class CategoryChips extends Template
         $limit = (int) ($this->getData('limit') ?: 8);
 
         $collection = $this->collectionFactory->create();
-        $collection->addAttributeToSelect(['name', 'image', 'thumbnail'])
+        $collection->addAttributeToSelect(['name', 'url_key'])
             ->addAttributeToFilter('is_active', 1)
             ->addAttributeToFilter('include_in_menu', 1)
             ->setStoreId((int) $this->storeManager->getStore()->getId())
@@ -58,19 +61,39 @@ class CategoryChips extends Template
             ->setLoadProductCount(true)
             ->addAttributeToSort('position', 'ASC');
 
-        $out = [];
+        $icons = (array) ($this->getData('icons') ?: []);
+
+        $out   = [];
+        $index = 0;
         foreach ($collection as $category) {
             $count = (int) $category->getProductCount();
             if ($count < 1) {
                 continue;
             }
-            $out[] = [
+            $urlKey = (string) $category->getUrlKey();
+            $out[]  = [
                 'id'    => (int) $category->getId(),
                 'name'  => (string) $category->getName(),
                 'url'   => $category->getUrl(),
                 'count' => $count,
-                'image' => $category->getImageUrl() ?: null,
+                /*
+                 * Figma's chip carries a flat glyph, not a photograph, and that is
+                 * the better source here as well as the matching one: the category
+                 * images on this catalog are cropped merchandising shots that read
+                 * as noise at 40px — "shoes" renders as a dog, "computer" as a
+                 * beach. Keyed on URL KEY because it is stable across store views,
+                 * unlike the translated name.
+                 */
+                'icon'  => $icons[$urlKey] ?? self::FALLBACK_ICON,
+                /*
+                 * Tint slot. Figma assigns each chip one of eight pastels in a
+                 * fixed order rather than deriving it from the category, so the
+                 * row reads as a designed sequence. Position, not id: an id-based
+                 * modulo would reshuffle the whole row when one category is added.
+                 */
+                'tint'  => $index % 8,
             ];
+            $index++;
             if (count($out) >= $limit) {
                 break;
             }
@@ -89,6 +112,12 @@ class CategoryChips extends Template
             'HM_HOME_CATEGORY_CHIPS',
             $this->storeManager->getStore()->getId(),
             (int) ($this->getData('limit') ?: 8),
+            /*
+             * The glyph map is part of the rendered output, so it has to be part of
+             * the key — otherwise editing layout leaves the cached row showing the
+             * old icons until the block cache happens to expire.
+             */
+            md5(json_encode($this->getData('icons') ?: [])),
         ];
     }
 

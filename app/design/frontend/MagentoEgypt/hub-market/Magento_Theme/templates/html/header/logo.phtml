@@ -6,23 +6,71 @@
  * siblings, so RTL reversed "MECommerce" into "CommerceME". A wordmark is a
  * single indivisible object and must never mirror, whatever the page direction.
  *
+ * ---------------------------------------------------------------------------
+ * WHY THIS IS A LOCKUP AND NOT THE ADMIN LOGO IMAGE
+ *
+ * Figma's brand is a horizontal two-tone wordmark ~26px tall sitting directly on
+ * the navy. The admin logo here is `Screenshot_5336.jpg` — 150x120, portrait,
+ * emblem stacked over two lines of type, on an OPAQUE WHITE ground. Painted on
+ * the navy header it is a white rectangle, which is why the previous pass had to
+ * round its corners to make it read as a deliberate chip rather than an artefact.
+ * That stopgap is recorded in _hm-header.less.
+ *
+ * So the mark is derived from the store's OWN artwork rather than replaced: the
+ * emblem is cropped out of that JPG, the white ground knocked out to alpha and
+ * the ink forced to white, giving web/images/hm-logo-mark.png — a transparent
+ * asset that sits on the navy with no chip. The type beside it is live text, so
+ * it stays selectable, translatable and crisp at any density, exactly as the
+ * reference build renders it.
+ *
+ * TO GO BACK TO THE ADMIN IMAGE: set $useLockup to false. The raster branch below
+ * is the previous template verbatim, so the admin logo keeps working — including
+ * for any store view that uploads a proper transparent asset later, at which
+ * point the lockup should come out rather than be kept.
+ * ---------------------------------------------------------------------------
+ *
  * @var \Magento\Theme\Block\Html\Header\Logo $block
  * @var \Magento\Framework\Escaper $escaper
  */
 declare(strict_types=1);
+
+$useLockup = true;
+
+/*
+ * Split so the leading word carries the accent, as Figma does with ME|Commerce.
+ *
+ * NOT run through __(). A wordmark is a brand asset, not UI copy, and translating
+ * it word by word is worse than leaving it alone: some module on this install
+ * carries an ar_SA entry for "Magento" but none for "Egypt", so the Arabic header
+ * rendered the mark half-transliterated as "ماجنتو Egypt". The reference build
+ * keeps its wordmark in Latin script in both locales for the same reason.
+ */
+$brandLead = 'Magento';
+$brandRest = 'Egypt';
 ?>
-<a class="hm-logo"
+<a class="hm-logo<?= $useLockup ? ' hm-logo--lockup' : '' ?>"
    dir="ltr"
    href="<?= $escaper->escapeUrl($block->getUrl('')) ?>"
    aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
-    <img class="hm-logo__img"
-         src="<?= $escaper->escapeUrl($block->getLogoSrc()) ?>"
-         alt="<?= $escaper->escapeHtmlAttr($block->getLogoAlt()) ?>"
-        <?php if ($block->getLogoWidth()): ?>
-         width="<?= $escaper->escapeHtmlAttr($block->getLogoWidth()) ?>"
-        <?php endif; ?>
-        <?php if ($block->getLogoHeight()): ?>
-         height="<?= $escaper->escapeHtmlAttr($block->getLogoHeight()) ?>"
-        <?php endif; ?>
-    />
+    <?php if ($useLockup): ?>
+        <?php /* Decorative: the accessible name is on the link above. */ ?>
+        <img class="hm-logo__mark"
+             src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-mark.png')) ?>"
+             alt="" aria-hidden="true" width="248" height="148"/>
+        <span class="hm-logo__word" aria-hidden="true">
+            <span class="hm-logo__word-lead"><?= $escaper->escapeHtml($brandLead) ?></span><span
+                  class="hm-logo__word-rest"><?= $escaper->escapeHtml($brandRest) ?></span>
+        </span>
+    <?php else: ?>
+        <img class="hm-logo__img"
+             src="<?= $escaper->escapeUrl($block->getLogoSrc()) ?>"
+             alt="<?= $escaper->escapeHtmlAttr($block->getLogoAlt()) ?>"
+            <?php if ($block->getLogoWidth()): ?>
+             width="<?= $escaper->escapeHtmlAttr($block->getLogoWidth()) ?>"
+            <?php endif; ?>
+            <?php if ($block->getLogoHeight()): ?>
+             height="<?= $escaper->escapeHtmlAttr($block->getLogoHeight()) ?>"
+            <?php endif; ?>
+        />
+    <?php endif; ?>
 </a>

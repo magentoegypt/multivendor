@@ -13,17 +13,24 @@
 //    ul.hm-nav__grid > li.level0 > a.level-top + ul.submenu > li.level1 > a
 //
 
+//  Figma paints this band #162d5a — a step LIGHTER than the header above it, not
+//  the same navy. Rendering both at @hm-navy is what made the whole header read
+//  as one undifferentiated slab; the reference reads as three stacked bands.
+//  White on #162d5a is 12.16:1.
 .hm-nav {
-    background: var(--hm-primary);
+    background: var(--hm-navy-nav);
     border-block-start: 1px solid fade(#ffffff, 8%);
 }
 
+//  56px was ours; Figma's row is `py-2.5` around 12px type plus a 2px underline
+//  rail — 38px. The extra 18px is why our header stood 173px against the
+//  reference's 181px WITH an extra band folded in.
 .hm-nav__inner {
     align-items: center;
     display: flex;
     gap: var(--hm-space-4);
     justify-content: space-between;
-    min-block-size: 5.6rem;
+    min-block-size: 0;
 }
 
 //
@@ -43,17 +50,23 @@
     &[open] .hm-nav__chevron { transform: rotate(180deg); }
 }
 
+//  Sized with the inline links beside it — Figma renders "All Categories" as the
+//  first item of the same row, at the same 12px, not as a heavier standalone
+//  control. It keeps its own weight so it still reads as the disclosure trigger.
 .hm-nav__trigger {
     align-items: center;
     color: var(--hm-on-inverse);
     cursor: pointer;
     display: flex;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.2rem;
+    font-weight: 600;
     gap: var(--hm-space-2);
-    min-block-size: 4.4rem;
-    padding-inline: var(--hm-space-3);
+    min-block-size: 3.8rem;
+    padding-inline: 1.4rem;
     user-select: none;
+
+    .hm-icon { block-size: 1.6rem; inline-size: 1.6rem; }
+    .hm-icon--sm { block-size: 1.2rem; inline-size: 1.2rem; }
 
     &:hover { background: fade(#ffffff, 8%); }
 
@@ -66,17 +79,24 @@
 .hm-nav__chevron { transition: transform var(--hm-duration) var(--hm-ease); }
 
 //  Bundle Deals — folded into this row instead of occupying a band of its own.
+//  --hm-accent-on-nav, not --hm-accent: the nav band is @hm-navy-nav, a step
+//  lighter than the header, and the fill orange measures 4.28:1 against it.
+//  See the token's own note.
 .hm-nav__promo {
     align-items: center;
-    color: var(--hm-accent);
+    color: var(--hm-accent-on-nav);
     display: flex;
+    font-size: 1.2rem;
     font-weight: 700;
     gap: var(--hm-space-2);
-    min-block-size: 4.4rem;
-    padding-inline: var(--hm-space-3);
+    min-block-size: 3.8rem;
+    padding-inline: 1.4rem;
     text-decoration: none;
+    white-space: nowrap;
 
-    &:hover { color: var(--hm-accent); text-decoration: underline; }
+    &:hover { color: var(--hm-accent-on-nav); text-decoration: underline; }
+
+    .hm-icon--sm { block-size: 1.4rem; inline-size: 1.4rem; }
 }
 
 //
@@ -213,15 +233,20 @@
 
 .hm-nav__inline-item { margin: 0; }
 
+//  Figma: `px-3.5 py-2.5 text-xs font-medium border-b-2`. The 44px minimum was a
+//  2.5.5 target-size choice, but 2.5.5 is a AAA criterion and these are pointer
+//  targets on a band the design draws at 38px; the 24px AA minimum (2.5.8) is
+//  still cleared with room to spare. Phones never see this row — it is display:
+//  none below 992px and the disclosure panel carries navigation there.
 .hm-nav__inline-link {
     align-items: center;
     border-block-end: 2px solid transparent;
     color: var(--hm-on-inverse-muted);   // 10.56:1 on navy
     display: inline-flex;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 500;
-    min-block-size: 4.4rem;              // 2.5.5 target size
-    padding-inline: var(--hm-space-3);
+    min-block-size: 3.8rem;
+    padding-inline: 1.4rem;
     text-decoration: none;
     white-space: nowrap;
 

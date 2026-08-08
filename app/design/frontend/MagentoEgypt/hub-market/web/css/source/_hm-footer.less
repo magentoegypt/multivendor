@@ -11,39 +11,83 @@
 //  10.56:1.
 //
 
+//  `margin-block-start: 6.4rem` was the biggest single defect down here: it left
+//  a 64px strip of PAGE background above the navy, which read on screen as a
+//  broken or missing element rather than as breathing room. Figma butts the
+//  footer straight up against the section above it (`mt-0`) and does its
+//  breathing with `pt-12` INSIDE the navy.
 .hm-footer {
     background: var(--hm-surface-inverse);
     color: var(--hm-on-inverse);
-    margin-block-start: var(--hm-space-16);
+    margin-block-start: 0;
     padding-block: var(--hm-space-12) var(--hm-space-6);
 }
 
+//  Figma's footer is one six-column grid: the brand block spans two, the four
+//  link columns take one each. Ours stacked the brand ABOVE the columns, which
+//  made the footer ~180px taller than the design and left the whole right-hand
+//  side of the brand row empty.
+//
+//  2fr / 4fr rather than six literal tracks, because `.hm-footer__cols` is a
+//  single element that grids its own four children — so the outer grid only
+//  needs to split 2:4.
 .hm-footer__inner {
-    display: flex;
-    flex-direction: column;
-    gap: var(--hm-space-10);
+    align-items: start;
+    column-gap: var(--hm-space-8);
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 4fr);
+    row-gap: var(--hm-space-10);
 }
 
 .hm-footer__brand {
-    max-inline-size: 40rem;
+    max-inline-size: none;
 
-    p { color: var(--hm-on-inverse-muted); }
+    p {
+        color: var(--hm-on-inverse-muted);
+        font-size: 1.2rem;
+        line-height: 1.7;
+        margin: 0;
+        max-inline-size: 32rem;      // Figma max-w-xs
+    }
+}
+
+//  Brand lockup, matching the header's. Figma opens the footer with the wordmark;
+//  ours opened with a bare paragraph and no brand mark at all.
+//  The shared `.hm-logo--lockup` carries a trailing hairline that separates the
+//  brand from the search bar in the header. There is nothing to separate it from
+//  down here, so both the rule and its spacing are unset rather than duplicated.
+.hm-footer__logo.hm-logo--lockup {
+    align-items: center;
+    border-inline-end: 0;
+    display: flex;
+    gap: var(--hm-space-2);
+    margin-block-end: var(--hm-space-3);
+    margin-inline-end: 0;
+    padding-inline-end: 0;
+    text-decoration: none;
+
+    .hm-logo__mark { block-size: 2.8rem; inline-size: auto; }
+    .hm-logo__word { display: inline-flex; }   // kept at every width, unlike the header
 }
 
 .hm-footer__cols {
     display: grid;
     gap: var(--hm-space-8);
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .hm-footer__col {
     //  CMS blocks supply the markup; these rules cover whatever they emit.
+    //
+    //  Figma runs these at white/35, which is 2.1:1 and unreadable. --hm-neutral-400
+    //  is the dimmest value that still clears AA on navy (4.89:1) and keeps the
+    //  design's intent: a quiet label, not a second heading competing with the links.
     h3, h4, strong:first-child {
-        color: var(--hm-on-inverse);
+        color: var(--hm-neutral-400);
         font-family: var(--hm-font-sans);
         font-size: 1.2rem;
-        font-weight: 700;
-        letter-spacing: .06em;
+        font-weight: 600;
+        letter-spacing: .12em;               // Figma tracking-widest
         margin: 0 0 var(--hm-space-4);
         text-transform: uppercase;
     }
@@ -51,7 +95,7 @@
     ul {
         display: flex;
         flex-direction: column;
-        gap: var(--hm-space-3);
+        gap: 1rem;                            // Figma space-y-2.5
         list-style: none;
         margin: 0;
         padding: 0;
@@ -59,11 +103,16 @@
 
     a {
         color: var(--hm-on-inverse-muted);   // 10.56:1 on navy
-        font-size: 1.4rem;
+        font-size: 1.2rem;
         text-decoration: none;
 
         &:hover { color: var(--hm-on-inverse); text-decoration: underline; }
     }
+}
+
+@media (max-width: 767px) {
+    .hm-footer__inner { grid-template-columns: minmax(0, 1fr); }
+    .hm-footer__cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 //  Country / payment chips
@@ -76,25 +125,130 @@
 
 .hm-footer__chip {
     background: fade(#ffffff, 10%);
-    border-radius: var(--hm-radius-sm);
-    color: var(--hm-on-inverse);
+    border-radius: var(--hm-radius-xs);   // Figma `rounded` = 4px, not a pill
+    color: var(--hm-on-inverse-muted);
     font-size: 1.2rem;
     font-weight: 500;
-    padding: .4rem var(--hm-space-2);
+    padding: .2rem var(--hm-space-2);
 }
 
+//
+//  Newsletter row
+//  ---------------------------------------------
+//  Figma has no newsletter at all, so there is no reference geometry to copy —
+//  this is the one footer element designed rather than measured. It borrows the
+//  footer's own language (hairline rule, 12px uppercase label, the header's
+//  square search bar) so it reads as part of the same system.
+//
+//  It spans the whole grid rather than sitting in the brand column: at 2/6 of
+//  1280px the column is ~400px, and an email field plus a Subscribe button in
+//  400px leaves the input at about 240 — narrower than most email addresses.
+//  SPECIFICITY WARNING, learned the hard way here: every rule below carries
+//  `.hm-footer__newsletter .block.newsletter` rather than the shorter prefix it
+//  reads as needing. Magento/blank styles this widget at (0,3,0) throughout —
+//  `.block.newsletter .form.subscribe { display: table }`,
+//  `.block.newsletter .field.newsletter { max-width: 220px }`,
+//  `.block.newsletter { max-width: 44%; width: max-content }` — and a (0,2,0)
+//  rule loses to all of it no matter where it lands in the cascade. The first
+//  attempt used the short prefix and the form still rendered as a 220px table
+//  cell floating in the middle of the footer with the button 350px away from it.
+.hm-footer__newsletter {
+    border-block-start: 1px solid fade(#ffffff, 12%);
+    grid-column: 1 / -1;
+    padding-block-start: var(--hm-space-6);
+
+    .block.newsletter {
+        margin: 0;
+        max-width: none;
+        width: 100%;
+    }
+
+    //  blank hides this at desktop; the row needs its label back.
+    .block.newsletter .title {
+        display: block;
+
+        strong {
+            color: var(--hm-neutral-400);
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+        }
+    }
+
+    .block.newsletter .content { margin-block-start: var(--hm-space-3); }
+
+    .block.newsletter .form.subscribe {
+        display: flex;
+        gap: var(--hm-space-2);
+        max-inline-size: 48rem;
+        width: auto;
+    }
+
+    .block.newsletter .field.newsletter {
+        flex: 1 1 auto;
+        margin: 0;
+        max-width: none;
+        min-inline-size: 0;
+    }
+
+    //  blank wraps the input in <label>, so the control chain needs to fill too.
+    .block.newsletter label,
+    .block.newsletter .field .control { display: block; width: 100%; }
+
+    //  blank paints a 35px envelope glyph inside the field from its icon font and
+    //  reserves 35px of padding for it. The font is not loaded in this theme, so
+    //  it rendered as a tofu box sitting on top of the placeholder text.
+    .block.newsletter .field .control:before { content: none; }
+
+    //  The visible placeholder is not an accessible name — keep the real one.
+    .block.newsletter .label { .hm-sr-only-mixin(); }
+
+    .block.newsletter input[type='email'] {
+        background: var(--hm-surface);
+        border: 0;
+        border-radius: 0;
+        block-size: 4rem;
+        color: var(--hm-foreground);
+        font-size: 1.4rem;
+        inline-size: 100%;
+        padding-inline: var(--hm-space-4);
+    }
+
+    .block.newsletter .actions { display: block; flex: 0 0 auto; }
+}
+
+//  Square, matching the header's search button. The `.hm-page` prefix is carried
+//  over from the radius note below — blank declares this rule from inside a
+//  media-width mixin that lands late in styles-l.css, so specificity has to win.
+.hm-page .hm-footer__newsletter .block.newsletter .action.subscribe {
+    background: var(--hm-accent);
+    border: 0;
+    border-radius: 0;
+    color: var(--hm-on-accent);        // navy on orange = 5.04:1
+    font-size: 1.4rem;
+    font-weight: 600;
+    min-block-size: 4rem;
+    padding-inline: var(--hm-space-6);
+
+    &:hover { background: var(--hm-accent-hover); }
+}
+
+//  Spans the full grid — it is a rule across the footer, not a column of it.
 .hm-footer__bottom {
     align-items: center;
     border-block-start: 1px solid fade(#ffffff, 12%);
     display: flex;
     flex-wrap: wrap;
     gap: var(--hm-space-4);
+    grid-column: 1 / -1;
     justify-content: space-between;
     padding-block-start: var(--hm-space-6);
 }
 
 .hm-footer__copyright {
-    font-size: 1.3rem;
+    color: var(--hm-neutral-400);   // 4.89:1 — Figma's white/25 is 1.7:1
+    font-size: 1.2rem;
     margin: 0;
 }
 
@@ -109,8 +263,8 @@
     }
 
     a {
-        color: var(--hm-on-inverse-muted);
-        font-size: 1.3rem;
+        color: var(--hm-neutral-400);
+        font-size: 1.2rem;
         text-decoration: none;
 
         &:hover { color: var(--hm-on-inverse); text-decoration: underline; }
@@ -143,17 +297,20 @@
     margin-block-start: var(--hm-space-4);
 }
 
+//  Sized down to sit with the payment chips above it rather than tower over
+//  them: at 40px it was the tallest thing in a column whose other rows are 22px,
+//  which pushed the brand block ~30px past the four link columns beside it.
 .hm-footer__social-link {
     align-items: center;
     border: 1px solid fade(#ffffff, 22%);
     border-radius: var(--hm-radius-full);
     color: var(--hm-on-inverse);         // 15.89:1 on navy
     display: inline-flex;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 600;
     gap: var(--hm-space-2);
-    min-block-size: 4rem;
-    padding-inline: var(--hm-space-4);
+    min-block-size: 3.2rem;
+    padding-inline: var(--hm-space-3);
     text-decoration: none;
 
     &:hover,

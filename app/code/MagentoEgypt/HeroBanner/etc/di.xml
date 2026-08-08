@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--
+        Grid data source. A plain SearchResult over the table is enough — this is
+        one flat table with no EAV and no joins, so there is nothing for a custom
+        collection to add.
+    -->
+    <virtualType name="MagentoEgypt\HeroBanner\Model\ResourceModel\Banner\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_hero_banner</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\HeroBanner\Model\ResourceModel\Banner</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="magentoegypt_herobanner_banner_listing_data_source" xsi:type="string">MagentoEgypt\HeroBanner\Model\ResourceModel\Banner\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Image uploader.
+
+        A virtual type over Magento\Catalog\Model\ImageUploader rather than a new
+        class: it already handles the tmp -> final move, MIME allow-listing and
+        the "file was uploaded but the record was never saved" cleanup, and
+        getting any of those wrong on an admin upload endpoint is a real security
+        problem, not a cosmetic one.
+
+        basePath "hero" puts finished files in pub/media/hero, which is where the
+        seeded Figma banners already live.
+    -->
+    <virtualType name="MagentoEgypt\HeroBanner\HeroImageUploader" type="Magento\Catalog\Model\ImageUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">hero/tmp</argument>
+            <argument name="basePath" xsi:type="string">hero</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="png" xsi:type="string">png</item>
+                <item name="webp" xsi:type="string">webp</item>
+            </argument>
+            <argument name="allowedMimeTypes" xsi:type="array">
+                <item name="jpg" xsi:type="string">image/jpg</item>
+                <item name="jpeg" xsi:type="string">image/jpeg</item>
+                <item name="png" xsi:type="string">image/png</item>
+                <item name="webp" xsi:type="string">image/webp</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="MagentoEgypt\HeroBanner\Controller\Adminhtml\Banner\Upload">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MagentoEgypt\HeroBanner\HeroImageUploader</argument>
+        </arguments>
+    </type>
+
+    <type name="MagentoEgypt\HeroBanner\Controller\Adminhtml\Banner\Save">
+        <arguments>
+            <argument name="imageUploader" xsi:type="object">MagentoEgypt\HeroBanner\HeroImageUploader</argument>
+        </arguments>
+    </type>
+</config>

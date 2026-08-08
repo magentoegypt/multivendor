@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+    Under Content, beside Blocks and Pages, because that is where a merchandiser
+    looks for homepage content.
+
+    Parented to an existing core node rather than a new top-level one. This
+    install already carries a broken custom menu parent — every admin request
+    logs "Specified invalid parent id (Magento_Backend::mgs)" from a
+    decommissioned module — and adding another vendor root would be one more of
+    the same class of problem.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/menu.xsd">
+    <menu>
+        <add id="MagentoEgypt_HeroBanner::banner"
+             title="Hero Banner"
+             translate="title"
+             module="MagentoEgypt_HeroBanner"
+             sortOrder="45"
+             parent="Magento_Cms::cms"
+             action="magentoegypt_herobanner/banner/index"
+             resource="MagentoEgypt_HeroBanner::banner"/>
+    </menu>
+</config>

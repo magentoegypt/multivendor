@@ -9,7 +9,9 @@
 //  Only the search + nav rows stick; the utility bar scrolls away.
 //
 
-@hm-navy-deep: darken(#0f2144, 4%);
+//  @hm-navy-deep and @hm-navy-nav now come from _hm-tokens.less — the design
+//  paints three distinct navies across the header stack and the old local
+//  `darken(@hm-navy, 4%)` only expressed one of them.
 
 .hm-header {
     background: var(--hm-primary);
@@ -35,9 +37,12 @@
 //
 //  Band 1 — utility
 //  ---------------------------------------------
+//  Figma: `bg-[#091830] text-xs py-1.5`, so 12px type in a 36px band — measured
+//  at exactly 36px on the reference build, which is why the header proper starts
+//  at y=36 there. Ours ran 13px type in a taller band and pushed everything down.
 .hm-header__utility {
     background: @hm-navy-deep;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
 .hm-header__utility-inner {
@@ -47,6 +52,7 @@
     gap: var(--hm-space-4);
     justify-content: space-between;
     min-block-size: 3.6rem;
+    padding-block: .6rem;
 }
 
 .hm-header__promise {
@@ -89,11 +95,15 @@
     background: var(--hm-primary);
 }
 
+//  Figma: `px-4 py-3` with `gap-4`, i.e. a 12px band around a 40px control row —
+//  64px, not the 72px minimum this had. The old min-block-size also fought the
+//  padding, so the row could not shrink to the design's height at any content size.
 .hm-header__inner {
     align-items: center;
     display: flex;
-    gap: var(--hm-space-5);
-    min-block-size: 7.2rem;
+    gap: var(--hm-space-4);
+    min-block-size: 0;
+    padding-block: var(--hm-space-3);
 }
 
 //  The wordmark never mirrors — see logo.phtml.
@@ -123,11 +133,70 @@
     }
 }
 
+//
+//  Brand lockup  (Figma: ME|Commerce — accent lead word, white remainder)
+//  ---------------------------------------------
+//  Figma's brand is `flex items-baseline gap-0.5` at text-xl (20px) in the display
+//  serif, followed by `pr-2 border-r border-white/10 mr-1` — a hairline that
+//  separates the brand from the search bar. Reproduced exactly, with the store's
+//  own emblem (knocked out to transparent white, see logo.phtml) leading it.
+.hm-logo--lockup {
+    align-items: center;
+    border-inline-end: 1px solid fade(#ffffff, 10%);
+    display: flex;
+    gap: var(--hm-space-2);
+    line-height: 1;
+    margin-inline-end: var(--hm-space-1);
+    padding-inline-end: var(--hm-space-2);
+    text-decoration: none;
+}
+
+//  Height-bound, not width-bound: the emblem is near-square, so capping the width
+//  would let it grow taller than the 40px control row beside it.
+//
+//  24px, not 30. The emblem is 124x74, so every pixel of height costs 1.7px of
+//  width — and the brand block is competing with the search field for the same
+//  row. Figma's brand is 145px wide; at 30px the mark alone took 50 and the block
+//  reached 196. This gets it to ~183 without shrinking the wordmark below the
+//  reference's 20px.
+.hm-logo__mark {
+    block-size: 2.4rem;
+    inline-size: auto;
+    object-fit: contain;
+}
+
+.hm-logo__word {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--hm-font-display);
+    font-size: 2rem;
+    gap: .2rem;                  // Figma gap-0.5 between the two brand words
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.hm-logo__word-lead {
+    color: var(--hm-accent);   // #f26522 on navy = 5.04:1, safe as text here
+    font-weight: 800;
+}
+
+.hm-logo__word-rest {
+    color: var(--hm-on-inverse);
+    font-weight: 700;
+}
+
+@media (max-width: 767px) {
+    //  The wordmark alone would push the search field off a phone. Keep the mark.
+    .hm-logo__word { display: none; }
+    .hm-logo--lockup { border-inline-end: 0; padding-inline-end: 0; }
+}
+
 .hm-header__actions {
     align-items: center;
     display: flex;
     flex-shrink: 0;
-    gap: var(--hm-space-2);
+    gap: var(--hm-space-4);   // Figma gap-4
     //  NO `margin-inline-start: auto`. That pushed the actions to the trailing edge
     //  by absorbing ALL the free space in the row, which left the search field at
     //  314px against Figma's ~930px. The search is the flex-grow item (see
@@ -135,6 +204,10 @@
     //  the trailing edge — without starving the field.
 }
 
+//  Figma: `flex-col items-center gap-0.5 min-w-[40px]` with a 20px glyph. The
+//  44px minimum below is the TOUCH-target floor and is kept on small screens; on
+//  a pointer-driven 1440 it only inflated the header band, so the desktop rule
+//  drops to the design's 40px box.
 .hm-header__action {
     align-items: center;
     color: var(--hm-on-inverse);
@@ -148,6 +221,14 @@
     text-decoration: none;
 
     &:hover { color: var(--hm-accent); }
+
+    .hm-icon { block-size: 2rem; inline-size: 2rem; }
+
+    @media (min-width: 768px) {
+        min-block-size: 0;
+        min-inline-size: 4rem;
+        padding: 0;
+    }
 }
 
 .hm-header__action-label {
@@ -199,11 +280,14 @@
         position: relative;
     }
 
+    //  SQUARE, not rounded. Figma's search is one hard-edged segmented bar —
+    //  `[ All Categories | field | Search ]` with no radius anywhere on it. Ours
+    //  carried 6px on the outer corners, which is the single most visible
+    //  difference in the header at 1:1.
     input {
         background: var(--hm-surface);
         border: 0;
-        border-start-start-radius: var(--hm-radius-sm);
-        border-end-start-radius: var(--hm-radius-sm);
+        border-radius: 0;
         block-size: 4.4rem;
         color: var(--hm-foreground);
         font-size: 1.6rem;        // 16px — below this iOS zooms on focus
@@ -213,6 +297,17 @@
         width: 100%;
 
         &::placeholder { color: var(--hm-placeholder); }
+    }
+
+    //  Desktop takes Figma's exact metrics: a 40px bar with 14px type. The 44px /
+    //  16px pair is kept below 768px on purpose — 44px is the touch-target floor
+    //  and anything under 16px makes iOS Safari zoom the page on focus. Neither
+    //  applies to the pointer-driven widths this design was drawn at.
+    @media (min-width: 768px) {
+        input {
+            block-size: 4rem;
+            font-size: 1.4rem;
+        }
     }
 
     .actions { display: block; flex: 0 0 auto; }
@@ -229,18 +324,16 @@
         align-items: center;
         background: var(--hm-accent);
         border: 0;
-        border-start-start-radius: 0;
-        border-end-start-radius: 0;
-        border-start-end-radius: var(--hm-radius-sm);
-        border-end-end-radius: var(--hm-radius-sm);
+        border-radius: 0;             // square, with the rest of the bar
         color: var(--hm-on-accent);   // navy on orange = 5.04:1
         cursor: pointer;
         display: flex;
+        font-size: 1.4rem;
         font-weight: 600;
         gap: var(--hm-space-2);
         min-block-size: 4.4rem;
         opacity: 1;
-        padding-inline: var(--hm-space-5);
+        padding-inline: var(--hm-space-6);   // Figma px-6
         position: static;
 
         &:before { content: none; }   // blank's icon-font glyph
@@ -255,11 +348,8 @@
         &:disabled {
             opacity: .85;
         }
-    }
 
-    input {
-        border-start-end-radius: 0;
-        border-end-end-radius: 0;
+        @media (min-width: 768px) { min-block-size: 4rem; }
     }
 }
 
@@ -315,7 +405,9 @@
 
         //  The icon comes from the inlined sprite now (see the minicart template).
         //  Killing the glyph without replacing it left this button EMPTY.
-        .hm-icon { block-size: 2.2rem; inline-size: 2.2rem; }
+        .hm-icon { block-size: 2rem; inline-size: 2rem; }
+
+        @media (min-width: 768px) { min-block-size: 0; min-inline-size: 4rem; }
 
         //  Match the Account / Wishlist labels beside it.
         .text {
@@ -328,14 +420,26 @@
             white-space: nowrap;
         }
 
+        //  Figma: a 16px accent disc clipped to the icon's top-trailing corner
+        //  (`-top-1.5 -right-1.5 w-4 h-4`), not a pill hanging off the button.
+        //  Label stays navy-on-orange (5.04:1) — white on #f26522 is 3.15:1 and
+        //  fails, which is the rule the whole theme is built on.
         .counter.qty {
+            align-items: center;
             background: var(--hm-accent);
             border-radius: var(--hm-radius-full);
+            block-size: 1.8rem;
             color: var(--hm-on-accent);
+            display: flex;
+            font-size: 1.2rem;
             font-weight: 700;
-            inset-block-start: 0;
-            inset-inline-end: 0;
-            min-inline-size: 2rem;
+            inset-block-start: -.4rem;
+            inset-inline-end: .2rem;
+            justify-content: center;
+            line-height: 1;
+            margin: 0;
+            min-inline-size: 1.8rem;
+            padding: 0 .3rem;
             position: absolute;
         }
     }
@@ -368,11 +472,31 @@
 //  This container existed but rendered empty: store_switcher was removed during
 //  the header rebuild and no topLinks child was ever declared, so both
 //  getChildHtml() calls returned nothing.
+//  Figma draws this rail as `divide-x divide-white/10` with `px-3` per item —
+//  hairline-separated segments, not gap-separated links. Spacing therefore comes
+//  from each item's own padding and the gap goes to zero, or every divider would
+//  float in the middle of a 16px void.
 .hm-header__utility-right {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--hm-space-4);
+    gap: 0;
+}
+
+.hm-utility__link,
+.hm-utility__lang {
+    border-inline-start: 1px solid fade(#ffffff, 10%);
+    padding-inline: var(--hm-space-3);
+}
+
+//  Suppress the leading hairline on whichever item is actually first. The lang
+//  switcher is first when it renders (>1 store view); the guest/member group is
+//  first when it does not, and that group is `display: contents`, so the rule has
+//  to reach through it to the real first link.
+.hm-header__utility-right > :first-child,
+.hm-header__utility-right > :first-child > :first-child {
+    border-inline-start: 0;
+    padding-inline-start: 0;
 }
 
 .hm-utility__link {
@@ -387,7 +511,7 @@
     &:hover,
     &:focus-visible { color: var(--hm-on-inverse); text-decoration: underline; }
 
-    .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
+    .hm-icon { block-size: 1.2rem; inline-size: 1.2rem; }
 }
 
 //
@@ -406,7 +530,7 @@
 .hm-utility__member {
     align-items: center;
     display: inline-flex;
-    gap: var(--hm-space-4);
+    gap: 0;   // the per-link padding above supplies the rhythm
 }
 
 //  "Sell with us" is the one acquisition link in the rail, so it gets the accent
@@ -569,55 +693,83 @@
     min-inline-size: 0;
 }
 
+//  Figma paints this segment as part of the HEADER, not part of the field:
+//  `bg-white/10 text-white/80 text-xs border-r border-white/15`. Ours rendered it
+//  as a light-grey control with dark text, which broke the bar into two visually
+//  unrelated halves — a grey box, then a white box.
+//
+//  Contrast: white/80 composited over white/10-on-navy measures 8.4:1. The old
+//  light-grey treatment was never a contrast problem, only a design one.
 .hm-search__cat-select {
-    background: var(--hm-surface-muted);
+    background: fade(#ffffff, 10%);
     border: 0;
-    border-inline-end: 1px solid var(--hm-border-subtle);
-    border-start-start-radius: var(--hm-radius-sm);
-    border-end-start-radius: var(--hm-radius-sm);
-    //  The end-side corners must be squared EXPLICITLY. A bare `select` rule in
-    //  the form styles sets the `border-radius` SHORTHAND, so rounding only the
-    //  start pair here leaves the end pair at 6px — putting a notch where this
-    //  control butts against the search input. Measured as 6px on all four
-    //  corners before this pair was added.
-    border-start-end-radius: 0;
-    border-end-end-radius: 0;
+    border-inline-end: 1px solid fade(#ffffff, 15%);
+    border-radius: 0;
     block-size: 4.4rem;
-    color: var(--hm-foreground);
+    color: fade(#ffffff, 80%);
     cursor: pointer;
     font-family: var(--hm-font-sans);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     max-inline-size: 18rem;
-    padding-inline: var(--hm-space-4);
+    min-inline-size: 13rem;      // Figma min-w-[130px]
+    padding-inline: var(--hm-space-3) var(--hm-space-6);
+
+    //  Figma sets `appearance-none` and shows NO indicator at all. A <select>
+    //  with no affordance is a real usability regression, not a style choice, so
+    //  the native control is suppressed and a faint chevron drawn in its place —
+    //  same visual weight as the reference, minus the guessing game.
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='rgba(255,255,255,.55)' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
+    background-position: right var(--hm-space-3) center;
+    background-repeat: no-repeat;
+    background-size: 1rem .7rem;
+
+    //  The chevron must follow the text edge under RTL, and `background-position`
+    //  has no logical form.
+    [dir='rtl'] & { background-position: left var(--hm-space-3) center; }
+
+    //  The popup list is painted by the OS using the control's own colours, so a
+    //  translucent-white control yields white-on-white options in some engines.
+    option { background: var(--hm-primary); color: var(--hm-on-inverse); }
 
     &:focus-visible {
         outline: var(--hm-focus-ring-width) solid var(--hm-focus-ring-inverse);
         outline-offset: -3px;
     }
-}
 
-//  With the selector present the FIELD no longer starts the bar, so it must not
-//  keep the leading radius or there is a visible notch between the two controls.
-.hm-page .block-search .hm-search__cat + .field.search input {
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
+    @media (min-width: 768px) { block-size: 4rem; }
 }
 
 //  On a phone the selector would eat the field. Drop it — the plain search still
 //  works, and the category filter is available from the results page facets.
 @media (max-width: 767px) {
     .hm-page .block-search .hm-search__cat { display: none; }
-    .hm-page .block-search .hm-search__cat + .field.search input {
-        border-start-start-radius: var(--hm-radius-sm);
-        border-end-start-radius: var(--hm-radius-sm);
-    }
 }
 
 //  Globe + language sit as one unit.
+//
+//  HEIGHT, specifically. Magento's Store\Block\Switcher renders `.switcher` with
+//  blank's `.switcher { margin: 0 0 10px }` plus a `.switcher-trigger strong`
+//  carrying its own line box; measured, this container stood 44px inside a bar
+//  Figma draws at 36, and it alone was what made the utility band 56px tall.
+//  Collapsing the inherited spacing here is what lets the bar hit its height.
 .hm-utility__lang {
     align-items: center;
     display: flex;
     gap: var(--hm-space-1);
+    line-height: 1;
 
-    .hm-icon { color: var(--hm-on-inverse-muted); flex-shrink: 0; }
+    .hm-icon { block-size: 1.2rem; color: var(--hm-on-inverse-muted); flex-shrink: 0; inline-size: 1.2rem; }
+
+    .switcher,
+    .switcher-store,
+    .switcher-trigger,
+    .switcher-trigger > strong {
+        display: flex;
+        align-items: center;
+        line-height: 1;
+        margin: 0;
+        min-block-size: 0;
+        padding: 0;
+    }
 }

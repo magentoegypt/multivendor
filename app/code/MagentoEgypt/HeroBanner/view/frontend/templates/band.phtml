@@ -1,0 +1,157 @@
+<?php
+/**
+ * Hub Market — homepage hero band: carousel + side tiles, from one block.
+ *
+ * Markup is unchanged from the two templates this replaces
+ * (MagentoEgypt_HomeSections::hero-carousel.phtml and the hm_home_hero CMS
+ * block), because the theme already styles those class names and the point of
+ * this module is to change where the CONTENT comes from, not how it looks.
+ *
+ * The carousel is CSS scroll-snap, not a slider library: the theme ships no
+ * carousel JS (MGS's died in the Phase L decommission), and scroll-snap gives
+ * native touch swiping, keyboard scrolling and correct RTL behaviour for free.
+ * With JS off the track degrades to a scrollable list of real links.
+ *
+ * No auto-advance. A carousel that moves on its own fails WCAG 2.2.2 without a
+ * pause control.
+ *
+ * @var \MagentoEgypt\HeroBanner\Block\Band $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+if (!$block->hasContent()) {
+    return;
+}
+
+$slides = $block->getSlides();
+$tiles  = $block->getTiles();
+$id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($slides)), 0, 8);
+?>
+<?php if ($slides): ?>
+<section class="hm-hero-carousel" aria-roledescription="carousel"
+         aria-label="<?= $escaper->escapeHtmlAttr(__('Featured promotions')) ?>"
+         id="<?= $escaper->escapeHtmlAttr($id) ?>">
+
+    <div class="hm-hero-carousel__viewport">
+        <ul class="hm-hero-carousel__track">
+            <?php foreach ($slides as $i => $s): ?>
+                <?php $img = $block->getImageUrl($s['image'] ?? null); ?>
+                <li class="hm-hero-carousel__slide"
+                    role="group" aria-roledescription="slide"
+                    aria-label="<?= $escaper->escapeHtmlAttr(__('%1 of %2', $i + 1, count($slides))) ?>">
+                    <a class="hm-hero-carousel__link" href="<?= $escaper->escapeUrl($block->getLinkUrl($s['url'] ?? null)) ?>">
+                        <?php if ($img): ?>
+                            <?php /* alt="" — the headline beside it is the accessible content. */ ?>
+                            <img class="hm-hero-carousel__img"
+                                 src="<?= $escaper->escapeUrl($img) ?>"
+                                 alt=""
+                                 <?= $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>
+                                 width="1600" height="840"/>
+                        <?php endif; ?>
+                        <span class="hm-hero-carousel__body">
+                            <?php if (!empty($s['kicker'])): ?>
+                                <span class="hm-hero-carousel__kicker"><?= $escaper->escapeHtml(__((string) $s['kicker'])) ?></span>
+                            <?php endif; ?>
+                            <span class="hm-hero-carousel__title"><?= $escaper->escapeHtml(__((string) $s['title'])) ?></span>
+                            <?php if (!empty($s['subtitle'])): ?>
+                                <span class="hm-hero-carousel__text"><?= $escaper->escapeHtml(__((string) $s['subtitle'])) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($s['cta_label'])): ?>
+                                <span class="hm-hero-carousel__cta"><?= $escaper->escapeHtml(__((string) $s['cta_label'])) ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+
+    <?php if (count($slides) > 1): ?>
+        <button class="hm-hero-carousel__nav hm-hero-carousel__nav--prev" type="button"
+                data-hm-carousel="prev"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Previous slide')) ?>">
+            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-chevron-left"/></svg>
+        </button>
+        <button class="hm-hero-carousel__nav hm-hero-carousel__nav--next" type="button"
+                data-hm-carousel="next"
+                aria-label="<?= $escaper->escapeHtmlAttr(__('Next slide')) ?>">
+            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-chevron-right"/></svg>
+        </button>
+
+        <div class="hm-hero-carousel__dots" role="tablist"
+             aria-label="<?= $escaper->escapeHtmlAttr(__('Choose slide')) ?>">
+            <?php foreach ($slides as $i => $s): ?>
+                <button class="hm-hero-carousel__dot" type="button" role="tab"
+                        data-hm-carousel-dot="<?= (int) $i ?>"
+                        aria-selected="<?= $i === 0 ? 'true' : 'false' ?>"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__((string) $s['title'])) ?>"></button>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</section>
+<?php endif; ?>
+
+<?php if ($tiles): ?>
+<div class="hm-hero-tiles">
+    <?php foreach ($tiles as $i => $t): ?>
+        <?php
+        $img  = $block->getImageUrl($t['image'] ?? null);
+        $slot = ['a', 'b', 'c'][$i % 3];
+        ?>
+        <a class="hm-hero-tile hm-hero-tile--<?= /* @noEscape */ $slot ?>"
+           href="<?= $escaper->escapeUrl($block->getLinkUrl($t['url'] ?? null)) ?>">
+            <?php if ($img): ?>
+                <img class="hm-hero-tile__img" src="<?= $escaper->escapeUrl($img) ?>"
+                     alt="" loading="lazy" width="800" height="380"/>
+            <?php endif; ?>
+            <span class="hm-hero-tile__body">
+                <span class="hm-hero-tile__title"><?= $escaper->escapeHtml(__((string) $t['title'])) ?></span>
+                <?php if (!empty($t['subtitle'])): ?>
+                    <span class="hm-hero-tile__text"><?= $escaper->escapeHtml(__((string) $t['subtitle'])) ?></span>
+                <?php endif; ?>
+            </span>
+        </a>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<?php if (count($slides) > 1): ?>
+<script>
+(function () {
+    'use strict';
+    var root = document.getElementById(<?= /* @noEscape */ json_encode($id) ?>);
+    if (!root) { return; }
+    var track = root.querySelector('.hm-hero-carousel__track');
+    var slides = [].slice.call(root.querySelectorAll('.hm-hero-carousel__slide'));
+    var dots = [].slice.call(root.querySelectorAll('[data-hm-carousel-dot]'));
+    if (!track || slides.length < 2) { return; }
+
+    function current() {
+        // Math.abs so this works unchanged under RTL, where scrollLeft is negative
+        // in some engines and counts down from zero in others.
+        var w = slides[0].offsetWidth || 1;
+        return Math.round(Math.abs(track.scrollLeft) / w);
+    }
+
+    function goTo(i) {
+        var n = Math.max(0, Math.min(slides.length - 1, i));
+        slides[n].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    }
+
+    root.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-hm-carousel]');
+        if (btn) { goTo(current() + (btn.getAttribute('data-hm-carousel') === 'next' ? 1 : -1)); return; }
+        var dot = e.target.closest('[data-hm-carousel-dot]');
+        if (dot) { goTo(parseInt(dot.getAttribute('data-hm-carousel-dot'), 10)); }
+    });
+
+    var raf;
+    track.addEventListener('scroll', function () {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(function () {
+            var n = current();
+            dots.forEach(function (d, i) { d.setAttribute('aria-selected', i === n ? 'true' : 'false'); });
+        });
+    }, { passive: true });
+}());
+</script>
+<?php endif; ?>

@@ -1,0 +1,1236 @@
+//
+//  Hub Market — Figma geometry pass
+//  _____________________________________________
+//
+//  Everything here was MEASURED off the reference build with a headless Chrome
+//  probe (docs/design/parity), not read off the design file. Where a number is
+//  quoted as "Figma: …" it is a computed style from the live reference DOM.
+//
+//  This file is imported LAST so it settles the cascade against both
+//  Magento/blank and the earlier theme partials. It deliberately does not
+//  rewrite those partials: the delta stays reviewable, and reverting the parity
+//  pass is one line in _extend.less.
+//
+//  Three things drive nearly all of it:
+//
+//    1. The SHELL. Figma's page is 1280px wide with 16px gutters (`max-w-7xl
+//       px-4`). This theme shipped 1440, so every band was 128px wider than the
+//       design at the same viewport and nothing downstream could line up. Fixed
+//       at the token (_hm-tokens.less), not here.
+//
+//    2. The BAND. Figma's sections are full-bleed strips — background edge to
+//       edge, content in the 1280 container — with a tight `mt-2 py-6` rhythm
+//       (8px + 24px). Ours were container-width blocks separated by a 48px
+//       margin, all on white. The tints are what give the reference page its
+//       rhythm; without them a nine-rail homepage reads as one undifferentiated
+//       column of product grids.
+//
+//    3. The CARD. Nine of the page's sections render the same product card, so
+//       every defect in it is on screen nine times.
+//
+
+//
+//  Full-bleed band
+//  ---------------------------------------------
+//  The rails are children of `.page-main`, which is the 1280px container, so a
+//  band has to break out of its own container and then put the gutter back.
+//
+//  Percentage margins and paddings both resolve against the CONTAINING BLOCK's
+//  inline size, never against the element's own width — so `50%` is a stable
+//  624px here whatever the band itself computes to, and the pair cancels
+//  exactly. This is why the trick survives a band that has a different width to
+//  its neighbours.
+//
+//  `50vw` includes the classic scrollbar error: on a window with a visible
+//  scrollbar, 50vw exceeds half the layout viewport and each band overhangs by
+//  half the scrollbar width. `.page-wrapper` clips it below. `overflow-x: clip`
+//  rather than `hidden` on purpose — `hidden` would make the wrapper a scroll
+//  container and break `position: sticky` for anything inside it.
+.hm-band() {
+    box-sizing: border-box;
+    margin-block: var(--hm-space-2) 0;
+    margin-inline: calc(50% - 50vw);
+    padding-block: var(--hm-space-6);
+    padding-inline: calc(50vw - 50%);
+}
+
+.page-wrapper { overflow-x: clip; }
+
+//
+//  Section head  (Figma: title + subtitle on the left, "See All ->" trailing)
+//  ---------------------------------------------
+.hm-section__head,
+.block.widget .block-title.hm-section__head {
+    align-items: flex-start;
+    border: 0;
+    display: flex;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    margin: 0 0 var(--hm-space-4);
+    padding: 0;
+}
+
+.hm-section__heading {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    min-inline-size: 0;
+}
+
+//  Figma runs rail headings at 20px, and 18px inside the four tinted category
+//  bands. Ours were 24px throughout — large enough that the heading competed
+//  with the products rather than labelling them.
+.block.widget .block-title h2,
+.hm-section__title {
+    font-family: var(--hm-font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+}
+
+.hm-rail--hm-home-rail-grocery,
+.hm-rail--hm-home-rail-fashion,
+.hm-rail--hm-home-rail-beauty,
+.hm-rail--hm-home-rail-furniture {
+    .block-title h2 { font-size: 1.8rem; }
+}
+
+//  Figma's subtitle is `text-xs text-gray-400` — #9ca3af, which is 2.6:1 on
+//  white and fails AA outright.
+//
+//  --hm-neutral-600 rather than --hm-foreground-muted, for the same reason the
+//  chip counts use it: #6b7280 clears AA on white at 4.83:1 but this line also
+//  sits on the tinted section bands, and on the mint one (#f0f7f1) it measured
+//  4.44:1 — six hundredths under. #535d70 holds at 5.9:1 everywhere at the same
+//  visual weight.
+.hm-section__sub {
+    color: var(--hm-neutral-600);
+    font-size: 1.2rem;
+    line-height: 1.4;
+    margin: 0;
+}
+
+//  @hm-accent-strong, not @hm-accent: this is TEXT and #f26522 is 3.15:1.
+.hm-section__more {
+    align-items: center;
+    color: var(--hm-accent-strong);
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    gap: var(--hm-space-1);
+    margin-inline-start: auto;
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible { color: var(--hm-accent-strong-hover); text-decoration: underline; }
+
+    //  The arrow points along the reading direction, so it mirrors in RTL.
+    .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
+    [dir='rtl'] & .hm-icon { transform: scaleX(-1); }
+}
+
+//
+//  Section bands, in page order
+//  ---------------------------------------------
+//  Tints are Figma's own values, measured from the rendered reference. They are
+//  the one place this theme takes colours from outside its palette, and
+//  deliberately so: they are 3-5% saturated washes whose entire job is to
+//  separate adjacent bands. Every one of them was contrast-checked against the
+//  text that sits on it — the darkest is #f0f7f1, on which --hm-foreground is
+//  15.4:1.
+@hm-tint-grocery:   #f0f7f1;
+@hm-tint-fashion:   #fdf5f8;
+@hm-tint-beauty:    #fdf5f9;
+@hm-tint-furniture: #faf7f4;
+
+.hm-chips,
+.block.widget[class*='hm-rail--hm-home'],
+.hm-stores,
+.hm-brands,
+.hm-promos,
+.hm-trust,
+.hm-app,
+.hm-bundle-band {
+    .hm-band();
+}
+
+//  Rails carried a 48px bottom margin from _hm-product-item.less; the band's own
+//  padding is the rhythm now, and leaving both stacked 72px between sections.
+.block.widget { margin-block-end: 0; }
+
+.hm-chips {
+    border-block-end: 1px solid var(--hm-border-subtle);
+    padding-block: var(--hm-space-5);
+}
+
+.hm-rail--hm-home-rail-grocery   { background: @hm-tint-grocery; }
+.hm-rail--hm-home-rail-fashion   { background: @hm-tint-fashion; }
+.hm-rail--hm-home-rail-beauty    { background: @hm-tint-beauty; }
+.hm-rail--hm-home-rail-furniture { background: @hm-tint-furniture; }
+.hm-rail--hm-home-featured       { background: var(--hm-surface-muted); }   // Popular Products
+
+.hm-rail--hm-home-bestsellers,
+.hm-brands,
+.hm-stores--featured { border-block-start: 1px solid var(--hm-border-subtle); }
+
+//  The Vnecoms rail's own wrapper is retired (see its template) — this only
+//  guards against a cached copy of the old markup surviving a deploy.
+.ves-sellerlist-inner { margin: 0; }
+
+.hm-brands { padding-block: 2.8rem; }   // Figma py-7; no 28px step in the scale
+
+.hm-stores--hm-home-topvendors { background: var(--hm-surface-muted); }
+
+//
+//  Picked For You — the dark panel
+//  ---------------------------------------------
+//  Figma: `linear-gradient(135deg, #080d1a, #0f1b35 40%, #12103a)` with two
+//  blurred colour blooms behind the content. The blooms are pure decoration and
+//  are drawn as pseudo-elements so they cost no markup.
+//
+//  What is NOT reproduced: the "AI ENGINE" pill, the "YOUR SEARCHES" chip row
+//  and the Refresh button. This rail is Magento's recently-viewed index. Badging
+//  it as a recommendation engine would be a claim about software that does not
+//  exist here; the panel treatment is the part that is a design decision.
+.hm-rail--hm-home-pickedforyou {
+    background: linear-gradient(135deg, #080d1a 0%, #0f1b35 40%, #12103a 100%);
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: var(--hm-space-8);
+    position: relative;
+
+    &::before,
+    &::after {
+        border-radius: 50%;
+        content: '';
+        filter: blur(60px);
+        opacity: .16;
+        pointer-events: none;
+        position: absolute;
+        z-index: 0;
+    }
+
+    &::before {
+        background: #6366f1;
+        block-size: 28rem;
+        inline-size: 28rem;
+        inset-block-start: -6rem;
+        inset-inline-start: 25%;
+    }
+
+    &::after {
+        background: var(--hm-accent);
+        block-size: 22rem;
+        inline-size: 22rem;
+        inset-block-end: -6rem;
+        inset-inline-end: 25%;
+    }
+
+    .block-title,
+    .block-content { position: relative; z-index: 1; }
+
+    //  `.block.widget .block-title h2` in _hm-product-item.less sets the light
+    //  foreground at the same (0,3,0) as a nested `.hm-rail--… .block-title h2`
+    //  would, so the two tie and the outcome depends on file order — fragile.
+    //  `.block.widget` in the selector takes this to (0,4,0) and settles it.
+    &.block.widget .block-title h2 { color: var(--hm-on-inverse); }
+
+    .hm-section__sub { color: var(--hm-on-inverse-muted); }   // 10.56:1 on the panel
+
+    //  Cards on a dark ground: the white surface would flare, so they take the
+    //  same translucent-white treatment Figma uses.
+    .product-item-info {
+        background: fade(#ffffff, 6%);
+        border-color: fade(#ffffff, 10%);
+
+        &:hover,
+        &:focus-within { border-color: fade(#ffffff, 28%); box-shadow: none; }
+    }
+
+    .product-item-name a.product-item-link { color: var(--hm-on-inverse); }
+    .product-item-name a.product-item-link:hover { color: var(--hm-accent); }
+    .hm-card__vendor { color: var(--hm-accent); }             // 5.04:1 on the panel
+    .price-box .price { color: var(--hm-price-inverse); }
+    .price-box .old-price .price { color: var(--hm-on-inverse-muted); }
+    .reviews-actions { color: var(--hm-on-inverse-muted); }
+}
+
+//
+//  Bundle band + New Stores — the two navy panels
+//  ---------------------------------------------
+.hm-bundle-band {
+    background: linear-gradient(135deg, @hm-navy 0%, #1a3a6a 100%);
+    padding-block: var(--hm-space-8);
+}
+
+.hm-stores--hm-home-newstores {
+    background: var(--hm-surface-inverse);
+    padding-block: var(--hm-space-8);
+
+    .hm-section__title { color: var(--hm-on-inverse); }
+    .hm-section__sub   { color: var(--hm-on-inverse-muted); }
+
+    .hm-stores__link {
+        background: fade(#ffffff, 6%);
+        border-color: fade(#ffffff, 10%);
+
+        &:hover { border-color: fade(#ffffff, 28%); }
+    }
+
+    .hm-stores__name  { color: var(--hm-on-inverse); }
+    .hm-stores__meta,
+    .hm-stores__reviews,
+    .hm-stores__score { color: var(--hm-on-inverse-muted); }
+
+    //  CONTRAST. Two colours that are correct on white are not correct here, and
+    //  both were measured failing on this panel after it went navy:
+    //    .hm-stores__dispatch  #0f7b3f on #0f2144 = 2.97:1
+    //    .hm-section__more     #c2410c on #0f2144 = 3.07:1
+    //  The success green has no navy-safe variant in the palette, so the dispatch
+    //  line takes the standard on-inverse muted (10.56:1) and keeps its clock
+    //  glyph in accent. The "All stores" link moves to the FILL orange, which is
+    //  the one that works on navy (5.04:1) and fails on white — the inverse of
+    //  the usual rule, and exactly why the palette carries both.
+    .hm-stores__dispatch { color: var(--hm-on-inverse-muted); }
+    .hm-stores__dispatch .hm-icon { color: var(--hm-accent); }
+    .hm-section__more { color: var(--hm-accent); }
+}
+
+//  Same correction for the other panel that went dark.
+.hm-rail--hm-home-pickedforyou .hm-section__more { color: var(--hm-accent); }
+
+//
+//  Product card  (Figma: the one component that repeats nine times)
+//  ---------------------------------------------
+.product-item {
+    //  Figma's grid is 4 columns at this width with a 12px gutter. `auto-fill,
+    //  minmax(22rem, …)` gave 5 at 1408 and 4 at 1280 — the column count moved
+    //  with the container instead of being a design decision.
+    .product-item-media {
+        background: var(--hm-neutral-50);
+        display: block;
+        overflow: hidden;
+        position: relative;
+    }
+
+    //  16px. Figma uses `rounded-xl` on the card and clips the image to it.
+    .product-item-info { border-radius: var(--hm-radius-lg); }
+
+    .product-item-photo {
+        aspect-ratio: 1 / 1;
+        display: block;
+        overflow: hidden;
+    }
+
+    .product-image-photo { transition: transform 500ms var(--hm-ease); }
+    .product-item-info:hover .product-image-photo { transform: scale(1.05); }
+
+    //  Figma: `p-3.5`.
+    .product-item-details {
+        gap: var(--hm-space-1);
+        padding: 1.4rem;
+    }
+
+    //  Figma renders product titles in the DISPLAY SERIF at 14px/500. The earlier
+    //  pass ruled that out ("never the display serif") and it is the single most
+    //  visible typographic difference between the two builds — a page of serif
+    //  titles reads completely differently to a page of sans ones. Playfair at
+    //  14px is comfortably legible; the rule it replaces was a preference, not a
+    //  measurement.
+    //
+    //  min-block-size holds two lines so a one-line and a two-line title produce
+    //  the same card height. Without it a rail of mixed titles staggers its price
+    //  rows, which is what made the live grids look ragged.
+    .product-item-name {
+        margin: 0;
+
+        a.product-item-link {
+            font-family: var(--hm-font-display);
+            font-size: 1.4rem;
+            font-weight: 500;
+            line-height: 1.35;
+            min-block-size: 3.8rem;
+        }
+    }
+
+    //  Price row: price block on the lead edge, actions on the trailing edge.
+    .hm-card__foot {
+        align-items: flex-end;
+        display: flex;
+        gap: var(--hm-space-2);
+        justify-content: space-between;
+        margin-block-start: auto;
+        padding-block-start: var(--hm-space-2);
+    }
+
+    .price-box {
+        align-items: baseline;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-1);
+        min-inline-size: 0;
+
+        .price { font-size: 1.6rem; }
+        .old-price .price { font-size: 1.2rem; text-decoration: line-through; }
+    }
+
+    //  Magento prints "Regular Price" / "Special Price" in front of each amount.
+    //  Figma shows two bare numbers, and on a 4-up rail the labels doubled the
+    //  height of the price block and pushed the real figures out of scanning
+    //  order. CLIPPED, not removed: the label is what tells a screen-reader user
+    //  which of the two numbers is the one they pay.
+    .price-box .price-label {
+        border: 0;
+        clip-path: inset(50%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+    }
+
+    //  Source order is old-price first, then special-price. Figma reads
+    //  "$49.99 $69.99" — current price first, struck-through original after it.
+    .price-box .old-price { order: 2; }
+    .price-box .special-price { order: 1; }
+
+    //  Actions collapse from a full-width button plus two 44px squares to
+    //  Figma's pair of compact icon buttons.
+    .product-item-inner { margin: 0; }
+
+    .product-item-actions {
+        display: flex;
+        gap: var(--hm-space-1);
+        padding: 0;
+    }
+
+    .actions-primary { flex: 0 0 auto; }
+
+    .action.tocart {
+        border-radius: var(--hm-radius-sm);
+        block-size: 3.2rem;
+        gap: 0;
+        inline-size: 3.2rem;
+        min-block-size: 0;
+        padding: 0;
+        width: auto;
+
+        .hm-icon { block-size: 1.6rem; inline-size: 1.6rem; }
+
+        //  Icon-only by sight, still named for assistive tech.
+        span {
+            border: 0;
+            clip-path: inset(50%);
+            height: 1px;
+            overflow: hidden;
+            position: absolute;
+            white-space: nowrap;
+            width: 1px;
+        }
+    }
+
+    .actions-secondary > a.action {
+        border-radius: var(--hm-radius-sm);
+        block-size: 3.2rem;
+        inline-size: 3.2rem;
+        min-block-size: 0;
+        min-inline-size: 0;
+
+        .hm-icon { block-size: 1.5rem; inline-size: 1.5rem; }
+    }
+
+    //  Rating: Figma sets 12px stars with the count beside them.
+    .rating-summary { line-height: 1; }
+    .reviews-actions { font-size: 1.2rem; }   // 12px floor
+}
+
+//  Discount badge. Figma paints this `bg-red-500` (#ef4444) with white text —
+//  3.76:1, under AA. --hm-discount-bg is the same red family at 6.54:1.
+//  12px, not Figma's 10: this theme holds a 12px floor for decorative text and
+//  the parity gate fails anything under it. The badge is small enough at 12.
+.hm-badge {
+    border-radius: var(--hm-radius-full);
+    font-size: 1.2rem;
+    font-weight: 700;
+    inset-block-start: var(--hm-space-2);
+    inset-inline-start: var(--hm-space-2);
+    line-height: 1;
+    padding: .4rem var(--hm-space-2);
+    position: absolute;
+    z-index: 2;
+}
+
+.hm-badge--discount {
+    background: var(--hm-discount-bg);
+    color: var(--hm-discount-fg);
+}
+
+//  Wishlist, on the image's trailing corner.
+//
+//  Figma reveals it with `opacity-0 group-hover:opacity-100`, which means it does
+//  not exist on a touch device — there is no hover there to trigger it. It is
+//  always visible here, and the fade is applied ONLY where a real pointer is
+//  present. `any-hover` rather than `hover` so a hybrid laptop with a
+//  touchscreen keeps the pointer behaviour.
+.hm-card__wish {
+    align-items: center;
+    background: var(--hm-surface);
+    border-radius: var(--hm-radius-full);
+    block-size: 3.2rem;
+    box-shadow: var(--hm-shadow-sm);
+    color: var(--hm-icon);
+    display: flex;
+    inline-size: 3.2rem;
+    inset-block-start: var(--hm-space-2);
+    inset-inline-end: var(--hm-space-2);
+    justify-content: center;
+    position: absolute;
+    z-index: 2;
+
+    &:hover { color: var(--hm-discount-bg); }
+
+    span {
+        border: 0;
+        clip-path: inset(50%);
+        height: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+        width: 1px;
+    }
+}
+
+@media (any-hover: hover) {
+    .hm-card__wish { opacity: 0; transition: opacity var(--hm-duration) var(--hm-ease); }
+    .product-item-info:hover .hm-card__wish,
+    .product-item-info:focus-within .hm-card__wish { opacity: 1; }
+}
+
+//  Vendor line. Figma: `text-[10px] text-[#f26522] font-semibold truncate`.
+//  @hm-accent-strong instead of @hm-accent — the fill orange is 3.15:1 and this
+//  is text; 12px rather than 10 for the same reason the rest of the theme holds
+//  a 12px floor.
+.hm-card__vendor {
+    color: var(--hm-accent-strong);
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+//
+//  Rail grids — Figma's column counts, fixed rather than fluid
+//  ---------------------------------------------
+.products-grid .product-items,
+.block.widget .product-items {
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+//  Best Selling is the one six-across rail in the reference; Popular Products is
+//  four across over two rows, like everything else.
+.hm-rail--hm-home-bestsellers .product-items {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+@media (max-width: 1199px) {
+    .hm-rail--hm-home-bestsellers .product-items { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+    .products-grid .product-items,
+    .block.widget .product-items,
+    .hm-rail--hm-home-bestsellers .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+//
+//  Best Selling rank badges  (Figma: 1-3 accent, 4-6 navy)
+//  ---------------------------------------------
+//  A CSS counter rather than markup: the rank is the card's POSITION in the
+//  rail, which is exactly what a counter expresses, and it keeps the rank out of
+//  the shared card template where no other rail wants it.
+//
+//  `content: counter() / ""` supplies empty alternative text, so the number is
+//  not announced — the rail is already ordered, and "1" read out before a
+//  product name is noise rather than information.
+.hm-rail--hm-home-bestsellers .product-items { counter-reset: hm-rank; }
+
+.hm-rail--hm-home-bestsellers .product-item { counter-increment: hm-rank; }
+
+.hm-rail--hm-home-bestsellers .product-item-media::before {
+    align-items: center;
+    background: var(--hm-surface-inverse);
+    border-radius: var(--hm-radius-full);
+    block-size: 2.2rem;
+    color: var(--hm-on-inverse);
+    content: counter(hm-rank) / "";
+    display: flex;
+    font-size: 1.2rem;
+    font-weight: 700;
+    inline-size: 2.2rem;
+    inset-block-start: var(--hm-space-2);
+    inset-inline-start: var(--hm-space-2);
+    justify-content: center;
+    position: absolute;
+    z-index: 3;
+}
+
+//  Figma marks the podium in accent and the rest in navy.
+.hm-rail--hm-home-bestsellers .product-item:nth-child(-n+3) .product-item-media::before {
+    background: var(--hm-accent);
+    color: var(--hm-on-accent);   // 5.04:1
+}
+
+//  A discounted bestseller would otherwise stack its badge under the rank.
+.hm-rail--hm-home-bestsellers .hm-badge--discount { inset-block-start: 3.6rem; }
+
+//  Swatches inside a homepage rail. Figma's cards carry none, and they are the
+//  reason the live rails looked ragged: a card with two size rows and a colour
+//  row stood ~90px taller than the card beside it, so every price row in the
+//  rail sat at a different height. They stay on the category listing, where the
+//  grid is uniform and choosing a variant in place is genuinely useful.
+.hm-home .block.widget .swatch-opt,
+.hm-home .block.widget .swatch-attribute-options,
+.hm-home .block.widget .product-item .swatch-attribute { display: none; }
+
+//
+//  Category chips  (Figma: eight tinted tiles under the hero)
+//  ---------------------------------------------
+//  The eight pastels are Figma's, sampled from the rendered reference. They are
+//  washes, not brand colours — the label on every one of them is
+//  --hm-neutral-700 at 8.6:1 or better.
+@hm-chip-tints:
+    #e8f5e9, #e3f2fd, #fff3e0, #fce4ec,
+    #ede7f6, #fff8e1, #fdf5f9, #e8eaf6;
+
+.hm-chips__list {
+    display: grid;
+    gap: var(--hm-space-2);
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+//  The border and the 110px min-height come from the previous white-card
+//  treatment. Figma's chip is a bare tinted tile: no border, sized by content.
+.hm-chips__link {
+    align-items: center;
+    border: 0;
+    border-radius: var(--hm-radius);
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    justify-content: center;
+    min-block-size: 0;
+    padding: var(--hm-space-3);
+    text-align: center;
+    text-decoration: none;
+    transition: box-shadow var(--hm-duration) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible { border: 0; box-shadow: var(--hm-shadow); }
+    &:hover .hm-chips__icon { transform: scale(1.1); }
+}
+
+//  Written out rather than generated: LESS's `each()` indexes from 1 and the
+//  block's tint slot is zero-based, so a loop would need an off-by-one fudge in
+//  the selector for no gain over eight literal lines.
+.hm-chips__link--0 { background: extract(@hm-chip-tints, 1); }
+.hm-chips__link--1 { background: extract(@hm-chip-tints, 2); }
+.hm-chips__link--2 { background: extract(@hm-chip-tints, 3); }
+.hm-chips__link--3 { background: extract(@hm-chip-tints, 4); }
+.hm-chips__link--4 { background: extract(@hm-chip-tints, 5); }
+.hm-chips__link--5 { background: extract(@hm-chip-tints, 6); }
+.hm-chips__link--6 { background: extract(@hm-chip-tints, 7); }
+.hm-chips__link--7 { background: extract(@hm-chip-tints, 8); }
+
+//  RESET, not just restyle. _hm-home.less built this as a 52px grey disc holding
+//  a 24px sprite icon, sized for the category photo it used to contain. With a
+//  glyph inside it, that disc renders as a white circle floating on the tint —
+//  the tile ends up reading as two nested shapes. Figma sets the glyph directly
+//  on the tile at `text-3xl`.
+.hm-chips__icon {
+    background: none;
+    block-size: auto;
+    border-radius: 0;
+    display: block;
+    font-size: 3rem;
+    inline-size: auto;
+    line-height: 1.1;
+    margin: 0;
+    transition: transform var(--hm-duration) var(--hm-ease);
+}
+
+.hm-chips__name {
+    color: var(--hm-neutral-700);
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+//  --hm-foreground-muted (#6b7280) is 4.83:1 on WHITE, but these counts sit on
+//  the eight pastel washes, which cost enough contrast to drop them under AA —
+//  measured 4.00:1 on the lavender chip, 4.02 on the pink, 4.04 on the indigo,
+//  4.23 on the blue and 4.30 on the mint. --hm-neutral-600 (#535d70) restores the
+//  margin at the same visual weight. Same correction the promo tiles already
+//  carry in _hm-home.less, for the same reason.
+.hm-chips__count {
+    color: var(--hm-neutral-600);
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+
+@media (max-width: 991px) {
+    .hm-chips__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+//
+//  Deals countdown  (Figma: a navy pill inline with the heading)
+//  ---------------------------------------------
+//  It rendered as a pale pill orphaned UNDER the product grid. Being beside the
+//  heading is the whole point of a countdown — "5d 11:19 remaining" attached to
+//  nothing tells a shopper nothing.
+.hm-countdown {
+    align-items: center;
+    align-self: center;
+    background: var(--hm-surface-inverse);
+    border: 0;
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-on-inverse);
+    display: inline-flex;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    gap: var(--hm-space-2);
+    letter-spacing: .04em;
+    padding: .6rem var(--hm-space-3);
+
+    //  Figma tints the clock glyph accent — 5.04:1 on navy.
+    .hm-icon { block-size: 1.4rem; color: var(--hm-accent); inline-size: 1.4rem; }
+}
+
+.hm-countdown__label { font-weight: 500; opacity: .8; }
+
+//
+//  Store cards  (Featured Stores / Top Vendors / New Stores)
+//  ---------------------------------------------
+//  These rendered ragged: a vendor with a rating stood taller than one without,
+//  and one with a dispatch line taller again, so a row of four cards had four
+//  different heights. The grid rows are equalised and each optional line gets a
+//  reserved slot instead.
+.hm-stores__list {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-stores__link {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    block-size: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    justify-content: flex-start;
+    padding: var(--hm-space-4);
+    text-align: center;
+    text-decoration: none;
+    transition: border-color var(--hm-duration) var(--hm-ease);
+
+    &:hover { border-color: var(--hm-accent); }
+}
+
+//  Avatar. No vendor on this install has uploaded a logo, so the fallback is
+//  what actually renders — it needs to look deliberate rather than like a
+//  missing image. A tinted disc carrying the store's initial reads as an avatar;
+//  the previous grey store glyph, repeated four times in a row, read as four
+//  broken images.
+.hm-stores__avatar {
+    align-items: center;
+    background: var(--hm-accent-subtle);
+    border-radius: var(--hm-radius-full);
+    block-size: 4.8rem;
+    color: var(--hm-accent-strong);
+    display: flex;
+    flex-shrink: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    inline-size: 4.8rem;
+    justify-content: center;
+    overflow: hidden;
+    text-transform: uppercase;
+
+    img { block-size: 100%; inline-size: 100%; object-fit: cover; }
+    .hm-icon { block-size: 2.2rem; inline-size: 2.2rem; }
+}
+
+.hm-stores__name {
+    color: var(--hm-foreground);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-inline-size: 100%;
+}
+
+.hm-stores__meta,
+.hm-stores__dispatch { font-size: 1.2rem; }
+
+//  Figma's "Visit Store" pill. Present on every card, so the four cards in a row
+//  end on the same line whatever optional data each one carries.
+.hm-stores__cta {
+    border: 1px solid fade(#f26522, 45%);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-accent-strong);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-block-start: auto;
+    padding: .5rem var(--hm-space-3);
+
+    .hm-stores__link:hover & {
+        background: var(--hm-accent);
+        border-color: var(--hm-accent);
+        color: var(--hm-on-accent);
+    }
+}
+
+.hm-stores--hm-home-newstores .hm-stores__cta {
+    border-color: fade(#ffffff, 30%);
+    color: var(--hm-accent);
+}
+
+@media (max-width: 767px) {
+    .hm-stores__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+//
+//  Promo tiles  (Figma: three gradient banners with a glyph watermark)
+//  ---------------------------------------------
+//  Ours were flat tints with dark text. Figma's are saturated 135deg gradients
+//  carrying white type and an oversized emoji at 25% opacity in the corner.
+//
+//  White on all three gradients was measured at their LIGHTEST stop, which is
+//  the worst case: 5.9:1 (navy), 5.1:1 (green), 4.9:1 (purple). The subtitle
+//  runs at white/70 rather than Figma's white/55, which would have been 3.4:1.
+.hm-promos {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding-block: var(--hm-space-5);
+}
+
+//  align-items is the CROSS axis, and this is a column — `flex-end` here pushed
+//  every tile's copy to the trailing edge, right-aligned against the watermark.
+//  Vertical placement is `justify-content` (set below); this is horizontal.
+.hm-promo {
+    align-items: flex-start;
+    border-radius: var(--hm-radius-lg);
+    display: flex;
+    isolation: isolate;
+    min-block-size: 14.4rem;
+    overflow: hidden;
+    padding: var(--hm-space-5);
+    position: relative;
+    text-decoration: none;
+
+    //  Watermark glyph. `content` is set per tile below.
+    &::after {
+        font-size: 4.8rem;
+        inset-block-start: var(--hm-space-3);
+        inset-inline-end: var(--hm-space-4);
+        line-height: 1;
+        opacity: .25;
+        pointer-events: none;
+        position: absolute;
+        z-index: 0;
+    }
+
+    > * { position: relative; z-index: 1; }
+
+    &:hover { filter: brightness(1.08); }
+}
+
+.hm-promo--a {
+    background: linear-gradient(135deg, #0f2144 0%, #1e3a6e 100%);
+    &::after { content: "🎁" / ""; }
+}
+
+.hm-promo--b {
+    background: linear-gradient(135deg, #1a4731 0%, #2d7a3a 100%);
+    &::after { content: "🥬" / ""; }
+}
+
+.hm-promo--c {
+    background: linear-gradient(135deg, #3b1f6e 0%, #6b3fa0 100%);
+    &::after { content: "🏪" / ""; }
+}
+
+//  One treatment for all three, since all three are now dark.
+.hm-promo {
+    .hm-promo__kicker {
+        background: fade(#ffffff, 20%);
+        border-radius: var(--hm-radius-xs);
+        color: var(--hm-on-inverse);
+        display: inline-block;
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        margin-block-end: var(--hm-space-2);
+        padding: .2rem var(--hm-space-2);
+        text-transform: uppercase;
+    }
+
+    .hm-promo__title {
+        color: var(--hm-on-inverse);
+        display: block;
+        font-family: var(--hm-font-display);
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .hm-promo__text {
+        color: fade(#ffffff, 70%);
+        display: block;
+        font-size: 1.2rem;
+        margin-block-start: .4rem;
+    }
+}
+
+//  The three tiles are stacked children of a single anchor, so the anchor itself
+//  has to be the flex column — the `> *` z-index rule above assumes it.
+.hm-promo {
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+    .hm-promos { grid-template-columns: minmax(0, 1fr); }
+}
+
+//
+//  Trust strip  (Figma: five circular icon badges)
+//  ---------------------------------------------
+//  The markup is a CMS block this theme does not own and which carries no icon
+//  elements, so the glyphs are drawn from the sprite as masked pseudo-elements
+//  keyed on position. That couples the icons to the ORDER of the five items:
+//  reorder them in admin and the icons follow the slot, not the claim. Recorded
+//  rather than hidden — the alternative is putting markup in the CMS block,
+//  which takes the icons out of version control.
+.hm-trust {
+    border-block-start: 1px solid var(--hm-border-subtle);
+    display: grid;
+    gap: var(--hm-space-6);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-block: var(--hm-space-8);
+}
+
+.hm-trust__item {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    text-align: center;
+
+    &::before {
+        background-color: var(--hm-accent-subtle);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 2.2rem 2.2rem;
+        border-radius: var(--hm-radius-full);
+        block-size: 4.8rem;
+        content: '';
+        display: block;
+        inline-size: 4.8rem;
+    }
+}
+
+//  One tinted disc carrying one glyph, drawn as a single element: the tint is
+//  background-color and the glyph a data-URI background-image layered over it.
+//  Two pseudo-elements would be needed to mask instead, and `::before` /
+//  `::after` on a flex item sit BESIDE each other rather than overlaid.
+//
+//  Stroke is #c2410c (@hm-accent-strong) rather than the fill orange: on
+//  #fff4ef the fill orange measures 2.9:1 and 1.4.11 wants 3:1 for a meaningful
+//  graphic.
+.hm-trust__glyph(@svg, @tint) {
+    &::before {
+        background-color: @tint;
+        background-image: @svg;
+    }
+}
+
+//  Position-keyed, in the order the CMS block lists them:
+//  approved sellers / secure payments / nationwide delivery / easy returns /
+//  WhatsApp support.
+.hm-trust__item:nth-child(1) {
+    .hm-trust__glyph(
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c2410c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 7 4.4-4.4A2 2 0 0 1 7.8 2h8.4a2 2 0 0 1 1.4.6L22 7'/%3E%3Cpath d='M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8'/%3E%3Cpath d='M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4'/%3E%3Cpath d='M2 7h20'/%3E%3C/svg%3E"),
+        @hm-accent-subtle);
+}
+
+.hm-trust__item:nth-child(2) {
+    .hm-trust__glyph(
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f7b3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1 1 0 0 1 1.5 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3C/svg%3E"),
+        @hm-success-subtle);
+}
+
+.hm-trust__item:nth-child(3) {
+    .hm-trust__glyph(
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c2410c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'/%3E%3Cpath d='M15 18H9'/%3E%3Cpath d='M19 18h2a1 1 0 0 0 1-1v-3.7a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14'/%3E%3Ccircle cx='17' cy='18' r='2'/%3E%3Ccircle cx='7' cy='18' r='2'/%3E%3C/svg%3E"),
+        @hm-accent-subtle);
+}
+
+.hm-trust__item:nth-child(4) {
+    .hm-trust__glyph(
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/svg%3E"),
+        @hm-info-subtle);
+}
+
+.hm-trust__item:nth-child(5) {
+    .hm-trust__glyph(
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f7b3f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7.9 20A9 9 0 1 0 4 16.1L2 22Z'/%3E%3C/svg%3E"),
+        @hm-success-subtle);
+}
+
+.hm-trust__title {
+    color: var(--hm-foreground);
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.hm-trust__text {
+    color: var(--hm-foreground-muted);
+    font-size: 1.2rem;
+}
+
+//
+//  App banner
+//  ---------------------------------------------
+.hm-app {
+    background: linear-gradient(135deg, @hm-navy 0%, #162d5a 50%, @hm-navy 100%);
+    border-radius: 0;
+    padding-block: var(--hm-space-12);
+    position: relative;
+}
+
+//  Figma pairs the copy with a phone mock on the trailing side. Drawn as a
+//  decorative background rather than markup — the CMS block that supplies this
+//  banner has no slot for an image, and an illustration of the product is not
+//  something a screen reader needs announced.
+//
+//  Hidden below 992px: at phone width the copy already fills the band, and a
+//  picture of a phone on a phone is not worth 40% of the viewport.
+@media (min-width: 992px) {
+    .hm-app::after {
+        background: url('../images/hm-app-phone.svg') no-repeat center / contain;
+        block-size: 26rem;
+        content: '';
+        inline-size: 18rem;
+        inset-block-start: 50%;
+        inset-inline-end: 12%;
+        pointer-events: none;
+        position: absolute;
+        transform: translateY(-50%);
+    }
+
+    //  Keep the copy clear of it.
+    .hm-app__body { max-inline-size: 52ch; }
+}
+
+//  Figma's page ends ON the footer. blank leaves `.page-main` with a bottom
+//  margin, which showed as a strip of page background between the navy app
+//  banner and the navy footer — reading as a rendering fault rather than as
+//  spacing, because both sides of the gap are the same colour.
+.hm-home .page-main,
+.hm-home .columns,
+.hm-home .column.main { margin-block-end: 0; padding-block-end: 0; }
+
+//
+//  Top Brands
+//  ---------------------------------------------
+//  Figma runs eight brand chips in one row. `auto-fit, minmax(12rem, …)` gave
+//  nine at this width, so the ninth wrapped alone onto a second row.
+.hm-brands__list { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+
+@media (max-width: 991px) {
+    .hm-brands__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+//
+//  Hero band geometry  (Figma: `grid lg:grid-cols-4 gap-2.5`, min-height 340)
+//  ---------------------------------------------
+//  The band is built with floats (see the long note in _hm-home.less about why
+//  inline-block failed). Kept — but the RATIO was ours, not Figma's: 68/30 with a
+//  2% gutter against the design's 3-of-4 columns with a 10px gap. At 1248px that
+//  is 933.5 / 304.5 / 10, i.e. 74.8% / 24.4% / 0.8%.
+@media (min-width: 992px) {
+    .hm-home .column.main > .hm-hero-carousel { inline-size: 74.8%; }
+    .hm-home .column.main > .hm-hero-tiles    { inline-size: 24.4%; margin-left: .8%; }
+
+    [dir='rtl'] .hm-home .column.main > .hm-hero-tiles,
+    html:lang(ar) .hm-home .column.main > .hm-hero-tiles { margin-left: 0; margin-right: .8%; }
+
+    //  CLEARING THE FLOAT BAND.
+    //
+    //  `.hm-usp` used to be the next sibling and carried `clear: both` for the
+    //  whole page. Removing that strip (it duplicated the trust row — see the
+    //  layout XML) took the clear with it, and the category chips wrapped into
+    //  the 25% gap beside the hero: eight tiles crushed into a 300px column,
+    //  overlapping the promo tiles.
+    //
+    //  Clearing EVERY non-hero child rather than naming the next one, so the
+    //  band stays clear whatever section is reordered in next.
+    .hm-home .column.main > *:not(.hm-hero-carousel):not(.hm-hero-tiles) { clear: both; }
+}
+
+//
+//  Hero interior  (all values from the reference build's computed styles)
+//  ---------------------------------------------
+//  The band is 340px in Figma. Ours measured 389 — not because a height was set
+//  too high but because the COPY did not fit: the headline ran 40px against
+//  Figma's 36, the subtext 16px against 14, and the body carried 80px of inline
+//  padding against 48. The slide grew to contain it, and the tile column, which
+//  divides the same height three ways, grew with it (125px tiles against 107).
+//  So the tiles are fixed by fixing the type.
+.hm-home .hm-hero-carousel__slide,
+.hm-home .hm-hero-carousel__viewport { min-block-size: 34rem; }
+
+//  Figma: `px-8 md:px-12 py-10`. The 80px this replaces came from an earlier fix
+//  for the headline colliding with the prev arrow — but Figma solves the same
+//  problem by moving the ARROW in to 12px and making it 36px wide, so 48px of
+//  padding clears it with 0 to spare, which is exactly what the design does.
+//  gap: 0, because the children already carry their own margins (Figma spaces
+//  them with mb-4 / mb-3 / mb-6, not with a flex gap). Keeping both stacked 8px
+//  onto every gap and was most of the 45px by which the band still overshot 340
+//  after the type sizes were corrected.
+//
+//  align-items: flex-start so the kicker pill and the CTA hug their content —
+//  the default `stretch` made both run the full width of the body box.
+.hm-hero-carousel__body {
+    align-items: flex-start;
+    gap: 0;
+    padding-block: var(--hm-space-10);
+    padding-inline: var(--hm-space-12);
+}
+
+.hm-hero-carousel__kicker {
+    font-size: 1.2rem;              // Figma 10px; 12px is this theme's floor
+    letter-spacing: .12em;
+    margin-block-end: var(--hm-space-4);
+    padding: .4rem var(--hm-space-3);
+}
+
+.hm-hero-carousel__title {
+    font-size: 3.6rem;              // Figma text-4xl
+    line-height: 1.15;
+    margin-block-end: var(--hm-space-3);
+    max-inline-size: 38.4rem;       // Figma max-w-sm
+}
+
+.hm-hero-carousel__text {
+    font-size: 1.4rem;
+    margin-block: 0 var(--hm-space-6);
+    max-inline-size: 34rem;         // Figma max-w-xs, plus room for Arabic
+}
+
+.hm-hero-carousel__cta {
+    font-size: 1.4rem;
+    min-block-size: 4rem;
+    padding-inline: 2.8rem;         // Figma px-7
+}
+
+//  Figma's arrows are translucent dark discs over the photograph, not white
+//  buttons: a solid white 44px circle is the heaviest thing in the band and
+//  competes with the CTA.
+.hm-hero-carousel__nav {
+    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, .3);
+    block-size: 3.6rem;
+    border: 0;
+    color: #ffffff;
+    inline-size: 3.6rem;
+    min-block-size: 0;
+    padding: 0;
+
+    &:hover { background: rgba(0, 0, 0, .5); color: #ffffff; }
+
+    .hm-icon { block-size: 2rem; inline-size: 2rem; }
+}
+
+.hm-hero-carousel__nav--prev { inset-inline-start: var(--hm-space-3); }
+.hm-hero-carousel__nav--next { inset-inline-end: var(--hm-space-3); }
+
+//  Dots: 6px pills that stretch to 24px when selected.
+.hm-hero-carousel__dots {
+    gap: .6rem;
+    inset-block-end: var(--hm-space-4);
+    inset-inline-start: var(--hm-space-8);
+}
+
+.hm-hero-carousel__dot {
+    background: fade(#ffffff, 40%);
+    block-size: .6rem;
+    border: 0;
+    border-radius: var(--hm-radius-full);
+    inline-size: .6rem;
+    min-block-size: 0;
+    min-inline-size: 0;
+    padding: 0;
+    transition: inline-size var(--hm-duration) var(--hm-ease), background var(--hm-duration) var(--hm-ease);
+
+    &[aria-selected='true'] { background: #ffffff; inline-size: 2.4rem; }
+
+    //  2.5.5 target size: the visible dot is 6px, so the HIT area is padded out
+    //  to 24px with a pseudo-element rather than by growing the dot itself.
+    position: relative;
+
+    &::after {
+        content: '';
+        inset: -.9rem;
+        position: absolute;
+    }
+}
+
+.hm-hero-tiles { gap: 1rem; }   // Figma gap-2.5
+
+//  Figma anchors tile copy to the bottom-lead corner (`absolute bottom-3 left-3`)
+//  rather than centring it, and runs a two-stop scrim.
+.hm-hero-tile__body {
+    justify-content: flex-end;
+    padding: var(--hm-space-3);
+}
+
+.hm-hero-tile::after {
+    background: linear-gradient(to var(--hm-scrim-dir, right),
+                rgba(15, 33, 68, .85) 0%, rgba(15, 33, 68, .35) 60%, rgba(15, 33, 68, .05) 100%);
+}
+
+.hm-hero-tile__title { font-size: 1.4rem; font-weight: 700; }
+.hm-hero-tile__text  { color: fade(#ffffff, 75%); font-size: 1.2rem; }
+
+//
+//  Magento/blank icon-font glyphs on the card actions
+//  ---------------------------------------------
+//  blank draws `.action.towishlist:before` and `.action.tocompare:before` from
+//  its own icon font. The card now supplies real SVG icons from the sprite, so
+//  every card rendered TWO hearts — the sprite one and the font one stacked in
+//  the same corner. Same treatment the minicart trigger already uses.
+.product-item .action.towishlist:before,
+.product-item .action.tocompare:before,
+.hm-card__wish:before { content: none; }

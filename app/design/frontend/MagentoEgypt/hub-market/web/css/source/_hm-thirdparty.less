@@ -142,3 +142,52 @@ a.scroll-to-top {
 
     span, img { display: none; }
 }
+
+//
+//  Mageplaza_Search — the 140px hole in the header
+//  ---------------------------------------------
+//  Mageplaza/Search/view/frontend/web/css/source/_module.less:132 ships
+//
+//      @media (min-width: 768px) { .block-search { z-index: 999 !important;
+//                                                  padding-left: 140px !important } }
+//
+//  It exists to clear that module's own floated `#search_mini_form { width: 374px;
+//  float: right }`, neither of which applies to this theme's flex header. What it
+//  actually did here was indent the search band by 140 PHYSICAL pixels: the field
+//  started at x=312 instead of x=250 and lost 140px of width, and under RTL the
+//  indent landed on the wrong side entirely.
+//
+//  `!important` is the only thing that beats `!important` at equal specificity,
+//  and this is scoped to `.hm-page` so it cannot reach any other theme.
+.hm-page .block-search {
+    padding-inline: 0 !important;
+    z-index: auto !important;
+}
+
+//
+//  Magento/blank — the 25px under the search field
+//  ---------------------------------------------
+//  blank's `.block-search .control { padding: 0 0 25px }` reserves room for the
+//  autocomplete panel, which is absolutely positioned here and needs none. It was
+//  25 of the 25px by which the header band overshot the design: the row measured
+//  89px against Figma's 64, with a 40px field inside a 65px block.
+//
+//  Specificity, not order: (0,3,0) beats blank's (0,2,0) wherever the two land.
+.hm-page .block-search .control {
+    padding: 0;
+}
+
+//
+//  Magento/blank — `.footer.content` framing our own footer
+//  ---------------------------------------------
+//  blank draws `border-top: 1px solid #e8ecf3; margin-top: 25px; padding: 25px 0`
+//  on this wrapper. Against a navy footer that is a pale hairline floating above
+//  it and 50px of stray padding INSIDE the navy — and, because the wrapper is also
+//  the 1280px container, it inset `.hm-footer__inner` to 1216px so the footer
+//  columns no longer lined up with the header above them.
+.page-footer .footer.content {
+    border-block-start: 0;
+    margin: 0;
+    max-width: none;
+    padding: 0;
+}

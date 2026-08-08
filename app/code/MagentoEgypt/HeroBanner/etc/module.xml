@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — homepage hero band.
+ *
+ * The hero carousel and the three promo tiles beside it are ONE component in the
+ * design and are now one module: same table, same admin grid, same frontend
+ * block. Before this they were two unrelated things —
+ *
+ *   - the carousel was MagentoEgypt\HomeSections\Block\HeroCarousel, which derived
+ *     its slides from the category tree and took its per-slide copy from a
+ *     hard-coded array in the theme's layout XML. Changing a headline meant
+ *     editing layout and redeploying;
+ *   - the tiles were a CMS block (`hm_home_hero`) holding raw HTML, so their
+ *     images and links were unversioned markup a merchandiser had to hand-edit.
+ *
+ * Neither was manageable, and the two could not be kept in step. Both are
+ * replaced by rows in `magentoegypt_hero_banner`, edited from
+ * Content > Hub Market > Hero Banner.
+ *
+ * setup_version is deliberately ABSENT. This module ships db_schema.xml, which
+ * declarative schema applies on setup:upgrade without a version, and a data
+ * patch, which is tracked in patch_list. Declaring a setup_version without a
+ * matching setup_module row makes DbStatusValidator 500 the whole storefront —
+ * that has happened on this install before.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HeroBanner">
+        <sequence>
+            <module name="Magento_Backend"/>
+            <module name="Magento_Ui"/>
+            <module name="Magento_Store"/>
+            <module name="Magento_Catalog"/>
+        </sequence>
+    </module>
+</config>

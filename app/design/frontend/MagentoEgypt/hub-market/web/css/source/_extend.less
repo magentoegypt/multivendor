@@ -34,3 +34,10 @@
 @import '_hm-marketplace.less';
 @import '_hm-cms.less';
 @import '_hm-thirdparty.less';
+
+//  LAST, deliberately. _hm-figma.less is the geometry pass that reconciles this
+//  theme with the Figma reference build (band system, section heads, the product
+//  card). It corrects values set in the partials above rather than duplicating
+//  them, so it has to settle the cascade — and keeping it separate means the
+//  parity delta is one file to read and one line to revert.
+@import '_hm-figma.less';
