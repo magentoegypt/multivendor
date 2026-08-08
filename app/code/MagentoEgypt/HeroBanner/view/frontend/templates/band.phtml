@@ -26,6 +26,20 @@ $slides = $block->getSlides();
 $tiles  = $block->getTiles();
 $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($slides)), 0, 8);
 ?>
+<?php
+/*
+ * The band WRAPPER is what makes the two halves one row.
+ *
+ * They used to be two siblings floated side by side in `.column.main`, and a
+ * float cannot tell its neighbour how tall it is: the carousel measured 389px
+ * against a tile column of 335, so the column stopped 54px short of the hero and
+ * the band's bottom edge was visibly ragged. Figma builds this as one four-column
+ * grid with the hero spanning three, which equalises the two by construction —
+ * and now that both halves come out of THIS template, there is something to put
+ * the grid on.
+ */
+?>
+<div class="hm-hero-band">
 <?php if ($slides): ?>
 <section class="hm-hero-carousel" aria-roledescription="carousel"
          aria-label="<?= $escaper->escapeHtmlAttr(__('Featured promotions')) ?>"
@@ -113,6 +127,7 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
     <?php endforeach; ?>
 </div>
 <?php endif; ?>
+</div>
 
 <?php if (count($slides) > 1): ?>
 <script>

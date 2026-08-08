@@ -1326,30 +1326,57 @@
 }
 
 //
-//  Hero band geometry  (Figma: `grid lg:grid-cols-4 gap-2.5`, min-height 340)
+//  Hero band  (Figma: `grid lg:grid-cols-4 gap-2.5`, min-height 340)
 //  ---------------------------------------------
-//  The band is built with floats (see the long note in _hm-home.less about why
-//  inline-block failed). Kept — but the RATIO was ours, not Figma's: 68/30 with a
-//  2% gutter against the design's 3-of-4 columns with a 10px gap. At 1248px that
-//  is 933.5 / 304.5 / 10, i.e. 74.8% / 24.4% / 0.8%.
-@media (min-width: 992px) {
-    .hm-home .column.main > .hm-hero-carousel { inline-size: 74.8%; }
-    .hm-home .column.main > .hm-hero-tiles    { inline-size: 24.4%; margin-left: .8%; }
+//  ONE GRID, replacing the two floated siblings.
+//
+//  The float version could not work, and the reason is structural rather than a
+//  tuning problem: a float has no way to adopt its neighbour's height. Measured
+//  live, the carousel stood 389px and the tile column 335 — the column stopped
+//  54px above the hero's bottom edge and the band read as two unrelated blocks
+//  rather than one row. No ratio fixes that; only a shared row does.
+//
+//  Figma uses `grid-cols-4` with the hero at `col-span-3`, which also produces
+//  the exact widths the percentages had been approximating: at a 1248px container
+//  with a 10px gap, four tracks are 304.5 each, so the hero is
+//  3 x 304.5 + 2 x 10 = 933.5 and the tile column 304.5.
+//
+//  The wrapper this hangs on comes from MagentoEgypt_HeroBanner's band template.
+//  The float rules in _hm-home.less targeted `.column.main > .hm-hero-carousel`
+//  and no longer match now that both halves sit inside it; they are removed there
+//  rather than left as dead selectors that read as live.
+.hm-hero-band {
+    display: grid;
+    gap: 1rem;                                       // Figma gap-2.5
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    //  Figma's hero container carries `pt-3`. Ours sat flush against the nav, so
+    //  the navy header and the hero photograph met with no seam at all.
+    margin-block: var(--hm-space-3) var(--hm-space-2);
+    min-block-size: 34rem;
+}
 
-    [dir='rtl'] .hm-home .column.main > .hm-hero-tiles,
-    html:lang(ar) .hm-home .column.main > .hm-hero-tiles { margin-left: 0; margin-right: .8%; }
+.hm-hero-band > .hm-hero-carousel {
+    grid-column: span 3;
+    margin: 0;
+    min-inline-size: 0;   // lets the scroll track shrink instead of overflowing
+}
 
-    //  CLEARING THE FLOAT BAND.
-    //
-    //  `.hm-usp` used to be the next sibling and carried `clear: both` for the
-    //  whole page. Removing that strip (it duplicated the trust row — see the
-    //  layout XML) took the clear with it, and the category chips wrapped into
-    //  the 25% gap beside the hero: eight tiles crushed into a 300px column,
-    //  overlapping the promo tiles.
-    //
-    //  Clearing EVERY non-hero child rather than naming the next one, so the
-    //  band stays clear whatever section is reordered in next.
-    .hm-home .column.main > *:not(.hm-hero-carousel):not(.hm-hero-tiles) { clear: both; }
+//  A grid item stretches to the row by default, so the column now ends exactly
+//  where the carousel does. `grid-auto-rows: 1fr` in _hm-home.less divides that
+//  height three ways; the 24px bottom margin it also carried would have pulled
+//  the column short again by exactly that much.
+.hm-hero-band > .hm-hero-tiles {
+    margin: 0;
+    min-inline-size: 0;
+}
+
+@media (max-width: 991px) {
+    .hm-hero-band {
+        grid-template-columns: minmax(0, 1fr);
+        min-block-size: 0;
+    }
+
+    .hm-hero-band > .hm-hero-carousel { grid-column: auto; }
 }
 
 //
@@ -1363,6 +1390,51 @@
 //  So the tiles are fixed by fixing the type.
 .hm-home .hm-hero-carousel__slide,
 .hm-home .hm-hero-carousel__viewport { min-block-size: 34rem; }
+
+//
+//  What actually decided the band's height
+//  ---------------------------------------------
+//  The IMAGE did, via `.hm-hero-carousel__img { aspect-ratio: 24/10 }` in
+//  _hm-home.less: at a 933.5px column that computes to 389px, which is exactly
+//  the height the band kept landing on and 49px over Figma's 340. Every other
+//  measurement in the band was being derived from a hard-coded picture ratio.
+//
+//  Figma inverts that — the container states `min-height: 340px` and the image is
+//  `absolute inset-0 w-full h-full object-cover`, so the LAYOUT sets the height
+//  and the photograph fills whatever it is given. Same here now, which also means
+//  the aspect ratio of a banner uploaded in admin can no longer move the fold.
+//
+//  The BODY stays in flow (relative, not absolute) so unusually long merchandiser
+//  copy grows the band instead of spilling out of it — that copy is admin-editable
+//  now and cannot be assumed to fit. Measured: the three current slides run
+//  318.6px of content inside the 340, with room to spare.
+.hm-hero-band > .hm-hero-carousel,
+.hm-hero-carousel__viewport,
+.hm-hero-carousel__track,
+.hm-hero-carousel__link { block-size: 100%; }
+
+.hm-hero-carousel__link { overflow: hidden; }
+
+.hm-hero-carousel__img {
+    aspect-ratio: auto;
+    block-size: 100%;
+    inline-size: 100%;
+    inset: 0;
+    object-fit: cover;
+    position: absolute;
+}
+
+//  box-sizing matters here, and its absence is not obvious. This theme inherits
+//  no global border-box, so `min-block-size: 100%` resolved against the CONTENT
+//  box: 340 of content plus the body's own 80px of vertical padding made the
+//  slide 420 tall. The copy then sat 40px lower than the box it was centred in
+//  and the CTA landed on top of the carousel dots.
+.hm-hero-carousel__body {
+    box-sizing: border-box;
+    inset: auto;
+    min-block-size: 100%;
+    position: relative;
+}
 
 //  Figma: `px-8 md:px-12 py-10`. The 80px this replaces came from an earlier fix
 //  for the headline colliding with the prev arrow — but Figma solves the same
@@ -1460,7 +1532,18 @@
     }
 }
 
-.hm-hero-tiles { gap: 1rem; }   // Figma gap-2.5
+//  The tile COLUMN. Moved here with the rest of the band from _hm-home.less.
+//
+//  `grid-auto-rows: 1fr` is what makes the three tiles divide the band's height
+//  rather than each taking its content height — and it only means anything now
+//  that the column is a grid item stretched to the carousel's row. Under the old
+//  float layout the column had no height to divide, so the tiles collapsed to
+//  content (65px each against a 389px carousel) the moment their min-height went.
+.hm-hero-tiles {
+    display: grid;
+    gap: 1rem;                 // Figma gap-2.5
+    grid-auto-rows: 1fr;
+}
 
 //  Figma anchors tile copy to the bottom-lead corner (`absolute bottom-3 left-3`)
 //  rather than centring it, and runs a two-stop scrim.
@@ -1473,6 +1556,20 @@
     background: linear-gradient(to var(--hm-scrim-dir, right),
                 rgba(15, 33, 68, .85) 0%, rgba(15, 33, 68, .35) 60%, rgba(15, 33, 68, .05) 100%);
 }
+
+//  DARK BASE, and it is not decorative.
+//
+//  These tiles carry white text over a photograph. If a banner image is removed,
+//  404s, or has simply not been uploaded yet, white on the page background is
+//  1.07:1 — invisible. A navy base means the tile degrades to the same treatment
+//  as the scrim rather than to nothing at all.
+//
+//  It also restores the gate: a CSS gradient is a background-IMAGE, so the parity
+//  harness stops walking and refuses to score anything above it. With no opaque
+//  colour beneath, it climbed all the way to the white page and reported six
+//  1.0:1 failures on this rail. The rule was lost when the float band was removed
+//  from _hm-home.less — it lived in the same block.
+.hm-hero-tile { background: var(--hm-surface-inverse); }
 
 .hm-hero-tile__title { font-size: 1.4rem; font-weight: 700; }
 .hm-hero-tile__text  { color: fade(#ffffff, 75%); font-size: 1.2rem; }

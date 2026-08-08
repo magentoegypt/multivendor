@@ -858,144 +858,31 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
 }
 
 //
-//  Hero band: carousel + promo tiles side by side (Figma layout)
+//  Hero band — MOVED to _hm-figma.less
 //  ---------------------------------------------
-//  The carousel and the three tiles form one band. On the homepage body class
-//  only, so it cannot affect the same blocks elsewhere.
-.hm-home .hm-hero-carousel { margin-block-end: 0; }
-
-@media (min-width: 992px) {
-    .hm-home .hm-hero-carousel,
-    .hm-home .hm-hero-tiles {
-        display: inline-block;
-        vertical-align: top;
-    }
-
-    //  Grid rather than floats so the two columns share a row height.
-    .hm-home .column.main > .hm-hero-carousel { inline-size: calc(70% - .8rem); }
-    .hm-home .column.main > .hm-hero-tiles    { inline-size: calc(30% - .8rem); margin-inline-start: 1.6rem; }
-}
-
-//  The tile column must MATCH THE HERO'S HEIGHT, not exceed it. Figma runs a 454px
-//  hero beside three 145px tiles; ours rendered 3 x 225 = 711px against a 399px hero,
-//  so the column ran far past the carousel. `1fr` rows divide whatever height the
-//  hero sets, so the two stay aligned at any breakpoint without hard-coding either.
-.hm-hero-tiles {
-    display: grid;
-    gap: var(--hm-space-3);
-    grid-auto-rows: 1fr;
-    margin-block-end: var(--hm-space-6);
-    min-block-size: 0;
-}
-
-.hm-hero-tile {
-    border-radius: var(--hm-radius);
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: var(--hm-space-1);
-    justify-content: center;
-    min-block-size: 9rem;
-    padding: var(--hm-space-5);
-    text-decoration: none;
-    transition: box-shadow var(--hm-duration) var(--hm-ease);
-
-    &:hover, &:focus-visible { box-shadow: var(--hm-shadow); text-decoration: none; }
-}
-
-//  DARK fallback, not the old light tints. These tiles now carry white text over a
-//  photo; if a category image is removed or 404s, white-on-#f5f7fa is 1.07:1 and
-//  completely unreadable. A navy base means the tile degrades to the same treatment
-//  as the scrim rather than to an invisible label.
-.hm-hero-tile--a,
-.hm-hero-tile--b,
-.hm-hero-tile--c { background: var(--hm-surface-inverse); }
-
-.hm-hero-tile__title {
-    color: var(--hm-foreground);       // 15.89:1 on every tint above
-    font-size: 1.6rem;
-    font-weight: 700;
-}
-
-.hm-hero-tile__text {
-    //  WHITE now, not a muted grey: these tiles carry a PHOTO behind the text
-    //  (Figma parity), so the earlier tinted-surface fix no longer applies. The
-    //  scrim below guarantees the ratio rather than the flat background doing it.
-    color: var(--hm-on-inverse);
-    font-size: 1.3rem;
-}
-
+//  Three attempts lived here and all three are gone. Worth recording, because
+//  each failed for a different and non-obvious reason:
 //
-//  Keep the hero copy clear of the arrows.
-//  ---------------------------------------------
-//  The prev arrow sits at inset-inline-start: 1.6rem and is 4.4rem wide, so
-//  copy padded to 4rem collided with it - the title rendered underneath the
-//  button. Padding now clears the control plus a gutter.
-@media (min-width: 768px) {
-    .hm-hero-carousel__body { padding-inline: 8rem; }
-    .hm-hero-carousel__dots { inset-inline-start: 8rem; }
-}
-
+//    1. inline-block. The two blocks measured 970 and 422 inside a 1408 column,
+//       which fits — but inline-block honours the WHITESPACE between the elements
+//       in the HTML source, and that extra ~4px pushed the pair over the
+//       container so the second one wrapped. The CSS had been applying correctly
+//       the whole time.
+//    2. Floats. These fixed the wrap, because floats ignore inter-element
+//       whitespace. They could never fix the HEIGHT: a float cannot adopt its
+//       neighbour's, so the tile column always stopped short of the carousel's
+//       bottom edge — measured 335 against 389, a 54px ragged step.
+//    3. A 4rem inline padding on the hero body, so the headline cleared the prev
+//       arrow. Figma solves that collision by moving the arrow in to 12px and
+//       sizing it 36px, which its own 48px body padding clears exactly.
 //
-//  Hero band, corrected.
-//  ---------------------------------------------
-//  The earlier attempt set display:inline-block inside a media query, then the
-//  base `.hm-hero-tiles { display: flex }` rule below it re-declared display at
-//  equal specificity and won on source order — so the tiles stacked under the
-//  carousel instead of sitting beside it. This block is last, so it settles it.
-@media (min-width: 992px) {
-    .hm-home .column.main > .hm-hero-carousel {
-        display: inline-block;
-        inline-size: calc(70% - 1.6rem);
-        vertical-align: top;
-    }
-
-    .hm-home .column.main > .hm-hero-tiles {
-        display: inline-flex;          // inline-flex, not flex: it must sit in-line
-        flex-direction: column;
-        inline-size: 30%;
-        margin-inline-start: 1.2rem;
-        vertical-align: top;
-    }
-}
-
-//
-//  Hero band, settled.
-//  ---------------------------------------------
-//  inline-block did not work and the reason is worth recording: the two blocks
-//  measured 970px and 422px inside a 1408px column, which fits — but
-//  inline-block honours the whitespace BETWEEN the elements in the HTML source,
-//  and that extra ~4px pushed the pair over the container width so the second
-//  one wrapped. Measured in the live DOM; the CSS was applying correctly the
-//  whole time.
-//
-//  Floats ignore inter-element whitespace, which removes the failure mode
-//  entirely. Magento/blank uses floats for exactly this kind of two-column band.
-@media (min-width: 992px) {
-    .hm-home .column.main > .hm-hero-carousel,
-    .hm-home .column.main > .hm-hero-tiles {
-        box-sizing: border-box;   // blank sets no global border-box
-        float: left;
-        margin-inline-start: 0;
-    }
-
-    .hm-home .column.main > .hm-hero-carousel { inline-size: 68%; }
-    .hm-home .column.main > .hm-hero-tiles    { inline-size: 30%; margin-left: 2%; }
-
-    [dir='rtl'] .hm-home .column.main > .hm-hero-carousel,
-    [dir='rtl'] .hm-home .column.main > .hm-hero-tiles,
-    html:lang(ar) .hm-home .column.main > .hm-hero-carousel,
-    html:lang(ar) .hm-home .column.main > .hm-hero-tiles { float: right; }
-
-    [dir='rtl'] .hm-home .column.main > .hm-hero-tiles,
-    html:lang(ar) .hm-home .column.main > .hm-hero-tiles { margin-left: 0; margin-right: 2%; }
-
-    //  The service-promise strip is the next sibling, so it clears the band.
-    .hm-home .column.main > .hm-usp { clear: both; }
-
-    //  Match the tile column height to the carousel so the band reads as one row.
-    .hm-home .column.main > .hm-hero-tiles { margin-block-end: var(--hm-space-6); }
-}
+//  The band is now ONE CSS grid — `grid-cols-4` with the hero at `col-span-3`,
+//  as the reference builds it — which equalises the two columns by construction.
+//  See `.hm-hero-band` in _hm-figma.less. It hangs on a wrapper emitted by
+//  MagentoEgypt_HeroBanner's band template; the rules that used to live here
+//  selected `.hm-home .column.main > .hm-hero-carousel` and stopped matching the
+//  moment that wrapper appeared, so they are deleted rather than left behind
+//  looking active.
 
 //
 //  Today's Deals countdown
