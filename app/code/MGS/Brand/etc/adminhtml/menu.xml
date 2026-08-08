@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Backend/etc/menu.xsd">
     <menu>
+        <!-- The "MGS" top-level node used to come from MGS_ThemeSettings/MGS_Lookbook, both now disabled.
+             MGS_Brand is the only enabled module parenting under it, so it declares the node itself;
+             without this the admin menu build fails with "Specified invalid parent id (Magento_Backend::mgs)".
+             Magento merges duplicate ids, so this stays safe if those modules are re-enabled. -->
+        <add id="Magento_Backend::mgs" title="MGS" module="Magento_Backend" sortOrder="70" resource="Magento_Backend::mgs"/>
         <add id="MGS_Brand::brand" title="Shop By Brand" module="MGS_Brand" sortOrder="80" parent="Magento_Backend::mgs" resource="MGS_Brand::brand"/>
         <add id="MGS_Brand::manage_brand" title="Manage Brands" module="MGS_Brand" sortOrder="10" parent="MGS_Brand::brand" action="brand/brand/" resource="MGS_Brand::manage_brand"/>
         <add id="MGS_Brand::configuration" title="Configuration" module="MGS_Brand" sortOrder="20" parent="MGS_Brand::brand" action="adminhtml/system_config/edit/section/brand" resource="MGS_Brand::configuration"/>
