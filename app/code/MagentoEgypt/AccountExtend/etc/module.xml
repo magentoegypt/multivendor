@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * The customer account identity band and shopping-stats card.
+ *
+ * Lives in its own module rather than in MagentoEgypt_CheckoutExtend, which is
+ * scoped to cart and checkout presentation and would have been the wrong home.
+ *
+ * Deliberately declares NO setup_version: it ships no schema and no data
+ * scripts, and declaring one without ever running setup:upgrade makes
+ * DbStatusValidator 500 the entire storefront.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_AccountExtend">
+        <sequence>
+            <module name="Magento_Customer"/>
+            <module name="Magento_Sales"/>
+            <module name="Magento_Wishlist"/>
+        </sequence>
+    </module>
+</config>

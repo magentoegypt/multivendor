@@ -789,3 +789,159 @@
     //  under a list that already ends in a bordered card.
     &.block { border-block-end: 0; padding-block-end: 0; }
 }
+
+//
+//  Identity band
+//  ---------------------------------------------
+//  The header of the Figma account screen: avatar disc, name, e-mail, two stat
+//  chips, and Edit Profile on the trailing edge. Full width above both columns.
+.hm-identity {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-5);
+    margin-block-end: var(--hm-space-8);
+    padding: var(--hm-space-6);
+
+    &__avatar {
+        align-items: center;
+        //  Navy rather than the reference's indigo: this palette has no indigo,
+        //  and the disc is the largest single block of colour on the page.
+        background: var(--hm-primary);
+        border-radius: var(--hm-radius-full);
+        block-size: 7.2rem;
+        color: var(--hm-on-primary);
+        display: flex;
+        flex: 0 0 auto;
+        font-family: var(--hm-font-heading);
+        font-size: 2.4rem;
+        font-weight: 700;
+        inline-size: 7.2rem;
+        justify-content: center;
+        letter-spacing: .02em;
+        line-height: 1;
+    }
+
+    &__body {
+        display: flex;
+        flex: 1 1 24rem;
+        flex-direction: column;
+        gap: .2rem;
+        min-inline-size: 0;
+    }
+
+    &__name {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-heading);
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    &__email {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        margin: 0;
+        overflow-wrap: anywhere;      // long addresses must not widen the band
+    }
+
+    &__chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-4);
+        list-style: none;
+        margin: var(--hm-space-2) 0 0;
+        padding: 0;
+    }
+
+    &__chip {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        display: inline-flex;
+        font-size: 1.3rem;
+        gap: var(--hm-space-2);
+
+        .hm-icon { color: var(--hm-accent-strong); }
+    }
+
+    &__edit {
+        align-items: center;
+        box-sizing: border-box;
+        display: inline-flex;
+        flex: 0 0 auto;
+        justify-content: center;
+        margin-inline-start: auto;    // logical, so it mirrors
+        min-block-size: 4.8rem;
+        padding-block: 0;
+        padding-inline: var(--hm-space-5);
+    }
+}
+
+//
+//  Shopping Stats
+//  ---------------------------------------------
+.hm-stats {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    margin-block-start: var(--hm-space-4);
+    padding: var(--hm-space-5);
+
+    &__title {
+        font-family: var(--hm-font-heading);
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin: 0 0 var(--hm-space-3);
+    }
+
+    &__list { margin: 0; }
+
+    &__row {
+        align-items: baseline;
+        display: flex;
+        gap: var(--hm-space-3);
+        justify-content: space-between;
+        padding-block: var(--hm-space-2);
+
+        + .hm-stats__row { border-block-start: 1px solid var(--hm-border-subtle); }
+    }
+
+    &__label {
+        color: var(--hm-foreground-muted);
+        //  The label is the part allowed to wrap. This card sits in a 288px
+        //  rail and the amounts here are long — "٣٠٬٦٩٣٫٠٠ ج.م." — so something
+        //  has to give, and a figure broken across two lines is unreadable in a
+        //  way a wrapped label is not.
+        flex: 1 1 auto;
+        font-size: 1.3rem;
+        margin: 0;
+        min-inline-size: 0;
+    }
+
+    &__value {
+        color: var(--hm-foreground);
+        flex: 0 0 auto;
+        font-size: 1.4rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+        margin: 0;
+        text-align: end;
+        white-space: nowrap;
+    }
+}
+
+@media (max-width: 767px) {
+    .hm-identity {
+        gap: var(--hm-space-4);
+        padding: var(--hm-space-4);
+
+        //  Edit Profile drops to its own full-width row rather than being
+        //  squeezed beside a wrapped name.
+        &__edit { inline-size: 100%; margin-inline-start: 0; }
+    }
+}

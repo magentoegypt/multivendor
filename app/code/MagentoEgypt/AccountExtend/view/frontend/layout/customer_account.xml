@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * The identity band and the Shopping Stats card, on the `customer_account`
+ * handle so they appear on every account route rather than the dashboard only —
+ * which is what the reference does.
+ *
+ * The band goes in `columns.top`, a container the page layout already owns, so
+ * it spans both columns. Note that container also holds `page.messages`: the
+ * band is declared AFTER it so a success or error message still lands above the
+ * fold.
+ *
+ * Both blocks are `cacheable="false"` by inheritance from the account pages
+ * themselves; they read the customer session, so they must never be cached.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="columns.top">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.account.identity"
+                   after="page.messages"
+                   template="MagentoEgypt_AccountExtend::account/identity.phtml">
+                <arguments>
+                    <argument name="account_stats" xsi:type="object">MagentoEgypt\AccountExtend\ViewModel\AccountStats</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <referenceContainer name="sidebar.main">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.account.stats"
+                   after="sidebar.main.account_nav"
+                   template="MagentoEgypt_AccountExtend::account/stats.phtml">
+                <arguments>
+                    <argument name="account_stats" xsi:type="object">MagentoEgypt\AccountExtend\ViewModel\AccountStats</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

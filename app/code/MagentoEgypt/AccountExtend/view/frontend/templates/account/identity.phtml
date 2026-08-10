@@ -1,0 +1,50 @@
+<?php
+/**
+ * Customer identity band — the header of the Figma account screen.
+ *
+ * Renders above both columns on every account route, which is where the
+ * reference puts it. Guarded on being logged in: `columns.top` is a shared
+ * container and a half-rendered band on a guest page would be worse than none.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+/** @var \MagentoEgypt\AccountExtend\ViewModel\AccountStats $stats */
+$stats = $block->getData('account_stats');
+if (!$stats || !$stats->isLoggedIn()) {
+    return;
+}
+$hmName = $stats->getName();
+?>
+<section class="hm-identity">
+    <?php /*
+        The disc carries initials, not a photo: Magento has no customer avatar
+        and inventing an upload for one band is a bigger change than the band.
+        aria-hidden because the name it abbreviates is read out immediately
+        after it.
+    */ ?>
+    <span class="hm-identity__avatar" aria-hidden="true"><?= $escaper->escapeHtml($stats->getInitials()) ?></span>
+
+    <div class="hm-identity__body">
+        <?php if ($hmName !== ''): ?>
+            <p class="hm-identity__name"><?= $escaper->escapeHtml($hmName) ?></p>
+        <?php endif; ?>
+        <p class="hm-identity__email"><?= $escaper->escapeHtml($stats->getEmail()) ?></p>
+
+        <ul class="hm-identity__chips">
+            <li class="hm-identity__chip">
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-package"/></svg>
+                <span><?= $escaper->escapeHtml(__('%1 Orders', $stats->getOrderCount())) ?></span>
+            </li>
+            <li class="hm-identity__chip">
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>
+                <span><?= $escaper->escapeHtml(__('%1 Wishlist Items', $stats->getWishlistCount())) ?></span>
+            </li>
+        </ul>
+    </div>
+
+    <a class="hm-identity__edit hm-btn hm-btn--secondary" href="<?= $escaper->escapeUrl($stats->getEditUrl()) ?>">
+        <?= $escaper->escapeHtml(__('Edit Profile')) ?>
+    </a>
+</section>

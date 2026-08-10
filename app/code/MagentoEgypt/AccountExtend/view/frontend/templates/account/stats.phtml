@@ -1,0 +1,35 @@
+<?php
+/**
+ * Shopping Stats — the small panel under the sidebar nav in the Figma account
+ * screen.
+ *
+ * All three figures come from the same single aggregate the identity band
+ * already ran; the ViewModel memoises it, so rendering both costs one query.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+/** @var \MagentoEgypt\AccountExtend\ViewModel\AccountStats $stats */
+$stats = $block->getData('account_stats');
+if (!$stats || !$stats->isLoggedIn()) {
+    return;
+}
+
+$hmRows = [
+    [__('Total Spent'), $stats->getTotalSpentFormatted()],
+    [__('Orders This Year'), (string) $stats->getOrdersThisYear()],
+    [__('Avg. Order Value'), $stats->getAverageOrderValueFormatted()],
+];
+?>
+<section class="hm-stats">
+    <h2 class="hm-stats__title"><?= $escaper->escapeHtml(__('Shopping Stats')) ?></h2>
+    <dl class="hm-stats__list">
+        <?php foreach ($hmRows as [$hmLabel, $hmValue]): ?>
+            <div class="hm-stats__row">
+                <dt class="hm-stats__label"><?= $escaper->escapeHtml($hmLabel) ?></dt>
+                <dd class="hm-stats__value"><?= $escaper->escapeHtml($hmValue) ?></dd>
+            </div>
+        <?php endforeach; ?>
+    </dl>
+</section>
