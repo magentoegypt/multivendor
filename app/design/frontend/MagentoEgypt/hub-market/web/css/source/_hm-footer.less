@@ -215,7 +215,20 @@
         padding-inline: var(--hm-space-4);
     }
 
-    .block.newsletter .actions { display: block; flex: 0 0 auto; }
+    //  `width` has to be named, not just `display`.
+    //
+    //  blank ships `.block.newsletter .actions { display: table-cell; width: 1% }`.
+    //  Resetting only the display left the 1% standing, so at 390 the flex
+    //  basis resolved to 3.58px and the 116px Subscribe button overflowed its
+    //  own parent — measured 95px past the right edge of the viewport, on every
+    //  page of the site, which is a horizontal-overflow failure by this theme's
+    //  own parity gate.
+    .block.newsletter .actions {
+        display: block;
+        flex: 0 0 auto;
+        inline-size: auto;
+        width: auto;
+    }
 }
 
 //  Square, matching the header's search button. The `.hm-page` prefix is carried

@@ -883,6 +883,16 @@
     gap: var(--hm-space-8);
     grid-template-columns: repeat(auto-fit, minmax(32rem, 1fr));
 
+    //  427px OF DEAD PAGE, and both cards jammed against the far edge.
+    //
+    //  blank hangs `.abs-add-clearfix-desktop` on this element. As grid items
+    //  its two pseudos are real children, so FOUR items were laid into three
+    //  tracks: ::before plus the two panels on row one, ::after alone on row
+    //  two — which is also where the 32px of phantom container height came
+    //  from (643 against a 611 card). Same trap as the cart's .cart-container.
+    &::before,
+    &::after { content: none; }
+
     > .block {
         background: var(--hm-surface);
         border: 1px solid var(--hm-border-subtle);
@@ -900,8 +910,15 @@
     }
 }
 
+//  `.form.password-forget` is here because Vnecoms_Sms emits ONE hyphenated
+//  class where core emits three (`form password forget`), so both blank's
+//  sizing and this theme's field treatment missed the forgot-password page
+//  entirely — it was rendering a 1248px-wide email input and a 1248px-wide
+//  five-character CAPTCHA box.
 .form-login,
-.form.create.account {
+.form.create.account,
+.form.password-forget,
+.form.password.forget {
     .field { margin-block-end: var(--hm-space-4); }
 
     .label {
@@ -1019,10 +1036,94 @@ a.sms-login-field-ctrl {
 
 //  Magento's floated label/control pattern clipped the inputs; make the login
 //  fields a simple stacked block.
-.form-login .field,
-.form.create.account .field {
+//
+//  `:not(.choice)` is load-bearing. Without it this also caught the consent
+//  rows — "Sign Up for Newsletter", "Allow remote shopping assistance" — whose
+//  label belongs BESIDE its checkbox, not stacked above it as a full-width
+//  block. Measured: a 13px checkbox at x=257 with its own label at x=96 on the
+//  next line, 161px to the left of and 18px below the box it names, on all
+//  three consent rows.
+.form-login .field:not(.choice),
+.form.create.account .field:not(.choice),
+.form.password-forget .field:not(.choice),
+.form.password.forget .field:not(.choice) {
     > .label { display: block; float: none; text-align: start; width: auto; }
     > .control { width: 100%; }
+}
+
+//  The other half of the same defect: the 161px offset is blank's
+//  `.fieldset > .field.choice::before { width: 25.8%; float: left }`, an empty
+//  spacer standing in for the floated label column this theme no longer uses.
+.customer-account-create,
+.customer-account-login,
+.customer-account-forgotpassword {
+    .fieldset > .field.choice::before,
+    .fieldset > .field.no-label::before { content: none; display: none; }
+
+    .fieldset > .field.choice {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-2);
+        margin-inline-start: 0;
+        min-block-size: 4.4rem;
+
+        > .label {
+            display: inline;
+            font-weight: 400;
+            inline-size: auto;
+            margin: 0;
+        }
+    }
+
+    //  Native 13px controls in browser blue, as on the checkout.
+    input[type='checkbox'],
+    input[type='radio'] {
+        accent-color: var(--hm-accent-strong);
+        block-size: 1.8rem;
+        inline-size: 1.8rem;
+    }
+
+    //  blank's `abs-margin-for-forms-desktop` pins the submit button, the
+    //  legends and "* Required Fields" at `margin-left: 25.8%` — the width of
+    //  that same abandoned label column. It is PHYSICAL, so the Arabic login
+    //  toolbar's box was byte-identical to the English one and the Arabic
+    //  forgot-password button ended up stranded on the visual left of a
+    //  right-aligned form. (0,4,1) to beat blank's (0,3,1).
+    .column:not(.sidebar-main) form .actions-toolbar,
+    .column:not(.sidebar-additional) form .actions-toolbar {
+        margin-inline-start: 0;
+        margin-left: 0;
+    }
+
+    .fieldset .legend { margin-inline-start: 0; margin-left: 0; }
+    .login-container .fieldset::after { margin-inline-start: 0; margin-left: 0; }
+}
+
+//  The most form-heavy page in the journey was the only one with no card:
+//  fields sat bare at x=96, 624px wide in a 1248px band. It is not inside a
+//  `.login-container`, so the panel rule above never reached it.
+.customer-account-create .column.main .form.create.account {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 72rem;
+    min-inline-size: 0;              // clears blank's min-width: 600px, which fights at 390
+    padding: var(--hm-space-6);
+    width: auto;
+}
+
+.customer-account-forgotpassword .column.main .form.password-forget {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 56rem;
+    min-inline-size: 0;
+    padding: var(--hm-space-6);
+    width: auto;
 }
 
 .action.login.primary,
@@ -1055,36 +1156,15 @@ a.sms-login-field-ctrl {
 //  Order history with the Vnecoms per-vendor split, RMA, store credit and the
 //  address book were never drawn in the design and are deliberately left on
 //  default styling until they are.
-.block-collapsible-nav {
-    background: var(--hm-surface);
-    border: 1px solid var(--hm-border-subtle);
-    border-radius: var(--hm-radius);
-    padding: var(--hm-space-4);
-
-    .item {
-        margin: 0;
-
-        a, strong {
-            border-inline-start: 2px solid transparent;
-            color: var(--hm-foreground-muted);
-            display: block;
-            font-size: 1.4rem;
-            padding: var(--hm-space-3) var(--hm-space-4);
-            text-decoration: none;
-        }
-
-        a:hover { color: var(--hm-accent-strong); }
-
-        &.current {
-            a, strong {
-                border-inline-start-color: var(--hm-accent);
-                color: var(--hm-foreground);
-                font-weight: 600;
-            }
-        }
-    }
-}
-
+//  `.block-collapsible-nav` USED to be styled here as well as in
+//  _hm-account.less, both at (0,1,0). Account is imported second so it won
+//  per-property — but only for the properties it re-declares, so the active
+//  item resolved as a UNION of the two: account's tinted pill with a 6px
+//  radius, PLUS this block's 2px inline-start bar, whose square ends collided
+//  with the pill's corners. Every non-current item carried the transparent 2px
+//  too, insetting the whole list by 18px on one side and 16px on the other.
+//  One declaration, in _hm-account.less. The rules below are the ones that
+//  were unique to this block and had to survive the deletion.
 .account {
     .column.main .block {
         border-block-end: 1px solid var(--hm-border-subtle);
@@ -1092,6 +1172,9 @@ a.sms-login-field-ctrl {
         padding-block-end: var(--hm-space-6);
     }
 
+    //  _hm-account.less has no `legend` rule at all and sizes .block-title only
+    //  for the dashboard blocks, so this is the only thing giving Account
+    //  Information, Newsletter and Address Edit their heading scale.
     .block-title strong,
     .legend span {
         font-family: var(--hm-font-heading);
@@ -1102,12 +1185,17 @@ a.sms-login-field-ctrl {
     .table-wrapper table {
         inline-size: 100%;
 
+        //  `letter-spacing` and `text-transform: uppercase` were here and are
+        //  gone. The RTL neutraliser in _hm-root.less covers headings, buttons
+        //  and actions — NOT `th` — so Arabic table headers were being letter-
+        //  spaced, which breaks cursive joining. Uppercase is a no-op on Arabic
+        //  script but was also a house-style deviation in English: no other
+        //  table on the storefront shouts its column names. _hm-account.less
+        //  already supplies the intended header treatment.
         th {
             color: var(--hm-foreground-muted);
             font-size: 1.2rem;
-            letter-spacing: .06em;
             text-align: start;
-            text-transform: uppercase;
         }
 
         th, td {
@@ -1616,5 +1704,117 @@ a.sms-login-field-ctrl {
     .am-checkout .payment-option-title.field.choice {
         margin-inline: 0;
         padding-inline: 0;
+    }
+}
+
+//
+//  Order success page
+//  ---------------------------------------------
+//  The Figma reference has no success page, so the standard here is the cart
+//  and checkout the shopper has just come through. That is the whole finding:
+//  the page inverted the pattern those two now set — white page, white panels,
+//  and the only tinted surface on it was the items table's header row.
+//
+//  The page is Amasty's (module-checkout-thank-you-page), but the body class is
+//  `checkout-onepage-success` and it renders inside `div.account`, so both the
+//  rules here and the shared `.account` rules above reach it.
+.checkout-onepage-success {
+    .page-wrapper { background: var(--hm-surface-muted); }
+
+    .page-main {
+        max-inline-size: 115.2rem;
+        padding-block-start: var(--hm-space-8);   // was 0 — the h1 began on the
+                                                  // exact pixel the nav ended
+        padding-inline: var(--hm-space-4);
+    }
+
+    //  48px, the loudest h1 on the storefront, on a page whose job is to be
+    //  calm. 30px matches the cart and checkout either side of it.
+    .page-title-wrapper .page-title {
+        font-family: var(--hm-font-heading);
+        font-size: 3rem;
+        font-weight: 700;
+        margin-block-end: var(--hm-space-6);
+    }
+
+    //  The one tinted thing on a white page was a table header. With the page
+    //  tinted it has to go the other way.
+    .account .data.table thead th { background: transparent; }
+
+    //  Shipping/Billing address and Shipping/Payment method. blank floats these
+    //  at 48.8%, which left ~144px of dead white beside a one-line Shipping
+    //  Method panel. Floats self-heal on grid items; `width` does not, so it is
+    //  reset explicitly and at a weight that beats blank's (0,7,0).
+    .block-order-details-view .block-content {
+        align-items: start;
+        display: grid;
+        gap: var(--hm-space-6);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .account .column.main .block:not(.widget) .block-content .box {
+        float: none;
+        inline-size: auto;
+        margin-block-end: 0;
+        width: auto;
+    }
+
+    .account .box { padding: var(--hm-space-6); }
+
+    //  Items Ordered stays a table — its renderer is shared with the order
+    //  view, the guest order view and the print view, so rewriting it as cards
+    //  is three pages of regression for one screen. Wrapping it in the panel
+    //  treatment gets it to read as a card from the outside.
+    .order-details-items {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        padding: var(--hm-space-6);
+    }
+
+    //  Totals, matching the cart and checkout for the third time: muted label,
+    //  near-black value, a hairline above the grand row, 18px/700 on BOTH sides
+    //  of it and navy — not the accent — for the amount. blank sets
+    //  `font-weight: 400` on `.mark` at (0,4,1), so a rule that sets only size
+    //  and colour leaves the label at 400 beside a 700 amount.
+    .table-order-items tfoot {
+        .mark { color: var(--hm-foreground-muted); font-weight: 400; }
+        .amount .price { color: var(--hm-foreground); font-weight: 500; }
+
+        .grand_total th,
+        .grand_total td,
+        .grand_total .mark,
+        .grand_total .amount {
+            border-block-start: 1px solid var(--hm-border-subtle);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .grand_total .mark { color: var(--hm-foreground); }
+        .grand_total .amount,
+        .grand_total .amount .price { color: var(--hm-foreground); }
+    }
+
+    //  blank aligns these with a physical `right`.
+    .table-order-items {
+        .col.price, .col.qty, .col.subtotal,
+        tfoot .mark, tfoot .amount { text-align: end; }
+    }
+
+    //  The tel: link was the only accent-coloured text on the page, which made
+    //  the customer's own phone number louder than their order number.
+    .box-content a[href^='tel:'] {
+        color: var(--hm-foreground);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+}
+
+@media (max-width: 767px) {
+    .account .page-title-wrapper .page-title,
+    .checkout-onepage-success .page-title-wrapper .page-title { font-size: 2.8rem; }
+
+    .checkout-onepage-success .block-order-details-view .block-content {
+        grid-template-columns: minmax(0, 1fr);
     }
 }

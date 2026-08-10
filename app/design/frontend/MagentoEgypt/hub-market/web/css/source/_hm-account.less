@@ -429,12 +429,30 @@
 //  account screen is 24px, but its heading is the customer's NAME inside a single
 //  tabbed page; ours are per-route page titles, and dropping below the cart would
 //  add a fifth heading size to the scale for no gain.
+//  The three PUBLIC account routes carry no `.account` body class — they are
+//  `customer-account-login`, `-create` and `-forgotpassword` — so none of the
+//  rules in this file reached them and they were still rendering blank's 48px
+//  h1, the loudest heading on the storefront.
 .account .page-title-wrapper .page-title,
+.customer-account-login .page-title-wrapper .page-title,
+.customer-account-create .page-title-wrapper .page-title,
+.customer-account-forgotpassword .page-title-wrapper .page-title,
 .vstorecredit-index-index .page-title-wrapper .page-title,
 .vrma-customer-index .page-title-wrapper .page-title {
     font-family: var(--hm-font-heading);
     font-size: 3rem;
     font-weight: 700;
+    margin-block-end: var(--hm-space-6);
+}
+
+//  Same three routes: the tinted ground and the 32px of air above the heading
+//  that the cart, checkout and success pages all now have. Without this the
+//  panels added to these pages are white cards on a white page.
+.customer-account-login,
+.customer-account-create,
+.customer-account-forgotpassword {
+    .page-wrapper { background: var(--hm-surface-muted); }
+    .page-main { padding-block-start: var(--hm-space-8); }
 }
 
 //
@@ -490,4 +508,60 @@
     .sidebar-main { float: inline-start; }
 
     .column.main { float: inline-end; }
+
+    //  THE GUTTERS ARE PHYSICAL AND SO THEY DO NOT MIRROR. blank puts
+    //  `padding-right: 2%` on the sidebar and `padding-left: 2%` on the main
+    //  column (and swaps them for `2columns-right`), which in Arabic lands both
+    //  on the OUTER edges: the two columns touch with a 0px gutter and ~25px of
+    //  dead space appears at each page edge. Both physical sides have to be
+    //  named before the logical one can do the work.
+    .sidebar-main {
+        padding-left: 0;
+        padding-right: 0;
+        padding-inline-end: var(--hm-space-8);
+    }
+
+    .column.main {
+        padding-left: 0;
+        padding-right: 0;
+        padding-inline-start: 0;
+    }
+
+    //  The rail was 183px of usable width holding around thirteen links — "My
+    //  Downloadable Products" and "Newsletter Subscriptions" cannot fit that at
+    //  14px and wrapped. The reference gives its four-item nav 288px.
+    @media (min-width: 768px) {
+        .sidebar-main { inline-size: 23.077%; }   // 288/1248
+        .column.main  { inline-size: 76.923%; }
+    }
+}
+
+//
+//  Account page ground
+//  ---------------------------------------------
+//  Nothing tinted the account pages, so every panel this file paints
+//  `--hm-surface` sat white-on-white with only a --hm-border-subtle hairline
+//  (1.18:1) to separate it. One selector covers every route on the
+//  `customer_account` handle.
+.account .page-wrapper { background: var(--hm-surface-muted); }
+
+//  #6b7280 is 4.83:1 on white but 4.50:1 on the tinted page — exactly on the
+//  AA line. Table copy sits directly on that tint.
+.account .data.table tbody td { color: @hm-neutral-600; }
+
+//
+//  Sidebar nav — the single definition.
+//  ---------------------------------------------
+//  This used to be declared here AND in _hm-checkout.less, both at (0,1,0),
+//  and the active item resolved as a union of the two: this file's tinted pill
+//  plus that one's 2px inline-start bar, square ends against curved corners.
+//  blank also ships a PHYSICAL `border-left: 3px solid transparent` with
+//  `.item.current a { border-color: #c2410c }`, so under <html lang="ar"> the
+//  logical border mapped to one side and blank's survived on the other and
+//  Arabic drew bars on BOTH edges. Named explicitly to kill it.
+.block-collapsible-nav .item > a,
+.block-collapsible-nav .item > strong {
+    border-left: 0;
+    border-right: 0;
+    border-inline-start: 0;
 }
