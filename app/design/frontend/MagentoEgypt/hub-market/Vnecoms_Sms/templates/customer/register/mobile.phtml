@@ -1,0 +1,287 @@
+<?php
+/**
+ * Hub Market override of Vnecoms_Sms::customer/register/mobile.phtml.
+ *
+ * THE REQUIRED MOBILE FIELD HAD NO ACCESSIBLE NAME. Its label pointed at
+ * `mobile-number`, which is the HIDDEN input that carries the normalised value;
+ * the visible control is `mobile-number-input` and had no label, aria-label or
+ * title. A screen reader met a required text box called nothing. The label now
+ * points at the control the customer actually types into.
+ *
+ * `mobile-number` was also duplicated by the hidden authentication popup that
+ * renders on every page, so `for=` resolved into the dialog rather than even
+ * reaching the intended hidden field. All three ids are prefixed here; every
+ * reference to them lives in this file's own inline JS and is renamed with them.
+ *
+ * `mobile-number-id` is deliberately NOT renamed: it is a pre-existing Vnecoms
+ * reference to an id that exists nowhere in the markup, and giving it a new
+ * name would only make a dead line look intentional.
+ *
+ * This template is shared with the SMS-notifications account page
+ * (customer_account_sms), which is why the rename is done in the template
+ * rather than per-page.
+ */
+?>
+<div class="field mobile vsms-field-container required">
+    <label for="hm-reg-mobile-input" class="label"><span><?php /* @escapeNotVerified */ echo __('Mobile Number') ?></span></label>
+    <div class="control">
+        <input type="tel" name="mobile_number_input" id="hm-reg-mobile-input" value="<?php echo $block->getInitMobileNumber();?>"
+            class="input-text hm-reg-mobile required-entry validate-require-other-fields validate-sms-phone-number<?php if($block->isEnabledVerifying()):?> otp-verify<?php endif;?><?php if($block->getIsVerifiedMobile()):?> otp-validated<?php endif;?>" />
+        <input type="hidden" name="mobile_number" id="hm-reg-mobile" />
+        <input type="hidden" name="mobile_otp" id="hm-reg-mobile-otp" />
+    </div>
+</div>
+
+<div class="sms-otp-dialog" id="sms-otp-dialog">
+    <div class="sms-otp-step-1">
+        <p><?php echo __("Click to the button below to verify your phone number")?> <span class="sms-otp-mobile"></span></p>
+        <button class="action primary send-otp-btn" id="send-otp-btn"><span><?php echo __("Get OTP")?></span></button>
+    </div>
+    <div class="sms-otp-step-2">
+        <p><?php echo __("A text message with a %1-digit verification code has been sent to",$block->getOtpLength())?> <span id="sms-otp-dialog-mobile" class="sms-otp-mobile"></span></p>
+        <input type="text" name="sms_otp_code" id="sms-otp-input" value="" class="input-text required-entry" placeholder="<?php echo __("Your OTP")?>"/>
+        <button class="action primary send-otp-btn" id="verify-otp-btn"><span><?php echo __("Verify")?></span></button>
+        <a href="#" class="resend-otp-btn" id="resend-otp-btn" data-time="<?php echo $block->getOtpResendPeriodTime()?>"><?php echo __("Resend after %1 seconds", $block->getOtpResendPeriodTime())?></a>
+    </div>
+</div>
+
+<script type="text/javascript">
+var URL_SEND_OTP = '<?php echo $block->getSendOtpUrl();?>';
+var URL_VERIFY_OTP = '<?php echo $block->getVerifyOtpUrl();?>';
+
+require([
+     'jquery',
+     'Magento_Ui/js/modal/modal',
+     'Magento_Ui/js/modal/alert',
+     'Vnecoms_Sms/js/utils',
+     'jquery/intltellinput',
+     'jquery/mask',
+     'mage/mage',
+     'mage/validation',
+     'loader',
+     'domReady!'
+], function($, modal, alert){
+	function initMobileInput(){
+	    $("#hm-reg-mobile-input").intlTelInput({
+	    	initialCountry: '<?php echo strtolower($block->getInitialCountry());?>',
+            allowDropdown: <?php echo strtolower($block->getAllowCountryDropdown());?>,
+	    <?php if($block->getInitialCountry() == 'auto'):?>
+        	geoIpLookup: function(callback) {
+        	    $.get("<?php echo $block->getGeoIpUrl()?>", function() {}, "jsonp").always(function(resp) {
+     	    	   var countryCode = (resp && resp.country) ? resp.country : "";
+     	    	   callback(countryCode);
+    		    });
+      		},
+  		<?php endif;?>
+  		onlyCountries: <?php echo $block->getOnlyCountries();?>,
+		preferredCountries:<?php echo $block->getPreferredCountries();?>
+        }).done(function() {
+        	initMask();
+           $('#hm-reg-mobile').val($("#hm-reg-mobile-input").intlTelInput("getNumber"));
+           if ($('#mobilenumber')) {
+               $('#mobilenumber').val($("#hm-reg-mobile-input").intlTelInput("getNumber"));
+           }
+     	   $('#hm-reg-mobile-input').on('keyup', function() {
+      		   validatePhoneNum();
+       	   }).on("countrychange", function(e, countryData) {
+          		validatePhoneNum();
+          		initMask();
+      	   });
+      	});
+	}
+
+	/**
+	 * Get Mask
+	 */
+	function initMask(){
+		var countryData = $("#hm-reg-mobile-input").intlTelInput("getSelectedCountryData");
+		if(!countryData.iso2) return false;
+		var numberType = intlTelInputUtils.numberType['MOBILE'];
+		var mask = intlTelInputUtils.getExampleNumber(countryData.iso2, true, numberType);
+		$("#hm-reg-mobile-input").mask(mask.replace(/([0-9])/g, '0'));
+	}
+
+    /**
+     * Validate phone number
+     */
+    function validatePhoneNum(){
+        var number = $("#hm-reg-mobile-input").intlTelInput("getNumber");
+        var currentCustomerNumber = '<?php echo $this->getCustomer()->getMobilenumber()?>';
+        if(currentCustomerNumber.length && (number == currentCustomerNumber)){
+        	$('#hm-reg-mobile-input').addClass('otp-validated');
+        }else{
+        	$('#hm-reg-mobile-input').removeClass('otp-validated');
+        }
+
+        $('#hm-reg-mobile').val(number);
+        if ($('#mobilenumber')) {
+            $('#mobilenumber').val(number);
+        }
+        $('.sms-otp-mobile').html($("#hm-reg-mobile-input").intlTelInput("getNumber", intlTelInputUtils.numberFormat.INTERNATIONAL)); /*intlTelInputUtils.numberFormat.NATIONAL*/
+    }
+
+    /**
+     * Send otp
+     */
+    function sendOtp(isResend){
+        $('#send-otp-btn').prop('disabled','disabled');
+        $('#send-otp-btn span').first().text('<?php echo __('OTP is sending ...');?>');
+    	$.ajax({
+      		  url: URL_SEND_OTP,
+      		  method: "POST",
+      		  data: {
+          		  mobile : $("#hm-reg-mobile").val(),
+          		  resend : isResend,
+    		  },
+      		  dataType: "json"
+    		}).done(function( response ){
+                $('#send-otp-btn span').first().text('<?php echo __('Get OTP');?>');
+                $('#send-otp-btn').prop('disabled',false);
+    			if(response.success){
+    				$('.sms-otp-step-1').hide();
+    				$('.sms-otp-step-2').show();
+    				$('#mobile-number-id').val(response.mobile_id);
+    				runCountDown();
+    			}else{
+    				alert({
+        				modalClass: 'confirm ves-error',
+                        title: "<?php echo __("Verify Error");?>",
+                        content: response.msg,
+                    });
+    			}
+
+    	});
+    }
+
+    function runCountDown(){
+        var resendBtn = $('#resend-otp-btn');
+        if(!resendBtn.hasClass('running')){
+        	resendBtn.addClass('running');
+        }
+
+        if(!resendBtn.data('couting')){
+        	!resendBtn.data('couting', resendBtn.data('time'));
+        }
+        var count = parseInt(resendBtn.data('couting'));
+        count --;
+        resendBtn.data('couting', count);
+        resendBtn.html('<?php echo __("Resend after %1 seconds")?>'.replace('%1', count));
+
+        if(count == 0) {
+        	resendBtn.removeClass('running');
+        	resendBtn.html('<?php echo __("Resend OTP")?>');
+            return;
+        }
+        setTimeout(function(){runCountDown()}, 1000);
+    }
+
+    initMobileInput();
+
+    $('#send-otp-btn').click(function(){
+    	sendOtp(0);
+    });
+
+    $('#resend-otp-btn').click(function(){
+        if($('#resend-otp-btn').hasClass('running')){
+        	return false;
+        }
+    	sendOtp(1);
+    	return false;
+    });
+
+    $('#verify-otp-btn').click(function(){
+    	$('#sms-otp-error').remove();
+        if($(this).hasClass('verifying')){
+            return;
+        }
+        var otp = $('#sms-otp-input').val();
+        if(!otp){
+        	$('#sms-otp-input').after('<div id="sms-otp-error" class="sms-otp-error" for="sms-otp-input"><?php echo __("This is required field.");?></div>');
+            return;
+        }
+
+        $(this).addClass('verifying');
+
+    	$.ajax({
+  		  url: URL_VERIFY_OTP,
+  		  method: "POST",
+  		  data: {
+      		  mobile : $("#hm-reg-mobile").val(),
+      		  otp: otp
+		  },
+  		  dataType: "json"
+		}).done(function( response ){
+			$('#verify-otp-btn').removeClass('verifying');
+			$('#sms-otp-input').val('');
+			if(response.success){
+				$("#hm-reg-mobile-otp").val(response.otp);
+				$('#hm-reg-mobile-input').addClass('otp-validated').validation().validation('isValid');
+				$('#sms-otp-dialog').modal('closeModal');
+				$('#form-validate').submit();
+			}else{
+				$('#sms-otp-input').after('<div id="sms-otp-error" class="sms-otp-error" for="sms-otp-input">'+response.msg+'</div>');
+			}
+
+		});
+    });
+
+
+    var rules = {
+	   'validate-sms-phone-number': [
+          function (value, element) {
+              var currentNumber = $(element).intlTelInput("getNumber");
+              var getCode = $(element).intlTelInput('getSelectedCountryData').dialCode;
+              var nationalNumber = intlTelInputUtils.formatNumber(currentNumber, getCode, intlTelInputUtils.numberFormat.NATIONAL);
+
+              if (getCode == "234") {
+                  if (nationalNumber.length != 13) {
+                      return false;
+                  } else {
+                      return true;
+                  }
+              } else {
+                  return $(element).intlTelInput("isValidNumber");
+              }
+          },
+          '<?php echo __("Type a vaild Phone Number to continue.")?>'
+        ],
+        'otp-verify': [
+            function (value, element) {
+            	var isValid = true;
+                var elements = $(element).parents('form').find('input,select,textarea');
+                elements.each(function(index, elm){
+                    if($(elm).is(":hidden") || elm == element) {return true};
+                    isValid = (isValid && $.validator.validateElement(elm));
+                });
+                if(!isValid) return false;
+
+                if(!$(element).hasClass('otp-validated')){
+                    $('#send-otp-btn span').first().text('<?php echo __('Get OTP');?>');
+                    $('#send-otp-btn').prop('disabled',false);
+                	$('.sms-otp-step-1').show();
+    				$('.sms-otp-step-2').hide();
+    				$('#sms-otp-input').attr('autocomplete', 'one-time-code');
+                	$('#sms-otp-dialog').modal('openModal');
+                	return false;
+                }
+                return true;
+            },
+            '<?php echo __("Your mobile number is not verified.")?>'
+        ],
+    };
+    $.each(rules, function (i, rule) {
+        rule.unshift(i);
+        $.validator.addMethod.apply($.validator, rule);
+    });
+
+    var options = {
+        type: 'popup',
+        modalClass:'otp-verify-modal',
+        responsive: true,
+        innerScroll: true,
+        title: '<?php echo __("Verify Your Mobile Number")?>',
+        buttons: []
+    };
+    var popup = modal(options, $('#sms-otp-dialog'));
+});
+</script>

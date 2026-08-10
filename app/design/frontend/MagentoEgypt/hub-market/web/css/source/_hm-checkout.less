@@ -1118,6 +1118,22 @@ a.sms-login-field-ctrl {
 
     .fieldset .legend { margin-inline-start: 0; margin-left: 0; }
     .login-container .fieldset::after { margin-inline-start: 0; margin-left: 0; }
+
+    //  "Go back" to sign-in. Blank hides it outright with
+    //  `.actions-toolbar > .secondary .action.back { display: none }` at
+    //  (0,3,0), so the forgot-password page had no route back at all — and the
+    //  href was empty besides (see the template override for why). Fixing one
+    //  without the other changes nothing, which is why both are in this commit.
+    .actions-toolbar > .secondary .action.back {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        display: inline-flex;
+        font-size: 1.4rem;
+        min-block-size: 4.4rem;
+        text-decoration: underline;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
 }
 
 //  The most form-heavy page in the journey was the only one with no card:
