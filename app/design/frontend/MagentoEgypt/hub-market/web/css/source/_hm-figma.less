@@ -285,7 +285,22 @@
         //  would have been the accent again, a second orange beside the vendor.
         .price-box .price { color: var(--hm-on-inverse); }
         .price-box .old-price .price { color: var(--hm-on-inverse-muted); }
-        .reviews-actions { color: var(--hm-on-inverse-muted); }
+
+        //  The review line renders only for products that HAVE reviews, and the
+        //  four products this rail happens to show on the English store have
+        //  none — so it was invisible to an English-only check and only turned
+        //  up once the Arabic store was swept. Two separate misses:
+        //    .rating-summary .label > span   #1a1a2e on the card   1.00:1
+        //    .reviews-actions a.action.view  #c2410c on the card   2.80:1
+        //  Setting the colour on `.reviews-actions` alone did not reach the
+        //  second: the anchor carries its own accent-strong and inheritance
+        //  never applies to an element with its own declaration.
+        .product-reviews-summary,
+        .rating-summary .label,
+        .rating-summary .label > span,
+        .reviews-actions,
+        .reviews-actions a { color: var(--hm-on-inverse-muted); }
+        .reviews-actions a:hover { color: var(--hm-accent-on-dark); }
     }
 }
 
@@ -1598,7 +1613,18 @@
 
 //  Dots: 6px pills that stretch to 24px when selected.
 .hm-hero-carousel__dots {
-    gap: .6rem;
+    //  1.8rem, not .6rem. The dots are 6px and the gap WAS 6px, putting their
+    //  centres 12px apart — while each one's hit area (the ::after below) is
+    //  padded out to 24px, i.e. +/-12px from its centre. So every dot's hit area
+    //  reached exactly the centre of its neighbour, and being later in the DOM
+    //  it painted on top: elementFromPoint at dot 1's own centre returned DOT 2.
+    //  Tapping the middle dot went to the wrong slide, at every viewport.
+    //
+    //  A 24px target and a 12px pitch cannot both hold, and 2.5.8's spacing
+    //  exemption needs 24px between centres too, so the pitch is what gives:
+    //  6px dot + 18px gap = 24px centre-to-centre, and the hit areas tile edge
+    //  to edge without overlapping. Verified by hit-testing each dot after.
+    gap: 1.8rem;
     inset-block-end: var(--hm-space-4);
     inset-inline-start: var(--hm-space-8);
 }

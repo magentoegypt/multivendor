@@ -178,6 +178,19 @@
             line-height: 1.45;
             padding-block: .3rem;
 
+            //  2.5.8 target size. These came out 293x23 — one pixel short — with
+            //  the panel OPEN on mobile, which is the only state they are
+            //  reachable in (at desktop the level1 lists are display:none, and
+            //  closed they sit behind the hero). They stack directly on top of
+            //  one another, so the spacing exemption does not apply either.
+            //  min-block-size rather than more padding: `line-height: normal`
+            //  wins over the 1.45 above in the mobile panel, so the computed
+            //  height varies by font metrics and padding maths cannot guarantee
+            //  the floor. This does.
+            align-items: center;
+            display: flex;
+            min-block-size: 2.4rem;
+
             &:hover { color: var(--hm-accent-strong); }
         }
     }
