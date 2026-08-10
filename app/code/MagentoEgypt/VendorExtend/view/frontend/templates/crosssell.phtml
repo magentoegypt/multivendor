@@ -79,66 +79,122 @@ $canItemsAddToCart = false;
                             <?php endif; ?>
                         <?php endif; ?>
                         <?php /* @escapeNotVerified */ echo($iterator++ == 1) ? '<li class="item product product-item">' : '</li><li class="item product product-item">' ?>
+                        <?php
+                        /*
+                         * CARD ANATOMY MIRRORS Magento_CatalogWidget's grid.phtml.
+                         *
+                         * It did not, and that was visible: this template still emitted
+                         * the pre-rebuild structure — actions nested inside .product-top,
+                         * no .hm-card__foot, and text-only buttons. The rebuilt card CSS
+                         * turns .action.tocart into a 32px icon button and clips the
+                         * label, so a button with no <svg> in it rendered as a bare
+                         * orange square, and the wishlist/compare links as empty boxes.
+                         * Captured on both the cart page and inside the minicart, in
+                         * both store views.
+                         *
+                         * Keep this in step with grid.phtml and Magento_Catalog's
+                         * list.phtml — the three are one component wearing three
+                         * templates, and this is the copy that gets forgotten.
+                         */
+                        ?>
                         <div class="product-item-info <?php /* @escapeNotVerified */ echo $available; ?>">
-                            <div class="product-top">
-                                <?php /* @escapeNotVerified */ echo '<!-- ' . $image . '-->' ?>
-                                <a href="<?php /* @escapeNotVerified */ echo $block->getProductUrl($_item) ?>" class="product photo product-item-photo">
+                            <div class="product-item-media">
+                                <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>" class="product-item-photo">
                                     <?= $block->getImage($_item, $image)->setData('product',$_item)->toHtml(); ?>
                                 </a>
-                                <div class="label">
-                                    <?php echo $themeSettingConfig->getProductLabel($_item); ?>
-                                </div>
-                                <div class="product-item-inner">
-                                    <div class="product actions product-item-actions">
-                                        <div class="actions-primary">
-                                            <?php if ($_item->isSaleable()): ?>
-                                                <?php if ($_item->getTypeInstance()->hasRequiredOptions($_item)): ?>
-                                                    <button class="action tocart primary" data-mage-init='{"redirectUrl": {"url": "<?php /* @escapeNotVerified */ echo $block->getAddToCartUrl($_item) ?>"}}' type="button" title="<?php /* @escapeNotVerified */ echo __('Add to Cart') ?>">
-                                                        <span><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
-                                                    </button>
-                                                <?php else: ?>
-                                                    <?php $postDataHelper = $this->helper('Magento\Framework\Data\Helper\PostHelper');
-                                                    $postData = $postDataHelper->getPostData($block->getAddToCartUrl($_item), ['product' => $_item->getEntityId()])
-                                                    ?>
-                                                    <button class="action tocart primary"
-                                                            data-post='<?php /* @escapeNotVerified */ echo $postData; ?>'
-                                                            type="button" title="<?php /* @escapeNotVerified */ echo __('Add to Cart') ?>">
-                                                        <span><?php /* @escapeNotVerified */ echo __('Add to Cart') ?></span>
-                                                    </button>
-                                                <?php endif; ?>
-                                            <?php else: ?>
-                                                <?php if ($_item->isAvailable()): ?>
-                                                    <div class="stock available"><span><?= /* @escapeNotVerified */ __('In stock') ?></span></div>
-                                                <?php else: ?>
-                                                    <div class="stock unavailable"><span><?= /* @escapeNotVerified */ __('Out of stock') ?></span></div>
-                                                <?php endif; ?>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div data-role="add-to-links" class="actions-secondary">
-                                            <?php if ($this->helper('Magento\Wishlist\Helper\Data')->isAllow()): ?>
-                                                <a href="#" class="action towishlist" title="<?= __('Add to Wish List') ?>" aria-label="<?= __('Save') ?>" data-post='<?= /* @noEscape */ $block->getAddToWishlistParams($block->getProduct()) ?>' data-action="add-to-wishlist" role="button">
-                                                    <span><?= $block->escapeHtml(__('Add to Wish List')) ?></span>
-                                                </a>
-                                            <?php endif; ?>
-                                            <?php $compareHelper = $this->helper('Magento\Catalog\Helper\Product\Compare'); ?>
-                                            <a href="#" class="action tocompare" title="<?= $block->escapeHtml(__('Add to Compare')) ?>" aria-label="<?= $block->escapeHtml(__('Compare')) ?>" data-post='<?= /* @escapeNotVerified */ $compareHelper->getPostDataParams($_item) ?>' role="button">
-                                                <span><?= /* @escapeNotVerified */ __('Add to Compare') ?></span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php $hmLabel = $themeSettingConfig->getProductLabel($_item); ?>
+                                <?php if ($hmLabel): ?>
+                                    <div class="label"><?= /* @noEscape */ $hmLabel ?></div>
+                                <?php endif; ?>
+                                <?php if ($this->helper('Magento\Wishlist\Helper\Data')->isAllow()): ?>
+                                    <?php /*
+                                        Was getAddToWishlistParams($block->getProduct()) —
+                                        the BLOCK's product, not the loop's. On a crosssell
+                                        block that is empty, so every card posted the same
+                                        useless payload. It is $_item.
+                                    */ ?>
+                                    <a href="#"
+                                       class="action towishlist hm-card__wish"
+                                       title="<?= $block->escapeHtmlAttr(__('Add to Wish List')) ?>"
+                                       data-post='<?= /* @noEscape */ $block->getAddToWishlistParams($_item) ?>'
+                                       data-action="add-to-wishlist"
+                                       role="button">
+                                        <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>
+                                        <span><?= $block->escapeHtml(__('Add to Wish List')) ?></span>
+                                    </a>
+                                <?php endif; ?>
                             </div>
                             <div class="product details product-item-details">
-                                <strong class="product name product-item-name"><a class="product-item-link" title="<?= $block->escapeHtml($_item->getName()) ?>" href="<?php /* @escapeNotVerified */ echo $block->getProductUrl($_item) ?>">
+                                <strong class="product name product-item-name"><a class="product-item-link" title="<?= $block->escapeHtmlAttr($_item->getName()) ?>" href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>">
                                     <?= $block->escapeHtml($_item->getName()) ?></a>
                                 </strong>
                                 <?php if ($templateType): ?>
                                     <?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
                                 <?php endif; ?>
 
-                                <?php /* @escapeNotVerified */ echo $block->getProductPrice($_item); ?>
+                                <div class="hm-card__foot">
+                                    <?php /* @escapeNotVerified */ echo $block->getProductPrice($_item); ?>
+
+                                    <div class="product-item-inner">
+                                        <div class="product actions product-item-actions">
+                                            <div class="actions-primary">
+                                                <?php if ($_item->isSaleable()): ?>
+                                                    <?php if ($_item->getTypeInstance()->hasRequiredOptions($_item)): ?>
+                                                        <button class="action tocart primary" data-mage-init='{"redirectUrl": {"url": "<?= $block->escapeUrl($block->getAddToCartUrl($_item)) ?>"}}' type="button" title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-cart"/></svg>
+                                                            <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                        </button>
+                                                    <?php else: ?>
+                                                        <?php /*
+                                                            A real form, not a data-post button.
+                                                            The require block at the foot of this
+                                                            file binds catalogAddToCart to
+                                                            "[data-role=tocart-form]" — a selector
+                                                            that matched NOTHING while these were
+                                                            buttons, so adding from a crosssell
+                                                            card fell back to a full page POST and
+                                                            reload. With the form it is ajax, and
+                                                            the minicart updates in place, which
+                                                            is the whole point of a crosssell that
+                                                            lives inside the minicart.
+                                                        */ ?>
+                                                        <?php $postParams = $block->getAddToCartPostParams($_item); ?>
+                                                        <form data-role="tocart-form" data-product-sku="<?= $block->escapeHtmlAttr($_item->getSku()) ?>" action="<?= $block->escapeUrl($postParams['action']) ?>" method="post">
+                                                            <?php $hmViewModel = $block->getData('viewModel'); ?>
+                                                            <?php foreach (($hmViewModel ? $hmViewModel->getOptionsData($_item) : []) as $optionItem): ?>
+                                                                <input type="hidden"
+                                                                       name="<?= $block->escapeHtmlAttr($optionItem['name']) ?>"
+                                                                       value="<?= $block->escapeHtmlAttr($optionItem['value']) ?>">
+                                                            <?php endforeach; ?>
+                                                            <input type="hidden" name="product" value="<?= $block->escapeHtmlAttr($postParams['data']['product']) ?>">
+                                                            <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED ?>" value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                            <?= $block->getBlockHtml('formkey') ?>
+                                                            <button type="submit" class="action tocart primary" title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
+                                                                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-cart"/></svg>
+                                                                <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                            </button>
+                                                        </form>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <?php if ($_item->isAvailable()): ?>
+                                                        <div class="stock available"><span><?= $block->escapeHtml(__('In stock')) ?></span></div>
+                                                    <?php else: ?>
+                                                        <div class="stock unavailable"><span><?= $block->escapeHtml(__('Out of stock')) ?></span></div>
+                                                    <?php endif; ?>
+                                                <?php endif; ?>
+                                            </div>
+                                            <div data-role="add-to-links" class="actions-secondary">
+                                                <?php $compareHelper = $this->helper('Magento\Catalog\Helper\Product\Compare'); ?>
+                                                <a href="#" class="action tocompare" title="<?= $block->escapeHtmlAttr(__('Add to Compare')) ?>" data-post='<?= /* @noEscape */ $compareHelper->getPostDataParams($_item) ?>' role="button">
+                                                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-compare"/></svg>
+                                                    <span><?= $block->escapeHtml(__('Add to Compare')) ?></span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </div>
                             <?=($iterator == count($items)+1) ? '</li>' : '' ?>
                         <?php endforeach ?>
                     </div>

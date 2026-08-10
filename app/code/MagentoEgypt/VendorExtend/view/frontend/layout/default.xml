@@ -2,19 +2,27 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <move element="ves.quotation" destination="theme.headers"/>
-        <referenceContainer name="minicart.addons">
-            <block class="MagentoEgypt\VendorExtend\Block\Cart\Crosssell" name="checkout.minicart.crosssell" template="MagentoEgypt_VendorExtend::crosssell.phtml">
-                <arguments>
-                    <argument name="type" xsi:type="string">crosssell</argument>
-                    <argument name="view_model" xsi:type="object">Magento\Catalog\ViewModel\Product\Listing\PreparePostData</argument>
-                </arguments>
-                <block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="crosssell.product.addto" as="addto">
-                    <block class="Magento\Catalog\Block\Product\ProductList\Item\AddTo\Compare"
-                           name="crosssell.product.addto.compare" as="compare"
-                           template="Magento_Catalog::product/list/addto/compare.phtml"/>
-                </block>
-            </block>
-        </referenceContainer>
+        <!--
+            The cross-sell carousel USED to be injected into `minicart.addons`
+            here. It has been removed, on measurement rather than taste.
+
+            The block sets $_maxItemCount = 8 (core uses 4) and the theme's rail
+            grid is a fixed four columns, so inside the 340px dropdown it laid
+            out two rows of eight cards at 64px wide: names truncated mid-word,
+            prices sliced through the glyph, and the second row below the fold of
+            a 1000px viewport. It also rendered in the header on EVERY page of
+            the site, not just the cart.
+
+            Nothing is lost on /cart — that page's "More Choices:" is a
+            DIFFERENT block (core's `checkout.cart.crosssell`, rendered by
+            Magento_Catalog::product/list/items.phtml, which the theme now
+            overrides). The merchandising slot survives where it has room to work.
+
+            To restore it, re-add the block below and give it
+            `grid-template-columns: 1fr` scoped to `.block-minicart` plus a real
+            item cap — `products_count` is not honoured by this block.
+        -->
+
         <referenceBlock name="quotes_links" remove="true" />
     </body>
 </page>

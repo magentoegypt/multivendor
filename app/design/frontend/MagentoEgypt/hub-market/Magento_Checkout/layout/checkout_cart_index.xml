@@ -30,5 +30,36 @@
                 <argument name="view_model" xsi:type="object">MagentoEgypt\CheckoutExtend\ViewModel\CartTitle</argument>
             </arguments>
         </referenceBlock>
+
+        <!--
+            THE ORDER OF THE SUMMARY RAIL.
+
+            Core stacks it: title, shipping estimator, totals, coupon, checkout
+            button. Measured against the reference, that put 101px of collapsed
+            accordion between the heading and the first number, and another 93px
+            between the Order Total and the button that acts on it — so the two
+            things a shopper is looking for, the sum and the way to pay it, were
+            the two furthest apart.
+
+            The reference's sequence is numbers, action, reassurance. That is what
+            this produces:
+
+                Order Summary -> totals -> Proceed to Checkout -> trust list
+                              -> Estimate Shipping and Tax -> Apply Discount Code
+
+            Neither accordion is removed. Both are real features the static
+            prototype simply does not have, both are collapsed by default, and
+            both belong below the fold of the rail rather than in front of the
+            total — which is also the conventional placement for a coupon field.
+        -->
+        <referenceContainer name="cart.summary">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="checkout.cart.summary.trust"
+                   template="Magento_Checkout::cart/trust.phtml"
+                   after="checkout.cart.methods.bottom"/>
+        </referenceContainer>
+
+        <move element="checkout.cart.shipping" destination="cart.summary" after="checkout.cart.summary.trust"/>
+        <move element="checkout.cart.coupon"   destination="cart.summary" after="checkout.cart.shipping"/>
     </body>
 </page>

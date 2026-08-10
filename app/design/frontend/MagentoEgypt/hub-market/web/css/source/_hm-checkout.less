@@ -39,7 +39,27 @@
 //
 //  Cart
 //  ---------------------------------------------
+//  A NOTE ON SPECIFICITY, WHICH GOVERNS EVERY RULE BELOW.
+//
+//  On desktop, Magento/blank's cart CSS is emitted AFTER this theme's — blank's
+//  `@media (min-width: 768px)` cart block sits ~10k further down the compiled
+//  styles-l.css than the last theme selector. So "it is imported last, it wins"
+//  is false here. Everything in this section is prefixed with
+//  `.checkout-cart-index` to win on WEIGHT rather than order. Measured, not
+//  assumed: blank ships `.cart-summary{float:right;width:23%}` at (0,1,0) and
+//  `.cart-container .form-cart{float:left;width:73%}` at (0,2,0).
 .checkout-cart-index {
+
+    //  Figure and ground, the reference's way round. The page is the tinted
+    //  band and the panels are white. This page had it inverted — a white page
+    //  with a GREY summary card, so the one element meant to read as raised was
+    //  the only one that read as sunken.
+    .page-wrapper { background: var(--hm-surface-muted); }
+
+    //  Measured: `main` and the `h1` both began at the exact y the navy nav band
+    //  ends — zero page padding, 6px of visible clearance to the first ink. The
+    //  reference gives 32. Hung on .page-main so the empty-cart page gets it too.
+    .page-main { padding-block-start: var(--hm-space-8); }
 
     //  30px, matching the Figma cart heading. Was 3.6rem, which read a step
     //  louder than the reference at every breakpoint.
@@ -47,6 +67,45 @@
         font-family: var(--hm-font-heading);
         font-size: 3rem;
         font-weight: 700;
+        //  Generic h1 typography supplies 48px here; the reference is 32. This
+        //  is an addition, not an edit — no margin was authored above.
+        margin-block-end: var(--hm-space-8);
+    }
+
+    //
+    //  ONE GRID INSTEAD OF TWO FLOATS
+    //  ---------------------------------------------
+    //  blank floats the two columns. That produced three separate defects, all
+    //  measured rather than eyeballed:
+    //
+    //    1. Columns came out 911 / 50 / 287 against the reference's 821 / 32 / 395.
+    //    2. `float` is PHYSICAL. The Arabic cart's census was byte-identical to
+    //       the English one — the rail never moved, on a page whose whole point
+    //       is that it mirrors.
+    //    3. `.cart-summary` is the FIRST child in source order (core declares it
+    //       `after="-"`), so on mobile 520px of totals AND the Proceed to
+    //       Checkout button rendered 151px BEFORE the first product. A shopper
+    //       was asked to pay before being shown what they were paying for.
+    //
+    //  A grid with explicit placement fixes all three at once, and mirrors for
+    //  free because grid tracks follow the writing mode.
+    .cart-container {
+        align-items: start;
+        display: grid;
+        gap: var(--hm-space-6);
+        grid-template-columns: minmax(0, 1fr);
+
+        //  blank hangs a clearfix here (.abs-add-clearfix-desktop); as grid
+        //  items those two pseudos become phantom tracks.
+        &::before,
+        &::after { content: none; }
+
+        //  Explicit rows, not `order`. #gift-options-cart is a real third child
+        //  (empty, script-only) that auto-placement would drop into 1/1 and use
+        //  to evict the item table.
+        .form-cart         { float: none; width: auto; grid-row: 1; }
+        .cart-summary      { float: none; width: auto; grid-row: 2; }
+        #gift-options-cart { grid-row: 3; }
     }
 
     //  Magento renders the cart as a real <table>. Left alone on desktop; the
@@ -71,20 +130,76 @@
         .col { padding-block: var(--hm-space-5); vertical-align: top; }
     }
 
-    .product-item-photo {
-        display: block;
-        inline-size: 9rem;
+    //  96px, per the reference. Two bugs in one rule:
+    //
+    //  The authored 9rem was DEAD — blank's
+    //  `.cart.table-wrapper .product-item-photo{display:table-cell;width:1%;
+    //  padding-right:24px}` at (0,3,0) is emitted later and won, so the cell
+    //  collapsed onto the image's intrinsic 160px and the thumbnail rendered
+    //  160x162 against a reference 96x96.
+    //
+    //  And the selector was too WIDE: bare `.product-item-photo` under
+    //  `.checkout-cart-index` also hit the cross-sell rail at the foot of the
+    //  page, squeezing those cards' photos into a 90px box inside a 303px card
+    //  and leaving ~213px of empty white. Scoping it to `.col.item` hands the
+    //  cross-sell cards back to _hm-product-item.less's square treatment.
+    .cart.table-wrapper .col.item .product-item-photo {
+        //  inline-block, not block. blank makes this a `table-cell` so the name
+        //  sits BESIDE the thumbnail; `display: block` fixed the 160px sizing
+        //  but dropped the name underneath it. inline-block keeps the pair on
+        //  one line, mirrors with `direction` for free, and — unlike making the
+        //  <td> itself a flex container — leaves the table's column algorithm
+        //  alone, so the four columns still line up across rows.
+        display: inline-block;
+        margin-inline-end: var(--hm-space-4);
+        vertical-align: top;
+        block-size: 9.6rem;
+        box-sizing: border-box;         // no global border-box in this build
+        flex: 0 0 auto;                 // the mobile cell is a flex row
+        inline-size: 9.6rem;
+        //  `padding: 0`, not `padding-inline-end: 0`. blank sets the PHYSICAL
+        //  `padding-right: 24px`, which under `direction: rtl` is the START
+        //  side — so zeroing the logical end left it standing and the Arabic
+        //  thumbnail measured 120 wide against 96 in English.
+        padding: 0;
+        //  And below 768px blank swaps this for
+        //  `{position:absolute; top:15px; left:0; max-width:60px; width:100%}`.
+        //  `max-width` beats `width`, so the mobile thumbnail stayed 60px however
+        //  large inline-size was set; `position:absolute` also took it out of
+        //  flow so the row could not be a flex line. Both have to be named to be
+        //  undone — this rule out-specifies blank's (0,5,0) vs (0,3,0), but an
+        //  un-named property is not overridden by weight.
+        max-inline-size: none;
+        max-width: none;
+        position: static;
 
         img {
-            background: var(--hm-surface-muted);
-            border: 1px solid var(--hm-border-subtle);
+            block-size: 100%;
             border-radius: var(--hm-radius-sm);
+            inline-size: 100%;
+            object-fit: cover;          // no letterbox left to fill, so no tint
         }
+    }
+
+    .cart.table-wrapper .col.item .product-item-details {
+        display: inline-block;
+        //  blank pairs its `display: table-cell` with `width: 99%`. Winning the
+        //  display property alone was not enough: at 99% the details box could
+        //  not share a line with a 96px thumbnail, so it wrapped underneath and
+        //  the name still sat below the image. The width has to be named too.
+        inline-size: auto;
+        width: auto;
+        max-inline-size: calc(100% - 13rem);   // 96 thumb + 16 gap + inline whitespace
+        vertical-align: top;
     }
 
     .product-item-name a {
         color: var(--hm-foreground);
-        font-family: var(--hm-font-sans);
+        //  --hm-font-heading, NOT --hm-font-display: _hm-root.less remaps only
+        //  the former to IBM Plex Sans Arabic under :lang(ar), and product names
+        //  on this catalogue are Arabic in BOTH store views. --hm-font-display
+        //  would drop them to a serif fallback.
+        font-family: var(--hm-font-heading);
         font-size: 1.6rem;
         font-weight: 600;
         text-decoration: none;
@@ -92,19 +207,99 @@
         &:hover { color: var(--hm-accent-strong); }
     }
 
+    //  The reference renders the unit price and the line total identically —
+    //  18px/700, near-black. Orange is this theme's price colour on a CARD,
+    //  where it is the loudest thing in a small box; in a cart row it competes
+    //  with the one control that matters, and every figure on the page was
+    //  wearing it.
     .cart-price .price,
     .col.subtotal .price {
-        color: var(--hm-price);
+        color: var(--hm-foreground);
+        font-size: 1.8rem;
         font-variant-numeric: tabular-nums;
         font-weight: 700;
     }
 
+    //  Struck compare-at price, when one exists.
+    .cart-price .old-price .price,
+    .col.subtotal .old-price .price {
+        color: var(--hm-price-was);
+        font-size: 1.4rem;
+        font-weight: 400;
+    }
+
+    //  blank narrows this to 45px via a `.cart.table-wrapper .col.qty .input-text`
+    //  rule emitted later, so the authored 6.4rem needs the page prefix and the
+    //  extra class to actually land.
+    .cart.table-wrapper .col.qty input.qty,
     .col.qty input.qty {
         border: 1px solid var(--hm-border-strong);
         border-radius: var(--hm-radius-sm);
         block-size: 4.4rem;
         inline-size: 6.4rem;
         text-align: center;
+    }
+
+    //  Continue Shopping / Update Shopping Cart.
+    //
+    //  These were two pixel-identical grey pills 694px apart, with the continue
+    //  link floated hard left. The reference gives Continue Shopping an outlined
+    //  secondary treatment; navy is the right outline here rather than the
+    //  reference's blue, which would compete with the orange primary in the rail.
+    //
+    //  Update Shopping Cart STAYS in this row. It is
+    //  `<button name="update_cart_action">` inside `form.form-cart`, and
+    //  `.cart-summary` is a sibling OUTSIDE that form — moving it into the rail
+    //  would silently stop quantity edits from committing.
+    .cart.main.actions {
+        align-items: stretch;
+        display: flex;
+        gap: var(--hm-space-3);
+        justify-content: space-between;
+        margin-block-start: var(--hm-space-4);
+
+        //  Measured 198x58 against 217x46 — same row, two different heights,
+        //  because one is an <a> with padding and the other a <button>.
+        > .action {
+            align-items: center;
+            box-sizing: border-box;
+            display: inline-flex;
+            justify-content: center;
+            margin: 0;
+            min-block-size: 4.8rem;
+            padding-block: 0;
+        }
+    }
+
+    //  (0,5,0) — blank floats this at (0,4,0) and is emitted later.
+    .cart-container .form-cart .action.continue {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-primary);
+        border-radius: var(--hm-radius);
+        color: var(--hm-primary);
+        float: none;
+        font-size: 1.6rem;
+        font-weight: 500;
+        min-block-size: 4.8rem;
+
+        &:hover { background: var(--hm-primary); color: var(--hm-on-primary); }
+    }
+
+    //  blank sets `text-align: right` on this; physical, so it never mirrored.
+    .cart-container .form-cart .actions { text-align: end; }
+
+    //  Empty cart. Was an h1, two sentences, and 244px of unbroken white — 63%
+    //  of the main region — with the only route back to the catalogue being the
+    //  word "here" inside a sentence.
+    .cart-empty {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        margin-block-end: var(--hm-space-8);
+        padding: var(--hm-space-8);
+        text-align: center;
+
+        p { margin-block-end: var(--hm-space-4); }
     }
 
     //  Edit / Remove: icon-adjacent text actions, given real hit areas.
@@ -123,18 +318,31 @@
     }
 }
 
+//  Desktop columns. 821 / 32 / 395 reproduces the reference exactly; plain
+//  2fr/1fr gives 810.67 / 405.33, which is close but not the thing.
+@media (min-width: 768px) {
+    .checkout-cart-index .cart-container {
+        column-gap: var(--hm-space-8);
+        grid-template-columns: minmax(0, 821fr) minmax(0, 395fr);
+
+        .form-cart         { grid-column: 1; grid-row: 1; }
+        .cart-summary      { align-self: start; grid-column: 2; grid-row: 1; }
+        #gift-options-cart { grid-column: 1; grid-row: 2; }
+    }
+}
+
 //  Summary panel
-.cart-summary {
-    background: var(--hm-surface-muted);
+.checkout-cart-index .cart-summary {
+    background: var(--hm-surface);      // was --hm-surface-muted; see the band note above
     border: 1px solid var(--hm-border-subtle);
     border-radius: var(--hm-radius);
-    padding: var(--hm-space-5);
+    padding: var(--hm-space-6);
 
     > .title {
         font-family: var(--hm-font-heading);
-        font-size: 2.2rem;
+        font-size: 2rem;                // 22px is off this theme's type scale
         font-weight: 700;
-        margin-block-end: var(--hm-space-4);
+        margin-block: 0 var(--hm-space-4);   // kills an inherited 18px top margin
     }
 
     .cart-totals {
@@ -142,8 +350,24 @@
         font-variant-numeric: tabular-nums;
 
         th, td { padding-block: var(--hm-space-2); }
-        .grand .amount, .grand .mark { font-size: 1.8rem; font-weight: 700; }
-        .grand .amount { color: var(--hm-price); }
+
+        //  The reference mutes the label and keeps the value near-black, then
+        //  closes the group with a rule and states the Total at full weight on
+        //  BOTH sides. Live had all three labels at full strength and all three
+        //  values in orange, so nothing in the rail had a hierarchy.
+        .totals:not(.grand) .mark          { color: var(--hm-foreground-muted); font-weight: 400; }
+        .totals:not(.grand) .amount .price { color: var(--hm-foreground); font-weight: 500; }
+
+        .grand .amount, .grand .mark {
+            border-block-start: 1px solid var(--hm-border-subtle);
+            font-size: 1.8rem;
+            font-weight: 700;
+            padding-block-start: var(--hm-space-4);
+        }
+        //  blank sets `.cart-totals .mark strong { font-weight: 400 }`, which
+        //  left the one row that matters lighter than its own value.
+        .grand .mark strong, .grand .amount strong { font-weight: 700; }
+        .grand .amount { color: var(--hm-foreground); }
     }
 
     //  Collapsible "Estimate Shipping and Tax" / "Apply Discount Code"
@@ -156,6 +380,46 @@
         font-weight: 600;
         min-block-size: 4.4rem;
         padding-block: var(--hm-space-3);
+    }
+
+    //  The <strong> inside those titles carries all the glyphs and was rendering
+    //  18px/400 — louder than every totals row and larger than the Total's own
+    //  label, for two controls that are collapsed by default.
+    .block > .title strong {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    //  A bare 18px-tall text link under a 52px button. Give it a real target.
+    .checkout-methods-items .multicheckout {
+        display: block;
+        min-block-size: 4.4rem;
+        padding-block: var(--hm-space-3);
+        text-align: center;
+    }
+
+    //  Trust list, closing the rail as the reference does. The third line is
+    //  this marketplace's actual promise and the one piece of reference content
+    //  the live page had no counterpart for.
+    .cart-summary__trust {
+        border-block-start: 1px solid var(--hm-border-subtle);
+        list-style: none;
+        margin: var(--hm-space-6) 0 0;
+        padding: var(--hm-space-6) 0 0;
+
+        li {
+            color: var(--hm-foreground-muted);
+            display: flex;
+            font-size: 1.4rem;
+            gap: var(--hm-space-2);
+            line-height: var(--hm-leading-snug);
+
+            + li { margin-block-start: var(--hm-space-3); }
+        }
+
+        //  --hm-success, not the reference's green-600, which fails AA.
+        .hm-icon { color: var(--hm-success); flex: 0 0 auto; }
     }
 
     .checkout.methods .action.primary.checkout {
@@ -172,6 +436,207 @@
     }
 
     .multicheckout { color: var(--hm-accent-strong); font-size: 1.4rem; }
+}
+
+//
+//  Mini-cart panel
+//  ---------------------------------------------
+//  The Figma build has no drawer — its header "Cart" control is a plain link to
+//  /cart — so the standard here is this theme's own system and the visual
+//  language the reference cart page sets.
+//
+//  This panel had never been styled: `_hm-checkout.less` contained zero
+//  `.block-minicart` rules, so it was blank's default sitting inside a navy
+//  header. Two of the three defects below made it unusable rather than merely
+//  unstyled.
+//
+//  SPECIFICITY. Blank's `.minicart-wrapper .block-minicart{right:-15px;
+//  width:390px}` is emitted ~29k AFTER the last theme selector in styles-l.css,
+//  and its mobile `width:290px` lands later still. Equal weight loses, so the
+//  positional rules below are written at (0,3,0) via `.hm-header__action`.
+
+//  1. WHITE TEXT ON A WHITE PANEL.
+//
+//  `.hm-header` sets `color: var(--hm-on-inverse)` for the navy bar, the
+//  dropdown is appended inside it, and blank's `.block-minicart{background:#fff}`
+//  never sets a colour — so the panel inherited white on white. Measured
+//  directly on the element: color rgb(255,255,255), background rgb(255,255,255).
+//  "2 Items in Cart", "Cart Subtotal" and every "Qty" label were in the DOM and
+//  invisible; an EMPTY minicart opened as a blank white box with only an X in it.
+//  This one declaration is the fix — everything after it is refinement.
+.block-minicart {
+    color: var(--hm-foreground);
+
+    .items-total,
+    .subtotal .label,
+    .minicart-items .details-qty .label { color: var(--hm-foreground-muted); }
+
+    .subtotal .amount .price { font-size: 1.8rem; font-weight: 700; }
+
+    //  The empty state is the worst case of the colour bug above: a single
+    //  <strong> with no rule anywhere in the build.
+    .subtitle.empty {
+        color: var(--hm-foreground);
+        display: block;
+        padding-block: var(--hm-space-6);
+        text-align: center;
+    }
+}
+
+//  2. IN ARABIC THE PANEL OPENED 151px OFF THE LEFT EDGE OF THE SCREEN.
+//
+//  `right` is physical and does not care about `direction: rtl`. Measured on
+//  /ar/: the panel box is x = -151, width 390 — 39% of it, including the first
+//  thumbnail and qty input, outside the viewport. English measured correctly at
+//  x = 969. Logical properties, and the physical ones explicitly unset so they
+//  cannot win.
+.hm-header__action .minicart-wrapper .block-minicart {
+    //  Chrome too: blank declares background/border/shadow on
+    //  `.minicart-wrapper .block-minicart` at (0,2,0), so a bare
+    //  `.block-minicart` loses. Its border is #bbb — 1.92:1, and in no token.
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);             // was square
+    box-shadow: var(--hm-shadow-lg);
+    left: auto;
+    right: auto;
+    inset-inline-end: -1.5rem;
+    padding: var(--hm-space-5);
+
+    &:before { left: auto; right: auto; inset-inline-end: 2.6rem; }
+    &:after  { left: auto; right: auto; inset-inline-end: 2.5rem; }
+}
+
+.minicart-wrapper {
+    //  Blank hides the panel title outright, which left a 55px empty band above
+    //  an unlabelled price. It is the only thing that says what this panel is.
+    .block-minicart .block-title {
+        align-items: baseline;
+        border-block-end: 1px solid var(--hm-border-subtle);
+        display: flex;
+        gap: var(--hm-space-2);
+        justify-content: flex-start;
+        margin-block-end: var(--hm-space-4);
+        padding-block-end: var(--hm-space-3);
+        padding-inline-end: 4.4rem;      // clears the absolutely-placed close button
+
+        strong {
+            font-family: var(--hm-font-heading);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .qty { color: var(--hm-foreground-muted); font-size: 1.4rem; }
+    }
+
+    //  44px target, mirrored. `position: absolute` is set here rather than
+    //  assumed: nothing in the compiled build declares it for this button, so
+    //  the inset properties were inert and the close control sat in flow at the
+    //  start of .block-content, printed over the panel title.
+    //  ORDER MATTERS IN THIS BLOCK. `inset-inline-end` and `right` are the same
+    //  property in a left-to-right context, so the usual alphabetical ordering
+    //  put `right: auto` after the logical value and silently cancelled it —
+    //  the button lost its offsets and rendered at the start of the panel, on
+    //  top of the title. Physical resets first, logical value last.
+    .action.close {
+        block-size: 4.4rem;
+        inline-size: 4.4rem;
+        position: absolute;
+        z-index: 1;
+        left: auto;
+        right: auto;
+        inset-block-start: var(--hm-space-2);
+        inset-inline-end: var(--hm-space-2);
+    }
+}
+
+//  3. The row was blank's float/padding pattern, which does not mirror either.
+.minicart-items {
+    .product-item { border-block-end: 1px solid var(--hm-border-subtle); }
+
+    .product-item > .product {
+        display: flex;
+        gap: var(--hm-space-3);
+
+        &:before, &:after { content: none; }
+    }
+
+    .product-item-photo,
+    .product-image-container {
+        flex: 0 0 auto;
+        float: none;
+        margin: 0;
+    }
+
+    //  etc/view.xml renders this at 120px — the largest product image anywhere
+    //  in the cart family, and 47% of the row width at 390px. Constrained here
+    //  rather than in view.xml so the source stays crisp at 2x and no
+    //  derivative regeneration is needed.
+    .product-image-container,
+    .product-image-wrapper,
+    img.product-image-photo {
+        block-size: 7.2rem !important;   // view.xml writes these inline
+        inline-size: 7.2rem !important;
+        object-fit: cover;
+    }
+    .product-image-wrapper { padding: 0 !important; }
+    img.product-image-photo { border-radius: var(--hm-radius-sm); position: static; }
+
+    .product-item-details {
+        flex: 1 1 auto;
+        min-inline-size: 0;
+        padding-inline-start: 0;
+        padding-left: 0;
+    }
+
+    .product-item-name a {
+        color: var(--hm-foreground);       // was --hm-accent-strong, i.e. the price colour
+        font-family: var(--hm-font-heading);
+        font-size: 1.4rem;
+        font-weight: 500;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+
+    .price { font-weight: 700; }
+
+    .product .actions {
+        display: flex;
+        float: none;
+        gap: var(--hm-space-1);
+        justify-content: flex-end;
+        margin: 0;
+    }
+
+    //  Both actions were ~14px of icon-font ink in a 28px box, in blank's
+    //  #303030, against the 4.4rem floor every other control in this header
+    //  holds. The gear is also the wrong metaphor and its label is clipped —
+    //  "View and Edit Cart" below already covers editing, so it goes.
+    .action.edit { display: none; }
+
+    .action.delete {
+        align-items: center;
+        display: inline-flex;
+        justify-content: center;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+
+        &:before { color: var(--hm-foreground-muted); font-size: 1.8rem; }
+        &:hover:before { color: var(--hm-danger); }
+    }
+
+    //  11px, below this theme's documented 12px floor.
+    .update-cart-item { font-size: 1.2rem; min-block-size: 4.4rem; }
+}
+
+//  Blank narrows the panel to 290px below 640px, after the theme, so this needs
+//  the weight — and both properties, since it sets the physical one.
+@media (max-width: 767px) {
+    .hm-header__action .minicart-wrapper .block-minicart {
+        inline-size: min(32rem, calc(100vw - 2.4rem));
+        width: min(32rem, calc(100vw - 2.4rem));
+    }
 }
 
 //
@@ -526,7 +991,18 @@ a.sms-login-field-ctrl {
         .cart.table-wrapper {
             thead { .hm-visually-hidden(); }
 
+            //  The collapse stopped at the tbody. `tbody.cart.item` went
+            //  `display: block` but `tr.item-info` stayed a table-row, so table
+            //  auto-layout sized each tbody independently — card one's row came
+            //  out 233px and card two's 249px, and stacked cards did not align.
+            //  The table and the rows have to come out of table layout too.
+            display: block;
+
+            .cart.items { display: block; }
+            .cart.item > tr { display: block; }
+
             .cart.item {
+                background: var(--hm-surface);
                 border: 1px solid var(--hm-border-subtle);
                 border-radius: var(--hm-radius);
                 display: block;
@@ -547,7 +1023,46 @@ a.sms-login-field-ctrl {
                 }
             }
 
-            .col.item { display: block; }
+            //  blank ships `.col.qty, .col.price, .col.subtotal {display:block;
+            //  float:left; width:33%; text-align:center}` at (0,4,0) AFTER the
+            //  theme, so the rule above lost on those three cells. Written at
+            //  (0,5,0) here. Proof it was blank winning: only Price/Qty/Subtotal
+            //  printed a colon — the theme's own `attr(data-th)` does not have one.
+            .col.price,
+            .col.qty,
+            .col.subtotal {
+                display: flex;
+                float: none;
+                text-align: start;
+                width: auto;
+            }
+
+            //  Same weight problem, and blank appends ':' to the label.
+            .col[data-th]:before { content: attr(data-th); }
+
+            //  The single most prominent word in every mobile row was the
+            //  column header "Item", printed above the product name.
+            //
+            //  A flex line rather than blank's absolutely-positioned thumbnail
+            //  plus a 75px left indent on the cell — that pattern is what forced
+            //  the 60px cap above, and it does not mirror.
+            .col.item {
+                align-items: flex-start;
+                display: flex;
+                gap: var(--hm-space-3);
+                padding-inline-start: 0;
+                padding-left: 0;
+
+                &:before { content: none; }
+            }
+        }
+
+        //  Two buttons, each wrapping onto two lines inside a space-between row
+        //  360px wide. Stack them and let each take the full width.
+        .cart.main.actions {
+            flex-direction: column;
+
+            .action { inline-size: 100%; justify-content: center; }
         }
 
         .page-title-wrapper .page-title { font-size: 2.8rem; }

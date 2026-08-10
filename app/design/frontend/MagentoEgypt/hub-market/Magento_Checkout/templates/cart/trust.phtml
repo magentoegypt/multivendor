@@ -1,0 +1,34 @@
+<?php
+/**
+ * Hub Market — the three reassurance lines that close the cart summary rail.
+ *
+ * The Figma reference ends its Order Summary with a ruled-off list of three
+ * ticks, and the live rail ended on a bare multi-address link. The third line is
+ * the only piece of reference copy this storefront had no counterpart for
+ * anywhere, and it is the one that states what the marketplace actually is:
+ * a single checkout across several sellers.
+ *
+ * Static by design. Two of the three are policy statements, not computed facts,
+ * and the SSL line is true of every page — deriving them from config would
+ * invent a coupling and buy nothing. The strings go through __() so /ar/
+ * translates them.
+ */
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$hmTrust = [
+    ['icon' => 'hm-lock',  'text' => __('Secure checkout with SSL encryption')],
+    ['icon' => 'hm-check', 'text' => __('30-day money-back guarantee')],
+    ['icon' => 'hm-check', 'text' => __('Orders from multiple vendors in one checkout')],
+];
+?>
+<ul class="cart-summary__trust">
+    <?php foreach ($hmTrust as $hmLine): ?>
+        <li>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false">
+                <use href="#<?= $escaper->escapeHtmlAttr($hmLine['icon']) ?>"/>
+            </svg>
+            <span><?= $escaper->escapeHtml($hmLine['text']) ?></span>
+        </li>
+    <?php endforeach; ?>
+</ul>

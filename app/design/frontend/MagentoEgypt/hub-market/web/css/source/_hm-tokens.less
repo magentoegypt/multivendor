@@ -125,7 +125,14 @@
 //  Typography
 //  ---------------------------------------------
 @hm-font-sans:    'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-@hm-font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+//  IBM Plex Sans Arabic sits in this stack deliberately, ahead of the serif
+//  fallbacks. --hm-font-heading is remapped to the Arabic face under :lang(ar)
+//  but --hm-font-display is NOT, and product names on this catalogue are Arabic
+//  in BOTH store views — so every card title was resolving its Arabic glyphs to
+//  Georgia. Latin is unaffected: Playfair comes first and covers it, and the
+//  Arabic faces are unicode-range subsetted, so nothing extra downloads for a
+//  page with no Arabic on it.
+@hm-font-display: 'Playfair Display', 'IBM Plex Sans Arabic', Georgia, 'Times New Roman', serif;
 @hm-font-arabic:  'IBM Plex Sans Arabic', 'Tajawal', 'Noto Sans Arabic', sans-serif;
 
 @hm-text-xs:   1.2rem;   // 12px — the floor for decorative text

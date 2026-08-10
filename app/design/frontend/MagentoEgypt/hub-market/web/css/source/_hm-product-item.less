@@ -33,6 +33,13 @@
         background: var(--hm-surface);
         border: 1px solid var(--hm-border-subtle);
         border-radius: var(--hm-radius);
+        //  There is no global `* { box-sizing: border-box }` in this build — only
+        //  scoped declarations. `block-size: 100%` plus two 1px borders therefore
+        //  makes the card 2px TALLER than its <li>, and because the card also
+        //  clips (`overflow: hidden` below) it cut its own bottom row off: the
+        //  cross-sell grid on /cart was slicing through the price and the action
+        //  buttons. Measured 226 inside a 224 track.
+        box-sizing: border-box;
         display: flex;
         flex-direction: column;
         block-size: 100%;
