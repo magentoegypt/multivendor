@@ -48,11 +48,36 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
     <div class="hm-hero-carousel__viewport">
         <ul class="hm-hero-carousel__track">
             <?php foreach ($slides as $i => $s): ?>
-                <?php $img = $block->getImageUrl($s['image'] ?? null); ?>
+                <?php
+                $img = $block->getImageUrl($s['image'] ?? null);
+
+                /*
+                 * Per-slide art direction. Figma tints every slide to its own
+                 * photograph rather than using one house colour; both values are
+                 * merchandiser-set, and both fall back to the theme's navy and
+                 * green when a row leaves them empty.
+                 *
+                 * Emitted as custom properties on the slide so the CSS stays one
+                 * rule with a default rather than one rule per slide.
+                 */
+                $tone   = $block->getToneRgb($s['tone'] ?? null);
+                $accent = $block->getAccentPair($s['accent'] ?? null);
+
+                $style = '';
+                if ($tone) {
+                    $style .= '--hm-slide-tone:' . $tone . ';';
+                }
+                if ($accent) {
+                    $style .= '--hm-slide-accent:' . $accent['bg'] . ';'
+                            . '--hm-slide-accent-fg:' . $accent['fg'] . ';';
+                }
+                ?>
                 <li class="hm-hero-carousel__slide"
                     role="group" aria-roledescription="slide"
                     aria-label="<?= $escaper->escapeHtmlAttr(__('%1 of %2', $i + 1, count($slides))) ?>">
-                    <a class="hm-hero-carousel__link" href="<?= $escaper->escapeUrl($block->getLinkUrl($s['url'] ?? null)) ?>">
+                    <a class="hm-hero-carousel__link"
+                       <?php if ($style !== ''): ?>style="<?= $escaper->escapeHtmlAttr($style) ?>"<?php endif; ?>
+                       href="<?= $escaper->escapeUrl($block->getLinkUrl($s['url'] ?? null)) ?>">
                         <?php if ($img): ?>
                             <?php /* alt="" — the headline beside it is the accessible content. */ ?>
                             <img class="hm-hero-carousel__img"

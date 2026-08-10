@@ -2150,3 +2150,63 @@
 //  The column therefore keeps Magento's own order (title, stock/SKU, price, form,
 //  social links, then whatever modules append). The two things Figma really
 //  changes — the price row and the meta line — are fixed in place above.
+
+//
+//  Per-slide art direction  (Figma tints each hero to its own photograph)
+//  ---------------------------------------------
+//  Every slide in the reference carries its own scrim and its own accent, keyed to
+//  the picture behind it — measured off the rendered build, which encodes them in
+//  oklab:
+//
+//      Fashion    scrim #0f2144  accent #f26522
+//      Grocery    scrim #0d3320  accent #2d7a3a
+//      Furniture  scrim #2a1200  accent #c85c2c
+//
+//  Ours painted one navy scrim and one green pill on all three, so the band read
+//  as the same slide three times over.
+//
+//  The values come from the banner row, not from here: they are art direction that
+//  changes with the photograph, and the photograph is admin-managed. The custom
+//  properties below are the DEFAULTS, so a row that sets neither renders exactly
+//  as it did before.
+//
+//  An "R, G, B" triplet rather than a hex, because the scrim needs the same colour
+//  at two alphas — `rgba(var(--tone), .9)` needs no color-mix().
+.hm-hero-carousel__body {
+    background: linear-gradient(
+        to var(--hm-scrim-dir, right),
+        rgba(var(--hm-slide-tone, 15, 33, 68), .9) 0%,
+        rgba(var(--hm-slide-tone, 15, 33, 68), .5) 50%,
+        rgba(var(--hm-slide-tone, 15, 33, 68), 0) 100%
+    );
+}
+
+//  RTL flips which edge the copy sits on, so the dark end of the scrim has to
+//  follow it. _hm-home.less sets --hm-scrim-dir for the tiles; the carousel needs
+//  its own, because its scrim lives on a different element.
+.hm-hero-carousel { --hm-scrim-dir: right; }
+
+[dir='rtl'] .hm-hero-carousel,
+html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
+
+//  The pill and the CTA take the slide's accent when it has one. The LABEL colour
+//  is chosen per accent in PHP by measured contrast, and an accent that cannot
+//  reach AA against either white or navy is refused there — see Block\Band. So
+//  whatever lands here is already safe.
+.hm-hero-carousel__kicker {
+    background: var(--hm-slide-accent, var(--hm-success));
+    color: var(--hm-slide-accent-fg, var(--hm-on-status));
+}
+
+.hm-hero-carousel__cta {
+    background: var(--hm-slide-accent, var(--hm-success));
+    color: var(--hm-slide-accent-fg, var(--hm-on-status));
+}
+
+//  The hover pair is derived rather than configured: a second colour per slide is
+//  more art direction than a merchandiser should have to reason about, and
+//  darkening the accent always moves contrast in the safe direction.
+.hm-hero-carousel__link:hover .hm-hero-carousel__cta {
+    background: var(--hm-slide-accent, var(--hm-success-hover));
+    filter: brightness(.9);
+}

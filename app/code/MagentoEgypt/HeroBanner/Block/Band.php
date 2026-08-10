@@ -103,6 +103,97 @@ class Band extends Template
     }
 
     /**
+     * Scrim base as an "R, G, B" triplet for rgba() in CSS, or null.
+     *
+     * A triplet rather than the hex itself because the scrim needs the colour at
+     * two different alphas. `rgba(var(--tone), .9)` works everywhere; applying
+     * alpha to a hex custom property needs color-mix(), which is newer than this
+     * storefront's browser floor.
+     */
+    public function getToneRgb(?string $hex): ?string
+    {
+        $rgb = $this->parseHex($hex);
+
+        return $rgb ? implode(', ', $rgb) : null;
+    }
+
+    /**
+     * The accent, and a label colour measured against it.
+     *
+     * Figma's own accents do not all pass: #f26522 is 3.15:1 against white,
+     * #c85c2c is 4.18:1 against white and 3.8:1 against navy — it fails BOTH, so
+     * there is no label colour that makes it legible. Rather than ship an
+     * unreadable button, a colour that cannot reach AA either way is refused and
+     * the theme's own accent-strong (#c2410c, 5.18:1 on white) stands in.
+     *
+     * @return array{bg: string, fg: string}|null
+     */
+    public function getAccentPair(?string $hex): ?array
+    {
+        $rgb = $this->parseHex($hex);
+        if (!$rgb) {
+            return null;
+        }
+
+        $white = $this->contrast($rgb, [255, 255, 255]);
+        $navy  = $this->contrast($rgb, [15, 33, 68]);
+
+        if (max($white, $navy) < 4.5) {
+            /* Unusable as configured — fall back to a pairing that is not. */
+            return ['bg' => '#c2410c', 'fg' => '#ffffff'];
+        }
+
+        return [
+            'bg' => sprintf('#%02x%02x%02x', ...$rgb),
+            'fg' => $white >= $navy ? '#ffffff' : '#0f2144',
+        ];
+    }
+
+    /**
+     * @return array{0: int, 1: int, 2: int}|null
+     */
+    private function parseHex(?string $hex): ?array
+    {
+        $hex = ltrim(trim((string) $hex), '#');
+        if (strlen($hex) === 3) {
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
+        }
+        if (!preg_match('/^[0-9a-f]{6}$/i', $hex)) {
+            return null;
+        }
+
+        return [
+            (int) hexdec(substr($hex, 0, 2)),
+            (int) hexdec(substr($hex, 2, 2)),
+            (int) hexdec(substr($hex, 4, 2)),
+        ];
+    }
+
+    /**
+     * WCAG relative-luminance contrast ratio. Not an estimate.
+     *
+     * @param array{0: int, 1: int, 2: int} $a
+     * @param array{0: int, 1: int, 2: int} $b
+     */
+    private function contrast(array $a, array $b): float
+    {
+        $lum = static function (array $c): float {
+            $f = static function (int $v): float {
+                $v /= 255;
+
+                return $v <= 0.03928 ? $v / 12.92 : (($v + 0.055) / 1.055) ** 2.4;
+            };
+
+            return 0.2126 * $f($c[0]) + 0.7152 * $f($c[1]) + 0.0722 * $f($c[2]);
+        };
+
+        $la = $lum($a);
+        $lb = $lum($b);
+
+        return (max($la, $lb) + 0.05) / (min($la, $lb) + 0.05);
+    }
+
+    /**
      * Fetch both slots in one query, grouped.
      *
      * Store resolution: rows scoped to the current store view win over the

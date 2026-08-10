@@ -30,6 +30,29 @@
                 comment="Button label; carousel slides only"/>
 
         <!--
+            ART DIRECTION, per slide.
+
+            Figma tints every hero slide to its own photograph rather than using
+            one house colour: the grocery slide sits on a deep green scrim with a
+            green pill, furniture on warm brown with terracotta, fashion on navy
+            with orange. Measured off the reference build, which encodes them as
+            oklab; the hex equivalents are in the seed patch.
+
+            `tone` is the scrim base — it is composited at 90%/50% over the
+            photograph, so it must be DARK or the white copy on top loses contrast.
+            `accent` is the kicker pill and the CTA; Block\Band picks a white or
+            navy label for it by measured ratio and rejects the colour outright if
+            neither reaches AA.
+
+            Both nullable: a row that sets neither falls back to the theme's navy
+            and green, which is what every slide did before this.
+        -->
+        <column xsi:type="varchar" name="tone" nullable="true" length="16"
+                comment="Scrim base colour, hex. Must be dark."/>
+        <column xsi:type="varchar" name="accent" nullable="true" length="16"
+                comment="Kicker and CTA colour, hex"/>
+
+        <!--
             Stored as a path relative to pub/media, e.g. "hero/hero-grocery.jpg".
             Not a full URL: the base URL differs between environments and between
             the secure and unsecure scopes, so baking one in breaks on every copy

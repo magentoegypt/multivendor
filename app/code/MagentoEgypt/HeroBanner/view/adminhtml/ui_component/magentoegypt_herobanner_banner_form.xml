@@ -119,6 +119,25 @@
             </argument>
         </field>
 
+        <field name="tone" formElement="input" sortOrder="72">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Scrim colour</label>
+                <notice translate="true">Hex, e.g. #0d3320. Carousel slides only. This is laid over the photograph behind the copy, so it must be DARK — a light value will make the white headline unreadable. Leave empty for the theme navy.</notice>
+                <validation>
+                    <rule name="validate-length" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="accent" formElement="input" sortOrder="74">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Accent colour</label>
+                <notice translate="true">Hex, e.g. #2d7a3a. Colours the kicker pill and the button. The label is set to white or navy automatically, whichever is legible; a colour that is readable against neither is replaced at render time. Leave empty for the theme green.</notice>
+            </settings>
+        </field>
+
         <field name="sort_order" formElement="input" sortOrder="80">
             <settings>
                 <dataType>number</dataType>

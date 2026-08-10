@@ -60,6 +60,7 @@ class Save extends Action implements HttpPostActionInterface
         $allowed = [
             'banner_id', 'slot', 'title', 'kicker', 'subtitle', 'cta_label',
             'image', 'url', 'sort_order', 'is_active', 'store_id',
+            'tone', 'accent',
         ];
         $clean = array_intersect_key($data, array_flip($allowed));
 
@@ -71,6 +72,23 @@ class Save extends Action implements HttpPostActionInterface
 
         if (!in_array($clean['slot'] ?? '', [Banner::SLOT_HERO, Banner::SLOT_TILE], true)) {
             $clean['slot'] = Banner::SLOT_HERO;
+        }
+
+        /*
+         * Colours are normalised, not validated away: a value that is not a hex
+         * is stored as empty rather than rejected, because the renderer already
+         * falls back cleanly and failing the whole save over a colour field would
+         * lose the merchandiser's copy with it.
+         */
+        foreach (['tone', 'accent'] as $colourField) {
+            if (!array_key_exists($colourField, $clean)) {
+                continue;
+            }
+            $value = strtolower(trim((string) $clean[$colourField]));
+            if ($value !== '' && $value[0] !== '#') {
+                $value = '#' . $value;
+            }
+            $clean[$colourField] = preg_match('/^#[0-9a-f]{3}$|^#[0-9a-f]{6}$/', $value) ? $value : null;
         }
 
         try {
