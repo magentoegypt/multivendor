@@ -135,8 +135,16 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
         <?php
         $img  = $block->getImageUrl($t['image'] ?? null);
         $slot = ['a', 'b', 'c'][$i % 3];
+
+        /*
+         * Tiles carry a scrim tone for the same reason the slides do — Figma tints
+         * each one to its photograph (navy, plum, olive). No accent: a tile has no
+         * pill and no button, only the scrim and white copy on top of it.
+         */
+        $tileTone = $block->getToneRgb($t['tone'] ?? null);
         ?>
         <a class="hm-hero-tile hm-hero-tile--<?= /* @noEscape */ $slot ?>"
+           <?php if ($tileTone): ?>style="--hm-slide-tone:<?= $escaper->escapeHtmlAttr($tileTone) ?>"<?php endif; ?>
            href="<?= $escaper->escapeUrl($block->getLinkUrl($t['url'] ?? null)) ?>">
             <?php if ($img): ?>
                 <img class="hm-hero-tile__img" src="<?= $escaper->escapeUrl($img) ?>"

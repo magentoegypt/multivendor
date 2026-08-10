@@ -1595,9 +1595,20 @@
     padding: var(--hm-space-3);
 }
 
+//  Tile scrim, tinted per tile like the slides. Figma's are navy, plum and olive.
+//
+//  THE RAMP IS OURS, and deliberately so. Figma runs `from-[tone]/80 to-transparent`
+//  — two stops, straight to nothing. Its copy sits bottom-left over roughly the
+//  first half of a 305px tile, where that ramp has already fallen to about 0.48
+//  alpha; composited over a light photograph that puts white text at 3.1:1.
+//  Measured, not assumed. Holding a high alpha across the band the text actually
+//  occupies and falling away after it keeps the worst case above 6:1 while looking
+//  the same on the dark photography the design was drawn against.
 .hm-hero-tile::after {
     background: linear-gradient(to var(--hm-scrim-dir, right),
-                rgba(15, 33, 68, .85) 0%, rgba(15, 33, 68, .35) 60%, rgba(15, 33, 68, .05) 100%);
+                rgba(var(--hm-slide-tone, 15, 33, 68), .88) 0%,
+                rgba(var(--hm-slide-tone, 15, 33, 68), .70) 45%,
+                rgba(var(--hm-slide-tone, 15, 33, 68), .15) 100%);
 }
 
 //  DARK BASE, and it is not decorative.
@@ -1612,7 +1623,13 @@
 //  colour beneath, it climbed all the way to the white page and reported six
 //  1.0:1 failures on this rail. The rule was lost when the float band was removed
 //  from _hm-home.less — it lived in the same block.
-.hm-hero-tile { background: var(--hm-surface-inverse); }
+//  Follows the tone too, so a tile whose image fails degrades to its OWN colour
+//  rather than to the house navy.
+//
+//  Folded into this rule rather than added as a second one: a separate
+//  `.hm-hero-tile { background: … }` earlier in the file lost to this one and the
+//  base stayed navy on all three tiles while the scrims were already tinted.
+.hm-hero-tile { background: rgb(var(--hm-slide-tone, 15, 33, 68)); }
 
 .hm-hero-tile__title { font-size: 1.4rem; font-weight: 700; }
 .hm-hero-tile__text  { color: fade(#ffffff, 75%); font-size: 1.2rem; }

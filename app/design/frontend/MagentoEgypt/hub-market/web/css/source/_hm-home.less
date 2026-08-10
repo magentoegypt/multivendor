@@ -705,8 +705,11 @@
 //  The scrim is what makes white text legible over an arbitrary merchandiser
 //  photo. Without it contrast depends on whatever image was uploaded, which is
 //  not something a design system can guarantee.
+//  The GRADIENT is not set here any more. It is tinted per slide from the banner
+//  row, so it lives with the rest of the per-slide art direction in
+//  _hm-figma.less; a hard-coded navy here would win over it in one direction and
+//  lose in the other.
 .hm-hero-carousel__body {
-    background: linear-gradient(90deg, rgba(15, 33, 68, .88) 0%, rgba(15, 33, 68, .70) 45%, rgba(15, 33, 68, 0) 85%);
     display: flex;
     flex-direction: column;
     gap: var(--hm-space-2);
@@ -716,10 +719,10 @@
     position: absolute;
 }
 
-[dir='rtl'] .hm-hero-carousel__body,
-html:lang(ar) .hm-hero-carousel__body {
-    background: linear-gradient(270deg, rgba(15, 33, 68, .88) 0%, rgba(15, 33, 68, .70) 45%, rgba(15, 33, 68, 0) 85%);
-}
+//  The RTL flip is --hm-scrim-dir now (see _hm-figma.less), not a second
+//  hard-coded gradient. This rule was (0,2,0) against the tone-aware one's
+//  (0,1,0), so on the Arabic storefront it won: all three slides rendered the
+//  house navy while the English ones were correctly tinted.
 
 //  Figma renders this kicker as a filled PILL above the headline (its copy is
 //  "SAME-DAY DELIVERY"; ours is the live item count, which is real data rather
@@ -1182,9 +1185,16 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
 //  gradients take no logical keyword, so the direction is a custom property the
 //  RTL block below flips — physical `to right` would put the dark end on the wrong
 //  side of the Arabic tile and strand the text on the bright part of the photo.
+//  `html:lang(ar)` is the one that actually matches. Magento renders
+//  `<html lang="ar">` and does NOT add `dir="rtl"` — _hm-root.less says so
+//  explicitly and sets `direction` from the language for exactly this reason — so
+//  `[dir='rtl']` never fired and `.hm-rtl` is a class nothing emits. The tile
+//  scrims kept their dark end on the left in Arabic, under the photo rather than
+//  under the copy.
 .hm-hero-tiles { --hm-scrim-dir: right; }
+
 [dir='rtl'] .hm-hero-tiles,
-.hm-rtl .hm-hero-tiles { --hm-scrim-dir: left; }
+html:lang(ar) .hm-hero-tiles { --hm-scrim-dir: left; }
 
 .hm-hero-tile__title { color: var(--hm-on-inverse); }
 
