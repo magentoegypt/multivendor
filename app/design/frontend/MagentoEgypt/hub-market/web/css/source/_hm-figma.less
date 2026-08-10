@@ -1383,7 +1383,19 @@
     //  Figma's hero container carries `pt-3`. Ours sat flush against the nav, so
     //  the navy header and the hero photograph met with no seam at all.
     margin-block: var(--hm-space-3) var(--hm-space-2);
-    min-block-size: 34rem;
+
+    //  454px, MEASURED — not the 340 in the reference's own markup.
+    //
+    //  `style="min-height: 340px"` on the reference hero is a floor, not the
+    //  design height: its copy overruns it and the band actually renders 453.9px
+    //  at 1440. Reading the declaration instead of the rendered box is exactly the
+    //  mistake this whole pass exists to avoid, and it cost 114px here — our band
+    //  sat at the floor because our copy is shorter, and the side tiles came out
+    //  107px against Figma's 145.
+    //
+    //  A floor rather than a fixed height, so longer merchandiser copy still grows
+    //  the band instead of spilling out of it.
+    min-block-size: 45.4rem;
 }
 
 .hm-hero-band > .hm-hero-carousel {
@@ -1420,7 +1432,7 @@
 //  divides the same height three ways, grew with it (125px tiles against 107).
 //  So the tiles are fixed by fixing the type.
 .hm-home .hm-hero-carousel__slide,
-.hm-home .hm-hero-carousel__viewport { min-block-size: 34rem; }
+.hm-home .hm-hero-carousel__viewport { min-block-size: 45.4rem; }
 
 //
 //  What actually decided the band's height
