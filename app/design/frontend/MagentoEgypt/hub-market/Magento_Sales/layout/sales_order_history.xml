@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Supplies the order-history cards with their line items.
+ *
+ * `view_model` is already taken on this block — Magento_OrderCancellationUi
+ * binds its own Config there when it re-points the template — so this one is
+ * `history_items` rather than overwriting it.
+ *
+ * The template that consumes it is
+ * hub-market/Magento_OrderCancellationUi/templates/order/history.phtml, which is
+ * the copy that actually renders; see the note at the top of that file.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales.order.history">
+            <arguments>
+                <argument name="history_items" xsi:type="object">MagentoEgypt\CheckoutExtend\ViewModel\OrderHistoryItems</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

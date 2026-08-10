@@ -565,3 +565,195 @@
     border-right: 0;
     border-inline-start: 0;
 }
+
+//
+//  Order history cards
+//  ---------------------------------------------
+//  The Figma account screen renders each order as a card: a tinted header strip
+//  with the order number, date and total plus a status pill, the products
+//  inside it, and the actions along the foot. Core renders four table cells and
+//  a link.
+//
+//  The markup comes from the theme's Magento_OrderCancellationUi override —
+//  NOT Magento_Sales, which that module re-points at runtime.
+.hm-order-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-4);
+}
+
+//  The column headers stay in the DOM for `extra.column.header` consumers and
+//  are hidden rather than dropped; a header row above a list of cards is noise.
+.hm-order-history-extra-head { .hm-visually-hidden(); }
+
+.hm-order-card {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    overflow: hidden;              // clips the head strip to the corner radius
+
+    &__head {
+        align-items: center;
+        background: var(--hm-surface-muted);
+        border-block-end: 1px solid var(--hm-border-subtle);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-3) var(--hm-space-6);
+        justify-content: space-between;
+        padding: var(--hm-space-4) var(--hm-space-6);
+    }
+
+    &__meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-3) var(--hm-space-6);
+    }
+
+    &__field {
+        align-items: baseline;
+        display: inline-flex;
+        gap: var(--hm-space-2);
+    }
+
+    &__label {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+
+    &__value {
+        color: var(--hm-foreground);
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    &__total { font-variant-numeric: tabular-nums; }
+
+    //  Status pill. Keyed on the status CODE via a modifier the ViewModel emits,
+    //  never on the label — labels are admin-editable and translated, and this
+    //  install already carries custom ones.
+    &__status {
+        border-radius: var(--hm-radius-full);
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: .4rem var(--hm-space-3);
+        white-space: nowrap;
+
+        &--success { background: var(--hm-success-subtle); color: var(--hm-success); }
+        &--warning { background: var(--hm-warning-subtle); color: var(--hm-warning); }
+        &--danger  { background: var(--hm-danger-subtle);  color: var(--hm-danger); }
+        &--info    { background: var(--hm-info-subtle);    color: var(--hm-info); }
+        &--neutral { background: var(--hm-neutral-100);    color: var(--hm-neutral-700); }
+    }
+
+    &__items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &__actions {
+        border-block-start: 1px solid var(--hm-border-subtle);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-3);
+        padding: var(--hm-space-4) var(--hm-space-6);
+
+        //  `padding-block: 0` so min-block-size governs. .hm-btn's own vertical
+        //  padding was stacking on top of it and rendering these at 70px, where
+        //  every other primary/secondary pair in the theme is 48.
+        > .action {
+            align-items: center;
+            box-sizing: border-box;
+            display: inline-flex;
+            flex: 1 1 auto;
+            justify-content: center;
+            min-block-size: 4.8rem;
+            padding-block: 0;
+        }
+    }
+
+    &__cancel {
+        align-items: center;
+        color: var(--hm-danger);
+        display: inline-flex;
+        flex: 0 0 auto;
+        font-size: 1.3rem;
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-3);
+        text-decoration: underline;
+    }
+}
+
+.hm-order-line {
+    display: flex;
+    gap: var(--hm-space-3);
+    padding: var(--hm-space-4) var(--hm-space-6);
+
+    + .hm-order-line { border-block-start: 1px solid var(--hm-border-subtle); }
+
+    &__media {
+        flex: 0 0 auto;
+        line-height: 0;             // no descender gap under an inline image
+    }
+
+    &__img {
+        background: var(--hm-surface-muted);
+        block-size: 6.4rem;
+        border-radius: var(--hm-radius-sm);
+        inline-size: 6.4rem;
+        object-fit: cover;
+    }
+
+    &__body {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        gap: .2rem;
+        min-inline-size: 0;
+    }
+
+    &__name {
+        color: var(--hm-foreground);
+        //  --hm-font-heading, not --hm-font-display: only the former is remapped
+        //  to the Arabic face, and product names here are Arabic in both stores.
+        font-family: var(--hm-font-heading);
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+
+    &__vendor {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+
+    &__price {
+        color: var(--hm-foreground);
+        font-size: 1.5rem;
+        font-variant-numeric: tabular-nums;
+        font-weight: 700;
+    }
+
+    &__qty {
+        color: var(--hm-foreground-muted);
+        font-size: 1.2rem;
+        font-weight: 400;
+        margin-inline-start: var(--hm-space-2);
+    }
+}
+
+@media (max-width: 767px) {
+    .hm-order-card__head,
+    .hm-order-card__actions { padding-inline: var(--hm-space-4); }
+
+    .hm-order-line { padding-inline: var(--hm-space-4); }
+
+    //  Stack the actions rather than let three of them share a 360px row.
+    .hm-order-card__actions {
+        flex-direction: column;
+
+        > .action, > .hm-order-card__cancel { inline-size: 100%; justify-content: center; }
+    }
+}

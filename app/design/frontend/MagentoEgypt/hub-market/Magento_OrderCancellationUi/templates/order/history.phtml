@@ -1,0 +1,172 @@
+<?php
+/**
+ * Hub Market order history — one card per order, as the Figma account screen
+ * draws it.
+ *
+ * WHY THIS FILE LIVES UNDER Magento_OrderCancellationUi AND NOT Magento_Sales.
+ * `sales.order.history` renders `Magento_Sales::order/history.phtml` only until
+ * Magento_OrderCancellationUi's own `sales_order_history.xml` calls
+ * `setTemplate` on the block at layout time and re-points it at
+ * `Magento_OrderCancellationUi::order/history.phtml`. That module is enabled
+ * here. A `Magento_Sales/templates/order/history.phtml` override in this theme
+ * would therefore compile cleanly, be picked up by nothing, and look exactly
+ * like a caching problem.
+ *
+ * Overriding at this path also keeps the Cancel Order affordance, whose
+ * ViewModel and `cancelOrderModal` init only exist in this copy.
+ *
+ * Everything core rendered still renders: the `info` child block, the
+ * `extra.column.header` / `extra.container` extension points (Vnecoms injects a
+ * per-vendor column through those), View Order, Reorder with its PostHelper
+ * payload, Cancel Order with its modal, the pager and the empty-state message.
+ * The table is gone; the data is not.
+ *
+ * @var \Magento\Sales\Block\Order\History $block
+ * @var \Magento\OrderCancellationUi\ViewModel\Config $viewModel
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+$viewModel = $block->getViewModel();
+$_orders   = $block->getOrders();
+
+/** @var \MagentoEgypt\CheckoutExtend\ViewModel\OrderHistoryItems|null $hmItems */
+$hmItems = $block->getData('history_items');
+if ($hmItems && $_orders) {
+    //  Two queries for the whole page, before the loop starts. See the note on
+    //  the ViewModel for why this is not done per order.
+    $hmItems->preload($_orders);
+}
+?>
+<?= $block->getChildHtml('info') ?>
+
+<?php if ($_orders && count($_orders)): ?>
+    <?php /*
+        The column headers are kept, visually hidden. `extra.column.header` is a
+        public extension point and dropping it silently would break any module
+        that renders into it; hiding it keeps the contract without printing a
+        header row above a list of cards.
+    */ ?>
+    <div class="hm-order-history-extra-head"><?= $block->getChildHtml('extra.column.header') ?></div>
+
+    <div class="hm-order-cards" id="my-orders-table">
+        <?php foreach ($_orders as $_order): ?>
+            <?php
+            $hmStatus  = (string) $_order->getStatus();
+            $hmTint    = $hmItems ? $hmItems->getStatusTint($hmStatus) : 'neutral';
+            $hmLines   = $hmItems ? $hmItems->getItems($_order) : [];
+            $hmCanView = $hmStatus !== 'received';
+            ?>
+            <section class="hm-order-card">
+                <div class="hm-order-card__head">
+                    <div class="hm-order-card__meta">
+                        <span class="hm-order-card__field">
+                            <span class="hm-order-card__label"><?= $escaper->escapeHtml(__('Order #')) ?></span>
+                            <span class="hm-order-card__value"><?= $escaper->escapeHtml($_order->getRealOrderId()) ?></span>
+                        </span>
+                        <span class="hm-order-card__field">
+                            <span class="hm-order-card__label"><?= $escaper->escapeHtml(__('Date')) ?></span>
+                            <span class="hm-order-card__value"><?= /* @noEscape */ $block->formatDate($_order->getCreatedAt()) ?></span>
+                        </span>
+                        <span class="hm-order-card__field">
+                            <span class="hm-order-card__label"><?= $escaper->escapeHtml(__('Order Total')) ?></span>
+                            <span class="hm-order-card__value hm-order-card__total"><?= /* @noEscape */ $_order->formatPrice($_order->getGrandTotal()) ?></span>
+                        </span>
+
+                        <?php /* Vnecoms and friends render extra cells through this. */ ?>
+                        <?php $extra = $block->getChildBlock('extra.container'); ?>
+                        <?php if ($extra): ?>
+                            <?php $extra->setOrder($_order); ?>
+                            <span class="hm-order-card__field hm-order-card__extra"><?= $extra->getChildHtml() ?></span>
+                        <?php endif; ?>
+                    </div>
+
+                    <span class="hm-order-card__status hm-order-card__status--<?= $escaper->escapeHtmlAttr($hmTint) ?>">
+                        <?= $escaper->escapeHtml($_order->getStatusLabel()) ?>
+                    </span>
+                </div>
+
+                <?php if ($hmLines): ?>
+                    <ul class="hm-order-card__items">
+                        <?php foreach ($hmLines as $hmLine): ?>
+                            <li class="hm-order-line">
+                                <span class="hm-order-line__media">
+                                    <?php if ($hmLine['thumb']): ?>
+                                        <img class="hm-order-line__img"
+                                             src="<?= $escaper->escapeUrl($hmLine['thumb']) ?>"
+                                             alt="" loading="lazy" width="64" height="64">
+                                    <?php endif; ?>
+                                </span>
+                                <span class="hm-order-line__body">
+                                    <?php if ($hmLine['url']): ?>
+                                        <a class="hm-order-line__name" href="<?= $escaper->escapeUrl($hmLine['url']) ?>">
+                                            <?= $escaper->escapeHtml($hmLine['name']) ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <span class="hm-order-line__name"><?= $escaper->escapeHtml($hmLine['name']) ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($hmLine['vendor']): ?>
+                                        <span class="hm-order-line__vendor"><?= $escaper->escapeHtml($hmLine['vendor']) ?></span>
+                                    <?php endif; ?>
+                                    <span class="hm-order-line__price">
+                                        <?= /* @noEscape */ $_order->formatPrice($hmLine['price']) ?>
+                                        <?php if ($hmLine['qty'] > 1): ?>
+                                            <span class="hm-order-line__qty"><?= $escaper->escapeHtml(__('Qty: %1', $hmLine['qty'])) ?></span>
+                                        <?php endif; ?>
+                                    </span>
+                                </span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+
+                <?php if ($hmCanView): ?>
+                    <div class="hm-order-card__actions">
+                        <a href="<?= $escaper->escapeUrl($block->getViewUrl($_order)) ?>" class="action view hm-btn hm-btn--secondary">
+                            <span><?= $escaper->escapeHtml(__('View Order')) ?></span>
+                        </a>
+
+                        <?php if ($this->helper(\Magento\Sales\Helper\Reorder::class)->canReorder($_order->getEntityId())): ?>
+                            <?php /*
+                                The reference calls this "Buy Again"; Magento calls
+                                it Reorder and it is the same action, posted the same
+                                way. The label follows the reference, the mechanism
+                                does not change.
+                            */ ?>
+                            <a href="#" data-post='<?= /* @noEscape */
+                                $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)
+                                    ->getPostData($block->getReorderUrl($_order))
+                            ?>' class="action order hm-btn hm-btn--primary">
+                                <span><?= $escaper->escapeHtml(__('Buy Again')) ?></span>
+                            </a>
+                        <?php endif ?>
+
+                        <?php if ($viewModel->canCancel($_order->getEntityId())): ?>
+                            <a href="#" class="cancel-order hm-order-card__cancel"
+                               id="cancel-order-<?= /* @noEscape */ $_order->getId() ?>" data-mage-init='{
+                                   "cancelOrderModal":{
+                                       "url": "<?= /* @noEscape */ $block->getBaseUrl(); ?>",
+                                       "order_id": "<?= $escaper->escapeHtml(__($_order->getId())); ?>"
+                                   }
+                                }'>
+                                <span><?= $escaper->escapeHtml(__('Cancel Order')) ?></span>
+                            </a>
+                            <?= $this->getLayout()->createBlock(\Magento\Framework\View\Element\Template::class)
+                                ->setOrder($_order)
+                                ->setReasons($viewModel->getCancellationReasons($_order->getEntityId()))
+                                ->setTemplate('Magento_OrderCancellationUi::cancel-order-modal.phtml')->toHtml()
+                            ?>
+                        <?php endif ?>
+                    </div>
+                <?php endif ?>
+            </section>
+        <?php endforeach; ?>
+    </div>
+
+    <?php if ($block->getPagerHtml()): ?>
+        <div class="order-products-toolbar toolbar bottom"><?= $block->getPagerHtml() ?></div>
+    <?php endif ?>
+<?php else: ?>
+    <div class="message info empty"><span><?= $escaper->escapeHtml($block->getEmptyOrdersMessage()) ?></span></div>
+<?php endif ?>
