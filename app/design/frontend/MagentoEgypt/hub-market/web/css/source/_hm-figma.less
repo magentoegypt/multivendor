@@ -2253,3 +2253,62 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     background: var(--hm-slide-accent, var(--hm-success-hover));
     filter: brightness(.9);
 }
+
+//
+//  Disabled add-to-cart
+//  ---------------------------------------------
+//  A disabled control has to LOOK disabled, and after the card rebuild this one
+//  did not: measured on the category listing, the disabled button and the enabled
+//  one beside it were both #f26522 at opacity 1, differing only in `cursor` —
+//  which says nothing until you hover and nothing at all on a touch screen. The
+//  card rule sets `background: var(--hm-accent)` unconditionally and at a
+//  specificity that overrode whatever blank would otherwise have done.
+//
+//  It is not hypothetical. Vnecoms_Quotation disables the cart button on every
+//  product whose `ves_enable_quote` marks it quote-only — one of eleven on
+//  /clothes.html today — and Magento itself ships the listing button disabled
+//  until catalogAddToCart binds, so this is also what the control looks like for
+//  the first few hundred milliseconds of every page load.
+//
+//  1.4.3 and 1.4.11 both exempt inactive components from contrast, but legible is
+//  still better than not: #535d70 on #e8ecf3 measures 5.4:1.
+.product-item .action.tocart:disabled,
+.hm-pdp .box-tocart .action.tocart:disabled {
+    background: var(--hm-neutral-200);
+    border-color: var(--hm-neutral-200);
+    color: var(--hm-neutral-600);
+    cursor: not-allowed;
+
+    &:hover {
+        background: var(--hm-neutral-200);
+        border-color: var(--hm-neutral-200);
+    }
+}
+
+//  Touch targets on the card actions.
+//
+//  32px clears WCAG 2.5.8 (AA, 24x24) but not 2.5.5's 44x44, and this is the
+//  primary conversion control on the page. The rest of this theme already draws
+//  the distinction — header actions and nav links are 44 on small screens and
+//  smaller on pointer-driven widths — so the card follows the same rule rather
+//  than inventing a third convention.
+//
+//  The row wraps at this width because three 44px buttons plus a price do not fit
+//  a ~183px card at 390px; without it the actions overflowed the card edge.
+@media (max-width: 767px) {
+    .product-item .action.tocart,
+    .product-item .actions-secondary > a.action {
+        block-size: 4.4rem;
+        inline-size: 4.4rem;
+        min-inline-size: 4.4rem;
+    }
+
+    .product-item .hm-card__foot {
+        flex-wrap: wrap;
+        row-gap: var(--hm-space-2);
+
+        .price-box { flex: 1 1 100%; }
+    }
+
+    .product-item .product-item-actions { justify-content: flex-end; }
+}
