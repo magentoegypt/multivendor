@@ -799,9 +799,13 @@
     //  `.checkout-block` (4 in the rendered DOM) — `.amcheckout-block` and
     //  `.amcheckout-step-container` do NOT exist here and were a guess.
     //  Verified against a post-JS DOM capture of the real checkout.
-    .checkout-block,
-    .amcheckout-content,
-    .amcheckout-items {
+    //
+    //  `.amcheckout-content` and `.amcheckout-items` USED to be in this list and
+    //  are not any more: both are DESCENDANTS of .checkout-block, so every panel
+    //  drew a second 1px hairline inset 13px inside the first. `.amcheckout-items`
+    //  was worse — it is the <tbody> of the shipping-rate table, so it painted a
+    //  248px bordered box adrift in a 568px panel.
+    .checkout-block {
         background: var(--hm-surface);
         border: 1px solid var(--hm-border-subtle);
         border-radius: var(--hm-radius);
@@ -1196,11 +1200,17 @@ a.sms-login-field-ctrl {
 //  guessing: it is the SHIPPING METHOD price, `span.price` inside
 //  `tr.row.amcheckout-method`, whose row band is #eaeaea. Two earlier selector
 //  guesses (summary container, opc-block-summary) missed it entirely.
+//
+//  NARROWED. This used to also catch `.amcheckout-summary-container .price` and
+//  `.opc-block-summary .price`, which is every amount in the order summary — and
+//  those sit on a WHITE card, not the grey band, so the rescue was not needed
+//  there and it flattened the totals: subtotal, shipping and grand total all
+//  rendered the same rust, leaving the one number that matters nothing to stand
+//  out from. --hm-accent-strong is 5.18:1 on white, so the summary is safe
+//  without it. See the totals hierarchy block further down.
 .checkout-index-index {
     .amcheckout-method .col-price .price,
-    tr.amcheckout-method .price,
-    .amcheckout-summary-container .price,
-    .opc-block-summary .price {
+    tr.amcheckout-method .price {
         color: var(--hm-accent-strong-hover);           // 4.30 -> 5.7:1 on #eaeaea
     }
 }
@@ -1227,4 +1237,384 @@ a.sms-login-field-ctrl {
     span { color: inherit; }
 
     &:hover { border-color: var(--hm-accent); }
+}
+
+//
+//  Checkout parity pass
+//  ---------------------------------------------
+//  Measured against the Figma reference's /checkout. Everything here is a
+//  RESTYLE — no Amasty block is moved, per the standing decision at the top of
+//  this file.
+//
+//  WHY THIS IS A SEPARATE BLOCK AND NOT AN ADDITION TO THE ONE ABOVE. That block
+//  is rooted `.am-checkout, .amcheckout-wrapper` — (0,2,0). Almost everything
+//  below has to out-weigh blank, core Magento_Checkout or Amasty, all three of
+//  which are emitted after the theme in the compiled sheet. Rooting these at
+//  `.checkout-index-index` buys the class that makes them win on weight rather
+//  than on emission order.
+.checkout-index-index {
+
+    //  1. THE ARABIC HEADING WAS UNREADABLE.
+    //
+    //  `.authentication-wrapper` was the one block on the page whose box is
+    //  byte-identical between locales — [915,122,408,44] in both — because
+    //  blank floats it right with a negative top margin and a 33.33% WIDTH (not
+    //  max-width). Everything around it mirrors and it does not, so in Arabic
+    //  the Sign In button was painted straight over the h1 and the subtitle:
+    //  "الدفع" clipped, the first words of the description hidden.
+    //
+    //  Taken out of the float entirely and positioned logically. `width` has to
+    //  be reset as well as the logical property or the 33% box survives.
+    .checkout-container { position: relative; }
+
+    .authentication-wrapper {
+        float: none;
+        margin: 0;
+        max-inline-size: none;
+        width: auto;
+        inline-size: auto;
+        position: absolute;
+        inset-block-start: var(--hm-space-6);
+        inset-inline-end: var(--hm-space-5);
+        text-align: end;
+        z-index: 2;
+    }
+
+    //  Reserve the gutter off the ARABIC button (157px + margin), not the 93px
+    //  English one, or Arabic re-collides. (0,3,0) to beat Amasty's 70% width.
+    .am-checkout .checkout-header {
+        padding-inline-end: 18rem;
+        width: auto;
+    }
+
+    //  2. FIGURE AND GROUND. Live painted a hard #eaeaea slab with square
+    //  corners inside white gutters; the reference tints the whole page, which
+    //  is what the cart before it now does too.
+    //
+    //  Written against the ID as well as the class: Amasty's admin
+    //  "Background color" field renders `#checkout{background:X!important}`
+    //  inline from its own head.phtml. It is unset today, but an admin toggling
+    //  it would silently undo a class-only rule.
+    .page-wrapper { background: var(--hm-surface-muted); }
+
+    .am-checkout:not(.-modern),
+    #checkout.am-checkout {
+        background: transparent;
+        margin-block: 0;
+        padding-block: 0;
+    }
+
+    //  3. Heading rhythm. 32px above, and the subtitle stops shouting — it was
+    //  18px near-black under a 30px title, where the reference runs 14px muted.
+    .page-main { padding-block-start: var(--hm-space-8); }
+
+    .am-checkout .checkout-header {
+        margin-block-start: 0;
+
+        //  @hm-neutral-600, not --hm-foreground-muted: the page is tinted now,
+        //  and #6b7280 on #f5f7fa is 4.50:1 — exactly on the line.
+        .description {
+            color: @hm-neutral-600;
+            font-size: 1.4rem;
+        }
+    }
+
+    //  4. PANEL CHROME. Amasty ships a 1px-SPREAD shadow (a second outline on
+    //  all four sides) and, on hover, a blue glow this palette does not contain.
+    //  Padding was 24/12; the reference is 24 all round.
+    .checkout-block {
+        box-shadow: none;
+        overflow: hidden;              // clips the summary tint to the radius
+        padding: var(--hm-space-6);
+
+        &:hover { box-shadow: var(--hm-shadow-sm); }
+    }
+
+    //  Core paints the order summary #f5f5f5 — a WARM grey nothing else here
+    //  uses — and Amasty bleeds it to the card edge with a negative margin, so
+    //  it filled the top two-thirds of a rounded card with square corners.
+    //
+    //  The horizontal bleed goes with it: `-12px` margin against `12px` padding
+    //  nets to zero, but both are PHYSICAL, so any future change to either lands
+    //  on the wrong side in Arabic.
+    .opc-block-summary {
+        background: transparent;
+        margin-inline: 0;
+        padding-inline: 0;
+    }
+
+    //  48px between the last line item and the first total, against 24 elsewhere
+    //  in the rail; and a physical `padding: 15px 15px 0 0` on the items wrapper
+    //  that indents the list on one side only.
+    .opc-block-summary .items-in-cart { margin-block-end: var(--hm-space-6); }
+    .opc-block-summary .minicart-items-wrapper { padding: 0; }
+
+    //  5. COLUMNS. Amasty is 50/50; the reference is 736/32/352 in a 1120 band —
+    //  the same 2:1 the cart ships. Guarded at 900px because that is where
+    //  Amasty's own 50% rule starts; unguarded, these percentages would apply to
+    //  the stacked mobile column too and render every panel at a third width.
+    .page-main { max-inline-size: 115.2rem; }
+
+    .checkout-block { margin-inline: 0; }
+
+    @media (min-width: 900px) {
+        .opc-wrapper.am-opc-wrapper.layout-2columns {
+            gap: var(--hm-space-8);
+
+            //  calc rather than 66%/34%: percentages plus a 32px gap overflow
+            //  the row and flex-shrink resolves them to 718/370, not 736/352.
+            > .checkout-column:nth-child(1) {
+                flex: 0 0 calc((100% - 3.2rem) * 736 / 1088);
+                width: auto;
+            }
+            > .checkout-column:nth-child(2) {
+                flex: 0 0 calc((100% - 3.2rem) * 352 / 1088);
+                width: auto;
+            }
+        }
+    }
+
+    //  6. THE FORM: labels above the field, not in a right-aligned 146px column
+    //  beside it.
+    //
+    //  Blank's form-field-type-revert mixin floats the label left at 25.8% with
+    //  `text-align: right` — all physical, so in Arabic the split did not mirror
+    //  at all and the RTL reader met the input before its label. Below 768px
+    //  blank already stacks, so this only changes desktop.
+    .opc-wrapper .fieldset > .field:not(.choice) {
+        > .label {
+            box-sizing: border-box;
+            display: block;
+            float: none;
+            inline-size: auto;
+            width: auto;
+            padding: 0 0 var(--hm-space-2);
+            text-align: start;
+            color: var(--hm-foreground);
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+
+        > .control { float: none; width: auto; }
+    }
+
+    //  Same mixin's spacer pseudo, so a `.no-label` field cannot re-open the
+    //  146px indent later.
+    .opc-wrapper .fieldset > .field.choice:before,
+    .opc-wrapper .fieldset > .field.no-label:before { display: none; width: auto; }
+
+    //  Two-up name, three-up city/state/postcode — the reference's shape.
+    //  Deliberately NOT using `order` to reach its City -> State -> ZIP visual
+    //  sequence: the DOM order is State, City, ZIP and reordering visually would
+    //  desync the tab sequence.
+    #shipping-new-address-form {
+        column-gap: var(--hm-space-4);
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+
+        > .field { grid-column: span 6; }
+        > [name$='.firstname'],
+        > [name$='.lastname'] { grid-column: span 3; }
+        > [name$='.region_id'],
+        > [name$='.region'],
+        > [name$='.city'],
+        > [name$='.postcode'] { grid-column: span 2; }
+    }
+
+    //  7. TOOLTIPS. The "?" was #bbbbbb on white — 1.92:1, failing 1.4.11 — in a
+    //  24px box, and both the gutter and the icon were positioned physically, so
+    //  in Arabic the gutter opened on one side and the icon painted over the
+    //  input on the other.
+    .control._with-tooltip {
+        input {
+            margin-right: 0;
+            margin-inline-end: var(--hm-space-2);
+            inline-size: calc(100% - 4.8rem);
+        }
+
+        .field-tooltip { right: auto; inset-inline-end: 0; }
+
+        .field-tooltip-action {
+            align-items: center;
+            color: var(--hm-foreground-muted);      // 4.83:1
+            display: inline-flex;
+            justify-content: center;
+            min-block-size: 4.4rem;
+            min-inline-size: 4.4rem;
+        }
+    }
+
+    //  The SMS module pins this to a literal 160px, which looked like a broken
+    //  field beside 420px neighbours. Ships with the tooltip gutter above.
+    .sms-address-mobile-container .intl-tel-input {
+        display: block;
+        inline-size: calc(100% - 4.8rem);
+
+        input.mobile-number { inline-size: 100%; }
+    }
+
+    //  8. The "create an account after checkout" note was 16px near-black —
+    //  louder than the label above it — and opened a 94px hole in a 30px rhythm.
+    .opc-wrapper .form-login .fieldset .note,
+    .opc-wrapper .form-shipping-address .fieldset .note {
+        color: var(--hm-foreground-muted);
+        display: block;
+        font-size: 1.3rem;
+        line-height: 1.5;
+        margin-block-start: var(--hm-space-1);
+    }
+
+    //  9. Native 13px checkboxes and radios in browser blue — the only blue ink
+    //  on a navy-and-orange page. `accent-color` recolours but does NOT resize.
+    .am-checkout {
+        input[type='checkbox'],
+        input[type='radio'] {
+            accent-color: var(--hm-accent-strong);
+            block-size: 1.8rem;
+            inline-size: 1.8rem;
+        }
+
+        //  Scoped to this one row: a blanket `.field.choice` would also catch
+        //  the discount trigger and every payment-method title.
+        .billing-address-same-as-shipping-block.field.choice {
+            align-items: center;
+            display: flex;
+            gap: var(--hm-space-2);
+            min-block-size: 4.4rem;
+
+            > label { margin: 0; }
+        }
+    }
+
+    //  10. Place Order was a 128px button flush to the physical right edge —
+    //  which, being physical, sat in the same place in Arabic. Full width, as
+    //  the reference and the cart both do, and the float stops mattering.
+    .am-checkout .action.primary.checkout,
+    .am-checkout .amcheckout-button.-place-order {
+        inline-size: 100%;
+        width: 100%;
+    }
+
+    //  11. THE SUMMARY LINE ITEM. Amasty indents the details 118px and blank
+    //  lays the row out as table cells with physical alignment. Together they
+    //  produced a 145px gutter at 1440, prices CLIPPED MID-WORD at 390 ("EG",
+    //  cut at the panel edge), and in Arabic the name and the price welded into
+    //  one run. A flex row fixes all three and mirrors for free.
+    .opc-block-summary .minicart-items {
+        .product-item-details { padding-left: 0; padding-inline-start: 0; }
+        .product-image-container { margin-left: 0; margin-inline: 0; }
+
+        .product-item-inner {
+            align-items: flex-start;
+            display: flex;
+            gap: var(--hm-space-3);
+            inline-size: auto;
+            margin-block-end: var(--hm-space-2);
+        }
+
+        .product-item-name-block {
+            display: block;
+            flex: 1 1 auto;
+            min-inline-size: 0;
+            text-align: start;
+        }
+
+        .subtotal {
+            display: block;
+            flex: 0 0 auto;
+            text-align: end;
+            white-space: nowrap;
+        }
+
+        //  Was "Qty" near-black and the number muted. One muted unit; 1.2rem is
+        //  the documented floor, not a target.
+        .details-qty {
+            color: var(--hm-foreground-muted);
+            font-size: 1.2rem;
+            margin-block-start: var(--hm-space-1);
+
+            .label, .value { color: inherit; }
+        }
+    }
+
+    //  12. TOTALS HIERARCHY, ported from the cart rail. Every amount was rust
+    //  and every label full strength, so the grand total had nothing to
+    //  separate from and no rule above it.
+    .opc-block-summary .table-totals {
+        .totals:not(.grand) .mark { color: var(--hm-foreground-muted); font-weight: 400; }
+        .totals:not(.grand) .amount .price { color: var(--hm-foreground); font-weight: 500; }
+
+        .grand .mark,
+        .grand .amount {
+            border-block-start: 1px solid var(--hm-border-subtle);
+            font-size: 1.8rem;
+            font-weight: 700;
+            padding-block-start: var(--hm-space-4);
+        }
+
+        .grand .mark strong,
+        .grand .amount strong { font-weight: 700; }
+
+        //  Navy, matching the cart rail one page earlier. It was inheriting the
+        //  global `.price` accent, so the cart said EGP 38 in navy and the
+        //  checkout said EGP 38 in orange for the same number.
+        .grand .amount,
+        .grand .amount .price { color: var(--hm-foreground); }
+    }
+
+    //  13. Panel titles. "Payment Method" rendered 26px/300 — the inner
+    //  `.step-title` takes blank's rule while the theme's rule above only
+    //  reaches the outer `.amcheckout-title` wrapper. And #ccc is a second grey
+    //  that exists nowhere else in this theme.
+    .amcheckout-title .step-title,
+    .checkout-payment-method .payment-methods .step-title,
+    .opc-wrapper .step-title {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-heading);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .opc-wrapper.am-opc-wrapper .checkout-payment-method .payment-methods .step-title,
+    .am-checkout .amcheckout-title,
+    .am-checkout .step-title { border-block-end-color: var(--hm-border-subtle); }
+
+    //  "2 Items in Cart" was 24px/300 — 4px louder than the panel title above it
+    //  and the largest text in the rail.
+    .opc-block-summary .items-in-cart > .title strong {
+        font-size: 1.6rem;
+        font-weight: 600;
+    }
+
+    //  14. The one decision on the payment panel was its palest text: Amasty's
+    //  method title is a `<label class="label">`, which the generic label rule
+    //  had muted to 14px.
+    .payment-method-title .label,
+    .am-checkout .payment-method-title > label {
+        color: var(--hm-foreground);
+        font-size: 1.6rem;
+        font-weight: 500;
+    }
+
+    //  15. The shipping-rate table shrink-wrapped to ~247px inside a 568px
+    //  panel, leaving a stray cell rule adrift in dead space.
+    .table-checkout-shipping-method {
+        inline-size: 100%;
+        width: 100%;
+
+        tbody td {
+            border-block-start: 1px solid var(--hm-border-subtle);
+            padding-block: var(--hm-space-4);
+        }
+
+        .col-price { text-align: end; }
+    }
+
+    //  16. The discount trigger carried a physical 22px start-indent that
+    //  nothing else on the card has — and being physical, English got the indent
+    //  and Arabic got it on the other side.
+    .am-checkout .payment-option-title.field.choice {
+        margin-inline: 0;
+        padding-inline: 0;
+    }
 }
