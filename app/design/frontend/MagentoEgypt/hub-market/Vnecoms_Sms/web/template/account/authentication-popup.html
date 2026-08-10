@@ -92,19 +92,28 @@
                   id="login-form">
                 <div class="fieldset login" data-bind="attr: {'data-hasrequired': $t('* Required Fields')}">
                     <div class="field email required">
-                        <label class="label">
+                        <!--
+                            Was a <label class="label"> with no `for`. It names
+                            nothing — it is a switch between two inputs — while
+                            the two inputs it switches between had no label at
+                            all, so both required fields were unnamed. Same fix
+                            as the login page: a named group here, a real label
+                            on each control below.
+                        -->
+                        <div class="sms-login-switch" role="group" data-bind="attr: {'aria-label': $t('Sign in with')}">
                             <!-- ko if: loginByMobile() -->
-                            <a href="#" data-bind="click: toggleLoginField.bind($data)"><span data-bind="i18n: 'Email Address'"></span></a>
+                            <a href="#" class="sms-login-field-ctrl" data-bind="click: toggleLoginField.bind($data)"><span data-bind="i18n: 'Email Address'"></span></a>
                             <span data-bind="i18n: 'or'"></span>
-                            <strong data-bind="i18n: 'Mobile'"></strong>
+                            <strong class="sms-login-field-ctrl selected" data-bind="i18n: 'Mobile'"></strong>
                             <!-- /ko -->
                             <!-- ko ifnot: loginByMobile() -->
-                            <strong data-bind="i18n: 'Email Address'"></strong>
+                            <strong class="sms-login-field-ctrl selected" data-bind="i18n: 'Email Address'"></strong>
                             <span data-bind="i18n: 'or'"></span>
-                            <a href="#" data-bind="click: toggleLoginField.bind($data)"><span data-bind="i18n: 'Mobile'"></span></a>
+                            <a href="#" class="sms-login-field-ctrl" data-bind="click: toggleLoginField.bind($data)"><span data-bind="i18n: 'Mobile'"></span></a>
                             <!-- /ko -->
-                        </label>
+                        </div>
                         <div class="control">
+                            <label class="label" for="customer-email" data-bind="visible: !loginByMobile()"><span data-bind="i18n: 'Email Address'"></span></label>
                             <input name="username"
                                    id="customer-email"
                                    type="email"
@@ -113,6 +122,7 @@
                                    data-bind="attr: {autocomplete: autocomplete}, visible: !loginByMobile()"
                                    data-validate="{required:true, 'validate-email':true}">
                             <div data-bind="visible: loginByMobile()">
+                                <label class="label" for="login-mobile"><span data-bind="i18n: 'Mobile Number'"></span></label>
                                 <input type="text"
                                        class="input-text"
                                        id="login-mobile"

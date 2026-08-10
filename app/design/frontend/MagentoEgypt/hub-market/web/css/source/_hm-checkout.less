@@ -1855,3 +1855,178 @@ a.sms-login-field-ctrl {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+//
+//  Authentication popup
+//  ---------------------------------------------
+//  The minicart's login surface when guest checkout is disabled. It is not
+//  reachable while guest checkout is on — see the note at the head of the
+//  theme's Vnecoms_Sms authentication-popup template — but when it IS reachable
+//  it is the whole login journey, and it shipped with none of the theme on it:
+//  a 30px/300 heading, the thinnest weight anywhere on the site, and a grey
+//  secondary Sign In on a page whose primary action is orange everywhere else.
+//
+//  Scoped to `.popup-authentication`, the class Magento's modal adds, so none
+//  of this can reach the page-level login form that shares its markup.
+.popup-authentication {
+
+    .modal-inner-wrap { border-radius: var(--hm-radius); }
+
+    .modal-content { padding-block: 0 var(--hm-space-6); }
+
+    //  The two halves. Magento already draws a rule between them; this just
+    //  gives each side room and keeps the gutter logical so it mirrors.
+    .block-authentication {
+        gap: var(--hm-space-8);
+
+        .block { padding-inline: 0; }
+    }
+
+    //  30px/300 -> 20px/700, the theme's panel-title scale.
+    .block-title strong {
+        color: var(--hm-foreground);
+        font-family: var(--hm-font-heading);
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: var(--hm-leading-snug);
+    }
+
+    //  Benefits list: bullets removed, ticks in their place, matching the cart
+    //  rail's trust list rather than inventing a third list style.
+    .block-new-customer .block-content ul {
+        list-style: none;
+        margin: var(--hm-space-3) 0 0;
+        padding: 0;
+
+        li {
+            color: var(--hm-foreground-muted);
+            font-size: 1.4rem;
+            padding-inline-start: var(--hm-space-5);
+            position: relative;
+
+            + li { margin-block-start: var(--hm-space-2); }
+
+            &:before {
+                color: var(--hm-success);
+                content: '✓';
+                font-weight: 700;
+                inset-inline-start: 0;
+                position: absolute;
+            }
+        }
+    }
+
+    //  Labels. blank leaves these right-aligned from its floated-label pattern,
+    //  which is PHYSICAL — in English it put the label hard against the right
+    //  edge above a left-aligned input, and it cannot mirror.
+    //  Both arms need the `.form-login` class to reach (0,5,0). Without it the
+    //  DIRECT-child arm is (0,4,0) and loses — measured: the password label
+    //  stayed `text-align: right` while the email label, which is a level
+    //  deeper and so already (0,5,0), came out correct. Two labels, two
+    //  alignments, in the same form.
+    .form-login .fieldset > .field > .label,
+    .form-login .fieldset > .field .control > .label {
+        color: var(--hm-foreground);
+        display: block;
+        float: none;
+        font-size: 1.4rem;
+        font-weight: 500;
+        margin-block-end: var(--hm-space-2);
+        text-align: start;
+        width: auto;
+    }
+
+    //  The email/mobile switch, matching the login page's segmented control.
+    //  The current side renders as <strong>, the other as <a>, so both need the
+    //  treatment and only the current one gets the fill.
+    .sms-login-switch {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+        margin-block-end: var(--hm-space-3);
+    }
+
+    .fieldset > .field > .control { width: auto; }
+
+    input[type='text'],
+    input[type='email'],
+    input[type='password'] {
+        background: var(--hm-surface-input);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        block-size: 4.8rem;
+        box-sizing: border-box;
+        font-size: 1.6rem;
+        inline-size: 100%;
+        padding-inline: var(--hm-space-4);
+    }
+
+    //  The toolbar has to become a column before `inline-size: 100%` on the
+    //  button means anything: blank floats `.primary` and lets it shrink-wrap,
+    //  so 100% resolved to the button's own 87px. Stacked, with Forgot Your
+    //  Password beneath rather than beside — there is no room for two controls
+    //  side by side in a 337px column.
+    //  (0,4,0). `.block-content` is a flex column and the toolbar carries an
+    //  `auto` top margin, which resolved to 221px and dropped Create an Account
+    //  to the floor of the dialog — 92px below Sign In, which sits directly
+    //  under its own field. A fixed start margin puts both CTAs with their
+    //  content.
+    .block-authentication .block .actions-toolbar {
+        align-items: stretch;
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-2);
+        margin-block-start: var(--hm-space-5);
+
+        > .primary,
+        > .secondary {
+            float: none;
+            inline-size: 100%;
+            margin: 0;
+            text-align: start;
+            width: auto;
+        }
+    }
+
+    //  Sign In was `.action.action-login.secondary` — grey, 93px wide, and the
+    //  quietest thing in a dialog that exists to be signed in through.
+    .actions-toolbar .primary .action.action-login,
+    .actions-toolbar .primary .action.action-register {
+        align-items: center;
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        box-sizing: border-box;
+        color: var(--hm-on-accent);        // navy on orange, 5.04:1
+        display: inline-flex;
+        font-size: 1.6rem;
+        font-weight: 700;
+        inline-size: 100%;
+        justify-content: center;
+        min-block-size: 4.8rem;
+        padding-block: 0;
+
+        &:hover { background: var(--hm-accent-hover); border-color: var(--hm-accent-hover); }
+    }
+
+    .actions-toolbar .secondary .action {
+        align-items: center;
+        color: var(--hm-accent-strong);
+        display: inline-flex;
+        font-size: 1.4rem;
+        min-block-size: 4.4rem;
+    }
+
+    //  44px target; it was 72x54 of mostly padding with a small glyph.
+    .action-close {
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+    }
+}
+
+@media (max-width: 767px) {
+    //  Magento stacks the two halves at this width; the divider between them
+    //  becomes a horizontal rule, so the gap does the separating instead.
+    .popup-authentication .block-authentication { gap: var(--hm-space-6); }
+}
