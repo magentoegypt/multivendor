@@ -18,6 +18,22 @@
  * page at once from a 122-line template, where the alternative was carrying a
  * 402-line override of Magento_Customer::form/register.phtml — and another of
  * the contact form after it — and re-diffing both on every upgrade.
+ *
+ * IF YOU ARE HERE BECAUSE "THE POPUP NEVER OPENS": that is by design, and it
+ * was investigated. Magento builds this modal LAZILY —
+ * Magento_Customer/js/view/authentication-popup::setModalElement only calls
+ * createPopup() when `cart().isGuestCheckoutAllowed === false`, otherwise it
+ * just subscribes and waits. Guest checkout is enabled on this store, so
+ * authenticationPopup.modalWindow stays null and showModal() is a no-op on an
+ * empty jQuery set. Both real callers — Magento_Checkout's sidebar.js and
+ * proceed-to-checkout.js — are gated on that identical condition, so nothing
+ * ever asks for it. Calling showModal() from a console bypasses that guard and
+ * looks like a bug; it is not one.
+ *
+ * Verified rather than reasoned: setting isGuestCheckoutAllowed=false on the
+ * cart customer-data section in the browser fires core's subscriber, the modal
+ * is built, showModal() opens it, and the renamed Sign In button above renders
+ * and is usable inside it.
  */
 -->
 <!--
