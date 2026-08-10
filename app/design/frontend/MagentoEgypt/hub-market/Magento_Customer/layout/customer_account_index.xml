@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Supplies the dashboard's Recent Orders cards with their line items.
+ *
+ * Same ViewModel as the full order history, and the same reason for the
+ * argument name: `view_model` is already taken on this block —
+ * Magento_OrderCancellationUi binds its Config there when it re-points the
+ * template — so this one is `history_items`.
+ *
+ * The template that consumes it is
+ * hub-market/Magento_OrderCancellationUi/templates/order/recent.phtml.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_account_dashboard_top">
+            <arguments>
+                <argument name="history_items" xsi:type="object">MagentoEgypt\CheckoutExtend\ViewModel\OrderHistoryItems</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

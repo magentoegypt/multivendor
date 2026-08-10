@@ -757,3 +757,35 @@
         > .action, > .hm-order-card__cancel { inline-size: 100%; justify-content: center; }
     }
 }
+
+//  Dashboard "Recent Orders" header. The block reuses the order-history card
+//  wholesale; only its title row is its own, and core emits the heading and the
+//  View All link as bare adjacent children with no layout between them.
+.block-dashboard-orders {
+    .block-title.order {
+        align-items: baseline;
+        display: flex;
+        gap: var(--hm-space-4);
+        justify-content: space-between;
+        margin-block-end: var(--hm-space-4);
+
+        > strong {
+            font-family: var(--hm-font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .action.view {
+            color: var(--hm-accent-strong);
+            font-size: 1.4rem;
+            font-weight: 600;
+            //  A text link is not a 44px target on its own; padding gives it one
+            //  without turning it into a button.
+            padding-block: var(--hm-space-2);
+        }
+    }
+
+    //  The shared `.account .column.main .block` separator would draw a rule
+    //  under a list that already ends in a bordered card.
+    &.block { border-block-end: 0; padding-block-end: 0; }
+}
