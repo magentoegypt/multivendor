@@ -171,6 +171,36 @@
                         <item name="cars" xsi:type="string">🚗</item>
                         <item name="pharmacy" xsi:type="string">💊</item>
                     </argument>
+                    <!--
+                        Chip tints, also keyed on URL KEY, as slots 0-7 into the
+                        pastel ramp in _hm-figma.less.
+
+                        Figma pairs its eight pastels to the CATEGORY, not to the
+                        position in the row, and that is worth reproducing for a
+                        reason beyond parity: with a positional modulo, disabling
+                        or adding one category re-colours every chip after it. An
+                        unmapped category still falls back to the positional
+                        rotation, so the row is never uncoloured.
+
+                        Slots:  0 mint  1 blue  2 amber  3 pink
+                                4 lavender  5 cream  6 rose  7 indigo
+                    -->
+                    <argument name="tints" xsi:type="array">
+                        <item name="super-market" xsi:type="number">0</item>
+                        <item name="sports" xsi:type="number">0</item>
+                        <item name="pharmacy" xsi:type="number">1</item>
+                        <item name="mobile-tablet" xsi:type="number">1</item>
+                        <item name="furniture" xsi:type="number">2</item>
+                        <item name="clothes" xsi:type="number">3</item>
+                        <item name="computer" xsi:type="number">4</item>
+                        <item name="shoes" xsi:type="number">5</item>
+                        <item name="toys" xsi:type="number">5</item>
+                        <item name="health" xsi:type="number">6</item>
+                        <item name="home-appliances" xsi:type="number">6</item>
+                        <item name="bags" xsi:type="number">7</item>
+                        <item name="books" xsi:type="number">4</item>
+                        <item name="cars" xsi:type="number">2</item>
+                    </argument>
                 </arguments>
             </block>
 

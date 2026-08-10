@@ -907,7 +907,9 @@
 .hm-chips__link {
     align-items: center;
     border: 0;
-    border-radius: var(--hm-radius);
+    //  16px, not 12. Figma's chip is `rounded-xl`; ours carried the theme's
+    //  default radius and read noticeably boxier beside it. Measured.
+    border-radius: var(--hm-radius-lg);
     display: flex;
     flex-direction: column;
     gap: .6rem;

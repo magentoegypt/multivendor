@@ -62,6 +62,7 @@ class CategoryChips extends Template
             ->addAttributeToSort('position', 'ASC');
 
         $icons = (array) ($this->getData('icons') ?: []);
+        $tints = (array) ($this->getData('tints') ?: []);
 
         $out   = [];
         $index = 0;
@@ -86,12 +87,16 @@ class CategoryChips extends Template
                  */
                 'icon'  => $icons[$urlKey] ?? self::FALLBACK_ICON,
                 /*
-                 * Tint slot. Figma assigns each chip one of eight pastels in a
-                 * fixed order rather than deriving it from the category, so the
-                 * row reads as a designed sequence. Position, not id: an id-based
-                 * modulo would reshuffle the whole row when one category is added.
+                 * Tint slot, keyed on URL KEY like the glyph above, with the
+                 * position as a fallback.
+                 *
+                 * Figma assigns its eight pastels per CATEGORY, not per slot, and
+                 * that difference is not cosmetic: with a positional modulo,
+                 * disabling or adding one category re-colours every chip after it
+                 * in the row. Keyed on the category, a chip keeps its colour for
+                 * as long as it exists.
                  */
-                'tint'  => $index % 8,
+                'tint'  => array_key_exists($urlKey, $tints) ? (int) $tints[$urlKey] % 8 : $index % 8,
             ];
             $index++;
             if (count($out) >= $limit) {
@@ -117,7 +122,7 @@ class CategoryChips extends Template
              * the key — otherwise editing layout leaves the cached row showing the
              * old icons until the block cache happens to expire.
              */
-            md5(json_encode($this->getData('icons') ?: [])),
+            md5(json_encode([$this->getData('icons') ?: [], $this->getData('tints') ?: []])),
         ];
     }
 
