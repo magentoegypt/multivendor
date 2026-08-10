@@ -42,6 +42,20 @@
 @hm-accent-hover:      #e85d18;  // navy label on it 4.55:1 — do not go darker
 @hm-accent-strong:     #c2410c;  // TEXT.  vs white 5.18:1
 @hm-accent-strong-hover:#9a3412; //        vs white 7.31:1
+//  TEXT on a dark ground. @hm-accent is 5.04:1 on FLAT @hm-navy (#0f2144), and
+//  that figure is what the navy panels were built against — but nothing on those
+//  panels actually sits on flat navy:
+//    · .hm-bundles is a GRADIENT running to #1a3a6a, and its "All Bundles" link
+//      sits at the light end                                    → 4.03:1
+//    · the store and product cards are fade(#ffffff, 6%) over the navy, which
+//      lifts the local backdrop to ~#1d2e4f                     → 4.28:1 (CTA)
+//                                                               → 4.73:1 (vendor)
+//  Both lightening effects were missed because the ratio was computed against
+//  the panel's declared background rather than the pixels behind the glyphs.
+//  This value clears 4.5:1 against every one of those backdrops with headroom
+//  (5.6:1 on the gradient's light end, 6.0:1 on the 6% card). FILLS still use
+//  @hm-accent — this is a text colour only.
+@hm-accent-on-dark:    #fb923c;  //        on the navy panels ≥5.6:1
 @hm-on-accent:         #0f2144;  // navy on #f26522 5.04:1
 @hm-accent-subtle:     #fff4ef;
 

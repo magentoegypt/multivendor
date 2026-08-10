@@ -265,12 +265,28 @@
         &:focus-within { border-color: fade(#ffffff, 28%); box-shadow: none; }
     }
 
-    .product-item-name a.product-item-link { color: var(--hm-on-inverse); }
-    .product-item-name a.product-item-link:hover { color: var(--hm-accent); }
-    .hm-card__vendor { color: var(--hm-accent); }             // 5.04:1 on the panel
-    .price-box .price { color: var(--hm-price-inverse); }
-    .price-box .old-price .price { color: var(--hm-on-inverse-muted); }
-    .reviews-actions { color: var(--hm-on-inverse-muted); }
+    //  `.block.widget` — NOT decoration. Every card foreground below competes
+    //  with a `.product-item …` rule further down this file, and the ones that
+    //  tied on specificity lost on source order alone. The price was the visible
+    //  casualty: `.product-item .price-box .price { color: var(--hm-foreground) }`
+    //  (the light-card decision, ~380 lines below) is also (0,3,0) and later, so
+    //  it repainted the price #1a1a2e on this navy card — 1.12:1, invisible.
+    //  Measured, not inferred: the rule here was correct and still lost.
+    //  This scope takes the group to (0,4,0)+ and settles all of them.
+    &.block.widget {
+        .product-item-name a.product-item-link { color: var(--hm-on-inverse); }        // 14.7:1
+        .product-item-name a.product-item-link:hover { color: var(--hm-accent-on-dark); }
+
+        .hm-card__vendor { color: var(--hm-accent-on-dark); }   // was 4.73:1, now 6.7:1
+
+        //  The price is the highest-contrast text on a card, not an accent one —
+        //  the same call the light card makes with --hm-foreground (15.9:1), and
+        //  the reason the vendor keeps the panel's only orange. --hm-price-inverse
+        //  would have been the accent again, a second orange beside the vendor.
+        .price-box .price { color: var(--hm-on-inverse); }
+        .price-box .old-price .price { color: var(--hm-on-inverse-muted); }
+        .reviews-actions { color: var(--hm-on-inverse-muted); }
+    }
 }
 
 //
@@ -291,8 +307,11 @@
 .hm-bundles {
     .hm-section__title { color: var(--hm-on-inverse); }
     .hm-section__sub   { color: var(--hm-on-inverse-muted); }   // 10.56:1 on navy
-    //  Fill orange, not the text orange: on navy that pairing inverts. 5.04:1.
-    .hm-section__more  { color: var(--hm-accent); }
+    //  Fill orange, not the text orange: on navy that pairing inverts. But the
+    //  5.04:1 that justified it was measured against flat @hm-navy, and this
+    //  panel is a GRADIENT to #1a3a6a — the link sits at the light end, where it
+    //  measured 4.03:1. The on-dark accent holds across the whole sweep.
+    .hm-section__more  { color: var(--hm-accent-on-dark); }
 }
 
 //  auto-fit rather than four fixed tracks: this catalog has three enabled
@@ -561,13 +580,20 @@
     //  glyph in accent. The "All stores" link moves to the FILL orange, which is
     //  the one that works on navy (5.04:1) and fails on white — the inverse of
     //  the usual rule, and exactly why the palette carries both.
+    //
+    //  AMENDED: 5.04:1 is the figure for text on this panel's own background.
+    //  The cards on it are fade(#ffffff, 6%), which lifts the local backdrop to
+    //  ~#1d2e4f and took "Visit Store" to 4.28:1. All accent text in this band
+    //  now uses the on-dark accent so the header link and the card CTA stay the
+    //  same orange — a band showing two oranges would be the worse outcome.
     .hm-stores__dispatch { color: var(--hm-on-inverse-muted); }
-    .hm-stores__dispatch .hm-icon { color: var(--hm-accent); }
-    .hm-section__more { color: var(--hm-accent); }
+    .hm-stores__dispatch .hm-icon { color: var(--hm-accent-on-dark); }
+    .hm-section__more { color: var(--hm-accent-on-dark); }
 }
 
-//  Same correction for the other panel that went dark.
-.hm-rail--hm-home-pickedforyou .hm-section__more { color: var(--hm-accent); }
+//  Same correction for the other panel that went dark. (This rail carries no
+//  "see all" link today; the rule stays so the panel is correct if one appears.)
+.hm-rail--hm-home-pickedforyou .hm-section__more { color: var(--hm-accent-on-dark); }
 
 //
 //  Product card  (Figma: the one component that repeats nine times)
@@ -1121,7 +1147,7 @@
 
 .hm-stores--hm-home-newstores .hm-stores__cta {
     border-color: fade(#ffffff, 30%);
-    color: var(--hm-accent);
+    color: var(--hm-accent-on-dark);   // 4.28:1 on the 6% card → 6.0:1
 }
 
 @media (max-width: 767px) {
