@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Adds short_description to the attribute set loaded for quote items.
+ *
+ * The cart line now carries the reference's two-line product summary, and
+ * `$item->getProduct()->getData('short_description')` came back empty for every
+ * line: quote item products are NOT loaded with the full attribute set, only
+ * with the `quote_item` group declared here and in core's own
+ * catalog_attributes.xml. The attribute existed on the product and was simply
+ * not in the select.
+ *
+ * Declaring it is the cheap fix — it joins into the load the cart already does,
+ * rather than costing a repository call per line the way fetching it in the
+ * template would.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Catalog/etc/catalog_attributes.xsd">
+    <group name="quote_item">
+        <attribute name="short_description"/>
+    </group>
+</config>

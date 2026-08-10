@@ -1,0 +1,25 @@
+<?php
+/**
+ * Hub Market — edit a cart line's options.
+ *
+ * Core's markup, with the product name folded into the accessible name: every
+ * row shipped the identical "Edit item parameters", so the control list read
+ * "Edit, Edit" with nothing distinguishing the products.
+ *
+ * Demoted to a quiet text link by the CSS rather than removed. The reference has
+ * no edit affordance at all, but configurable and bundle lines here genuinely
+ * need one — the alternative is remove-and-re-add.
+ *
+ * @var $block \Magento\Checkout\Block\Cart\Item\Renderer\Actions\Edit
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+<?php if ($block->isProductVisibleInSiteVisibility()): ?>
+    <?php $hmName = (string) $block->getItem()->getName(); ?>
+    <a class="action action-edit"
+       href="<?= $escaper->escapeUrl($block->getConfigureUrl()) ?>"
+       title="<?= $escaper->escapeHtmlAttr(__('Edit %1', $hmName)) ?>"
+       aria-label="<?= $escaper->escapeHtmlAttr(__('Edit %1', $hmName)) ?>">
+        <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+    </a>
+<?php endif ?>

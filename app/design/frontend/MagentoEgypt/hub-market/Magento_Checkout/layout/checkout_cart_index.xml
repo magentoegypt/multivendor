@@ -25,6 +25,18 @@
             </arguments>
         </referenceBlock>
 
+        <!--
+            Per-seller grouping for the line items. The reference draws one card
+            per vendor with the seller named across the top; this supplies the
+            grouping and the shop-page URL. See the note at the head of the
+            theme's cart/form.phtml.
+        -->
+        <referenceBlock name="checkout.cart.form">
+            <arguments>
+                <argument name="vendor_groups" xsi:type="object">MagentoEgypt\CheckoutExtend\ViewModel\CartVendors</argument>
+            </arguments>
+        </referenceBlock>
+
         <referenceBlock name="page.main.title" template="Magento_Theme::html/title-cart.phtml">
             <arguments>
                 <argument name="view_model" xsi:type="object">MagentoEgypt\CheckoutExtend\ViewModel\CartTitle</argument>

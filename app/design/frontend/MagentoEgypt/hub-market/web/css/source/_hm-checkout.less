@@ -108,112 +108,158 @@
         #gift-options-cart { grid-row: 3; }
     }
 
-    //  Magento renders the cart as a real <table>. Left alone on desktop; the
-    //  responsive collapse is handled at the bottom of this file.
-    .cart.table-wrapper {
+    //
+    //  VENDOR CARDS
+    //  ---------------------------------------------
+    //  The reference renders one card PER SELLER — white panel, 1px border,
+    //  clipped corners, the seller named in a tinted strip across the top — and
+    //  that seller's lines stacked inside it, divided by hairlines. It is the
+    //  most marketplace-specific thing on the page: it answers "who am I buying
+    //  each of these from", which a flat table cannot.
+    //
+    //  The markup is divs now (see cart/form.phtml for why a table could not
+    //  express the grouping), so almost none of the old table CSS survives.
+    .hm-cart-groups {
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-4);
+    }
+
+    .hm-cart-group {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        overflow: hidden;          // clips the head strip to the corner radius
+    }
+
+    .hm-cart-group__head {
+        background: var(--hm-surface-muted);
         border-block-end: 1px solid var(--hm-border-subtle);
-
-        thead th {
-            border-block-end: 1px solid var(--hm-border-subtle);
-            color: var(--hm-foreground-muted);   // was inheriting the price accent
-            font-family: var(--hm-font-sans);
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: .06em;
-            padding-block: var(--hm-space-3);
-            text-align: start;
-            text-transform: uppercase;
-        }
-
-        .cart.item { border-block-end: 1px solid var(--hm-border-subtle); }
-
-        .col { padding-block: var(--hm-space-5); vertical-align: top; }
+        padding: var(--hm-space-3) var(--hm-space-6);
     }
 
-    //  96px, per the reference. Two bugs in one rule:
-    //
-    //  The authored 9rem was DEAD — blank's
-    //  `.cart.table-wrapper .product-item-photo{display:table-cell;width:1%;
-    //  padding-right:24px}` at (0,3,0) is emitted later and won, so the cell
-    //  collapsed onto the image's intrinsic 160px and the thumbnail rendered
-    //  160x162 against a reference 96x96.
-    //
-    //  And the selector was too WIDE: bare `.product-item-photo` under
-    //  `.checkout-cart-index` also hit the cross-sell rail at the foot of the
-    //  page, squeezing those cards' photos into a 90px box inside a 303px card
-    //  and leaving ~213px of empty white. Scoping it to `.col.item` hands the
-    //  cross-sell cards back to _hm-product-item.less's square treatment.
-    .cart.table-wrapper .col.item .product-item-photo {
-        //  inline-block, not block. blank makes this a `table-cell` so the name
-        //  sits BESIDE the thumbnail; `display: block` fixed the 160px sizing
-        //  but dropped the name underneath it. inline-block keeps the pair on
-        //  one line, mirrors with `direction` for free, and — unlike making the
-        //  <td> itself a flex container — leaves the table's column algorithm
-        //  alone, so the four columns still line up across rows.
-        display: inline-block;
-        margin-inline-end: var(--hm-space-4);
-        vertical-align: top;
-        block-size: 9.6rem;
-        box-sizing: border-box;         // no global border-box in this build
-        flex: 0 0 auto;                 // the mobile cell is a flex row
-        inline-size: 9.6rem;
-        //  `padding: 0`, not `padding-inline-end: 0`. blank sets the PHYSICAL
-        //  `padding-right: 24px`, which under `direction: rtl` is the START
-        //  side — so zeroing the logical end left it standing and the Arabic
-        //  thumbnail measured 120 wide against 96 in English.
-        padding: 0;
-        //  And below 768px blank swaps this for
-        //  `{position:absolute; top:15px; left:0; max-width:60px; width:100%}`.
-        //  `max-width` beats `width`, so the mobile thumbnail stayed 60px however
-        //  large inline-size was set; `position:absolute` also took it out of
-        //  flow so the row could not be a flex line. Both have to be named to be
-        //  undone — this rule out-specifies blank's (0,5,0) vs (0,3,0), but an
-        //  un-named property is not overridden by weight.
-        max-inline-size: none;
-        max-width: none;
-        position: static;
-
-        img {
-            block-size: 100%;
-            border-radius: var(--hm-radius-sm);
-            inline-size: 100%;
-            object-fit: cover;          // no letterbox left to fill, so no tint
-        }
-    }
-
-    .cart.table-wrapper .col.item .product-item-details {
-        display: inline-block;
-        //  blank pairs its `display: table-cell` with `width: 99%`. Winning the
-        //  display property alone was not enough: at 99% the details box could
-        //  not share a line with a 96px thumbnail, so it wrapped underneath and
-        //  the name still sat below the image. The width has to be named too.
-        inline-size: auto;
-        width: auto;
-        max-inline-size: calc(100% - 13rem);   // 96 thumb + 16 gap + inline whitespace
-        vertical-align: top;
-    }
-
-    .product-item-name a {
-        color: var(--hm-foreground);
-        //  --hm-font-heading, NOT --hm-font-display: _hm-root.less remaps only
-        //  the former to IBM Plex Sans Arabic under :lang(ar), and product names
-        //  on this catalogue are Arabic in BOTH store views. --hm-font-display
-        //  would drop them to a serif fallback.
+    //  The reference uses blue-600 here. This theme has no blue in its palette
+    //  and introducing one for a single link would give the page a third accent;
+    //  navy is the established link colour for structural navigation and clears
+    //  AA comfortably (15.89:1 on the strip).
+    .hm-cart-group__vendor {
+        color: var(--hm-primary);
         font-family: var(--hm-font-heading);
-        font-size: 1.6rem;
+        font-size: 1.5rem;
         font-weight: 600;
         text-decoration: none;
 
-        &:hover { color: var(--hm-accent-strong); }
+        &:hover { color: var(--hm-accent-strong); text-decoration: underline; }
     }
 
-    //  The reference renders the unit price and the line total identically —
-    //  18px/700, near-black. Orange is this theme's price colour on a CARD,
-    //  where it is the loudest thing in a small box; in a cart row it competes
-    //  with the one control that matters, and every figure on the page was
-    //  wearing it.
-    .cart-price .price,
-    .col.subtotal .price {
+    //
+    //  LINE
+    //  ---------------------------------------------
+    .hm-cart-line {
+        //  flex-start, not the default stretch. Stretching made the media and
+        //  aside columns as tall as the tallest of the three and the card 293px
+        //  against the reference's 199 — a lot of white space defended by
+        //  nothing.
+        align-items: flex-start;
+        display: flex;
+        gap: var(--hm-space-4);
+        padding: var(--hm-space-6);
+
+        + .hm-cart-line { border-block-start: 1px solid var(--hm-border-subtle); }
+    }
+
+    .hm-cart-line__media {
+        flex: 0 0 auto;
+
+        .product-item-photo {
+            display: block;
+            block-size: 9.6rem;
+            box-sizing: border-box;
+            inline-size: 9.6rem;
+            //  The image wrappers are inline-level spans, so the anchor picked
+            //  up a descender gap and measured 103 tall around a 96 image.
+            line-height: 0;
+            overflow: hidden;
+            //  blank still ships its cart thumbnail rules — `width:1%` and
+            //  `padding-right:24px` on desktop, and below 768px an absolutely
+            //  positioned box with `max-width:60px`. None of them apply to a
+            //  flex child by intent, but `max-width` and `position` would still
+            //  land, so both are named.
+            max-inline-size: none;
+            max-width: none;
+            padding: 0;
+            position: static;
+
+        }
+
+        //  Magento's image renderer wraps the <img> in
+        //  `.product-image-container` and `.product-image-wrapper` and writes
+        //  the size from etc/view.xml as INLINE STYLE — `width:160px` on the
+        //  container and a percentage `padding-bottom` on the wrapper. Inline
+        //  wins over any selector, so the anchor was 96px around a 160px
+        //  payload and the media column measured 184x167. This is the same trap
+        //  the minicart hit; `!important` is the only thing that answers an
+        //  inline style short of changing view.xml and regenerating every
+        //  derivative.
+        .product-image-container,
+        .product-image-wrapper,
+        img.product-image-photo {
+            block-size: 9.6rem !important;
+            inline-size: 9.6rem !important;
+        }
+
+        .product-image-wrapper { padding: 0 !important; }
+
+        img.product-image-photo {
+            border-radius: var(--hm-radius-sm);
+            object-fit: cover;
+            position: static;
+        }
+    }
+
+    .hm-cart-line__body {
+        flex: 1 1 auto;
+        min-inline-size: 0;        // lets long names ellipsis instead of pushing the aside off
+    }
+
+    .product-item-name {
+        display: block;
+        margin: 0 0 var(--hm-space-1);
+
+        a {
+            color: var(--hm-foreground);
+            //  --hm-font-heading, NOT --hm-font-display: _hm-root.less remaps
+            //  only the former to IBM Plex Sans Arabic under :lang(ar), and
+            //  product names on this catalogue are Arabic in BOTH store views.
+            font-family: var(--hm-font-heading);
+            font-size: 1.6rem;
+            font-weight: 600;
+            text-decoration: none;
+
+            &:hover { color: var(--hm-accent-strong); }
+        }
+    }
+
+    //  Two lines, clamped. The clamp needs all four declarations — line-clamp
+    //  alone does nothing without the box display and the orientation.
+    .hm-cart-line__desc {
+        color: var(--hm-foreground-muted);
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        font-size: 1.4rem;
+        line-height: 1.45;
+        margin: 0 0 var(--hm-space-2);
+        overflow: hidden;
+    }
+
+    //  The reference renders unit price and line total identically — 18px/700,
+    //  near-black. Orange is this theme's price colour on a CARD, where it is
+    //  the loudest thing in a small box; in a cart row it competed with the one
+    //  control that matters, and every figure on the page was wearing it.
+    .hm-cart-line__price .price,
+    .hm-cart-line__total .price {
         color: var(--hm-foreground);
         font-size: 1.8rem;
         font-variant-numeric: tabular-nums;
@@ -221,23 +267,75 @@
     }
 
     //  Struck compare-at price, when one exists.
-    .cart-price .old-price .price,
-    .col.subtotal .old-price .price {
+    .hm-cart-line__price .old-price .price,
+    .hm-cart-line__total .old-price .price {
         color: var(--hm-price-was);
         font-size: 1.4rem;
         font-weight: 400;
     }
 
-    //  blank narrows this to 45px via a `.cart.table-wrapper .col.qty .input-text`
-    //  rule emitted later, so the authored 6.4rem needs the page prefix and the
-    //  extra class to actually land.
-    .cart.table-wrapper .col.qty input.qty,
-    .col.qty input.qty {
-        border: 1px solid var(--hm-border-strong);
-        border-radius: var(--hm-radius-sm);
-        block-size: 4.4rem;
-        inline-size: 6.4rem;
+    //  Trash at the top, stepper in the middle, line total at the foot — the
+    //  reference's `flex-col items-end justify-between`.
+    .hm-cart-line__aside {
+        align-items: flex-end;
+        display: flex;
+        flex: 0 0 auto;
+        flex-direction: column;
+        gap: var(--hm-space-3);
+        justify-content: space-between;
+    }
+
+    //
+    //  QTY STEPPER
+    //  ---------------------------------------------
+    .hm-qty {
+        margin: 0;
+
+        .control.qty {
+            align-items: stretch;
+            border: 1px solid var(--hm-border-strong);
+            border-radius: var(--hm-radius);
+            display: inline-flex;
+            overflow: hidden;
+        }
+
+        label { display: flex; margin: 0; }
+        .label { .hm-visually-hidden(); }
+    }
+
+    .hm-qty__btn {
+        align-items: center;
+        background: var(--hm-surface);
+        border: 0;
+        color: var(--hm-foreground);
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        //  44px, not the reference's 32 — this is the theme's touch floor and
+        //  these are the two most-pressed controls on the page.
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+        padding: 0;
+
+        &:hover { background: var(--hm-surface-muted); color: var(--hm-accent-strong); }
+    }
+
+    //  Borderless inside the stepper shell, which carries the outline.
+    .hm-qty input.qty {
+        appearance: textfield;
+        -moz-appearance: textfield;
+        background: var(--hm-surface);
+        border: 0;
+        border-radius: 0;
+        block-size: auto;
+        font-variant-numeric: tabular-nums;
+        font-weight: 500;
+        inline-size: 4.8rem;
+        min-block-size: 4.4rem;
         text-align: center;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button { appearance: none; margin: 0; }
     }
 
     //  Continue Shopping / Update Shopping Cart.
@@ -302,19 +400,54 @@
         p { margin-block-end: var(--hm-space-4); }
     }
 
-    //  Edit / Remove: icon-adjacent text actions, given real hit areas.
-    .item-actions .actions-toolbar > .action {
-        border: 1px solid var(--hm-border-subtle);
-        border-radius: var(--hm-radius);
-        color: var(--hm-foreground-muted);
-        display: inline-flex;
-        align-items: center;
-        font-size: 1.3rem;
-        min-block-size: 4rem;
-        margin-inline-end: var(--hm-space-2);
-        padding-inline: var(--hm-space-4);
+    //  Remove and Edit.
+    //
+    //  These were two grey pills on a row of their own, 79px tall, below the
+    //  line. The reference leads its trailing column with a red trash glyph and
+    //  has no edit affordance at all — but configurable and bundle lines here
+    //  genuinely need one, so Edit survives as a quiet text link under it.
+    //  One ROW, not a column. Stacked, these two came to 133px and were the
+    //  tallest thing in the line — the two least important controls on it
+    //  setting the height of the card.
+    .hm-cart-line__aside .item-actions {
+        display: flex;
+        justify-content: flex-end;
 
-        &:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
+        .actions-toolbar {
+            align-items: center;
+            display: flex;
+            gap: var(--hm-space-2);
+            margin: 0;
+        }
+    }
+
+    .action.action-delete {
+        align-items: center;
+        background: none;
+        border: 0;
+        //  --hm-danger, and the label is clipped rather than dropped so the
+        //  control keeps an accessible name.
+        color: var(--hm-danger);
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+        padding: 0;
+
+        > span { .hm-visually-hidden(); }
+
+        .hm-icon { block-size: 2rem; inline-size: 2rem; }
+
+        &:hover { color: var(--hm-danger); opacity: .75; }
+    }
+
+    .action.action-edit {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+        text-decoration: underline;
+
+        &:hover { color: var(--hm-accent-strong); }
     }
 }
 
@@ -983,79 +1116,40 @@ a.sms-login-field-ctrl {
 //
 //  Responsive
 //  ---------------------------------------------
-//  The cart is a real <table>, so below 768px it is collapsed to stacked rows
-//  rather than left to scroll sideways. Magento/blank ships the data-th
-//  attributes this relies on.
+//  The whole table-collapse apparatus that used to live here is GONE, along with
+//  the table. The line is a flex row of divs now, so the small-screen job is
+//  just to let the trailing column drop under the text instead of squeezing it.
 @media (max-width: 767px) {
     .checkout-cart-index {
-        .cart.table-wrapper {
-            thead { .hm-visually-hidden(); }
-
-            //  The collapse stopped at the tbody. `tbody.cart.item` went
-            //  `display: block` but `tr.item-info` stayed a table-row, so table
-            //  auto-layout sized each tbody independently — card one's row came
-            //  out 233px and card two's 249px, and stacked cards did not align.
-            //  The table and the rows have to come out of table layout too.
-            display: block;
-
-            .cart.items { display: block; }
-            .cart.item > tr { display: block; }
-
-            .cart.item {
-                background: var(--hm-surface);
-                border: 1px solid var(--hm-border-subtle);
-                border-radius: var(--hm-radius);
-                display: block;
-                margin-block-end: var(--hm-space-4);
-                padding: var(--hm-space-4);
-            }
-
-            .col {
-                display: flex;
-                justify-content: space-between;
-                padding-block: var(--hm-space-2);
-
-                &:before {
-                    color: var(--hm-foreground-muted);
-                    content: attr(data-th);
-                    font-size: 1.3rem;
-                    font-weight: 600;
-                }
-            }
-
-            //  blank ships `.col.qty, .col.price, .col.subtotal {display:block;
-            //  float:left; width:33%; text-align:center}` at (0,4,0) AFTER the
-            //  theme, so the rule above lost on those three cells. Written at
-            //  (0,5,0) here. Proof it was blank winning: only Price/Qty/Subtotal
-            //  printed a colon — the theme's own `attr(data-th)` does not have one.
-            .col.price,
-            .col.qty,
-            .col.subtotal {
-                display: flex;
-                float: none;
-                text-align: start;
-                width: auto;
-            }
-
-            //  Same weight problem, and blank appends ':' to the label.
-            .col[data-th]:before { content: attr(data-th); }
-
-            //  The single most prominent word in every mobile row was the
-            //  column header "Item", printed above the product name.
-            //
-            //  A flex line rather than blank's absolutely-positioned thumbnail
-            //  plus a 75px left indent on the cell — that pattern is what forced
-            //  the 60px cap above, and it does not mirror.
-            .col.item {
-                align-items: flex-start;
-                display: flex;
-                gap: var(--hm-space-3);
-                padding-inline-start: 0;
-                padding-left: 0;
-
-                &:before { content: none; }
-            }
+        .hm-cart-line {
+            display: grid;
+            //  Thumb stays beside the text; the aside spans both columns below.
+            grid-template-columns: 7.2rem minmax(0, 1fr);
+            gap: var(--hm-space-3);
+            padding: var(--hm-space-4);
         }
+
+        .hm-cart-line__media .product-item-photo {
+            block-size: 7.2rem;
+            inline-size: 7.2rem;
+        }
+
+        .hm-cart-line__aside {
+            align-items: center;
+            flex-direction: row;
+            grid-column: 1 / -1;
+            justify-content: space-between;
+        }
+
+        //  Remove leads the trailing column on desktop; in a horizontal row it
+        //  belongs at the end, away from the stepper it would otherwise sit
+        //  beside — a delete control adjacent to a minus button is a mis-tap
+        //  waiting to happen.
+        .hm-cart-line__aside .item-actions { order: 3; }
+        .hm-cart-line__total { order: 2; }
+        .hm-qty { order: 1; }
+
+        .hm-cart-group__head { padding-inline: var(--hm-space-4); }
 
         //  Two buttons, each wrapping onto two lines inside a space-between row
         //  360px wide. Stack them and let each take the full width.

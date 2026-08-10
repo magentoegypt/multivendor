@@ -13,6 +13,9 @@
     <module name="MagentoEgypt_CheckoutExtend">
         <sequence>
             <module name="Magento_Checkout"/>
+            <!-- CartVendors composes HomeSections' VendorNames rather than
+                 duplicating the vendor-table read. -->
+            <module name="MagentoEgypt_HomeSections"/>
         </sequence>
     </module>
 </config>

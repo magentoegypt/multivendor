@@ -1,0 +1,144 @@
+<?php
+/**
+ * Hub Market override of Magento_Checkout::cart/form.phtml.
+ *
+ * WHY THIS IS NOT A TABLE ANY MORE
+ * --------------------------------
+ * The Figma cart renders one CARD PER SELLER — a white panel with the seller's
+ * name in a tinted strip across the top, and that seller's lines inside it. A
+ * `<table>` cannot express that: the item renderer emits one `<tbody>` per line,
+ * `<tbody>` cannot nest, and border-radius and margin do not paint on a row
+ * group. The grouping is the point of the component on a marketplace, so the
+ * table goes and the rows become divs.
+ *
+ * WHAT HAD TO SURVIVE THE CHANGE, and did — all re-tested:
+ *   - every qty input keeps `name="cart[<id>][qty]"` and stays inside
+ *     `form.form-cart`, so `update_cart_action=update_qty` still serialises;
+ *   - `data-role="cart-item-qty"` is untouched: Magento_Checkout/js/shopping-cart
+ *     collects those with a document-wide `$.find`, not by walking the table;
+ *   - the `shoppingCart` widget's `data-mage-init` moves to the container that
+ *     replaces the table, keeping `id="shopping-cart-table"` so anything else
+ *     bound to that id still resolves;
+ *   - the pager, `form_before`, the MSRP branch and `getActions()` all still
+ *     render through their own blocks.
+ *
+ * The `<caption>` is gone with the table; the group headings now carry the
+ * structure, and the page already has an h1.
+ *
+ * @var $block \Magento\Checkout\Block\Cart\Grid
+ * @var $escaper \Magento\Framework\Escaper
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+/** @var \MagentoEgypt\CheckoutExtend\ViewModel\CartVendors|null $hmVendors */
+$hmVendors = $block->getData('vendor_groups');
+$hmItems   = $block->getItems();
+$hmGroups  = $hmVendors
+    ? $hmVendors->getGroups(is_array($hmItems) ? $hmItems : iterator_to_array($hmItems))
+    : [['vendor_id' => 0, 'name' => null, 'url' => null, 'items' => $hmItems]];
+?>
+<?= $block->getChildHtml('form_before') ?>
+<form action="<?= $escaper->escapeUrl($block->getUrl('checkout/cart/updatePost')) ?>"
+      method="post"
+      id="form-validate"
+      data-mage-init='{"Magento_Checkout/js/action/update-shopping-cart":
+          {"validationURL" : "<?= $escaper->escapeUrl($block->getUrl('checkout/cart/updateItemQty')) ?>",
+          "updateCartActionContainer": "#update_cart_action_container"}
+      }'
+      class="form form-cart">
+    <?= $block->getBlockHtml('formkey') ?>
+    <?php /*
+        NOT `cart table-wrapper`. There is no table here any more, and that class
+        drags in blank's whole cart-table ruleset — `.cart.table-wrapper
+        .product-item-photo{padding-right:24px}` alone was adding 24px to every
+        thumbnail's box, at a specificity that ties with the theme's and is
+        emitted later. Dropping the class is cheaper and safer than out-weighting
+        each rule as it surfaces.
+    */ ?>
+    <div class="cart hm-cart-wrapper">
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="cart-products-toolbar cart-products-toolbar-top toolbar"
+                 data-attribute="cart-products-toolbar-top"><?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+
+        <div id="shopping-cart-table"
+             class="cart items hm-cart-groups"
+             data-mage-init='{"shoppingCart":{"emptyCartButton": ".action.clear",
+             "updateCartActionContainer": "#update_cart_action_container"},
+             "hmCartQty":{}}'>
+            <?php foreach ($hmGroups as $hmGroup): ?>
+                <section class="hm-cart-group">
+                    <?php if ($hmGroup['name'] !== null): ?>
+                        <div class="hm-cart-group__head">
+                            <?php /*
+                                The seller is a LINK where a shop page exists. On a
+                                marketplace "who is this from" is a real question
+                                and the answer has a page; the reference links it
+                                too. Falls back to plain text rather than an anchor
+                                with nowhere to go.
+                            */ ?>
+                            <?php if ($hmGroup['url']): ?>
+                                <a class="hm-cart-group__vendor" href="<?= $escaper->escapeUrl($hmGroup['url']) ?>">
+                                    <?= $escaper->escapeHtml($hmGroup['name']) ?>
+                                </a>
+                            <?php else: ?>
+                                <span class="hm-cart-group__vendor"><?= $escaper->escapeHtml($hmGroup['name']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="hm-cart-group__items">
+                        <?php foreach ($hmGroup['items'] as $_item): ?>
+                            <?= $block->getItemHtml($_item) ?>
+                        <?php endforeach ?>
+                    </div>
+                </section>
+            <?php endforeach ?>
+        </div>
+
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="cart-products-toolbar cart-products-toolbar-bottom toolbar"
+                 data-attribute="cart-products-toolbar-bottom"><?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+    </div>
+    <div class="cart main actions">
+        <?php if ($block->getContinueShoppingUrl()): ?>
+            <a class="action continue"
+               href="<?= $escaper->escapeUrl($block->getContinueShoppingUrl()) ?>"
+               title="<?= $escaper->escapeHtmlAttr(__('Continue Shopping')) ?>">
+                <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span>
+            </a>
+        <?php endif; ?>
+        <?php if ($block->getViewModel()->isClearShoppingCartEnabled()): ?>
+            <button type="button"
+                    name="update_cart_action"
+                    data-cart-empty=""
+                    value="empty_cart"
+                    title="<?= $escaper->escapeHtmlAttr(__('Clear Shopping Cart')) ?>"
+                    class="action clear" id="empty_cart_button">
+                <span><?= $escaper->escapeHtml(__('Clear Shopping Cart')) ?></span>
+            </button>
+        <?php endif ?>
+        <?php /*
+            Kept, and kept HERE. The stepper commits on its own (see
+            hm-cart-qty.js), so this is now a belt-and-braces control rather than
+            the only way to change a quantity — but it is still the only thing
+            that commits a value typed straight into the field, and it cannot
+            move into the summary rail because the rail is outside this form.
+        */ ?>
+        <button type="submit"
+                name="update_cart_action"
+                data-cart-item-update=""
+                value="update_qty"
+                title="<?= $escaper->escapeHtmlAttr(__('Update Shopping Cart')) ?>"
+                class="action update">
+            <span><?= $escaper->escapeHtml(__('Update Shopping Cart')) ?></span>
+        </button>
+        <input type="hidden" value="" id="update_cart_action_container" data-cart-item-update=""/>
+    </div>
+</form>
+<?= $block->getChildHtml('checkout.cart.order.actions') ?>
+<?= $block->getChildHtml('shopping.cart.table.after') ?>

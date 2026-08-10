@@ -1,0 +1,29 @@
+<?php
+/**
+ * Hub Market — remove a cart line.
+ *
+ * Two changes from core, both of which the reference's design forces anyway.
+ *
+ * A BUTTON, NOT AN ANCHOR. Core ships `<a href="#" data-post>`: exposed to
+ * assistive tech as a link, not activatable with Space, and without JS it jumps
+ * to the top of the page instead of doing anything. `button[data-post]` is in
+ * mage/dataPost's default postTrigger list, so the binding is unchanged.
+ *
+ * A NAMED CONTROL. Every row shipped the identical accessible name "Remove
+ * item", so a control list read "Remove item, Remove item" with nothing to tell
+ * two products apart. The product name goes in the label. The reference is worse
+ * here — an unnamed icon button — so WCAG 2.4.4 is the standard, not parity.
+ *
+ * @var $block \Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove
+ * @var $escaper \Magento\Framework\Escaper
+ */
+$hmName = (string) $block->getItem()->getName();
+?>
+<button type="button"
+        class="action action-delete"
+        title="<?= $escaper->escapeHtmlAttr(__('Remove %1 from your cart', $hmName)) ?>"
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Remove %1 from your cart', $hmName)) ?>"
+        data-post='<?= /* @noEscape */ $block->getDeletePostJson() ?>'>
+    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-trash"/></svg>
+    <span><?= $escaper->escapeHtml(__('Remove item')) ?></span>
+</button>
