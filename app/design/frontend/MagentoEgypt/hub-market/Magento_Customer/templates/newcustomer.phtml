@@ -1,0 +1,30 @@
+<?php
+/**
+ * Hub Market override of Magento_Customer::newcustomer.phtml.
+ *
+ * One change: the heading id. `block-new-customer-heading` also exists inside
+ * the hidden authentication popup, which renders BEFORE this block on the login
+ * page, so this panel's `aria-labelledby` resolved into the dialog and the
+ * "New Customers" card was announced with the popup's heading instead of its
+ * own. See the note at the head of the theme's Vnecoms_Sms customer/login.phtml
+ * for why the visible page is the side that gets renamed.
+ *
+ * @var \Magento\Customer\Block\Form\Login\Info $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php if ($block->getRegistration()->isAllowed()): ?>
+<div class="block block-new-customer">
+    <div class="block-title">
+        <strong id="hm-new-customer-heading" role="heading" aria-level="2"><?= $escaper->escapeHtml(__('New Customers')) ?></strong>
+    </div>
+    <div class="block-content" aria-labelledby="hm-new-customer-heading">
+        <p><?= $escaper->escapeHtml(__('Creating an account has many benefits: check out faster, keep more than one address, track orders and more.')) ?></p>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <a href="<?= $escaper->escapeUrl($block->getCreateAccountUrl()) ?>" class="action create primary"><span><?= $escaper->escapeHtml(__('Create an Account')) ?></span></a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>

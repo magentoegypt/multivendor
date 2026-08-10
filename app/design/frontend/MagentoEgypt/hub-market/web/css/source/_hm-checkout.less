@@ -948,23 +948,20 @@
 //  is `selected`, not `active`:
 //    <a class="sms-login-field-ctrl selected" href="#by_email"><span>Email</span></a>
 //
-//  THE PILLS LIVE INSIDE THE <label>, NOT BESIDE IT. Vnecoms emits:
+//  THE PILLS ARE NO LONGER INSIDE A <label>. Vnecoms wrapped them in
+//  `<label class="label" for="email">`, which made the email input's accessible
+//  name the label's entire text — "Email or Mobile" — and pointed `for` at an id
+//  the hidden authentication popup also owns. The theme's login.phtml override
+//  replaces that wrapper with
 //
-//    <div class="field email required">
-//      <label class="label" for="email">
-//        <a class="sms-login-field-ctrl selected" href="#by_email">Email</a>
-//        or
-//        <a class="sms-login-field-ctrl" href="#by_mobile">Mobile</a>
-//      </label>
-//      <div id="by_mobile" class="control sms-login-field">…</div>
-//      <div id="by_email"  class="control sms-login-field">…</div>
-//    </div>
+//    <div class="sms-login-switch" role="group" aria-label="Sign in with">
 //
-//  A <label> is `display: inline` by default, so two 4.4rem-tall inline-flex
-//  children could not build a line box that contained them — the "Email" pill
-//  overlapped its own input and "Mobile" dropped below it. An earlier comment here
-//  claimed the pills "sit side by side without needing a parent element"; that was
-//  the bug. The label has to become the flex row.
+//  and gives each input a real label of its own. The flex row moves with it.
+//
+//  The original reason the wrapper needs to be a flex row still stands: it is
+//  `display: inline` by default, so two 4.4rem-tall inline-flex children could
+//  not build a line box that contained them — the "Email" pill overlapped its
+//  own input and "Mobile" dropped below it.
 //  THE CONTROLS ARE FLOATED. Magento/blank floats `.control` left inside the login
 //  fieldset. Floated children are out of flow, so the parent `.field` collapses —
 //  measured via CDP as width **0**, and the label with it. A zero-width flex
@@ -998,14 +995,38 @@
         width: auto;
     }
 
-    //  Declared last and at the same (0,5,0) weight so it beats the generic label
-    //  rule immediately above it rather than relying on source order alone.
-    .fieldset > .field.email > .label {
+    //  Declared last and at the same weight so it beats the generic label rule
+    //  immediately above it rather than relying on source order alone.
+    .fieldset > .field.email .sms-login-switch {
         align-items: center;
         display: flex;
         flex-wrap: wrap;
         gap: var(--hm-space-2);
         margin-block-end: var(--hm-space-3);
+    }
+
+    //  The per-input labels the override adds sit one level deeper than the
+    //  generic rule above reaches — inside `.control.sms-login-field` — so they
+    //  need their own declaration or they would render as bare inline text.
+    .fieldset > .field .sms-login-field > .label {
+        color: var(--hm-foreground);
+        display: block;
+        font-size: 1.4rem;
+        font-weight: 500;
+        margin-block-end: var(--hm-space-2);
+    }
+
+    //  Magento's required marker is `.fieldset > .field.required > .label:after`
+    //  — a DIRECT child selector, so it misses these; the email field would show
+    //  no asterisk while the password below it showed one, on two fields that
+    //  are equally required. Logical margin, and the theme's danger token rather
+    //  than core's hardcoded #e02b27.
+    .fieldset > .field.required .sms-login-field > .label:after,
+    .fieldset > .field._required .sms-login-field > .label:after {
+        color: var(--hm-danger);
+        content: '*';
+        font-size: 1.4rem;
+        margin-inline-start: var(--hm-space-1);
     }
 }
 

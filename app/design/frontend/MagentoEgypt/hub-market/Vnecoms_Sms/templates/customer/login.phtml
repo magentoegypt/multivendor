@@ -1,0 +1,206 @@
+<?php
+/**
+ * Hub Market override of Vnecoms_Sms::customer/login.phtml.
+ *
+ * THE PROBLEM: EVERY LABEL ON THIS FORM POINTED AT A HIDDEN DIALOG.
+ *
+ * Magento_Customer's `authentication-popup` block is declared in
+ * `default.xml`, so it renders on EVERY page — including this one, hidden, and
+ * BEFORE the visible form in the DOM. Vnecoms renders its mobile/OTP login into
+ * that popup as well as into this template, so the login page shipped seven
+ * duplicated ids: send2 x3, pass, login-form, mobile-number, login_type,
+ * block-customer-login-heading, block-new-customer-heading.
+ *
+ * `for=` and `aria-labelledby` resolve to the FIRST match in the document, and
+ * the popup is first. So clicking "Password" focused a hidden input inside a
+ * dialog, and the "Registered Customers" panel was announced as "Checkout using
+ * your account" — the popup's heading.
+ *
+ * Two of the three `send2`s were this template's own doing: the Sign In button
+ * and the Send OTP button below it shared an id.
+ *
+ * WHY THIS SIDE AND NOT THE POPUP. The popup cannot simply be removed from
+ * these handles — Magento_Checkout's sidebar.js and proceed-to-checkout.js both
+ * call authenticationPopup.showModal() when guest checkout is off, and it is
+ * the minicart's login path on every page. Renaming ITS ids would mean auditing
+ * core's popup JS as well as Vnecoms'. Renaming this form's is contained: every
+ * binding that reaches these ids is either a widget option or lives in this
+ * file, and both are visible below.
+ *
+ * VERIFIED BEFORE RENAMING — the id-based bindings in Vnecoms_Sms's JS are:
+ *   login.js            mobileInput / mobileField / loginTypeField / passwordField
+ *                       are all OPTIONS with defaults; the new ids are passed in.
+ *   validate-customer.js loginButtonSelector defaults to '#login-form .action.login';
+ *                       passed in. Its other hardcoded ids (#send-otp-btn,
+ *                       #resend-otp-btn, #verify-otp-btn, #sms-otp-input,
+ *                       #sms-otp-dialog, #ves-loadingbox) belong to the OTP
+ *                       dialog, are not duplicated, and are deliberately left
+ *                       alone.
+ *
+ * @var \Magento\Customer\Block\Form\Login $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+$username = $block->getUsername();
+$mobile = '';
+$isMobileLogin = false;
+if ($username) {
+    if (substr($username, 0, 1) == '+') {
+        $isMobileLogin = true;
+        $mobile = $username;
+        $username = '';
+    }
+}
+?>
+<div class="block block-customer-login">
+    <div class="block-title">
+        <strong id="hm-login-heading" role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Registered Customers')) ?></strong>
+    </div>
+    <div class="block-content" aria-labelledby="hm-login-heading">
+        <form class="form form-login"
+              action="<?= $escaper->escapeUrl($block->getPostActionUrl()) ?>"
+              data-test_login_action="<?= $escaper->escapeUrl($block->getUrl('vsms/login/loginPost')) ?>"
+              method="post"
+              id="hm-login-form">
+            <?= $block->getBlockHtml('formkey') ?>
+            <fieldset class="fieldset login" data-hasrequired="<?= $escaper->escapeHtmlAttr(__('* Required Fields')) ?>">
+                <div class="field note"><?= $escaper->escapeHtml(__('If you have an account, sign in with your email address.')) ?></div>
+
+                <div class="field email required">
+                    <?php /*
+                        This was a <label for="email"> WRAPPING the two toggle
+                        anchors, which made the email input's accessible name
+                        the label's whole text — "Email or Mobile" — while the
+                        password field below it had a proper one. It is not a
+                        label for anything: it is a pair of switches. The real
+                        label now sits under it, and the group gets a name of
+                        its own.
+                    */ ?>
+                    <div class="sms-login-switch" role="group" aria-label="<?= $escaper->escapeHtmlAttr(__('Sign in with')) ?>">
+                        <a class="sms-login-field-ctrl<?= $isMobileLogin ? '' : ' selected' ?>"
+                           href="#<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_EMAIL ?>"><span><?= $escaper->escapeHtml(__('Email')) ?></span></a>
+                        <?= $escaper->escapeHtml(__('or')) ?>
+                        <a class="sms-login-field-ctrl<?= $isMobileLogin ? ' selected' : '' ?>"
+                           href="#<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_MOBILE ?>"><span><?= $escaper->escapeHtml(__('Mobile')) ?></span></a>
+                    </div>
+
+                    <div id="by_mobile" class="control sms-login-field"<?= $isMobileLogin ? '' : ' style="display: none;"' ?>>
+                        <label class="label" for="hm-login-mobile-input"><span><?= $escaper->escapeHtml(__('Mobile Number')) ?></span></label>
+                        <input name="login[mobile]"
+                               value="<?= $escaper->escapeHtmlAttr($mobile) ?>"
+                               <?php if ($block->isAutocompleteDisabled()): ?> autocomplete="off"<?php endif; ?>
+                               id="hm-login-mobile-input"
+                               type="text"
+                               class="input-text"
+                               title="<?= $escaper->escapeHtmlAttr(__('Mobile')) ?>">
+                        <input type="hidden" name="mobilenumber" id="hm-login-mobile"/>
+                        <input type="hidden" name="login_type" id="hm-login-type" value="<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_EMAIL ?>"/>
+                    </div>
+
+                    <div id="by_email" class="control sms-login-field"<?= $isMobileLogin ? ' style="display: none;"' : '' ?>>
+                        <label class="label" for="hm-login-email"><span><?= $escaper->escapeHtml(__('Email Address')) ?></span></label>
+                        <input name="login[username]"
+                               value="<?= $escaper->escapeHtmlAttr($username) ?>"
+                               <?php if ($block->isAutocompleteDisabled()): ?> autocomplete="off"<?php endif; ?>
+                               id="hm-login-email"
+                               type="email"
+                               autocomplete="username"
+                               class="input-text"
+                               title="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                               data-validate="{required:true, 'validate-email':true}">
+                    </div>
+                </div>
+
+                <div class="field password required" id="magento-password-login">
+                    <label for="hm-login-pass" class="label"><span><?= $escaper->escapeHtml(__('Password')) ?></span></label>
+                    <div class="control">
+                        <input name="login[password]"
+                               type="password"
+                               <?php if ($block->isAutocompleteDisabled()): ?> autocomplete="off"<?php else: ?> autocomplete="current-password"<?php endif; ?>
+                               class="input-text"
+                               id="hm-login-pass"
+                               title="<?= $escaper->escapeHtmlAttr(__('Password')) ?>"
+                               data-validate="{required:true}">
+                    </div>
+                </div>
+
+                <?= $block->getChildHtml('form_additional_info') ?>
+
+                <div class="actions-toolbar actions-toolbar-login">
+                    <div class="primary">
+                        <button type="submit" class="action login primary" name="send" id="hm-login-submit"><span><?= $escaper->escapeHtml(__('Sign In')) ?></span></button>
+                    </div>
+                    <div class="secondary">
+                        <a class="action remind" href="<?= $escaper->escapeUrl($block->getForgotPasswordUrl()) ?>"><span><?= $escaper->escapeHtml(__('Forgot Your Password?')) ?></span></a>
+                    </div>
+                </div>
+
+                <div class="actions-toolbar actions-toolbar-otp" style="display: none">
+                    <div class="primary">
+                        <button type="submit" class="action login primary" name="send" id="hm-login-otp-submit"><span><?= $escaper->escapeHtml(__('Send OTP')) ?></span></button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+<?php
+/** @var \Vnecoms\Sms\Helper\Data $smsHelper */
+$smsHelper = \Magento\Framework\App\ObjectManager::getInstance()->get(\Vnecoms\Sms\Helper\Data::class);
+?>
+    <script type="text/javascript">
+    require([
+         'jquery',
+         'jquery/intltellinput',
+         'Vnecoms_Sms/js/utils',
+         'smsLogin',
+         'domReady!'
+    ], function ($) {
+        $('.block-customer-login').smsLogin({
+            login_type_config: '<?= $escaper->escapeJs($smsHelper->getConfigTypeLogin()) ?>',
+            initialCountry: '<?= $escaper->escapeJs(strtolower($smsHelper->getInitialCountry())) ?>',
+            allowDropdown: <?= /* @noEscape */ strtolower($smsHelper->getAllowCountryDropdown()) ?>,
+            onlyCountries: <?= /* @noEscape */ $smsHelper->isAllowedAllCountries() ? '[]' : json_encode(explode(',', $smsHelper->getAllowedCountries())) ?>,
+            preferredCountries: <?= /* @noEscape */ json_encode(explode(',', $smsHelper->getPreferredCountries())) ?>,
+            geoIpUrl: '<?= $escaper->escapeJs($smsHelper->getGeoIpDatabase() ? $block->getUrl('vsms/geoip') : 'https://ipinfo.io') ?>',
+            /* The three renamed fields, passed as the options login.js already
+               reads them from. Without these it would still be looking for the
+               popup's copies. */
+            mobileInput: '#hm-login-mobile-input',
+            mobileField: '#hm-login-mobile',
+            loginTypeField: '#hm-login-type'
+        });
+    });
+    </script>
+    <?php if ($smsHelper->isEnabledOtpLogin() || $smsHelper->isEnabled2FALogin()): ?>
+        <script type="text/x-magento-init">
+        {
+            "#hm-login-form": {
+                "Vnecoms_Sms/js/validate-customer": {
+                    "sendOtpURL": "<?= $escaper->escapeUrl($block->getUrl('vsms/otp_login/send')) ?>",
+                    "verifyOtpURL": "<?= $escaper->escapeUrl($block->getUrl('vsms/otp_login/verify')) ?>",
+                    "login_type_config": "<?= $escaper->escapeJs($smsHelper->getConfigTypeLogin()) ?>",
+                    "loginButtonSelector": "#hm-login-form .action.login"
+                }
+            }
+        }
+        </script>
+        <div class="ves-loadingbox" id="ves-loadingbox">
+            <div class="ves-overlay"></div>
+            <div class="loading-img"></div>
+        </div>
+        <div class="sms-otp-dialog" id="sms-otp-dialog">
+            <div class="sms-otp-step-1">
+                <p><?= $escaper->escapeHtml(__('This extra step shows it’s really you trying to sign in. Click to the button below to send an OTP to your phone number')) ?> <span class="sms-otp-mobile"></span></p>
+                <button class="action primary send-otp-btn" id="send-otp-btn"><span><?= $escaper->escapeHtml(__('Get OTP')) ?></span></button>
+            </div>
+            <div class="sms-otp-step-2">
+                <p><?= $escaper->escapeHtml(__('A text message with a %1-digit verification code has been sent to', $block->getOtpLength())) ?> <span id="sms-otp-dialog-mobile" class="sms-otp-mobile"></span></p>
+                <input type="text" name="sms_otp_code" id="sms-otp-input" value="" class="input-text required-entry" placeholder="<?= $escaper->escapeHtmlAttr(__('Your OTP')) ?>"/>
+                <button class="action primary send-otp-btn" id="verify-otp-btn"><span><?= $escaper->escapeHtml(__('Verify')) ?></span></button>
+                <a href="#" class="resend-otp-btn" id="resend-otp-btn" data-time="<?= $escaper->escapeHtmlAttr($smsHelper->getOtpResendPeriodTime()) ?>"><?= $escaper->escapeHtml(__('Resend after %1 seconds', $smsHelper->getOtpResendPeriodTime())) ?></a>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
