@@ -80,8 +80,16 @@
 //  Figma runs rail headings at 20px, and 18px inside the four tinted category
 //  bands. Ours were 24px throughout — large enough that the heading competed
 //  with the products rather than labelling them.
+//  Navy, not --hm-foreground. Figma sets every section heading `text-[#0f2144]`
+//  — the brand colour — while card titles stay near-black at gray-800. Ours used
+//  #1a1a2e for both, which loses that distinction. 15.89:1 on white and 14.9:1 on
+//  the deepest section tint, so it costs nothing.
+//
+//  The dark panels (Picked For You, Bundle Deals, New Stores) override this at
+//  higher specificity and are unaffected.
 .block.widget .block-title h2,
 .hm-section__title {
+    color: var(--hm-primary);
     font-family: var(--hm-font-display);
     font-size: 2rem;
     font-weight: 700;
@@ -983,9 +991,18 @@
 //  It rendered as a pale pill orphaned UNDER the product grid. Being beside the
 //  heading is the whole point of a countdown — "5d 11:19 remaining" attached to
 //  nothing tells a shopper nothing.
+//  `margin-inline-end: auto` is what keeps this beside the heading.
+//
+//  Figma wraps the title and the pill in one flex group and puts the "All Deals"
+//  link opposite them. Ours are two direct children of a `space-between` head, so
+//  with no third child the pill was pushed to the far edge of a 1248px row — a
+//  countdown 1100px away from the thing it is counting down. Absorbing the free
+//  space after the pill puts it back against the title and still leaves a trailing
+//  link, if one is ever added, on the opposite edge.
 .hm-countdown {
     align-items: center;
     align-self: center;
+    margin-inline-end: auto;
     background: var(--hm-surface-inverse);
     border: 0;
     border-radius: var(--hm-radius-sm);
@@ -995,7 +1012,7 @@
     font-size: 1.2rem;
     font-weight: 700;
     gap: var(--hm-space-2);
-    letter-spacing: .04em;
+    letter-spacing: .05em;   // Figma 0.6px at 12px
     padding: .6rem var(--hm-space-3);
 
     //  Figma tints the clock glyph accent — 5.04:1 on navy.
@@ -1003,6 +1020,13 @@
 }
 
 .hm-countdown__label { font-weight: 500; opacity: .8; }
+
+//  NOT `ui-monospace`, which is what Figma uses for the digits. The reason it
+//  reaches for a mono is so the timer does not jitter as the digits change width,
+//  and `font-variant-numeric: tabular-nums` on the brand font solves that without
+//  putting a fourth typeface on the page — which the parity gate counts, and would
+//  fail. Set on .hm-countdown__value above.
+
 
 //
 //  Store cards  (Featured Stores / Top Vendors / New Stores)
