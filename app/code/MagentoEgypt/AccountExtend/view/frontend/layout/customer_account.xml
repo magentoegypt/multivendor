@@ -38,5 +38,155 @@
                 </arguments>
             </block>
         </referenceContainer>
+
+        <!--
+            SIDEBAR NAV: icons, and the reference's four destinations first.
+
+            The Figma nav has four items. This store has fourteen, and they are
+            ORDERED rather than removed. Checked before deciding: product
+            reviews has 373 rows, the newsletter has live subscribers, six
+            downloadable products are saleable, GDPR is switched on, and the
+            Vnecoms credit / RMA / quotation modules are all enabled. Removing a
+            link does not remove its route — it strands anyone who arrives from
+            a bookmark or an e-mail with no way back — so pruning to four would
+            hide working features rather than simplify the account.
+
+            Billing Agreements already self-hides (payment/paypal_express/active
+            is 0) and is classed here only so it matches if it is ever enabled.
+
+            The icon hook is the `attributes` ARRAY, not a `class` string.
+            These links have no template — Link\Current renders its own markup
+            in PHP — and although `class` appears in Html\Link's
+            $allowedAttributes, that list feeds getLinkAttributes(), which
+            Link\Current never calls. What it calls is a private
+            getAttributesHtml() reading `attributes`. Verified by rendering a
+            SortLink both ways: the `class` form emitted nothing at all.
+
+            It lands on the <a> and, for the active entry, on the <strong> that
+            replaces it — which matters, because the active item has no href for
+            a selector to hook. Sort order is DESCENDING.
+        -->
+        <referenceBlock name="customer-account-navigation-account-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--account</item>
+                    </argument>
+                    <argument name="sortOrder" xsi:type="number">300</argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-orders-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--orders</item>
+                    </argument>
+                    <argument name="sortOrder" xsi:type="number">290</argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-wish-list-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--wishlist</item>
+                    </argument>
+                    <argument name="sortOrder" xsi:type="number">280</argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-address-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--address</item>
+                    </argument>
+                    <argument name="sortOrder" xsi:type="number">270</argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-account-edit-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--settings</item>
+                    </argument>
+                    <argument name="sortOrder" xsi:type="number">260</argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-delimiter-1">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">255</argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-newsletter-subscriptions-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--newsletter</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-product-reviews-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--reviews</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-downloadable-products-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--downloads</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-my-credit-cards-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--cards</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-billing-agreements-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--cards</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-vnecoms-credit-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--credit</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-vnecoms-marketplace-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--marketplace</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-rma">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--returns</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-quotes-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--quotes</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="customer-account-navigation-gdpr-link">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--gdpr</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
+        <referenceBlock name="sms-notification">
+                <arguments>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--sms</item>
+                    </argument>
+                </arguments>
+        </referenceBlock>
     </body>
 </page>
