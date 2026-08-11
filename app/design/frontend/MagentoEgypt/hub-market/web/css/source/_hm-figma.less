@@ -1174,7 +1174,10 @@
 //  ---------------------------------------------
 .hm-stores__cover {
     background: linear-gradient(135deg, var(--hm-primary) 0%, #1a3a6a 100%);
-    block-size: 8.8rem;
+    //  7rem, not 8.8 — Figma's band is shallower, and with the card's three
+    //  stacked lines gone the taller band left the text crowded into the bottom
+    //  third of the card.
+    block-size: 7rem;
     border-radius: var(--hm-radius) var(--hm-radius) 0 0;
     display: block;
     //  Full-bleed inside a card that carries side padding for its text.
@@ -1182,8 +1185,7 @@
     position: relative;
 }
 
-//  The text column: name, rating, dispatch, count, VERIFIED — one stack, tight,
-//  starting at the avatar's top edge rather than centred against it.
+//  The text column: name, one meta line, and VERIFIED on New Stores.
 .hm-stores__body {
     align-items: flex-start;
     display: flex;
@@ -1191,6 +1193,49 @@
     gap: .4rem;
     min-inline-size: 0;
 }
+
+//  Figma sets the store name in the accent, not the body ink — it is the one
+//  coloured word on the card and what makes the vendor read as a brand rather
+//  than a label. Two tokens because the two rails sit on opposite grounds:
+//  accent-strong is 5.18:1 on the white card, accent-on-dark clears AA on navy.
+//  The plain fill orange would fail on both.
+.hm-stores--hm-home-topvendors .hm-stores__name { color: var(--hm-accent-strong); }
+.hm-stores--hm-home-newstores  .hm-stores__name { color: var(--hm-accent-on-dark); }
+
+//  ONE meta row — "* 4.8 . 156 products" — where three stacked lines used to be.
+.hm-stores--hm-home-topvendors,
+.hm-stores--hm-home-newstores {
+    .hm-stores__meta {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 1.2rem;
+        gap: .5rem;
+    }
+
+    .hm-stores__rating {
+        align-items: center;
+        display: flex;
+        gap: .3rem;
+    }
+
+    .hm-stores__star { color: var(--hm-rating-star); }
+
+    .hm-stores__score {
+        color: var(--hm-foreground);
+        font-weight: 700;
+    }
+
+    //  The separator is generated, not typed: a literal "·" in the template
+    //  would need translating and would render on cards that carry no rating.
+    .hm-stores__rating + .hm-stores__count::before {
+        content: '·';
+        margin-inline-end: .5rem;
+    }
+}
+
+.hm-stores--hm-home-newstores .hm-stores__meta { color: var(--hm-on-inverse-muted); }
 
 //  Figma's amber chip. --hm-rating-star on navy is the same amber the stars use,
 //  and the navy label on it is 6.3:1 — white would be 2.4:1 and fail.
@@ -1269,10 +1314,10 @@
     //  the navy shows outside the card on both sides.
     .hm-stores--hm-home-topvendors &,
     .hm-stores--hm-home-newstores & {
-        align-items: stretch;
+        align-items: center;
         column-gap: var(--hm-space-3);
         display: grid;
-        grid-template-areas: "avatar body" "cta cta";
+        grid-template-areas: "avatar body";
         grid-template-columns: auto minmax(0, 1fr);
         overflow: hidden;
         row-gap: var(--hm-space-3);
@@ -1280,14 +1325,11 @@
 
         .hm-stores__avatar { grid-area: avatar; }
         .hm-stores__body   { grid-area: body; min-inline-size: 0; }
-
-        //  auto pushes the pill to the card floor, so four cards carrying
-        //  different optional lines still end on one baseline.
-        .hm-stores__cta { grid-area: cta; margin-block-start: auto; }
     }
 
     .hm-stores--hm-home-topvendors & {
-        grid-template-areas: "cover cover" "avatar body" "cta cta";
+        align-items: start;
+        grid-template-areas: "cover cover" "avatar body";
         padding: 0 var(--hm-space-4) var(--hm-space-4);
 
         .hm-stores__cover { grid-area: cover; }
@@ -1296,10 +1338,15 @@
         //  under it, which is what makes the band read as a cover and not as a
         //  coloured header. Pulled up by half its height, ringed in the card's
         //  own surface so it reads as cut out of the band.
+        //  A rounded SQUARE on this rail, not a disc — Figma uses the disc for
+        //  New Stores and a squircle for the vendor cover card.
         .hm-stores__avatar {
             border: 3px solid var(--hm-surface);
+            border-radius: var(--hm-radius);
+            block-size: 4rem;
             box-sizing: content-box;
-            margin-block-start: -2.8rem;
+            inline-size: 4rem;
+            margin-block-start: -2.4rem;
             z-index: 1;
         }
     }
@@ -2235,6 +2282,7 @@
 
     .toolbar-amount,
     .toolbar-sorter,
+    .field.limiter,
     .modes { display: none; }
 
     .pages { margin-inline: auto; }

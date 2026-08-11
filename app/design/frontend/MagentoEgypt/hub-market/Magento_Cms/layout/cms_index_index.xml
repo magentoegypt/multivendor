@@ -405,6 +405,7 @@
                    name="hm.home.topvendors" after="hm.home.brands"
                    template="MagentoEgypt_HomeSections::new-stores.phtml">
                 <arguments>
+                    <argument name="subtitle" xsi:type="string" translate="true">Highest-rated sellers verified by Magento Egypt</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                     <argument name="order_by" xsi:type="string">rating</argument>
                     <argument name="heading" xsi:type="string" translate="true">Top Vendors This Month</argument>
@@ -415,6 +416,7 @@
                    name="hm.home.newstores" after="hm.home.topvendors"
                    template="MagentoEgypt_HomeSections::new-stores.phtml">
                 <arguments>
+                    <argument name="subtitle" xsi:type="string" translate="true">Recently joined verified sellers</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                 </arguments>
             </block>

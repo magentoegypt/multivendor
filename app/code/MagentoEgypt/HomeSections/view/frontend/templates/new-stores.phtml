@@ -53,9 +53,23 @@ $hmIndex = 0;
 ?>
 <section class="hm-stores hm-stores--<?= $escaper->escapeHtmlAttr($hmStoresSlug) ?>" aria-labelledby="<?= $escaper->escapeHtmlAttr($headingId) ?>">
     <div class="hm-section__head">
-        <h2 class="hm-section__title" id="<?= $escaper->escapeHtmlAttr($headingId) ?>"><?= $escaper->escapeHtml($heading) ?></h2>
+        <div class="hm-section__heading">
+            <h2 class="hm-section__title" id="<?= $escaper->escapeHtmlAttr($headingId) ?>"><?= $escaper->escapeHtml($heading) ?></h2>
+            <?php
+            /*
+             * Subtitle and link label are per-rail, like the heading, because one
+             * template renders both sections. Every other homepage section head
+             * carries a subtitle; these two were the only ones without.
+             */
+            $hmSub = (string) ($block->getData('subtitle') ?: '');
+            ?>
+            <?php if ($hmSub !== ''): ?>
+                <p class="hm-section__sub"><?= $escaper->escapeHtml(__($hmSub)) ?></p>
+            <?php endif; ?>
+        </div>
         <a class="hm-section__more" href="<?= $escaper->escapeUrl($block->getUrl('sellerlist')) ?>">
-            <?= $escaper->escapeHtml(__('All stores')) ?>
+            <?= $escaper->escapeHtml($hmIsTopVendors ? __('All Vendors') : __('All Stores')) ?>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
         </a>
     </div>
     <ul class="hm-stores__list">
@@ -107,24 +121,32 @@ $hmIndex = 0;
                     </span>
                     <span class="hm-stores__body">
                     <span class="hm-stores__name"><?= $escaper->escapeHtml($s['name']) ?></span>
-                    <?php if ($s['stars'] !== null && $s['reviews'] > 0): ?>
-                        <span class="hm-stores__rating"
-                              aria-label="<?= $escaper->escapeHtmlAttr(__('Rated %1 out of 5 from %2 reviews', $s['stars'], $s['reviews'])) ?>">
-                            <span class="hm-stars" aria-hidden="true">
-                                <span class="hm-stars__fill" style="inline-size: <?= (float) $s['stars'] * 20 ?>%"></span>
-                            </span>
-                            <span class="hm-stores__score"><?= $escaper->escapeHtml(number_format((float) $s['stars'], 1)) ?></span>
-                            <span class="hm-stores__reviews">(<?= (int) $s['reviews'] ?>)</span>
-                        </span>
-                    <?php endif; ?>
-                    <?php if (!empty($s['dispatch'])): ?>
-                        <span class="hm-stores__dispatch">
-                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-clock"/></svg>
-                            <?= $escaper->escapeHtml($s['dispatch']) ?>
-                        </span>
-                    <?php endif; ?>
+                    <?php
+                    /*
+                     * ONE meta line, not three.
+                     *
+                     * Figma's vendor card carries a single line — "* 4.8 . 156
+                     * products" — where ours printed the rating, a dispatch time
+                     * and the product count on separate rows. That is three times
+                     * the card height for the same information, and the dispatch
+                     * line only exists on some vendors, which is what made the row
+                     * ragged. The dispatch time is dropped from BOTH rails: it is
+                     * real data, but it is not on this card in the reference, and
+                     * it is still shown on the seller's own page.
+                     *
+                     * New Stores shows the count alone — the reference puts no
+                     * rating on that card, only the VERIFIED mark.
+                     */
+                    ?>
                     <span class="hm-stores__meta">
-                        <?= $escaper->escapeHtml(__('%1 products', $s['products'])) ?>
+                        <?php if ($hmIsTopVendors && $s['stars'] !== null && $s['reviews'] > 0): ?>
+                            <span class="hm-stores__rating"
+                                  aria-label="<?= $escaper->escapeHtmlAttr(__('Rated %1 out of 5 from %2 reviews', $s['stars'], $s['reviews'])) ?>">
+                                <svg class="hm-icon hm-icon--sm hm-stores__star" aria-hidden="true" focusable="false"><use href="#hm-star"/></svg>
+                                <span class="hm-stores__score"><?= $escaper->escapeHtml(number_format((float) $s['stars'], 1)) ?></span>
+                            </span>
+                        <?php endif; ?>
+                        <span class="hm-stores__count"><?= $escaper->escapeHtml(__('%1 products', $s['products'])) ?></span>
                     </span>
                     <?php if ($hmIsNewStores): ?>
                         <span class="hm-stores__verified">
@@ -134,15 +156,13 @@ $hmIndex = 0;
                     <?php endif; ?>
                     <?php
                     /*
-                     * Figma's "Visit Store" pill. Rendered on EVERY card, not only
-                     * those with a rating: it is what makes four cards carrying
-                     * different optional lines (rating, dispatch time) end on the
-                     * same baseline. Not a nested <a> — the whole card is the link,
-                     * and an anchor inside an anchor is invalid and unfocusable.
+                     * The "Visit Store" pill is gone. Figma's vendor cards carry
+                     * no button — the whole card is the link, and the pill was a
+                     * second control pointing at the same place. It had been kept
+                     * to give four cards a common baseline; that job now belongs
+                     * to the grid, which pins the text stack instead.
                      */
                     ?>
-                    </span>
-                    <span class="hm-stores__cta"><?= $escaper->escapeHtml(__('Visit Store')) ?></span>
                 </a>
             </li>
         <?php endforeach; ?>
