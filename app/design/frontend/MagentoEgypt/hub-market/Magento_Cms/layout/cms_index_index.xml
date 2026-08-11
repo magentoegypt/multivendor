@@ -241,7 +241,24 @@
                     -->
                     <argument name="title" xsi:type="string" translate="true">Featured Stores</argument>
                     <argument name="subtitle" xsi:type="string" translate="true">Verified sellers with the widest ranges</argument>
-                    <argument name="seller_ids" xsi:type="string">seno,ronza,loly,MIA</argument>
+                    <!--
+                        FOUR ids, and the rail rendered THREE. `seno` was silently
+                        dropped, and not by anything in this layout: the vendor
+                        collection INNER JOINs ves_vendor_user on is_super_user = 1
+                        and then customer_entity, and vendor 12 (seno) has no
+                        ves_vendor_user row at all — no owner account. An inner
+                        join on a missing row removes the vendor, so the widget
+                        asked for four, matched three, and the fourth grid track
+                        sat empty with nothing in the markup to explain it.
+
+                        Replaced rather than repaired: giving seno an owner account
+                        is a vendor-administration act, not a homepage one. ENARA
+                        is approved, HAS a super user, and carries 11 products —
+                        the largest eligible catalog after the three already here.
+                        seno itself is raised separately; it has 29 products and is
+                        invisible to every block that uses this collection.
+                    -->
+                    <argument name="seller_ids" xsi:type="string">ENARA,ronza,loly,MIA</argument>
                     <argument name="items" xsi:type="number">4</argument>
                     <argument name="show_name" xsi:type="number">1</argument>
                     <argument name="autoplay" xsi:type="number">0</argument>
