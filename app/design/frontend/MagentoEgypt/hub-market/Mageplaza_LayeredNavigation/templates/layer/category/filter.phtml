@@ -1,0 +1,95 @@
+<?php
+/**
+ * Hub Market override of Mageplaza_LayeredNavigation's filter template.
+ *
+ * THE CHECKBOX IN FRONT OF EVERY FILTER OPTION IS DECORATION.
+ *
+ * It carries no name, no id, no value and no handler — the <a> beside it is the
+ * control that actually applies the filter, and it already carries the option
+ * label and the count as its accessible name. The input exists so the option
+ * LOOKS like a checkbox.
+ *
+ * Left as-is it is a focusable form control with no accessible name at all. That
+ * was invisible while the rail shipped collapsed; opening the filters to match
+ * the design (see _hm-figma.less) put fifteen of them on the category page, and
+ * the site sweep caught the jump from 4 unnamed controls to 19.
+ *
+ * aria-hidden + tabindex="-1" rather than a label: giving it a name would put a
+ * SECOND tab stop on every option that does nothing when activated, which is
+ * worse for keyboard users than the visual-only element it actually is.
+ *
+ * Only those two attributes are added. Everything else is Mageplaza's.
+ */
+?>
+<?php
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     ${MODULENAME}
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+/** @var \Mageplaza\LayeredNavigation\Model\Layer\Filter\CategoryItem $filterItems */
+/** @var \Mageplaza\LayeredNavigation\Block\Navigation\FilterRenderer\Category $block */
+$filter = $block->getFilter();
+$filterPathItems = $filterItems->getItems($block->getPath());
+$filterModel     = $block->getFilterModel();
+?>
+    <?php foreach ($filterPathItems as $filterItem): ?>
+        <?php
+        $hasChild = $filterItems->hasChildrenData($filterItem->getValue());
+        $isExpandByClick = $block->isExpandByClick($filterItem);
+        $isSelected = $filterModel->isSelected($filterItem);
+        ?>
+    <li class="item">
+        <?php if ($isExpandByClick): ?>
+            <span class="icon-expand <?= /** @noEscape */ $isSelected ? 'active' : '' ?>"></span>
+        <?php endif; ?>
+        <?php if ($filterItem->getCount() > 0): ?>
+            <input type="<?= /** @noEscape */ $filterModel->isMultiple($filter) ? 'checkbox' : 'radio' ?>" aria-hidden="true" tabindex="-1"
+                <?= /** @noEscape */ $filterModel->isMultiple($filter) ? '' : 'name="' . $filter->getRequestVar() . '"' ?>
+                <?= /** @noEscape */ $isSelected ? 'checked="checked"' : '' ?> />
+            <a href="<?= /** @noEscape */ $block->escapeUrl($filterModel->getItemUrl($filterItem)) ?>">
+                <?= /** @noEscape */ $filterItem->getLabel() ?>
+                <?php if ($filterModel->isShowCounter($filter)): ?>
+                    <span class="count"><?= /** @noEscape */ $filterItem->getCount() ?>
+                            <span class="filter-count-label">
+                                <?= /** @noEscape */ ($filterItem->getCount() === 1) ? 'item' : 'items' ?>
+                            </span>
+                        </span>
+                <?php endif; ?>
+            </a>
+        <?php else: ?>
+            <input type="<?= /** @noEscape */ $filterModel->isMultiple($filter) ? 'checkbox' : 'radio' ?>" aria-hidden="true" tabindex="-1"
+                   disabled="disabled"/>
+            <span>
+                <?= /** @noEscape */ $filterItem->getLabel() ?>
+                <?php if ($filterModel->isShowCounter($filter)): ?>
+                    <span class="count"><?= /** @noEscape */ $filterItem->getCount() ?>
+                            <span class="filter-count-label">
+                                <?= /** @noEscape */ ($filterItem->getCount() === 1) ? 'item' : 'items' ?>
+                            </span>
+                        </span>
+                <?php endif; ?>
+            </span>
+        <?php endif; ?>
+        <?php if ($hasChild): ?>
+            <ol class="category-items items level-<?= /* @noEscape */  $block->getLevel() ?>" <?= !$isSelected && $isExpandByClick ? 'style="display: none"' : '' ?> >
+                <?= /* @noEscape */ $block->renderChildrenItems($filterItem->getValue()) ?>
+            </ol>
+        <?php endif; ?>
+    </li>
+    <?php endforeach; ?>

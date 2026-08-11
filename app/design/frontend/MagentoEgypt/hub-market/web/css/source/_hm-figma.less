@@ -1841,8 +1841,29 @@
 //
 //  Filter rail — Figma draws each filter as its own white card
 //  ---------------------------------------------
-.hm-plp .sidebar-main {
-    inline-size: 22.4rem;      // Figma w-56
+//  THE RAIL WAS 288px WIDE, NOT 224px, AND IT WAS COSTING THE CARDS 10px EACH.
+//  `.hm-plp .sidebar-main` below is (0,2,0) and was losing to
+//  `.hm-page.page-layout-2columns-left .sidebar-main { inline-size: 23.077% }`
+//  at (0,3,0) — an ACCOUNT rule (_hm-account.less) that matches any
+//  2-columns-left page, and the category page is one. Same rule also supplied a
+//  32px padding-inline-end where Figma's gutter is 24px.
+//
+//  Measured consequence: rail 288 instead of 224, grid 960 instead of 1000, and
+//  every card 231px instead of Figma's 241px. Fixing the rail is what fixes the
+//  card width — (1000 - 3*12) / 4 = 241 exactly.
+//
+//  Scoped with .hm-page.hm-plp.page-layout-2columns-left so it is (0,4,0) and
+//  cannot be outranked by the account rule again.
+.hm-page.hm-plp.page-layout-2columns-left {
+    .sidebar-main {
+        //  24.8rem = 22.4rem of rail + 2.4rem gutter, border-box.
+        inline-size: 24.8rem;
+        padding-inline-end: 2.4rem;
+    }
+
+    .column.main {
+        inline-size: ~"calc(100% - 24.8rem)";
+    }
 }
 
 .hm-plp .sidebar .block.filter,
@@ -1875,13 +1896,50 @@
     border-block-end: 1px solid var(--hm-border-subtle);   // undo blank's divider-only rule
 }
 
+//  Figma sets every filter heading in the display serif, in navy, sentence case.
+//  Ours were DM Sans in the body ink — the rail read as a form, not as the
+//  design's stack of titled cards.
 .hm-plp .filter-options-title {
-    color: var(--hm-foreground);
+    //  --hm-font-heading, not --hm-font-display: the heading token swaps to the
+    //  Arabic face inside the RTL scope, and Playfair has no Arabic coverage.
+    color: var(--hm-primary);
+    font-family: var(--hm-font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    line-height: 1.34;
     margin: 0 0 var(--hm-space-3);
     padding: 0;
+    text-transform: none;
 }
 
 .hm-plp .filter-options-content { padding: 0; }
+
+//  THE RAIL WAS ENTIRELY COLLAPSED. Magento's collapsible widget runs at every
+//  breakpoint here, so all six filters rendered as shut pills with no values —
+//  Figma shows all of them open with their options visible, and no chevrons.
+//  On desktop the rail is always open and the toggle affordance is removed; the
+//  accordion is left intact below 768px, where a stacked open rail would bury
+//  the products.
+@media (min-width: 768px) {
+    .hm-plp .filter-options-content {
+        display: block !important;   // beats the widget's inline display:none
+    }
+
+    .hm-plp .filter-options-title {
+        cursor: default;
+        pointer-events: none;
+
+        &::after { display: none; }   // the chevron
+    }
+}
+
+//  Figma has no wrapper heading over the rail — each filter card carries its own
+//  title. Ours printed a "Shop By" label above them, which is Magento's.
+.hm-plp .block.filter .filter-title,
+.hm-plp .block.filter > .block-title {
+    .hm-visually-hidden();
+}
 
 //
 //  Toolbar — Figma puts the count on the lead edge, sort and view on the trailing
@@ -1932,6 +1990,80 @@
     display: flex;
     font-size: 1.4rem;
     gap: var(--hm-space-1);
+}
+
+//  Figma puts the price and the cart control on ONE line — price on the lead
+//  edge, a single square button on the trailing edge. Ours stacked the action
+//  row UNDER the price, which cost ~40px of card height on every tile and left
+//  the price looking orphaned.
+.hm-plp .product-item .hm-card__foot {
+    align-items: center;
+    column-gap: var(--hm-space-2);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    //  flex-basis MUST be reset here. The shared card rule gives .price-box
+    //  `flex: 1 1 100%`, which makes it claim a whole flex line on its own and
+    //  wraps the action row underneath — the exact stacking this block exists to
+    //  undo. Setting display:flex on the parent alone achieves nothing while the
+    //  child still asks for 100%.
+    .price-box {
+        flex: 0 1 auto;
+        margin: 0;
+    }
+
+    //  margin:auto 0 0 on .product-item-inner is what bottom-aligns the footer
+    //  so prices line up across a row whose cards differ in height. That job
+    //  belongs to .hm-card__foot itself (it carries margin-block-start:auto), so
+    //  the inner element must stop claiming the space or it pushes the button
+    //  away from the price.
+    .product-item-inner {
+        flex: 0 0 auto;
+        margin: 0;
+    }
+
+    .product-item-actions { padding-block-start: 0; }
+}
+
+//  Square icon buttons, 36px, 12px radius — Figma's exact geometry. Ours were
+//  44px minimums inherited from the rails, which is a touch target sized for a
+//  full-width button, not for a control sitting beside a price.
+//
+//  ONE DELIBERATE DEVIATION: Figma draws a WHITE cart glyph on the orange fill.
+//  White on #f26522 is 3.1:1 and fails AA; the navy glyph this theme already
+//  uses (--hm-on-accent) is 5.04:1 on the same fill. Geometry copied, colour
+//  not — the same call made for the vendor label, which stays #c2410c rather
+//  than Figma's #f26522 for the identical reason.
+//  --hm-radius is 12px and --hm-radius-lg is 16px. Figma's button radius is 12,
+//  so this is --hm-radius; the 16 belongs to the CARD, not to the control.
+.hm-plp .product-item {
+    .actions-primary { flex: 0 0 auto; }
+
+    .action.tocart {
+        block-size: 3.6rem;
+        border-radius: var(--hm-radius);
+        //  NO `width` alongside `inline-size`. They are the same property in a
+        //  horizontal writing mode, so declaring both means the later one wins —
+        //  a `width: auto` added here to cancel the base rule's `width: 100%`
+        //  silently collapsed the button to 18px instead.
+        inline-size: 3.6rem;
+        min-block-size: 0;
+        min-inline-size: 0;
+        padding: 0;
+    }
+
+    //  box-sizing: the secondary buttons carry a 1px border, and without this
+    //  they measure 38px against the cart button's 36 — a visible 2px step in a
+    //  row of three squares.
+    .actions-secondary > a.action {
+        block-size: 3.6rem;
+        border-radius: var(--hm-radius);
+        box-sizing: border-box;
+        inline-size: 3.6rem;
+        min-block-size: 0;
+        min-inline-size: 0;
+    }
 }
 
 .hm-plp .product-item .actions-primary {
