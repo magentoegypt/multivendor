@@ -802,12 +802,24 @@
 //  always visible here, and the fade is applied ONLY where a real pointer is
 //  present. `any-hover` rather than `hover` so a hybrid laptop with a
 //  touchscreen keeps the pointer behaviour.
-//  The second selector is not decoration. On the listing templates this control
-//  is a child of .actions-secondary, and `.product-item .actions-secondary >
-//  a.action` (0,3,1) — plus a .hm-plp variant at (0,4,1) — sized it as a square
-//  row button, so the disc came out 36x36 at a 12px radius instead of a 32px
-//  circle. Matching that shape here settles it without !important.
+//  The extra selectors are not decoration — they are the two rules this control
+//  has to out-specify, and the second one produced a visible defect:
+//
+//  1. `.product-item .actions-secondary > a.action` (0,3,1) sized it as a square
+//     row button, so the disc came out 36x36 at a 12px radius, not a 32px circle.
+//
+//  2. `.products.list.items .action.towishlist { display: inline-block }` is
+//     (0,5,0) and beat the `display: flex` here. Because the disc is absolutely
+//     positioned, inline-block then BLOCKIFIES to block — so align-items and
+//     justify-content stopped applying and the icon rendered 46px down inside a
+//     32px button, hanging out the bottom. Nothing looked wrong in the rule
+//     itself; the computed value was `block`, which neither rule asks for.
+//
+//  `.products.list.items .action.towishlist.hm-card__wish` is (0,6,0) and settles
+//  both without !important.
 .hm-card__wish,
+.product-items .action.towishlist.hm-card__wish,
+.products.list.items .action.towishlist.hm-card__wish,
 .product-item .actions-secondary > a.action.hm-card__wish {
     align-items: center;
     background: var(--hm-surface);
@@ -830,6 +842,14 @@
     justify-content: center;
     position: absolute;
     z-index: 2;
+
+    //  blank draws .action.towishlist's icon as a ::before glyph from
+    //  icons-blank-theme. Its content is an empty string, so it looks like it
+    //  renders nothing — but it still generates a 17px-wide flex item, and
+    //  17 + the 15px SVG is exactly the 32px button, which is why the real icon
+    //  ended up flush against the trailing edge with 17px of nothing beside it.
+    //  This theme supplies its own sprite icon, so the glyph box is redundant.
+    &::before { content: none; }
 
     &:hover { color: var(--hm-discount-bg); }
 
