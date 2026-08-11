@@ -1751,8 +1751,16 @@
     padding-inline: calc(50vw - 50%);
 }
 
+//  28px total, not 42. The hero band measured 170 against Figma's 156, and the
+//  whole of the 14px was here: the trail rendered 30px tall (the container kept
+//  a 16px/24px line box while its own items are 12px) plus a 12px margin. The
+//  band's height is then set by the 64px thumbnail hanging off the bottom of
+//  .hm-cat-hero__body, so every pixel the trail adds pushes the band — and with
+//  it the toolbar, the grid and the fold — straight down.
 .hm-cat-hero__trail {
-    margin-block-end: var(--hm-space-3);
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-block-end: var(--hm-space-2);
 
     ol {
         display: flex;
@@ -1762,6 +1770,12 @@
         margin: 0;
         padding: 0;
     }
+
+    //  The LIST ITEMS carry blank's 12px bottom margin, and the ol is a flex
+    //  container — so that margin lands inside the flex line and makes a 19.2px
+    //  row measure 31.2. Zeroing the ol alone does nothing; this is the rule
+    //  that actually recovers the 12px.
+    li { margin: 0; }
 
     //  Figma separates crumbs with "/". Generated content rather than markup so
     //  it is not announced, and suppressed on the first item.
@@ -1866,11 +1880,22 @@
     }
 }
 
+//  THE FILTER CARDS WERE INSET 21px ON EACH SIDE. Figma's cards span the full
+//  224px rail; ours measured 182px at x=117, because `.sidebar .block` gives the
+//  WRAPPER a 20px padding and a 1px border, and the cards are nested inside it.
+//  Two boxes were being drawn where the design has one, and the inner one lost
+//  42px of width to the outer one's padding.
+//
+//  The wrapper keeps its margin (it separates the rail from what follows) and
+//  gives up everything that makes it look like a card of its own.
 .hm-plp .sidebar .block.filter,
 .hm-plp .sidebar .block-compare,
 .hm-plp .sidebar .block-wishlist {
     background: transparent;
+    border: 0;
+    border-radius: 0;
     margin-block-end: var(--hm-space-4);
+    padding: 0;
 }
 
 //  The "Shopping Options" heading is a label for the rail, not a card of its own.
@@ -1969,6 +1994,33 @@
     border: 0;
     padding: 0;
 }
+
+//  62px, not 86. Figma's first card sits at y=437; ours sat at 495, and after
+//  the hero band's 14px the rest was the toolbar carrying 60px-tall view-mode
+//  buttons and a 50px sorter inside 24px of padding. Capping the controls at
+//  38px lands the row on 62 and the grid on Figma's y.
+.hm-plp .toolbar-products {
+    .modes,
+    .modes-mode,
+    .toolbar-sorter,
+    .sorter-options,
+    .sorter-action {
+        block-size: 3.8rem;
+        box-sizing: border-box;
+        min-block-size: 0;
+    }
+
+    .modes { align-items: center; display: flex; gap: var(--hm-space-1); }
+    .modes-mode { align-items: center; display: inline-flex; inline-size: 3.8rem; justify-content: center; padding: 0; }
+    .toolbar-sorter { align-items: center; display: flex; gap: var(--hm-space-2); }
+    .sorter-options { padding-block: 0; }
+}
+
+//  blank gives .products a 36px top margin. It is an adjacent sibling of the
+//  toolbar, so the two margins collapse to the larger one and the grid sat 36px
+//  below the toolbar instead of Figma's 16 — the last of the offset that had the
+//  first card 21px low.
+.hm-plp .products { margin-block-start: var(--hm-space-4); }
 
 .hm-plp .toolbar-products .toolbar-amount { margin: 0; order: 1; }
 .hm-plp .toolbar-products .toolbar-sorter { margin-inline-start: auto; order: 2; }
