@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Store-view translations for catalog content that the theme cannot reach.
+ *
+ * NO setup_version. This module ships data patches only, and patches are
+ * tracked in `patch_list` rather than `setup_module`. Declaring a version here
+ * without a matching schema install makes DbStatusValidator report the module
+ * as out of date and 500s the whole storefront until setup:upgrade is run.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_CatalogTranslate">
+        <sequence>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_Store"/>
+        </sequence>
+    </module>
+</config>
