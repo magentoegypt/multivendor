@@ -969,27 +969,45 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
 
 .hm-app__body { max-inline-size: 62ch; }
 
+//  Figma sets this as an accent PILL, not muted text — it is the band's only
+//  coloured element besides the buttons, and as plain grey uppercase it read as
+//  a caption rather than a label.
+//
+//  Navy on the fill orange, not white: white on #f26522 is 3.1:1 and fails,
+//  --hm-on-accent is 5.04:1 on the same fill. Same call as every other accent
+//  chip in the theme.
 .hm-app__kicker {
-    color: var(--hm-on-inverse-muted);      // 10.56:1 on navy
+    align-self: flex-start;
+    background: var(--hm-accent);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-on-accent);
+    display: inline-block;
     font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: .06em;
-    margin: 0;
+    margin: 0 0 var(--hm-space-3);
+    padding: .5rem 1.2rem;
     text-transform: uppercase;
 }
 
 .hm-app__title {
     color: var(--hm-on-inverse);            // 15.89:1
     font-family: var(--hm-font-heading);
-    font-size: 3.2rem;
+    //  3.6rem — measured off the reference, which runs this headline over two
+    //  lines so it holds the band against the phone mock beside it. At the 3.2
+    //  it shipped with, the copy block sat visually lighter than the artwork.
+    font-size: 3.6rem;
     font-weight: 700;
     line-height: 1.15;
     margin: var(--hm-space-2) 0;
 }
 
 .hm-app__text {
+    //  14px like the reference, but opaque rather than white-at-55% — that
+    //  alpha lands near 5.5:1 on the navy where this token is 10.56:1, and a
+    //  smaller size is exactly where the margin matters.
     color: var(--hm-on-inverse-muted);
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     line-height: 1.6;
     margin: 0 0 var(--hm-space-5);
 }

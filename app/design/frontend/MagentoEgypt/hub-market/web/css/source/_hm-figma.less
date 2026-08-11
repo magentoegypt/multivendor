@@ -1607,15 +1607,22 @@
         @hm-success-subtle);
 }
 
+//  Measured off the reference: label 14/700, caption 11/400. The label matches
+//  exactly. The caption does NOT — 11px is below the 12px floor this theme holds
+//  everywhere, so it sits at 12 and the label/caption ratio is 1.17 rather than
+//  Figma's 1.27. The hierarchy is carried by weight and colour instead, which is
+//  where most of it comes from anyway.
 .hm-trust__title {
     color: var(--hm-foreground);
     font-size: 1.4rem;
     font-weight: 700;
+    line-height: 1.4;
 }
 
 .hm-trust__text {
-    color: var(--hm-foreground-muted);
+    color: var(--hm-foreground-muted);      // 4.83:1
     font-size: 1.2rem;
+    line-height: 1.5;
 }
 
 //
@@ -1636,11 +1643,18 @@
 //  Hidden below 992px: at phone width the copy already fills the band, and a
 //  picture of a phone on a phone is not worth 40% of the viewport.
 @media (min-width: 992px) {
+    //  16 x 34, not 18 x 26. A phone is roughly 1:2; at 18x26 the mock was
+    //  squat enough to read as a tablet, and `contain` letterboxed the artwork
+    //  inside it rather than filling the box. The band gets a matching floor so
+    //  the taller mock has somewhere to go — it is absolutely positioned, so it
+    //  contributes no height of its own and would otherwise overflow.
+    .hm-app { min-block-size: 43rem; }
+
     .hm-app::after {
         background: url('../images/hm-app-phone.svg') no-repeat center / contain;
-        block-size: 26rem;
+        block-size: 34rem;
         content: '';
-        inline-size: 18rem;
+        inline-size: 16rem;
         inset-block-start: 50%;
         inset-inline-end: 12%;
         pointer-events: none;
