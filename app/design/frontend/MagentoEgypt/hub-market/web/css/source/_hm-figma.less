@@ -1613,7 +1613,7 @@
 //  Figma's 1.27. The hierarchy is carried by weight and colour instead, which is
 //  where most of it comes from anyway.
 .hm-trust__title {
-    color: var(--hm-foreground);
+    color: @hm-navy;                        // #0f2144, the reference's label
     font-size: 1.4rem;
     font-weight: 700;
     line-height: 1.4;
@@ -1643,18 +1643,20 @@
 //  Hidden below 992px: at phone width the copy already fills the band, and a
 //  picture of a phone on a phone is not worth 40% of the viewport.
 @media (min-width: 992px) {
-    //  16 x 34, not 18 x 26. A phone is roughly 1:2; at 18x26 the mock was
-    //  squat enough to read as a tablet, and `contain` letterboxed the artwork
-    //  inside it rather than filling the box. The band gets a matching floor so
-    //  the taller mock has somewhere to go — it is absolutely positioned, so it
-    //  contributes no height of its own and would otherwise overflow.
-    .hm-app { min-block-size: 43rem; }
+    //  14.2 x 37 matches the redrawn asset's 180x470 canvas and the reference's
+    //  143x373 mock. The box has to track the artwork's aspect: `contain`
+    //  letterboxes anything else, which is why the earlier 16x34 box left the
+    //  phone rendering at its old size inside a taller empty area.
+    //
+    //  The band gets a floor because the mock is absolutely positioned and so
+    //  contributes no height of its own — without it the artwork overflowed.
+    .hm-app { min-block-size: 39.5rem; }
 
     .hm-app::after {
         background: url('../images/hm-app-phone.svg') no-repeat center / contain;
-        block-size: 34rem;
+        block-size: 37rem;
         content: '';
-        inline-size: 16rem;
+        inline-size: 14.2rem;
         inset-block-start: 50%;
         inset-inline-end: 12%;
         pointer-events: none;
@@ -1662,8 +1664,10 @@
         transform: translateY(-50%);
     }
 
-    //  Keep the copy clear of it.
-    .hm-app__body { max-inline-size: 52ch; }
+    //  60.4rem = 604px, the reference's copy-column width, and still ~420px
+    //  clear of the mock's leading edge. In rem, not ch: `ch` resolves against
+    //  DM Sans here, so 60ch came out 657 and overshot.
+    .hm-app__body { max-inline-size: 60.4rem; }
 }
 
 //  Figma's page ends ON the footer. blank leaves `.page-main` with a bottom

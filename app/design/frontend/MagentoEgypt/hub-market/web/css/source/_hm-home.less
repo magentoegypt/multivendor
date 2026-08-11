@@ -998,7 +998,7 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
     //  it shipped with, the copy block sat visually lighter than the artwork.
     font-size: 3.6rem;
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.25;                      // 45/36, measured
     margin: var(--hm-space-2) 0;
 }
 
@@ -1010,6 +1010,10 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
     font-size: 1.4rem;
     line-height: 1.6;
     margin: 0 0 var(--hm-space-5);
+    //  The reference sets the paragraph narrower than the headline — 448 against
+    //  604 — so the copy block reads as a column rather than as a full-width
+    //  slab. Ours ran both to the same 569.
+    max-inline-size: 45rem;
 }
 
 .hm-app__actions {
@@ -1098,9 +1102,11 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
     font-size: 1.2rem;
 }
 
+//  14/700, measured off the reference. This one does not need raising — only
+//  the "Download on the" line above it was under the floor.
 .hm-app__store-name {
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: 1.4rem;
+    font-weight: 700;
 }
 
 @media (max-width: 767px) {
