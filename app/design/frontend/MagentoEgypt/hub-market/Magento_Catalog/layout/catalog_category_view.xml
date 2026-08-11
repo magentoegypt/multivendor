@@ -58,5 +58,20 @@
             image appeared twice at wildly different sizes.
         -->
         <referenceBlock name="category.image" remove="true"/>
+
+        <!--
+            Figma's filter rail holds filters and nothing else. Magento adds a
+            "Compare Products" and a "My Wish List" card under them, and on a
+            catalog where neither list is usually populated both render as an
+            empty box with a sentence in it — two cards of dead weight above the
+            fold, in a 224px rail the design gives entirely to facets.
+
+            Removed in layout rather than hidden in CSS: display:none would still
+            build the blocks (the wishlist one queries the customer's list) and
+            still ship them to every visitor. Neither feature is lost — compare
+            and wishlist both remain on the product cards and in the header.
+        -->
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
     </body>
 </page>

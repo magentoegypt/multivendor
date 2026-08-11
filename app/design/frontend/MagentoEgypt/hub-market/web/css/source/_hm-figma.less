@@ -1946,13 +1946,27 @@
 //  ---------------------------------------------
 //  Ours had the view switcher first, the count centred and the sort last, which
 //  is Magento/blank's order, not the design's.
+//  Figma sits the toolbar in a white card of its own, the same surface and
+//  radius as the product tiles below it. Ours was bare on the page ground, so
+//  the count and the sort looked like they belonged to the grid rather than
+//  labelling it.
 .hm-plp .toolbar-products {
     align-items: center;
-    background: transparent;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-lg);
     display: flex;
     flex-wrap: wrap;
     gap: var(--hm-space-3);
     margin: 0 0 var(--hm-space-4);
+    padding: var(--hm-space-3) var(--hm-space-4);
+}
+
+//  The repeated bottom toolbar is pagination only — no surface, or the page
+//  ends on an empty white slab.
+.hm-plp .products ~ .toolbar-products {
+    background: transparent;
+    border: 0;
     padding: 0;
 }
 
