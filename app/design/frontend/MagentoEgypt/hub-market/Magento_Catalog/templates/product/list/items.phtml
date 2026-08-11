@@ -230,7 +230,9 @@ $_item = null;
                             <?php else:?>
                                 <li class="item product product-item">
                             <?php endif; ?>
-                            <div class="product-item-info <?= /* @noEscape */ $available ?>">
+                            <?php /* Bundles keep a permanently visible action — see list.phtml. */ ?>
+                            <?php $hmIsBundle = in_array($_item->getTypeId(), ['bundle', 'new_bundle'], true); ?>
+                            <div class="product-item-info <?= /* @noEscape */ $available ?><?= $hmIsBundle ? ' hm-card--bundle' : '' ?>">
                                 <div class="product-item-media">
                                     <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>"
                                        class="product photo product-item-photo">

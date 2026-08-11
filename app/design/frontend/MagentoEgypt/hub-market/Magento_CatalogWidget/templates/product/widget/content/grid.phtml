@@ -147,7 +147,9 @@ use Magento\Wishlist\Helper\Data;
                         $hmVendorName = $hmVendors ? $hmVendors->getName($_item->getData('vendor_id')) : null;
                         ?>
                         <?= /* @noEscape */ ($iterator++ == 1) ? '<li class="product-item">' : '</li><li class="product-item">' ?>
-                        <div class="product-item-info">
+                        <?php /* Bundles keep a permanently visible action — see list.phtml. */ ?>
+                        <?php $hmIsBundle = in_array($_item->getTypeId(), ['bundle', 'new_bundle'], true); ?>
+                        <div class="product-item-info<?= $hmIsBundle ? ' hm-card--bundle' : '' ?>">
                             <div class="product-item-media">
                                 <a href="<?= $escaper->escapeUrl($block->getProductUrl($_item)) ?>" class="product-item-photo">
                                     <?= $block->getImage($_item, $image)->toHtml() ?>
@@ -243,15 +245,17 @@ use Magento\Wishlist\Helper\Data;
                                                         <?php endif; ?>
                                                     </div>
                                                 <?php endif; ?>
-                                                <?php if ($block->getAddToCompareUrl() && $showCompare): ?>
-                                                    <div class="actions-secondary" data-role="add-to-links">
-                                                        <?php $compareHelper = $this->helper(Compare::class);?>
-                                                        <a href="#" class="action tocompare" data-post='<?= /* @noEscape */ $compareHelper->getPostDataParams($_item) ?>' title="<?= $escaper->escapeHtmlAttr(__('Add to Compare')) ?>">
-                                                            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-compare"/></svg>
-                                                            <span><?= $escaper->escapeHtml(__('Add to Compare')) ?></span>
-                                                        </a>
-                                                    </div>
-                                                <?php endif; ?>
+                                                <?php /*
+                                                    Compare is gone from the card. The other five listing
+                                                    types drop it in layout (Magento_Theme/layout/default.xml)
+                                                    because they render it through the `addto` child block;
+                                                    this widget builds the control inline, so layout has
+                                                    nothing to remove and it has to come out here.
+
+                                                    Figma's card carries two actions — the wishlist disc on
+                                                    the image and add-to-cart in the price row. The compare
+                                                    FEATURE is untouched; only the per-card button is gone.
+                                                */ ?>
                                             </div>
                                         </div>
                                     <?php endif; ?>

@@ -3,13 +3,20 @@
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  *
- * Hub Market fork. ONE change: the sprite icon.
+ * Hub Market fork. TWO changes: the sprite icon, and the hm-card__wish class.
  *
  * The card CSS renders these secondary actions as 32px icon buttons and clips
  * their label — that is the design. Core emits only the label, so on the category
  * listing every card showed two empty bordered squares where the wishlist and
  * compare buttons should be. The homepage rails did not have the problem because
  * their template supplies the icon inline.
+ *
+ * hm-card__wish is what lifts this control out of the price row and onto the
+ * image, top-trailing corner, as a 32px disc — the position the homepage rails
+ * already used and the one Figma draws. Adding it HERE rather than in each
+ * listing template is the point: this one file feeds the addto group on the
+ * category, search, related, upsell and cross-sell lists, so all five pick up
+ * the same control from a single change and cannot drift apart later.
  *
  * The <span> is KEPT and clipped rather than dropped: with the label gone the
  * control would have no accessible name beyond its title attribute.
@@ -19,7 +26,7 @@
 ?>
 <?php if ($block->getWishlistHelper()->isAllow()) : ?>
     <a href="#"
-       class="action towishlist"
+       class="action towishlist hm-card__wish"
        title="<?= $block->escapeHtmlAttr(__('Add to Wish List')) ?>"
        aria-label="<?= $block->escapeHtmlAttr(__('Add to Wish List')) ?>"
        data-post='<?= /* @noEscape */ $block->getAddToWishlistParams($block->getProduct()) ?>'

@@ -232,5 +232,31 @@
             No override needed for the skip-link target: Magento's main container
             already renders <main id="maincontent">, which skip-link.phtml points at.
         -->
+
+        <!--
+            PRODUCT CARDS CARRY TWO ACTIONS, NOT THREE.
+
+            Figma's card has exactly two controls: a wishlist disc on the image and
+            an add-to-cart square in the price row. Magento adds a third, Compare,
+            which put a row of three identical bordered squares under the price on
+            every listing and is the least-used of the three by a wide margin.
+
+            Removed here rather than in five separate handles: these five blocks
+            are the SAME compare control declared once per list type (category,
+            search, related, upsell, cross-sell). Layout removal by name resolves
+            against the merged layout, so one place covers all of them and any
+            future list that reuses the names.
+
+            Compare itself is NOT disabled — the feature, its page and its header
+            link all still work. Only the per-card button is gone.
+
+            view.addto.compare is deliberately NOT removed: that is the product
+            page's own button, not a card control.
+        -->
+        <referenceBlock name="category.product.addto.compare" remove="true"/>
+        <referenceBlock name="catalogsearch.product.addto.compare" remove="true"/>
+        <referenceBlock name="related.product.addto.compare" remove="true"/>
+        <referenceBlock name="upsell.product.addto.compare" remove="true"/>
+        <referenceBlock name="crosssell.product.addto.compare" remove="true"/>
     </body>
 </page>

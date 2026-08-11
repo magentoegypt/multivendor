@@ -802,15 +802,29 @@
 //  always visible here, and the fade is applied ONLY where a real pointer is
 //  present. `any-hover` rather than `hover` so a hybrid laptop with a
 //  touchscreen keeps the pointer behaviour.
-.hm-card__wish {
+//  The second selector is not decoration. On the listing templates this control
+//  is a child of .actions-secondary, and `.product-item .actions-secondary >
+//  a.action` (0,3,1) — plus a .hm-plp variant at (0,4,1) — sized it as a square
+//  row button, so the disc came out 36x36 at a 12px radius instead of a 32px
+//  circle. Matching that shape here settles it without !important.
+.hm-card__wish,
+.product-item .actions-secondary > a.action.hm-card__wish {
     align-items: center;
     background: var(--hm-surface);
+    border: 0;
     border-radius: var(--hm-radius-full);
     block-size: 3.2rem;
     box-shadow: var(--hm-shadow-sm);
     color: var(--hm-icon);
     display: flex;
     inline-size: 3.2rem;
+    //  `.action { min-height: 4.4rem }` is only (0,1,0), the same as this rule —
+    //  but a MIN constraint is applied after the used height is resolved, so it
+    //  wins on the cascade regardless and stretched the disc to 32x44 on the
+    //  homepage rails. Specificity was never the lever here; the constraint has
+    //  to be released explicitly.
+    min-block-size: 0;
+    min-inline-size: 0;
     inset-block-start: var(--hm-space-2);
     inset-inline-end: var(--hm-space-2);
     justify-content: center;
@@ -830,10 +844,60 @@
     }
 }
 
+//
+//  Card actions — two controls, everywhere
+//  ---------------------------------------------
+//  Figma's card carries exactly two: a wishlist disc on the image and an
+//  add-to-cart square on the price row. Compare is removed from every listing
+//  (Magento_Theme/layout/default.xml for the five block-driven lists, inline in
+//  the CatalogWidget rail which builds its own).
+//
+//  The wishlist reaches its position through the hm-card__wish class, which the
+//  shared addto/wishlist.phtml now applies, so the category, search, related,
+//  upsell and cross-sell lists all get it from one template. `display: contents`
+//  on the wrapper is what lets that happen: the anchor is absolutely positioned
+//  against .product-item-info, and without it the now-empty .actions-secondary
+//  still sits in the action row as a flex item and opens a gap beside the cart
+//  button.
+.product-item-info .actions-secondary { display: contents; }
+
+//  Add to cart: 36px square, 12px radius, trailing edge of the price row. This
+//  is deliberately NOT scoped to .hm-plp — the rails, the cross-sell rail and
+//  every other listing carry the same card and had three different button
+//  geometries between them.
+.product-item .action.tocart {
+    block-size: 3.6rem;
+    border-radius: var(--hm-radius);
+    inline-size: 3.6rem;
+    min-block-size: 0;
+    min-inline-size: 0;
+    padding: 0;
+}
+
 @media (any-hover: hover) {
-    .hm-card__wish { opacity: 0; transition: opacity var(--hm-duration) var(--hm-ease); }
+    //  BOTH controls fade in on the card, not just the wishlist.
+    //
+    //  The hover guard is the whole point of using any-hover rather than a
+    //  breakpoint: on a touch device there is no hover, the query never matches,
+    //  and both controls stay permanently visible. A plain :hover rule would
+    //  hide the only add-to-cart affordance on every phone.
+    .product-item-info .hm-card__wish,
+    .product-item-info:not(.hm-card--bundle) .action.tocart {
+        opacity: 0;
+        transition: opacity var(--hm-duration) var(--hm-ease);
+    }
+
     .product-item-info:hover .hm-card__wish,
-    .product-item-info:focus-within .hm-card__wish { opacity: 1; }
+    .product-item-info:focus-within .hm-card__wish,
+    .product-item-info:not(.hm-card--bundle):hover .action.tocart,
+    .product-item-info:not(.hm-card--bundle):focus-within .action.tocart { opacity: 1; }
+
+    //  A bundle cannot be bought from a listing — its button navigates to the
+    //  product page to be configured. Hiding a navigation affordance until hover
+    //  is not the same trade as hiding a one-click shortcut, so bundles keep
+    //  theirs on screen. Spelled out as its own rule rather than left implicit
+    //  in the :not() above.
+    .product-item-info.hm-card--bundle .action.tocart { opacity: 1; }
 }
 
 //  Vendor line. Figma: `text-[10px] text-[#f26522] font-semibold truncate`.
@@ -2119,17 +2183,11 @@
         padding: 0;
     }
 
-    //  box-sizing: the secondary buttons carry a 1px border, and without this
-    //  they measure 38px against the cart button's 36 — a visible 2px step in a
-    //  row of three squares.
-    .actions-secondary > a.action {
-        block-size: 3.6rem;
-        border-radius: var(--hm-radius);
-        box-sizing: border-box;
-        inline-size: 3.6rem;
-        min-block-size: 0;
-        min-inline-size: 0;
-    }
+    //  The secondary-action row is gone: compare is removed from the card and
+    //  the wishlist has moved onto the image as .hm-card__wish. Sizing rules for
+    //  a row of square secondary buttons would now only fight that disc — this
+    //  block used to set them to 36x36 at a 12px radius and was doing exactly
+    //  that.
 }
 
 .hm-plp .product-item .actions-primary {
