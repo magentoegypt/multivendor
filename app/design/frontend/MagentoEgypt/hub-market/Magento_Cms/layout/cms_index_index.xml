@@ -210,6 +210,8 @@
                    after="hm.home.bestsellers">
                 <arguments>
                     <argument name="title" xsi:type="string" translate="true">Popular Products</argument>
+                    <argument name="more_url" xsi:type="string">all.html</argument>
+                    <argument name="more_label" xsi:type="string" translate="true">View All</argument>
                     <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
                     <argument name="products_count" xsi:type="number">8</argument>
                     <argument name="show_pager" xsi:type="number">0</argument>
@@ -356,6 +358,8 @@
                    name="hm.home.brands" after="hm.home.featured"
                    template="MagentoEgypt_HomeSections::top-brands.phtml">
                 <arguments>
+                    <!-- MGS_Brand's front name; see top-brands.phtml. -->
+                    <argument name="more_url" xsi:type="string">brand</argument>
                     <!-- Eight, because Figma runs this row eight wide and the ninth
                          brand wrapped onto a row of its own. -->
                     <argument name="limit" xsi:type="number">8</argument>
@@ -414,6 +418,16 @@
                 <arguments>
                     <argument name="title" xsi:type="string" translate="true">Best Selling Items</argument>
                     <argument name="subtitle" xsi:type="string" translate="true">Top-rated across all categories this month</argument>
+                    <!--
+                        Figma gives every rail head a trailing "See All" link.
+                        Four rails had one and five did not; these are the two
+                        that have a real destination. all.html is category 168
+                        ("All", 734 products) — its English URL rewrite was
+                        missing entirely and had to be generated before this
+                        link could point anywhere.
+                    -->
+                    <argument name="more_url" xsi:type="string">all.html</argument>
+                    <argument name="more_label" xsi:type="string" translate="true">View All</argument>
                     <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
                     <argument name="products_count" xsi:type="number">6</argument>
                     <argument name="show_pager" xsi:type="number">0</argument>

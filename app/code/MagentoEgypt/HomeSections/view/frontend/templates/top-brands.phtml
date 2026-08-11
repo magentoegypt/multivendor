@@ -12,10 +12,31 @@ $brands = $block->getBrands();
 if (!$brands) {
     return;
 }
+
+/*
+ * "All Brands" link. Every other section head on the homepage carries one and
+ * this row did not — the product rails get theirs from a layout argument, but
+ * this template builds its own head, so the link has to be built here too.
+ *
+ * The destination is the MGS_Brand front name rather than a hardcoded path, so
+ * it follows the module if the route is ever renamed. Rendered only when a
+ * target is configured, which keeps the row working if MGS_Brand goes away —
+ * the same reason the whole section already returns early with no brands.
+ */
+$hmBrandsUrl = (string) ($block->getData('more_url') ?: '');
+if ($hmBrandsUrl !== '' && !preg_match('~^https?://~i', $hmBrandsUrl)) {
+    $hmBrandsUrl = rtrim($block->getBaseUrl(), '/') . '/' . ltrim($hmBrandsUrl, '/');
+}
 ?>
 <section class="hm-brands" aria-labelledby="hm-brands-title">
     <div class="hm-section__head">
         <h2 class="hm-section__title" id="hm-brands-title"><?= $escaper->escapeHtml(__('Top Brands')) ?></h2>
+        <?php if ($hmBrandsUrl !== ''): ?>
+            <a class="hm-section__more" href="<?= $escaper->escapeUrl($hmBrandsUrl) ?>">
+                <?= $escaper->escapeHtml(__('All Brands')) ?>
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
+            </a>
+        <?php endif; ?>
     </div>
     <ul class="hm-brands__list">
         <?php foreach ($brands as $b): ?>
