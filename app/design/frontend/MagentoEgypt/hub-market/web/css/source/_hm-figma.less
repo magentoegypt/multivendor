@@ -1182,6 +1182,16 @@
     position: relative;
 }
 
+//  The text column: name, rating, dispatch, count, VERIFIED — one stack, tight,
+//  starting at the avatar's top edge rather than centred against it.
+.hm-stores__body {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    min-inline-size: 0;
+}
+
 //  Figma's amber chip. --hm-rating-star on navy is the same amber the stars use,
 //  and the navy label on it is 6.3:1 — white would be 2.4:1 and fail.
 .hm-stores__rank {
@@ -1243,26 +1253,56 @@
     //  geometry — cover, overlapping avatar, name, one meta line — without
     //  inventing artwork that no vendor has uploaded, and it upgrades to a real
     //  image the day a banner field exists.
-    .hm-stores--hm-home-topvendors & {
-        padding: 0 var(--hm-space-4) var(--hm-space-4);
+    //
+    //  Both vendor rails: avatar BESIDE the text, not stacked above it
+    //  ---------------------------------------------
+    //  The card was a plain flex column, so every child took a line of its own:
+    //  the avatar sat on one row and the name under it, and the optional lines
+    //  (rating, dispatch) pushed "N products" to a different height on every
+    //  card — the ragged rows in the reference shot. A two-column grid puts the
+    //  avatar and the text side by side as Figma draws them, and named areas let
+    //  the cover span the full width above both.
+    //
+    //  overflow: hidden is what stops the cover band bleeding past the card's
+    //  rounded corners. The band is pulled out to the card edge with a negative
+    //  margin, so without clipping its square corners overhang the radius and
+    //  the navy shows outside the card on both sides.
+    .hm-stores--hm-home-topvendors &,
+    .hm-stores--hm-home-newstores & {
+        align-items: stretch;
+        column-gap: var(--hm-space-3);
+        display: grid;
+        grid-template-areas: "avatar body" "cta cta";
+        grid-template-columns: auto minmax(0, 1fr);
+        overflow: hidden;
+        row-gap: var(--hm-space-3);
         text-align: start;
 
-        //  The avatar straddles the cover's bottom edge in Figma rather than
-        //  sitting under it, which is what makes the band read as a cover and
-        //  not as a coloured header. Pulled up by half its own height, given a
-        //  ring in the card's surface colour so it reads as cut out of the
-        //  cover, and z-indexed above the band.
+        .hm-stores__avatar { grid-area: avatar; }
+        .hm-stores__body   { grid-area: body; min-inline-size: 0; }
+
+        //  auto pushes the pill to the card floor, so four cards carrying
+        //  different optional lines still end on one baseline.
+        .hm-stores__cta { grid-area: cta; margin-block-start: auto; }
+    }
+
+    .hm-stores--hm-home-topvendors & {
+        grid-template-areas: "cover cover" "avatar body" "cta cta";
+        padding: 0 var(--hm-space-4) var(--hm-space-4);
+
+        .hm-stores__cover { grid-area: cover; }
+
+        //  The avatar straddles the cover's bottom edge rather than sitting
+        //  under it, which is what makes the band read as a cover and not as a
+        //  coloured header. Pulled up by half its height, ringed in the card's
+        //  own surface so it reads as cut out of the band.
         .hm-stores__avatar {
             border: 3px solid var(--hm-surface);
             box-sizing: content-box;
             margin-block-start: -2.8rem;
-            position: relative;
             z-index: 1;
         }
     }
-
-    .hm-stores--hm-home-topvendors &,
-    .hm-stores--hm-home-newstores & { align-items: stretch; }
 }
 
 //  Avatar. No vendor on this install has uploaded a logo, so the fallback is

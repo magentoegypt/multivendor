@@ -88,6 +88,14 @@ $hmIndex = 0;
                      * substr would slice it mid-codepoint and emit a broken glyph.
                      */
                     $initial = mb_strtoupper(mb_substr(trim((string) $s['name']), 0, 1, 'UTF-8'), 'UTF-8');
+                    /*
+                     * A vendor with no store name produced an EMPTY disc — card
+                     * four of New Stores rendered a blank circle. mb_substr of ''
+                     * is '', so the fallback needs its own fallback.
+                     */
+                    if ($initial === '') {
+                        $initial = '?';
+                    }
                     ?>
                     <span class="hm-stores__avatar" aria-hidden="true">
                         <?php if ($s['logo']): ?>
@@ -97,6 +105,7 @@ $hmIndex = 0;
                             <?= $escaper->escapeHtml($initial) ?>
                         <?php endif; ?>
                     </span>
+                    <span class="hm-stores__body">
                     <span class="hm-stores__name"><?= $escaper->escapeHtml($s['name']) ?></span>
                     <?php if ($s['stars'] !== null && $s['reviews'] > 0): ?>
                         <span class="hm-stores__rating"
@@ -132,6 +141,7 @@ $hmIndex = 0;
                      * and an anchor inside an anchor is invalid and unfocusable.
                      */
                     ?>
+                    </span>
                     <span class="hm-stores__cta"><?= $escaper->escapeHtml(__('Visit Store')) ?></span>
                 </a>
             </li>
