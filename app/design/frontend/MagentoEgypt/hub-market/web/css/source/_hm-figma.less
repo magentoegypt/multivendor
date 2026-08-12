@@ -3066,3 +3066,75 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 
     > .label { margin: 0; }
 }
+
+//
+//  Product tabs — the strip was not a strip
+//  ---------------------------------------------
+//  Magento alternates title/content/title/content as siblings and relies on
+//  FLOATS in styles-l.css to pull the titles up into a row. Those floats are not
+//  surviving here, so "Details" sat alone above its content and "More
+//  Information" and "Reviews" rendered underneath it as stray links — three tabs
+//  that did not look like tabs and gave no clue they were clickable.
+//
+//  Flex with explicit order does the same job without depending on float
+//  behaviour: every title first, every content after, contents full width. The
+//  collapsible JS still hides the inactive panes, so only one shows.
+.hm-pdp .product.data.items {
+    display: flex;
+    flex-wrap: wrap;
+    border-block-start: 1px solid var(--hm-border-subtle);
+    margin-block-start: var(--hm-space-10);
+    padding-block-start: var(--hm-space-6);
+
+    > .item.title {
+        margin: 0;
+        order: 0;
+
+        > .switch {
+            border: 0;
+            border-block-end: 2px solid transparent;
+            color: var(--hm-foreground-muted);
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 600;
+            padding: var(--hm-space-3) var(--hm-space-4);
+            text-decoration: none;
+        }
+
+        &.active > .switch,
+        > .switch:hover {
+            border-block-end-color: var(--hm-accent);
+            color: var(--hm-foreground);
+        }
+    }
+
+    > .item.content {
+        border: 0;
+        margin: 0;
+        order: 1;
+        padding: var(--hm-space-6) 0 0;
+        inline-size: 100%;
+    }
+}
+
+//
+//  Related / upsell rows
+//  ---------------------------------------------
+//  Heading to the size the reference gives it — 30px Playfair, same as every
+//  other section title on the site. It was rendering at 24px.
+.hm-pdp .block.related .block-title strong,
+.hm-pdp .block.upsell .block-title strong {
+    font-family: var(--hm-font-display);
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+//  Magento's bulk-select UI on the related row — "Check items to add to the cart
+//  or [select all]", plus a checkbox on every card. The reference draws none of
+//  it: the card is the link and the cart lives on the product page. It is hidden
+//  rather than removed so the block keeps working if it is ever wanted back.
+.hm-pdp .block.related .block-actions,
+.hm-pdp .block.related .field.choice.related {
+    display: none;
+}
