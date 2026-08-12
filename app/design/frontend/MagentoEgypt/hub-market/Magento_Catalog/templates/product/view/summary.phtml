@@ -25,22 +25,53 @@ if (!$hmProduct) {
     return;
 }
 
-$hmSummary = trim((string) $hmProduct->getShortDescription());
-
-if ($hmSummary === '') {
+/*
+ * BOTH sources go through the same cleaner.
+ *
+ * The first version trusted short_description and only cleaned the description
+ * fallback. That was wrong: on this catalogue short_description is where the
+ * worst markup lives — one product's is a whole escaped <section> of Vue-era
+ * ProductActions markup — and it went straight to the page as literal
+ * "&lt;section class=&quot;…" text. Whichever field supplies the text, it gets
+ * the same treatment.
+ */
+$hmClean = static function (string $raw): string {
     /*
-     * strip_tags AFTER a newline is forced between block elements — otherwise
-     * "<li>Zippered main compartment.</li><li>Front zippered pocket.</li>"
-     * collapses to "...compartment.Front..." with no space.
-     *
-     * Descriptions on this install can also carry {{widget}} / {{block}}
-     * directives; those are dropped rather than rendered, because a widget
-     * belongs in the description tab, not in a one-line summary.
+     * DECODE FIRST. Several products store their markup escaped — `&lt;br/&gt;`
+     * rather than `<br/>`. strip_tags sees that as ordinary text and leaves it,
+     * which is exactly how literal tags ended up rendered on the page.
      */
-    $hmRaw = (string) $hmProduct->getDescription();
-    $hmRaw = preg_replace('/\{\{[^}]*\}\}/', '', $hmRaw);
-    $hmRaw = preg_replace('#<(br|/p|/li|/h[1-6]|/div)[^>]*>#i', ' ', $hmRaw);
-    $hmSummary = trim(preg_replace('/\s+/u', ' ', strip_tags($hmRaw)));
+    $raw = html_entity_decode($raw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    /*
+     * <style> and <script> must go WITH their contents. strip_tags drops the
+     * tags and keeps the text between them, so a Page Builder body — they all
+     * open with a <style> block of #html-body rules — would dump raw CSS here.
+     */
+    $raw = preg_replace('#<(style|script)\b[^>]*>.*?</\1>#is', ' ', $raw);
+
+    //  Widget/block directives are dropped rather than rendered: a widget
+    //  belongs in the description tab, not in a one-line summary.
+    $raw = preg_replace('/\{\{[^}]*\}\}/', '', $raw);
+
+    //  Space out block ends before stripping, or "<li>Zippered main
+    //  compartment.</li><li>Front zippered pocket.</li>" collapses to
+    //  "compartment.Front".
+    $raw = preg_replace('#<(br|/p|/li|/h[1-6]|/div|/td|/tr)[^>]*>#i', ' ', $raw);
+
+    $out = trim(preg_replace('/\s+/u', ' ', strip_tags($raw)));
+
+    //  If what survived has no letters, or still carries CSS or attribute
+    //  wreckage, there is no sentence to show. An empty slot beats debris.
+    if (!preg_match('/\p{L}/u', $out) || preg_match('/[{}<>]|#html-body/', $out)) {
+        return '';
+    }
+    return $out;
+};
+
+$hmSummary = $hmClean((string) $hmProduct->getShortDescription());
+if ($hmSummary === '') {
+    $hmSummary = $hmClean((string) $hmProduct->getDescription());
 }
 
 if ($hmSummary === '') {

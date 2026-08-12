@@ -2471,24 +2471,91 @@
 //  the left edge of the viewport instead of lining up with the content column
 //  under it. `margin-inline: auto` is the whole fix; the 16px padding it already
 //  carries then lands the first crumb on the same x as the page body.
+//  The band runs the FULL width and carries the rule; the crumbs inside it sit in
+//  the container. The reference wraps its breadcrumb in a `border-b
+//  border-black/8` div spanning the viewport (1920 wide, 1px) with a `max-w-7xl
+//  mx-auto` inner — ours had the max-width on the outer element, so there was
+//  nothing full-width left to draw a rule on.
+//  `.page-wrapper > .breadcrumbs`, not `.breadcrumbs`, and `max-width`, not
+//  `max-inline-size`.
+//
+//  blank treats the breadcrumb as one of its PAGE CONTAINERS: in styles-l.css,
+//  `@media (min-width: 768px) { .navigation, .breadcrumbs, .header.content,
+//  .footer.content { max-width: 1280px; margin-left: auto; margin-right: auto } }`.
+//  That is (0,1,0), the same as a bare `.breadcrumbs`, and it sits inside a media
+//  query so it always cascades later — a plain override ties and loses silently.
+//  Magento uses the `.page-wrapper >` form itself a few rules further down, so
+//  this is its own escape hatch rather than an invented one.
+//
+//  The physical property matters too: `max-inline-size: none` against blank's
+//  `max-width: 1280px` is a tie between two spellings of the same thing, which is
+//  why the first attempt computed as 1280 with no warning anywhere.
+.page-wrapper > .breadcrumbs {
+    border-block-end: 1px solid var(--hm-border-subtle);
+    margin-inline: 0;
+    max-width: none;
+    padding-inline: 0;
+}
+
 .breadcrumbs {
-    margin-inline: auto;
+
+    //  FLEX, so the gaps are even.
+    //
+    //  blank leaves the crumbs as `inline-block` list items, which means the
+    //  newlines between them in the markup render as text and add ~3px of their
+    //  own. With an 8px margin on each side of the separator that came out 8px
+    //  before the slash and 11px after — a wobble you can see at 12px type, and
+    //  not what the reference draws (a flat `gap-2`, 8px between every element).
+    .items {
+        //  BASELINE, not the flex default of `stretch`. Stretch makes every crumb
+        //  box as tall as the tallest, and the text then sits at the top of its
+        //  own box rather than on a shared line — visible here because the Arabic
+        //  product name is taller than "Home" and "Fashion" beside it.
+        align-items: baseline;
+        //  border-box, or the 16px padding adds ON TOP of the 1280 max-width and
+        //  the row comes out 1312 wide — which centres 16px left of the page
+        //  content instead of flush with it.
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+        //  The container inset moves here, since the band above it is now full
+        //  width and can no longer provide it.
+        margin-inline: auto;
+        max-inline-size: var(--hm-container);
+        padding-inline: var(--hm-space-4);
+    }
 
     //  SLASH, not blank's chevron. Magento draws the separator as an
     //  `icons-blank-theme` glyph at 24px — a different family and twice the size
     //  of the labels either side of it. Figma uses a plain "/" in the body face,
     //  the same size and colour as the links.
     //
-    //  The 8px each side is Figma's `gap-2`; because the separator is a
-    //  pseudo-element rather than a flex child, the gap has to come from its own
-    //  margins.
+    //  Only a LEADING margin: the separator sits inside its crumb, so the flex
+    //  gap above already supplies the space that follows it. Setting both would
+    //  double the gap on one side, which is the bug this rule is fixing.
     .item:not(:last-child)::after {
         color: var(--hm-foreground-muted);
         content: '/';
+        //  `inline`, and this is the line that fixes the slash sitting high.
+        //
+        //  blank draws its separator as an icon glyph and gives the pseudo
+        //  `display: inline-block`. Overriding the content, font and margins left
+        //  that behind — and an inline-block's baseline is the baseline of its own
+        //  last line box, not the text baseline of the run it sits in. With an
+        //  18px line-height on 12px type the half-leading lifted the glyph about
+        //  4px: measured at 4x, the slash inked y40-80 while the letters beside it
+        //  sat 62-96 on a baseline of 95.
+        //
+        //  As plain inline text it is laid out exactly like the link next to it,
+        //  so the two share a baseline by construction rather than by matching
+        //  font metrics and hoping.
+        display: inline;
         font-family: var(--hm-font-body);
         font-size: 1.2rem;
         line-height: inherit;
-        margin-inline: var(--hm-space-2);
+        margin-inline-end: 0;
+        margin-inline-start: var(--hm-space-2);
         vertical-align: baseline;
     }
 }
@@ -3200,4 +3267,96 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     line-height: 1.65;
     margin: var(--hm-space-4) 0 0;
     max-inline-size: 58ch;
+}
+
+//
+//  PDP alignment corrections — measured, not eyeballed
+//  ---------------------------------------------
+//
+//  1. ADD TO CART SAT 8px BELOW THE STEPPER. blank puts `padding: 18px 0 0` on
+//     .field.qty. The fieldset aligns its items on flex-end, so the button lined
+//     up with the BOTTOM OF THE FIELD, and the field had slack under the stepper
+//     that the button did not. Both controls are now pinned to the same 5.2rem
+//     height and the field carries no padding, so the two bottoms coincide.
+.hm-pdp .product-info-main .box-tocart .field.qty {
+    padding: 0;
+    justify-content: flex-end;
+}
+
+.hm-pdp .box-tocart .hm-qty {
+    block-size: 5.2rem;
+
+    .hm-qty__step,
+    input.qty {
+        block-size: 5.2rem;
+        min-block-size: 5.2rem;
+    }
+}
+
+.hm-pdp .box-tocart .action.tocart {
+    block-size: 5.2rem;
+    min-block-size: 5.2rem;
+}
+
+//  2. STARS SAT 5px LEFT OF EVERY OTHER LINE IN THE CARD. Magento gives
+//     .rating-result a -5px left margin and renders .rating-summary as a
+//     table-cell, so the row escaped the details column's 14px padding while the
+//     seller, title and price respected it. Flex, and no negative margin.
+.product-item .rating-summary,
+.product-item .reviews-actions {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+
+.product-item .rating-summary .rating-result {
+    margin-inline-start: 0;
+}
+
+//  3. The summary paragraph was capped at 58ch — 555px inside a 592px column,
+//     so its right edge alone stopped short of every other block. The reference
+//     runs it the full width of the column.
+.hm-pdp__summary { max-inline-size: none; }
+
+//
+//  Alignment, round two — the first attempt fixed the computed values and the
+//  geometry did not move. Both causes were things the computed style does not
+//  show you.
+//
+//  A. The 8px above the label and 8px below the stepper were not padding —
+//     padding-top computed as 0 and the offsets stayed. .field.qty contains
+//     two ZERO-HEIGHT children besides the label and the control (Magento's
+//     validation placeholders), and with `gap` every one of them buys a gap:
+//     0 + 8 + label + 8 + control + 8 = the 16px of slack. `gap` is the wrong
+//     tool on a container whose children you do not control — the spacing moves
+//     onto the label, where it applies once.
+.hm-pdp .product-info-main .box-tocart .field.qty {
+    gap: 0;
+
+    > .label { margin-block-end: var(--hm-space-2); }
+}
+
+//  B. Magento pulls .rating-result 5px left with a negative margin, so the
+//     stars escaped the card's 14px text inset while the seller, title and
+//     price respected it. (0,4,0) and both properties: the shorthand blank uses
+//     is `margin`, and margin-inline-start alone lost to it.
+.product-item .product-reviews-summary .rating-summary .rating-result,
+.product-item .rating-summary .rating-result {
+    margin-inline-start: 0;
+    margin-left: 0;
+}
+
+//  C. The stars still started 6px left of the seller, title and price — and the
+//     cause was my own previous fix. Magento renders .product-reviews-summary as
+//     `display: table` with .rating-summary as its table-cell; setting the CELL
+//     to inline-flex leaves the table in place and the browser wraps it in an
+//     anonymous cell, which is what the 6px was. Making the CONTAINER a flex row
+//     removes the table box altogether, so the children lay out against the
+//     card's own text inset like every other line.
+.product-item .product-reviews-summary {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    margin-block: var(--hm-space-3);
 }
