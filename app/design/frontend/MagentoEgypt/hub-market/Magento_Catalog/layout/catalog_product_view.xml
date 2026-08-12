@@ -128,23 +128,6 @@
             </arguments>
         </referenceBlock>
         <!--
-            THE SECOND PDP SHAPE.
-            105 products carry page_layout="3-columns-product", which
-            MagentoEgypt_VendorExtend uses to nest two containers inside
-            product.info.main: .product-info-content and .product-info-last.
-            Everything real then lives inside those, so the `before=` and
-            `after=` references above resolve against nothing and both of my
-            blocks fell to the very bottom of the column — the seller credit
-            rendered under the delivery assurances, ~1700px below the title it
-            is supposed to introduce.
-
-            These two moves re-target that shape. On the 1column shape the
-            destination does not exist and the move is skipped, leaving the
-            placement above intact, so one layout file serves both.
-        -->
-        <move element="hm.pdp.seller"  destination="product.info.main.content" before="-"/>
-        <move element="hm.pdp.summary" destination="product.info.main.content" after="product.info.price"/>
-        <!--
             UNWANTED ELEMENTS ON THE 3-COLUMN SHAPE.
             MagentoEgypt_VendorExtend's catalog_product_view_amazon_three handle
             builds an Amazon-style column the reference does not draw. These are

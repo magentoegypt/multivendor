@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — placement for the 3-columns-product PDP only.
+ *
+ * MagentoEgypt_VendorExtend nests .product-info-content and .product-info-last
+ * inside product.info.main on this shape, so the seller credit and the summary
+ * have to be moved into the content container to sit with the title and price.
+ *
+ * These moves MUST live in this handle and not in catalog_product_view.xml.
+ * A <move> whose destination does not exist does not quietly no-op — it DROPS
+ * the element. Putting them in the shared file removed the seller line and the
+ * summary from every 1column product on the site, which is exactly what
+ * happened and what this file exists to prevent.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <move element="hm.pdp.seller"  destination="product.info.main.content" before="-"/>
+        <move element="hm.pdp.summary" destination="product.info.main.content" after="product.info.price"/>
+    </body>
+</page>

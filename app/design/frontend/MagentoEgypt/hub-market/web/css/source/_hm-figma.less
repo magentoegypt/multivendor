@@ -3457,7 +3457,13 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  fix and is worth doing separately.
 .hm-pdp .block.related .product-items > .product-item:nth-child(n+5),
 .hm-pdp .block.upsell  .product-items > .product-item:nth-child(n+5) {
-    display: none;
+    //  !important, and it is earned. Checked in a real browser: every one of
+    //  these <li> carries an INLINE style="display: list-item;" — the shuffle
+    //  script reveals items with jQuery .show(), which writes the element's
+    //  default display straight onto the style attribute. An inline declaration
+    //  beats any selector, so the (0,6,0) rule this replaces never stood a
+    //  chance; the cascade trace showed it matching and losing anyway.
+    display: none !important;
 }
 
 //  The rails are grids, so four across is the count the reference uses at this
