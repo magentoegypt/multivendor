@@ -3607,3 +3607,71 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     font-size: 1.6rem;
     font-weight: 600;
 }
+
+//
+//  Empty cart
+//  ---------------------------------------------
+//  Core shipped two sentences and an inline "here" link in a white box. The
+//  reference centres a large outline bag, a display heading, a supporting line
+//  and one button on the page tint — no card, no page title.
+//
+//  The <h1> is hidden VISUALLY, not removed: the reference draws no title here,
+//  but a page whose only heading is unreachable is a worse trade than a title a
+//  sighted user does not see.
+.checkout-cart-index .page-main:has(.cart-empty) {
+    .page-title-wrapper { .hm-visually-hidden(); }
+
+    //  No white card — the reference sits this straight on the tint.
+    .cart-container,
+    .cart.table-wrapper,
+    .form-cart { background: none; border: 0; padding: 0; }
+}
+
+.hm-cart-empty {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding-block: var(--hm-space-12);
+    text-align: center;
+}
+
+.hm-cart-empty__icon {
+    block-size: 13rem;
+    color: var(--hm-border-strong);
+    inline-size: 13rem;
+    margin-block-end: var(--hm-space-8);
+
+    svg { block-size: 100%; inline-size: 100%; }
+}
+
+.hm-cart-empty__title {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-display);
+    font-size: 3.6rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 var(--hm-space-3);
+}
+
+.hm-cart-empty__text {
+    color: var(--hm-foreground-muted);      // 4.83:1
+    font-size: 1.8rem;
+    margin: 0 0 var(--hm-space-8);
+}
+
+//  The reference's button is blue; this is the theme's accent, as everywhere
+//  else in the funnel. Navy on orange is 5.04:1 — white on it is 3.1:1.
+.hm-cart-empty__cta {
+    align-items: center;
+    background: var(--hm-accent);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-on-accent);
+    display: inline-flex;
+    font-size: 1.6rem;
+    font-weight: 700;
+    min-block-size: 5.2rem;
+    padding-inline: var(--hm-space-10);
+    text-decoration: none;
+
+    &:hover { background: var(--hm-accent-hover); color: var(--hm-on-accent); }
+}

@@ -1,0 +1,49 @@
+<?php
+/**
+ * Hub Market — empty cart.
+ *
+ * Core renders two bare sentences and an inline "here" link, left-aligned in a
+ * white box. The reference gives the empty cart a real state: a large outline
+ * bag, a display heading, a supporting line and one obvious button, centred.
+ *
+ * The page's own <h1> ("Shopping Cart") is kept in the DOM and hidden visually
+ * in CSS rather than removed. The reference shows no page title here, but a
+ * page whose only heading is invisible to assistive tech is a worse trade than
+ * a title a sighted user does not see — so the h1 still names the page, and
+ * "Your cart is empty" is the visible heading under it.
+ *
+ * The icon is inline SVG, not an <img>: it is one path, it inherits currentColor
+ * so it tracks the text colour in both themes, and it costs no request.
+ *
+ * @var \Magento\Checkout\Block\Cart $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<div class="cart-empty hm-cart-empty">
+    <?= $block->getChildHtml('checkout_cart_empty_widget') ?>
+
+    <span class="hm-cart-empty__icon" aria-hidden="true">
+        <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3"
+             stroke-linecap="round" stroke-linejoin="round" focusable="false">
+            <path d="M12 20h40l-3.2 32a4 4 0 0 1-4 3.6H19.2a4 4 0 0 1-4-3.6z"/>
+            <path d="M23 28V15a9 9 0 0 1 18 0v13"/>
+            <path d="M25 40a9 9 0 0 0 14 0"/>
+        </svg>
+    </span>
+
+    <p class="hm-cart-empty__title"><?= $escaper->escapeHtml(__('Your cart is empty')) ?></p>
+    <p class="hm-cart-empty__text"><?= $escaper->escapeHtml(__('Add some products to get started')) ?></p>
+
+    <a class="hm-cart-empty__cta" href="<?= $escaper->escapeUrl($block->getContinueShoppingUrl()) ?>">
+        <?= $escaper->escapeHtml(__('Continue Shopping')) ?>
+    </a>
+
+    <?= $block->getChildHtml('shopping.cart.table.after') ?>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Magento_Checkout/js/empty-cart": {}
+    }
+}
+</script>
