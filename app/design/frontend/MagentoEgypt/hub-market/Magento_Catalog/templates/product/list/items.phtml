@@ -25,6 +25,7 @@
  * See COPYING.txt for license details.
  */
 
+use Magento\Catalog\Block\Product\ReviewRendererInterface;
 use Magento\Catalog\ViewModel\Product\Listing\PreparePostData;
 use Magento\Framework\App\ActionInterface;
 
@@ -50,7 +51,18 @@ switch ($type = $block->getType()) {
 
             $showAddTo = true;
             $showCart = false;
-            $templateType = null;
+            /*
+             * SHORT_VIEW, not null.
+             *
+             * Core sets $templateType = null in all four branches of this
+             * template, and getReviewsSummaryHtml($item, null) renders nothing —
+             * so the related, upsell and cross-sell rows have never shown a star
+             * rating, on any product, however many reviews it has. The PLP and
+             * the homepage rails both pass SHORT_VIEW and do show them; these
+             * rows were the odd ones out, and the reference puts stars on every
+             * card it draws.
+             */
+            $templateType = ReviewRendererInterface::SHORT_VIEW;
             $description = false;
         }
         break;
@@ -71,7 +83,7 @@ switch ($type = $block->getType()) {
 
             $showAddTo = true;
             $showCart = false;
-            $templateType = null;
+            $templateType = ReviewRendererInterface::SHORT_VIEW;
             $description = false;
         }
         break;
@@ -90,7 +102,7 @@ switch ($type = $block->getType()) {
 
             $showAddTo = false;
             $showCart = false;
-            $templateType = null;
+            $templateType = ReviewRendererInterface::SHORT_VIEW;
             $description = false;
             $canItemsAddToCart = false;
         }
@@ -111,7 +123,7 @@ switch ($type = $block->getType()) {
 
             $showAddTo = false;
             $showCart = false;
-            $templateType = null;
+            $templateType = ReviewRendererInterface::SHORT_VIEW;
             $description = false;
             $canItemsAddToCart = false;
         }
