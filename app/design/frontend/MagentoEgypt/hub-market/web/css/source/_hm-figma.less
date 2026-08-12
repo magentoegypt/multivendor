@@ -2583,7 +2583,11 @@
 //  the display serif at 30px, tight, directly above the rating row. As a page
 //  heading it was 48px and sat above both columns.
 .hm-pdp .product-info-main .page-title-wrapper {
-    margin: 0 0 var(--hm-space-2);
+    //  No bottom margin: the column owns the rhythm now. This 8px was the one
+    //  gap left out of step — 32 between title and price where every other line
+    //  inside the identity block is 24 — and it beat the column's reset because
+    //  it is (0,3,0) against (0,2,0).
+    margin: 0;
 
     .page-title { margin: 0; }
 
@@ -3532,3 +3536,33 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 .hm-pdp .product-options-wrapper .swatch-attribute-label,
 .hm-pdp .product-options-wrapper .field > .label > span,
 .hm-pdp .box-tocart .field.qty > .label > span { font-weight: 500; }
+
+//
+//  Column rhythm — one gap, not eight accidents
+//  ---------------------------------------------
+//  .product-info-main is a flex column with gap:16, and then every child adds a
+//  margin of its own on top of it. Measured live, the real gaps down the column
+//  were:
+//
+//      24  24  32  16  28  40  31
+//
+//  — no rhythm at all, which is what reads as "spacing is off" however correct
+//  the order is. The reference runs ~20-24 between lines inside the identity
+//  block and ~32 at the two section breaks (before the assurances, before the
+//  seller card).
+//
+//  So: the container owns the spacing, the children own none of it, and the two
+//  section breaks get a deliberate extra step.
+.hm-pdp .product-info-main {
+    gap: 2.4rem;
+
+    > * { margin-block: 0; }
+
+    //  2.4 + 0.8 = 3.2rem at the two section boundaries.
+    .hm-pdp__assurances       { order: 1; margin-block-start: 0.8rem; }
+    .vendor-profile-container { order: 2; margin-block-start: 0.8rem; }
+}
+
+//  The price block carries its own internal rule already (border-block-end +
+//  padding); zeroing margins above must not collapse that away.
+.hm-pdp .product-info-main .product-info-price { padding-block-end: 2.4rem; }
