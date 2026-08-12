@@ -3368,18 +3368,11 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  and .product-info-last, and renders several blocks in BOTH. Measured on
 //  /ar/bag2310310595691394.html.
 
-//  1. THE PRICE WAS PRINTED TWICE — once in the content block at the top, once
-//     again at the head of .product-info-last. The second one is the duplicate:
-//     it sits below the options, detached from the title it belongs to, and it
-//     is what made the page look like two half-finished product pages stacked.
-.hm-pdp .product-info-last > .price-box { display: none; }
-
-//  2. THE ATTRIBUTE TABLE WAS PRINTED TWICE — once inside the add-to-cart form
-//     and once in the More Information tab, which is the tab's whole purpose.
-//     The copy in the buy box pushed the cart 196px down the page.
-.hm-pdp .product-add-form .additional-attributes-wrapper { display: none; }
-
-//  3. THE BUY BOX WAS A PILE. One fieldset held the quantity field, the cart
+//  The duplicated price and attribute table that used to be hidden here are
+//  removed as blocks in catalog_product_view.xml instead — hiding a block still
+//  runs its queries and ships its markup.
+//
+//  THE BUY BOX WAS A PILE. One fieldset held the quantity field, the cart
 //     button, Buy Now and Add to Quote, each a different width and each finding
 //     its own left edge — 434, 213 and 217 wide at three different x positions,
 //     with the stepper 120px below the cart button it belongs beside.

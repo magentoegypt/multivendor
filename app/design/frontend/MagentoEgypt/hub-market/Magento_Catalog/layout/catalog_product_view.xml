@@ -144,5 +144,42 @@
         -->
         <move element="hm.pdp.seller"  destination="product.info.main.content" before="-"/>
         <move element="hm.pdp.summary" destination="product.info.main.content" after="product.info.price"/>
+        <!--
+            UNWANTED ELEMENTS ON THE 3-COLUMN SHAPE.
+            MagentoEgypt_VendorExtend's catalog_product_view_amazon_three handle
+            builds an Amazon-style column the reference does not draw. These are
+            removed as BLOCKS rather than hidden with CSS — a display:none block
+            still runs its queries and still ships its markup, and two of these
+            are duplicates of something already on the page.
+
+            Each is one line to restore if the business wants it back.
+        -->
+
+        <!-- "Fullfilled By ronza" — duplicates the seller credit now above the
+             title, and carries a typo. -->
+        <referenceBlock name="product.info.vendor.profile.title" remove="true"/>
+
+        <!-- The SECOND price, at the head of .product-info-last, detached from
+             the title it belongs to. -->
+        <referenceBlock name="product.price.last" remove="true"/>
+
+        <!-- The attribute table inside the add-to-cart form. The same table is
+             the entire content of the More Information tab; this copy pushed the
+             cart 196px down the page. -->
+        <referenceBlock name="product.info.attribute" remove="true"/>
+
+        <!-- "About this item" — a THIRD copy of the description, after the
+             summary under the price and the description tab. -->
+        <referenceBlock name="product.info.overview" remove="true"/>
+
+        <!-- Installment strip (تمارا / تابى / After Pay / الراجحى). Not in the
+             reference, and those are Gulf BNPL providers on a store that
+             delivers inside Egypt and takes COD, Visa and Mastercard. -->
+        <referenceContainer name="product.info.main.last.installment" remove="true"/>
+
+        <!-- "Paying off / Delivery by / Sold by" table. The reference draws no
+             such block, and the seller credit above the title already carries
+             the attribution that matters. -->
+        <referenceBlock name="product.info.vendor.profile.soldby" remove="true"/>
     </body>
 </page>
