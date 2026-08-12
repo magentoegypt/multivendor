@@ -234,6 +234,37 @@ $_item = null;
              */
             $hmKicker = $type === 'related' ? __('More like this')
                 : ($type === 'upsell' ? __('You may also like') : null);
+
+            /*
+             * "View All" — the reference draws one and I left it out last pass
+             * because related products are not a browsable collection, so there
+             * was nothing honest to link to.
+             *
+             * There is: the product's own category. It is a real page of
+             * genuinely related items, which is what the shopper clicking
+             * "View All" next to "More like this" expects. Deepest category
+             * wins (getCategoryCollection returns ancestors too, and "View All"
+             * pointing at the site root would be useless).
+             *
+             * Rendered only when a category resolves — a product in no category
+             * gets no link rather than a dead one.
+             */
+            $hmRailUrl = null;
+            if (method_exists($block, 'getProduct') && $block->getProduct()) {
+                try {
+                    $hmCats = $block->getProduct()->getCategoryCollection()
+                        ->addAttributeToSelect('url_key')
+                        ->addAttributeToFilter('is_active', 1)
+                        ->addAttributeToSort('level', 'DESC')
+                        ->setPageSize(1);
+                    $hmCat = $hmCats->getFirstItem();
+                    if ($hmCat && $hmCat->getId()) {
+                        $hmRailUrl = $hmCat->getUrl();
+                    }
+                } catch (\Throwable $e) {
+                    $hmRailUrl = null;
+                }
+            }
             ?>
             <div class="block-title title hm-rail__head">
                 <div class="hm-rail__heading">
@@ -243,6 +274,11 @@ $_item = null;
                     <strong id="block-<?= $block->escapeHtmlAttr($class) ?>-heading" role="heading"
                             aria-level="2"><?= $block->escapeHtml($title) ?></strong>
                 </div>
+                <?php if ($hmRailUrl): ?>
+                    <a class="hm-rail__more" href="<?= $block->escapeUrl($hmRailUrl) ?>">
+                        <?= $block->escapeHtml(__('View All')) ?>
+                    </a>
+                <?php endif; ?>
             </div>
             <div class="block-content content" aria-labelledby="block-<?= $block->escapeHtmlAttr($class) ?>-heading">
                 <?php if ($type == 'related' && $canItemsAddToCart):?>

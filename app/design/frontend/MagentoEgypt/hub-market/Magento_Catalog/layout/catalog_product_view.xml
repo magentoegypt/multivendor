@@ -75,6 +75,20 @@
         <referenceBlock name="view.addto.compare" remove="true"/>
 
         <!--
+            Summary paragraph, directly under the price — where the reference
+            puts it. Placed after product.info.price rather than replacing
+            product.info.overview: that core block renders `short_description`
+            and nothing else, and short_description is empty on all 2304
+            products here, so it emitted nothing at all.
+        -->
+        <referenceContainer name="product.info.main">
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="hm.pdp.summary"
+                   after="product.info.price"
+                   template="Magento_Catalog::product/view/summary.phtml"/>
+        </referenceContainer>
+
+        <!--
             Seller names for the related and upsell cards. Same ViewModel the
             category page passes to its own list template, so a card in these
             rows carries the same seller credit as one on a category page.

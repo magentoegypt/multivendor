@@ -1,0 +1,67 @@
+<?php
+/**
+ * Hub Market — the one-paragraph product summary under the price.
+ *
+ * The reference puts a short description there and Magento's own
+ * `product.info.overview` block renders `short_description` — which is empty on
+ * every one of the 2304 products in this catalogue, so that block emitted
+ * nothing and the slot was simply missing.
+ *
+ * Rather than write marketing copy for 2304 products, this falls back to the
+ * merchant's OWN full description, trimmed to a lead paragraph. Nothing is
+ * invented: the words are the ones already on the product. `short_description`
+ * still wins whenever someone fills it in, so populating it properly later
+ * needs no code change.
+ *
+ * Not a data patch, deliberately. Writing a derived summary into
+ * short_description would bake today's guess at a trim length into 2304 rows
+ * and quietly overwrite whatever the merchandising team enters next.
+ *
+ * @var \Magento\Catalog\Block\Product\View $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmProduct = $block->getProduct();
+if (!$hmProduct) {
+    return;
+}
+
+$hmSummary = trim((string) $hmProduct->getShortDescription());
+
+if ($hmSummary === '') {
+    /*
+     * strip_tags AFTER a newline is forced between block elements — otherwise
+     * "<li>Zippered main compartment.</li><li>Front zippered pocket.</li>"
+     * collapses to "...compartment.Front..." with no space.
+     *
+     * Descriptions on this install can also carry {{widget}} / {{block}}
+     * directives; those are dropped rather than rendered, because a widget
+     * belongs in the description tab, not in a one-line summary.
+     */
+    $hmRaw = (string) $hmProduct->getDescription();
+    $hmRaw = preg_replace('/\{\{[^}]*\}\}/', '', $hmRaw);
+    $hmRaw = preg_replace('#<(br|/p|/li|/h[1-6]|/div)[^>]*>#i', ' ', $hmRaw);
+    $hmSummary = trim(preg_replace('/\s+/u', ' ', strip_tags($hmRaw)));
+}
+
+if ($hmSummary === '') {
+    return;
+}
+
+/*
+ * Trim to a lead paragraph on a WORD boundary, and only when there is enough
+ * left over to be worth trimming — cutting "…" onto a 165-character
+ * description reads as truncated data rather than as a summary.
+ */
+$hmLimit = 200;
+if (mb_strlen($hmSummary, 'UTF-8') > $hmLimit + 40) {
+    $hmCut = mb_substr($hmSummary, 0, $hmLimit, 'UTF-8');
+    //  mb_strrpos on a space: Arabic descriptions are multi-byte and a byte
+    //  slice would cut mid-codepoint.
+    $hmSpace = mb_strrpos($hmCut, ' ', 0, 'UTF-8');
+    if ($hmSpace !== false && $hmSpace > $hmLimit * 0.6) {
+        $hmCut = mb_substr($hmCut, 0, $hmSpace, 'UTF-8');
+    }
+    $hmSummary = rtrim($hmCut, " .,;:—-") . '…';
+}
+?>
+<p class="hm-pdp__summary"><?= $escaper->escapeHtml($hmSummary) ?></p>

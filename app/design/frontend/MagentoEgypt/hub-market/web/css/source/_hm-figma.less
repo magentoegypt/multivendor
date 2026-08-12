@@ -3181,3 +3181,23 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     margin-block-end: var(--hm-space-1);
     text-transform: uppercase;
 }
+
+//  "View All" beside the rail heading, and the summary paragraph under the
+//  price. 14px each, matching the reference.
+.hm-rail__more {
+    color: var(--hm-foreground);
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-decoration: underline;
+    white-space: nowrap;
+
+    &:hover { color: var(--hm-accent-strong); }
+}
+
+.hm-pdp__summary {
+    color: var(--hm-foreground-muted);      // 4.83:1
+    font-size: 1.4rem;
+    line-height: 1.65;
+    margin: var(--hm-space-4) 0 0;
+    max-inline-size: 58ch;
+}
