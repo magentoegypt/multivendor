@@ -3627,6 +3627,18 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     .form-cart { background: none; border: 0; padding: 0; }
 }
 
+//  The white panel was .cart-empty ITSELF, not a wrapper — which is why
+//  resetting .cart-container and .form-cart did nothing. The reference sits this
+//  straight on the page tint.
+//
+//  (0,3,0): the card is painted by `.checkout-cart-index .cart-empty` at
+//  (0,2,0), so `.hm-cart-empty` alone lost to it.
+.checkout-cart-index .cart-empty.hm-cart-empty {
+    background: none;
+    border: 0;
+    box-shadow: none;
+}
+
 .hm-cart-empty {
     align-items: center;
     display: flex;
@@ -3661,17 +3673,57 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 
 //  The reference's button is blue; this is the theme's accent, as everywhere
 //  else in the funnel. Navy on orange is 5.04:1 — white on it is 3.1:1.
+//  Measured off the reference's own primary CTA: #2563eb, white, 12px radius,
+//  48 tall, 16/600. Mine was orange, navy, a full pill, 52 tall and 700 — five
+//  differences on one button.
+//
+//  The blue is this theme's existing --hm-info (#1d4ed8) rather than the
+//  reference's #2563eb: same family, already in the palette, and 6.70:1 against
+//  white where the reference's own is 4.55:1.
+//
+//  Radius is 1.2rem, NOT the pill it shipped as. The reference rounds its
+//  buttons to 12 — the same radius as its cards — and a full pill was a
+//  different rounding language on the same page.
 .hm-cart-empty__cta {
     align-items: center;
-    background: var(--hm-accent);
-    border-radius: var(--hm-radius-full);
-    color: var(--hm-on-accent);
+    background: var(--hm-info);
+    border-radius: var(--hm-radius);
+    color: #fff;
     display: inline-flex;
     font-size: 1.6rem;
-    font-weight: 700;
-    min-block-size: 5.2rem;
+    font-weight: 600;
+    min-block-size: 4.8rem;
     padding-inline: var(--hm-space-10);
     text-decoration: none;
 
-    &:hover { background: var(--hm-accent-hover); color: var(--hm-on-accent); }
+    &:hover { background: #1e40af; color: #fff; }
+}
+
+//  The funnel's primary CTA follows the same rule, so the cart does not show a
+//  blue button on one state and an orange one on the other. The reference draws
+//  Proceed to Checkout in exactly this blue.
+.checkout-cart-index .checkout-methods-items .action.primary.checkout {
+    background: var(--hm-info);
+    border-color: var(--hm-info);
+    border-radius: var(--hm-radius);
+    color: #fff;
+    font-weight: 600;
+
+    &:hover { background: #1e40af; border-color: #1e40af; color: #fff; }
+}
+
+//  No white panel. The reference sits the empty state straight on the page
+//  tint; the card came from the cart form wrapper, which has nothing to wrap
+//  when the cart is empty.
+.checkout-cart-index .page-main:has(.cart-empty) {
+    .cart-container,
+    .form-cart,
+    .cart.table-wrapper,
+    .cart-summary,
+    .column.main > .cart-container > * {
+        background: none;
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+    }
 }
