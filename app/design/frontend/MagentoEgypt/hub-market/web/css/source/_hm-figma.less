@@ -3684,11 +3684,22 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  Radius is 1.2rem, NOT the pill it shipped as. The reference rounds its
 //  buttons to 12 — the same radius as its cards — and a full pill was a
 //  different rounding language on the same page.
+//  EVERY LINK STATE, not just the default. blank ships
+//
+//      a:visited, .alink:visited { color: #c2410c }
+//
+//  at (0,1,1), which beats a single class at (0,1,0) — so the moment the
+//  shopper had been to the homepage this button rendered ORANGE ON BLUE.
+//
+//  It is worth recording how nearly this was missed: getComputedStyle reported
+//  white the whole time. Browsers deliberately return the UNVISITED colour for
+//  :visited links, as a privacy protection against sniffing history through the
+//  CSSOM. So the screenshot was right and the measurement was lying — the exact
+//  reverse of the failure mode everywhere else in this branch.
 .hm-cart-empty__cta {
     align-items: center;
     background: var(--hm-info);
     border-radius: var(--hm-radius);
-    color: #fff;
     display: inline-flex;
     font-size: 1.6rem;
     font-weight: 600;
@@ -3696,7 +3707,15 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     padding-inline: var(--hm-space-10);
     text-decoration: none;
 
-    &:hover { background: #1e40af; color: #fff; }
+    &,
+    &:link,
+    &:visited,
+    &:hover,
+    &:focus,
+    &:active { color: #fff; text-decoration: none; }
+
+    &:hover,
+    &:focus { background: #1e40af; }
 }
 
 //  The funnel's primary CTA follows the same rule, so the cart does not show a
