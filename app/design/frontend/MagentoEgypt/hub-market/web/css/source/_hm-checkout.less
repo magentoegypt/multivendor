@@ -488,8 +488,13 @@
         //  closes the group with a rule and states the Total at full weight on
         //  BOTH sides. Live had all three labels at full strength and all three
         //  values in orange, so nothing in the rail had a hierarchy.
-        .totals:not(.grand) .mark          { color: var(--hm-foreground-muted); font-weight: 400; }
-        .totals:not(.grand) .amount .price { color: var(--hm-foreground); font-weight: 500; }
+        //  tr.totals, not .totals. The <table> itself also carries class
+        //  `totals`, so `.totals:not(.grand)` matched the TABLE and therefore
+        //  every .mark inside it — including the grand total's, which was left
+        //  muted at 400 while its own amount sat at 700. The row is what this
+        //  was meant to select.
+        tr.totals:not(.grand) .mark          { color: var(--hm-foreground-muted); font-weight: 400; }
+        tr.totals:not(.grand) .amount .price { color: var(--hm-foreground); font-weight: 500; }
 
         .grand .amount, .grand .mark {
             border-block-start: 1px solid var(--hm-border-subtle);
@@ -1666,7 +1671,7 @@ a.sms-login-field-ctrl {
     //  and every label full strength, so the grand total had nothing to
     //  separate from and no rule above it.
     .opc-block-summary .table-totals {
-        .totals:not(.grand) .mark { color: var(--hm-foreground-muted); font-weight: 400; }
+        tr.totals:not(.grand) .mark { color: var(--hm-foreground-muted); font-weight: 400; }
         .totals:not(.grand) .amount .price { color: var(--hm-foreground); font-weight: 500; }
 
         .grand .mark,

@@ -3566,3 +3566,44 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  The price block carries its own internal rule already (border-block-end +
 //  padding); zeroing margins above must not collapse that away.
 .hm-pdp .product-info-main .product-info-price { padding-block-end: 2.4rem; }
+
+//
+//  Cart — element-by-element against the reference, measured in a browser
+//  ---------------------------------------------
+//  Most of it already matched: the 1248 grid at x=136 with 821/395 columns and a
+//  32px gutter is identical, as are the vendor card (821 wide, white, 12px
+//  radius, 0.8px border), its 49px header bar, the summary card (395, 12px
+//  radius, 24px padding), the summary title at 20/700 Playfair, and the subtotal
+//  pair at 16/400 muted over 16/500 dark. Four things did not.
+
+//  1. ITEM TITLE 16 -> 18. Right family and weight already; one step small.
+.checkout-cart-index .cart.item .product-item-name,
+.checkout-cart-index .cart.item .product-item-name > a { font-size: 1.8rem; }
+
+//  2. THUMBNAIL RADIUS 6 -> 12, matching the reference and the vendor card it
+//     sits inside. 6 read as a different rounding language on the same row.
+.checkout-cart-index .cart.item .product-image-photo,
+.checkout-cart-index .cart.item .product-image-container { border-radius: var(--hm-radius); }
+
+//  3. ORDER TOTAL WAS LIGHTER THAN THE SUBTOTAL ABOVE IT — 18/400 in muted grey
+//     where the reference sets 18/700 in the foreground colour. The one number
+//     the shopper is looking for was the quietest thing in the card.
+.checkout-cart-index .cart-totals tr.grand.totals th.mark,
+.checkout-cart-index .cart-totals tr.grand.totals td.amount,
+.checkout-cart-index .cart-totals tr.grand.totals th.mark strong,
+.checkout-cart-index .cart-totals tr.grand.totals .price {
+    color: var(--hm-foreground);
+    font-weight: 700;
+}
+
+//  4. VENDOR NAME was 15/600 Playfair in navy; the reference sets 16/600 sans
+//     and colours it as a link. Sans at 16 matches the reference exactly. The
+//     colour is this theme's accent rather than the reference's blue — the
+//     seller credit on the PDP is already --hm-accent-strong at 5.18:1, and one
+//     seller name should not be two different colours in one checkout flow.
+.checkout-cart-index .hm-cart-group__vendor {
+    color: var(--hm-accent-strong);
+    font-family: var(--hm-font-sans);
+    font-size: 1.6rem;
+    font-weight: 600;
+}
