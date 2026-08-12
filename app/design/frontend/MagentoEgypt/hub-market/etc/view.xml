@@ -49,9 +49,18 @@
                 <width>800</width>
                 <height>800</height>
             </image>
+            <!--
+                190, not 100. The reference runs three thumbnails across the
+                584px gallery column at 189 each; at 100 they rendered as a
+                cluster of stamps under a 592px photo. Fotorama takes its
+                thumbnail box straight from this entry (gallery.phtml passes it
+                through as thumbwidth/thumbheight), so the size has to change
+                here rather than in CSS — scaling a 100px source up would just
+                render it soft.
+            -->
             <image id="product_page_more_views" type="thumbnail">
-                <width>100</width>
-                <height>100</height>
+                <width>190</width>
+                <height>190</height>
             </image>
             <image id="product_page_image_small" type="thumbnail">
                 <width>100</width>

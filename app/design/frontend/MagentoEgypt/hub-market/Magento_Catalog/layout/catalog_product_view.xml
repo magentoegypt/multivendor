@@ -40,6 +40,17 @@
             </block>
         </referenceBlock>
 
+        <!--
+            Compare, removed here rather than through themesettings.
+            MGS_ThemeSettings has an observer that unsets `view.addto.compare`
+            when themesettings/product_details/compare is 0. That flag is 0 and
+            the button still rendered — the module is disabled, so the observer
+            never fires and none of those switches do anything. Layout removal
+            does not depend on it. The reference PDP draws no Compare control,
+            and the listing pages already had theirs removed in default.xml.
+        -->
+        <referenceBlock name="view.addto.compare" remove="true"/>
+
         <!-- Delivery, returns and payment, under the add-to-cart row. -->
         <referenceContainer name="product.info.main">
             <block class="Magento\Framework\View\Element\Template"

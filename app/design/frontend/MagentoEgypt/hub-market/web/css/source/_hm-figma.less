@@ -2493,9 +2493,12 @@
     h1 {
         color: var(--hm-foreground);
         font-family: var(--hm-font-display);
-        font-size: 3rem;
+        //  3.6rem / 1.25 / -.01em, measured. It shipped at 3rem, which is the
+        //  size the reference gives its SECTION headings, not its product title.
+        font-size: 3.6rem;
         font-weight: 700;
-        line-height: 1.2;
+        letter-spacing: -.01em;
+        line-height: 1.25;
         margin: 0;
     }
 }
@@ -2822,4 +2825,121 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     }
 
     .product-item .product-item-actions { justify-content: flex-end; }
+}
+
+
+//
+//  PDP hero — corrections found by measuring, not by reading the stylesheet
+//  ---------------------------------------------
+//
+//  THE PRICE WAS NEVER 30px. Two rules in this theme ask for it — 3rem in
+//  _hm-pdp.less and 3.2rem above — and both lose. Magento/blank ships
+//
+//      .product-info-main .price-box .price-wrapper .price { font-size: 1.8rem }
+//
+//  at (0,4,0) where ours are (0,3,0), and blank's sheet is emitted after the
+//  theme's. The PDP price has been rendering at 18px, in the meta row, hard
+//  against the right edge of the column. The fix is the `.price-wrapper` step in
+//  the selector, not a larger number.
+//
+//  `.product-info-price` IS NOT A PRICE ROW either. Magento nests the stock line
+//  and the review summary inside it, as siblings of the price box, so setting it
+//  `display: flex` laid stock, reviews and price out side by side — which is
+//  exactly what the page was doing. The reference stacks rating over price, so
+//  this becomes a column and the three children are ordered explicitly.
+.hm-pdp .product-info-main .product-info-price {
+    align-items: stretch;
+    border-block-end: 1px solid var(--hm-border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    justify-content: flex-start;
+    margin: 0;
+    padding-block-end: var(--hm-space-5);
+}
+
+.hm-pdp .product-info-main .product-reviews-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--hm-space-2);
+    margin: 0;
+    order: 1;
+
+    //  blank renders this as a table, which is what pinned it to the right of
+    //  the row and centred it against the price.
+    .reviews-actions,
+    .rating-summary { display: inline-flex; align-items: center; }
+
+    .reviews-actions a { color: var(--hm-foreground-muted); font-size: 1.4rem; }
+}
+
+.hm-pdp .product-info-main .price-box              { order: 2; }
+.hm-pdp .product-info-main .product-info-stock-sku { order: 3; }
+
+//  (0,5,0) and (0,6,0) — one step past blank.
+//
+//  Black, not the theme's orange: the reference sets the PDP price in near-black
+//  Playfair and puts the colour on the savings chip instead. Orange here competed
+//  with the add-to-cart button for the same attention.
+.hm-pdp .product-info-main .price-box .price-wrapper .price {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-display);
+    font-size: 3.6rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.hm-pdp .product-info-main .price-box .old-price .price-wrapper .price {
+    color: var(--hm-price-was);
+    font-family: var(--hm-font-sans);
+    font-size: 1.8rem;
+    font-weight: 400;
+    text-decoration: line-through;
+}
+
+//  Equal columns with a 64px gutter. The theme had 1.15fr / 1fr and a 40px gap,
+//  which made the gallery wider than the info column; the reference splits the
+//  1232 container into two 584s.
+.hm-pdp .column.main {
+    column-gap: 6.4rem;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+//  No cards. The reference floats neither column on a panel — the image sits on
+//  the page and the copy sits beside it. The white-card-on-tint treatment was
+//  this theme's own addition and it costs 24px of padding on each side plus a
+//  border the reference does not draw.
+.hm-pdp .page-wrapper { background: var(--hm-surface); }
+
+.hm-pdp .product.media,
+.hm-pdp .product-info-main {
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+}
+
+//  Option labels: uppercase micro-label, like every other label in the reference.
+.hm-pdp .product-options-wrapper .swatch-attribute-label,
+.hm-pdp .product-options-wrapper .field > .label > span,
+.hm-pdp .box-tocart .field.qty > .label > span {
+    color: var(--hm-foreground);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+//  The gallery frame goes with the cards. _hm-pdp.less draws a 1px border and a
+//  12px radius on the stage; the reference puts the photo straight on the page.
+//  The radius stays on the thumbs, which the reference does round.
+.hm-pdp .product.media {
+    .fotorama__stage,
+    .gallery-placeholder {
+        border: 0;
+        border-radius: 0;
+    }
+
+    .fotorama__nav-wrap { margin-block-start: var(--hm-space-4); }
+    .fotorama__thumb    { border-radius: var(--hm-radius); overflow: hidden; }
 }
