@@ -3360,3 +3360,91 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     gap: var(--hm-space-2);
     margin-block: var(--hm-space-3);
 }
+
+//
+//  The 3-columns-product shape (105 products)
+//  ---------------------------------------------
+//  MagentoEgypt_VendorExtend splits the info column into .product-info-content
+//  and .product-info-last, and renders several blocks in BOTH. Measured on
+//  /ar/bag2310310595691394.html.
+
+//  1. THE PRICE WAS PRINTED TWICE — once in the content block at the top, once
+//     again at the head of .product-info-last. The second one is the duplicate:
+//     it sits below the options, detached from the title it belongs to, and it
+//     is what made the page look like two half-finished product pages stacked.
+.hm-pdp .product-info-last > .price-box { display: none; }
+
+//  2. THE ATTRIBUTE TABLE WAS PRINTED TWICE — once inside the add-to-cart form
+//     and once in the More Information tab, which is the tab's whole purpose.
+//     The copy in the buy box pushed the cart 196px down the page.
+.hm-pdp .product-add-form .additional-attributes-wrapper { display: none; }
+
+//  3. THE BUY BOX WAS A PILE. One fieldset held the quantity field, the cart
+//     button, Buy Now and Add to Quote, each a different width and each finding
+//     its own left edge — 434, 213 and 217 wide at three different x positions,
+//     with the stepper 120px below the cart button it belongs beside.
+//
+//     Quantity and cart share the first row; the two secondary actions share the
+//     second and stretch to the same width. Logical properties throughout — this
+//     shape is mostly Arabic and the row has to mirror.
+.hm-pdp .product-info-last .box-tocart .fieldset {
+    //  flex-START, not end. The actions column is now three stacked buttons
+    //  tall, and aligning on the end dropped the quantity field to the bottom
+    //  of all three — 150px below the cart button it belongs beside.
+    align-items: flex-start;
+    column-gap: var(--hm-space-3);
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: var(--hm-space-3);
+
+    > .field.qty { flex: 0 0 auto; }
+
+    //  Cart takes the rest of row one; the secondaries are forced onto row two
+    //  by a full-width basis rather than by a hard-coded order.
+    > .actions { flex: 1 1 20rem; margin: 0; }
+
+    > .buy-now-btn,
+    > .toquote,
+    > .action.tocart ~ .action:not(.tocart) {
+        flex: 1 1 100%;
+        margin: 0;
+    }
+}
+
+.hm-pdp .product-info-last .box-tocart .action.tocart,
+.hm-pdp .product-info-last .box-tocart .buy-now-btn,
+.hm-pdp .product-info-last .box-tocart .toquote {
+    inline-size: 100%;
+    min-block-size: 5.2rem;
+}
+
+//  4. Wishlist and the seller/delivery table were flush against the column edge
+//     while everything above them carried the column's own rhythm.
+.hm-pdp .product-info-last > * + * { margin-block-start: var(--hm-space-4); }
+
+.hm-pdp .product-info-last .product-addto-links { margin-block-start: var(--hm-space-5); }
+
+//  5. ADD TO CART AND BUY NOW WERE DRAWN ON TOP OF EACH OTHER. Both sit inside
+//     .actions, which the module leaves as `display: block`, and both reported
+//     y=752 — the cart button 52 tall, the Buy Now wrapper 114, occupying the
+//     same space. Add to Quote then hung off to one side at 217 wide with a
+//     stray `margin-left: 10px`.
+//
+//     .actions becomes a flex column. Stacking is then the container's job
+//     rather than the sum of whatever margins three different modules apply,
+//     which is what let them collide in the first place.
+.hm-pdp .product-info-last .box-tocart .actions {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-3);
+
+    > * { margin: 0; inline-size: 100%; }
+
+    .action.primary,
+    .buynow-button > *,
+    .quote-actions > * {
+        inline-size: 100%;
+        min-block-size: 5.2rem;
+    }
+}
