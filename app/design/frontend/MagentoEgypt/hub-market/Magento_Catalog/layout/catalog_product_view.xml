@@ -74,6 +74,22 @@
         -->
         <referenceBlock name="view.addto.compare" remove="true"/>
 
+        <!--
+            Seller names for the related and upsell cards. Same ViewModel the
+            category page passes to its own list template, so a card in these
+            rows carries the same seller credit as one on a category page.
+        -->
+        <referenceBlock name="catalog.product.related">
+            <arguments>
+                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="product.info.upsell">
+            <arguments>
+                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+            </arguments>
+        </referenceBlock>
+
         <!-- Delivery, returns and payment, under the add-to-cart row. -->
         <referenceContainer name="product.info.main">
             <block class="Magento\Framework\View\Element\Template"
@@ -81,5 +97,21 @@
                    after="product.info.form"
                    template="Magento_Catalog::product/view/assurances.phtml"/>
         </referenceContainer>
+
+        <!--
+            Breadcrumbs come from the theme's own template rather than core's,
+            which prints an empty div and builds Home + product name in JS. The
+            design calls for Home / Category / Product, and the category is
+            unreachable through core's widget without turning on
+            catalog/seo/product_use_categories — a setting that rewrites every
+            product URL. The view model resolves the category instead.
+        -->
+        <referenceBlock name="breadcrumbs">
+            <arguments>
+                <argument name="product_crumbs" xsi:type="object">
+                    MagentoEgypt\Breadcrumbs\ViewModel\ProductCrumbs
+                </argument>
+            </arguments>
+        </referenceBlock>
     </body>
 </page>

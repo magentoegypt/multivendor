@@ -3138,3 +3138,46 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 .hm-pdp .block.related .field.choice.related {
     display: none;
 }
+
+//
+//  PDP rating row
+//  ---------------------------------------------
+//  14px muted, tight under the title — the reference's treatment. It was
+//  inheriting 16px body copy in the foreground colour, which gave the review
+//  count the same weight as the price sitting under it.
+.hm-pdp .product-info-main .product-reviews-summary {
+    font-size: 1.4rem;
+
+    .reviews-actions,
+    .reviews-actions a,
+    .reviews-actions span {
+        color: var(--hm-foreground-muted);      // 4.83:1
+        font-size: 1.4rem;
+    }
+
+    .reviews-actions a:hover { color: var(--hm-accent-strong); }
+}
+
+//
+//  Related / upsell rail head
+//  ---------------------------------------------
+//  Kicker over the heading, matching the section heads on the homepage. The
+//  reference's is 10px; this is 12px, the floor this theme holds.
+.hm-rail__head {
+    align-items: flex-end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    justify-content: space-between;
+    margin-block-end: var(--hm-space-5);
+}
+
+.hm-rail__kicker {
+    color: var(--hm-accent-strong);         // 5.18:1
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    margin-block-end: var(--hm-space-1);
+    text-transform: uppercase;
+}

@@ -26,11 +26,26 @@
  */
 
 use Magento\Catalog\Block\Product\ReviewRendererInterface;
+use Magento\Catalog\Pricing\Price\FinalPrice;
+use Magento\Catalog\Pricing\Price\RegularPrice;
 use Magento\Catalog\ViewModel\Product\Listing\PreparePostData;
 use Magento\Framework\App\ActionInterface;
 
 /* @var $block \Magento\Catalog\Block\Product\AbstractProduct */
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+
+/**
+ * Seller names for the cards. Supplied as a layout argument, exactly as
+ * catalog_category_view.xml supplies it to product/list.phtml — one query for
+ * the whole row rather than a vendor load per card.
+ *
+ * Null-safe: this template also renders in contexts where the argument was not
+ * passed (cross-sell in the cart, any third-party block reusing it), and a
+ * missing seller name simply omits the line.
+ *
+ * @var \MagentoEgypt\HomeSections\ViewModel\VendorNames|null $hmVendors
+ */
+$hmVendors = $block->getData('vendor_names');
 ?>
 
 <?php
@@ -210,9 +225,24 @@ $_item = null;
         <?php else:?>
         <div class="block <?= $block->escapeHtmlAttr($class) ?>">
             <?php endif; ?>
-            <div class="block-title title">
-                <strong id="block-<?= $block->escapeHtmlAttr($class) ?>-heading" role="heading"
-                        aria-level="2"><?= $block->escapeHtml($title) ?></strong>
+            <?php
+            /*
+             * Kicker over the heading, like every section head on this site and
+             * like the reference, which sets "MORE LIKE THIS" above "Related
+             * Products". It is per-row because this template renders three
+             * different rows and one label cannot describe all of them.
+             */
+            $hmKicker = $type === 'related' ? __('More like this')
+                : ($type === 'upsell' ? __('You may also like') : null);
+            ?>
+            <div class="block-title title hm-rail__head">
+                <div class="hm-rail__heading">
+                    <?php if ($hmKicker): ?>
+                        <span class="hm-rail__kicker"><?= $block->escapeHtml($hmKicker) ?></span>
+                    <?php endif; ?>
+                    <strong id="block-<?= $block->escapeHtmlAttr($class) ?>-heading" role="heading"
+                            aria-level="2"><?= $block->escapeHtml($title) ?></strong>
+                </div>
             </div>
             <div class="block-content content" aria-labelledby="block-<?= $block->escapeHtmlAttr($class) ?>-heading">
                 <?php if ($type == 'related' && $canItemsAddToCart):?>
@@ -245,13 +275,45 @@ $_item = null;
                             <?php /* Bundles keep a permanently visible action — see list.phtml. */ ?>
                             <?php $hmIsBundle = in_array($_item->getTypeId(), ['bundle', 'new_bundle'], true); ?>
                             <div class="product-item-info <?= /* @noEscape */ $available ?><?= $hmIsBundle ? ' hm-card--bundle' : '' ?>">
+                                <?php
+                                /*
+                                 * Discount and seller, lifted verbatim from this theme's
+                                 * product/list.phtml so a card in the related row is the same
+                                 * card as one on a category page. They were the two pieces the
+                                 * reference draws and this template did not.
+                                 *
+                                 * Discount comes from the price model, never from special_price
+                                 * alone — a special price that is not currently active, or that
+                                 * equals the regular price, must not print a badge.
+                                 */
+                                $hmDiscount = 0;
+                                try {
+                                    $hmPriceInfo = $_item->getPriceInfo();
+                                    $hmRegular   = (float) $hmPriceInfo->getPrice(RegularPrice::PRICE_CODE)->getAmount()->getValue();
+                                    $hmFinal     = (float) $hmPriceInfo->getPrice(FinalPrice::PRICE_CODE)->getAmount()->getValue();
+                                    if ($hmRegular > 0 && $hmFinal > 0 && $hmFinal < $hmRegular) {
+                                        $hmDiscount = (int) round((1 - $hmFinal / $hmRegular) * 100);
+                                    }
+                                } catch (\Throwable $e) {
+                                    $hmDiscount = 0;
+                                }
+                                $hmVendorName = $hmVendors ? $hmVendors->getName($_item->getData('vendor_id')) : null;
+                                ?>
                                 <div class="product-item-media">
                                     <a href="<?= $block->escapeUrl($block->getProductUrl($_item)) ?>"
                                        class="product photo product-item-photo">
                                         <?= $block->getImage($_item, $image)->toHtml() ?>
                                     </a>
+                                    <?php if ($hmDiscount > 0): ?>
+                                        <span class="hm-badge hm-badge--discount">
+                                            <?= $block->escapeHtml(__('-%1%', $hmDiscount)) ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="product details product-item-details">
+                                    <?php if ($hmVendorName): ?>
+                                        <span class="hm-card__vendor"><?= $block->escapeHtml($hmVendorName) ?></span>
+                                    <?php endif; ?>
                                     <strong class="product name product-item-name"><a
                                                 class="product-item-link"
                                                 title="<?= $block->escapeHtmlAttr($_item->getName()) ?>"
