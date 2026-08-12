@@ -3483,3 +3483,52 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     .hm-pdp .block.related .product-items,
     .hm-pdp .block.upsell .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+//
+//  PDP buy box and column order, measured off the reference in a real browser
+//  ---------------------------------------------
+//  The reference stacks its info column in this order, with these geometries:
+//
+//    y=277  seller           14/500
+//    y=312  title            36/700 Playfair
+//    y=422  rating           14/400
+//    y=466  price row        36/700 + was 18/400 + Save chip 12/400 uppercase
+//    y=558  short desc       14/400
+//    y=635  options          label 12/500 UPPERCASE + hint 12/400 on the right
+//    y=903  "select options" 12/400
+//    y=935  QUANTITY         584 wide — label and stepper on their OWN full-width row
+//    y=1024 Add to Cart      its own row beneath, 48 tall
+//    y=1104 assurances
+//    y=1245 seller card
+//
+//  1. CART BELONGS UNDER THE QUANTITY, NOT BESIDE IT. Ours put them side by side,
+//     which is why the row needed the alignment surgery earlier in this branch —
+//     the reference never asks two controls of different heights to share a
+//     baseline. Stacked, that whole class of problem disappears.
+.hm-pdp .box-tocart .fieldset {
+    align-items: stretch;
+    flex-direction: column;
+    row-gap: var(--hm-space-4);
+}
+
+//  The stepper keeps its intrinsic width; only the button spans the column.
+.hm-pdp .box-tocart .field.qty { align-self: flex-start; }
+
+.hm-pdp .box-tocart .actions,
+.hm-pdp .box-tocart .action.tocart { inline-size: 100%; }
+
+//  2. ASSURANCES SIT ABOVE THE SELLER CARD in the reference; ours had the card
+//     first. Ordered rather than moved: on the 3-column shape the seller card
+//     block is removed outright, and a <move> naming a missing element drops the
+//     block it is moving — which is exactly the regression this branch already
+//     shipped once.
+.hm-pdp .product-info-main {
+    .hm-pdp__assurances       { order: 1; }
+    .vendor-profile-container { order: 2; }
+}
+
+//  3. Option and quantity labels are 500 in the reference, not 700. At 700 the
+//     micro-label competed with the values under it.
+.hm-pdp .product-options-wrapper .swatch-attribute-label,
+.hm-pdp .product-options-wrapper .field > .label > span,
+.hm-pdp .box-tocart .field.qty > .label > span { font-weight: 500; }
