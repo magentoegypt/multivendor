@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — checkout uses the site's own header and footer.
+ *
+ * Magento ships checkout on the `checkout` page layout, which starts from
+ * `empty` and builds its own header container holding nothing but the logo:
+ * no navigation, no search, no account or cart links, and no footer at all.
+ * That is a deliberate conversion pattern — remove the exits so the shopper
+ * finishes — and it is a real trade, not an oversight.
+ *
+ * Switching to `1column` restores the standard containers, so Magento_Theme's
+ * default.xml populates the header and footer exactly as it does on every other
+ * page. Nothing here re-implements them; the page simply stops opting out.
+ *
+ * If cart abandonment moves the wrong way, reverting is one attribute.
+ */
+-->
+<page layout="1column"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="hm-checkout"/>
+    </body>
+</page>

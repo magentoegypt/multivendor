@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — checkout keeps the site's own header and footer.
+ *
+ * The page layout has to be overridden HERE, not in Magento_Checkout. Amasty's
+ * one-step checkout serves this page through its own `amasty_checkout` handle,
+ * which declares layout="checkout" and is resolved after the core handle — so
+ * `<page layout="1column">` in Magento_Checkout/layout/checkout_index_index.xml
+ * applied its body class and lost the layout attribute. Same handle, same file
+ * name, one module along.
+ *
+ * `checkout` starts from `empty` and builds a header container holding nothing
+ * but the logo: no navigation, no search, no account or cart links, no footer.
+ * That is a deliberate conversion pattern — remove the exits so the shopper
+ * finishes — and switching away from it is a real trade, not a bug fix. If cart
+ * abandonment moves the wrong way, reverting is one attribute.
+ *
+ * Nothing here re-implements the header or footer. On `1column` the standard
+ * containers exist again and Magento_Theme's default.xml fills them exactly as
+ * on every other page.
+ */
+-->
+<page layout="1column"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <attribute name="class" value="hm-checkout"/>
+    </body>
+</page>
