@@ -3441,3 +3441,39 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
         min-block-size: 5.2rem;
     }
 }
+
+//
+//  Rails: one row, like the reference
+//  ---------------------------------------------
+//  The default shape renders TWELVE related products — three rows of four — and
+//  the upsell row another twelve under it, then "Related Products By Brand"
+//  under that. The reference draws four, once. On the default-layout product
+//  that alone accounted for well over a thousand pixels of page.
+//
+//  Capped in CSS rather than on the block because Magento's Related block takes
+//  no limit argument (Upsell does; Related does not), so there is no way to stop
+//  the collection loading them. The cards are built and then hidden, which is
+//  wasteful — a block plugin setting a page size on the collection is the right
+//  fix and is worth doing separately.
+.hm-pdp .block.related .product-items > .product-item:nth-child(n+5),
+.hm-pdp .block.upsell  .product-items > .product-item:nth-child(n+5) {
+    display: none;
+}
+
+//  The rails are grids, so four across is the count the reference uses at this
+//  width; below 1024 they fall to two and the cap still holds one visible row.
+.hm-pdp .block.related .product-items,
+.hm-pdp .block.upsell .product-items {
+    display: grid;
+    gap: var(--hm-space-5);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+
+    > .product-item { inline-size: auto; margin: 0; }
+}
+
+@media (max-width: 1023px) {
+    .hm-pdp .block.related .product-items,
+    .hm-pdp .block.upsell .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
