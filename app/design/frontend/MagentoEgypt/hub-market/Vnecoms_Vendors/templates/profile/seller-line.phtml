@@ -1,0 +1,64 @@
+<?php
+/**
+ * Hub Market — the seller credit that sits ABOVE the product title.
+ *
+ * The reference PDP opens the info column with the seller, not the product:
+ * "TECHGEAR PRO ✓" in small caps, then the title. This install already renders a
+ * full vendor profile card, but it sits below the add-to-cart button, which is
+ * after the shopper has decided. On a marketplace the seller is part of what is
+ * being decided, so it belongs at the top too.
+ *
+ * The card below is left in place — it carries the join date, sales count and
+ * contact details, which this line deliberately does not repeat.
+ *
+ * The tick reads vendor status, the only verification signal this install has;
+ * there is no `verified` attribute among the 21 vendor attributes. That is the
+ * same call already made on the homepage vendor rails, and the marketplace
+ * already promises approval before a store goes live — so the mark restates an
+ * existing claim rather than inventing a second one.
+ *
+ * @var \Vnecoms\Vendors\Block\Profile\Title $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/*
+ * The SAME fallback chain as profile/title.phtml in this theme, and for the same
+ * reason documented there: getStoreName() reads a `store_name` vendor attribute
+ * that does not exist on this install, so it returns '' for every vendor. It
+ * returned '' here too, which made this whole line silently render nothing.
+ *
+ * getStoreName() -> company -> vendor_id (the URL key, which always exists
+ * because it is what routes the seller's own page).
+ */
+$hmVendor = $block->getVendor();
+$hmName   = trim((string) $block->getStoreName());
+if ($hmName === '' && $hmVendor) {
+    $hmName = trim((string) $hmVendor->getCompany()) ?: trim((string) $hmVendor->getVendorId());
+}
+if ($hmName === '') {
+    return;
+}
+$hmUrl = (string) $block->getVendorUrl();
+
+/*
+ * getStatus() is read defensively: Profile::getVendor() can return null on a
+ * product with no seller, so the tick simply does not render — which is the
+ * correct outcome anyway.
+ */
+$hmApproved = $hmVendor && (int) $hmVendor->getStatus() === 2;
+?>
+<p class="hm-pdp__seller">
+    <?php if ($hmUrl !== ''): ?>
+        <a class="hm-pdp__seller-name" href="<?= $escaper->escapeUrl($hmUrl) ?>">
+            <?= $escaper->escapeHtml($hmName) ?>
+        </a>
+    <?php else: ?>
+        <span class="hm-pdp__seller-name"><?= $escaper->escapeHtml($hmName) ?></span>
+    <?php endif; ?>
+    <?php if ($hmApproved): ?>
+        <span class="hm-pdp__seller-check"
+              title="<?= $escaper->escapeHtmlAttr(__('Approved seller')) ?>">
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-check"/></svg>
+            <span class="hm-sr-only"><?= $escaper->escapeHtml(__('Approved seller')) ?></span>
+        </span>
+    <?php endif; ?>
+</p>

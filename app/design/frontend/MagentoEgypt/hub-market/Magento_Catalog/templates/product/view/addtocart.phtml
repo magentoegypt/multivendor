@@ -1,0 +1,104 @@
+<?php
+/**
+ * Hub Market — add-to-cart row.
+ *
+ * Overridden for ONE reason: the reference draws quantity as a stepper — minus,
+ * the number, plus — and Magento ships a bare number input. The browser's own
+ * spinner arrows are ~10px, appear only on hover, and vanish entirely on touch,
+ * so quantity was effectively keyboard-only on a phone.
+ *
+ * The buttons are type="button" so they cannot submit the form, and they drive
+ * the same #qty input Magento validates — nothing downstream changes. `disabled`
+ * on the minus at the floor is set by the script, not hard-coded, so it tracks
+ * whatever minimum the product's own quantity validators impose.
+ *
+ * Everything else is core, kept verbatim so the next upgrade diff stays small.
+ *
+ * @var $block \Magento\Catalog\Block\Product\View
+ */
+?>
+<?php $_product = $block->getProduct(); ?>
+<?php $buttonTitle = __('Add to Cart'); ?>
+<?php if ($_product->isSaleable()) :?>
+<div class="box-tocart">
+    <div class="fieldset">
+        <?php if ($block->shouldRenderQuantity()) :?>
+        <div class="field qty">
+            <label class="label" for="qty"><span><?= $block->escapeHtml(__('Qty')) ?></span></label>
+            <div class="control hm-qty">
+                <button type="button" class="hm-qty__step hm-qty__step--down"
+                        data-hm-qty="-1"
+                        aria-label="<?= $block->escapeHtmlAttr(__('Decrease quantity')) ?>">&#8722;</button>
+                <input type="number"
+                       name="qty"
+                       id="qty"
+                       min="0"
+                       value="<?= $block->getProductDefaultQty() * 1 ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                       class="input-text qty"
+                       data-validate="<?= $block->escapeHtml(json_encode($block->getQuantityValidators())) ?>"
+                       />
+                <button type="button" class="hm-qty__step hm-qty__step--up"
+                        data-hm-qty="1"
+                        aria-label="<?= $block->escapeHtmlAttr(__('Increase quantity')) ?>">&#43;</button>
+            </div>
+        </div>
+        <?php endif; ?>
+        <div class="actions">
+            <button type="submit"
+                    title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
+                    class="action primary tocart"
+                    id="product-addtocart-button" disabled>
+                <span><?= $block->escapeHtml($buttonTitle) ?></span>
+            </button>
+            <?= $block->getChildHtml('', true) ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "Magento_Catalog/js/validate-product": {}
+        }
+    }
+</script>
+
+<script>
+    //  Vanilla, not a jQuery widget: this is two buttons nudging one input, and
+    //  a widget would have to be registered, deployed and initialised for it.
+    //  `input` is dispatched so Magento's own validators and any price/stock
+    //  listeners see the change exactly as if it had been typed.
+    (function () {
+        'use strict';
+        var box = document.querySelector('.box-tocart .hm-qty');
+        if (!box) {
+            return;
+        }
+        var input = box.querySelector('#qty');
+        var sync = function () {
+            var min = parseFloat(input.getAttribute('min'));
+            var down = box.querySelector('.hm-qty__step--down');
+            if (down && !isNaN(min)) {
+                down.disabled = (parseFloat(input.value) || 0) <= min;
+            }
+        };
+        box.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-hm-qty]');
+            if (!btn) {
+                return;
+            }
+            var min = parseFloat(input.getAttribute('min'));
+            var next = (parseFloat(input.value) || 0) + parseFloat(btn.getAttribute('data-hm-qty'));
+            if (!isNaN(min) && next < min) {
+                next = min;
+            }
+            input.value = next;
+            input.dispatchEvent(new Event('input', {bubbles: true}));
+            input.dispatchEvent(new Event('change', {bubbles: true}));
+            sync();
+        });
+        input.addEventListener('input', sync);
+        sync();
+    }());
+</script>

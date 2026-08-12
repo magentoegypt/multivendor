@@ -62,9 +62,15 @@
                 <width>190</width>
                 <height>190</height>
             </image>
+            <!--
+                This is the one fotorama actually reads. GalleryOptions builds
+                `thumbwidth`/`thumbheight` from product_page_image_small — NOT
+                from product_page_more_views, which is the obvious-looking entry
+                and the one I changed first, to no effect.
+            -->
             <image id="product_page_image_small" type="thumbnail">
-                <width>100</width>
-                <height>100</height>
+                <width>190</width>
+                <height>190</height>
             </image>
 
             <!-- Cart and mini-cart -->

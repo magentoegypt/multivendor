@@ -2463,9 +2463,39 @@
 
 .hm-pdp .page-wrapper { background: var(--hm-surface-muted); }
 
+//
+//  Breadcrumbs
+//  ---------------------------------------------
+//  Applies to every page that shows one, not just the PDP — blank leaves
+//  `.breadcrumbs` at `margin: 0` with a 1280px max-width, so it sat hard against
+//  the left edge of the viewport instead of lining up with the content column
+//  under it. `margin-inline: auto` is the whole fix; the 16px padding it already
+//  carries then lands the first crumb on the same x as the page body.
+.breadcrumbs {
+    margin-inline: auto;
+
+    //  SLASH, not blank's chevron. Magento draws the separator as an
+    //  `icons-blank-theme` glyph at 24px — a different family and twice the size
+    //  of the labels either side of it. Figma uses a plain "/" in the body face,
+    //  the same size and colour as the links.
+    //
+    //  The 8px each side is Figma's `gap-2`; because the separator is a
+    //  pseudo-element rather than a flex child, the gap has to come from its own
+    //  margins.
+    .item:not(:last-child)::after {
+        color: var(--hm-foreground-muted);
+        content: '/';
+        font-family: var(--hm-font-body);
+        font-size: 1.2rem;
+        line-height: inherit;
+        margin-inline: var(--hm-space-2);
+        vertical-align: baseline;
+    }
+}
+
 //  Figma runs the breadcrumb as a quiet line on the page tint, not as a band.
 .hm-pdp .breadcrumbs {
-    margin: 0;
+    margin-block: 0;
     padding-block: var(--hm-space-4);
 
     li, a, strong { font-size: 1.2rem; }
@@ -2942,4 +2972,97 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 
     .fotorama__nav-wrap { margin-block-start: var(--hm-space-4); }
     .fotorama__thumb    { border-radius: var(--hm-radius); overflow: hidden; }
+}
+
+//  Seller credit above the title — 14px medium, the reference's own weight, with
+//  the approval tick beside it. Not uppercased in CSS: the reference's seller is
+//  a proper noun set in caps, and text-transform would shout any brand that
+//  isn't ("Nike" -> "NIKE").
+.hm-pdp__seller {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-2);
+    margin: 0 0 var(--hm-space-2);
+}
+
+.hm-pdp__seller-name {
+    color: var(--hm-accent-strong);         // #c2410c, 5.18:1 on white
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-decoration: none;
+
+    &:hover { color: var(--hm-accent-strong); text-decoration: underline; }
+}
+
+.hm-pdp__seller-check {
+    align-items: center;
+    color: var(--hm-success);
+    display: inline-flex;
+
+    //  The tick is decorative; the word is what a screen reader gets. There is
+    //  no global .hm-sr-only class in this theme — only the mixin — so the class
+    //  is declared here rather than assumed.
+    .hm-sr-only { .hm-visually-hidden(); }
+}
+
+//
+//  Quantity stepper
+//  ---------------------------------------------
+//  A single control, not three: one border round the group, the buttons flush
+//  inside it. The input keeps its own 4.4rem target height so the row still
+//  clears 2.5.5 on touch.
+.hm-pdp .box-tocart .hm-qty {
+    align-items: stretch;
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius);
+    display: inline-flex;
+    overflow: hidden;
+
+    .hm-qty__step {
+        background: var(--hm-surface);
+        border: 0;
+        color: var(--hm-foreground);
+        cursor: pointer;
+        font-size: 1.8rem;
+        inline-size: 4.4rem;
+        line-height: 1;
+        min-block-size: 4.4rem;
+        padding: 0;
+
+        &:hover:not(:disabled) { background: var(--hm-surface-muted); }
+        &:disabled             { color: var(--hm-foreground-muted); cursor: default; }
+    }
+
+    input.qty {
+        appearance: textfield;
+        background: var(--hm-surface);
+        border: 0;
+        border-inline: 1px solid var(--hm-border-strong);
+        border-radius: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        inline-size: 5.6rem;
+        min-block-size: 4.4rem;
+        text-align: center;
+
+        //  The native spinners are what the stepper replaces; leaving them in
+        //  gives the control two sets of arrows.
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button { appearance: none; margin: 0; }
+    }
+}
+
+//  QUANTITY label above the stepper, not beside it. blank lays .field.qty out
+//  inline, which put a 12px "QTY" against the left edge of the control and threw
+//  the add-to-cart row off the baseline the reference sets.
+.hm-pdp .product-info-main .box-tocart .field.qty {
+    //  (0,4,0). At (0,3,0) only flex-direction survived and `display` stayed
+    //  block, so the column did nothing — blank sets display on this field at
+    //  equal specificity and is emitted later.
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+
+    > .label { margin: 0; }
 }

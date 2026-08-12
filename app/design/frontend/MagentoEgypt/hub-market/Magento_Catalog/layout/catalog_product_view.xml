@@ -41,6 +41,29 @@
         </referenceBlock>
 
         <!--
+            Seller credit above the title, which is where the reference opens the
+            info column.
+
+            Placed with <move>, not with a `before=` on the block itself. The
+            title arrives in this container via <move> too, and a `before=`
+            naming it is evaluated while scheduling — before that move has run —
+            so the reference does not resolve and the block is quietly appended
+            to the end of the column. It rendered under the vendor card. Moves
+            are processed after everything is scheduled, so by then the title is
+            a real sibling and the reference holds.
+
+            It reuses Vnecoms' own Profile\Title block — same vendor resolution
+            as the profile card lower down, so the two can never disagree — with
+            this theme's template.
+        -->
+        <referenceContainer name="product.info.main">
+            <block class="Vnecoms\Vendors\Block\Profile\Title"
+                   name="hm.pdp.seller"
+                   template="Vnecoms_Vendors::profile/seller-line.phtml"/>
+        </referenceContainer>
+        <move element="hm.pdp.seller" destination="product.info.main" before="page.main.title"/>
+
+        <!--
             Compare, removed here rather than through themesettings.
             MGS_ThemeSettings has an observer that unsets `view.addto.compare`
             when themesettings/product_details/compare is 0. That flag is 0 and
