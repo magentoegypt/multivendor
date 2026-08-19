@@ -37,13 +37,26 @@ declare(strict_types=1);
 $useLockup = true;
 
 /*
- * Split so the leading word carries the accent, as Figma does with ME|Commerce.
+ * THE BRAND IS "MAGENTO EGYPT", NOT "MECommerce".
+ *
+ * This read ME|Commerce, which is the Figma reference build's brand — a design
+ * mock's placeholder that reached the live storefront. The merchant's own
+ * uploaded logo (pub/media/logo/default/Screenshot_5336.jpg, the same artwork
+ * hm-logo-mark.png is cropped from) reads "MAGENTO EGYPT / Multi-Vendors
+ * Marketplace", and that artwork is the authority here — there is no
+ * general/store_information/name configured on any store view to defer to.
+ *
+ * Split so the leading word carries the accent, which is what makes this read as
+ * Magento|Egypt rather than as one word.
  *
  * NOT run through __(). A wordmark is a brand asset, not UI copy, and translating
- * it word by word is worse than leaving it alone: some module on this install
- * carries an ar_SA entry for "Magento" but none for "Egypt", so the Arabic header
- * rendered the mark half-transliterated as "ماجنتو Egypt". The reference build
- * keeps its wordmark in Latin script in both locales for the same reason.
+ * it piece by piece is worse than leaving it alone. That is not theoretical here:
+ * this mark once rendered half-transliterated as "ماجنتو Egypt", because some
+ * module shipped an ar_SA entry for "Magento" and none for "Egypt". Nothing on
+ * this install translates either word TODAY — checked across every app and
+ * vendor i18n file — so passing them through __() would look harmless right up
+ * until some module ships one again. The reference build keeps its
+ * wordmark in Latin script in both locales for the same reason.
  */
 $brandLead = 'Magento';
 $brandRest = 'Egypt';

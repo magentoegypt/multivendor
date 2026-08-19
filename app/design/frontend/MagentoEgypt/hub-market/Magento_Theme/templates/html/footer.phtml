@@ -33,8 +33,10 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
              * previously started with a bare sentence and carried no mark at all,
              * so the footer had no brand anchor on any page.
              *
-             * Same two assets as the header (see Magento_Theme/templates/html/
-             * header/logo.phtml) so the two lockups cannot drift apart.
+             * Same mark and same classes as the header (see Magento_Theme/
+             * templates/html/header/logo.phtml). The wordmark itself is written
+             * out twice, though, so changing the brand means changing it in BOTH
+             * files — it has already drifted once.
              */
             ?>
             <a class="hm-footer__logo hm-logo--lockup" dir="ltr"
@@ -45,8 +47,8 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
                      alt="" aria-hidden="true" width="248" height="148"/>
                 <span class="hm-logo__word" aria-hidden="true">
                     <?php /* Not translated - see header/logo.phtml. */ ?>
-                    <span class="hm-logo__word-lead">Magento</span><span
-                          class="hm-logo__word-rest">Egypt</span>
+                    <span class="hm-logo__word-lead">ME</span><span
+                          class="hm-logo__word-rest">Commerce</span>
                 </span>
             </a>
 
@@ -75,7 +77,23 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
 
         <div class="hm-footer__bottom">
             <p class="hm-footer__copyright hm-muted">
-                <?= $escaper->escapeHtml(__('Copyright © %1 MECommerce. All rights reserved.', date('Y'))) ?>
+                <?php
+                /*
+                 * The brand is a PARAMETER, not part of the translated string.
+                 * It read "MECommerce" — the Figma reference build's brand,
+                 * which is a mock's placeholder and not this store's. The
+                 * merchant's own logo artwork reads "MAGENTO EGYPT".
+                 *
+                 * Passing it as %2 keeps the sentence translatable while the
+                 * brand itself never goes through __(), for the same reason
+                 * documented in header/logo.phtml: a module shipping an ar_SA
+                 * entry for one word of a two-word brand renders it half
+                 * transliterated.
+                 */
+                ?>
+                <?= $escaper->escapeHtml(
+                    __('Copyright © %1 %2. All rights reserved.', date('Y'), 'Magento Egypt')
+                ) ?>
             </p>
             <div class="hm-footer__legal">
                 <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)
