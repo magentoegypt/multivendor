@@ -828,3 +828,63 @@
 .hm-pdp .vendor-profile-container {
     background: #f6f4f1;
 }
+
+//
+//  Related / upsell card info — one rhythm instead of four
+//  ---------------------------------------------
+//  The info block under each card image mixed a 4px flex gap with a rating row
+//  carrying its own 12px margins top AND bottom, and that row measured 49px tall
+//  around a ~20px star line. So vendor→title sat 4px apart while title→rating
+//  and rating→price sat 16px apart, and the card read as three loose bands.
+//
+//  One gap owns the rhythm; the children stop contributing margins of their own.
+.hm-pdp .block.related,
+.hm-pdp .block.upsell {
+    .product-item-details {
+        gap: var(--hm-space-2);
+    }
+
+    //  Rating row: centred, no margins, and no minimum height inflating it.
+    .product-reviews-summary {
+        align-items: center;
+        column-gap: var(--hm-space-2);
+        margin-block: 0;
+        min-block-size: 0;
+    }
+
+    //  The stars are drawn with the icon font, so the glyph size IS the row
+    //  height — 28px made the row nearly as tall as the title above it.
+    .rating-summary,
+    .rating-result {
+        font-size: 1.8rem;
+        min-block-size: 0;
+    }
+
+    //  Same 44px touch-target minimum that inflated the PDP tabs. On a card it
+    //  makes a 20px star line into a 44px band. 2.4rem is the gate this theme
+    //  actually holds, and the link's own padding still clears it.
+    .reviews-actions,
+    .reviews-actions .action {
+        line-height: 1.2;
+        margin: 0;
+        min-block-size: 2.4rem;
+    }
+
+    //  Price foot: the 8px pad plus the gap was doubling the space above it.
+    //
+    //  `margin-block-start: auto` also pins it to the bottom of the card, so the
+    //  prices line up across a row. Without it a product with no reviews loses
+    //  the rating line and its price rides ~24px higher than its neighbours' —
+    //  visible on any row where only some products have been reviewed.
+    .hm-card__foot {
+        margin-block-start: auto;
+        padding-block-start: 0;
+    }
+
+    //  The details column has to fill the card for that auto margin to have
+    //  anything to push against.
+    .product-item-details {
+        block-size: 100%;
+        flex-direction: column;
+    }
+}
