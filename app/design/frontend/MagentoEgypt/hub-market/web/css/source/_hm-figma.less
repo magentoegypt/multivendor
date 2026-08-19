@@ -3971,3 +3971,57 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     color: var(--hm-success);               // green, as the reference draws it
     font-weight: 600;
 }
+
+//
+//  Minicart: blank's icon-font glyph appears the moment you click
+//  ---------------------------------------------------------------
+//  Clicking the cart put a SECOND cart icon in the header — a grey one beside
+//  the theme's own — and shoved "My Cart" under its own count badge.
+//
+//  It is Magento/blank's icon font again:
+//
+//      .action.showcart::before  content "\e611"  icons-blank-theme  35px  #8f8f8f
+//
+//  Invisible at rest and drawn only once .minicart-wrapper gains `.active`,
+//  which is exactly why it survived every check until someone opened the
+//  dropdown. Same fault as the wishlist heart earlier in this branch: the
+//  parent theme paints an icon this theme already provides as an SVG.
+//
+//  The glyph also widened the link from 42px to 106px, which is what dragged
+//  the whole cluster left and slid the absolutely positioned counter off the
+//  icon and onto the label.
+.minicart-wrapper .action.showcart,
+.minicart-wrapper.active .action.showcart {
+    &::before,
+    &::after { content: none !important; }
+
+    //  blank ALSO rewrites the box on `.active`: display back to inline-block
+    //  and min-height to 0, which collapsed the icon-over-label stack from
+    //  42x38 to 67x24 and slid the absolutely positioned badge off the icon and
+    //  onto the words. The control must not change shape because a panel opened.
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    min-block-size: 4.4rem;
+}
+
+//  With the glyph gone the link is its own size again, so the badge sits back
+//  on the icon rather than over the words.
+.minicart-wrapper .action.showcart .counter.qty {
+    inset-block-start: -.4rem;
+    inset-inline-end: -.6rem;
+}
+
+//  Minicart thumbnail: the tinted ground was stretching to the row.
+//  `a.product-item-photo` measured 72x182 around a 72x72 image, so it painted
+//  110px of empty tint under the bag — the grey slab in the dropdown. The
+//  anchor is a flex item and was filling the row height; pinning it to the top
+//  keeps the tint on the picture.
+.minicart-items .product-item-photo {
+    align-self: flex-start;
+    block-size: auto;
+    border-radius: var(--hm-radius);
+    flex: none;
+    overflow: hidden;
+}
