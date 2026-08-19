@@ -420,3 +420,116 @@
         max-inline-size: 100%;
     }
 }
+
+//
+//  Microsite column track — the sidebar was dropping BELOW the products
+//  ---------------------------------------------
+//  Every vendor microsite screen rendered its profile column ~1000px underneath
+//  the product grid, leaving a blank left gutter beside the content and no
+//  vendor header anywhere near the products.
+//
+//  Not a styling preference — an arithmetic overflow. Vnecoms ships
+//  `page-layout-2columns-left`, and on this theme that resolved to
+//  `.column.main` 960px floated inline-end beside a 322px sidebar inside a
+//  1248px `.columns`. 960 + 322 = 1282, which is 34px more than the track, and a
+//  float that cannot fit beside its sibling wraps to the next line.
+//
+//  Fixed with an explicit grid rather than by trimming a width, because the two
+//  widths come from different stylesheets and any future change to either
+//  re-breaks the sum. A grid track cannot overflow its container.
+//
+//  SPECIFICITY, measured not assumed. The float survived a first attempt at
+//  `.vendor-page .column.main` (0,3,0) because _hm-account.less carries
+//  `.hm-page.page-layout-2columns-left .column.main` (0,4,0), and the 76.923%
+//  width from the same file then resolved against the new grid track and made
+//  the column narrower still. These selectors are deliberately (0,5,0).
+//
+//  The rail is `.sidebar-additional`: these pages ship NO `.sidebar-main`, which
+//  is why pinning that class alone left the profile where it was.
+//
+//  Placement is explicit so the rail leads in LTR and — because grid follows
+//  `direction` — automatically leads on the right in Arabic, with no RTL rule.
+.hm-page.vendor-page {
+    .columns {
+        align-items: start;
+        column-gap: var(--hm-space-6);
+        display: grid;
+        grid-template-columns: 30rem minmax(0, 1fr);
+    }
+
+    //  Floats and percentage widths must go, or they fight the tracks.
+    .columns .column.main,
+    .columns .sidebar.sidebar-main,
+    .columns .sidebar.sidebar-additional {
+        float: none;
+        inline-size: auto;
+        max-inline-size: 100%;
+        min-inline-size: 0;
+        padding-inline: 0;
+        width: auto;
+    }
+
+    .columns .sidebar.sidebar-main,
+    .columns .sidebar.sidebar-additional { grid-column: 1; grid-row: 1; }
+    .columns .column.main                { grid-column: 2; grid-row: 1; }
+
+    //  Single column once there is no room for a 30rem rail beside content.
+    @media (max-width: 47.99em) {
+        .columns { grid-template-columns: minmax(0, 1fr); }
+        .columns .sidebar.sidebar-main,
+        .columns .sidebar.sidebar-additional,
+        .columns .column.main { grid-column: 1; grid-row: auto; }
+    }
+}
+
+//
+//  Microsite tab bar — the store search sat ON TOP of the tab labels
+//  ---------------------------------------------
+//  "Shipping Policy" and "Refund Policy" were unreadable: the search block is
+//  floated inside a nav whose tab list is only 497px wide, so it overlapped them
+//  rather than sitting beside them.
+//
+//  The flex item is `.block-search-by-vendor`, NOT the <form> inside it — the
+//  form is two levels down, so styling the form alone left the wrapper floated.
+//
+//  And the wrapper was `position: absolute`, which is the whole bug: an absolute
+//  box is out of the flex flow, so neither `flex-wrap` nor an auto margin could
+//  ever move it — it simply painted over whatever tab was beneath it. Measured
+//  240x25 at x=759, straddling "Shipping Policy". Returning it to `static` is
+//  what actually fixes the overlap; the flex sizing below only places it.
+//
+//  Vnecoms also centres the nav with a ~407px `margin-left`, which left the row
+//  too narrow to hold the tabs and the field side by side. Full width, no margin.
+.hm-page.vendor-page .vendor-menu {
+    .vendor-nav-container {
+        align-items: center;
+        display: flex;
+        flex: 1 1 100%;
+        flex-wrap: wrap;
+        gap: var(--hm-space-4);
+        inline-size: 100%;
+        margin-inline: 0;
+    }
+
+    ul {
+        display: flex;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2) var(--hm-space-5);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .block-search-by-vendor {
+        flex: 0 1 26rem;
+        float: none;
+        inset: auto;
+        margin-inline-start: auto;
+        max-inline-size: 100%;
+        position: static;
+
+        form,
+        input { inline-size: 100%; }
+    }
+}
