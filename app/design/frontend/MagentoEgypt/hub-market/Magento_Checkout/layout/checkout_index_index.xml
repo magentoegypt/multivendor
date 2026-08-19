@@ -1,25 +1,66 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Hub Market — checkout uses the site's own header and footer.
+ * Hub Market. Checkout: correct page layout, plus the site header and footer.
  *
- * Magento ships checkout on the `checkout` page layout, which starts from
- * `empty` and builds its own header container holding nothing but the logo:
- * no navigation, no search, no account or cart links, and no footer at all.
- * That is a deliberate conversion pattern — remove the exits so the shopper
- * finishes — and it is a real trade, not an oversight.
+ * TWO SEPARATE FACTS, EASILY CONFUSED.
  *
- * Switching to `1column` restores the standard containers, so Magento_Theme's
- * default.xml populates the header and footer exactly as it does on every other
- * page. Nothing here re-implements them; the page simply stops opting out.
+ * 1. THE PAGE LAYOUT MUST BE `checkout`. Six modules declare a layout for this
+ *    handle and they disagree: core Checkout, CSP and Vnecoms_Sms say
+ *    `checkout`; MGS_AjaxCart, Accept_Payments and Vnecoms_Credit say
+ *    `1column`. While Amasty's one step checkout was enabled its own handle
+ *    settled it at `checkout`. Disabling Amasty removed that tie breaker, a
+ *    1column declaration won, and the Knockout checkout stopped mounting: a
+ *    spinner, .opc-wrapper at zero height, no sidebar, no inputs. `checkout` is
+ *    not cosmetic, it defines the container structure the checkout's own layout
+ *    and JS are written against. Declared here so the theme, which is resolved
+ *    last, ends the argument.
  *
- * If cart abandonment moves the wrong way, reverting is one attribute.
+ * 2. THE HEADER AND FOOTER ARE MISSING BECAUSE `checkout` OMITS THEIR
+ *    CONTAINERS, not because anything removes the blocks. Magento_Theme's
+ *    default.xml declares them on every page; on this handle their destinations
+ *    simply do not exist, so they are dropped. Adding the three containers
+ *    1column would have contributed puts them back without touching anything
+ *    the checkout defines.
+ *
+ * Order matters between the two. Adding these containers while the page was on
+ * 1column REPLACED the existing ones and discarded the blocks default.xml had
+ * already placed in them, which is why an earlier attempt produced a page with
+ * neither header nor footer AND a broken form. Both are in this branch's
+ * history.
+ *
+ * Reverting is one attribute: drop layout="checkout" and the referenceContainer
+ * block, and the page returns to Magento's logo only checkout header.
  */
 -->
-<page
+<page layout="checkout"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <attribute name="class" value="hm-checkout"/>
+
+        <!--
+            The three containers 1column contributes to page.wrapper, and nothing
+            else. Names, tags and positions copied from
+            vendor/magento/module-theme/view/frontend/page_layout/1column.xml so
+            default.xml's blocks resolve exactly as they do on every other page.
+        -->
+        <referenceContainer name="page.wrapper">
+            <container name="header.container" as="header_container"
+                       label="Page Header Container"
+                       htmlTag="header" htmlClass="page-header" before="main.content"/>
+            <container name="page.top" as="page_top"
+                       label="After Page Header" after="header.container"/>
+            <container name="footer-container" as="footer"
+                       label="Page Footer Container"
+                       htmlTag="footer" htmlClass="page-footer" before="before.body.end"/>
+        </referenceContainer>
+
+        <!--
+            The checkout's own logo only header goes, or the page carries two:
+            the stub above the real one. The logo the page layout moves into it
+            goes with it, which is correct, since the site header renders its own.
+        -->
+        <referenceContainer name="checkout.header.container" remove="true"/>
     </body>
 </page>
