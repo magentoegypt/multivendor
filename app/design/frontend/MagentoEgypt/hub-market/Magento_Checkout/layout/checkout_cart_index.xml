@@ -73,6 +73,22 @@
                 block so it shares getContinueShoppingUrl() with the copy it
                 replaces.
             -->
+            <!--
+                Free-shipping notice, directly under the totals and above the
+                checkout button, which is where the reference puts it. The
+                Uses Magento\Checkout\Block\Cart, an already compiled class, so
+                it needs no DI compile. See the template for why the view model
+                version cannot ship without one.
+
+                before="checkout.cart.methods.bottom", not "checkout.cart.methods":
+                the latter is a CONTAINER NESTED INSIDE the former, not a sibling
+                in cart.summary, so referencing it placed the block nowhere and it
+                rendered not at all. Sibling references only.
+            -->
+            <block class="Magento\Checkout\Block\Cart"
+                   name="checkout.cart.summary.freeshipping"
+                   template="Magento_Checkout::cart/freeshipping.phtml"
+                   after="checkout.cart.totals.container"/>
             <block class="Magento\Checkout\Block\Cart"
                    name="checkout.cart.summary.continue"
                    template="Magento_Checkout::cart/continue.phtml"

@@ -3951,3 +3951,23 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  Skip links stay 1px until focused. That is the point of them: they are
 //  invisible to a pointer user and full size the moment a keyboard reaches
 //  them, so the 24x24 minimum does not apply to their resting state.
+
+//  Free-shipping notice in the cart summary. Green when earned, neutral when it
+//  is still a target — the reference only draws the earned state, but the
+//  "spend X more" line is the useful half and it should not read as a success.
+.hm-cart__freeship {
+    align-items: center;
+    color: var(--hm-foreground-muted);      // 4.83:1
+    display: flex;
+    font-size: 1.3rem;
+    gap: var(--hm-space-2);
+    line-height: 1.4;
+    margin: var(--hm-space-3) 0 0;
+
+    .hm-icon { flex: none; }
+}
+
+.hm-cart__freeship--won {
+    color: var(--hm-success);               // green, as the reference draws it
+    font-weight: 600;
+}

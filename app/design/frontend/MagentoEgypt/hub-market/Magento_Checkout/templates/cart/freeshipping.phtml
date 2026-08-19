@@ -1,0 +1,74 @@
+<?php
+/**
+ * Hub Market — "You qualify for free shipping" in the cart summary.
+ *
+ * This store really does offer it: an active cart price rule grants free
+ * shipping over a subtotal threshold (base_subtotal >= 50, no end date, all
+ * customer groups, website 1). The freeshipping CARRIER is switched off, so the
+ * promise lives entirely in that rule.
+ *
+ * ---------------------------------------------------------------------------
+ * WHY THIS ASKS THE QUOTE AND NOT THE RULE
+ *
+ * The obvious build is a view model that reads the rule, finds the threshold and
+ * renders "Spend X more for free shipping" — the useful half of the feature. I
+ * wrote it. It cannot ship without `setup:di:compile`.
+ *
+ * This install runs production mode with compiled DI (generated/metadata
+ * present, 6587 generated classes), so the ObjectManager uses the compiled
+ * factory. A class added since the last compile has no definition, resolving an
+ * <argument xsi:type="object"> to it throws, and Magento drops the whole block
+ * SILENTLY — no exception logged, no output, nothing to notice. The already
+ * compiled ProductSavings view model on the PDP uses the same mechanism and
+ * works, which is what isolated it.
+ *
+ * Compiling means taking the storefront down on a two core box, so the feature
+ * is built the way that needs no new class: the quote already knows whether free
+ * shipping was granted, whatever granted it — rule, coupon or carrier. That is
+ * also exactly what the reference draws, which shows only the earned state.
+ *
+ * MagentoEgypt\CheckoutExtend\ViewModel\FreeShipping is kept for the day a
+ * compile happens; swapping to it is a one line layout change.
+ * ---------------------------------------------------------------------------
+ *
+ * @var \Magento\Checkout\Block\Cart $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+/*
+ * THE TEST IS THE CHARGE, NOT THE FLAG.
+ *
+ * The first version asked the address for getFreeShipping(). On this install
+ * that returns TRUE while the shopper is still charged: rule 2 matches at
+ * subtotal >= 50 and sets the flag, but the Flat Rate carrier ignores it
+ * because carriers/flatrate/free_shipping_enable is unset, so a 3 x EGP 34 cart
+ * shows "You qualify for free shipping" directly above "Shipping EGP 15".
+ * Verified by building a quote server side: flag true, shipping amount 15,
+ * applied rule 2.
+ *
+ * Reading the actual shipping amount cannot contradict the total printed beside
+ * it. It also means this line switches itself on the moment the carrier config
+ * is corrected, with no code change.
+ */
+$hmQualified = false;
+try {
+    $hmQuote = $block->getQuote();
+    if ($hmQuote && $hmQuote->getItemsCount() && !$hmQuote->isVirtual()) {
+        $hmAddress = $hmQuote->getShippingAddress();
+        $hmQualified = $hmAddress
+            && $hmAddress->getShippingMethod()
+            && (float) $hmAddress->getShippingAmount() === 0.0
+            && (float) $hmQuote->getBaseSubtotal() > 0;
+    }
+} catch (\Throwable $e) {
+    //  A notice is decoration; it must never take the cart page down.
+    $hmQualified = false;
+}
+
+if (!$hmQualified) {
+    return;
+}
+?>
+<p class="hm-cart__freeship hm-cart__freeship--won">
+    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-check"/></svg>
+    <?= $escaper->escapeHtml(__('You qualify for free shipping')) ?>
+</p>
