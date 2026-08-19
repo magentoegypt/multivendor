@@ -888,3 +888,61 @@
         flex-direction: column;
     }
 }
+
+//
+//  Price figures — "EGP 44" looked like two different sizes
+//  ---------------------------------------------
+//  It was not a size difference. Playfair Display defaults to OLD-STYLE figures:
+//  digits drawn at x-height with descenders, so "44" sat visibly shorter than the
+//  cap-height "EGP" beside it at the identical 36px. Measured identical font-size
+//  on one text node — there is no smaller element to find.
+//
+//  `lining-nums` selects the cap-height figures the face also ships;
+//  `tabular-nums` keeps digits on a fixed advance so a price does not reflow as
+//  the number changes. Applied wherever a price is set in the display face.
+.hm-pdp .product-info-price .price,
+.hm-pdp .product-info-price .price-wrapper,
+.hm-pdp .price-box .price {
+    font-feature-settings: "lnum" 1, "tnum" 1;
+    font-variant-numeric: lining-nums tabular-nums;
+}
+
+//
+//  Rating row alignment — the stars hung outside the column
+//  ---------------------------------------------
+//  `.rating-result` measured x=741 against an info column starting at x=752, so
+//  the star run began 11px to the LEFT of the title and the price and its first
+//  glyph was clipped by the column edge. Magento offsets these with margins to
+//  compensate for the icon font's own side bearing; with this theme's star glyph
+//  that compensation overshoots.
+//
+//  Zeroed and laid out explicitly so the row starts on the column's own left
+//  edge, like every other line in the panel.
+.hm-pdp .product-info-main .product-reviews-summary {
+    align-items: center;
+    column-gap: var(--hm-space-3);
+    display: flex;
+    flex-wrap: wrap;
+    margin-inline: 0;
+
+    .rating-summary,
+    .rating-result {
+        margin-inline: 0;
+    }
+
+    //  The last 6px was not a margin at all — `.rating-summary` is
+    //  `position: relative; left: -6px`, a nudge that zeroing margins cannot
+    //  reach. Neutralised rather than re-nudged, and `left` is set (not an inset
+    //  logical property) because the offset it undoes is itself `left`, which
+    //  shifts the same physical direction in Arabic and would push the stars the
+    //  wrong way there.
+    .rating-summary {
+        left: 0;
+    }
+
+    //  The glyph run is absolutely positioned at left:0 of .rating-result, so
+    //  pinning that box to the column edge is what actually aligns the stars.
+    .rating-result {
+        inline-size: 10rem;
+    }
+}
