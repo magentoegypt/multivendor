@@ -449,7 +449,17 @@
 //
 //  Placement is explicit so the rail leads in LTR and — because grid follows
 //  `direction` — automatically leads on the right in Arabic, with no RTL rule.
-.hm-page.vendor-page {
+//  SCOPED TO PAGES THAT ARE ACTUALLY TWO COLUMNS. `vendor-page` is on the body of
+//  the PDP too — Vnecoms adds it wherever vendor blocks render — and the first
+//  version of this rule keyed on that class alone. The product page is
+//  `page-layout-1column` with NO sidebar, so it inherited a 30rem track that
+//  nothing occupied: `.column.main` measured 924px starting at x=420 inside a
+//  1248px container, losing 324px of the product page to an empty column.
+//
+//  Keying on the layout class instead states the actual precondition — build the
+//  two-column grid only where the page really has two columns.
+.hm-page.vendor-page.page-layout-2columns-left,
+.hm-page.vendor-page.page-layout-2columns-right {
     .columns {
         align-items: start;
         column-gap: var(--hm-space-6);
