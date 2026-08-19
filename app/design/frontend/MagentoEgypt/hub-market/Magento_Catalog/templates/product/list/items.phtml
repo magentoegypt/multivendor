@@ -288,9 +288,35 @@ $_item = null;
                                 data-role="select-all"><span><?= $block->escapeHtml(__('select all')) ?></span></button>
                     </div>
                 <?php endif; ?>
+                <?php
+                /*
+                 * ONE ROW, CAPPED HERE RATHER THAN IN CSS.
+                 *
+                 * The reference draws four related products; this install was
+                 * building ten, and eight upsells, then hiding all but four with
+                 * `:nth-child(n+5){display:none !important}`. Every hidden card
+                 * still cost a resized image, a price render, a review summary
+                 * and an add-to-cart form — the markup is by far the expensive
+                 * part, not the query.
+                 *
+                 * The CSS cap is gone with this change; keeping both would mean
+                 * two places to change the number.
+                 *
+                 * NOT a limit on the collection: Related and Upsell each declare
+                 * a limit API they never apply to their own query, and the hooks
+                 * that would fix that (_prepareData) are protected. Limiting the
+                 * query needs a plugin on Product::getRelatedProductCollection()
+                 * and a DI compile, which is a bigger and riskier change than
+                 * the saving justifies on this host — the query is one indexed
+                 * link lookup for a single product.
+                 */
+                $hmRailLimit = 4;
+                ?>
                 <div class="products wrapper grid products-grid products-<?= $block->escapeHtmlAttr($type) ?>">
                     <ol class="products list items product-items">
+                        <?php $hmRendered = 0; ?>
                         <?php foreach ($items as $_item):?>
+                            <?php if (++$hmRendered > $hmRailLimit) { break; } ?>
                             <?php $available = ''; ?>
                             <?php if (!$_item->isComposite() && $_item->isSaleable() && $type == 'related'):?>
                                 <?php if (!$_item->getRequiredOptions()):?>

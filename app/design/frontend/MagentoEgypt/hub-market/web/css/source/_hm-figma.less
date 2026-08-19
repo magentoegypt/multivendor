@@ -3464,24 +3464,13 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  under that. The reference draws four, once. On the default-layout product
 //  that alone accounted for well over a thousand pixels of page.
 //
-//  Capped in CSS rather than on the block because Magento's Related block takes
-//  no limit argument (Upsell does; Related does not), so there is no way to stop
-//  the collection loading them. The cards are built and then hidden, which is
-//  wasteful — a block plugin setting a page size on the collection is the right
-//  fix and is worth doing separately.
-.hm-pdp .block.related .product-items > .product-item:nth-child(n+5),
-.hm-pdp .block.upsell  .product-items > .product-item:nth-child(n+5) {
-    //  !important, and it is earned. Checked in a real browser: every one of
-    //  these <li> carries an INLINE style="display: list-item;" — the shuffle
-    //  script reveals items with jQuery .show(), which writes the element's
-    //  default display straight onto the style attribute. An inline declaration
-    //  beats any selector, so the (0,6,0) rule this replaces never stood a
-    //  chance; the cascade trace showed it matching and losing anyway.
-    display: none !important;
-}
+//  The one-row cap now lives in items.phtml, at the loop, so the extra cards are
+//  never built. It was here as `:nth-child(n+5){display:none !important}`, which
+//  hid them after paying for every one of them.
 
-//  The rails are grids, so four across is the count the reference uses at this
-//  width; below 1024 they fall to two and the cap still holds one visible row.
+//  Four across at this width, two below 1024 — where the template's four cards
+//  then make two rows rather than one. That is the right trade on a phone; a
+//  single row of four would be unreadable.
 .hm-pdp .block.related .product-items,
 .hm-pdp .block.upsell .product-items {
     display: grid;
