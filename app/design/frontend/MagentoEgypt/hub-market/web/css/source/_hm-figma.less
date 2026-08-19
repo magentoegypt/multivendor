@@ -138,7 +138,10 @@
     text-decoration: none;
     white-space: nowrap;
 
-    &:hover,
+    //  Split, because the two states no longer want the same thing: the pointer
+    //  gets the colour shift alone, while focus keeps the underline. Losing it
+    //  there would leave a keyboard user with only a colour change to go on.
+    &:hover { color: var(--hm-accent-strong-hover); }
     &:focus-visible { color: var(--hm-accent-strong-hover); text-decoration: underline; }
 
     //  The arrow points along the reading direction, so it mirrors in RTL.
@@ -2056,7 +2059,7 @@
     //  Figma's white/50 is 3.2:1 on navy. --hm-neutral-400 is the dimmest value
     //  that still clears AA here (4.89:1).
     a { color: var(--hm-neutral-400); text-decoration: none; }
-    a:hover { color: var(--hm-on-inverse); text-decoration: underline; }
+    a:hover { color: var(--hm-on-inverse); }
     span { color: var(--hm-on-inverse-muted); }
 }
 
@@ -2567,6 +2570,13 @@
 
     li, a, strong { font-size: 1.2rem; }
     a { color: var(--hm-neutral-600); }
+
+    //  This quieter colour is (0,2,1), which TIES blank's `.breadcrumbs a:hover`
+    //  and beats it on source order — so it was overriding the hover colour too,
+    //  and the trail's only remaining hover cue was the underline. With that gone
+    //  sitewide the crumbs went completely inert, so the hover is restated here
+    //  at (0,3,1) using the same accent blank was reaching for.
+    a:hover { color: var(--hm-accent-strong); }
 }
 
 //  Both columns sit on white cards floating on the tint.
@@ -3063,7 +3073,7 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     letter-spacing: .02em;
     text-decoration: none;
 
-    &:hover { color: var(--hm-accent-strong); text-decoration: underline; }
+    &:hover { color: var(--hm-accent-strong); }
 }
 
 .hm-pdp__seller-check {
@@ -3746,3 +3756,88 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
         padding: 0;
     }
 }
+
+//
+//  Visited links in the navy chrome
+//  ---------------------------------------------
+//  blank emits a blanket `a:visited, .alink:visited { color: @link__visited__color }`
+//  from lib/_typography.less. At (0,1,1) that outranks any chrome link whose own
+//  rule is a bare single class (0,1,0), so once a visitor had been to a category
+//  the whole nav row repainted itself accent orange on the navy bar — along with
+//  Register, Account and the social icons. Ten menu items all reading as active
+//  at once, and the one item that IS meant to be orange no longer stood out.
+//
+//  The colour VALUE is not the problem: @link__visited__color already equals
+//  @link__color, so the rule adds nothing to ordinary content links and only
+//  ever damages links carrying a colour of their own. But a declaration cannot
+//  be withdrawn once it has matched, so each affected link restates its colour
+//  with :visited attached, which lands at (0,2,0) and wins.
+//
+//  Only these needed it. `.hm-footer__col a` and `.hm-footer__legal a` are
+//  already (0,1,1) and win the tie on source order, and the All Categories panel
+//  links are (0,2,2) and (0,1,3), so all three were never affected.
+//
+//  Two constraints worth knowing before editing this block. Browsers restrict
+//  :visited to the colour family, so anything but a colour declaration here is
+//  silently dropped. And getComputedStyle reports the UNVISITED colour for every
+//  element regardless of history — it is specified to lie, so this block cannot
+//  be verified by measuring the page and has to be read off the cascade instead.
+//
+.hm-nav__all:visited,
+.hm-nav__inline-link:visited,
+.hm-utility__link:visited,
+.hm-utility__lang:visited {
+    color: var(--hm-on-inverse-muted);
+}
+
+.hm-nav__trigger:visited,
+.hm-header__action:visited,
+.hm-footer__social-link:visited {
+    color: var(--hm-on-inverse);
+}
+
+//  The two deliberate calls to action, which keep their accent rather than
+//  drifting to blank's slightly darker visited orange. After the modifier's
+//  base class above, since both land at (0,2,0) and source order decides.
+.hm-nav__promo:visited {
+    color: var(--hm-accent-on-nav);
+}
+
+.hm-utility__link--sell:visited {
+    color: var(--hm-accent);
+}
+
+//
+//  Visited links must not repaint theme components
+//  ---------------------------------------------
+//  Magento/blank ships `a:visited, .alink:visited { color: #c2410c }` at
+//  (0,1,1), which beats any single class. Every component built on an <a> is
+//  therefore one browsing-history entry away from being recoloured, and it is
+//  invisible in review three ways over: it only shows for links the viewer has
+//  actually visited, it never shows in a fresh profile, and getComputedStyle
+//  reports the UNVISITED colour for :visited links as a privacy protection — so
+//  the measurement says the component is fine while the browser paints it
+//  orange.
+//
+//  It has already bitten twice on this branch: the empty-cart button and the
+//  homepage "Start shopping" CTA, the second rendering orange on orange.
+//
+//  Audited the homepage for anchors that carry a background and have no
+//  :visited pin of their own — 16 of them. These are the card and tile
+//  wrappers: their labels live in child elements with their own colours, so
+//  what blank recolours is whatever text inherits straight from the anchor.
+//  `color: inherit` restores the natural cascade, which is what these should
+//  have had all along; it is not a colour choice, it is the absence of one.
+.hm-hero-tile:visited,
+.hm-chips__link:visited,
+.hm-stores__link:visited,
+.hm-brands__link:visited,
+.hm-bundle:visited,
+.hm-card__link:visited,
+.product-item-photo:visited,
+.product-item-link:visited { color: inherit; }
+
+//  These two DO set a colour of their own, so they get it back rather than
+//  inheriting.
+.hm-skip-link:visited        { color: var(--hm-accent-strong); }
+.product-item .action.towishlist:visited { color: var(--hm-foreground); }
