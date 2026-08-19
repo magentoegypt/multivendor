@@ -437,7 +437,7 @@
     text-decoration: none;
     white-space: nowrap;
 
-    &:hover { text-decoration: underline; }
+    &:hover { color: var(--hm-accent-strong-hover); }
 }
 
 //
@@ -1035,16 +1035,37 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
     padding-inline: var(--hm-space-6);
     text-decoration: none;
 
-    &:hover { background: var(--hm-accent-hover); color: var(--hm-on-accent); }
+    //  EVERY link state, not just the default. Both of these are <a>, and blank
+    //  ships `a:visited { color: #c2410c }` at (0,1,1), which beats a single
+    //  class. "Start shopping" points at the homepage, so for any returning
+    //  shopper the label rendered ORANGE ON ORANGE — all but unreadable.
+    //
+    //  Same fault as the empty-cart button, and it hides the same way:
+    //  getComputedStyle reports the UNVISITED colour for :visited links, as a
+    //  privacy protection, so the API says this is fine when it is not. Links
+    //  have to be checked by eye.
+    &,
+    &:link,
+    &:visited,
+    &:hover,
+    &:focus,
+    &:active { color: var(--hm-on-accent); }
+
+    &:hover,
+    &:focus { background: var(--hm-accent-hover); }
 }
 
 .hm-app__link {
-    color: var(--hm-on-inverse);
     font-size: 1.5rem;
     font-weight: 600;
     text-decoration: underline;
 
-    &:hover { color: var(--hm-on-inverse); }
+    &,
+    &:link,
+    &:visited,
+    &:hover,
+    &:focus,
+    &:active { color: var(--hm-on-inverse); }
 }
 
 //  App-store badges. The reference draws two white pills on the navy, each with
