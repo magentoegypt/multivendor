@@ -61,7 +61,9 @@
         margin: 0;
     }
 
-    .sorter-label,
+    //  .sorter-label is gone from this list on purpose — the theme's sorter
+    //  template renders it .hm-sr-only now, because Figma shows the dropdown with
+    //  no visible "Sort By" caption. The limiter still has visible captions.
     .limiter-label,
     .limiter-text {
         color: var(--hm-foreground-muted);
@@ -80,26 +82,62 @@
         padding-inline: var(--hm-space-3);
     }
 
-    //  Sort-direction toggle: an icon-only control, so it needs a real name.
-    .sorter-action {
-        align-items: center;
-        border: 1px solid var(--hm-border-subtle);
-        border-radius: var(--hm-radius);
-        color: var(--hm-icon);
-        display: flex;
-        justify-content: center;
-        min-block-size: 4.4rem;
-        min-inline-size: 4.4rem;
-
-        &:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
-    }
+    //  The sort-direction toggle that used to be styled here is gone. Figma has
+    //  no such control: its dropdown carries the direction inside each option
+    //  ("Price: High to Low"), so the separate ascending/descending button has
+    //  nothing left to do. Removed in the template rather than hidden here —
+    //  see Magento_Catalog/templates/product/list/toolbar/sorter.phtml.
 }
 
 //  Grid / list view switcher
+//
+//  The GLYPHS come from Magento's luma-icons font, which draws a dot-grid and a
+//  two-column block — neither matches Figma, and neither matches the Lucide
+//  vocabulary the rest of this theme uses via the #hm-* sprite. The markup is
+//  produced inside core's toolbar.phtml, so overriding a 200-line template for
+//  two icons would be the expensive fix; masking the pseudo-element with the same
+//  paths the sprite's hm-grid / hm-list carry is the cheap one and keeps the two
+//  in step.
 .modes {
     display: flex;
     gap: var(--hm-space-1);
     margin: 0;
+
+    .modes-mode::before {
+        background-color: currentColor;
+        block-size: 1.8rem;
+        content: '';
+        display: block;
+        inline-size: 1.8rem;
+        //  -webkit- prefix first: Safari still needs it, and an unprefixed-only
+        //  mask leaves the button showing a solid square there.
+        -webkit-mask-position: center;
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-size: contain;
+        mask-position: center;
+        mask-repeat: no-repeat;
+        mask-size: contain;
+    }
+
+    //  BASE64, not a url-encoded SVG. The readable form —
+    //  `escape('<svg …>')` interpolated into url("data:image/svg+xml,@{var}") —
+    //  fails the LESS compile outright with "Invalid % without number", because
+    //  escape() emits %XX sequences and Less then reads those `%` as the start of
+    //  a number unit. It takes the whole stylesheet down, not just this rule.
+    //
+    //  hm-grid: four rounded squares.
+    .mode-grid::before {
+        @grid-svg: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjMiIHk9IjMiIHJ4PSIxIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iNyIgeD0iMTQiIHk9IjMiIHJ4PSIxIi8+PHJlY3Qgd2lkdGg9IjciIGhlaWdodD0iNyIgeD0iMTQiIHk9IjE0IiByeD0iMSIvPjxyZWN0IHdpZHRoPSI3IiBoZWlnaHQ9IjciIHg9IjMiIHk9IjE0IiByeD0iMSIvPjwvc3ZnPg==";
+        -webkit-mask-image: url("data:image/svg+xml;base64,@{grid-svg}");
+        mask-image: url("data:image/svg+xml;base64,@{grid-svg}");
+    }
+
+    //  hm-list: three dotted rows.
+    .mode-list::before {
+        @list-svg: "PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJibGFjayIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0zIDVoLjAxIi8+PHBhdGggZD0iTTMgMTJoLjAxIi8+PHBhdGggZD0iTTMgMTloLjAxIi8+PHBhdGggZD0iTTggNWgxMyIvPjxwYXRoIGQ9Ik04IDEyaDEzIi8+PHBhdGggZD0iTTggMTloMTMiLz48L3N2Zz4=";
+        -webkit-mask-image: url("data:image/svg+xml;base64,@{list-svg}");
+        mask-image: url("data:image/svg+xml;base64,@{list-svg}");
+    }
 
     .modes-mode {
         align-items: center;
@@ -253,6 +291,24 @@
     min-block-size: 3.2rem;
     min-inline-size: 3.2rem;
     outline-offset: 2px;
+
+    /*
+     * Centre the label. Magento_Swatches ships these as `display: block`, so a
+     * text swatch put its 20px line box at the TOP of a 32px content area and
+     * the letter rode high with the slack underneath — measured 48x42 with the
+     * text sitting 12px off centre.
+     *
+     * Flex centring rather than a line-height equal to the height: the box grows
+     * with `min-block-size` and its padding, so a fixed line-height would only be
+     * correct at one size and would break the moment a two-character size like
+     * "XL" or a longer option label wrapped.
+     *
+     * The box itself is unchanged — still content-box, still 3.2rem min — so
+     * only the text moves.
+     */
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
 
     &.selected {
         border-color: var(--hm-primary);

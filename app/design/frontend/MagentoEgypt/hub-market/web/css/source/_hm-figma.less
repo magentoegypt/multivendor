@@ -3096,7 +3096,11 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 .hm-pdp .box-tocart .hm-qty {
     align-items: stretch;
     border: 1px solid var(--hm-border-strong);
-    border-radius: var(--hm-radius);
+    //  Square, like the rest of this form — the shared UI draws the buy box with
+    //  sharp corners. Changed HERE rather than overridden in _hm-pdp.less because
+    //  that file's rule has the same (0,3,0) specificity and loses on source
+    //  order, so an override there would have been silently dead.
+    border-radius: 0;
     display: inline-flex;
     overflow: hidden;
 

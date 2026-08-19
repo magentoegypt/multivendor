@@ -82,7 +82,25 @@
                 catalog_product_view.xml; see that file for why it is moved
                 rather than re-rendered.
             */ ?>
-            <?= $block->getChildHtml('wishlist') ?>
+            <?php
+            /*
+             * Looked up by NAME, not with getChildHtml('wishlist').
+             *
+             * Core declares TWO add-to-cart blocks from this same template —
+             * `product.info.addtocart` and `product.info.addtocart.additional` —
+             * and a product WITH options renders the additional one. The layout
+             * move can only attach the wishlist to one of them, so on
+             * configurables the heart became a child of a block that never
+             * renders and vanished from the page entirely: no anchor in the buy
+             * row, an empty `product-addto-links`, and no addToWishlist init.
+             *
+             * A name lookup renders it whichever instance is the live one. Only
+             * one ever renders per page, so this cannot double it, and the loop
+             * below skips the block by name so it is not emitted twice here.
+             */
+            $hmWishlist = $block->getLayout()->getBlock('view.addto.wishlist');
+            ?>
+            <?= $hmWishlist ? $hmWishlist->toHtml() : '' ?>
 
             <button type="button"
                     class="hm-buybar__icon hm-share"
