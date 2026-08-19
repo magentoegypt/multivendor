@@ -44,10 +44,39 @@ $tag = in_array($tag, $allowed, true) ? $tag : 'h3';
  * heading with no name. Fall back through company to the vendor's URL key, which
  * always exists because it is what routed us to this page.
  */
+
+/*
+ * Same humanising as MagentoEgypt\HomeSections\ViewModel\VendorNames::publicName().
+ *
+ * Four sellers on this install never filled in `company`, and the fallback below
+ * ends at the vendor's url key — the routing identifier. The cart was fixed to
+ * show "Test 1" while this template still printed "test_1", so the same seller
+ * was named two different ways on two pages.
+ *
+ * Duplicated deliberately rather than injected: this template is rendered by
+ * THREE different block names (the PDP vendor card, and the microsite's top and
+ * left headings), so a per-block ViewModel argument would have to be added in
+ * three places and would silently drop a block if any name were wrong. The
+ * transformation is four lines and has no state.
+ *
+ * Existing capitalisation is preserved so "MIA" and "ENARA" are not flattened.
+ */
+$hmPublicName = static function (string $key): string {
+    $words = array_filter(preg_split('/\s+/', trim(str_replace(['_', '-', '.'], ' ', $key))) ?: []);
+
+    return implode(' ', array_map(
+        static fn (string $w): string => $w === mb_strtolower($w, 'UTF-8')
+            ? mb_convert_case($w, MB_CASE_TITLE, 'UTF-8')
+            : $w,
+        $words
+    ));
+};
+
 $storeName = trim((string) $block->getStoreName());
 if ($storeName === '') {
     $vendor = $block->getVendor();
-    $storeName = trim((string) $vendor->getCompany()) ?: trim((string) $vendor->getVendorId());
+    $storeName = trim((string) $vendor->getCompany())
+        ?: $hmPublicName(trim((string) $vendor->getVendorId()));
 }
 
 /*
