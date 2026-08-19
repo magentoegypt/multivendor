@@ -50,7 +50,7 @@ $image = $hero->getImageUrl();
                 <h1 class="hm-cat-hero__title"><?= $escaper->escapeHtml($hero->getName()) ?></h1>
                 <?php if ($count > 0): ?>
                     <p class="hm-cat-hero__meta">
-                        <?= $escaper->escapeHtml(__('%1 products from verified sellers', $count)) ?>
+                        <?= $escaper->escapeHtml(__('%1 products from approved sellers', $count)) ?>
                     </p>
                 <?php endif; ?>
             </div>

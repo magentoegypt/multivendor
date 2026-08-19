@@ -240,7 +240,7 @@
                         numeric id. These are approved stores that have products.
                     -->
                     <argument name="title" xsi:type="string" translate="true">Featured Stores</argument>
-                    <argument name="subtitle" xsi:type="string" translate="true">Verified sellers with the widest ranges</argument>
+                    <argument name="subtitle" xsi:type="string" translate="true">Approved sellers with the widest ranges</argument>
                     <!--
                         FOUR ids, and the rail rendered THREE. `seno` was silently
                         dropped, and not by anything in this layout: the vendor
@@ -405,7 +405,7 @@
                    name="hm.home.topvendors" after="hm.home.brands"
                    template="MagentoEgypt_HomeSections::new-stores.phtml">
                 <arguments>
-                    <argument name="subtitle" xsi:type="string" translate="true">Highest-rated sellers verified by Magento Egypt</argument>
+                    <argument name="subtitle" xsi:type="string" translate="true">Highest-rated sellers approved by Magento Egypt</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                     <argument name="order_by" xsi:type="string">rating</argument>
                     <argument name="heading" xsi:type="string" translate="true">Top Vendors This Month</argument>
@@ -416,7 +416,7 @@
                    name="hm.home.newstores" after="hm.home.topvendors"
                    template="MagentoEgypt_HomeSections::new-stores.phtml">
                 <arguments>
-                    <argument name="subtitle" xsi:type="string" translate="true">Recently joined verified sellers</argument>
+                    <argument name="subtitle" xsi:type="string" translate="true">Recently joined approved sellers</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                 </arguments>
             </block>
