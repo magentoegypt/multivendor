@@ -3841,3 +3841,44 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  inheriting.
 .hm-skip-link:visited        { color: var(--hm-accent-strong); }
 .product-item .action.towishlist:visited { color: var(--hm-foreground); }
+
+//  Continue Shopping in the summary rail — the reference's secondary button:
+//  same width as the CTA above it, outline rather than filled, 16/500.
+//
+//  Every link state pinned, for the reason the sweep above documents: this is an
+//  <a> pointing at a page the shopper has certainly visited, so blank's global
+//  a:visited would repaint it the moment it mattered.
+.hm-cart__continue {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-info);
+    border-radius: var(--hm-radius);
+    display: flex;
+    font-size: 1.6rem;
+    font-weight: 500;
+    justify-content: center;
+    margin-block-start: var(--hm-space-3);
+    min-block-size: 4.8rem;
+    text-decoration: none;
+
+    &,
+    &:link,
+    &:visited,
+    &:hover,
+    &:focus,
+    &:active { color: var(--hm-info); text-decoration: none; }
+
+    &:hover,
+    &:focus { background: var(--hm-info-subtle, #eff4ff); }
+}
+
+//  Cart thumbnails get the same tinted ground the listing tiles already use.
+//  The Joust Duffle Bag is a pale grey product shot on white; at 96px on a white
+//  card it read as an empty box — I went looking for a broken image before
+//  checking the file. The listing cards already sit on --hm-surface-muted, so
+//  this is consistency rather than a new idea.
+.checkout-cart-index .cart.item .product-image-wrapper {
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius);
+    overflow: hidden;
+}

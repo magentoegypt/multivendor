@@ -65,10 +65,22 @@
             total — which is also the conventional placement for a coupon field.
         -->
         <referenceContainer name="cart.summary">
+            <!--
+                Continue Shopping directly under Proceed to Checkout, which is
+                where the reference pairs them. It used to live at the bottom
+                left of the item list — the two options a shopper is choosing
+                between were in opposite corners of the page. Uses the cart
+                block so it shares getContinueShoppingUrl() with the copy it
+                replaces.
+            -->
+            <block class="Magento\Checkout\Block\Cart"
+                   name="checkout.cart.summary.continue"
+                   template="Magento_Checkout::cart/continue.phtml"
+                   after="checkout.cart.methods.bottom"/>
             <block class="Magento\Framework\View\Element\Template"
                    name="checkout.cart.summary.trust"
                    template="Magento_Checkout::cart/trust.phtml"
-                   after="checkout.cart.methods.bottom"/>
+                   after="checkout.cart.summary.continue"/>
         </referenceContainer>
 
         <move element="checkout.cart.shipping" destination="cart.summary" after="checkout.cart.summary.trust"/>

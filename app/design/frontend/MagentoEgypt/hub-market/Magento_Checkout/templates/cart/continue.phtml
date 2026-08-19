@@ -1,0 +1,23 @@
+<?php
+/**
+ * Hub Market — "Continue Shopping" inside the summary rail.
+ *
+ * The reference pairs it directly under Proceed to Checkout, as a secondary
+ * button of the same width. Ours sat at the bottom-left of the item list, on the
+ * far side of the page from the decision it belongs to: a shopper deciding
+ * whether to check out or keep browsing had the two options in opposite corners.
+ *
+ * The copy of it in form.phtml is removed rather than hidden, so there is only
+ * ever one of these on the page.
+ *
+ * @var \Magento\Checkout\Block\Cart $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmUrl = (string) $block->getContinueShoppingUrl();
+if ($hmUrl === '') {
+    return;
+}
+?>
+<a class="hm-cart__continue" href="<?= $escaper->escapeUrl($hmUrl) ?>">
+    <?= $escaper->escapeHtml(__('Continue Shopping')) ?>
+</a>

@@ -149,7 +149,7 @@
         font-weight: 600;
         text-decoration: none;
 
-        &:hover { color: var(--hm-accent-strong); text-decoration: underline; }
+        &:hover { color: var(--hm-accent-strong); }
     }
 
     //
@@ -560,13 +560,20 @@
         .hm-icon { color: var(--hm-success); flex: 0 0 auto; }
     }
 
+    //  Blue, matching the reference's funnel CTA and the empty-cart button.
+    //  This rule is (0,5,0) and was quietly beating the blue set elsewhere, so
+    //  it is changed here at source rather than out-specified — the same trap
+    //  the grand-total `:not(.grand)` rule set earlier in this branch.
+    //
+    //  White on --hm-info (#1d4ed8) is 6.70:1; the reference's own blue manages
+    //  4.55:1.
     .checkout.methods .action.primary.checkout {
-        background: var(--hm-accent);
-        border: 1px solid var(--hm-accent);
+        background: var(--hm-info);
+        border: 1px solid var(--hm-info);
         border-radius: var(--hm-radius);
-        color: var(--hm-on-accent);       // navy on orange = 5.04:1
+        color: #fff;
         font-size: 1.6rem;
-        font-weight: 700;
+        font-weight: 600;
         min-block-size: 5.2rem;
         width: 100%;
 

@@ -105,13 +105,13 @@ $hmGroups  = $hmVendors
         <?php endif ?>
     </div>
     <div class="cart main actions">
-        <?php if ($block->getContinueShoppingUrl()): ?>
-            <a class="action continue"
-               href="<?= $escaper->escapeUrl($block->getContinueShoppingUrl()) ?>"
-               title="<?= $escaper->escapeHtmlAttr(__('Continue Shopping')) ?>">
-                <span><?= $escaper->escapeHtml(__('Continue Shopping')) ?></span>
-            </a>
-        <?php endif; ?>
+        <?php
+        /*
+         * Continue Shopping moved to the summary rail, under Proceed to
+         * Checkout — see cart/continue.phtml. Removed here rather than hidden
+         * so the page never carries two of them.
+         */
+        ?>
         <?php if ($block->getViewModel()->isClearShoppingCartEnabled()): ?>
             <button type="button"
                     name="update_cart_action"

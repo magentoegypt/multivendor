@@ -18,7 +18,11 @@
 
 $hmTrust = [
     ['icon' => 'hm-lock',  'text' => __('Secure checkout with SSL encryption')],
-    ['icon' => 'hm-check', 'text' => __('30-day money-back guarantee')],
+    //  14 days, not 30. Every other surface on this store says 14 — the trust
+    //  strip, and the assurances on every product page — so this line was the
+    //  storefront contradicting itself on the one promise a shopper is most
+    //  likely to hold it to.
+    ['icon' => 'hm-check', 'text' => __('14-day returns on most items')],
     ['icon' => 'hm-check', 'text' => __('Orders from multiple vendors in one checkout')],
 ];
 ?>
