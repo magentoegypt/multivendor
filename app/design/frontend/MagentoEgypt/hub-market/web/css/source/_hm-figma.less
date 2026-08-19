@@ -3871,3 +3871,83 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     border-radius: var(--hm-radius);
     overflow: hidden;
 }
+
+//
+//  Touch targets: WCAG 2.5.8 minimum, checked on a 390px phone
+//  ---------------------------------------------
+//  Audited the storefront at 390x844 with touch emulation. No horizontal
+//  scroll anywhere and no text under 12px, but four controls fail the 24x24
+//  minimum, and three of them are things people tap constantly:
+//
+//    footer links                67x16   16 of them
+//    .hm-section__more           82x21   11 of them
+//    hero carousel dots          24x6    the worst by far
+//    seller search button        16x44   sixteen pixels wide
+//
+//  The visual size of each is deliberate and stays as it is. What grows is the
+//  HIT AREA, which is what the criterion is actually about.
+
+//  Footer links: the target grows with padding, the text does not move, because
+//  the padding is absorbed by the existing column gap.
+.hm-footer a,
+.hm-footer__col a {
+    display: inline-block;
+    min-block-size: 2.4rem;
+    padding-block: .4rem;
+}
+
+//  Section "view all" links.
+.hm-section__more,
+.hm-rail__more {
+    min-block-size: 2.4rem;
+    padding-block: .2rem;
+}
+
+//  Carousel dots stay 6px to look at. `background-clip: content-box` keeps the
+//  paint inside the content box while padding pushes the button out to 24x24,
+//  so the dot looks identical and the target is four times taller.
+.hm-hero-carousel__dot {
+    background-clip: content-box;
+    block-size: 2.4rem;
+    box-sizing: border-box;
+    inline-size: 2.4rem;
+    padding: .9rem;
+}
+
+//  The seller search button was 16px wide, which is not a button.
+.seller-search-form .action.seller-search,
+.action.seller-search {
+    min-inline-size: 4.4rem;
+    min-block-size: 4.4rem;
+}
+
+//  Second pass, after re-auditing: three more short by 1 to 8 pixels.
+//
+//    seller list vendor name   54x21
+//    PDP breadcrumb links      36x16
+//    .hm-app__link             99x23   one pixel short
+.hm-vendor-card__name,
+.vendor-list .vendor-title a,
+.seller-list a,
+.breadcrumbs li a,
+.hm-app__link {
+    display: inline-block;
+    min-block-size: 2.4rem;
+    padding-block: .2rem;
+}
+
+//  Vendor LOGO links collapse to 77x18 and 66x21 because no vendor on this
+//  install has uploaded a logo, so the anchor wraps nothing. A min size makes
+//  the link tappable now and correctly sized once artwork exists. The real fix
+//  is not to render a logo link with no logo, which is Vnecoms template
+//  territory and a separate change.
+.vendor_info .logo-container a,
+.vendor-profile-container .vendor-profile-logo a {
+    display: inline-block;
+    min-block-size: 2.4rem;
+    min-inline-size: 2.4rem;
+}
+
+//  Skip links stay 1px until focused. That is the point of them: they are
+//  invisible to a pointer user and full size the moment a keyboard reaches
+//  them, so the 24x24 minimum does not apply to their resting state.
