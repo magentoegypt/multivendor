@@ -830,7 +830,7 @@
 }
 
 //
-//  Related / upsell card info — one rhythm instead of four
+//  PRODUCT CARD info block — one rhythm instead of four
 //  ---------------------------------------------
 //  The info block under each card image mixed a 4px flex gap with a rating row
 //  carrying its own 12px margins top AND bottom, and that row measured 49px tall
@@ -838,8 +838,22 @@
 //  and rating→price sat 16px apart, and the card read as three loose bands.
 //
 //  One gap owns the rhythm; the children stop contributing margins of their own.
-.hm-pdp .block.related,
-.hm-pdp .block.upsell {
+//
+//  Scoped to the card GRIDS, not to `.product-item`, which is deliberate: the
+//  same class names appear in the minicart, and that dropdown has its own
+//  compaction in _hm-figma.less that this would fight. `.products.wrapper` covers
+//  the PLP and the PDP's related/upsell rows; `.products-grid` covers the
+//  homepage widget rails. The cart uses different markup and is untouched.
+//
+//  Measured identical on all three surfaces before being shared: 49px rating row,
+//  12px margins, a 44px touch-target on the review link, and the stars 6px left
+//  of the product name.
+//  `.hm-page` on the body takes these to (0,3,0). At (0,2,0) they TIED with
+//  `.product-item .product-item-details { gap: var(--hm-space-1) }` and lost on
+//  source order — which is why the homepage rails kept the 4px gap and the 12px
+//  margins after the first pass while the PLP happened to win.
+.hm-page .products.wrapper,
+.hm-page .products-grid {
     .product-item-details {
         gap: var(--hm-space-2);
     }
@@ -850,6 +864,15 @@
         column-gap: var(--hm-space-2);
         margin-block: 0;
         min-block-size: 0;
+    }
+
+    //  The stars sat 6px LEFT of the product title — `.rating-summary` is
+    //  `position: relative; left: -6px`, the same nudge that pulled the PDP's
+    //  rating row out of its column. Zeroing margins cannot reach an offset, and
+    //  `left` is used rather than a logical inset because the rule it undoes is
+    //  itself `left`, which shifts the same physical way under RTL.
+    .rating-summary {
+        left: 0;
     }
 
     //  The stars are drawn with the icon font, so the glyph size IS the row
