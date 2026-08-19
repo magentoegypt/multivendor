@@ -49,6 +49,16 @@ if ($storeName === '') {
     $vendor = $block->getVendor();
     $storeName = trim((string) $vendor->getCompany()) ?: trim((string) $vendor->getVendorId());
 }
+
+/*
+ * Localise the seller's name for the current store. Vendor data has no store
+ * scope (ves_vendor_entity_varchar has no store_id), so one stored value serves
+ * the English store, the Arabic store and the seller's own panel — an Arabic
+ * company name rendered untranslated on the English storefront. Mapping lives
+ * in the theme i18n CSVs; anything unmapped passes through unchanged, so a
+ * seller who has not been given an English name still gets their own.
+ */
+$storeName = (string) __($storeName);
 ?>
 <<?= /* @noEscape */ $tag ?> class="vendor-title">
     <?php if ($block->getVendorUrl()): ?>

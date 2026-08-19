@@ -90,7 +90,7 @@ $allStoresUrl = $block->getUrl('sellerlist');
                             <?= $block->escapeHtml($initial) ?>
                         <?php endif; ?>
                     </span>
-                    <span class="hm-stores__name"><?= $block->escapeHtml($sellerName) ?></span>
+                    <span class="hm-stores__name"><?= $block->escapeHtml(__($sellerName)) ?></span>
                     <?php
                     /*
                      * Rating comes back as raw HTML from

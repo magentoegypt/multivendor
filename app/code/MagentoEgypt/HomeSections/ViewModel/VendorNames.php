@@ -97,8 +97,17 @@ class VendorNames implements ArgumentInterface
                 $key  = trim((string) ($row['vendor_id'] ?? ''));
                 $name = trim((string) ($row['company'] ?? ''));
 
+                /*
+                 * `company` is free text the seller typed, and vendor data has NO
+                 * store scope — ves_vendor_entity_varchar carries no store_id — so
+                 * the one stored value feeds both storefronts and the seller's own
+                 * panel. An Arabic company name therefore rendered on the English
+                 * store. Localised here rather than rewritten in the table, so the
+                 * Arabic store keeps the Arabic and the seller keeps their name.
+                 * Mapping lives in the theme i18n CSVs; unmapped names pass through.
+                 */
                 $this->map[(int) $row['entity_id']] = [
-                    'name' => $name !== '' ? $name : $key,
+                    'name' => $name !== '' ? (string) __($name) : $key,
                     'key'  => $key,
                 ];
             }

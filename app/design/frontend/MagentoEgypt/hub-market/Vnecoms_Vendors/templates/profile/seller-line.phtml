@@ -37,6 +37,9 @@ if ($hmName === '' && $hmVendor) {
 if ($hmName === '') {
     return;
 }
+//  Localised for the current store — see profile/title.phtml for why this is a
+//  display-time translation and not a fix to the vendor record.
+$hmName = (string) __($hmName);
 $hmUrl = (string) $block->getVendorUrl();
 
 /*
