@@ -78,6 +78,41 @@ class VendorNames implements ArgumentInterface
     }
 
     /**
+     * Last-resort display name for a seller who has never filled in `company`.
+     *
+     * Four vendors on this install have an empty company, and the fallback used
+     * to print the raw url key — so the cart grouped items under "test_1" and the
+     * rails credited "magento_tester". That is an internal identifier, not a
+     * name a shopper should ever be shown.
+     *
+     * The key is the only other thing every vendor is guaranteed to have (it is
+     * what routes their shop page), so it is formatted into something readable
+     * rather than replaced with an invented name: separators become spaces and
+     * all-lowercase words are capitalised. "test_1" -> "Test 1".
+     *
+     * Existing capitalisation is preserved, so acronyms and brand casing that
+     * sellers chose themselves survive — "MIA" and "ENARA" are not flattened to
+     * "Mia" and "Enara".
+     *
+     * The result still goes through __(), so a merchant can name any of these
+     * four properly from the theme's i18n CSV without touching code — and
+     * filling in `company` in the vendor panel takes precedence over all of it.
+     */
+    private function publicName(string $key): string
+    {
+        $words = preg_split('/\s+/', trim(str_replace(['_', '-', '.'], ' ', $key))) ?: [];
+
+        $words = array_map(
+            static fn(string $w): string => $w === mb_strtolower($w, 'UTF-8')
+                ? mb_convert_case($w, MB_CASE_TITLE, 'UTF-8')
+                : $w,
+            array_filter($words, static fn(string $w): bool => $w !== '')
+        );
+
+        return implode(' ', $words);
+    }
+
+    /**
      * @return array<int, array{name: string, key: string}>
      */
     private function load(): array
@@ -107,7 +142,7 @@ class VendorNames implements ArgumentInterface
                  * Mapping lives in the theme i18n CSVs; unmapped names pass through.
                  */
                 $this->map[(int) $row['entity_id']] = [
-                    'name' => $name !== '' ? (string) __($name) : $key,
+                    'name' => (string) __($name !== '' ? $name : $this->publicName($key)),
                     'key'  => $key,
                 ];
             }
