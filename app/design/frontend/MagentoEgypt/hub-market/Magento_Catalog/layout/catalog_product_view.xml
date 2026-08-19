@@ -189,6 +189,24 @@
             it. Compare was already removed by this theme, and email-to-a-friend
             is off, so `product.info.addto` had no visible children either.
         -->
+        <!--
+            Buy Now and Add to Quote off the product page.
+
+            Both hang off `product.info.addtocart`, and both ship a SECOND copy on
+            `product.info.addtocart.additional` — the block a product WITH options
+            renders. Removing only the first pair leaves them on every configurable
+            and nowhere else, which is the trap that hid the missing wishlist
+            earlier in this branch. All four names are removed.
+
+            Buy Now (Mageprince) skipped the cart entirely; Add to Quote is
+            Vnecoms Quotation. Removed as blocks rather than hidden, so neither
+            renders, queries, or ships its JS.
+        -->
+        <referenceBlock name="product.buynow" remove="true"/>
+        <referenceBlock name="product.buynow.config" remove="true"/>
+        <referenceBlock name="product.info.addtoquote" remove="true"/>
+        <referenceBlock name="product.info.additional.addtoquote" remove="true"/>
+
         <referenceContainer name="product.info.social" remove="true"/>
 
         <referenceBlock name="vendor.profile.description" remove="true"/>

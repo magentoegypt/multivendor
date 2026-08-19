@@ -2042,3 +2042,60 @@ a.sms-login-field-ctrl {
     //  becomes a horizontal rule, so the gap does the separating instead.
     .popup-authentication .block-authentication { gap: var(--hm-space-6); }
 }
+
+//
+//  Cart line — the aside outgrew the details column
+//  ---------------------------------------------
+//  Measured against the reference: there the line total shares a baseline with
+//  the price (both ~324). Here the price sat at 351 and the total at 445, because
+//  the aside stacked three tiers to 144px against a details column only ~50px
+//  tall — the product has no description to fill it, so the row read as two
+//  columns of different lengths with a hole between them.
+//
+//  The line becomes a GRID so the two columns share a row rather than each
+//  finding its own height, and the aside's content is pinned to the top so the
+//  bin sits level with the title and the total follows the qty immediately
+//  instead of drifting to the bottom of an over-tall column.
+.checkout-cart-index {
+    .hm-cart-line {
+        align-items: start;
+        column-gap: var(--hm-space-5);
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+    }
+
+    .hm-cart-line__media { grid-column: 1; }
+    .hm-cart-line__body  { grid-column: 2; }
+
+    //  The aside becomes a ROW. Stacked, it summed to 136px against a 50px body
+    //  and the line total ended up 86px below the price it should sit level
+    //  with — the reference aligns those two, but only because its body carries
+    //  a description that makes the columns the same height. No product on this
+    //  catalogue has one, so matching the reference's stack here would keep the
+    //  drift. A row aligns quantity, total and the bin on the body's own line.
+    .hm-cart-line__aside {
+        align-items: center;
+        column-gap: var(--hm-space-5);
+        display: flex;
+        flex-direction: row;
+        grid-column: 3;
+        justify-content: flex-end;
+    }
+
+    //  Quantity, then the line total, then the bin — cheapest to reach last,
+    //  and the destructive control furthest from the stepper it sits beside.
+    .hm-cart-line__aside .field.qty        { order: 1; }
+    .hm-cart-line__aside .hm-cart-line__total {
+        min-inline-size: 8rem;
+        order: 2;
+        text-align: end;
+    }
+    .hm-cart-line__aside .item-actions     { order: 3; }
+
+    //  The bin and Edit sat in a 56px block of their own; they only need their
+    //  own line height.
+    .hm-cart-line__aside .item-actions {
+        gap: var(--hm-space-3);
+        margin: 0;
+    }
+}
