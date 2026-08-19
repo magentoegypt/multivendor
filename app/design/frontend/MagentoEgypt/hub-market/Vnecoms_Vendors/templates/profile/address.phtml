@@ -1,0 +1,65 @@
+<?php
+/**
+ * Hub Market — vendor location line, with the city localised.
+ *
+ * The block composes the address from street/city/region/postcode plus the
+ * country, and the country is ALREADY locale-aware — Profile::getAddress()
+ * calls getCountryName($locale). The city and region are not: they are free
+ * text the vendor typed once, so an Egyptian seller who wrote "الجيزة" showed
+ * "الجيزة, Andorra" on the English storefront.
+ *
+ * Fixed here rather than in the data on purpose. `ves_vendor_entity.city` has
+ * NO store scope — `ves_vendor_entity_varchar` carries no store_id column — so
+ * there is exactly one value behind both storefronts and the vendor's own
+ * panel. Overwriting it with "Giza" would fix English by breaking Arabic, and
+ * would rewrite what the seller sees in their own account. Translating at
+ * display time gives each store the right language and leaves vendor-owned
+ * data untouched.
+ *
+ * The mapping lives in the theme's i18n/en_US.csv, so adding a city is a CSV
+ * row and needs no code change. On the Arabic store ar_SA.csv has no such row
+ * and __() returns the original string, which is the desired outcome.
+ *
+ * @var \Vnecoms\Vendors\Block\Profile\Address $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmAddress = trim((string) $block->getAddress());
+if ($hmAddress === '') {
+    return;
+}
+
+$hmVendor = $block->getVendor();
+if ($hmVendor) {
+    /*
+     * Swap the tokens inside the composed string rather than rebuilding the
+     * address: the layout of that string is the merchant's address template
+     * (Vnecoms\Vendors\Helper\Data::getAddressTemplate) and duplicating it here
+     * would silently drift from whatever they configure.
+     *
+     * Longest first — otherwise a city that is a prefix of another would be
+     * replaced inside it.
+     */
+    $hmTokens = array_filter([
+        trim((string) $hmVendor->getCity()),
+        trim((string) $hmVendor->getRegion()),
+    ]);
+    $hmTokens = array_unique($hmTokens);
+    usort($hmTokens, static fn($a, $b) => mb_strlen($b) <=> mb_strlen($a));
+
+    foreach ($hmTokens as $hmToken) {
+        $hmLocalised = (string) __($hmToken);
+        if ($hmLocalised !== $hmToken) {
+            $hmAddress = str_replace($hmToken, $hmLocalised, $hmAddress);
+        }
+    }
+}
+
+/*
+ * Several vendors typed a trailing space into the city ("القاهرة "), and the
+ * token is matched trimmed, so the space survived the swap and rendered as
+ * "Cairo , Egypt". Tidy the seam rather than the vendor's stored value.
+ */
+$hmAddress = preg_replace('/\s+,/u', ',', $hmAddress);
+$hmAddress = trim(preg_replace('/\s{2,}/u', ' ', $hmAddress));
+?>
+<span class="vendor-location"><?= $escaper->escapeHtml($hmAddress) ?></span>
