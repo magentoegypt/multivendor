@@ -1,0 +1,40 @@
+<?php
+/**
+ * Hub Market — wishlist as an icon button in the buy bar.
+ *
+ * The reference puts the heart directly beside Add to Cart as a square icon
+ * button. Core renders a text link ("Add to Wish List") in a separate
+ * `product-social-links` container far below the button, which is what left the
+ * dead band under the buy box.
+ *
+ * Overridden here rather than hand-written into addtocart.phtml so the block's
+ * own wiring survives: `getWishlistParams()` and the `addToWishlist`
+ * x-magento-init below are what keep the post data in sync with the CHOSEN
+ * options on a configurable product. Rebuilding the markup from
+ * getAddToWishlistParams() in another template would have dropped that and
+ * quietly wishlisted the wrong variant.
+ *
+ * The label stays in the DOM as screen-reader text — the icon alone is not a
+ * name for a control.
+ *
+ * @var \Magento\Wishlist\Block\Catalog\Product\View\AddTo\Wishlist $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php if ($block->isWishListAllowed()) : ?>
+    <a href="#"
+       class="action towishlist hm-buybar__icon"
+       data-post='<?= /* @noEscape */ $block->getWishlistParams() ?>'
+       data-action="add-to-wishlist"
+       title="<?= $escaper->escapeHtmlAttr(__('Add to Wish List')) ?>">
+        <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>
+        <span class="hm-sr-only"><?= $escaper->escapeHtml(__('Add to Wish List')) ?></span>
+    </a>
+<?php endif; ?>
+<script type="text/x-magento-init">
+    {
+        "body": {
+            "addToWishlist": <?= /* @noEscape */ $block->getWishlistOptionsJson() ?>
+        }
+    }
+</script>

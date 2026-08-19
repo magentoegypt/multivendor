@@ -64,6 +64,30 @@
         <move element="hm.pdp.seller" destination="product.info.main" before="page.main.title"/>
 
         <!--
+            Wishlist heart onto the buy row.
+
+            The reference puts the heart beside Add to Cart as a square icon
+            button. Core parks it in the `product.info.social` container well
+            below the buy box, which is what produced the dead band under the
+            button.
+
+            MOVED, not re-rendered. The block carries its own `addToWishlist`
+            x-magento-init, and that is what keeps the post payload in step with
+            the options chosen on a CONFIGURABLE product. Rebuilding the anchor
+            from getAddToWishlistParams() in addtocart.phtml would have looked
+            identical and quietly wishlisted the wrong variant.
+
+            `product.info.addtocart` is a real block in Magento_Catalog's own
+            catalog_product_view.xml, so this destination exists — a <move> to a
+            missing destination DROPS the element instead of no-opping.
+
+            The alias matters: addtocart.phtml pulls it with
+            getChildHtml('wishlist') and skips it in the loop that renders the
+            block's other children, so it cannot render twice.
+        -->
+        <move element="view.addto.wishlist" destination="product.info.addtocart" as="wishlist"/>
+
+        <!--
             Compare, removed here rather than through themesettings.
             MGS_ThemeSettings has an observer that unsets `view.addto.compare`
             when themesettings/product_details/compare is 0. That flag is 0 and

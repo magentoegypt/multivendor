@@ -252,7 +252,7 @@
 .price-comparison,
 .other-sellers {
     a { color: var(--hm-accent-strong); font-weight: 600; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    a:hover { color: var(--hm-accent-strong-hover); }
 }
 
 //
@@ -513,4 +513,102 @@
     flex-wrap: wrap;
     gap: var(--hm-space-4);
     margin: 0;
+}
+
+//
+//  Buy row — Add to Cart with the wishlist and share beside it
+//  ---------------------------------------------
+//  The reference pairs a full-width Add to Cart with two square icon buttons on
+//  the same line. Ours stacked the button, then left ~130px of dead space, then
+//  a text "Add to Wish List" link, because core renders the wishlist in a
+//  separate `product-social-links` container below the buy box. The wishlist
+//  block is moved onto this row in catalog_product_view.xml; these rules place it.
+.hm-pdp .box-tocart .actions.hm-buybar {
+    align-items: stretch;
+    display: flex;
+    gap: var(--hm-space-3);
+
+    /*
+     * `flex: 0 0 auto` undoes `flex: 1 1 24rem` from _hm-figma.less. That value
+     * was written for a row, but `.box-tocart .fieldset` is a flex COLUMN, so
+     * the 24rem basis applied to HEIGHT — the row measured 200px tall around
+     * three 52px controls, which is where the dead band under the button
+     * actually came from. Height it to its content instead.
+     */
+    flex: 0 0 auto;
+
+    //  The cart button takes the row; the icons take only their own square.
+    .action.primary.tocart {
+        flex: 1 1 auto;
+        margin: 0;
+        min-inline-size: 0;
+    }
+}
+
+//  Shared shape for both icon buttons. 5.2rem matches the cart button's height
+//  so the row reads as one control group, and is far past the 24px pointer
+//  target this theme holds itself to.
+.hm-pdp .box-tocart .hm-buybar .hm-buybar__icon {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    block-size: 5.2rem;
+    color: var(--hm-foreground);
+    cursor: pointer;
+    display: inline-flex;
+    flex: none;
+    inline-size: 5.2rem;
+    justify-content: center;
+    padding: 0;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+
+    .hm-icon {
+        block-size: 2rem;
+        inline-size: 2rem;
+    }
+
+    //  Every state pinned. A bare `color` loses to blank's `a:visited` (0,1,1)
+    //  on the wishlist anchor, which would leave a purple heart after one visit.
+    &,
+    &:link,
+    &:visited {
+        color: var(--hm-foreground);
+        text-decoration: none;
+    }
+
+    &:hover,
+    &:focus-visible {
+        background: var(--hm-surface-muted);
+        border-color: var(--hm-accent);
+        color: var(--hm-accent);
+    }
+
+    //  Confirmation for the share button's clipboard fallback.
+    &.is-copied {
+        border-color: var(--hm-success);
+        color: var(--hm-success);
+    }
+}
+
+//  Secondary actions (Add to Quote, instant purchase) sit BELOW the buy row,
+//  full width, so they read as alternatives rather than competing with it.
+//  Add to Quote is now a SIBLING of the buy row rather than a child of
+//  `.actions`, so it no longer inherits that block's `> * { inline-size: 100% }`
+//  and collapsed to its content width (296px of a 592px column, floated to the
+//  end). Sized here instead.
+.hm-pdp .box-tocart .quote-actions {
+    inline-size: 100%;
+    margin-block-start: var(--hm-space-3);
+
+    .action.primary,
+    #product-addtoquote-button {
+        inline-size: 100%;
+        justify-content: center;
+    }
+}
+
+//  The now-empty social container would still paint a 40px band.
+.hm-pdp .product-social-links:empty {
+    display: none;
 }

@@ -2,10 +2,26 @@
 /**
  * Hub Market — add-to-cart row.
  *
- * Overridden for ONE reason: the reference draws quantity as a stepper — minus,
- * the number, plus — and Magento ships a bare number input. The browser's own
- * spinner arrows are ~10px, appear only on hover, and vanish entirely on touch,
- * so quantity was effectively keyboard-only on a phone.
+ * Overridden for TWO reasons.
+ *
+ * ONE — the reference draws quantity as a stepper — minus, the number, plus —
+ * and Magento ships a bare number input. The browser's own spinner arrows are
+ * ~10px, appear only on hover, and vanish entirely on touch, so quantity was
+ * effectively keyboard-only on a phone.
+ *
+ * TWO — core renders the submit button `disabled` and relies on
+ * Magento_Catalog/js/validate-product to remove the attribute once it binds. On
+ * this host that took a measured 1.2–2.4 seconds AFTER the page had painted, and
+ * the disabled styling is grey-on-grey, so the primary call to action sat
+ * looking unavailable for over a second and did nothing if clicked. The
+ * attribute is gone here.
+ *
+ * Dropping it is safe because this form is a real POST to checkout/cart/add, not
+ * an ajax-only control: a submit that beats the JavaScript still adds the
+ * product, and required-option validation exists server-side as well as client-
+ * side, so a configurable submitted without its options comes back with
+ * Magento's own "specify the product's required option(s)" message rather than
+ * adding something wrong.
  *
  * The buttons are type="button" so they cannot submit the form, and they drive
  * the same #qty input Magento validates — nothing downstream changes. `disabled`
@@ -24,7 +40,8 @@
     <div class="fieldset">
         <?php if ($block->shouldRenderQuantity()) :?>
         <div class="field qty">
-            <label class="label" for="qty"><span><?= $block->escapeHtml(__('Qty')) ?></span></label>
+            <?php /* "Quantity", not core's "Qty" — the reference spells it out. */ ?>
+            <label class="label" for="qty"><span><?= $block->escapeHtml(__('Quantity')) ?></span></label>
             <div class="control hm-qty">
                 <button type="button" class="hm-qty__step hm-qty__step--down"
                         data-hm-qty="-1"
@@ -34,7 +51,7 @@
                        id="qty"
                        min="0"
                        value="<?= $block->getProductDefaultQty() * 1 ?>"
-                       title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Quantity')) ?>"
                        class="input-text qty"
                        data-validate="<?= $block->escapeHtml(json_encode($block->getQuantityValidators())) ?>"
                        />
@@ -44,15 +61,50 @@
             </div>
         </div>
         <?php endif; ?>
-        <div class="actions">
+        <div class="actions hm-buybar">
+            <?php /* No `disabled` — see the note at the top of this file. */ ?>
             <button type="submit"
                     title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
                     class="action primary tocart"
-                    id="product-addtocart-button" disabled>
+                    id="product-addtocart-button">
+                <?php /* The reference puts a cart glyph before the label.
+                         aria-hidden: the button already says "Add to Cart". */ ?>
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false">
+                    <use href="#hm-cart"/>
+                </svg>
                 <span><?= $block->escapeHtml($buttonTitle) ?></span>
             </button>
-            <?= $block->getChildHtml('', true) ?>
+
+            <?php /*
+                The wishlist heart and the share control sit ON the buy row, as
+                the reference shows — not stranded below it. The wishlist block
+                is moved in from `product.info.social` by this theme's
+                catalog_product_view.xml; see that file for why it is moved
+                rather than re-rendered.
+            */ ?>
+            <?= $block->getChildHtml('wishlist') ?>
+
+            <button type="button"
+                    class="hm-buybar__icon hm-share"
+                    data-hm-share
+                    data-share-title="<?= $block->escapeHtmlAttr($_product->getName()) ?>"
+                    title="<?= $block->escapeHtmlAttr(__('Share this product')) ?>">
+                <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-share"/></svg>
+                <span class="hm-sr-only"><?= $block->escapeHtml(__('Share this product')) ?></span>
+            </button>
         </div>
+
+        <?php /*
+            Every OTHER child of this block — Add to Quote, instant purchase,
+            daily deals — rendered by name so it lands BELOW the buy row.
+            `getChildHtml('', true)` cannot be used any more: it would render the
+            moved wishlist a second time, giving the page two controls with the
+            same post payload.
+        */ ?>
+        <?php foreach ($block->getChildNames() as $hmChild) : ?>
+            <?php if ($hmChild === 'view.addto.wishlist') { continue; } ?>
+            <?= $block->getLayout()->renderElement($hmChild, false) ?>
+        <?php endforeach; ?>
     </div>
 </div>
 <?php endif; ?>
@@ -100,5 +152,45 @@
         });
         input.addEventListener('input', sync);
         sync();
+    }());
+
+    /*
+     * Share control.
+     *
+     * navigator.share is the native sheet where it exists (phones, Safari), and
+     * it is the only path that can offer real targets — a page cannot enumerate
+     * a user's apps. Everywhere else this copies the URL, which is what a
+     * shopper on a desktop actually wants, and says so for a moment.
+     *
+     * No third-party share widgets on purpose: every one of them is a tracker on
+     * a page that is otherwise free of them.
+     *
+     * navigator.share and navigator.clipboard both require a secure context and
+     * both reject if the user dismisses the sheet, so every call is guarded and
+     * the rejection is swallowed rather than logged as an error.
+     */
+    (function () {
+        'use strict';
+        var btn = document.querySelector('[data-hm-share]');
+        if (!btn) {
+            return;
+        }
+        btn.addEventListener('click', function () {
+            var url = window.location.href;
+            var title = btn.getAttribute('data-share-title') || document.title;
+
+            if (navigator.share) {
+                navigator.share({title: title, url: url}).catch(function () {});
+                return;
+            }
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function () {
+                    btn.classList.add('is-copied');
+                    window.setTimeout(function () {
+                        btn.classList.remove('is-copied');
+                    }, 1600);
+                }).catch(function () {});
+            }
+        });
     }());
 </script>
