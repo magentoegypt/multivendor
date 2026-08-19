@@ -179,6 +179,18 @@
             under Andorra, and free-text regions like "999999999". Not something
             to display more prominently on the product page.
         -->
+        <!--
+            The social container is empty now the wishlist has moved onto the buy
+            row, but it was still costing a full 24px of the info column's gap: it
+            holds an empty `product-addto-links` wrapper, so `:empty` never
+            matched it and the CSS meant to collapse it did nothing.
+
+            Removed as a container rather than hidden — there is nothing left in
+            it. Compare was already removed by this theme, and email-to-a-friend
+            is off, so `product.info.addto` had no visible children either.
+        -->
+        <referenceContainer name="product.info.social" remove="true"/>
+
         <referenceBlock name="vendor.profile.description" remove="true"/>
         <referenceContainer name="vendor.profile.address.container" remove="true"/>
         <referenceContainer name="vendor.profile.sales_joindate.container" remove="true"/>

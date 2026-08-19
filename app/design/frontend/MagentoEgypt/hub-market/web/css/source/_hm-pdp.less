@@ -764,3 +764,49 @@
         color: var(--hm-surface);
     }
 }
+
+//
+//  Add to Cart — ink, not accent
+//  ---------------------------------------------
+//  The shared UI draws the primary as a black block with white text. Uses the
+//  theme's ink token (#1a1a2e) rather than a raw #000: it is the same value the
+//  Visit Store button already inverts to on hover, so the two controls on this
+//  page stay one system. White on #1a1a2e measures ~16:1, far past AA.
+//
+//  Deliberately overrides `.action.primary`, which is accent-orange everywhere
+//  else. Scoped to this button so the accent stays the primary on the rest of
+//  the storefront.
+.hm-pdp .box-tocart .actions.hm-buybar .action.primary.tocart {
+    background: var(--hm-foreground);
+    border-color: var(--hm-foreground);
+    color: var(--hm-surface);
+
+    .hm-icon { color: currentColor; }
+
+    &:hover,
+    &:focus-visible {
+        background: var(--hm-accent);
+        border-color: var(--hm-accent);
+        color: var(--hm-foreground);
+    }
+}
+
+//
+//  Divider rhythm under the buy box
+//  ---------------------------------------------
+//  The rule above the assurances had 32px of air before it (24px column gap plus
+//  an 8px margin) and 16px after — visibly lopsided, and sitting on top of the
+//  24px the empty social container was still reserving. With that container gone
+//  this balances the two sides on the column's own 24px rhythm.
+.hm-pdp .product-info-main {
+    .hm-pdp__assurances {
+        margin-block-start: 0;
+        padding-block-start: var(--hm-space-6);
+    }
+
+    //  The vendor card is a bordered panel, not a divider — its own padding
+    //  spaces it, so the stray top margin only pushed it off the rhythm.
+    .vendor-profile-container {
+        margin-block-start: 0;
+    }
+}
