@@ -1,0 +1,19 @@
+<?php
+/**
+ * Hub Market — "Visit Store" across the foot of the PDP vendor card.
+ *
+ * Renders nothing without a URL rather than an inert button: the card already
+ * names the seller, and a control that looks pressable and does nothing is worse
+ * than no control.
+ *
+ * @var \Vnecoms\Vendors\Block\Profile\Title $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmUrl = trim((string) $block->getVendorUrl());
+if ($hmUrl === '') {
+    return;
+}
+?>
+<a class="hm-vendor-card__visit" href="<?= $escaper->escapeUrl($hmUrl) ?>">
+    <?= $escaper->escapeHtml(__('Visit Store')) ?>
+</a>

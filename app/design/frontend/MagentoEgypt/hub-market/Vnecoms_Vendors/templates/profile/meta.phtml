@@ -1,0 +1,59 @@
+<?php
+/**
+ * Hub Market — the rating / catalogue-size line under the store name.
+ *
+ * The shared UI reads "4.8 ★ · 156 products". Both halves are real data and both
+ * are optional:
+ *
+ *   - Stars come from APPROVED customer reviews on that seller's products. A
+ *     vendor with none returns null and the stars are omitted entirely rather
+ *     than printing 0 or a hopeful 5 — an invented rating is worse than none on
+ *     a marketplace, because it is the number a shopper trusts most.
+ *   - The count is the seller's live, browsable catalogue (enabled and visible),
+ *     not the raw vendor_id column, which would include disabled products and
+ *     every configurable's hidden children.
+ *
+ * If a seller has neither, the whole line is skipped and the card is just the
+ * name and the button.
+ *
+ * @var \Vnecoms\Vendors\Block\Profile\Title $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmVendor = $block->getVendor();
+if (!$hmVendor) {
+    return;
+}
+
+/** @var \MagentoEgypt\HomeSections\ViewModel\VendorNames|null $hmVendors */
+$hmVendors = $block->getData('vendor_names');
+if (!$hmVendors) {
+    return;
+}
+
+$hmStats    = $hmVendors->getStats($hmVendor->getId());
+$hmStars    = $hmStats['stars'];
+$hmProducts = (int) $hmStats['products'];
+
+if ($hmStars === null && $hmProducts === 0) {
+    return;
+}
+?>
+<p class="hm-vendor-card__meta">
+    <?php if ($hmStars !== null): ?>
+        <span class="hm-vendor-card__rating">
+            <?= $escaper->escapeHtml(number_format((float) $hmStars, 1)) ?>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-star"/></svg>
+            <span class="hm-sr-only"><?= $escaper->escapeHtml(__('average rating from %1 reviews', $hmStats['reviews'])) ?></span>
+        </span>
+    <?php endif; ?>
+
+    <?php if ($hmStars !== null && $hmProducts > 0): ?>
+        <span class="hm-vendor-card__sep" aria-hidden="true">&middot;</span>
+    <?php endif; ?>
+
+    <?php if ($hmProducts > 0): ?>
+        <span class="hm-vendor-card__count">
+            <?= $escaper->escapeHtml(__('%1 products', $hmProducts)) ?>
+        </span>
+    <?php endif; ?>
+</p>

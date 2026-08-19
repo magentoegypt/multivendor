@@ -166,6 +166,69 @@
              title, and carries a typo. -->
         <referenceBlock name="product.info.vendor.profile.title" remove="true"/>
 
+        <!--
+            PDP vendor card, rebuilt to the shared UI.
+
+            Vnecoms stacks six rows in `.vendor-profile-container` — store name,
+            description, address, sales, join date, phone, opening hours. The
+            design keeps three things: who the seller is, how they are rated, and
+            a way through to their shop. The rest is removed as BLOCKS rather than
+            hidden in CSS, so the page stops querying and rendering them at all.
+
+            Address in particular was carrying junk: an Egyptian seller filed
+            under Andorra, and free-text regions like "999999999". Not something
+            to display more prominently on the product page.
+        -->
+        <referenceBlock name="vendor.profile.description" remove="true"/>
+        <referenceContainer name="vendor.profile.address.container" remove="true"/>
+        <referenceContainer name="vendor.profile.sales_joindate.container" remove="true"/>
+        <referenceContainer name="vendor.profile.phone_opentime.container" remove="true"/>
+
+        <!--
+            Rating and catalogue size, under the store name.
+
+            Reuses Vnecoms' own Profile\Title block class rather than introducing
+            one: a NEW class needs a di:compile before layout can reference it, and
+            until then Magento drops the block with nothing in the log. This class
+            is already compiled and already gives getVendor().
+
+            VendorNames is likewise an EXISTING compiled ViewModel — it is passed
+            the same way on the homepage rails — so this argument is safe.
+        -->
+        <referenceContainer name="vendor.profile.description.container">
+            <block class="Vnecoms\Vendors\Block\Profile\Title"
+                   name="hm.pdp.vendor.meta"
+                   after="vendor.profile.title"
+                   template="Vnecoms_Vendors::profile/meta.phtml">
+                <arguments>
+                    <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <!--
+            "Visit Store" spans the whole card, so it belongs to the container
+            rather than to the text column beside the logo.
+        -->
+        <referenceContainer name="vendor.profile.container">
+            <block class="Vnecoms\Vendors\Block\Profile\Title"
+                   name="hm.pdp.vendor.visit"
+                   after="vendor.profile.description.container"
+                   template="Vnecoms_Vendors::profile/visit-store.phtml">
+                <!--
+                    getVendorUrl() is NOT computed by the block — it returns
+                    getData('vendor_url'), and this child is what sets it: its
+                    _prepareLayout() calls setVendorUrl() on its PARENT. Vnecoms
+                    attaches the same child to the title and logo blocks for
+                    exactly this reason. Without it the URL is empty and the
+                    button silently renders nothing, which is what happened on
+                    the first pass.
+                -->
+                <block class="Vnecoms\VendorsPage\Block\Catalog\Product\Profile"
+                       name="hm.pdp.vendor.visit.link"/>
+            </block>
+        </referenceContainer>
+
         <!-- The SECOND price, at the head of .product-info-last, detached from
              the title it belongs to. -->
         <referenceBlock name="product.price.last" remove="true"/>

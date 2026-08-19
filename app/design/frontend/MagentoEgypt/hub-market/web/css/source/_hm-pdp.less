@@ -640,3 +640,127 @@
         border-start-start-radius: 0;
     }
 }
+
+//
+//  PDP vendor card — rebuilt to the shared UI
+//  ---------------------------------------------
+//  A quiet panel: logo, seller name with the approved mark, one line of rating
+//  and catalogue size, then "Visit Store" across the foot. Vnecoms' six stacked
+//  rows (description, address, sales, join date, phone, hours) are removed as
+//  blocks in catalog_product_view.xml, so this only has to lay out what is left.
+.hm-pdp .vendor-profile-container {
+    align-items: center;
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: 0;
+    column-gap: var(--hm-space-4);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: var(--hm-space-5);
+    row-gap: var(--hm-space-4);
+
+    //  Vnecoms ships Bootstrap-era column classes on these; the grid owns the
+    //  track widths now, so their percentages have to go or they fight it.
+    .vendor-profile-logo,
+    .vendor-profile-description {
+        float: none;
+        inline-size: auto;
+        margin: 0;
+        max-inline-size: 100%;
+        min-inline-size: 0;
+        padding: 0;
+    }
+
+    .vendor-profile-logo {
+        grid-column: 1;
+
+        img {
+            block-size: 5.6rem;
+            border-radius: var(--hm-radius-xs);
+            display: block;
+            inline-size: 5.6rem;
+            object-fit: cover;
+        }
+    }
+
+    .vendor-profile-description { grid-column: 2; }
+
+    //  Full width under both tracks.
+    .hm-vendor-card__visit { grid-column: 1 / -1; }
+}
+
+//  Seller name — a card heading, not a page heading.
+.hm-pdp .vendor-profile-container .vendor-title {
+    align-items: center;
+    display: flex;
+    font-family: var(--hm-font-sans);
+    font-size: 1.6rem;
+    font-weight: 700;
+    gap: var(--hm-space-2);
+    line-height: 1.3;
+    margin: 0;
+
+    a {
+        color: var(--hm-foreground);
+        text-decoration: none;
+
+        &:hover { color: var(--hm-accent); }
+    }
+}
+
+.hm-pdp .hm-vendor-card__check {
+    align-items: center;
+    color: var(--hm-accent);
+    display: inline-flex;
+    flex: none;
+}
+
+.hm-pdp .hm-vendor-card__meta {
+    align-items: center;
+    color: var(--hm-foreground-muted);
+    display: flex;
+    font-size: 1.3rem;
+    gap: var(--hm-space-1);
+    //  Pinned: something upstream centres paragraphs in this card, which left
+    //  the rating floating mid-column while the name above it sat flush left.
+    justify-content: flex-start;
+    margin: .4rem 0 0;
+}
+
+.hm-pdp .hm-vendor-card__rating {
+    align-items: center;
+    display: inline-flex;
+    gap: .3rem;
+
+    .hm-icon { color: var(--hm-warning, #d97706); }
+}
+
+//  Outlined, square, full width — a secondary route, not competing with the
+//  buy button above it.
+.hm-pdp .hm-vendor-card__visit {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-foreground);
+    border-radius: 0;
+    color: var(--hm-foreground);
+    display: flex;
+    font-size: 1.4rem;
+    font-weight: 600;
+    justify-content: center;
+    min-block-size: 4.4rem;
+    padding: var(--hm-space-2) var(--hm-space-4);
+    text-align: center;
+    text-decoration: none;
+    transition: background-color .15s ease, color .15s ease;
+
+    //  Pinned across states — a bare `color` loses to blank's `a:visited`.
+    &,
+    &:link,
+    &:visited { color: var(--hm-foreground); }
+
+    &:hover,
+    &:focus-visible {
+        background: var(--hm-foreground);
+        color: var(--hm-surface);
+    }
+}

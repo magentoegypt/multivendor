@@ -41,6 +41,9 @@ class VendorNames implements ArgumentInterface
     /** @var array<int, array{name: string, key: string}>|null */
     private ?array $map = null;
 
+    /** @var array<int, array{products:int, stars:float|null, reviews:int}>|null */
+    private ?array $stats = null;
+
     public function __construct(
         private readonly ResourceConnection $resource,
         private readonly LoggerInterface $logger
@@ -62,6 +65,120 @@ class VendorNames implements ArgumentInterface
         }
 
         return $this->load()[$id]['name'] ?? null;
+    }
+
+    /**
+     * Headline stats for one vendor: how many products, and the star rating.
+     *
+     * The PDP vendor card shows "4.8 * . 156 products". Both numbers are real:
+     * the count is the seller's live, browsable catalogue and the stars come from
+     * approved customer reviews. A vendor with no reviews returns null stars and
+     * the card omits them rather than printing a hopeful 0 or 5.
+     *
+     * Batched for the same reason the name map is — one query for the whole
+     * table, not one per card, so a page with several vendor references does not
+     * pay per reference.
+     *
+     * @return array{products:int, stars:float|null, reviews:int}
+     */
+    public function getStats(mixed $vendorId): array
+    {
+        $id = (int) $vendorId;
+        $empty = ['products' => 0, 'stars' => null, 'reviews' => 0];
+        if ($id <= 0) {
+            return $empty;
+        }
+
+        return $this->loadStats()[$id] ?? $empty;
+    }
+
+    /**
+     * @return array<int, array{products:int, stars:float|null, reviews:int}>
+     */
+    private function loadStats(): array
+    {
+        if ($this->stats !== null) {
+            return $this->stats;
+        }
+
+        $this->stats = [];
+
+        try {
+            $connection = $this->resource->getConnection();
+            $product    = $this->resource->getTableName('catalog_product_entity');
+            $intTable   = $this->resource->getTableName('catalog_product_entity_int');
+            $attribute  = $this->resource->getTableName('eav_attribute');
+            $entityType = $this->resource->getTableName('eav_entity_type');
+
+            $attrId = static function (string $code) use ($connection, $attribute, $entityType) {
+                return $connection->select()
+                    ->from(['a' => $attribute], ['attribute_id'])
+                    ->join(['e' => $entityType], 'e.entity_type_id = a.entity_type_id', [])
+                    ->where('e.entity_type_code = ?', 'catalog_product')
+                    ->where('a.attribute_code = ?', $code);
+            };
+
+            /*
+             * Counts only what a shopper can actually reach: enabled, and not
+             * "Not Visible Individually". Counting the raw vendor_id column would
+             * include disabled products and every configurable's hidden children,
+             * which is how a seller with 6 listings ends up advertising 40.
+             */
+            $counts = $connection->select()
+                ->from(['p' => $product], ['vendor_id', 'products' => 'COUNT(*)'])
+                ->joinInner(
+                    ['st' => $intTable],
+                    'st.entity_id = p.entity_id AND st.store_id = 0 AND st.attribute_id = (' . $attrId('status') . ')',
+                    []
+                )
+                ->joinInner(
+                    ['vis' => $intTable],
+                    'vis.entity_id = p.entity_id AND vis.store_id = 0 AND vis.attribute_id = (' . $attrId('visibility') . ')',
+                    []
+                )
+                ->where('p.vendor_id > 0')
+                ->where('st.value = ?', 1)
+                ->where('vis.value > ?', 1)
+                ->group('p.vendor_id');
+
+            foreach ($connection->fetchAll($counts) as $row) {
+                $this->stats[(int) $row['vendor_id']] = [
+                    'products' => (int) $row['products'],
+                    'stars'    => null,
+                    'reviews'  => 0,
+                ];
+            }
+
+            /*
+             * review_entity_summary.rating_summary is a PERCENTAGE (0-100), not a
+             * star value — /20 converts it. Treating it as 0-5 is the obvious way
+             * to publish a wrong rating. Same conversion as HomeSections\Block\NewStores.
+             */
+            $ratings = $connection->select()
+                ->from(['pe' => $product], ['vendor_id'])
+                ->join(['r' => $this->resource->getTableName('review')], 'r.entity_pk_value = pe.entity_id', [])
+                ->join(
+                    ['s' => $this->resource->getTableName('review_entity_summary')],
+                    's.entity_pk_value = pe.entity_id',
+                    ['pct' => 'AVG(s.rating_summary)', 'total' => 'COUNT(DISTINCT r.review_id)']
+                )
+                ->where('r.status_id = ?', 1)
+                ->where('pe.vendor_id > 0')
+                ->group('pe.vendor_id');
+
+            foreach ($connection->fetchAll($ratings) as $row) {
+                $id = (int) $row['vendor_id'];
+                $this->stats[$id] ??= ['products' => 0, 'stars' => null, 'reviews' => 0];
+                $this->stats[$id]['stars']   = round(((float) $row['pct']) / 20, 1);
+                $this->stats[$id]['reviews'] = (int) $row['total'];
+            }
+        } catch (LocalizedException | \Throwable $e) {
+            //  The card renders without stats rather than taking the PDP down.
+            $this->logger->warning('HomeSections: vendor stats unavailable: ' . $e->getMessage());
+            $this->stats = [];
+        }
+
+        return $this->stats;
     }
 
     /**

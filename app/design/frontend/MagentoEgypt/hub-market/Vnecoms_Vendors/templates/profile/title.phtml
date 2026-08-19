@@ -96,4 +96,21 @@ $storeName = (string) __($storeName);
     <?php else: ?>
         <?= $block->escapeHtml($storeName) ?>
     <?php endif; ?>
+    <?php
+    /*
+     * Approved-seller mark, the same signal the PDP seller line already uses:
+     * vendor status 2. There is no `verified` attribute among the 21 vendor
+     * attributes on this install, and the marketplace already promises approval
+     * before a store goes live, so this restates an existing claim rather than
+     * inventing a second one. Omitted entirely when a vendor is not approved.
+     */
+    $hmVendorForCheck = $block->getVendor();
+    ?>
+    <?php if ($hmVendorForCheck && (int) $hmVendorForCheck->getStatus() === 2): ?>
+        <span class="hm-vendor-card__check" title="<?= $block->escapeHtmlAttr(__('Approved seller')) ?>">
+            <?php /* The badge glyph, not a bare tick — the shared UI shows a ringed check. */ ?>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-vendor-verified"/></svg>
+            <span class="hm-sr-only"><?= $block->escapeHtml(__('Approved seller')) ?></span>
+        </span>
+    <?php endif; ?>
 </<?= /* @noEscape */ $tag ?>>
