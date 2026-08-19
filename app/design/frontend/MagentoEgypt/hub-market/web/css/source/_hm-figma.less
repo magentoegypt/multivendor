@@ -4025,3 +4025,70 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     flex: none;
     overflow: hidden;
 }
+
+//
+//  Minicart line items — 182px of dropdown for one product
+//  ---------------------------------------------
+//  Measured on a single-item cart: `.product-item-details` ran 182px tall for a
+//  one-line product. The height was not the content, it was the scaffolding —
+//  14px padding top and bottom, a 12px margin above the qty row, a 44px qty
+//  input, and then the delete control on its OWN 44px row underneath, which is
+//  what put the bin icon adrift far below the quantity.
+//
+//  Compacted by laying the details out as a grid so the delete sits BESIDE the
+//  price/qty column instead of under it, and by trimming the paddings. The name
+//  spans both tracks so a long product title still wraps across the full width.
+//
+//  The qty field drops 44px -> 32px and the delete keeps a 2.4rem minimum: both
+//  stay above the 24x24 pointer-target floor this theme holds itself to, so the
+//  compaction costs no reachability. Anything tighter would start trading away
+//  that gate, which is where this stops.
+.minicart-items .product-item-details {
+    align-items: end;
+    column-gap: var(--hm-space-3);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-block: .8rem;
+
+    //  Title spans both tracks — it must keep the full width to wrap into.
+    .product-item-name {
+        grid-column: 1 / -1;
+        margin-block: 0;
+    }
+
+    .product-item-pricing {
+        grid-column: 1;
+        min-inline-size: 0;
+    }
+
+    //  Was a full-width row below the qty; now the second track on the same row.
+    .product.actions {
+        grid-column: 2;
+        margin: 0;
+        min-block-size: 2.4rem;
+    }
+}
+
+.minicart-items .details-qty {
+    align-items: center;
+    column-gap: var(--hm-space-2);
+    display: flex;
+    margin-block-start: .6rem;
+
+    .label {
+        margin-block: 0;
+    }
+
+    .item-qty {
+        block-size: 3.2rem;
+        inline-size: 5.6rem;
+        padding-block: .4rem;
+        text-align: center;
+    }
+}
+
+//  Tighten the gap the price sits in: Magento gives .price-excluding-tax a
+//  6px top margin that reads as a stray step under the title here.
+.minicart-items .product-item-pricing .price-excluding-tax {
+    margin-block-start: 0;
+}
