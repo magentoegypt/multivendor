@@ -739,7 +739,9 @@
 //  buy button above it.
 .hm-pdp .hm-vendor-card__visit {
     align-items: center;
-    background: var(--hm-surface);
+    //  Transparent, so the card's warm panel reads through the button instead of
+    //  a white slab sitting on it.
+    background: transparent;
     border: 1px solid var(--hm-foreground);
     border-radius: 0;
     color: var(--hm-foreground);
@@ -747,7 +749,10 @@
     font-size: 1.4rem;
     font-weight: 600;
     justify-content: center;
-    min-block-size: 4.4rem;
+    //  2.4rem is the floor, not the rendered height: the padding below takes the
+    //  real target to ~3.3rem, so this still clears the 24x24 pointer-target gate
+    //  the theme holds. It only stops the button growing taller than its content.
+    min-block-size: 2.4rem;
     padding: var(--hm-space-2) var(--hm-space-4);
     text-align: center;
     text-decoration: none;
@@ -809,4 +814,17 @@
     .vendor-profile-container {
         margin-block-start: 0;
     }
+}
+
+//  Breathing room between the breadcrumb row and the gallery.
+.hm-pdp .column.main {
+    margin-block-start: var(--hm-space-6);
+}
+
+//  Warm panel for the seller card, per the shared UI. Literal value rather than
+//  a token: the theme's surface tokens are cool greys (--hm-surface-muted is
+//  #f5f7fa) and this is a warm off-white with no equivalent in the palette.
+//  If it turns out to be wanted in more places it should become a token.
+.hm-pdp .vendor-profile-container {
+    background: #f6f4f1;
 }

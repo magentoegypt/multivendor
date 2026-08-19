@@ -3172,24 +3172,56 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     padding-block-start: var(--hm-space-6);
 
     > .item.title {
+        //  Size to the label. As a stretched flex item the <li> ran 70px around a
+        //  65px anchor, and the anchor itself was far taller than its text — so
+        //  the 2px indicator floated roughly 30px BELOW the word it belonged to,
+        //  reading as a stray rule rather than an underline.
+        align-self: flex-start;
         margin: 0;
         order: 0;
 
         > .switch {
+            align-items: center;
             border: 0;
             border-block-end: 2px solid transparent;
+            //  THE actual cause of the floating indicator. A 44px touch-target
+            //  min-height was landing on a content-box, so padding (12+12) and
+            //  the 2px rule stacked ON TOP of it: 70px of anchor around a 17px
+            //  label, with the underline stranded at the bottom. border-box keeps
+            //  the same 44px target and makes it the whole control.
+            box-sizing: border-box;
             color: var(--hm-foreground-muted);
-            display: block;
+            //  inline-flex + an explicit line-height, so the box is the text plus
+            //  its padding and nothing else. `display: block` left the height to
+            //  inherited line-height and that is where the slack came from.
+            display: inline-flex;
             font-size: 1.4rem;
             font-weight: 600;
+            line-height: 1.2;
             padding: var(--hm-space-3) var(--hm-space-4);
             text-decoration: none;
+            transition: color .15s ease, border-color .15s ease;
+        }
+
+        //  HOVER IS NOT ACTIVE. Both used to paint the same accent underline, so
+        //  pointing at a second tab made the page look like it had two selected
+        //  tabs — which is exactly what the reported screenshot shows. Hover now
+        //  darkens the label and hints with a neutral rule; only the open tab
+        //  gets the accent.
+        > .switch:hover,
+        > .switch:focus-visible {
+            border-block-end-color: var(--hm-border-strong);
+            color: var(--hm-foreground);
         }
 
         &.active > .switch,
-        > .switch:hover {
+        &.active > .switch:hover {
             border-block-end-color: var(--hm-accent);
             color: var(--hm-foreground);
+            //  Magento trims the active tab's bottom padding to 7px to make room
+            //  for a heavier border it no longer has here, which left the open
+            //  tab 5px shorter than its neighbours and the row visibly uneven.
+            padding-block-end: var(--hm-space-3);
         }
     }
 
