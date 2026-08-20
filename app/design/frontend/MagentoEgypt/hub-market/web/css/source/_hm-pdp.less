@@ -969,3 +969,31 @@
         inline-size: 10rem;
     }
 }
+
+//
+//  Buy row stays a ROW
+//  ---------------------------------------------
+//  _hm-figma.less carries `.hm-pdp .product-info-last .box-tocart .actions`
+//  with `flex-direction: column` and `> * { inline-size: 100% }`, written when
+//  this block held stacked full-width buttons. It ties my row rule at (0,4,0)
+//  and wins on import order, so on any page carrying `.product-info-last` the
+//  buy row breaks into three full-width rows — Add to Cart, then the heart, then
+//  share, each on its own line.
+//
+//  Pinned at (0,5,0) so the row survives that rule wherever it applies. The
+//  widths are restated too: direction alone is not enough once the children have
+//  been told to fill the line.
+.hm-pdp .box-tocart .fieldset .actions.hm-buybar {
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    .action.primary.tocart {
+        flex: 1 1 auto;
+        inline-size: auto;
+    }
+
+    .hm-buybar__icon {
+        flex: none;
+        inline-size: 5.2rem;
+    }
+}
