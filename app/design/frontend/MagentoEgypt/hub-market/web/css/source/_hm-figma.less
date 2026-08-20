@@ -3594,8 +3594,13 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     > * { margin-block: 0; }
 
     //  2.4 + 0.8 = 3.2rem at the two section boundaries.
-    .hm-pdp__assurances       { order: 1; margin-block-start: 0.8rem; }
-    .vendor-profile-container { order: 2; margin-block-start: 0.8rem; }
+    //  No extra margin: the info column already spaces its children with a 24px
+    //  row-gap, so an 0.8rem top margin here only stacked ON TOP of it — 32px
+    //  under the buy row where 24 was intended. Changed at source rather than
+    //  overridden in _hm-pdp.less, which ties this at (0,3,0) and loses on import
+    //  order, so the override there was silently dead.
+    .hm-pdp__assurances       { order: 1; margin-block-start: 0; }
+    .vendor-profile-container { order: 2; margin-block-start: 0; }
 }
 
 //  The price block carries its own internal rule already (border-block-end +

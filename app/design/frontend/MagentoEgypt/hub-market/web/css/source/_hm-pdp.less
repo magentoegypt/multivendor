@@ -1052,3 +1052,44 @@
         inline-size: 1.4rem;
     }
 }
+
+//
+//  Close the gap under the buy row
+//  ---------------------------------------------
+//  Measured from the BUY ROW rather than the form (the form's own bottom hides a
+//  trailing 12px, which is why an earlier check reading form-bottom reported the
+//  gap as smaller than it looks): 44px typical, 68px worst across 18 PDPs —
+//  12px of dead form tail plus the 32px divider offset.
+//
+//  The tail goes and the divider offset drops to 16px, so the assurances sit
+//  just under the buttons instead of across a band of white.
+.hm-pdp .product-add-form {
+    margin-block-end: 0;
+    padding-block-end: 0;
+}
+
+.hm-pdp .box-tocart {
+    margin-block-end: 0;
+    padding-block-end: 0;
+
+    .fieldset { margin-block-end: 0; padding-block-end: 0; }
+
+    /*
+     * THE 12px tail. Instant Purchase renders an empty div — it only produces a
+     * button for a signed-in customer with a stored card — but an empty flex
+     * ITEM still earns the fieldset's row-gap, so it pushed the form 12px past
+     * the buttons. Measured: buy row ends 678, the empty div sits at 690, and
+     * the fieldset stretches to meet it.
+     *
+     * `display: contents` rather than `none`: the box stops taking part in
+     * layout, so no gap is earned, but its children still render if it ever does
+     * produce a button. Hiding it outright would remove the feature.
+     */
+    .fieldset > #instant-purchase {
+        display: contents;
+    }
+}
+
+.hm-pdp .product-info-main .hm-pdp__assurances {
+    padding-block-start: var(--hm-space-4);
+}
