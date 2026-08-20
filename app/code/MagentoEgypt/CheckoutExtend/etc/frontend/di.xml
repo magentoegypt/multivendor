@@ -13,4 +13,10 @@
                 type="MagentoEgypt\CheckoutExtend\Plugin\Checkout\CustomerData\ItemComparePrice"
                 sortOrder="10"/>
     </type>
+
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="magentoegypt_remove_billing_address"
+                type="MagentoEgypt\CheckoutExtend\Plugin\Checkout\Block\Checkout\RemoveBillingAddress"
+                sortOrder="10"/>
+    </type>
 </config>

@@ -2735,3 +2735,73 @@ a.sms-login-field-ctrl {
 .hm-page.checkout-index-index .fieldset > .field .control .sms-address-mobile-container input.mobile-number {
     padding-left: 5.6rem;   // 48px of flag, plus 8px
 }
+
+//  ---------------------------------------------------------------------------
+//  PAYMENT METHODS
+//  ---------------------------------------------------------------------------
+//  The reference's payment step is one card of form fields, so there is no list
+//  to copy. What it does establish is that a choice on this checkout looks
+//  selectable — which is what the shipping rates now do, so the methods match
+//  them rather than inventing a third pattern.
+//
+//  Before: three radios stacked with a hairline between them, the selected one
+//  indistinguishable from the others except for the dot itself, and a Place
+//  Order button sitting inside whichever method was open.
+.hm-page.checkout-index-index {
+    .checkout-payment-method .payment-method {
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        margin-block-end: var(--hm-space-3);
+        padding: var(--hm-space-4) var(--hm-space-5);
+        transition: background-color .15s ease, border-color .15s ease;
+
+        &:hover { border-color: var(--hm-border-strong); }
+
+        //  Magento marks the open method `_active`, which is the same thing as
+        //  selected here — one method is open at a time.
+        &._active {
+            background: var(--hm-surface-muted);
+            border-color: var(--hm-accent);
+        }
+    }
+
+    //  The title row is the whole hit area; blank gives it a border and its own
+    //  padding, both of which the card now provides.
+    //
+    //  The radio is a SIBLING of the label here, not inside it, so the row itself
+    //  has to be the flex container — putting the gap on the label alone left the
+    //  radio stacked above the text.
+    .checkout-payment-method .payment-method-title {
+        align-items: center;
+        border: 0;
+        display: flex;
+        gap: var(--hm-space-3);
+        margin: 0;
+        padding: 0;
+
+        label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        input[type="radio"] {
+            accent-color: var(--hm-accent);
+            block-size: 1.8rem;
+            inline-size: 1.8rem;
+            margin: 0;
+        }
+    }
+
+    //  Method instructions, where a method has any. With the billing address
+    //  form gone this is empty for most of them, so it must not reserve space.
+    .checkout-payment-method .payment-method-content {
+        margin: 0;
+        padding: 0;
+
+        &:empty { display: none; }
+
+        > *:not(.actions-toolbar) { margin-block-start: var(--hm-space-3); }
+    }
+}

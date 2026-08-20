@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Account sidebar: drop Compare Products and My Wish List.
+ *
+ * Both are added site-wide to `sidebar.additional` by their own modules'
+ * default.xml, and on the account pages they render as empty dashed boxes under
+ * the account navigation — "You have no items to compare" and "You have no items
+ * in your wish list" — which is chrome telling the customer about nothing.
+ *
+ * Removed on the `customer_account` handle, not in default.xml, so they keep
+ * working anywhere else a sidebar renders them. Wishlist itself is untouched:
+ * the account's own Wish List page and the heart on product cards are separate.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+    </body>
+</page>
