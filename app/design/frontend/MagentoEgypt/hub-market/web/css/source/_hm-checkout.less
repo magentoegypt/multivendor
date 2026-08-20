@@ -2099,3 +2099,47 @@ a.sms-login-field-ctrl {
         margin: 0;
     }
 }
+
+//
+//  Checkout runs at the site's container width
+//  ---------------------------------------------
+//  Magento caps `.page-main` at 1152px on checkout where every other page on this
+//  storefront caps at 1280 — measured 1120 of content against 1248 elsewhere, so
+//  checkout sat visibly narrower than the cart it follows.
+//
+//  Worth noting the reference does the same (its checkout is 1120 inside a 1248
+//  site), so this is a deliberate departure FROM the reference toward internal
+//  consistency: the header, footer and cart around it are all 1248, and a step
+//  that narrows mid-flow reads as a different page rather than the next screen.
+.hm-page.checkout-index-index {
+    .page-main {
+        max-inline-size: 128rem;
+    }
+}
+
+//  Checkout heading + crumb, matching how every other page on the site opens.
+.hm-page.checkout-index-index .hm-checkout__title {
+    margin-block: 0 var(--hm-space-6);
+
+    .page-title {
+        font-family: var(--hm-font-display);
+        font-size: 3.6rem;
+        line-height: 1.15;
+        margin: 0;
+    }
+}
+
+.hm-page.checkout-index-index .hm-checkout__crumbs {
+    color: var(--hm-foreground-muted);
+    display: flex;
+    font-size: 1.3rem;
+    gap: var(--hm-space-2);
+    margin: .6rem 0 0;
+
+    a {
+        color: var(--hm-foreground-muted);
+        text-decoration: none;
+    }
+
+    a:hover { color: var(--hm-accent); text-decoration: underline; }
+}

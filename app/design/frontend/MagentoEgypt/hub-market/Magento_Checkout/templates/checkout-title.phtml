@@ -1,0 +1,31 @@
+<?php
+/**
+ * Hub Market — the "Checkout" heading.
+ *
+ * Magento's checkout renders NO h1: its layout never declares a title block, so
+ * the page opens straight into the step indicator. The reference opens with
+ * "Checkout" over a Cart / Checkout breadcrumb, and every other page on this
+ * storefront names itself.
+ *
+ * A page whose only heading is the step label is also poor for assistive tech —
+ * the document had no h1 at all.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<?php /*
+    NOT `page-title-wrapper`: Magento visually hides that class on checkout
+    (.lib-visually-hidden), which collapsed this to 1px around a 41px heading —
+    present in the DOM, invisible on the page. Own class only.
+*/ ?>
+<div class="hm-checkout__title">
+    <h1 class="page-title">
+        <span class="base"><?= $escaper->escapeHtml(__('Checkout')) ?></span>
+    </h1>
+    <p class="hm-checkout__crumbs">
+        <a href="<?= $escaper->escapeUrl($block->getUrl('checkout/cart')) ?>"><?= $escaper->escapeHtml(__('Cart')) ?></a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page"><?= $escaper->escapeHtml(__('Checkout')) ?></span>
+    </p>
+</div>

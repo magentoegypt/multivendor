@@ -62,5 +62,20 @@
             goes with it, which is correct, since the site header renders its own.
         -->
         <referenceContainer name="checkout.header.container" remove="true"/>
+
+        <!--
+            The page heading. Magento's checkout declares no title block at all,
+            so the document opened with no h1 and the page never named itself —
+            the reference leads with "Checkout" over a Cart / Checkout crumb.
+
+            A plain Template block with a theme template: no new class, so this
+            needs no di:compile.
+        -->
+        <referenceContainer name="main.content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.checkout.title"
+                   before="-"
+                   template="Magento_Checkout::checkout-title.phtml"/>
+        </referenceContainer>
     </body>
 </page>
