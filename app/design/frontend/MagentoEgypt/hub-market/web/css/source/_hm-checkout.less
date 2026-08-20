@@ -2143,3 +2143,97 @@ a.sms-login-field-ctrl {
 
     a:hover { color: var(--hm-accent); text-decoration: underline; }
 }
+
+//
+//  Checkout surfaces — the reference's card layout
+//  ---------------------------------------------
+//  The reference builds checkout from bordered white cards on a tinted page: a
+//  progress card, a form card headed "Shipping Information", and an Order Summary
+//  card. Ours ran flat sections straight on the page background.
+//
+//  Verified against step ONE only. Steps 2 and 3 are display:none for every
+//  visitor because of the stale-observable blocker recorded separately, so their
+//  styling here is written to the same rules but cannot yet be seen to land.
+.hm-page.checkout-index-index {
+    .opc-progress-bar {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        margin-block-end: var(--hm-space-6);
+        padding: var(--hm-space-5) var(--hm-space-6);
+    }
+
+    //  Form column and summary as cards.
+    .opc-wrapper .opc > li.checkout-shipping-address,
+    .opc-wrapper .opc > li#shipping,
+    .opc-wrapper .opc > li#payment,
+    .opc-wrapper .opc > li#checkout-step-review,
+    .opc-sidebar .opc-block-summary {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        padding: var(--hm-space-6);
+    }
+
+    //  Card headings: sentence-scale, with the section rule the reference draws
+    //  under them rather than the display-scale titles Magento ships.
+    .step-title,
+    .opc-block-summary > .title {
+        border-block-end: 1px solid var(--hm-border-subtle);
+        font-family: var(--hm-font-display);
+        font-size: 2rem;
+        font-weight: 700;
+        margin-block-end: var(--hm-space-5);
+        padding-block-end: var(--hm-space-4);
+    }
+
+    //  Inputs: the reference's calm bordered fields, label above.
+    .fieldset > .field > .label {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-block-end: .6rem;
+    }
+
+    .fieldset > .field .control input[type="text"],
+    .fieldset > .field .control input[type="email"],
+    .fieldset > .field .control input[type="tel"],
+    .fieldset > .field .control input[type="number"],
+    .fieldset > .field .control select {
+        border: 1px solid var(--hm-border-strong);
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-4);
+    }
+
+    //  Primary actions full width, as the reference draws them.
+    .actions-toolbar .action.primary,
+    .hm-continue-review__button,
+    .hm-review__place {
+        inline-size: 100%;
+        justify-content: center;
+        min-block-size: 5rem;
+    }
+
+    //  Review step's own summary rows.
+    .hm-review__block { margin-block-end: var(--hm-space-4); }
+
+    .hm-review__label {
+        color: var(--hm-foreground-muted);
+        display: block;
+        font-size: 1.2rem;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .hm-review__value { color: var(--hm-foreground); font-size: 1.4rem; }
+
+    .hm-review__actions {
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-3);
+        margin-block-start: var(--hm-space-5);
+    }
+
+    .hm-review__back {
+        background: transparent;
+        border: 1px solid var(--hm-border-strong);
+        min-block-size: 4.4rem;
+    }
+}
