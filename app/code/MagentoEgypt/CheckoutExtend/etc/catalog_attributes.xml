@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Adds short_description to the attribute set loaded for quote items.
+ * Adds short_description (and description as its fallback) to the attribute set
+ * loaded for quote items.
  *
  * The cart line now carries the reference's two-line product summary, and
  * `$item->getProduct()->getData('short_description')` came back empty for every
@@ -19,5 +20,18 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Catalog/etc/catalog_attributes.xsd">
     <group name="quote_item">
         <attribute name="short_description"/>
+        <!--
+            Only 158 of 2304 products carry a short_description, but 2075 carry
+            a description. Without this fallback nine cart lines in ten render
+            with no summary at all, and the reference's card is built around
+            having one.
+        -->
+        <attribute name="description"/>
+        <!--
+            The cart line strikes through the pre-discount price, which means
+            comparing the item's unit price against the product's own `price`
+            attribute. That attribute is not in the quote_item load either.
+        -->
+        <attribute name="price"/>
     </group>
 </config>

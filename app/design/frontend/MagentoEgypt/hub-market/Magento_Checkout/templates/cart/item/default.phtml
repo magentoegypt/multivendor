@@ -49,9 +49,14 @@ $hmItemId = (string) $_item->getId();
  *
  * Merchant copy here carries hard line breaks and stray markup, and the clamp
  * needs one continuous run of text.
+ *
+ * `description` is the fallback because short_description is the exception on
+ * this catalogue, not the rule: 158 products of 2304 have one, against 2075 with
+ * a description. It is stripped and collapsed the same way and clamped to two
+ * lines in CSS, so a long body copy still renders as the reference's blurb.
  */
 $hmDesc = null;
-foreach (['short_description'] as $hmAttribute) {
+foreach (['short_description', 'description'] as $hmAttribute) {
     $hmRaw = $product ? (string) $product->getData($hmAttribute) : '';
     if ($hmRaw === '') {
         continue;
@@ -60,6 +65,39 @@ foreach (['short_description'] as $hmAttribute) {
     if ($hmCandidate !== '') {
         $hmDesc = $hmCandidate;
         break;
+    }
+}
+
+/*
+ * Struck compare-at price, as the reference draws it beside the current one.
+ * Core's unit-price block renders the price being charged and nothing else, so
+ * the "was" figure is worked out here: the product's own `price` against the
+ * price this line is actually calculated at.
+ *
+ * Both are tax-exclusive, and this store displays tax-exclusive prices
+ * (tax/display/type is unset, so Magento's default of 1), so the two are
+ * directly comparable. If that setting ever changes to include tax, this
+ * comparison has to move to the tax-inclusive pair or the struck figure will
+ * read low against the one beside it.
+ */
+$hmWasPrice = null;
+if ($product) {
+    $hmBase  = (float) $product->getData('price');
+    $hmFinal = (float) $_item->getCalculationPrice();
+
+    if ($hmBase > 0.0 && $hmFinal > 0.0 && $hmBase - $hmFinal > 0.0001) {
+        /*
+         * Formatted off the quote's own store currency rather than a helper —
+         * this block is a DataObject, so an undeclared $block->helper() call
+         * does not fail loudly, it throws "Invalid method" and takes the cart
+         * page with it.
+         */
+        $hmQuote = $_item->getQuote();
+        $hmStore = $hmQuote ? $hmQuote->getStore() : null;
+
+        if ($hmStore) {
+            $hmWasPrice = $hmStore->getCurrentCurrency()->format($hmBase, [], false);
+        }
     }
 }
 ?>
@@ -146,6 +184,11 @@ foreach (['short_description'] as $hmAttribute) {
                 </span>
             <?php else: ?>
                 <?= $block->getUnitPriceHtml($_item) ?>
+                <?php if ($hmWasPrice !== null): ?>
+                    <span class="old-price">
+                        <span class="price"><?= $escaper->escapeHtml($hmWasPrice) ?></span>
+                    </span>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>

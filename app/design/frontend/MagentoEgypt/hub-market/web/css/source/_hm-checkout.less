@@ -2057,40 +2057,77 @@ a.sms-login-field-ctrl {
 //  bin sits level with the title and the total follows the qty immediately
 //  instead of drifting to the bottom of an over-tall column.
 .checkout-cart-index {
+    //  Stretch, not start: the reference aligns the line total with the price,
+    //  and it can only do that if both columns are the row's full height and
+    //  each pushes its last row to the foot. With `start` the body stopped at
+    //  its own content and the price sat 45px above the total.
     .hm-cart-line {
-        align-items: start;
+        align-items: stretch;
         column-gap: var(--hm-space-5);
         display: grid;
         grid-template-columns: auto minmax(0, 1fr) auto;
     }
 
-    .hm-cart-line__media { grid-column: 1; }
-    .hm-cart-line__body  { grid-column: 2; }
-
-    //  The aside becomes a ROW. Stacked, it summed to 136px against a 50px body
-    //  and the line total ended up 86px below the price it should sit level
-    //  with — the reference aligns those two, but only because its body carries
-    //  a description that makes the columns the same height. No product on this
-    //  catalogue has one, so matching the reference's stack here would keep the
-    //  drift. A row aligns quantity, total and the bin on the body's own line.
-    .hm-cart-line__aside {
-        align-items: center;
-        column-gap: var(--hm-space-5);
-        display: flex;
-        flex-direction: row;
-        grid-column: 3;
-        justify-content: flex-end;
+    //  The thumb keeps its own height rather than stretching to the row.
+    .hm-cart-line__media {
+        align-self: start;
+        grid-column: 1;
     }
 
-    //  Quantity, then the line total, then the bin — cheapest to reach last,
-    //  and the destructive control furthest from the stepper it sits beside.
-    .hm-cart-line__aside .field.qty        { order: 1; }
+    .hm-cart-line__body {
+        display: flex;
+        flex-direction: column;
+        grid-column: 2;
+    }
+
+    //  Pushed to the foot of the body column, level with the line total, with
+    //  the struck compare-at sitting beside it on the same baseline.
+    .hm-cart-line__body .hm-cart-line__price {
+        align-items: baseline;
+        column-gap: var(--hm-space-3);
+        display: flex;
+        flex-wrap: wrap;
+        margin-block-start: auto;
+    }
+
+    //  The aside stacks to the trailing edge, as the reference draws it: bin at
+    //  the top level with the title, stepper under it, line total at the foot
+    //  level with the price.
+    //
+    //  This was a ROW for a while. The reason was real — stacked, it summed to
+    //  136px against a body only ~50px tall, so the total ended up 86px below
+    //  the price it should sit level with — but the diagnosis was not: that was
+    //  read as "no product on this catalogue has a description". 158 products of
+    //  2304 have a short_description, and 2075 have a description. The template
+    //  now falls back to the latter, so the body carries the reference's blurb
+    //  on nine lines in ten and the two columns are the same height again.
+    //
+    //  `space-between` still needs a floor for the tenth: without it a line whose
+    //  product has no copy at all collapses the stack back onto itself. The
+    //  media column is 96px, so the row is never shorter than that anyway.
+    .hm-cart-line__aside {
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-3);
+        grid-column: 3;
+        justify-content: space-between;
+        min-block-size: 9.6rem;
+        row-gap: var(--hm-space-3);
+    }
+
+    //  Bin first, then the stepper, then the line total — top to bottom.
+    .hm-cart-line__aside .item-actions     { order: 1; }
+    .hm-cart-line__aside .field.qty        { order: 2; }
     .hm-cart-line__aside .hm-cart-line__total {
         min-inline-size: 8rem;
-        order: 2;
+        order: 3;
         text-align: end;
     }
-    .hm-cart-line__aside .item-actions     { order: 3; }
+
+    //  The reference has no Edit on a cart line; the product page is a click
+    //  away on the title and the thumb.
+    .hm-cart-line__aside .item-actions .action-edit { display: none; }
 
     //  The bin and Edit sat in a 56px block of their own; they only need their
     //  own line height.
