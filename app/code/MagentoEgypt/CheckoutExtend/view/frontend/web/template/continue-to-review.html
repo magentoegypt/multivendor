@@ -1,7 +1,25 @@
 <div class="hm-continue-review">
-    <button type="button"
-            class="action primary checkout hm-continue-review__button"
-            data-bind="click: continueToReview, enable: isReady()">
-        <span data-bind="i18n: 'Continue to Review'"></span>
-    </button>
+    <div class="hm-continue-review__note">
+        <svg class="hm-continue-review__note-icon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span data-bind="i18n: 'Your payment information is encrypted and secure'"></span>
+    </div>
+
+    <div class="hm-continue-review__actions">
+        <button type="button"
+                class="action hm-continue-review__back"
+                data-bind="click: backToShipping">
+            <span data-bind="i18n: 'Back'"></span>
+        </button>
+
+        <button type="button"
+                class="action primary checkout hm-continue-review__button"
+                data-bind="click: continueToReview, enable: isReady()">
+            <span data-bind="i18n: 'Review Order'"></span>
+        </button>
+    </div>
 </div>

@@ -131,7 +131,9 @@ var config = {
                 'Amasty_CheckoutCore/js/view/summary-mixin': false
             },
             'Magento_Checkout/js/view/summary/abstract-total': {
-                'Amasty_CheckoutCore/js/view/summary/abstract-total': false
+                'Amasty_CheckoutCore/js/view/summary/abstract-total': false,
+                //  Keeps the summary totals visible on step one — see the file.
+                'Magento_Checkout/js/summary-total-mixin': true
             },
             'Magento_Checkout/js/view/summary/cart-items': {
                 'Amasty_CheckoutCore/js/view/summary/cart-items-mixin': false

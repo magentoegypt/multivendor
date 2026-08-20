@@ -24,6 +24,17 @@ define([
             return !!quote.paymentMethod();
         }),
 
+        /**
+         * The reference pairs the forward action with a Back. navigateTo() only
+         * moves to a step it considers processed, which shipping always is by
+         * the time this button is on screen.
+         */
+        backToShipping: function () {
+            stepNavigator.navigateTo('shipping');
+
+            return true;
+        },
+
         continueToReview: function () {
             if (!quote.paymentMethod()) {
                 return false;

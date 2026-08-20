@@ -107,6 +107,35 @@
                                                 <item name="template" xsi:type="string">MagentoEgypt_CheckoutExtend/review-step</item>
                                             </item>
                                         </item>
+                                        <!--
+                                            Step one's field list, matched to the
+                                            reference: no Company, and Phone sits
+                                            with the name rather than trailing the
+                                            address. Country keeps its place ahead
+                                            of city/state/ZIP so those three stay
+                                            adjacent for the three-up grid row.
+                                        -->
+                                        <item name="shipping-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="shippingAddress" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="shipping-address-fieldset" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="company" xsi:type="array">
+                                                                    <item name="visible" xsi:type="boolean">false</item>
+                                                                </item>
+                                                                <item name="telephone" xsi:type="array">
+                                                                    <item name="sortOrder" xsi:type="string">50</item>
+                                                                </item>
+                                                                <item name="country_id" xsi:type="array">
+                                                                    <item name="sortOrder" xsi:type="string">75</item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
                                         <item name="billing-step" xsi:type="array">
                                             <item name="children" xsi:type="array">
                                                 <item name="payment" xsi:type="array">

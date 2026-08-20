@@ -2237,3 +2237,283 @@ a.sms-login-field-ctrl {
         min-block-size: 4.4rem;
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  Reference parity pass, measured against the Figma build's three steps
+//  (captured at 1440 as ref-checkout / ref-co-step2 / ref-co-step3).
+//
+//  Colour note: the reference draws its forward action blue and Place Order
+//  green. This store's primary stays orange — the standing instruction on this
+//  build is to take the reference's LAYOUT, not its brand colour. Only the lock
+//  icon and the completed-step tick borrow the reference's green.
+//  ---------------------------------------------------------------------------
+.hm-page.checkout-index-index {
+
+    //  Every panel is rounded in the reference; ours were square.
+    .opc-progress-bar,
+    .opc-wrapper .opc > li#shipping,
+    .opc-wrapper .opc > li#payment,
+    .opc-wrapper .opc > li#checkout-step-review,
+    .opc-sidebar .opc-block-summary {
+        border-radius: var(--hm-radius);
+    }
+
+    //  Progress bar. The reference sets each label BESIDE its dot with a rule
+    //  between items; Magento stacks the label under the dot and runs a single
+    //  line behind the whole row. Both of Magento's pseudo-elements are
+    //  repurposed rather than fought: the backing line becomes the connector.
+    .opc-progress-bar {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+    }
+
+    .opc-progress-bar-item {
+        align-items: center;
+        display: flex;
+        margin: 0;
+        text-align: start;
+        width: auto;
+
+        //  `order` only works here because the item is now a flex container;
+        //  this moves Magento's line out from behind the dot to after the label.
+        &:before {
+            background: var(--hm-border-strong);
+            content: '';
+            height: 2px;
+            inset: auto;
+            margin-inline: var(--hm-space-4);
+            order: 2;
+            position: static;
+            width: 9rem;
+        }
+
+        &:last-child:before { display: none; }
+
+        > span {
+            align-items: center;
+            display: flex;
+            min-block-size: 4rem;
+            padding: 0;
+            padding-inline-start: 4.6rem;   // logical, so Arabic mirrors it
+            position: relative;
+            width: auto;
+
+            &:before {
+                height: 3.4rem;
+                inset-block-start: 50%;
+                inset-inline-start: 0;
+                margin: 0;
+                transform: translateY(-50%);
+                width: 3.4rem;
+            }
+
+            //  Centred by matching the disc's own box rather than by a
+            //  horizontal translate: a translate that reads correctly in
+            //  English pushes the glyph off the disc once Arabic flips the
+            //  inline axis.
+            &:after {
+                block-size: 3.4rem;
+                inline-size: 3.4rem;
+                inset-block-start: 50%;
+                inset-inline-start: 0;
+                line-height: 3.4rem;
+                margin: 0;
+                text-align: center;
+                transform: translateY(-50%);
+            }
+        }
+
+        //  Each state's disc and glyph are set outright rather than inherited.
+        //  Blank leaves the active step's `content` computing to "" here, which
+        //  rendered an empty ring where the reference shows a numbered dot.
+        > span:before {
+            background: var(--hm-surface-muted);
+            border: 1px solid var(--hm-border-subtle);
+        }
+
+        //  The glyph's own pseudo also paints a 26px WHITE disc on top of the
+        //  disc above, which is what made every dot read as a hollow ring. The
+        //  reference fills the dot, so the inner disc goes and the number sits
+        //  straight on the colour.
+        > span:after {
+            background: transparent;
+            color: var(--hm-foreground-muted);
+            content: counter(i);
+            font-family: inherit;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        &._active {
+            > span:before {
+                background: var(--hm-accent);
+                border-color: var(--hm-accent);
+            }
+
+            > span:after {
+                color: #fff;
+                content: counter(i);
+                font-family: inherit;
+            }
+        }
+
+        //  Done: green disc, white tick, and the rule onward from it filled in.
+        &._complete {
+            &:before { background: var(--hm-success); }
+
+            > span:before {
+                background: var(--hm-success);
+                border-color: var(--hm-success);
+            }
+
+            //  A plain Unicode tick, not an icon-font glyph — this theme has
+            //  had blank icon fonts before and a missing tick reads as an empty
+            //  dot with no other cue.
+            > span:after {
+                color: #fff;
+                content: ~"'\2713'";
+                font-family: inherit;
+            }
+        }
+    }
+
+    //  The reference has no Sign In inside the progress card — the site header
+    //  already carries Login. Only the toggle goes; the authentication modal
+    //  stays reachable from the guest email field's own sign-in link.
+    .authentication-wrapper .action-auth-toggle { display: none; }
+
+    //  Nor does it repeat Ship To / Shipping Method under the summary. Ours
+    //  rendered them outside the card with no panel around them.
+    .opc-sidebar .opc-block-shipping-information { display: none; }
+
+    //  Order Summary: the reference lists the cart ABOVE the totals and never
+    //  collapses it. Magento appends it below and ships it shut.
+    .opc-block-summary {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .opc-block-summary > .title { order: 0; }
+    .opc-block-summary .items-in-cart { order: 1; }
+    .opc-block-summary > *:not(.title):not(.items-in-cart) { order: 2; }
+
+    .opc-block-summary .items-in-cart > .title { display: none; }
+
+    //  The collapsible writes display:none inline, so this needs the weight.
+    .opc-block-summary .items-in-cart [data-role="content"] { display: block !important; }
+
+    //  Each payment method renders its own Place Order. With ordering moved to
+    //  step three those buttons would put a live place-order in the middle of
+    //  the method list. Hidden, not removed — the review step still calls the
+    //  selected renderer's placeOrder() directly.
+    #payment .payment-method-content > .actions-toolbar { display: none; }
+
+    //  Step two's reassurance strip.
+    .hm-continue-review__note {
+        align-items: center;
+        background: var(--hm-surface-muted);
+        border-radius: var(--hm-radius-sm);
+        color: var(--hm-foreground-muted);
+        display: flex;
+        font-size: 1.3rem;
+        gap: var(--hm-space-2);
+        margin-block-end: var(--hm-space-5);
+        padding: var(--hm-space-3) var(--hm-space-4);
+    }
+
+    .hm-continue-review__note-icon { color: var(--hm-success); flex: 0 0 auto; }
+
+    //  Back beside the forward action, as the reference pairs them.
+    .hm-continue-review__actions,
+    .hm-review__actions {
+        display: flex;
+        flex-direction: row;
+        gap: var(--hm-space-4);
+    }
+
+    .hm-continue-review__back,
+    .hm-review__back {
+        background: transparent;
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius-sm);
+        flex: 0 0 36%;
+        min-block-size: 5rem;
+    }
+
+    .hm-continue-review__button,
+    .hm-review__place {
+        flex: 1 1 auto;
+        inline-size: auto;
+    }
+
+    .hm-review__place-icon { margin-inline-end: .8rem; }
+
+    //  Review step sections.
+    .hm-review__block { margin-block-end: var(--hm-space-5); }
+
+    .hm-review__heading {
+        font-family: var(--hm-font-display);
+        font-size: 1.7rem;
+        font-weight: 700;
+        margin: 0 0 var(--hm-space-2);
+    }
+
+    .hm-review__value--muted { color: var(--hm-foreground-muted); }
+
+    .hm-review__items {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .hm-review__item {
+        align-items: center;
+        border-block-start: 1px solid var(--hm-border-subtle);
+        display: flex;
+        gap: var(--hm-space-4);
+        padding-block: var(--hm-space-4);
+
+        &:first-child { border-block-start: 0; }
+    }
+
+    .hm-review__item-image {
+        block-size: 6.4rem;
+        border-radius: var(--hm-radius-sm);
+        inline-size: 6.4rem;
+        object-fit: cover;
+    }
+
+    .hm-review__item-text {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        gap: .2rem;
+    }
+
+    .hm-review__item-name { font-weight: 600; }
+
+    .hm-review__item-qty {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+
+    .hm-review__item-price {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+}
+
+//  Step headings carry a small icon in the reference.
+.hm-page.checkout-index-index {
+    .step-title.hm-step-title {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-3);
+    }
+
+    .hm-step-title__icon {
+        color: var(--hm-accent);
+        flex: 0 0 auto;
+    }
+}

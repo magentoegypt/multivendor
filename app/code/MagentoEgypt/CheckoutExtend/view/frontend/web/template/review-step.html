@@ -1,47 +1,81 @@
 <li id="checkout-step-review"
     class="checkout-review-step"
     data-bind="visible: hmIsVisible">
-    <div class="step-title" data-bind="i18n: 'Review'" data-role="title"></div>
+    <div class="step-title hm-step-title" data-role="title">
+        <svg class="hm-step-title__icon" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M9 11l3 3 8-8"/>
+            <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>
+        </svg>
+        <span data-bind="i18n: 'Review Your Order'"></span>
+    </div>
 
     <div id="checkout-step-review-content" class="step-content" data-role="content">
         <div class="hm-review">
             <!-- ko if: getShippingAddress() -->
             <div class="hm-review__block">
-                <span class="hm-review__label" data-bind="i18n: 'Ship to'"></span>
-                <div class="hm-review__value" data-bind="text: getShippingAddress().street ? getShippingAddress().street.join(', ') : ''"></div>
-                <div class="hm-review__value">
-                    <span data-bind="text: getShippingAddress().city"></span>,
-                    <span data-bind="text: getShippingAddress().postcode"></span>
-                </div>
-            </div>
-            <!-- /ko -->
-
-            <!-- ko if: getShippingMethodTitle() -->
-            <div class="hm-review__block">
-                <span class="hm-review__label" data-bind="i18n: 'Delivery'"></span>
-                <div class="hm-review__value" data-bind="text: getShippingMethodTitle()"></div>
+                <h3 class="hm-review__heading" data-bind="i18n: 'Shipping Address'"></h3>
+                <div class="hm-review__value" data-bind="text: getRecipient()"></div>
+                <div class="hm-review__value" data-bind="text: getStreet()"></div>
+                <div class="hm-review__value" data-bind="text: getCityLine()"></div>
+                <!-- ko if: getEmail() -->
+                <div class="hm-review__value" data-bind="text: getEmail()"></div>
+                <!-- /ko -->
+                <!-- ko if: getShippingMethodTitle() -->
+                <div class="hm-review__value hm-review__value--muted"
+                     data-bind="text: getShippingMethodTitle()"></div>
+                <!-- /ko -->
             </div>
             <!-- /ko -->
 
             <!-- ko if: getPaymentMethodTitle() -->
             <div class="hm-review__block">
-                <span class="hm-review__label" data-bind="i18n: 'Paying with'"></span>
+                <h3 class="hm-review__heading" data-bind="i18n: 'Payment Method'"></h3>
                 <div class="hm-review__value" data-bind="text: getPaymentMethodTitle()"></div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: getItems().length -->
+            <div class="hm-review__block">
+                <h3 class="hm-review__heading" data-bind="i18n: 'Order Items'"></h3>
+                <ol class="hm-review__items">
+                    <!-- ko foreach: getItems() -->
+                    <li class="hm-review__item">
+                        <!-- ko if: src -->
+                        <img class="hm-review__item-image" data-bind="attr: {src: src, alt: name}"/>
+                        <!-- /ko -->
+                        <div class="hm-review__item-text">
+                            <span class="hm-review__item-name" data-bind="text: name"></span>
+                            <span class="hm-review__item-qty">
+                                <span data-bind="i18n: 'Qty'"></span>: <span data-bind="text: qty"></span>
+                            </span>
+                        </div>
+                        <span class="hm-review__item-price" data-bind="text: price"></span>
+                    </li>
+                    <!-- /ko -->
+                </ol>
             </div>
             <!-- /ko -->
         </div>
 
         <div class="hm-review__actions">
             <button type="button"
-                    class="action primary checkout hm-review__place"
-                    data-bind="click: placeOrder, enable: canPlaceOrder()">
-                <span data-bind="i18n: 'Place Order'"></span>
+                    class="action hm-review__back"
+                    data-bind="click: backToPayment">
+                <span data-bind="i18n: 'Back'"></span>
             </button>
 
             <button type="button"
-                    class="action hm-review__back"
-                    data-bind="click: backToPayment">
-                <span data-bind="i18n: 'Back to payment'"></span>
+                    class="action primary checkout hm-review__place"
+                    data-bind="click: placeOrder, enable: canPlaceOrder()">
+                <svg class="hm-review__place-icon" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                     stroke-linejoin="round" aria-hidden="true" focusable="false">
+                    <rect x="3" y="11" width="18" height="11" rx="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                <span data-bind="i18n: 'Place Order'"></span>
             </button>
         </div>
     </div>

@@ -1,0 +1,103 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
+    <!--
+        Hub Market: the reference names this step "Shipping Information" and
+        sets a small truck beside it. The only reason this whole template is
+        overridden is that one line — the string is hard-coded here, and
+        retranslating "Shipping Address" globally would also rename it in the
+        account address book. Everything below is core, unchanged; re-copy it
+        from vendor/magento/module-checkout on upgrade.
+    -->
+    <div class="step-title hm-step-title" data-role="title">
+        <svg class="hm-step-title__icon" width="20" height="20" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true" focusable="false">
+            <path d="M1 3h13v13H1z"/>
+            <path d="M14 8h4l3 3v5h-7z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="17.5" cy="18.5" r="2.5"/>
+        </svg>
+        <span translate="'Shipping Information'"></span>
+    </div>
+    <div id="checkout-step-shipping"
+         class="step-content"
+         data-role="content">
+
+        <each if="!quoteIsVirtual" args="getRegion('customer-email')" render="" ></each>
+        <each args="getRegion('address-list')" render="" ></each>
+        <each args="getRegion('address-list-additional-addresses')" render="" ></each>
+
+        <!-- Address form pop up -->
+        <if args="!isFormInline">
+            <div class="new-address-popup">
+                <button type="button"
+                        class="action action-show-popup"
+                        click="showFormPopUp"
+                        visible="!isNewAddressAdded()">
+                    <span translate="'New Address'"></span>
+                </button>
+            </div>
+            <div id="opc-new-shipping-address"
+                 visible="isFormPopUpVisible()"
+                 render="shippingFormTemplate"></div>
+        </if>
+
+        <each args="getRegion('before-form')" render="" ></each>
+
+        <!-- Inline address form -->
+        <render if="isFormInline" args="shippingFormTemplate"></render>
+    </div>
+</li>
+
+<!--Shipping method template-->
+<li id="opc-shipping_method"
+    class="checkout-shipping-method"
+    data-bind="fadeVisible: visible(), blockLoader: isLoading"
+    role="presentation">
+    <div class="checkout-shipping-method">
+        <div class="step-title"
+             translate="'Shipping Methods'"
+             data-role="title"></div>
+
+        <each args="getRegion('before-shipping-method-form')" render="" ></each>
+
+        <div id="checkout-step-shipping_method"
+             class="step-content"
+             data-role="content"
+             role="tabpanel"
+             aria-hidden="false">
+            <form id="co-shipping-method-form"
+                  class="form methods-shipping"
+                  if="rates().length"
+                  submit="setShippingInformation"
+                  novalidate="novalidate">
+
+                <render args="shippingMethodListTemplate"></render>
+
+                <div id="onepage-checkout-shipping-method-additional-load">
+                    <each args="getRegion('shippingAdditional')" render="" ></each>
+                </div>
+                <div role="alert"
+                     if="errorValidationMessage().length"
+                     class="message notice">
+                    <span text="errorValidationMessage()"></span>
+                </div>
+                <div class="actions-toolbar" id="shipping-method-buttons-container">
+                    <div class="primary">
+                        <button data-role="opc-continue" type="submit" class="button action continue primary">
+                            <span translate="'Next'"></span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="no-quotes-block"
+                 ifnot="rates().length > 0"
+                 translate="'Sorry, no quotes are available for this order at this time'"></div>
+        </div>
+    </div>
+</li>

@@ -25,8 +25,9 @@ define([
     'Magento_Checkout/js/model/step-navigator',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/full-screen-loader',
+    'Magento_Catalog/js/price-utils',
     'mage/translate'
-], function (ko, Component, _, registry, stepNavigator, quote, fullScreenLoader, $t) {
+], function (ko, Component, _, registry, stepNavigator, quote, fullScreenLoader, priceUtils, $t) {
     'use strict';
 
     return Component.extend({
@@ -78,6 +79,85 @@ define([
         /** Shipping address, for the review summary. */
         getShippingAddress: function () {
             return quote.shippingAddress();
+        },
+
+        /** Recipient name, from the shipping address. */
+        getRecipient: function () {
+            var a = quote.shippingAddress();
+
+            if (!a) {
+                return '';
+            }
+
+            return [a.firstname, a.lastname].filter(Boolean).join(' ');
+        },
+
+        /** Street, which Magento models as an array of lines. */
+        getStreet: function () {
+            var a = quote.shippingAddress();
+
+            if (!a || !a.street) {
+                return '';
+            }
+
+            return _.filter(a.street, function (line) {
+                return line;
+            }).join(', ');
+        },
+
+        /** "City, Region Postcode" on one line, skipping whatever is missing. */
+        getCityLine: function () {
+            var a = quote.shippingAddress(),
+                tail;
+
+            if (!a) {
+                return '';
+            }
+
+            tail = [a.region, a.postcode].filter(Boolean).join(' ');
+
+            return [a.city, tail].filter(Boolean).join(', ');
+        },
+
+        /**
+         * Guest checkout keeps the address off the quote object, so fall back
+         * through the places Magento actually puts an email.
+         */
+        getEmail: function () {
+            var a = quote.shippingAddress(),
+                config = window.checkoutConfig || {};
+
+            return quote.guestEmail
+                || (a && a.email)
+                || (config.customerData && config.customerData.email)
+                || '';
+        },
+
+        /**
+         * Cart lines for the review list. Names and totals come from
+         * quoteItemData; thumbnails live in a separate imageData map keyed by
+         * item id, which is the same pairing the order summary uses.
+         */
+        getItems: function () {
+            var config = window.checkoutConfig || {},
+                images = config.imageData || {},
+                format = quote.getPriceFormat ? quote.getPriceFormat() : undefined;
+
+            return _.map(config.quoteItemData || [], function (item) {
+                var image = images[item['item_id']] || {},
+                    total = item['row_total_incl_tax'];
+
+                if (total === undefined || total === null) {
+                    total = item['row_total'];
+                }
+
+                return {
+                    name: item.name,
+                    qty: item.qty,
+                    price: priceUtils.formatPrice(total, format),
+                    src: image.src || null
+                };
+            });
         },
 
         /** Chosen shipping method, or null while none is set. */
