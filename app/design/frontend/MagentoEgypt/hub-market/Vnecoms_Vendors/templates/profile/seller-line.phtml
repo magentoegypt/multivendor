@@ -89,7 +89,7 @@ $hmApproved = $hmVendor && (int) $hmVendor->getStatus() === 2;
     <?php if ($hmApproved): ?>
         <span class="hm-pdp__seller-check"
               title="<?= $escaper->escapeHtmlAttr(__('Approved seller')) ?>">
-            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-check"/></svg>
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-vendor-verified"/></svg>
             <span class="hm-sr-only"><?= $escaper->escapeHtml(__('Approved seller')) ?></span>
         </span>
     <?php endif; ?>

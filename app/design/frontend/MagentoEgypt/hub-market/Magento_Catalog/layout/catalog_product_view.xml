@@ -59,7 +59,18 @@
         <referenceContainer name="product.info.main">
             <block class="Vnecoms\Vendors\Block\Profile\Title"
                    name="hm.pdp.seller"
-                   template="Vnecoms_Vendors::profile/seller-line.phtml"/>
+                   template="Vnecoms_Vendors::profile/seller-line.phtml">
+                <!--
+                    Without this child the seller credit rendered as a SPAN, not a
+                    link. getVendorUrl() does not build a URL — it returns
+                    getData('vendor_url'), and this block's _prepareLayout() is
+                    what sets it on the parent. Same wiring Vnecoms uses for its
+                    own title and logo blocks, and the same omission that left the
+                    "Visit Store" button silent earlier in this branch.
+                -->
+                <block class="Vnecoms\VendorsPage\Block\Catalog\Product\Profile"
+                       name="hm.pdp.seller.link"/>
+            </block>
         </referenceContainer>
         <move element="hm.pdp.seller" destination="product.info.main" before="page.main.title"/>
 
