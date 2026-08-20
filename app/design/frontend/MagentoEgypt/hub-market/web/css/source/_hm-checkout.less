@@ -2206,6 +2206,10 @@ a.sms-login-field-ctrl {
     //  Form column and summary as cards.
     .opc-wrapper .opc > li.checkout-shipping-address,
     .opc-wrapper .opc > li#shipping,
+    //  Core renders shipping METHODS as a second <li>, sibling to the address
+    //  one. It was never in this list, so the heading and the rates sat loose on
+    //  the tinted page with no panel under them at all.
+    .opc-wrapper .opc > li#opc-shipping_method,
     .opc-wrapper .opc > li#payment,
     .opc-wrapper .opc > li#checkout-step-review,
     .opc-sidebar .opc-block-summary {
@@ -2292,11 +2296,16 @@ a.sms-login-field-ctrl {
 
     //  Every panel is rounded in the reference; ours were square.
     .opc-wrapper .opc > li#shipping,
+    .opc-wrapper .opc > li#opc-shipping_method,
     .opc-wrapper .opc > li#payment,
     .opc-wrapper .opc > li#checkout-step-review,
     .opc-sidebar .opc-block-summary {
         border-radius: var(--hm-radius);
     }
+
+    //  Address and methods are two panels in one step, so they need the gap the
+    //  card language uses between panels rather than butting together.
+    .opc-wrapper .opc > li#shipping { margin-block-end: var(--hm-space-6); }
 
     //  STEP BAR — measured against the reference at 1440, element by element.
     //
@@ -2563,5 +2572,141 @@ a.sms-login-field-ctrl {
     .hm-step-title__icon {
         color: var(--hm-accent);
         flex: 0 0 auto;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  SHIPPING METHODS
+//  ---------------------------------------------------------------------------
+//  The reference's step one has no carrier selector at all — it shows shipping
+//  as FREE in the summary and goes straight to payment — so there is no frame to
+//  copy. The standard is the card language the rest of this checkout now uses.
+//
+//  What was there: Magento's four-column rate table, so a single flat rate read
+//  as a radio at the far left, then a price, then "Fixed", then "Flat Rate",
+//  strung across 800px with nothing tying them together and no indication the
+//  row was clickable — which it is, the <tr> carries selectShippingMethod.
+//
+//  Now each rate is a bordered row that looks selectable and shows its selected
+//  state: carrier as the title, method beneath it, price to the trailing edge.
+.hm-page.checkout-index-index {
+    //  Two IDs deliberately: Amasty caps this table at 600px inside a 746 column
+    //  with `#opc-shipping_method #checkout-shipping-method-load
+    //  .table-checkout-shipping-method`, and one ID does not outrank two however
+    //  many classes are stacked in front of it.
+    #opc-shipping_method #checkout-shipping-method-load .table-checkout-shipping-method {
+        display: block;
+        inline-size: 100%;
+        max-inline-size: none;
+        width: 100%;
+
+        //  "Select Method / Price / Method Title / Carrier Title" — column
+        //  headings for a layout that is no longer a table.
+        thead { display: none; }
+
+        tbody {
+            display: flex;
+            flex-direction: column;
+            gap: var(--hm-space-3);
+        }
+
+        tbody tr.row {
+            align-items: center;
+            //  `row` is also blank's grid-row helper, which hangs -15px off both
+            //  sides of anything carrying the class. The rate rows carry it by
+            //  coincidence, and it pulled them out past the card's padding.
+            margin-inline: 0;
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius);
+            column-gap: var(--hm-space-4);
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            padding: var(--hm-space-4) var(--hm-space-5);
+            row-gap: .2rem;
+            transition: background-color .15s ease, border-color .15s ease;
+
+            &:hover { border-color: var(--hm-border-strong); }
+
+            //  The row already commits the choice on click; this is what says so
+            //  before you click, and which one is holding after you have.
+            &:has(input:checked) {
+                background: var(--hm-surface-muted);
+                border-color: var(--hm-accent);
+            }
+        }
+
+        //  The cells stop being cells.
+        tbody td {
+            border: 0;
+            padding: 0;
+        }
+
+        //  Two of the four cells share the class `col-method` — the radio and
+        //  the method title — so placement goes by position, not by class.
+        tbody td:nth-child(1) {          // radio
+            align-self: center;
+            grid-area: 1 / 1 / 3 / 2;
+        }
+
+        //  The inner .price span has to be named too — colouring only the cell
+        //  leaves that span's own rule in charge, the same way it did in the
+        //  minicart. The accent is spent on the selected state, not the figure.
+        tbody td:nth-child(2),
+        tbody td:nth-child(2) .price {          // price
+            align-self: center;
+            color: var(--hm-foreground);
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+            grid-area: 1 / 3 / 3 / 4;
+            justify-self: end;
+            text-align: end;
+        }
+
+        tbody td:nth-child(3) {          // method title, e.g. "Fixed"
+            color: var(--hm-foreground-muted);
+            font-size: 1.3rem;
+            grid-area: 2 / 2;
+        }
+
+        tbody td:nth-child(4) {          // carrier title, e.g. "Flat Rate"
+            font-weight: 600;
+            grid-area: 1 / 2;
+        }
+
+        //  A carrier that cannot quote renders one full-width cell instead of
+        //  four; without this it would be placed into the radio's track.
+        tbody td.col-error {
+            color: var(--hm-danger);
+            grid-area: 1 / 1 / 3 / -1;
+        }
+
+        input[type="radio"] {
+            accent-color: var(--hm-accent);
+            block-size: 1.8rem;
+            inline-size: 1.8rem;
+            margin: 0;
+        }
+    }
+
+    //  The continue button was 100% of a 77px parent: blank floats
+    //  `.actions-toolbar > .primary` and leaves it shrink-wrapped, so the width
+    //  has to be taken off the wrapper, not the button.
+    //  Blank indents checkout form actions by 25.8% to clear the label column
+    //  its form layout used to have — 192px of it here, which pushed the button
+    //  clean out of the card. That column is long gone; the indent is not.
+    #shipping-method-buttons-container {
+        display: block;
+        inline-size: 100%;
+        margin-block-start: var(--hm-space-6);
+        margin-inline: 0;
+        text-align: start;
+
+        > .primary {
+            display: block;
+            float: none;
+            inline-size: 100%;
+            margin: 0;
+        }
     }
 }
