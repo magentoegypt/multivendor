@@ -2710,3 +2710,28 @@ a.sms-login-field-ctrl {
         }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  PHONE FIELD — room for the country flag
+//  ---------------------------------------------------------------------------
+//  intl-tel-input positions the flag absolutely over the first 48px of the field
+//  and clears it with a left padding of its own. This theme's checkout input rule
+//  sets `padding-inline: 16px` on every field on the page and overwrote that, so
+//  the number was typed underneath the flag — the placeholder read as
+//  "|00 123 4567" with the flag sitting on its first character.
+//
+//  Weighted past that rule deliberately. It is (0,6,1)
+//  — `.hm-page.checkout-index-index .fieldset > .field .control input[type=...]`
+//  — and it is emitted later in this file, so anything lighter loses however it
+//  is ordered. This is (0,7,1).
+//
+//  PHYSICAL padding, and that is not an oversight. Everywhere else in this theme
+//  the rule is logical properties so Arabic mirrors for free — but the thing
+//  being cleared here is itself positioned physically: intl-tel-input pins the
+//  flag to `left: 0` in both directions, verified in the Arabic checkout, where
+//  it sits at the left of a right-aligned field. A logical padding-inline-start
+//  therefore opens the gap on the wrong side in Arabic — 56px of empty space on the right
+//  and the flag still hard against the text on the left.
+.hm-page.checkout-index-index .fieldset > .field .control .sms-address-mobile-container input.mobile-number {
+    padding-left: 5.6rem;   // 48px of flag, plus 8px
+}
