@@ -99,6 +99,19 @@
                    after="checkout.cart.summary.continue"/>
         </referenceContainer>
 
+        <!--
+            "Check Out with Multiple Addresses" removed from the cart. It sat
+            directly under Proceed to Checkout as a second, competing call to
+            action, and the reference has no such flow.
+
+            This hides the entry point, not the feature: Magento_Multishipping is
+            still enabled and /multishipping/checkout/ still answers. To retire it
+            properly, set multishipping/options/checkout_multiple to 0 in admin
+            (Stores > Configuration > Sales > Multishipping Settings) — that also
+            closes the route and drops it from the account area.
+        -->
+        <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
+
         <move element="checkout.cart.shipping" destination="cart.summary" after="checkout.cart.summary.trust"/>
         <move element="checkout.cart.coupon"   destination="cart.summary" after="checkout.cart.shipping"/>
     </body>

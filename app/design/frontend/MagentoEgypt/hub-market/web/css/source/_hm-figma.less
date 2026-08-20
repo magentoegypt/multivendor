@@ -4084,48 +4084,113 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  stay above the 24x24 pointer-target floor this theme holds itself to, so the
 //  compaction costs no reachability. Anything tighter would start trading away
 //  that gate, which is where this stops.
+//  UPDATE: re-laid to the cart page card's arrangement — name with the remove
+//  control level beside it, then price and stepper sharing the row beneath.
+//  Previously the name spanned both tracks and the price and remove shared row
+//  two, which left the price column 198px wide: enough for the old bare number
+//  field, not enough for a stepper, which wrapped to a line of its own.
 .minicart-items .product-item-details {
-    align-items: end;
+    align-items: center;
     column-gap: var(--hm-space-3);
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     padding-block: .8rem;
+    row-gap: var(--hm-space-2);
 
-    //  Title spans both tracks — it must keep the full width to wrap into.
     .product-item-name {
-        grid-column: 1 / -1;
+        grid-area: 1 / 1;
         margin-block: 0;
-    }
-
-    .product-item-pricing {
-        grid-column: 1;
         min-inline-size: 0;
     }
 
-    //  Was a full-width row below the qty; now the second track on the same row.
+    //  Level with the name, as the remove control is on the cart card.
     .product.actions {
-        grid-column: 2;
+        grid-area: 1 / 2;
         margin: 0;
         min-block-size: 2.4rem;
     }
+
+    //  Full width, so price and stepper fit side by side.
+    .product-item-pricing {
+        align-items: center;
+        column-gap: var(--hm-space-3);
+        display: flex;
+        flex-wrap: wrap;
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: space-between;
+        min-inline-size: 0;
+        row-gap: var(--hm-space-2);
+    }
 }
 
-.minicart-items .details-qty {
-    align-items: center;
+//  Charged price in the text colour with the compare-at struck beside it, as on
+//  the cart card. The inner `.price` span has to be named too — colouring only
+//  the wrapper leaves that span's own rule in charge.
+.minicart-items .price-container {
+    align-items: baseline;
     column-gap: var(--hm-space-2);
     display: flex;
-    margin-block-start: .6rem;
+    flex-wrap: wrap;
+}
 
-    .label {
-        margin-block: 0;
-    }
+.minicart-items .price-wrapper,
+.minicart-items .price-wrapper .price {
+    color: var(--hm-foreground);
+    font-weight: 700;
+}
+
+.minicart-items .old-price .price {
+    color: var(--hm-price-was);
+    font-size: 1.3rem;
+    font-weight: 400;
+    text-decoration: line-through;
+}
+
+//  The bare number field becomes the cart page's stepper. Buttons at 3.6rem
+//  rather than the cart's 4.4: this is a 390px drawer and the row has to hold a
+//  price beside it. Still well clear of the 24x24 pointer-target floor this
+//  block set out to hold.
+.minicart-items .details-qty {
+    align-items: stretch;
+    border: 1px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius);
+    display: inline-flex;
+    margin-block-start: 0;
+    overflow: hidden;
+
+    label { display: flex; margin: 0; }
+    .label { .hm-visually-hidden(); }
 
     .item-qty {
-        block-size: 3.2rem;
-        inline-size: 5.6rem;
-        padding-block: .4rem;
+        block-size: auto;
+        border: 0;
+        font-weight: 600;
+        inline-size: 3.2rem;
+        min-block-size: 3.6rem;
+        padding: 0;
         text-align: center;
     }
+
+    .hm-qty__btn {
+        align-items: center;
+        background: var(--hm-surface);
+        border: 0;
+        color: var(--hm-foreground);
+        cursor: pointer;
+        display: inline-flex;
+        justify-content: center;
+        min-block-size: 3.6rem;
+        min-inline-size: 3.6rem;
+        padding: 0;
+
+        &:hover { background: var(--hm-surface-muted); color: var(--hm-accent-strong); }
+    }
+
+    //  The stepper commits on its own debounce, so core's per-item Update button
+    //  is never needed. `!important` because sidebar.js reveals it with .show(),
+    //  which writes an inline display.
+    .update-cart-item { display: none !important; }
 }
 
 //  Tighten the gap the price sits in: Magento gives .price-excluding-tax a

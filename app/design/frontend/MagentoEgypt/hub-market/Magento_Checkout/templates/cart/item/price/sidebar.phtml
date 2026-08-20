@@ -1,0 +1,38 @@
+<?php
+/**
+ * Hub Market — sidebar unit price, with the struck compare-at the cart card shows.
+ *
+ * Core renders the price being charged and nothing else. This adds the "was"
+ * figure beside it on the same rule as the cart line: the product's own `price`
+ * against the price this line is calculated at. Both are tax-exclusive, and this
+ * store displays tax-exclusive prices — if that setting changes, this comparison
+ * has to move to the tax-inclusive pair.
+ *
+ * `price` reaches the quote item through MagentoEgypt_CheckoutExtend's
+ * catalog_attributes.xml; quote items otherwise load a restricted set.
+ *
+ * Rendered in the minicart AND in the checkout Order Summary, so both pick this up.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+/** @var $block \Magento\Checkout\Block\Item\Price\Renderer */
+?>
+<?php
+$_item    = $block->getItem();
+$hmHelper = $this->helper(Magento\Checkout\Helper\Data::class);
+$hmFinal  = (float) $_item->getCalculationPrice();
+$hmProduct = $_item->getProduct();
+$hmBase   = $hmProduct ? (float) $hmProduct->getData('price') : 0.0;
+$hmWas    = ($hmBase > 0.0 && $hmFinal > 0.0 && $hmBase - $hmFinal > 0.0001) ? $hmBase : null;
+?>
+<div class="price-container">
+    <span class="price-label"><?= $block->escapeHtml(__('Price')) ?></span>
+    <span class="price-wrapper">
+        <?= $block->escapeHtml($hmHelper->formatPrice($hmFinal), ['span']) ?>
+    </span>
+    <?php if ($hmWas !== null): ?>
+        <?php /* formatPrice already returns <span class="price">…</span>. */ ?>
+        <span class="old-price"><?= $block->escapeHtml($hmHelper->formatPrice($hmWas), ['span']) ?></span>
+    <?php endif; ?>
+</div>

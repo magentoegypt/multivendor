@@ -1,0 +1,22 @@
+<!--
+/**
+ * Hub Market — minicart unit price, with the struck compare-at beside it.
+ *
+ * The parent binds this as `data: item.product_price, as: 'price'`, so `price`
+ * is the charged figure's HTML and NOT the line. The line stays reachable as
+ * `item`, the alias the item loop above sets — `$parent` here is the region's
+ * uiComponent, which is what made an earlier attempt render nothing at all.
+ *
+ * `typeof` guard because a Knockout binding that names a variable no context
+ * defines throws rather than reading as falsey.
+ *
+ * product_price_old already arrives as <span class="price">…</span> from
+ * Checkout\Helper\Data::formatPrice, so it is not wrapped again here.
+ */
+-->
+<div class="price-container">
+    <span class="price-wrapper" data-bind="html: price"></span>
+    <!-- ko if: typeof item !== 'undefined' && item.product_price_old -->
+    <span class="old-price" data-bind="html: item.product_price_old"></span>
+    <!-- /ko -->
+</div>

@@ -8,7 +8,12 @@
 /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
 ?>
 
-<div data-block="minicart" class="minicart-wrapper">
+<?php /*
+    hmMinicartQty is delegated from this wrapper rather than from the dropdown:
+    Knockout re-renders the item list on every quantity update, so a handler
+    bound inside it would be bound to a dead node the moment it succeeded.
+*/ ?>
+<div data-block="minicart" class="minicart-wrapper" data-mage-init='{"hmMinicartQty": {}}'>
     <a class="action showcart" href="<?= $block->escapeUrl($block->getShoppingCartUrl()) ?>"
        data-bind="scope: 'minicart_content'">
         <?php

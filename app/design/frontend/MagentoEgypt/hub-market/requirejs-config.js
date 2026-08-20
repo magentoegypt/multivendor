@@ -11,6 +11,7 @@ var config = {
     map: {
         '*': {
             hmCartQty: 'js/hm-cart-qty',
+            hmMinicartQty: 'js/hm-minicart-qty',
 
             /*
              * Same Amasty timing bug as the mixins below, but via `map`: their
