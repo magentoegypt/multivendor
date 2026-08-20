@@ -1,0 +1,68 @@
+<?php
+/**
+ * Hub Market — the stat tiles under the seller's name.
+ *
+ * The reference shows four: Products Listed, Average Rating, Positive Reviews,
+ * Response Time.
+ *
+ * Only the ones this install can answer honestly are rendered. Products and
+ * rating come from real catalogue and review data; "member since" is the
+ * seller's own join date. "Positive Reviews %" and "Response Time" are NOT
+ * shown: nothing on this install measures either, and a marketplace stat is
+ * exactly the kind of number a shopper takes at face value — a plausible 98% /
+ * 24h would be an invented promise about a real seller.
+ *
+ * A tile whose value is unknown is omitted rather than shown empty, so a seller
+ * with no reviews gets three tiles instead of a blank one.
+ *
+ * @var \Vnecoms\Vendors\Block\Profile\Title $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmVendor = $block->getVendor();
+if (!$hmVendor) {
+    return;
+}
+
+/** @var \MagentoEgypt\HomeSections\ViewModel\VendorNames|null $hmVendors */
+$hmVendors = $block->getData('vendor_names');
+if (!$hmVendors) {
+    return;
+}
+
+$hmStats = $hmVendors->getStats($hmVendor->getId());
+$hmTiles = [];
+
+if ((int) $hmStats['products'] > 0) {
+    $hmTiles[] = ['value' => (string) (int) $hmStats['products'], 'label' => __('Products listed')];
+}
+if ($hmStats['stars'] !== null) {
+    $hmTiles[] = ['value' => number_format((float) $hmStats['stars'], 1), 'label' => __('Average rating')];
+    //  Singular when there is one. __() has no plural form, so the choice is
+    //  made here rather than shipping "1 customer reviews".
+    $hmReviews = (int) $hmStats['reviews'];
+    $hmTiles[] = [
+        'value' => (string) $hmReviews,
+        'label' => $hmReviews === 1 ? __('Customer review') : __('Customer reviews'),
+    ];
+}
+
+$hmJoined = $hmVendor->getCreatedAt();
+if ($hmJoined) {
+    $hmTiles[] = [
+        'value' => $block->formatDate($hmJoined, \IntlDateFormatter::MEDIUM),
+        'label' => __('Selling since'),
+    ];
+}
+
+if (!$hmTiles) {
+    return;
+}
+?>
+<ul class="hm-vendor-stats">
+    <?php foreach ($hmTiles as $hmTile): ?>
+        <li class="hm-vendor-stats__tile">
+            <span class="hm-vendor-stats__value"><?= $escaper->escapeHtml($hmTile['value']) ?></span>
+            <span class="hm-vendor-stats__label"><?= $escaper->escapeHtml($hmTile['label']) ?></span>
+        </li>
+    <?php endforeach; ?>
+</ul>

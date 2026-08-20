@@ -37,5 +37,28 @@
                 <argument name="heading_tag" xsi:type="string">h1</argument>
             </arguments>
         </referenceBlock>
+
+        <!--
+            Stat tiles under the seller's name, as the reference shows.
+
+            Reuses Vnecoms' own Profile\Title class rather than introducing one:
+            a new class needs a di:compile before layout may reference it, and
+            until then Magento drops the block with nothing in the log. Both this
+            class and the VendorNames ViewModel are already compiled.
+
+            Added to the TOP profile container, which is where the profile renders
+            now that `vendors/vendorspage/profile_position` is `top` — the
+            reference puts the seller across the head of the page, not in a rail.
+        -->
+        <referenceContainer name="vendor.profile.top.description.container">
+            <block class="Vnecoms\Vendors\Block\Profile\Title"
+                   name="hm.vendor.stats"
+                   after="-"
+                   template="Vnecoms_Vendors::profile/vendor-stats.phtml">
+                <arguments>
+                    <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
     </body>
 </page>

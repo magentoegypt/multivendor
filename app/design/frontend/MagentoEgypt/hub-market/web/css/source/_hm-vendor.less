@@ -543,3 +543,125 @@
         input { inline-size: 100%; }
     }
 }
+
+//
+//  Seller hero — the reference's head-of-page profile
+//  ---------------------------------------------
+//  `vendors/vendorspage/profile_position` is now `top`, so Vnecoms renders the
+//  profile across the head of the page instead of in the left rail. That is the
+//  reference's shape; the config already existed, so no blocks were moved.
+//
+//  What it shipped as: the store name at display scale wrapping onto two lines,
+//  the logo stranded UNDER it, and the approved tick floating on its own row.
+//  Laid out here as a proper identity row — logo, then name, tick, meta.
+.hm-page.vendor-page {
+    .vendor-profile-wrapper {
+        margin-block-end: var(--hm-space-6);
+    }
+
+    .vendor-profile-container.vendor-profile-top {
+        align-items: center;
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        column-gap: var(--hm-space-5);
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        padding: var(--hm-space-6);
+        row-gap: var(--hm-space-4);
+
+        //  Vnecoms ships Bootstrap-era column classes on these; the grid owns the
+        //  tracks now, so their percentages have to go.
+        .vendor-profile-logo,
+        .vendor-profile-description {
+            float: none;
+            inline-size: auto;
+            margin: 0;
+            max-inline-size: 100%;
+            min-inline-size: 0;
+            padding: 0;
+        }
+
+        .vendor-profile-logo {
+            grid-column: 1;
+
+            img {
+                block-size: 9.6rem;
+                border-radius: var(--hm-radius);
+                display: block;
+                inline-size: 9.6rem;
+                object-fit: cover;
+            }
+        }
+
+        .vendor-profile-description { grid-column: 2; }
+    }
+
+    //  Store name: a page heading, not a display banner. It was rendering at
+    //  full display scale and wrapping "mega store" onto two lines.
+    .vendor-profile-top .vendor-title {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        font-family: var(--hm-font-display);
+        font-size: 2.8rem;
+        gap: var(--hm-space-2);
+        line-height: 1.2;
+        margin: 0 0 var(--hm-space-2);
+
+        a { color: var(--hm-foreground); text-decoration: none; }
+        a:hover { color: var(--hm-accent); }
+    }
+
+    //  Location / phone / sales / joined — one wrapping row of small facts,
+    //  not four stacked paragraphs.
+    .vendor-profile-top .vendor-info {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        column-gap: var(--hm-space-5);
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 1.3rem;
+        margin: 0;
+        row-gap: var(--hm-space-1);
+    }
+}
+
+//
+//  Stat tiles
+//  ---------------------------------------------
+//  Only tiles the data can answer are rendered — see vendor-stats.phtml for why
+//  "positive reviews %" and "response time" are deliberately absent.
+.hm-page.vendor-page .hm-vendor-stats {
+    display: grid;
+    gap: var(--hm-space-3);
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    list-style: none;
+    margin: var(--hm-space-5) 0 0;
+    padding: 0;
+}
+
+.hm-page.vendor-page .hm-vendor-stats__tile {
+    background: var(--hm-surface-muted);
+    border: 1px solid var(--hm-border-subtle);
+    padding: var(--hm-space-4);
+    text-align: center;
+}
+
+.hm-page.vendor-page .hm-vendor-stats__value {
+    color: var(--hm-foreground);
+    display: block;
+    font-family: var(--hm-font-display);
+    font-size: 2.4rem;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hm-page.vendor-page .hm-vendor-stats__label {
+    color: var(--hm-foreground-muted);
+    display: block;
+    font-size: 1.2rem;
+    letter-spacing: .04em;
+    margin-block-start: .4rem;
+    text-transform: uppercase;
+}
