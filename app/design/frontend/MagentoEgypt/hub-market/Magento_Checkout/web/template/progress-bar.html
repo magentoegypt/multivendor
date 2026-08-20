@@ -1,0 +1,19 @@
+<!--
+/**
+ * Hub Market — checkout step bar.
+ *
+ * The only change from core is the wrapper. The reference draws a full-width
+ * card with the steps centred in a 672px band inside it, and the <ul> cannot be
+ * both: it would need padding and a max-width at the same time. So the card is
+ * the wrapper and the list is the band.
+ */
+-->
+<div class="hm-steps">
+    <ul class="opc-progress-bar">
+        <!-- ko foreach: { data: steps().sort(sortItems), as: 'item' } -->
+            <li class="opc-progress-bar-item" data-bind="css: item.isVisible() ? '_active' : ($parent.isProcessed(item) ? '_complete' : '')">
+                <span data-bind="i18n: item.title, click: $parent.navigateTo"></span>
+            </li>
+        <!-- /ko -->
+    </ul>
+</div>

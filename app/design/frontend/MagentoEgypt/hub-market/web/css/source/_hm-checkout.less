@@ -2192,11 +2192,15 @@ a.sms-login-field-ctrl {
 //  visitor because of the stale-observable blocker recorded separately, so their
 //  styling here is written to the same rules but cannot yet be seen to land.
 .hm-page.checkout-index-index {
-    .opc-progress-bar {
+    //  The card is the wrapper; the list inside it is the 672px band. Measured
+    //  off the reference: 24px padding, 12px radius, 1px rgba(0,0,0,.09),
+    //  32px beneath.
+    .hm-steps {
         background: var(--hm-surface);
-        border: 1px solid var(--hm-border-subtle);
-        margin-block-end: var(--hm-space-6);
-        padding: var(--hm-space-5) var(--hm-space-6);
+        border: 1px solid rgba(0, 0, 0, .09);
+        border-radius: var(--hm-radius);
+        margin-block-end: var(--hm-space-8);
+        padding: var(--hm-space-6);
     }
 
     //  Form column and summary as cards.
@@ -2287,7 +2291,6 @@ a.sms-login-field-ctrl {
 .hm-page.checkout-index-index {
 
     //  Every panel is rounded in the reference; ours were square.
-    .opc-progress-bar,
     .opc-wrapper .opc > li#shipping,
     .opc-wrapper .opc > li#payment,
     .opc-wrapper .opc > li#checkout-step-review,
@@ -2295,122 +2298,130 @@ a.sms-login-field-ctrl {
         border-radius: var(--hm-radius);
     }
 
-    //  Progress bar. The reference sets each label BESIDE its dot with a rule
-    //  between items; Magento stacks the label under the dot and runs a single
-    //  line behind the whole row. Both of Magento's pseudo-elements are
-    //  repurposed rather than fought: the backing line becomes the connector.
+    //  STEP BAR — measured against the reference at 1440, element by element.
+    //
+    //    card      1120 wide, 24px padding, 12px radius, 1px rgba(0,0,0,.09)
+    //    band      672px, centred
+    //    step      circle + 12px gap + label, auto width
+    //    circle    40x40, round, 16px numeral
+    //    label     16px / 500 / #1a1a2e in every state
+    //    connector 2px, 118px, 16px clear each side
+    //
+    //  COLOUR: this is the one place the reference's own palette is copied
+    //  rather than translated to the brand — blue for the step in hand, green
+    //  for the ones behind it. Asked for explicitly, as an exact copy. The
+    //  buttons stay orange. Held as custom properties so switching the bar back
+    //  to brand colour is a three-line edit.
     .opc-progress-bar {
+        --hm-step-upcoming: #e5e7eb;
+        --hm-step-upcoming-ink: #4b5563;
+        --hm-step-active: #2563eb;
+        --hm-step-done: #16a34a;
+        --hm-step-label: #1a1a2e;
+
         align-items: center;
         display: flex;
-        justify-content: center;
+        margin: 0 auto;
+        max-inline-size: 67.2rem;
     }
 
     .opc-progress-bar-item {
         align-items: center;
         display: flex;
+        //  Grows so the two connectors share the leftover equally, which is what
+        //  puts both at 118px; the last step has nothing trailing it to grow for.
+        flex: 1 1 auto;
         margin: 0;
         text-align: start;
         width: auto;
 
-        //  `order` only works here because the item is now a flex container;
-        //  this moves Magento's line out from behind the dot to after the label.
+        &:last-child { flex: 0 0 auto; }
+
+        //  Magento's full-width backing line becomes the connector, moved out
+        //  from behind the dot to after the label. `order` works because the
+        //  item is itself a flex container now.
         &:before {
-            background: var(--hm-border-strong);
+            background: var(--hm-step-upcoming);
+            block-size: 2px;
             content: '';
-            height: 2px;
+            flex: 1 1 auto;
             inset: auto;
             margin-inline: var(--hm-space-4);
             order: 2;
             position: static;
-            width: 9rem;
+            width: auto;
         }
 
         &:last-child:before { display: none; }
 
         > span {
             align-items: center;
+            color: var(--hm-step-label);
             display: flex;
+            font-size: 1.6rem;
+            font-weight: 500;
             min-block-size: 4rem;
             padding: 0;
-            padding-inline-start: 4.6rem;   // logical, so Arabic mirrors it
+            //  40px circle + the reference's 12px gap.
+            padding-inline-start: 5.2rem;
             position: relative;
+            white-space: nowrap;
             width: auto;
-
-            &:before {
-                height: 3.4rem;
-                inset-block-start: 50%;
-                inset-inline-start: 0;
-                margin: 0;
-                transform: translateY(-50%);
-                width: 3.4rem;
-            }
-
-            //  Centred by matching the disc's own box rather than by a
-            //  horizontal translate: a translate that reads correctly in
-            //  English pushes the glyph off the disc once Arabic flips the
-            //  inline axis.
-            &:after {
-                block-size: 3.4rem;
-                inline-size: 3.4rem;
-                inset-block-start: 50%;
-                inset-inline-start: 0;
-                line-height: 3.4rem;
-                margin: 0;
-                text-align: center;
-                transform: translateY(-50%);
-            }
         }
 
-        //  Each state's disc and glyph are set outright rather than inherited.
-        //  Blank leaves the active step's `content` computing to "" here, which
-        //  rendered an empty ring where the reference shows a numbered dot.
+        //  The disc.
         > span:before {
-            background: var(--hm-surface-muted);
-            border: 1px solid var(--hm-border-subtle);
+            background: var(--hm-step-upcoming);
+            block-size: 4rem;
+            border: 0;
+            inline-size: 4rem;
+            inset-block-start: 50%;
+            inset-inline-start: 0;
+            margin: 0;
+            transform: translateY(-50%);
         }
 
-        //  The glyph's own pseudo also paints a 26px WHITE disc on top of the
-        //  disc above, which is what made every dot read as a hollow ring. The
-        //  reference fills the dot, so the inner disc goes and the number sits
-        //  straight on the colour.
+        //  The numeral. Centred by matching the disc's own box rather than by a
+        //  horizontal translate, which would push it off the disc once Arabic
+        //  flips the inline axis. Magento's glyph pseudo also paints a white
+        //  disc on top of the coloured one — that is what made every dot read as
+        //  a hollow ring, so it is cleared here.
         > span:after {
             background: transparent;
-            color: var(--hm-foreground-muted);
+            block-size: 4rem;
+            color: var(--hm-step-upcoming-ink);
             content: counter(i);
             font-family: inherit;
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.6rem;
+            font-weight: 500;
+            inline-size: 4rem;
+            inset-block-start: 50%;
+            inset-inline-start: 0;
+            line-height: 4rem;
+            margin: 0;
+            text-align: center;
+            transform: translateY(-50%);
         }
 
         &._active {
-            > span:before {
-                background: var(--hm-accent);
-                border-color: var(--hm-accent);
-            }
-
-            > span:after {
-                color: #fff;
-                content: counter(i);
-                font-family: inherit;
-            }
+            > span:before { background: var(--hm-step-active); }
+            > span:after  { color: #fff; content: counter(i); font-family: inherit; }
         }
 
-        //  Done: green disc, white tick, and the rule onward from it filled in.
+        //  Done: green disc, white tick, and the run onward from it filled in.
         &._complete {
-            &:before { background: var(--hm-success); }
+            &:before { background: var(--hm-step-active); }
 
-            > span:before {
-                background: var(--hm-success);
-                border-color: var(--hm-success);
-            }
+            > span:before { background: var(--hm-step-done); }
 
-            //  A plain Unicode tick, not an icon-font glyph — this theme has
-            //  had blank icon fonts before and a missing tick reads as an empty
-            //  dot with no other cue.
+            //  A plain Unicode tick, not an icon-font glyph — this theme has had
+            //  blank icon fonts before, and a missing tick reads as an empty dot
+            //  with no other cue.
             > span:after {
                 color: #fff;
                 content: ~"'\2713'";
                 font-family: inherit;
+                font-size: 1.8rem;
             }
         }
     }

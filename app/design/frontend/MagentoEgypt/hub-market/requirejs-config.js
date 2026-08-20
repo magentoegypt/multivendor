@@ -123,7 +123,9 @@ var config = {
             },
             'Magento_Checkout/js/view/shipping': {
                 'Amasty_Checkout/js/view/shipping-mixin': false,
-                'Amasty_CheckoutCore/js/view/shipping-mixin': false
+                'Amasty_CheckoutCore/js/view/shipping-mixin': false,
+                //  Renames the first step to "Shipping Info" — see the file.
+                'Magento_Checkout/js/step-title-mixin': true
             },
             'Magento_Checkout/js/view/shipping-address/address-renderer/default': {
                 'Amasty_CheckoutCore/js/view/shipping-address/address-renderer/default-mixin': false
