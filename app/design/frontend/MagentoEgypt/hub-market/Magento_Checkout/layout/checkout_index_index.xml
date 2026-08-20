@@ -77,5 +77,60 @@
                    before="-"
                    template="Magento_Checkout::checkout-title.phtml"/>
         </referenceContainer>
+
+        <!--
+            THIRD CHECKOUT STEP.
+
+            Magento ships two: shipping, then a billing step carrying payment
+            selection AND place-order together. The reference splits that into
+            Shipping Info / Payment / Review, so a Review step is registered after
+            payment and a "Continue to Review" button is added to the payment
+            step's own afterMethods region.
+
+            The payment RENDERERS are untouched. Each method owns its place-order
+            handler — and one of the three here is a card gateway that may own
+            redirect behaviour — so the review step calls the selected renderer's
+            existing placeOrder() rather than reimplementing it.
+        -->
+        <referenceBlock name="checkout.root">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="checkout" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="steps" xsi:type="array">
+                                    <item name="children" xsi:type="array">
+                                        <item name="review-step" xsi:type="array">
+                                            <item name="component" xsi:type="string">MagentoEgypt_CheckoutExtend/js/view/review-step</item>
+                                            <item name="sortOrder" xsi:type="string">3</item>
+                                            <item name="config" xsi:type="array">
+                                                <item name="template" xsi:type="string">MagentoEgypt_CheckoutExtend/review-step</item>
+                                            </item>
+                                        </item>
+                                        <item name="billing-step" xsi:type="array">
+                                            <item name="children" xsi:type="array">
+                                                <item name="payment" xsi:type="array">
+                                                    <item name="children" xsi:type="array">
+                                                        <item name="hm-continue-to-review" xsi:type="array">
+                                                            <item name="component" xsi:type="string">MagentoEgypt_CheckoutExtend/js/view/continue-to-review</item>
+                                                            <item name="displayArea" xsi:type="string">afterMethods</item>
+                                                            <item name="sortOrder" xsi:type="string">100</item>
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="template" xsi:type="string">MagentoEgypt_CheckoutExtend/continue-to-review</item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+
     </body>
 </page>

@@ -1,0 +1,48 @@
+<li id="checkout-step-review"
+    class="checkout-review-step"
+    data-bind="visible: hmIsVisible">
+    <div class="step-title" data-bind="i18n: 'Review'" data-role="title"></div>
+
+    <div id="checkout-step-review-content" class="step-content" data-role="content">
+        <div class="hm-review">
+            <!-- ko if: getShippingAddress() -->
+            <div class="hm-review__block">
+                <span class="hm-review__label" data-bind="i18n: 'Ship to'"></span>
+                <div class="hm-review__value" data-bind="text: getShippingAddress().street ? getShippingAddress().street.join(', ') : ''"></div>
+                <div class="hm-review__value">
+                    <span data-bind="text: getShippingAddress().city"></span>,
+                    <span data-bind="text: getShippingAddress().postcode"></span>
+                </div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: getShippingMethodTitle() -->
+            <div class="hm-review__block">
+                <span class="hm-review__label" data-bind="i18n: 'Delivery'"></span>
+                <div class="hm-review__value" data-bind="text: getShippingMethodTitle()"></div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: getPaymentMethodTitle() -->
+            <div class="hm-review__block">
+                <span class="hm-review__label" data-bind="i18n: 'Paying with'"></span>
+                <div class="hm-review__value" data-bind="text: getPaymentMethodTitle()"></div>
+            </div>
+            <!-- /ko -->
+        </div>
+
+        <div class="hm-review__actions">
+            <button type="button"
+                    class="action primary checkout hm-review__place"
+                    data-bind="click: placeOrder, enable: canPlaceOrder()">
+                <span data-bind="i18n: 'Place Order'"></span>
+            </button>
+
+            <button type="button"
+                    class="action hm-review__back"
+                    data-bind="click: backToPayment">
+                <span data-bind="i18n: 'Back to payment'"></span>
+            </button>
+        </div>
+    </div>
+</li>
