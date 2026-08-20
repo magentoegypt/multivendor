@@ -734,12 +734,22 @@
     }
 }
 
-//  The reference lifts the identity card onto the bottom of the cover. Only when
-//  a cover is actually present — `:has()` keeps a bannerless vendor from pulling
-//  its card up into the navigation.
-.hm-page.vendor-page .vendor-home-banner:has(img) + * .vendor-profile-wrapper,
-.hm-page.vendor-page .vendor-home-banner:has(img) ~ * .vendor-profile-wrapper {
+//  The reference lifts the identity card onto the bottom of the cover.
+//
+//  `.vendor-home-banner` and `.vendor-profile-wrapper` are DIRECT SIBLINGS in
+//  `.page-wrapper` — an earlier attempt here treated the card as a descendant of
+//  the banner's sibling and so never matched anything.
+//
+//  `:has(img)` guards it: a seller with no cover has a 0-height banner, and
+//  lifting the card 6rem there would drag it up into the navigation.
+.hm-page.vendor-page .vendor-home-banner:has(img) + .vendor-profile-wrapper {
     margin-block-start: -6rem;
     position: relative;
     z-index: 1;
+
+    //  It now sits ON an image, so it needs to read as a raised surface rather
+    //  than a bordered box floating over a photograph.
+    .vendor-profile-container.vendor-profile-top {
+        box-shadow: 0 .4rem 1.6rem rgba(15, 33, 68, .12);
+    }
 }
