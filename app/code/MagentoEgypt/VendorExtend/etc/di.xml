@@ -54,4 +54,13 @@
             </argument>
         </arguments>
     </type>
+    <!--
+        Vendor shop pages listed no products: Vnecoms' Home\ListProduct builds the
+        grid from the catalog LAYER, which has no vendor filter, while its own
+        vendor-filtered collection is used only to count for the "Items (n)" tab.
+        The subclass replaces just that one method and keeps the tab and the
+        toolbar count.
+    -->
+    <preference for="Vnecoms\VendorsPage\Block\Home\ListProduct"
+                type="MagentoEgypt\VendorExtend\Block\VendorsPage\Home\ListProduct"/>
 </config>
