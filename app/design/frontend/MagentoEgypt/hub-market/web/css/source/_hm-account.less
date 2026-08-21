@@ -541,7 +541,16 @@
     .sidebar-main {
         padding-left: 0;
         padding-right: 0;
-        padding-inline-end: var(--hm-space-8);
+
+        //  The gutter is a COLUMN gutter, and below 768px there are no columns —
+        //  blank stacks these two full width. Applied at every width it left
+        //  32px of trailing padding on a full-bleed rail, so on a phone the
+        //  Shopping Stats card drew 32px narrower than every card above it and
+        //  sat visibly out of line with them. blank's own `padding-right: 2%`
+        //  is desktop-only for exactly this reason; this now matches.
+        @media (min-width: 768px) {
+            padding-inline-end: var(--hm-space-8);
+        }
     }
 
     .column.main {
@@ -1384,6 +1393,17 @@
     }
 }
 
+//  `<fieldset class="fieldset additional_info">` is Magento's hook for other
+//  modules to inject extra account fields. Nothing injects any on this store, so
+//  it renders with NO children whatsoever — invisible until this file started
+//  carding every fieldset, at which point it became an empty 50px panel sitting
+//  between the form and Save.
+//
+//  `:not(:has(*))` rather than `:empty`: the tag still contains whitespace text
+//  nodes, and `:empty` counts those, so it would never match. This also covers
+//  any other container a module leaves behind rather than naming one class.
+.account .column.main .fieldset:not(:has(*)) { display: none; }
+
 .account .column.main .field {
     margin-block-end: var(--hm-space-4);
 
@@ -1491,5 +1511,67 @@
         clear: both;
         content: '';
         display: block;
+    }
+}
+
+//
+//  Legacy account tables on a phone
+//  ---------------------------------------------
+//  blank's responsive table pattern restacks every cell as a block and relies on
+//  `content: attr(data-th)` to label each one. The Vnecoms RMA and quotation
+//  grids emit no `data-th` at all, so on a 390px screen My Returns restacked
+//  into six unlabelled values in a column — Refund / March 5, 2025 /
+//  #000000012 / #000000038 / Resolved / View — with nothing to say which number
+//  was the RMA and which the order, and an empty grey strip where the header
+//  row used to be.
+//
+//  Keyed on the ABSENCE of the attribute rather than on those two modules, so
+//  any table that does label its cells keeps the stacked treatment and only the
+//  ones that cannot be stacked legibly fall back to scrolling with their header
+//  intact.
+@media (max-width: 767px) {
+    .hm-page.account .column.main .table-wrapper:has(table:not(:has(td[data-th]))) {
+        overflow-x: auto;
+    }
+
+    //  Written with the same child-combinator shape blank uses, because the
+    //  rules being undone are
+    //
+    //      .table-wrapper .table:not(.cart):not(.totals):not(.table-comparison)
+    //          > tbody > tr td   { display: block }   (0,5,3)
+    //          > thead > tr > th { display: none  }   (0,5,3)
+    //
+    //  and a flat `td { display: table-cell }` here also came to (0,5,3) — a tie,
+    //  which blank won on source order. Naming tbody/tr/td takes the type count
+    //  to five and settles it without an `!important`. First attempt restored the
+    //  rows and left every cell still stacked.
+    .hm-page.account .column.main table:not(:has(td[data-th])) {
+        display: table;
+        min-inline-size: 100%;
+
+        > thead { display: table-header-group; }
+        > tbody { display: table-row-group; }
+        > tfoot { display: table-row-group; }
+
+        > thead > tr,
+        > tbody > tr,
+        > tfoot > tr { display: table-row; }
+
+        //  blank's stacked pattern also sets `padding: 6px 0` — no horizontal
+        //  padding, because stacked blocks do not need any. Back in columns that
+        //  left the cells butting straight into each other: "March 5, 2025, 7:33
+        //  pm#000000012#000000038" with no gap to show where one value ended.
+        //  `vertical-align` because the Type cell holds a status pill and is
+        //  taller than the plain text beside it.
+        > thead > tr > th,
+        > thead > tr > td,
+        > tbody > tr > th,
+        > tbody > tr > td,
+        > tfoot > tr > td {
+            display: table-cell;
+            padding: var(--hm-space-2) var(--hm-space-3);
+            vertical-align: middle;
+            white-space: nowrap;
+        }
     }
 }
