@@ -202,8 +202,11 @@
     .banner-widget {
         margin-block-end: var(--hm-space-6);
 
+        //  No radius: this is a full-bleed band running edge to edge, not a
+        //  card, so rounded corners left four notches of page ground against
+        //  the header.
         img {
-            border-radius: var(--hm-radius);
+            border-radius: 0;
             display: block;
             inline-size: 100%;
             object-fit: cover;
@@ -795,6 +798,10 @@
 //  `:has(img)` guards it: a seller with no cover has a 0-height banner, and
 //  lifting the card 6rem there would drag it up into the navigation.
 .hm-page.vendor-page .vendor-home-banner:has(img) + .vendor-profile-wrapper {
+    //  Transparent: the wrapper is only a positioning box. Painting it white
+    //  drew a slab across the full width under the card, which is what put a
+    //  white step against the banner beside the logo.
+    background: transparent;
     margin-block-start: -6rem;
     position: relative;
     z-index: 1;
@@ -1038,4 +1045,12 @@
 body .block-search-by-vendor input[type="text"] {
     block-size: 4rem;
     min-block-size: 4rem;
+}
+
+//  The microsite sits on the tinted ground the cart, checkout and account pages
+//  use — #F5F7FA, which is `--hm-surface-muted`. The panels on it (seller card,
+//  stat tiles, product cards, pinned tab bar) are all white, so they read as
+//  surfaces rather than as page.
+.vendor-page .page-wrapper {
+    background: var(--hm-surface-muted);
 }
