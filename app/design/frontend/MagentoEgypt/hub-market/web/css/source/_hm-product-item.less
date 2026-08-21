@@ -213,3 +213,63 @@
 .block.widget {
     margin-block-end: var(--hm-space-12);
 }
+
+//
+//  Two empty boxes on configurable cards
+//  ---------------------------------------------
+//  Measured on a vendor grid of six: cards with swatches were painting two
+//  bordered rectangles with nothing in them.
+//
+//  1. `input.swatch-input.super-attribute-select` is Magento's hidden carrier for
+//     the chosen option — it is not meant to be seen. This theme's form styling
+//     puts a 1px border and a 4.4rem min-height on inputs, which turned it into a
+//     301x44 empty box across the card. Taken out of the paint, NOT out of the
+//     DOM: the swatch JS reads and writes its value.
+.product-item input.swatch-input,
+.product-item .swatch-input.super-attribute-select {
+    block-size: 0;
+    border: 0;
+    inline-size: 0;
+    margin: 0;
+    min-block-size: 0;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+}
+
+//  2. Vnecoms Quotation's "Add to Quote" renders on the card as a 34px bordered
+//     square whose only content is a 1x1 visually-hidden span — an empty box
+//     beside the cart button, with nothing to say what it does.
+//
+//     Hidden here rather than given an icon because the markup belongs to that
+//     module, and the action is not lost: the product page carries a properly
+//     labelled "Request a Quote". The reference has no such control on its cards
+//     either.
+//     Weighted to match the rule it has to beat: this file already styles
+//     `.product-item .actions-secondary > a.action` at (0,3,1), which is where
+//     the flex box and the border come from. A bare
+//     `.product-item .category-link-addtoquote` is (0,2,0) and lost — it
+//     deployed and changed nothing.
+.product-item .actions-secondary > a.action.category-link-addtoquote { display: none; }
+
+//
+//  Swatch row on the card — 66px for one line of 36px chips
+//  ---------------------------------------------
+//  Magento stacks margins on both wrappers: 8px top and bottom on
+//  `.swatch-attribute`, another 12px on `.swatch-attribute-options` inside it,
+//  and 6px under every chip. A single row of 36px chips came to 66px.
+//
+//  That is not just this card's problem — the grid equalises row height, so one
+//  configurable product inflated every plain card in the row and opened a void
+//  between its title and its price.
+//
+//  Chips keep their 36px, which is above the 24x24 pointer-target floor.
+.product-item {
+    .swatch-attribute { margin-block: 0; }
+    .swatch-attribute-options { margin-block: 0; }
+
+    .swatch-option {
+        margin-block: 0;
+        margin-inline: 0 var(--hm-space-2);   // logical, so Arabic mirrors
+    }
+}
