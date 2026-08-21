@@ -1,0 +1,116 @@
+<?php
+/**
+ * Hub Market — order history as cards, following the reference's account screen.
+ *
+ * Core renders a five-column table (Order # / Date / Total / Status / Action).
+ * The reference draws one card per order: a header carrying the same four facts
+ * with the status as a pill, and the actions along the foot.
+ *
+ * WHAT IS THE SAME AS CORE, DELIBERATELY
+ * --------------------------------------
+ * Every hook is kept: `getChildHtml('info')`, the `extra.column.header` /
+ * `extra.container` child blocks other modules inject columns through, the pager,
+ * and the empty-orders message. The actions keep core's own URLs and the
+ * PostHelper payload on Reorder — that carries the form key, and a hand-rolled
+ * link would post without one.
+ *
+ * WHAT THE REFERENCE HAS THAT THIS DOES NOT
+ * -----------------------------------------
+ * Per-item rows inside each card (thumbnail, name, seller, price). The history
+ * collection does not load order items, so drawing them means a lazy load per
+ * order — ten orders, ten extra queries, on a page that is already one of the
+ * slower ones in the account. That wants an items load on the collection rather
+ * than an N+1 hidden inside a template, so it is left for its own change.
+ *
+ * @var \Magento\Sales\Block\Order\History $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+$_orders = $block->getOrders();
+
+/**
+ * Status pill tone. Magento ships a dozen statuses and a merchant can add more,
+ * so this maps the few that carry a clear meaning and lets everything else fall
+ * back to neutral rather than guessing at a colour.
+ */
+$hmTone = static function (string $state): string {
+    switch ($state) {
+        case \Magento\Sales\Model\Order::STATE_COMPLETE:
+            return 'done';
+        case \Magento\Sales\Model\Order::STATE_PROCESSING:
+            return 'progress';
+        case \Magento\Sales\Model\Order::STATE_CANCELED:
+        case \Magento\Sales\Model\Order::STATE_CLOSED:
+            return 'closed';
+        case \Magento\Sales\Model\Order::STATE_HOLDED:
+        case \Magento\Sales\Model\Order::STATE_PAYMENT_REVIEW:
+            return 'hold';
+        default:
+            return 'neutral';
+    }
+};
+?>
+<?= $block->getChildHtml('info') ?>
+<?php if ($_orders && count($_orders)): ?>
+    <?php /* Kept so modules injecting an extra column still have their header hook. */ ?>
+    <?php $block->getChildHtml('extra.column.header') ?>
+
+    <ol class="hm-orders" id="my-orders-table">
+        <?php foreach ($_orders as $_order): ?>
+            <li class="hm-order">
+                <div class="hm-order__head">
+                    <span class="hm-order__fact">
+                        <span class="hm-order__label"><?= $escaper->escapeHtml(__('Order #')) ?></span>
+                        <strong class="hm-order__value"><?= $escaper->escapeHtml($_order->getRealOrderId()) ?></strong>
+                    </span>
+
+                    <span class="hm-order__fact">
+                        <span class="hm-order__label"><?= $escaper->escapeHtml(__('Date')) ?></span>
+                        <span class="hm-order__value"><?= /* @noEscape */ $block->formatDate($_order->getCreatedAt()) ?></span>
+                    </span>
+
+                    <span class="hm-order__fact">
+                        <span class="hm-order__label"><?= $escaper->escapeHtml(__('Order Total')) ?></span>
+                        <strong class="hm-order__value"><?= /* @noEscape */ $_order->formatPrice($_order->getGrandTotal()) ?></strong>
+                    </span>
+
+                    <span class="hm-order__status hm-order__status--<?= $escaper->escapeHtmlAttr($hmTone((string) $_order->getState())) ?>">
+                        <?= $escaper->escapeHtml($_order->getStatusLabel()) ?>
+                    </span>
+                </div>
+
+                <?php $extra = $block->getChildBlock('extra.container'); ?>
+                <?php if ($extra): ?>
+                    <div class="hm-order__extra">
+                        <?php $extra->setOrder($_order); ?>
+                        <?= $extra->getChildHtml() ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="hm-order__actions">
+                    <a href="<?= $escaper->escapeUrl($block->getViewUrl($_order)) ?>" class="action view hm-order__action">
+                        <span><?= $escaper->escapeHtml(__('View Details')) ?></span>
+                    </a>
+
+                    <?php if ($this->helper(\Magento\Sales\Helper\Reorder::class)->canReorder($_order->getEntityId())): ?>
+                        <?php /* PostHelper payload kept from core — it carries the form key. */ ?>
+                        <a href="#"
+                           data-post='<?= /* @noEscape */ $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)
+                               ->getPostData($block->getReorderUrl($_order)) ?>'
+                           class="action order hm-order__action hm-order__action--primary">
+                            <span><?= $escaper->escapeHtml(__('Buy Again')) ?></span>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </li>
+        <?php endforeach; ?>
+    </ol>
+
+    <?php if ($block->getPagerHtml()): ?>
+        <div class="order-products-toolbar toolbar bottom"><?= $block->getPagerHtml() ?></div>
+    <?php endif; ?>
+<?php else: ?>
+    <div class="message info empty"><span><?= $escaper->escapeHtml($block->getEmptyOrdersMessage()) ?></span></div>
+<?php endif; ?>
