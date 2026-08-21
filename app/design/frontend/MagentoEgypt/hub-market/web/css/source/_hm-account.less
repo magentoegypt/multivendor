@@ -1158,3 +1158,31 @@
 //  this only takes the edge off: the page's own bottom padding no longer stacks
 //  on top of the rail's overhang.
 .account .columns { padding-block-end: 0; }
+
+//
+//  The pager under the order cards
+//  ---------------------------------------------
+//  Two things were wrong with it, both inherited rather than written.
+//
+//  `.account .toolbar` is `justify-content: space-between`, which is right for a
+//  toolbar carrying a count on one side and a limiter on the other. The BOTTOM
+//  toolbar on the orders page carries only the pager, and space-between with a
+//  single child resolves to flex-start — so it sat against the leading edge
+//  while the same pager on the category page is centred.
+//
+//  And blank puts `margin-bottom: 30px` on `.account .toolbar .pages` — a
+//  physical margin from its float era, stacking under a pager that already has
+//  32px above it from the shared `.pages` rule.
+//
+//  Scoped to `.order-products-toolbar` so the wishlist's own toolbar, which does
+//  carry two controls and wants space-between, is left alone.
+.hm-page.account .order-products-toolbar {
+    justify-content: center;
+    margin-block: var(--hm-space-6) 0;
+}
+
+.hm-page.account .order-products-toolbar .pages {
+    margin-block: 0;
+    margin-bottom: 0;          // blank's 30px, which is physical
+    margin-inline: auto;
+}
