@@ -861,11 +861,15 @@
         margin: 0;
 
         > a {
+            //  inline-FLEX, not inline-block: a min-height on an inline-block
+            //  grows the box but leaves the label sitting at the top of it.
+            align-items: center;
             border-block-end: 2px solid transparent;
             color: var(--hm-foreground-muted);
-            display: inline-block;
+            display: inline-flex;
             font-size: 1.6rem;
             font-weight: 500;
+            min-block-size: 4.4rem;
             padding-block: var(--hm-space-4);
             text-decoration: none;
 
