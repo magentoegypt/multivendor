@@ -995,3 +995,23 @@
         }
     }
 }
+
+//
+//  "Items" heading above the product grid
+//  ---------------------------------------------
+//  Removed from view. The tab bar directly above already says "Items (6)", so
+//  the h3 repeated it a few pixels lower.
+//
+//  NOT `display: none`, because this element carries `id="vendor-products"` —
+//  the target the "Items" tab links to. An element with no box cannot be
+//  scrolled to, so hiding it that way would quietly break that tab. Kept in the
+//  flow at zero height, which holds the scroll position and leaves the heading
+//  in the document for assistive tech.
+.hm-page.vendor-page .vendor-products-title {
+    block-size: 0;
+    font-size: 0;
+    line-height: 0;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
