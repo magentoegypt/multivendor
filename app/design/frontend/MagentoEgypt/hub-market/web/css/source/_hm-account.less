@@ -1224,6 +1224,23 @@
     > .box {                                 // (0,8,0)
         float: none;
         inline-size: auto;
+
+        //  And the third thing that rule carries: `margin-bottom: 24px`, from
+        //  the era when these boxes were floated and needed their own spacing.
+        //
+        //  This is what made both cards draw ~26px taller than their content. A
+        //  grid row is sized by its items' MARGIN boxes, so the 24px counted
+        //  toward the row: an empty box measured 42 and produced a 65.6px row,
+        //  and with content it was 172 into a 197.9px row. `block-size: 100%`
+        //  then stretched the card to that inflated row, and the surplus showed
+        //  up as dead space under Edit / Change Password.
+        //
+        //  `margin-block-end: 0` was already being set at (0,4,0) further up and
+        //  losing to the same (0,7,0) selector as the width; it only takes
+        //  effect from here. The 20px gap between the cards is the grid's, and
+        //  the margin was doubling it besides.
+        margin-block-end: 0;
+        margin-bottom: 0;
         width: auto;
     }
 }
