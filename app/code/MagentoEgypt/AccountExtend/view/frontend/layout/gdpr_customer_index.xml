@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Make the GDPR route non-cacheable.
+ *
+ * It was the one account page rendering without the identity band and the
+ * Shopping Stats card, and the layout was not the cause: every one of the
+ * fourteen nav-link classes our customer_account.xml sets reaches this page,
+ * identical to the dashboard, so that handle merges here exactly as it does on
+ * the other thirteen routes.
+ *
+ * What differs is caching. Every other account route carries a block marked
+ * uncacheable, so the customer session survives layout generation there. This
+ * one does not, and Magento clears the customer session while building any
+ * cacheable page. AccountStats::isLoggedIn() therefore answered false, both
+ * templates took their guard clause, and both returned nothing. That happens on
+ * a cache miss as much as a hit, which is why a cache-busting query string
+ * changed nothing.
+ *
+ * A per-customer page had no business being in the full page cache, so this
+ * addresses the cause rather than hiding it. Element\Text with no text renders
+ * nothing; the block exists only to carry the flag.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Text"
+                   name="hm.gdpr.uncacheable"
+                   cacheable="false"/>
+        </referenceContainer>
+    </body>
+</page>

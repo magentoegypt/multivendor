@@ -1279,15 +1279,35 @@
 //  Promoting the wrapper itself to the flex row, at full width, restores the
 //  count / pager / limiter split; `margin-inline: auto` on `.pages` below then
 //  centres the buttons between the two.
-.hm-page.account .toolbar.bottom > .pager,
-.hm-page.account .order-products-toolbar > .pager,
-.hm-page.account .toolbar.wishlist-toolbar > .pager {
+//  Keyed on `.pager` itself rather than on the toolbars that usually wrap it,
+//  because the RMA pages render one directly into the column with no toolbar
+//  around it at all. There it stayed a block, so `.limiter` filled the 928px
+//  column and the "per page" <select> — which is width:100% — drew 928px wide
+//  with "1 Item" and "Show" collided on top of it.
+.hm-page.account .column.main .pager {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
+    float: none;                 // blank still floats it left
     gap: var(--hm-space-4);
     inline-size: 100%;
     justify-content: center;
+}
+
+//  And the select has to be told its own size, or `.limiter` shrink-to-fit and
+//  a 100% child size each other in a circle — the same loop that left
+//  `.pages .items` 43px wide inside a 205px pager.
+.hm-page.account .column.main .pager .limiter select,
+.hm-page.account .column.main .limiter select {
+    inline-size: auto;
+    width: auto;
+}
+
+//  Vnecoms sizes the RMA action row at 75% of the column, so Create Request sat
+//  three-quarters of the way across instead of against the table's edge.
+.hm-page.account .column.main .customer-request-title .buttons-set {
+    inline-size: 100%;
+    width: auto;
 }
 
 .hm-page.account .toolbar.bottom .pages,

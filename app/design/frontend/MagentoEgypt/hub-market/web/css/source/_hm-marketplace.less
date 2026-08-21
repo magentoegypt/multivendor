@@ -89,9 +89,19 @@
 //  The RMA request form ran the full 1440px width because nothing constrained it —
 //  two fields stretched edge to edge and the submit floated off on its own. Give it
 //  a readable measure and card it, matching the login form's treatment.
-.vrma-guest-index,
-.vrma-customer-index,
-.quotation-index-index {
+//
+//  Scoped to `.column.main`, not to the body class. The field rule below is
+//  `input.input-text, select, textarea` — a BARE `select` — so keyed on the page
+//  alone it compiled to `.vrma-customer-index select` at (0,1,1) and claimed
+//  every select on the route, the header's category dropdown included. That
+//  dropdown is styled by `.hm-search__cat-select` at (0,1,0), which lost: it was
+//  repainted with the white form-field background while keeping the header's
+//  white text, so on My Returns and My Quotes the control read as an empty white
+//  box. Confining the block to the content column leaves the intent intact and
+//  puts the chrome back out of reach.
+.vrma-guest-index .column.main,
+.vrma-customer-index .column.main,
+.quotation-index-index .column.main {
     .request-new-form,
     .form-list-wrapper {
         background: var(--hm-surface);
