@@ -381,6 +381,13 @@
     gap: var(--hm-space-3);
     margin-block-start: var(--hm-space-5);
 
+    //  Magento's clearfix mixin emits `content: ''; display: table` on both
+    //  pseudo-elements. That is inert on a block, but a flex container promotes
+    //  each one to a real flex item, and each item then claims its own 12px
+    //  gap — 24px of dead space between the buttons and after them.
+    &::before,
+    &::after { content: none; }
+
     .primary,
     .secondary { margin: 0; }
 }
@@ -1084,37 +1091,63 @@
     }
 }
 
-//  8-9. The rail's own width and the gap beside it.
 //
-//  The reference splits 288 / 32 / 928. Ours carried the gap INSIDE the rail as
-//  `padding-inline-end`, so the nav card measured 256 and the main column ran
-//  960. The rail now IS 288 and the gap is the leftover track between the two
-//  floats.
+//  Account columns: 288 / 32 / 928, as a grid
+//  ---------------------------------------------
+//  The reference lays this row out as `grid-template-columns: 288px 288px 288px
+//  288px` with a 32px gap and spans the content across the last three — 288 rail,
+//  32 gutter, 928 content, in a 1248 container. Measured off the reference, not
+//  inferred.
 //
-//  Scoped to `.account` deliberately. The block this corrects is keyed on
-//  `.hm-page.page-layout-2columns-*`, which is also the category page — editing
-//  it there would have moved the PLP's filter rail as a side effect of an
-//  account request.
+//  This used to be expressed as floats plus percentages, and it could not hold.
+//  A parent theme carries
+//
+//      .account.page-layout-2columns-left .sidebar-main { width: 22.3% }
+//      .account.page-layout-2columns-left .column.main  { width: 77.7% }
+//
+//  at (0,3,0) — exactly the specificity of the override this file used to carry,
+//  so the tie went to source order and the parent theme won the widths. The
+//  `margin-inline-end: 2.564%` added here for the gap had no competitor, so it
+//  applied on top of a pair that already summed to 100%: 102.56% in a 1248px
+//  row, the float dropped, and the nav rail landed BELOW the content on every
+//  page in the account. That is the blank left column.
+//
+//  A grid removes the whole class of failure: the tracks are stated once, the
+//  gap is a gutter rather than a margin competing for the same 100%, and
+//  placement no longer depends on `float: inline-end` being honoured. Track
+//  placement is explicit because the DOM order is main, sidebar-main,
+//  sidebar-additional — the rail comes second in source.
 @media (min-width: 768px) {
-    .account.page-layout-2columns-left .sidebar-main,
-    .account.page-layout-2columns-right .sidebar-main {
-        inline-size: 23.077%;          // 288/1248
-        //  The gap, stated. It used to be `padding-inline-end`, which put it
-        //  INSIDE the rail and shrank the nav card to 256; taking it out left
-        //  the 32px as leftover space between two floats, which only holds while
-        //  `float: inline-end` actually applies to the main column. Where that
-        //  logical value is not honoured the main column stops floating, flows
-        //  around the rail instead, and the columns touch — which is the missing
-        //  gap. As a margin it does not depend on the float at all.
-        //
-        //  23.077 + 2.564 + 74.359 = 100.
-        margin-inline-end: 2.564%;     // 32/1248
-        padding-inline-end: 0;
+    //  (0,4,0) via `.hm-page`, so it does not depend on where this file lands
+    //  relative to the parent theme in the compiled sheet.
+    .hm-page.account .columns {
+        column-gap: var(--hm-space-8);                  // 32
+        display: grid;
+        grid-template-columns: 28.8rem minmax(0, 1fr);  // 288 | 928
+
+        //  blank's clearfix. Inert on a block, but a grid container promotes it
+        //  to a real item, which would open an empty first column.
+        &::before,
+        &::after { content: none; }
+
+        > .column.main        { grid-column: 2; grid-row: 1; }
+        > .sidebar-main       { grid-column: 1; grid-row: 1; }
+        > .sidebar-additional { grid-column: 1; grid-row: 2; }
     }
 
-    .account.page-layout-2columns-left .column.main,
-    .account.page-layout-2columns-right .column.main {
-        inline-size: 74.359%;          // 928/1248
+    //  The floats and percentage widths the grid replaces. Left in place they
+    //  are inherited by the tracks and re-open the overflow described above.
+    .hm-page.account .columns > .column.main,
+    .hm-page.account .columns > .sidebar-main,
+    .hm-page.account .columns > .sidebar-additional {
+        float: none;
+        inline-size: auto;
+        margin-inline: 0;
+        //  Physical too: blank sets padding-right on the rail and padding-left
+        //  on the main column, and those do not mirror in Arabic.
+        padding-left: 0;
+        padding-right: 0;
+        width: auto;
     }
 }
 
@@ -1145,7 +1178,10 @@
 //  5. Contact Information and Newsletters sat side by side at different heights.
 //  They are grid items, so stretching them is enough — the card just has to take
 //  the height it is given.
-.account .column.main .block-content .box { block-size: 100%; margin-block-end: 0; }
+.account .column.main .block-content .box {
+    block-size: 100%;
+    margin-block-end: 0;
+}
 
 .account .column.main .block-dashboard-info .block-content,
 .account .column.main .block-dashboard-addresses .block-content {
@@ -1153,6 +1189,34 @@
     display: grid;
     gap: var(--hm-space-5);
     grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr));
+}
+
+//  Two things a parent theme puts on these boxes survive the switch to a grid
+//  and both were visible on the dashboard:
+//
+//      .account .column.main .block:not(.widget) .block-content:before   (0,6,0)
+//      .account .column.main .block:not(.widget) .block-content .box     (0,7,0)
+//
+//  The first is Magento's clearfix — `content: ''; display: table` — which a
+//  grid container promotes to a real item. It took column 1 at full row height,
+//  so Contact Information and Newsletters were auto-placed into columns 2 and 3
+//  and the dashboard opened on an empty 296px column. The second is
+//  `width: 48.8%`, meaningless for a grid item but still honoured as a width, so
+//  each box drew 144px inside its 296px track.
+//
+//  Restating them at (0,4,0) changed nothing — this is the same equal-or-lower
+//  specificity trap the columns above fell into. `.hm-page` plus the block's own
+//  `.block` class clears both without an `!important`.
+.hm-page.account .column.main .block.block-dashboard-info .block-content,
+.hm-page.account .column.main .block.block-dashboard-addresses .block-content {
+    &::before,
+    &::after { content: none; }              // (0,7,0)
+
+    > .box {                                 // (0,8,0)
+        float: none;
+        inline-size: auto;
+        width: auto;
+    }
 }
 
 //  9. The page title did not read as one: "My Account" and the "Account
@@ -1190,12 +1254,43 @@
 //  `<div class="toolbar wishlist-toolbar">` containing nothing but
 //  `wishlist_item_pager`, twice, above and below the grid. Same single child,
 //  same flex-start, same stray 30px. Both are covered now.
+//  SECOND CORRECTION: and the address book makes three. `address/grid.phtml`
+//  renders `<div class="customer-addresses-toolbar toolbar bottom">` around
+//  nothing but `getChildHtml('pager')` — the same single child, the same
+//  flex-start, the same stray 30px. Three pages hitting one inherited default is
+//  the default being wrong, not three separate bugs, so this now keys on the
+//  shape rather than on each page's own class: a bottom toolbar, plus the two
+//  account toolbars that carry a pager without saying `.bottom`.
+.hm-page.account .toolbar.bottom,
 .hm-page.account .order-products-toolbar,
 .hm-page.account .toolbar.wishlist-toolbar {
     justify-content: center;
     margin-block: var(--hm-space-6) 0;
 }
 
+//  What these toolbars actually contain is not a pager but `<div class="pager">`
+//  wrapping three parts: the count, `.pages`, and the limiter. Making the
+//  toolbar a flex row turned that wrapper into a single shrink-to-fit flex item,
+//  and it collapsed to 205px — the count overflowed on top of the buttons, and
+//  `.pages .items` (which wraps) broke its three buttons onto three separate
+//  rows. Measured, not guessed: `.pager` 205 wide inside a 928 toolbar, `.items`
+//  43 wide holding 62px buttons.
+//
+//  Promoting the wrapper itself to the flex row, at full width, restores the
+//  count / pager / limiter split; `margin-inline: auto` on `.pages` below then
+//  centres the buttons between the two.
+.hm-page.account .toolbar.bottom > .pager,
+.hm-page.account .order-products-toolbar > .pager,
+.hm-page.account .toolbar.wishlist-toolbar > .pager {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-4);
+    inline-size: 100%;
+    justify-content: center;
+}
+
+.hm-page.account .toolbar.bottom .pages,
 .hm-page.account .order-products-toolbar .pages,
 .hm-page.account .toolbar.wishlist-toolbar .pages {
     margin-block: 0;
@@ -1213,4 +1308,168 @@
 .hm-page.account .toolbar.wishlist-toolbar .limiter {
     float: none;
     margin-inline-start: auto;
+}
+
+//
+//  Account forms
+//  ---------------------------------------------
+//  Measured on the reference's Account Settings panel: the form sits in a card
+//  — #fff, 1px border, 12px radius, 24px padding, 928 wide — its heading is
+//  18px/600 with 16px beneath, and every label sits ABOVE its control at
+//  14px/500 with 8px beneath. Inputs are 42px tall, 12px radius, 8px/16px
+//  padding.
+//
+//  Ours had no card at all and still used Magento's older split row: the label
+//  floated 250px wide and right-aligned against a 720px control. On Edit
+//  Account Information and Newsletter Subscription that left the form loose on
+//  the tinted page background with its labels stranded in the middle of the
+//  column.
+.account .column.main .fieldset {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    margin-block-end: var(--hm-space-5);
+    padding: var(--hm-space-6);
+
+    //  blank floats the legend and gives it a bottom border; the reference draws
+    //  it as a plain heading. The float has to STAY, though: a `<legend>` is
+    //  only pulled out of the fieldset's border slot — the notch it is normally
+    //  drawn into — when it is floated, absolutely positioned, or display:none.
+    //  Setting `float: none` here put it back in the slot, and with a card
+    //  border now on the fieldset the heading was drawn straddling the card's
+    //  top edge with the border ruled through it.
+    > legend {
+        border: 0;
+        box-sizing: border-box;
+        float: inline-start;
+        font-family: var(--hm-font-heading);
+        font-size: 1.8rem;
+        font-weight: 600;
+        inline-size: 100%;
+        margin: 0 0 var(--hm-space-4);
+        padding: 0;
+    }
+
+    > br { display: none; }
+
+    //  Magento emits a bare <br> after every legend precisely to clear that
+    //  float. Hiding it lets the first field ride up alongside the heading, so
+    //  it stays in the flow — cleared, but with no line box of its own.
+    > legend + br {
+        clear: both;
+        display: block;
+        font-size: 0;
+        line-height: 0;
+    }
+}
+
+.account .column.main .field {
+    margin-block-end: var(--hm-space-4);
+
+    > .label {
+        box-sizing: border-box;
+        display: block;
+        float: none;
+        font-size: 1.4rem;
+        font-weight: 500;
+        inline-size: auto;
+        margin: 0 0 var(--hm-space-2);
+        padding: 0;
+        text-align: start;
+        width: auto;
+    }
+
+    > .control {
+        box-sizing: border-box;
+        float: none;
+        inline-size: auto;
+        width: auto;
+    }
+}
+
+//  `.field.choice` is the checkbox row, and it has no `.control` wrapper — the
+//  box and its label are siblings. Left to the block rule above, the label
+//  would drop onto its own line under the checkbox.
+.account .column.main .field.choice {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-2);
+
+    //  and the clearfix, which a flex container would promote to two items.
+    &::before,
+    &::after { content: none; }
+
+    > input { float: none; margin: 0; }
+
+    > .label,
+    > label {
+        display: inline;
+        font-size: 1.4rem;
+        font-weight: 400;
+        inline-size: auto;
+        margin: 0;
+        width: auto;
+    }
+}
+
+.account .column.main .fieldset {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"],
+    input[type="number"],
+    select,
+    textarea {
+        border-radius: var(--hm-radius);
+        font-size: 1.6rem;
+        padding: var(--hm-space-2) var(--hm-space-4);
+    }
+}
+
+//  blank indents a form's action row to line it up under the old label column:
+//
+//      .column:not(.sidebar-main) form .actions-toolbar { margin-left: 25.8% }   (0,3,1)
+//
+//  That is 239px on a 928 column, and with the labels now above their controls
+//  there is no column left for it to line up with — Save Address and the
+//  newsletter Save both sat adrift in the middle of the page. It is also
+//  physical, so in Arabic it pushes the buttons to the wrong side of a form that
+//  has otherwise mirrored. `.hm-page` plus the `form` type carries (0,4,1).
+.hm-page.account .column.main .actions-toolbar,
+.hm-page.account .column.main form .actions-toolbar {
+    margin-inline: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+//  The reference pairs First Name and Last Name on one row, 16px apart, and
+//  leaves every other field full width. Magento's address form gets that free
+//  from its `.fields.group` wrapper, but `customer/account/edit` renders the two
+//  name fields as bare siblings of the fieldset, so they stacked.
+//
+//  Floated rather than inline-block on purpose: `calc(50% - 8px)` twice plus a
+//  16px margin is exactly 100%, whereas two inline-blocks would also have to
+//  absorb the whitespace between the tags and would wrap at some font sizes.
+@media (min-width: 768px) {
+    .account .column.main .fieldset > .field-name-firstname,
+    .account .column.main .fieldset > .field-name-lastname {
+        box-sizing: border-box;
+        float: inline-start;
+        inline-size: calc(50% - var(--hm-space-2));
+    }
+
+    .account .column.main .fieldset > .field-name-firstname {
+        margin-inline-end: var(--hm-space-4);
+    }
+
+    //  Everything after the pair has to clear it, including the fieldset's own
+    //  bottom padding.
+    .account .column.main .fieldset > .field-name-lastname ~ .field { clear: both; }
+
+    .account .column.main .fieldset::after {
+        clear: both;
+        content: '';
+        display: block;
+    }
 }
