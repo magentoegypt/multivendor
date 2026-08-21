@@ -727,6 +727,14 @@
 .hm-page.vendor-page .hm-vendor-stats__tile:nth-child(3) .hm-vendor-stats__value { color: var(--hm-stat-3); }
 .hm-page.vendor-page .hm-vendor-stats__tile:nth-child(4) .hm-vendor-stats__value { color: var(--hm-stat-4); }
 
+//  On a phone the tile is 150 wide with 116 of content, and even at 2.2rem the
+//  date still takes two lines in both locales. Two lines is fine; the orphan is
+//  not. Left to itself Arabic broke "٢١ يونيو ٢٠٢٣ م" after the year and put the
+//  era suffix alone on the second line, which reads as a typo rather than as a
+//  date. `balance` splits the two lines evenly instead, and is a no-op on the
+//  single-token numbers in the other tiles.
+.hm-page.vendor-page .hm-vendor-stats__value { text-wrap: balance; }
+
 //  "Selling since" carries a date, not a figure, so it cannot hold the display
 //  size the numbers do without wrapping.
 .hm-page.vendor-page .hm-vendor-stats__tile:last-child:nth-child(4) .hm-vendor-stats__value,
@@ -1183,4 +1191,25 @@ body .block-search-by-vendor input[type="text"] {
     justify-content: center;
     min-block-size: 2.4rem;
     min-inline-size: 2.4rem;
+}
+
+//  Vendor meta icons must not be swallowed by the number beside them.
+//
+//  Each item is `<span class="vendor-…">` with its icon on `::before`. In Arabic
+//  the sales count reads "0 مبيعات", and an INLINE pseudo-element glyph next to
+//  a leading European digit joins the same bidi run, so the icon was reordered
+//  into the middle of the phrase — the number ended up outboard of its own icon.
+//  Measured on /ar/shop/sola/: the span spans 1033–1113 while its text occupies
+//  1048–1086 and 1105–1113, the 19px hole between them being the glyph.
+//
+//  `inline-block` makes the glyph an atomic inline, which bidi treats as a
+//  neutral object rather than as part of the adjacent number, so it stays at the
+//  start of the line box in both directions. Applied to all three, not just the
+//  one that showed it: location and joined-date are correct today only because
+//  their text happens to begin with Arabic, and a sales count above zero or a
+//  numeric city would put either of them in the same position.
+.hm-page.vendor-page .vendor-location::before,
+.hm-page.vendor-page .vendor-sales-count::before,
+.hm-page.vendor-page .vendor-joined-date::before {
+    display: inline-block;
 }
