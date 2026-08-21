@@ -273,3 +273,158 @@
         margin-inline: 0 var(--hm-space-2);   // logical, so Arabic mirrors
     }
 }
+
+//
+//  LIST MODE
+//  ---------------------------------------------
+//  The toolbar has always offered grid and list, but only grid was ever styled.
+//  In list mode the wrapper class changes to `.products-list`, every grid rule
+//  stops matching, and what was left was Magento's bare markup with half of this
+//  theme's card styling still clinging to it: rows of ragged width, the price
+//  sitting on top of the description, and the product image collapsed to 7.7px
+//  because nothing gave the image container a size any more.
+//
+//  So this is the missing half — a row layout, on the same card language as the
+//  grid: image on the leading side, everything else beside it.
+.hm-page .products.wrapper.products-list {
+    .product-items {
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-4);
+        margin: 0;
+        padding: 0;
+    }
+
+    .product-item {
+        inline-size: 100%;
+        margin: 0;
+        width: 100%;
+    }
+
+    .product-item-info {
+        align-items: start;
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        column-gap: var(--hm-space-5);
+        display: grid;
+        grid-template-columns: 18rem minmax(0, 1fr);
+        inline-size: 100%;
+        padding: var(--hm-space-4);
+    }
+
+    .product-item-media {
+        block-size: auto;
+        grid-column: 1;
+        inline-size: 18rem;
+        margin: 0;
+    }
+
+    .product-item-details {
+        block-size: auto;
+        grid-column: 2;
+        padding: 0;
+    }
+
+    //  The anchor and both image wrappers are inline-level spans by default, so
+    //  they collapsed to under 2px around a 180px image and took the row's
+    //  height with them. Block first, THEN size.
+    .product-item-photo,
+    .product-image-container,
+    .product-image-wrapper {
+        display: block;
+    }
+
+    //  view.xml writes the image box size inline, so undoing it needs the weight
+    //  — the same reason the minicart's thumbnail rules carry it.
+    .product-item-photo,
+    .product-image-container,
+    .product-image-wrapper,
+    img.product-image-photo {
+        block-size: 18rem !important;
+        inline-size: 18rem !important;
+    }
+
+    .product-image-wrapper { padding: 0 !important; }
+
+    img.product-image-photo {
+        object-fit: contain;
+        position: static;
+    }
+
+    //  Merchant copy here runs to a dozen lines of specification. Three is
+    //  enough to tell one product from another; the rest is on the product page.
+    .product-item-description {
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        color: var(--hm-foreground-muted);
+        display: -webkit-box;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        margin-block: var(--hm-space-3) 0;
+        overflow: hidden;
+
+        //  The copy carries its own <br>s and inline styling; none of it should
+        //  reopen the clamp.
+        * { display: inline; font-size: inherit !important; }
+        br { display: none; }
+    }
+
+    //  The grid card's foot is one row of price + cart. A list row has to carry
+    //  the description too, and it arrives nested inside `.product-item-inner`
+    //  alongside the cart — which measured 1283px inside a 1000px card and
+    //  pushed the copy off the edge.
+    //
+    //  `display: contents` on that wrapper lets its children join the foot's own
+    //  column, so description, price and cart can be ordered against each other
+    //  instead of being boxed apart.
+    .hm-card__foot {
+        align-items: start;
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-3);
+        margin-block-start: var(--hm-space-3);
+        max-inline-size: 100%;
+    }
+
+    .product-item-inner {
+        display: contents;
+    }
+
+    .product-item-description { order: 1; }
+    .price-box { order: 2; }
+
+    .product-item-actions,
+    .actions-primary {
+        order: 3;
+    }
+
+    //  "Learn More" repeats what the title already links to. The class is a bare
+    //  `action more`, not `product-item-link` — an earlier guess at the selector
+    //  matched nothing.
+    .action.more { display: none; }
+
+    //  The photo anchor carries 18px of padding from the grid card, which drew a
+    //  216px tinted square around a 180px image — the grey block under every row.
+    .product-item-photo {
+        box-sizing: border-box;
+        padding: 0;
+    }
+}
+
+//  One column below the rail breakpoint: an 18rem image beside text does not
+//  fit a phone.
+@media (max-width: 47.99em) {
+    .hm-page .products.wrapper.products-list {
+        .product-item-info { grid-template-columns: minmax(0, 1fr); row-gap: var(--hm-space-4); }
+        .product-item-media { grid-column: 1; inline-size: 100%; }
+        .product-item-details { grid-column: 1; }
+
+        .product-image-container,
+        .product-image-wrapper,
+        img.product-image-photo {
+            block-size: 24rem !important;
+            inline-size: 100% !important;
+        }
+    }
+}
