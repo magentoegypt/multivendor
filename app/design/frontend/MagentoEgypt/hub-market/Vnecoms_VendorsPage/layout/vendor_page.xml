@@ -59,6 +59,19 @@
             put them below the tabs; putting them in the wrapper puts them
             between the card and the tabs, which is the reference's order.
         -->
+        <!--
+            Contact Vendor, at the card's trailing edge as the reference has it.
+            Reuses Profile\Title for the same reason the stats block does: a new
+            class needs a di:compile before layout may reference it, and until
+            then Magento drops the block with nothing in the log.
+        -->
+        <referenceContainer name="vendor.profile.top.container">
+            <block class="Vnecoms\Vendors\Block\Profile\Title"
+                   name="hm.vendor.contact"
+                   after="-"
+                   template="Vnecoms_Vendors::profile/contact.phtml"/>
+        </referenceContainer>
+
         <referenceContainer name="vendor.profile.top.wrapper">
             <block class="Vnecoms\Vendors\Block\Profile\Title"
                    name="hm.vendor.stats"
