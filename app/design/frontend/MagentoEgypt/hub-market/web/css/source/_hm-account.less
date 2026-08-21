@@ -1099,6 +1099,16 @@
     .account.page-layout-2columns-left .sidebar-main,
     .account.page-layout-2columns-right .sidebar-main {
         inline-size: 23.077%;          // 288/1248
+        //  The gap, stated. It used to be `padding-inline-end`, which put it
+        //  INSIDE the rail and shrank the nav card to 256; taking it out left
+        //  the 32px as leftover space between two floats, which only holds while
+        //  `float: inline-end` actually applies to the main column. Where that
+        //  logical value is not honoured the main column stops floating, flows
+        //  around the rail instead, and the columns touch — which is the missing
+        //  gap. As a margin it does not depend on the float at all.
+        //
+        //  23.077 + 2.564 + 74.359 = 100.
+        margin-inline-end: 2.564%;     // 32/1248
         padding-inline-end: 0;
     }
 
@@ -1174,15 +1184,33 @@
 //  physical margin from its float era, stacking under a pager that already has
 //  32px above it from the shared `.pages` rule.
 //
-//  Scoped to `.order-products-toolbar` so the wishlist's own toolbar, which does
-//  carry two controls and wants space-between, is left alone.
-.hm-page.account .order-products-toolbar {
+//  CORRECTION: this was first scoped to `.order-products-toolbar` only, on the
+//  assumption that the wishlist's toolbar carries two controls and genuinely
+//  wants space-between. It does not — wishlist/view.phtml renders
+//  `<div class="toolbar wishlist-toolbar">` containing nothing but
+//  `wishlist_item_pager`, twice, above and below the grid. Same single child,
+//  same flex-start, same stray 30px. Both are covered now.
+.hm-page.account .order-products-toolbar,
+.hm-page.account .toolbar.wishlist-toolbar {
     justify-content: center;
     margin-block: var(--hm-space-6) 0;
 }
 
-.hm-page.account .order-products-toolbar .pages {
+.hm-page.account .order-products-toolbar .pages,
+.hm-page.account .toolbar.wishlist-toolbar .pages {
     margin-block: 0;
     margin-bottom: 0;          // blank's 30px, which is physical
     margin-inline: auto;
+}
+
+//  The bottom wishlist toolbar carries a literal `<br>` before the pager in core
+//  markup. In a flex row that is an empty flex item taking a share of the gap,
+//  which is why the two toolbars did not sit at the same height.
+.hm-page.account .toolbar.wishlist-toolbar > br { display: none; }
+
+//  blank floats the limiter right — physical, so in Arabic it lands on the wrong
+//  side of a row that has otherwise mirrored.
+.hm-page.account .toolbar.wishlist-toolbar .limiter {
+    float: none;
+    margin-inline-start: auto;
 }
