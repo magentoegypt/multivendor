@@ -25,7 +25,23 @@
 //  Shell
 //  ---------------------------------------------
 .account {
-    .columns { padding-block-start: var(--hm-space-6); }
+    //  The account pages had NO page padding at all: the heading started on the
+    //  pixel the nav ended and the last panel ran straight into the footer. The
+    //  only air was 20px above `.columns`, which sits BELOW the h1 and so never
+    //  helped the top of the page.
+    //
+    //  32px above and 48px below, which is the treatment cart, checkout, the
+    //  success page and the login/register pages already share — and matches the
+    //  reference, where the profile card sits on a clear band of ground and the
+    //  last order card is well clear of the footer.
+    .page-main {
+        padding-block-end: var(--hm-space-10);
+        padding-block-start: var(--hm-space-8);
+    }
+
+    //  Was carrying the top air on its own; the page now does it, and doubling
+    //  the two put 52px above the rail.
+    .columns { padding-block-start: 0; }
 
     .column.main { min-inline-size: 0; }   // lets wide tables shrink instead of pushing the page
 }
