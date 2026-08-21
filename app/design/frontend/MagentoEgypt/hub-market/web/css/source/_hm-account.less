@@ -1023,3 +1023,78 @@
 .catalog-product_compare-index .message.info.empty {
     padding: var(--hm-space-3) var(--hm-space-5);
 }
+
+//
+//  Reference parity — measured against the Figma account screen at 1440
+//  ---------------------------------------------
+//  Every value below was read off that page, not estimated. What it does NOT
+//  have is a render of ours to compare against: the account screens need a
+//  customer login. These are written from the stylesheet's own declared values,
+//  so they want an eye on them.
+
+//  1. Card hairline. The reference uses a translucent black, which sits slightly
+//  cooler on the tinted ground than this theme's solid #e8ecf3.
+.account .hm-identity,
+.account .block-collapsible-nav,
+.account .column.main .block {
+    border-color: rgba(0, 0, 0, .09);
+}
+
+//  2-7. The rail's nav. The reference runs full-bleed rows separated by
+//  hairlines; ours were inset pills with their own radius, two sizes down.
+.account .block-collapsible-nav {
+    //  2. Rows reach the card's own edges.
+    padding: 0;
+
+    .item {
+        > a,
+        > strong {
+            //  5. Square, with a divider instead of a gap.
+            border-block-end: 1px solid rgba(0, 0, 0, .09);
+            border-radius: 0;
+            //  4. 16px, up from 14.
+            font-size: 1.6rem;
+            //  3. 16px / 24px, up from 12 / 16.
+            padding: var(--hm-space-4) var(--hm-space-6);
+        }
+
+        //  No rule under the last row — the card's own border closes it.
+        &:last-child > a,
+        &:last-child > strong { border-block-end: 0; }
+
+        //  6-7. Active row. NOTE: this is the reference's blue, not this build's
+        //  orange — you asked for the whole list, and these two were flagged as
+        //  the brand-colour call. One word and they go back to
+        //  --hm-accent-subtle / --hm-accent-strong.
+        &.current > strong,
+        &.current > a {
+            background: #eff6ff;   // blue-50
+            color: #2563eb;        // blue-600
+            font-weight: 500;      // was 700
+        }
+    }
+}
+
+//  8-9. The rail's own width and the gap beside it.
+//
+//  The reference splits 288 / 32 / 928. Ours carried the gap INSIDE the rail as
+//  `padding-inline-end`, so the nav card measured 256 and the main column ran
+//  960. The rail now IS 288 and the gap is the leftover track between the two
+//  floats.
+//
+//  Scoped to `.account` deliberately. The block this corrects is keyed on
+//  `.hm-page.page-layout-2columns-*`, which is also the category page — editing
+//  it there would have moved the PLP's filter rail as a side effect of an
+//  account request.
+@media (min-width: 768px) {
+    .account.page-layout-2columns-left .sidebar-main,
+    .account.page-layout-2columns-right .sidebar-main {
+        inline-size: 23.077%;          // 288/1248
+        padding-inline-end: 0;
+    }
+
+    .account.page-layout-2columns-left .column.main,
+    .account.page-layout-2columns-right .column.main {
+        inline-size: 74.359%;          // 928/1248
+    }
+}
