@@ -724,6 +724,18 @@
 .hm-page.vendor-page .vendor-home-banner {
     margin-block-end: 0;
 
+    //  UPDATE: the cap below only ever reached a SLIDER banner — the swiper
+    //  chain and `.banner-item`. A seller who uploads a plain cover gets
+    //  `<div class="vendor-home-banner"><img></div>` with no slider in it, so
+    //  nothing capped the outer box: MIA CO's 2000x900 cover rendered at its own
+    //  ratio, 1440x648, and pushed the seller card most of the way down the
+    //  viewport. The cap belongs here, on the element that is always present.
+    //
+    //  25.6rem because the reference's band measures exactly 256px at 1440.
+    block-size: 25.6rem;
+    max-block-size: 25.6rem;
+    overflow: hidden;
+
     //  `!important` on width, deliberately. Swiper writes INLINE pixel widths
     //  (style="width:560px") once it initialises, and an inline style beats any
     //  stylesheet rule — capping the height alone left the slider recomputing
@@ -742,9 +754,9 @@
     .swiper-wrapper,
     .swiper-slide,
     .item.banner-item {
-        block-size: 28rem;
+        block-size: 25.6rem;
         inline-size: 100% !important;
-        max-block-size: 28rem;
+        max-block-size: 25.6rem;
         max-inline-size: 100% !important;
     }
 
@@ -1014,4 +1026,12 @@
     margin: 0;
     overflow: hidden;
     padding: 0;
+}
+
+//  Vendor search field: 4rem, as asked. `min-block-size` as well as the height —
+//  this theme puts a 4.4rem floor on text inputs, so setting height alone would
+//  have left it at 44px.
+body .block-search-by-vendor input[type="text"] {
+    block-size: 4rem;
+    min-block-size: 4rem;
 }
