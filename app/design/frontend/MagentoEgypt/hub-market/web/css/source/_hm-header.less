@@ -745,7 +745,16 @@
 
     //  The chevron must follow the text edge under RTL, and `background-position`
     //  has no logical form.
-    [dir='rtl'] & { background-position: left var(--hm-space-3) center; }
+    //
+    //  `:lang(ar)` is the half that actually matches. Nothing in this build emits
+    //  a `dir` attribute — direction is applied by `html:lang(ar)` in
+    //  _hm-root.less — so keyed on `[dir='rtl']` alone this rule never fired and
+    //  the chevron stayed pinned to the right edge in Arabic, on the wrong side
+    //  of a control whose text had already mirrored. Verified in the browser:
+    //  the element matches `:lang(ar) &` and does not match `[dir='rtl'] &`.
+    //  The attribute selector stays for the day the attribute is emitted.
+    [dir='rtl'] &,
+    :lang(ar) & { background-position: left var(--hm-space-3) center; }
 
     //  The popup list is painted by the OS using the control's own colours, so a
     //  translucent-white control yields white-on-white options in some engines.

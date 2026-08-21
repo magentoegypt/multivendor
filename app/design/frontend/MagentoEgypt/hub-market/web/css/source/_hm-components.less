@@ -42,6 +42,18 @@
     transform: scaleX(-1);
 }
 
+//  Same problem in a different medium: blank draws the pager's next/previous
+//  controls with an icon-font glyph on `::before`, so there is no element to
+//  carry `.hm-icon--dir`. Measured in Arabic on /ar/sales/order/history/ — page
+//  1 sits rightmost and page 2 to its left, so travel is leftward, but the
+//  "next" chevron still pointed right, contradicting the direction it moves in.
+[dir='rtl'] .pages .action.next::before,
+[dir='rtl'] .pages .action.previous::before,
+:lang(ar) .pages .action.next::before,
+:lang(ar) .pages .action.previous::before {
+    transform: scaleX(-1);
+}
+
 //
 //  Buttons
 //  ---------------------------------------------

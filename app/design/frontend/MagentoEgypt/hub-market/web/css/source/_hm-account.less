@@ -1592,3 +1592,25 @@
         }
     }
 }
+
+//  The "Manage Addresses" / "View All" link beside a block heading.
+//
+//  blank spaces it from the heading with
+//
+//      .account .column.main .block:not(.widget) .block-title > .action
+//          { margin-left: 15px }                                   (0,7,0)
+//
+//  which is physical and so does not mirror. In Arabic the heading sits on the
+//  right and the link to its left, which puts that 15px on the link's OUTER
+//  edge and leaves nothing but a word space between the two. Measured on
+//  /ar/customer/account/: heading left edge 930, link right edge 926 — a 4px
+//  gap where English gets 15.
+//
+//  Physical sides named first, then the logical one, or the shorthand order
+//  resolves against us: within one block a later `margin-left` would overwrite
+//  what `margin-inline-start` had just set in LTR.
+.hm-page.account .column.main .block:not(.widget) .block-title > .action {
+    margin-left: 0;
+    margin-right: 0;
+    margin-inline-start: var(--hm-space-4);
+}
