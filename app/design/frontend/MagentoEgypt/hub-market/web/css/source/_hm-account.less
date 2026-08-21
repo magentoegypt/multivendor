@@ -1000,7 +1000,15 @@
     > strong {
         align-items: center;
         display: flex;
-        gap: var(--hm-space-3);
+        //  NO `gap` here. Vnecoms' credit link renders its balance as an
+        //  element — `My Credit (<strong>EGP 0</strong>)` — so a flex gap put
+        //  12px on BOTH sides of it and the label read "My Credit ( EGP 0 )".
+        //  Text either side of an element becomes its own anonymous flex item;
+        //  the spacing belongs on the icon, which is what wants it.
+        gap: 0;
+        //  Two-line labels ("My Downloadable Products") should not open the row
+        //  as far as two full lines of the body leading would.
+        line-height: 1.3;
     }
 
     //  Scoped to the classed links only. A bare `::before` on every item would
@@ -1010,6 +1018,7 @@
         block-size: 1.8rem;
         content: '';
         flex: 0 0 auto;
+        margin-inline-end: var(--hm-space-3);   // was the row's `gap`
         inline-size: 1.8rem;
         mask: var(--hm-nav-icon) no-repeat center / contain;
         -webkit-mask: var(--hm-nav-icon) no-repeat center / contain;
@@ -1098,3 +1107,54 @@
         inline-size: 74.359%;          // 928/1248
     }
 }
+
+//
+//  Fixes from the account screen review
+//  ---------------------------------------------
+
+//  1. The empty bordered box under Shopping Stats.
+//
+//  Core's reorder/sidebar.phtml renders `<div class="block block-reorder">`
+//  UNCONDITIONALLY and only hides the title and content inside it, via a
+//  Knockout `no-display` class, when the customer has nothing to reorder. The
+//  wrapper still paints, so the sidebar showed an empty card.
+//
+//  Keyed on that same `no-display` rather than removing the block: Recently
+//  Ordered is a real feature, and this way it reappears the moment Knockout says
+//  there is something in it.
+.account .block-reorder:has(> .block-content.no-display) { display: none; }
+
+//  3. A section rule with nothing after it. The shared `.block` separator drew a
+//  line under the LAST section too, so Address Book ended on a rule against
+//  empty page.
+.account .column.main .block:last-child {
+    border-block-end: 0;
+    padding-block-end: 0;
+}
+
+//  5. Contact Information and Newsletters sat side by side at different heights.
+//  They are grid items, so stretching them is enough — the card just has to take
+//  the height it is given.
+.account .column.main .block-content .box { block-size: 100%; margin-block-end: 0; }
+
+.account .column.main .block-dashboard-info .block-content,
+.account .column.main .block-dashboard-addresses .block-content {
+    align-items: stretch;
+    display: grid;
+    gap: var(--hm-space-5);
+    grid-template-columns: repeat(auto-fit, minmax(26rem, 1fr));
+}
+
+//  9. The page title did not read as one: "My Account" and the "Account
+//  Information" heading under it were within 2px of each other, 55px apart.
+.account .page-main .page-title-wrapper .page-title {
+    font-size: 3.2rem;
+    line-height: 1.2;
+    margin-block-end: var(--hm-space-6);
+}
+
+//  2. The columns are uneven — the rail runs ~440px past the end of the dashboard
+//  content. The real cause is the number of nav entries, which is staying, so
+//  this only takes the edge off: the page's own bottom padding no longer stacks
+//  on top of the rail's overhang.
+.account .columns { padding-block-end: 0; }

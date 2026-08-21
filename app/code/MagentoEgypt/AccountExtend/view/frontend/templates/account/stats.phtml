@@ -18,7 +18,12 @@ if (!$stats || !$stats->isLoggedIn()) {
 
 $hmRows = [
     [__('Total Spent'), $stats->getTotalSpentFormatted()],
-    [__('Orders This Year'), (string) $stats->getOrdersThisYear()],
+    //  Only when there is something to say. Beside "11 Orders" and a total of
+    //  EGP 9,469, a flat "0" reads as a broken counter rather than as "none since
+    //  January" — which is what it actually means.
+    ...($stats->getOrdersThisYear() > 0
+        ? [[__('Orders This Year'), (string) $stats->getOrdersThisYear()]]
+        : []),
     [__('Avg. Order Value'), $stats->getAverageOrderValueFormatted()],
 ];
 ?>
