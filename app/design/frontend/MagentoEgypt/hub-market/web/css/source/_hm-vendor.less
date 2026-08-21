@@ -628,9 +628,43 @@
         a:hover { color: var(--hm-accent); }
     }
 
+    //  The description column itself wraps, so the TWO `.vendor-info` paragraphs
+    //  Vnecoms emits — one for location/sales/joined, one for phone/opening
+    //  hours — flow onto a single line of facts instead of stacking. The
+    //  reference carries one such row under the name.
+    .vendor-profile-top .vendor-profile-description {
+        align-items: baseline;
+        column-gap: var(--hm-space-5);
+        display: flex;
+        //  Named explicitly: an earlier rule sets `flex-direction: column` on
+        //  this element, and inheriting that quietly kept the two fact rows
+        //  stacked however the wrap was set.
+        flex-direction: row;
+        flex-wrap: wrap;
+        row-gap: var(--hm-space-2);
+    }
+
+    //  Name and tagline take the full width above that row.
+    .vendor-profile-top .vendor-title,
+    .vendor-profile-top .vendor-headline {
+        flex: 1 0 100%;
+    }
+
+    //  No seller on this install has filled the tagline in yet; an empty box
+    //  would still claim a row-gap.
+    .vendor-profile-top .vendor-headline:empty { display: none; }
+
+    .vendor-profile-top .vendor-headline {
+        color: var(--hm-foreground-muted);
+        font-size: 1.5rem;
+        line-height: 1.5;
+        margin-block-end: var(--hm-space-1);
+    }
+
     //  Location / phone / sales / joined — one wrapping row of small facts,
     //  not four stacked paragraphs.
     .vendor-profile-top .vendor-info {
+        flex: 0 1 auto;
         align-items: center;
         color: var(--hm-foreground-muted);
         column-gap: var(--hm-space-5);
@@ -802,7 +836,7 @@
     //  drew a slab across the full width under the card, which is what put a
     //  white step against the banner beside the logo.
     background: transparent;
-    margin-block-start: -6rem;
+    margin-block-start: -8rem;
     position: relative;
     z-index: 1;
 
@@ -948,7 +982,7 @@
         //  the card itself is not positioned. So this is the band's leading
         //  edge, not an offset back from the card: -15.2rem here put the logo
         //  56px off the left of the viewport.
-        inset-block-start: -4rem;
+        inset-block-start: 1rem;
         inset-inline-start: 0;
         margin: 0;
         position: absolute;
@@ -1053,4 +1087,89 @@ body .block-search-by-vendor input[type="text"] {
 //  surfaces rather than as page.
 .vendor-page .page-wrapper {
     background: var(--hm-surface-muted);
+}
+
+//
+//  MOBILE
+//  ---------------------------------------------
+@media (max-width: 47.99em) {
+    .hm-page.vendor-page {
+        //  The card and the tiles were running edge to edge: the band's
+        //  max-width is wider than a phone, so nothing held a gutter. Put it on
+        //  the wrapper, which holds both, and leave the banner full bleed.
+        //  border-box, or the gutter is ADDED to a 100% width and the card
+        //  hangs 16px off the right edge instead of sitting inside it.
+        .vendor-profile-wrapper {
+            box-sizing: border-box;
+            padding-inline: var(--hm-space-4);
+        }
+
+        .hm-vendor-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            margin-inline: var(--hm-space-4);
+        }
+
+        //  96px, not 128: at 390 the logo was a quarter of the screen before the
+        //  seller's own name.
+        .vendor-profile-container.vendor-profile-top > .vendor-profile-logo,
+        .vendor-profile-container.vendor-profile-top > .vendor-profile-logo img {
+            block-size: 9.6rem !important;
+            inline-size: 9.6rem !important;
+        }
+
+        //  Vnecoms separates these facts with `border-left` plus 15px of padding
+        //  and margin. On a phone the row wraps, and a wrapped item takes its
+        //  separator with it — so a line begins with a stray rule and 30px of
+        //  indent. All four sides cleared rather than the inline-start alone,
+        //  because the source rule is physical and would survive in Arabic.
+        //  The row's own gap does the separating at this width.
+        .vendor-profile-top .vendor-info > span {
+            border: 0;
+            margin-inline: 0;
+            padding-inline: 0;
+        }
+
+        .vendor-profile-top .vendor-info {
+            column-gap: var(--hm-space-4);
+            row-gap: var(--hm-space-1);
+        }
+
+        .hm-vendor-contact { inline-size: 100%; }
+        .hm-vendor-contact__button { inline-size: 100%; justify-content: center; }
+    }
+
+    //  Vnecoms hides the whole tab bar under 600px and puts nothing in its
+    //  place, so a phone had no way to reach About, Shipping or Refund except by
+    //  scrolling past the entire product grid. Brought back as a scrolling row —
+    //  the tabs are this page's only navigation.
+    .hm-page.vendor-page .vendor-menu-wrapper { display: block; }
+
+    .hm-page.vendor-page #vendor-menu.vendor-menu {
+        .vendor-nav-container {
+            align-items: stretch;
+            flex-wrap: nowrap;
+            gap: var(--hm-space-3);
+            overflow-x: auto;
+            padding-inline: var(--hm-space-4);
+            //  Momentum scrolling without a visible bar over the tabs.
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar { display: none; }
+        }
+
+        > .vendor-nav-container > ul {
+            flex: 0 0 auto;
+            flex-wrap: nowrap;
+            gap: var(--hm-space-5);
+        }
+
+        .vendor-menu-item > a { white-space: nowrap; }
+
+        //  The per-vendor search does not belong in a scrolling strip on a
+        //  phone; the site search in the header is two thumb-lengths away.
+        .block-search-by-vendor { display: none; }
+
+        //  The logo already sits on the card above.
+        .menu-logo-container { display: none; }
+    }
 }

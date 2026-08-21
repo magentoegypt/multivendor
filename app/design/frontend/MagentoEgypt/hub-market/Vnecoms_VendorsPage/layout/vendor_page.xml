@@ -60,6 +60,32 @@
             between the card and the tabs, which is the reference's order.
         -->
         <!--
+            Add to Wishlist on the microsite's cards.
+
+            Magento_Wishlist adds this block to `category.product.addto`, but on
+            the `catalog_category_view` handle only. The microsite declares its
+            own `category.product.addto` carrying nothing but Compare, so its
+            cards had a compare control (hidden by this theme) and no heart.
+
+            The companion block feeds the list's wishlist JS its data; it goes in
+            `category.product.list.additional`, and a reference to a container
+            the current handle does not have is ignored.
+        -->
+        <referenceBlock name="category.product.addto">
+            <block class="Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist"
+                   name="category.product.addto.wishlist"
+                   as="wishlist"
+                   before="compare"
+                   template="Magento_Wishlist::catalog/product/list/addto/wishlist.phtml"/>
+        </referenceBlock>
+
+        <referenceContainer name="category.product.list.additional">
+            <block class="Magento\Wishlist\Block\AddToWishlist"
+                   name="category.product.list.additional.wishlist_addto"
+                   as="addto"/>
+        </referenceContainer>
+
+        <!--
             The shared product card already prints the seller's name above the
             title — it just needs the ViewModel that resolves vendor_id to a
             public name, and that is passed per block name. The category and home
