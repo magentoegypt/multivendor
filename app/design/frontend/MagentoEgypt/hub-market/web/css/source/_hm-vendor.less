@@ -460,11 +460,16 @@
 //  two-column grid only where the page really has two columns.
 .hm-page.vendor-page.page-layout-2columns-left,
 .hm-page.vendor-page.page-layout-2columns-right {
+    //  ONE track, not two. This grid was built when Vnecoms' layered navigation
+    //  filled a left rail; that block is removed in vendor_page.xml because the
+    //  reference's vendor page has no rail, so a 30rem track here would leave
+    //  exactly the empty column this block was written to fix in the first place.
+    //  The layout class stays 2columns-left — every rule below is scoped to it.
     .columns {
         align-items: start;
         column-gap: var(--hm-space-6);
         display: grid;
-        grid-template-columns: 30rem minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr);
     }
 
     //  Floats and percentage widths must go, or they fight the tracks.
@@ -480,8 +485,8 @@
     }
 
     .columns .sidebar.sidebar-main,
-    .columns .sidebar.sidebar-additional { grid-column: 1; grid-row: 1; }
-    .columns .column.main                { grid-column: 2; grid-row: 1; }
+    .columns .sidebar.sidebar-additional { display: none; }
+    .columns .column.main                { grid-column: 1; grid-row: 1; }
 
     //  Single column once there is no room for a 30rem rail beside content.
     @media (max-width: 47.99em) {
@@ -640,31 +645,58 @@
     padding: 0;
 }
 
+//  White tiles below the seller card, not tinted panels inside it — the tiles
+//  now render in `content`, between the card and the tabs, as the reference has
+//  them.
 .hm-page.vendor-page .hm-vendor-stats__tile {
-    background: var(--hm-surface-muted);
+    background: var(--hm-surface);
     border: 1px solid var(--hm-border-subtle);
-    padding: var(--hm-space-4);
+    border-radius: var(--hm-radius);
+    padding: var(--hm-space-5) var(--hm-space-4);
     text-align: center;
+}
+
+//  The reference gives each tile its own colour rather than one house colour.
+//  Assigned by position, because which tiles exist depends on what the data can
+//  answer — a seller with no reviews gets two tiles, not four, and they should
+//  still be the first two colours rather than a gap in the sequence.
+.hm-page.vendor-page .hm-vendor-stats {
+    --hm-stat-1: #2563eb;
+    --hm-stat-2: #16a34a;
+    --hm-stat-3: #9333ea;
+    --hm-stat-4: #f97316;
 }
 
 .hm-page.vendor-page .hm-vendor-stats__value {
     color: var(--hm-foreground);
     display: block;
     font-family: var(--hm-font-display);
-    font-size: 2.4rem;
+    font-size: 3.2rem;
     font-variant-numeric: lining-nums tabular-nums;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.15;
+}
+
+.hm-page.vendor-page .hm-vendor-stats__tile:nth-child(1) .hm-vendor-stats__value { color: var(--hm-stat-1); }
+.hm-page.vendor-page .hm-vendor-stats__tile:nth-child(2) .hm-vendor-stats__value { color: var(--hm-stat-2); }
+.hm-page.vendor-page .hm-vendor-stats__tile:nth-child(3) .hm-vendor-stats__value { color: var(--hm-stat-3); }
+.hm-page.vendor-page .hm-vendor-stats__tile:nth-child(4) .hm-vendor-stats__value { color: var(--hm-stat-4); }
+
+//  "Selling since" carries a date, not a figure, so it cannot hold the display
+//  size the numbers do without wrapping.
+.hm-page.vendor-page .hm-vendor-stats__tile:last-child:nth-child(4) .hm-vendor-stats__value,
+.hm-page.vendor-page .hm-vendor-stats__tile:last-child:nth-child(2) .hm-vendor-stats__value {
+    font-size: 2.2rem;
 }
 
 .hm-page.vendor-page .hm-vendor-stats__label {
     color: var(--hm-foreground-muted);
     display: block;
-    font-size: 1.2rem;
-    letter-spacing: .04em;
+    font-size: 1.3rem;
     margin-block-start: .4rem;
-    text-transform: uppercase;
 }
+
+
 
 //
 //  Seller cover banner — 700px of it
@@ -751,5 +783,95 @@
     //  than a bordered box floating over a photograph.
     .vendor-profile-container.vendor-profile-top {
         box-shadow: 0 .4rem 1.6rem rgba(15, 33, 68, .12);
+    }
+}
+
+//
+//  Tab bar — plain, not a tinted panel
+//  ---------------------------------------------
+//  The reference runs Products / About / Reviews as plain text on the page with
+//  a rule beneath the row. Ours painted a tinted slab across the full width with
+//  a second, differently-tinted band inside it (#f5f5f1 on #f5f7fa), which read
+//  as a toolbar rather than navigation.
+//
+//  The in-page search stays. The reference has no such control, but ours is a
+//  working per-vendor search and dropping a real feature to match a mock is not
+//  a trade worth making — it is just quietened down.
+.hm-page.vendor-page {
+    .vendor-menu-wrapper { background: transparent; }
+
+    #vendor-menu.vendor-menu {
+        background: transparent;
+        border-block-end: 1px solid var(--hm-border-subtle);
+    }
+
+    .vendor-nav-container {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-6);
+
+        > ul {
+            display: flex;
+            flex: 1 1 auto;
+            gap: var(--hm-space-6);
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+    }
+
+    .vendor-menu-item {
+        margin: 0;
+
+        > a {
+            border-block-end: 2px solid transparent;
+            color: var(--hm-foreground-muted);
+            display: inline-block;
+            font-size: 1.6rem;
+            font-weight: 500;
+            padding-block: var(--hm-space-4);
+            text-decoration: none;
+
+            //  No active state is styled on purpose: these are in-page anchors,
+            //  not separate pages, so nothing on the server or in the DOM knows
+            //  which one you are looking at. Marking one permanently active
+            //  would be decoration that lies.
+            &:hover,
+            &:focus-visible {
+                border-block-end-color: var(--hm-accent);
+                color: var(--hm-foreground);
+            }
+        }
+    }
+
+    //  Was the loudest thing in the row.
+    .block-search-by-vendor { flex: 0 0 auto; }
+}
+
+//
+//  One band for the whole microsite
+//  ---------------------------------------------
+//  Measured: the seller card sat at x=80 w=1280, the stat tiles ran full bleed
+//  at 0/1440, the tab row at 16/1408, and the product grid at 96/1248 — four
+//  different left edges stacked down one page. The grid's band is the one to
+//  keep, since it is the site container every other page uses.
+//
+//  `--hm-container` is the outer 1280; the inner band is that less the page's
+//  own 16px gutters, which is where .column.main lands.
+.hm-page.vendor-page {
+    .vendor-profile-container.vendor-profile-top,
+    .hm-vendor-stats,
+    #vendor-menu.vendor-menu {
+        margin-inline: auto;
+        max-inline-size: calc(var(--hm-container) - (2 * var(--hm-space-4)));
+    }
+
+    //  The band goes on the menu, not the row inside it: centring the row within
+    //  a parent that is not itself centred just moved it to that parent's own
+    //  left edge. The rule under the tabs then spans the band, as it does in the
+    //  reference, rather than the full width of the page.
+    .vendor-nav-container {
+        inline-size: 100%;
+        padding-inline: 0;
     }
 }

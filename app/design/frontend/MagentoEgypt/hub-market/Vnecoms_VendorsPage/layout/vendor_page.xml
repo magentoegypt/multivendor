@@ -50,15 +50,40 @@
             now that `vendors/vendorspage/profile_position` is `top` — the
             reference puts the seller across the head of the page, not in a rail.
         -->
-        <referenceContainer name="vendor.profile.top.description.container">
+        <!--
+            Declared in the profile WRAPPER, after the seller card, because that
+            is the only place that renders where the reference puts them.
+
+            The tab bar is not in `content` — it is its own block in `page.top`,
+            so it paints before .columns does. Moving the tiles into `content`
+            put them below the tabs; putting them in the wrapper puts them
+            between the card and the tabs, which is the reference's order.
+        -->
+        <referenceContainer name="vendor.profile.top.wrapper">
             <block class="Vnecoms\Vendors\Block\Profile\Title"
                    name="hm.vendor.stats"
-                   after="-"
+                   after="vendor.profile.top.container"
                    template="Vnecoms_Vendors::profile/vendor-stats.phtml">
                 <arguments>
                     <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
                 </arguments>
             </block>
         </referenceContainer>
+
+        <!--
+            The reference's vendor page has no filter rail — a banner, the seller
+            card, four stat tiles, tabs, then a full-width product grid. Ours ran
+            Vnecoms' layered navigation down the left, which on this catalogue
+            listed raw attribute values ("Matrial", "storage", "ram") in mixed
+            Arabic and English and squeezed the grid into two thirds of the page.
+
+            The block is removed rather than the page layout switched to 1column:
+            the microsite's own rules are scoped to
+            `.hm-page.vendor-page.page-layout-2columns-*`, and changing the layout
+            would silently turn every one of them off. The now-empty column is
+            closed up in CSS instead.
+        -->
+        <referenceBlock name="vendor.catalog.leftnav" remove="true"/>
+
     </body>
 </page>
