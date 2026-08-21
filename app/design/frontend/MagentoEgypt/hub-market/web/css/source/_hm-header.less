@@ -84,7 +84,7 @@
         color: var(--hm-on-inverse);
         text-decoration: none;
 
-        &:hover { color: var(--hm-accent); text-decoration: underline; }
+        &:hover { color: var(--hm-accent); }
     }
 }
 
@@ -505,10 +505,15 @@
     display: inline-flex;
     font-size: 1.2rem;
     gap: .4rem;
+    //  2.4rem, the pointer-target floor this theme holds itself to (WCAG 2.5.8).
+    //  These sat at 18px tall — the text's own line box, with no vertical padding
+    //  at all. The bar is tall enough to absorb it; the type does not change.
+    min-block-size: 2.4rem;
     text-decoration: none;
     white-space: nowrap;
 
-    &:hover,
+    //  Split — pointer gets the colour alone, focus keeps the underline.
+    &:hover { color: var(--hm-on-inverse); }
     &:focus-visible { color: var(--hm-on-inverse); text-decoration: underline; }
 
     .hm-icon { block-size: 1.2rem; inline-size: 1.2rem; }
@@ -539,7 +544,13 @@
     color: var(--hm-accent);
     font-weight: 700;
 
-    &:hover, &:focus-visible { color: var(--hm-accent); }
+    //  Brightens within the accent family instead of going white like the other
+    //  utility links. That restated accent was deliberate — it stops
+    //  .hm-utility__link:hover turning the one CTA in the bar the same colour as
+    //  its neighbours — but it also meant the hover changed nothing except the
+    //  underline, so removing underlines sitewide left it inert. --hm-accent-on-nav
+    //  is the lighter orange already used for Bundle Deals on the navy nav.
+    &:hover, &:focus-visible { color: var(--hm-accent-on-nav); }
 }
 
 @media (max-width: 767px) {
@@ -560,6 +571,14 @@
     .switcher-store { margin: 0; }
 
     .switcher-label { .hm-sr-only-mixin(); }
+
+    //  The trigger is the tap target, and it was 12px tall — the strong's line
+    //  box and nothing else. Same 2.4rem floor as the links beside it.
+    .switcher-trigger {
+        align-items: center;
+        display: inline-flex;
+        min-block-size: 2.4rem;
+    }
 
     .switcher-trigger strong,
     .switcher-trigger > strong {
@@ -763,13 +782,30 @@
 
     .switcher,
     .switcher-store,
-    .switcher-trigger,
     .switcher-trigger > strong {
         display: flex;
         align-items: center;
         line-height: 1;
         margin: 0;
         min-block-size: 0;
+        padding: 0;
+    }
+
+    //  The trigger is pulled out of that list: it is the tap target, and
+    //  `min-block-size: 0` there is what kept it at its 12px line box. Everything
+    //  else in the group is a wrapper or the label inside it, which should stay
+    //  flat. 2.4rem is the pointer floor this theme holds itself to.
+    //  Both axes. The floor is 24x24, and the Arabic label — عربي — is only 20px
+    //  wide, so a height-only rule left it passing in English and failing in
+    //  Arabic on exactly the control that switches between them.
+    .switcher-trigger {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        line-height: 1;
+        margin: 0;
+        min-block-size: 2.4rem;
+        min-inline-size: 2.4rem;
         padding: 0;
     }
 }

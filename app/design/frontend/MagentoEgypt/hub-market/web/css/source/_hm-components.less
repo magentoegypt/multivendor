@@ -392,7 +392,7 @@
     gap: var(--hm-space-1);
     text-decoration: none;
 
-    &:hover { text-decoration: underline; }
+    &:hover { color: var(--hm-accent-strong-hover); }
 }
 
 //
@@ -447,4 +447,19 @@
     a:not(.hm-btn) { color: var(--hm-on-inverse); }
 
     .hm-muted { color: var(--hm-on-inverse-muted); }   // 10.56:1 on navy
+}
+
+//
+//  Breadcrumb links — pointer target
+//  ---------------------------------------------
+//  19px tall: the text's own line box, with no vertical padding. Same 2.4rem
+//  floor (WCAG 2.5.8) the rest of this theme holds. The row's visual height is
+//  unchanged — the links simply claim the space either side of their baseline.
+.hm-page .breadcrumbs .items > .item > a,
+//  The category hero draws its own trail rather than reusing Magento's
+//  breadcrumbs, so it needs naming separately — the rule above never reached it.
+.hm-page .hm-cat-hero__trail a {
+    align-items: center;
+    display: inline-flex;
+    min-block-size: 2.4rem;
 }

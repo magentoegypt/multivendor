@@ -1173,3 +1173,14 @@ body .block-search-by-vendor input[type="text"] {
         .menu-logo-container { display: none; }
     }
 }
+
+//  The vendor search submit was 21px wide — an icon button with no width of its
+//  own, sitting inside the field. Square it off to the theme's 2.4rem pointer
+//  floor. (The header's own search button is 121x40 and was never the problem.)
+.hm-page.vendor-page .block-search-by-vendor .action.search {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    min-block-size: 2.4rem;
+    min-inline-size: 2.4rem;
+}
