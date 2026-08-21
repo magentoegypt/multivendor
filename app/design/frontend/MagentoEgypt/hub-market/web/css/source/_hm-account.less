@@ -1071,6 +1071,14 @@
     //  2. Rows reach the card's own edges.
     padding: 0;
 
+    //  The two rules in this card were drawn in different greys, for no reason
+    //  beyond one being hardcoded and the other tokenised: the links use
+    //  rgba(0, 0, 0, .09) and the delimiter --hm-border-subtle, which resolves
+    //  a good deal darker. Once the doubling above is gone the delimiter is the
+    //  only line at that boundary, and a heavier one there reads as a mistake
+    //  rather than as grouping.
+    .delimiter { border-block-start-color: rgba(0, 0, 0, .09); }
+
     .item {
         > a,
         > strong {
@@ -1086,6 +1094,18 @@
         //  No rule under the last row — the card's own border closes it.
         &:last-child > a,
         &:last-child > strong { border-block-end: 0; }
+
+        //  Nor above a group delimiter. Magento renders those as
+        //  `<li class="nav item"><span class="delimiter"></span></li>` — the LI
+        //  carries no distinguishing class, so the span is what identifies it —
+        //  and the delimiter draws its own rule 12px below the hairline the link
+        //  above it had already drawn. Two lines 12px apart read as one doubled
+        //  border, which is what they looked like.
+        //
+        //  The delimiter is the separator at that boundary, so the link above
+        //  should not draw a second one.
+        &:has(+ .item > .delimiter) > a,
+        &:has(+ .item > .delimiter) > strong { border-block-end: 0; }
 
         //  6-7. Active row. NOTE: this is the reference's blue, not this build's
         //  orange — you asked for the whole list, and these two were flagged as
