@@ -2238,13 +2238,21 @@
 //
 //  Toolbar — Figma puts the count on the lead edge, sort and view on the trailing
 //  ---------------------------------------------
+//  SCOPE: this design was written for `.hm-plp`, a body class only the category
+//  page carries, so the vendor microsite's toolbar fell back to blank's order —
+//  view switcher first, count adrift in the middle, sort last, none of it on the
+//  band. The vendor scope is added to each selector here rather than putting
+//  `hm-plp` on that page: the same class also carries filter, sidebar, columns
+//  and page-wrapper rules, which would fight the microsite's own layout.
+//
 //  Ours had the view switcher first, the count centred and the sort last, which
 //  is Magento/blank's order, not the design's.
 //  Figma sits the toolbar in a white card of its own, the same surface and
 //  radius as the product tiles below it. Ours was bare on the page ground, so
 //  the count and the sort looked like they belonged to the grid rather than
 //  labelling it.
-.hm-plp .toolbar-products {
+.hm-plp .toolbar-products,
+.hm-page.vendor-page .toolbar-products {
     align-items: center;
     background: var(--hm-surface);
     border: 1px solid var(--hm-border-subtle);
@@ -2258,7 +2266,8 @@
 
 //  The repeated bottom toolbar is pagination only — no surface, or the page
 //  ends on an empty white slab.
-.hm-plp .products ~ .toolbar-products {
+.hm-plp .products ~ .toolbar-products,
+.hm-page.vendor-page .products ~ .toolbar-products {
     background: transparent;
     border: 0;
     padding: 0;
@@ -2268,7 +2277,8 @@
 //  the hero band's 14px the rest was the toolbar carrying 60px-tall view-mode
 //  buttons and a 50px sorter inside 24px of padding. Capping the controls at
 //  38px lands the row on 62 and the grid on Figma's y.
-.hm-plp .toolbar-products {
+.hm-plp .toolbar-products,
+.hm-page.vendor-page .toolbar-products {
     .modes,
     .modes-mode,
     .toolbar-sorter,
@@ -2289,16 +2299,23 @@
 //  toolbar, so the two margins collapse to the larger one and the grid sat 36px
 //  below the toolbar instead of Figma's 16 — the last of the offset that had the
 //  first card 21px low.
-.hm-plp .products { margin-block-start: var(--hm-space-4); }
+.hm-plp .products,
+.hm-page.vendor-page .products { margin-block-start: var(--hm-space-4); }
 
-.hm-plp .toolbar-products .toolbar-amount { margin: 0; order: 1; }
-.hm-plp .toolbar-products .toolbar-sorter { margin-inline-start: auto; order: 2; }
-.hm-plp .toolbar-products .modes { margin: 0; order: 3; }
-.hm-plp .toolbar-products .field.limiter { order: 4; }
+.hm-plp .toolbar-products .toolbar-amount,
+.hm-page.vendor-page .toolbar-products .toolbar-amount { margin: 0; order: 1; }
+.hm-plp .toolbar-products .toolbar-sorter,
+.hm-page.vendor-page .toolbar-products .toolbar-sorter { margin-inline-start: auto; order: 2; }
+.hm-plp .toolbar-products .modes,
+.hm-page.vendor-page .toolbar-products .modes { margin: 0; order: 3; }
+.hm-plp .toolbar-products .field.limiter,
+.hm-page.vendor-page .toolbar-products .field.limiter { order: 4; }
 
 //  The bottom toolbar repeats the pager; Figma centres it and shows nothing else.
 .hm-plp .toolbar-products ~ .toolbar-products,
-.hm-plp .products ~ .toolbar-products {
+.hm-plp .products ~ .toolbar-products,
+.hm-page.vendor-page .toolbar-products ~ .toolbar-products,
+.hm-page.vendor-page .products ~ .toolbar-products {
     justify-content: center;
 
     .toolbar-amount,
