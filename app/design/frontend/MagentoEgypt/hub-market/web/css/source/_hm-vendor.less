@@ -516,6 +516,9 @@
 //  Vnecoms also centres the nav with a ~407px `margin-left`, which left the row
 //  too narrow to hold the tabs and the field side by side. Full width, no margin.
 .hm-page.vendor-page .vendor-menu {
+    //  UPDATE: `margin-inline: 0` killed Vnecoms' ~407px indent, which was right,
+    //  but the bar is full width in both its static and its pinned state now, so
+    //  this row is what carries the band — auto margins, not zero.
     .vendor-nav-container {
         align-items: center;
         display: flex;
@@ -523,7 +526,8 @@
         flex-wrap: wrap;
         gap: var(--hm-space-4);
         inline-size: 100%;
-        margin-inline: 0;
+        margin-inline: auto;
+        max-inline-size: calc(var(--hm-container) - (2 * var(--hm-space-4)));
     }
 
     ul {
@@ -804,9 +808,26 @@
 .hm-page.vendor-page {
     .vendor-menu-wrapper { background: transparent; }
 
+    //  Vnecoms pins this bar with a `fixed` class on scroll — position: fixed,
+    //  top 0, z-index 100. Flattening it to transparent therefore let the whole
+    //  product grid scroll THROUGH it. Flat while it sits in the page, opaque
+    //  the moment it is pinned.
+    //
+    //  Full width in both states, because a fixed element does not centre from
+    //  `margin-inline: auto` without both insets — the band goes on the row
+    //  inside instead, which centres in either state.
     #vendor-menu.vendor-menu {
         background: transparent;
         border-block-end: 1px solid var(--hm-border-subtle);
+        inline-size: 100%;
+        margin-inline: 0;
+        max-inline-size: none;
+
+        &.fixed {
+            background: var(--hm-surface);
+            box-shadow: var(--hm-shadow-sm);
+            inset-inline: 0;
+        }
     }
 
     .vendor-nav-container {
@@ -866,8 +887,7 @@
     //  The band goes on the profile WRAPPER now, not the card: the card is inset
     //  from it to leave room for the logo, while the stat tiles inside the same
     //  wrapper still run the full band, which is how the reference stacks them.
-    .vendor-profile-wrapper,
-    #vendor-menu.vendor-menu {
+    .vendor-profile-wrapper {
         //  `inline-size: 100%` before the cap: the wrapper shrink-wraps to its
         //  content otherwise — with the card inset and the logo lifted out, that
         //  collapsed the whole band to 640px.
@@ -876,14 +896,7 @@
         max-inline-size: calc(var(--hm-container) - (2 * var(--hm-space-4)));
     }
 
-    //  The band goes on the menu, not the row inside it: centring the row within
-    //  a parent that is not itself centred just moved it to that parent's own
-    //  left edge. The rule under the tabs then spans the band, as it does in the
-    //  reference, rather than the full width of the page.
-    .vendor-nav-container {
-        inline-size: 100%;
-        padding-inline: 0;
-    }
+    .vendor-nav-container { padding-inline: 0; }
 }
 
 //
