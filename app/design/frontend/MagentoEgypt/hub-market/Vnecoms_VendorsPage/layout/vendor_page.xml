@@ -60,6 +60,32 @@
             between the card and the tabs, which is the reference's order.
         -->
         <!--
+            The shared product card already prints the seller's name above the
+            title — it just needs the ViewModel that resolves vendor_id to a
+            public name, and that is passed per block name. The category and home
+            lists get it in their own layouts; the microsite's two lists were
+            never on the list, so every card here rendered without a seller line.
+
+            Both names are referenced because the two microsite screens declare
+            their own: `vendors.products.list` on the shop home,
+            `credit.products.list` on the items page. A reference to a block that
+            is not in the current handle is simply ignored.
+
+            The star rating needs no wiring — getReviewsSummaryHtml() is already
+            in the card and renders wherever a product has reviews.
+        -->
+        <referenceBlock name="vendors.products.list">
+            <arguments>
+                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="credit.products.list">
+            <arguments>
+                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+            </arguments>
+        </referenceBlock>
+
+        <!--
             Contact Vendor, at the card's trailing edge as the reference has it.
             Reuses Profile\Title for the same reason the stats block does: a new
             class needs a di:compile before layout may reference it, and until
