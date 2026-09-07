@@ -1,13 +1,25 @@
 <?xml version="1.0"?>
 <!--
-    Under Content, beside Blocks and Pages, because that is where a merchandiser
-    looks for homepage content.
+    Under Content > Elements, beside Blocks and Pages, because that is where a
+    merchandiser looks for homepage content.
 
-    Parented to an existing core node rather than a new top-level one. This
-    install already carries a broken custom menu parent — every admin request
-    logs "Specified invalid parent id (Magento_Backend::mgs)" from a
-    decommissioned module — and adding another vendor root would be one more of
-    the same class of problem.
+    THE PARENT IS Magento_Backend::content_elements AND NOTHING ELSE. This
+    file's first version used parent="Magento_Cms::cms" — the MAGENTO 1 menu
+    id, which no module in Magento 2 declares — and the intent comment beside
+    it even explained it was "parented to an existing core node" to avoid the
+    invalid-parent failure class. It was itself that failure: the menu builder
+    throws OutOfRangeException("Specified invalid parent id") for an unknown
+    parent, Menu\Config does not catch it, and EVERY logged-in admin page dies
+    with "There has been an error processing your request" (report
+    f56b3de410ff…, ClickUp 86d49nh8k, 2026-09-06). The merged-menu cache is
+    what hid it for a month: the breakage only surfaces on the first admin hit
+    after a cache flush.
+
+    The two core Content nodes that actually exist in 2.4.8 are
+    Magento_Backend::content (the top-level) and
+    Magento_Backend::content_elements (the group core parents Pages and Blocks
+    to — verified in vendor/magento/module-cms/etc/adminhtml/menu.xml). Before
+    changing this parent again, grep vendor for `id="<the node>"` first.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/menu.xsd">
@@ -17,7 +29,7 @@
              translate="title"
              module="MagentoEgypt_HeroBanner"
              sortOrder="45"
-             parent="Magento_Cms::cms"
+             parent="Magento_Backend::content_elements"
              action="magentoegypt_herobanner/banner/index"
              resource="MagentoEgypt_HeroBanner::banner"/>
     </menu>
