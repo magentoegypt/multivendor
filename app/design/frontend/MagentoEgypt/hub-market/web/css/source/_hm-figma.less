@@ -280,7 +280,7 @@
         .product-item-name a.product-item-link { color: var(--hm-on-inverse); }        // 14.7:1
         .product-item-name a.product-item-link:hover { color: var(--hm-accent-on-dark); }
 
-        .hm-card__vendor { color: var(--hm-accent-on-dark); }   // was 4.73:1, now 6.7:1
+        .hm-card__vendor { color: var(--hm-accent-on-dark); }   // the card's orange, 6.7:1 on the panel
 
         //  The price is the highest-contrast text on a card, not an accent one —
         //  the same call the light card makes with --hm-foreground (15.9:1), and
@@ -332,17 +332,22 @@
     .hm-section__more  { color: var(--hm-accent-on-dark); }
 }
 
-//  auto-fit rather than four fixed tracks: this catalog has three enabled
-//  bundles, and a hard 4-column grid would leave a conspicuous empty cell. With
-//  auto-fit the three stretch to fill the row, and a fourth bundle drops the
-//  layout back to Figma's four columns on its own.
+//  FOUR fixed tracks — QA cycle 2 item 1-F: "We need them to be made up of
+//  four cards … exactly like the theme". The previous auto-fit stretched the
+//  three enabled bundles into three wide cards, which is precisely what QA
+//  photographed as wrong; a fourth demo bundle is seeded so the row fills
+//  (see dev/tools/hub-market/seed-demo-catalog-data.php).
 .hm-bundles__list {
     display: grid;
     gap: var(--hm-space-3);
-    grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     list-style: none;
     margin: 0;
     padding: 0;
+}
+
+@media (max-width: 1023px) {
+    .hm-bundles__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .hm-bundles__item { margin: 0; }
@@ -404,8 +409,9 @@
     padding: .4rem var(--hm-space-2);
 }
 
-//  Navy on the fill orange (5.04:1) — white on #f26522 is 3.15:1 and fails.
-.hm-bundle__badge--pct  { background: var(--hm-accent); color: var(--hm-on-accent); }
+//  Cycle 2: white on the fill orange, as the reference draws the badge — the
+//  navy-on-orange AA version is the recorded revert (white is 3.15:1).
+.hm-bundle__badge--pct  { background: var(--hm-accent); color: #ffffff; }
 .hm-bundle__badge--save { background: var(--hm-surface-inverse); color: var(--hm-on-inverse); }
 
 //  OPAQUE, not Figma's `bg-black/50 backdrop-blur-sm`.
@@ -448,7 +454,7 @@
 }
 
 .hm-bundle__vendor {
-    color: var(--hm-accent-strong);
+    color: var(--hm-accent);   // cycle 2: reference orange, same trade as .hm-card__vendor
     font-size: 1.2rem;
     font-weight: 600;
     line-height: 1.3;
@@ -468,7 +474,7 @@
     line-height: 1.3;
     overflow: hidden;
 
-    .hm-bundle:hover & { color: var(--hm-accent-strong); }
+    .hm-bundle:hover & { color: var(--hm-accent); }   // cycle 2: reference orange on hover
 }
 
 .hm-bundle__text {
@@ -519,12 +525,18 @@
     padding-block-start: var(--hm-space-2);
 }
 
+//  QA cycle 2, item 1-F: the reference reads "$849.99 $1049.97" on ONE line
+//  with the green saving under it — the struck price no longer stacks below.
 .hm-bundle__prices {
+    align-items: baseline;
+    column-gap: var(--hm-space-2);
     display: flex;
-    flex-direction: column;
-    gap: .2rem;
+    flex-flow: row wrap;
     min-inline-size: 0;
+    row-gap: .2rem;
 }
+
+.hm-bundle__saving { flex-basis: 100%; }
 
 .hm-bundle__price {
     color: var(--hm-price);
@@ -550,8 +562,11 @@
 .hm-bundle__cta {
     align-items: center;
     background: var(--hm-accent);
-    border-radius: var(--hm-radius-sm);
-    color: var(--hm-on-accent);      // navy on orange, 5.04:1
+    border-radius: var(--hm-radius);
+    //  Cycle 2: WHITE on the fill orange, as the reference draws it (12px/700
+    //  solid pill, measured). 3.15:1 — same recorded parity-over-AA trade as
+    //  .hm-card__vendor; the earlier navy-on-orange (5.04:1) is the revert.
+    color: #ffffff;
     display: inline-flex;
     flex-shrink: 0;
     font-size: 1.2rem;
@@ -613,6 +628,15 @@
 //  "see all" link today; the rule stays so the panel is correct if one appears.)
 .hm-rail--hm-home-pickedforyou .hm-section__more { color: var(--hm-accent-on-dark); }
 
+//  Best Sellers is the one rail the reference draws WITHOUT a vendor line —
+//  QA cycle 1 filed it as "remove the red/orange vendor name label above the
+//  product title". Hidden rather than dropped from the template, because the
+//  template is shared by eight rails and the other seven keep theirs.
+//  `display: none` and not visually-hidden: this is duplicated information, not
+//  something a screen reader is missing out on — the vendor is on the product
+//  page one click away.
+.hm-rail--hm-home-bestsellers .hm-card__vendor { display: none; }
+
 //
 //  Product card  (Figma: the one component that repeats nine times)
 //  ---------------------------------------------
@@ -638,7 +662,41 @@
 
     .product-image-photo { transition: transform 500ms var(--hm-ease); }
     .product-item-info:hover .product-image-photo { transform: scale(1.05); }
+}
 
+//  QA cycle 2 (1-B/1-E/2-A): the reference's card image fills the card
+//  edge-to-edge. Magento renders the image inside a container carrying an
+//  INLINE width (the configured image size, 240px), which left a gutter each
+//  side at card widths above it — !important is the only thing that beats an
+//  inline style. The ratio wrapper's padding hack goes with it; the card's
+//  aspect-ratio photo box already reserves the space.
+//
+//  Scoped to the LISTING contexts on purpose. A bare `.product-item` scope
+//  would also catch the MINICART items (they carry the same class) and stretch
+//  a 78px thumbnail across the drawer.
+.products-grid .product-item,
+.products.list .product-item,
+.block.widget .product-item {
+    .product-image-container { display: block; inline-size: 100% !important; }
+
+    .product-image-wrapper {
+        block-size: 100%;
+        display: block;
+        overflow: hidden;
+        padding-block-end: 0 !important;
+    }
+
+    .product-image-photo {
+        block-size: 100%;
+        inline-size: 100%;
+        object-fit: cover;
+        position: static;
+    }
+}
+
+//  The card interior, back at the original `.product-item` scope — the block
+//  above is deliberately narrower (see its comment) and must not swallow these.
+.product-item {
     //  Figma: `p-3.5`.
     .product-item-details {
         gap: var(--hm-space-1);
@@ -664,7 +722,13 @@
             font-weight: 500;
             line-height: 1.35;
             min-block-size: 3.8rem;
+            transition: color var(--hm-duration) var(--hm-ease);
         }
+
+        //  QA cycle 2, item 1-B: "the product name to change to orange when we
+        //  hover over it". The reference's own orange; hover state, so the
+        //  resting contrast is unaffected.
+        a.product-item-link:hover { color: var(--hm-accent); }
     }
 
     //  Price row: price block on the lead edge, actions on the trailing edge.
@@ -772,9 +836,47 @@
         .hm-icon { block-size: 1.5rem; inline-size: 1.5rem; }
     }
 
-    //  Rating: Figma sets 12px stars with the count beside them.
-    .rating-summary { line-height: 1; }
-    .reviews-actions { font-size: 1.2rem; }   // 12px floor
+    //  Price. Measured on the reference: 18px / 800 in the brand navy, with the
+    //  struck price at 12px beside it. Ours ran 16px / 700, which is the single
+    //  biggest reason the two cards read differently at a glance — the price is
+    //  the heaviest thing on the card and it was a step light.
+    .price-box .price {
+        font-size: 1.8rem;
+        font-weight: 800;
+    }
+
+    .old-price .price {
+        font-size: 1.2rem;
+        font-weight: 400;
+    }
+
+    //  Rating: SVG stars with the count on the SAME LINE, immediately beside
+    //  them — QA cycle 2 re-filed the count drifting away from the stars, so
+    //  the row is inline-flex with a fixed gap and must never justify-between.
+    //  The .hm-stars/.hm-rating classes come from summary_short.phtml.
+    .product-reviews-summary.hm-rating {
+        align-items: center;
+        display: inline-flex;
+        flex-wrap: nowrap;
+        gap: var(--hm-space-1);
+        margin: 0;
+    }
+
+    .hm-rating__count { font-size: 1.2rem; }   // 12px floor
+
+    //  An unrated product still renders its star track, at width 0, so the grid
+    //  keeps one card height — see Magento_Review/helper/summary_short.phtml.
+    //  This only stops the "(0)" beside it reading as loudly as a real count.
+    .hm-rating--empty .hm-rating__count { color: var(--hm-foreground-muted); }
+}
+
+//  The numeric score beside the stars — "4.7 (284 reviews)". PDP only: the
+//  reference card shows the count alone, and the card has no room for both.
+.hm-rating__score {
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-inline-start: var(--hm-space-1);
 }
 
 //  Discount badge. Figma paints this `bg-red-500` (#ef4444) with white text —
@@ -797,6 +899,16 @@
     background: var(--hm-discount-bg);
     color: var(--hm-discount-fg);
 }
+
+//  QA cycle 2, item 1-B: "The price before the discount has two lines through
+//  it, we need to delete one." Core blank's _prices.less puts line-through on
+//  the .old-price WRAPPER and this theme puts it on the inner .price — each
+//  inline box draws its own decoration at its own font metrics, so the struck
+//  price showed two parallel lines. The wrapper's is the one that goes: every
+//  context here decorates the inner .price (cards, PDP, minicart), so killing
+//  the wrapper decoration leaves exactly one line everywhere.
+.old-price,
+.old.price { text-decoration: none; }
 
 //  Wishlist, on the image's trailing corner.
 //
@@ -898,41 +1010,85 @@
 }
 
 @media (any-hover: hover) {
-    //  BOTH controls fade in on the card, not just the wishlist.
+    //  BOTH card controls fade in on hover — the wishlist disc and the cart
+    //  button. This is the SECOND REVERSAL of the cart button and it is
+    //  QA-directed both times, so the history stays here in full:
     //
-    //  The hover guard is the whole point of using any-hover rather than a
-    //  breakpoint: on a touch device there is no hover, the query never matches,
-    //  and both controls stay permanently visible. A plain :hover rule would
-    //  hide the only add-to-cart affordance on every phone.
+    //    - Cycle 1 filed "Add to Cart button is missing" against six rails
+    //      (their screenshots were static, so a hover-only control read as
+    //      absent) and the button was made permanent.
+    //    - Cycle 2 (86d45m4tj item 1-B) files the opposite with the reference
+    //      open beside it: "We need the add-to-cart button to show up only
+    //      when we hover over the card." The reference build does hide it
+    //      (`opacity-0 group-hover:opacity-100`), so hover-only is the match.
+    //
+    //  Do not "fix" this again in either direction without a QA ticket in hand.
+    //
+    //  any-hover rather than a breakpoint means a touch device never matches
+    //  the query, so BOTH controls stay permanently visible there instead of
+    //  being unreachable — the reference simply has no touch answer at all.
+    //  focus-within keeps keyboard access: tabbing into the card reveals them.
     .product-item-info .hm-card__wish,
-    .product-item-info:not(.hm-card--bundle) .action.tocart {
+    .product-item-info .action.tocart {
         opacity: 0;
         transition: opacity var(--hm-duration) var(--hm-ease);
     }
 
     .product-item-info:hover .hm-card__wish,
     .product-item-info:focus-within .hm-card__wish,
-    .product-item-info:not(.hm-card--bundle):hover .action.tocart,
-    .product-item-info:not(.hm-card--bundle):focus-within .action.tocart { opacity: 1; }
-
-    //  A bundle cannot be bought from a listing — its button navigates to the
-    //  product page to be configured. Hiding a navigation affordance until hover
-    //  is not the same trade as hiding a one-click shortcut, so bundles keep
-    //  theirs on screen. Spelled out as its own rule rather than left implicit
-    //  in the :not() above.
-    .product-item-info.hm-card--bundle .action.tocart { opacity: 1; }
+    .product-item-info:hover .action.tocart,
+    .product-item-info:focus-within .action.tocart { opacity: 1; }
 }
 
-//  Vendor line. Figma: `text-[10px] text-[#f26522] font-semibold truncate`.
-//  @hm-accent-strong instead of @hm-accent — the fill orange is 3.15:1 and this
-//  is text; 12px rather than 10 for the same reason the rest of the theme holds
-//  a 12px floor.
+//  QA cycle 2, item 1-B: card hover motion. The reference card transitions at
+//  200ms and lifts with a soft shadow while the image scales (the scale is
+//  further down, on .product-image-photo). Applied to every product card, so
+//  the rails, the listing, related and cross-sell all move the same way.
+.product-item .product-item-info {
+    transition: box-shadow var(--hm-duration) var(--hm-ease),
+                transform var(--hm-duration) var(--hm-ease);
+}
+
+.product-item .product-item-info:hover {
+    box-shadow: 0 12px 24px rgba(15, 33, 68, .10);
+    transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .product-item .product-item-info,
+    .product-item .product-item-info:hover { transform: none; transition: none; }
+}
+
+//  Vendor line — ORANGE, and this went round twice, so the measurement is
+//  recorded rather than the argument.
+//
+//  The reference's PRODUCT CARD vendor is `rgb(242, 101, 34)` — #f26522. Its
+//  CART vendor is `oklch(0.546 0.245 262.881)` — blue-600, #2563eb. They are two
+//  different colours on two different surfaces, and QA cycle 1's "change the
+//  vendor name to Blue" was filed against the CART page specifically. Applying
+//  it to the card as well repainted a line the reference draws orange.
+//
+//  QA CYCLE 2: the reference's own #f26522 (--hm-accent), no longer the
+//  darkened accent-strong. #f26522 on white is 3.15:1 and under AA for text —
+//  the earlier pass darkened it to #c2410c (5.18:1) for exactly that reason,
+//  and cycle 2 item 1-A then filed the darkened family sitewide as "the orange
+//  color used throughout the site doesn't match the theme". Parity was ruled
+//  to win; the AA figure stays recorded here so the trade is a decision, not
+//  an accident. The line is 12px/600 duplicated information (the vendor is on
+//  the PDP one click away).
+//
+//  12px rather than the reference's 10 for the same reason the rest of this
+//  theme holds a 12px floor.
 .hm-card__vendor {
-    color: var(--hm-accent-strong);
+    color: var(--hm-accent);
     display: block;
     font-size: 1.2rem;
     font-weight: 600;
     line-height: 1.3;
+    //  The slot is rendered even for products with no vendor (see list.phtml),
+    //  and an empty block box is 0px tall — which would put us straight back to
+    //  ragged rows. 1.2rem x 1.3 = 1.56rem, so 1.6rem holds exactly one line.
+    min-block-size: 1.6rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1001,14 +1157,43 @@
     z-index: 3;
 }
 
-//  Figma marks the podium in accent and the rest in navy.
-.hm-rail--hm-home-bestsellers .product-item:nth-child(-n+3) .product-item-media::before {
-    background: var(--hm-accent);
-    color: var(--hm-on-accent);   // 5.04:1
-}
+//  QA cycle 2, item 1-H: medal colours. Measured off the reference: rank 1 is
+//  amber (#f59e0b), and 4-6 keep the navy; silver and bronze for 2 and 3 keep
+//  the podium metaphor the reference's grey second chip implies.
+.hm-rail--hm-home-bestsellers .product-item:nth-child(1) .product-item-media::before { background: #f59e0b; color: #ffffff; }
+.hm-rail--hm-home-bestsellers .product-item:nth-child(2) .product-item-media::before { background: #9ca3af; color: #ffffff; }
+.hm-rail--hm-home-bestsellers .product-item:nth-child(3) .product-item-media::before { background: #b45309; color: #ffffff; }
 
 //  A discounted bestseller would otherwise stack its badge under the rank.
 .hm-rail--hm-home-bestsellers .hm-badge--discount { inset-block-start: 3.6rem; }
+
+//  QA cycle 2, item 1-H: "The card size here is much bigger than what's in the
+//  theme. We need this part to match the theme and remove the shopping cart."
+//  The reference bestseller card is the COMPACT variant: sans-serif name at
+//  11px/600, stars with NO count, the price in the accent orange, no cart
+//  button and no old price — nothing below the price row. Everything here is
+//  scoped so the other rails keep the full card.
+.hm-rail--hm-home-bestsellers {
+    //  display:none, not the hover fade — the control is not meant to exist on
+    //  this rail at all (and a focusable control that only appears on focus
+    //  would be a keyboard trap of the silly kind).
+    .product-item .action.tocart,
+    .actions-primary { display: none; }
+
+    &.block.widget .product-item-name a.product-item-link {
+        font-family: var(--hm-font-body);
+        font-size: 1.2rem;
+        font-weight: 600;
+        min-block-size: 3.4rem;
+    }
+
+    .hm-rating__count { display: none; }
+
+    &.block.widget .price-box .price { color: var(--hm-accent); font-size: 1.5rem; }
+    .price-box .old-price .price { font-size: 1.1rem; }
+
+    .product-item-details { padding: var(--hm-space-2) var(--hm-space-3) var(--hm-space-3); }
+}
 
 //  Swatches inside a homepage rail. Figma's cards carry none, and they are the
 //  reason the live rails looked ragged: a card with two size rows and a colour
@@ -1074,10 +1259,13 @@
 .hm-chips__link--7 { background: extract(@hm-chip-tints, 8); }
 
 //  RESET, not just restyle. _hm-home.less built this as a 52px grey disc holding
-//  a 24px sprite icon, sized for the category photo it used to contain. With a
-//  glyph inside it, that disc renders as a white circle floating on the tint —
-//  the tile ends up reading as two nested shapes. Figma sets the glyph directly
-//  on the tile at `text-3xl`.
+//  a 24px sprite icon, sized for the category photo it used to contain. That disc
+//  renders as a white circle floating on the tint and the tile reads as two
+//  nested shapes; Figma sets the glyph directly on the tile at `text-3xl`.
+//
+//  The glyph is an EMOJI again (it was briefly a sprite SVG — see the note in
+//  category-chips.phtml), so it is sized by font-size and needs no colour: an
+//  emoji carries its own. 3rem matches the reference's text-3xl.
 .hm-chips__icon {
     background: none;
     block-size: auto;
@@ -1444,22 +1632,34 @@
     border-radius: var(--hm-radius-lg);
     display: flex;
     isolation: isolate;
-    min-block-size: 14.4rem;
+    //  Cycle 2: the reference tile is ~130px; with the old space-5 padding the
+    //  content stack alone forced 170px, so the padding is the thing to trim.
+    min-block-size: 12.6rem;
     overflow: hidden;
-    padding: var(--hm-space-5);
+    padding: var(--hm-space-4) var(--hm-space-5);
     position: relative;
     text-decoration: none;
 
-    //  Watermark glyph. `content` is set per tile below.
-    &::after {
-        font-size: 4.8rem;
+    //  Watermark glyph — an SVG in the markup now, not a CSS `content` emoji.
+    //  QA cycle 1 named all three replacements (lightning bolt, crescent moon,
+    //  credit card) and an emoji cannot be swapped per banner from the CMS,
+    //  which is where the rest of this banner's content already lives. A
+    //  merchandiser editing the block can now change the icon with it.
+    .hm-promo__icon {
+        block-size: 4.4rem;
+        color: #ffffff;
+        inline-size: 4.4rem;
         inset-block-start: var(--hm-space-3);
         inset-inline-end: var(--hm-space-4);
-        line-height: 1;
-        opacity: .25;
+        //  QA cycle 2 item 1-G boxed all three icons: the reference tints each
+        //  glyph in its own colour at near-full strength — an orange bolt, a
+        //  pale moon, a light-blue card — not a ghosted white outline.
+        opacity: .9;
         pointer-events: none;
         position: absolute;
         z-index: 0;
+
+        .hm-icon { block-size: 100%; inline-size: 100%; }
     }
 
     > * { position: relative; z-index: 1; }
@@ -1467,23 +1667,26 @@
     &:hover { filter: brightness(1.08); }
 }
 
-.hm-promo--a {
-    background: linear-gradient(135deg, #0f2144 0%, #1e3a6e 100%);
-    &::after { content: "🎁" / ""; }
-}
+//  Gradients re-measured for cycle 2: the first tile sweeps navy into a purple
+//  cast (the reference's), not into a lighter navy.
+.hm-promo--a { background: linear-gradient(135deg, #0f2144 0%, #37306b 100%); }
+.hm-promo--b { background: linear-gradient(135deg, #1a4731 0%, #2d7a3a 100%); }
+.hm-promo--c { background: linear-gradient(135deg, #3b1f6e 0%, #6b3fa0 100%); }
 
-.hm-promo--b {
-    background: linear-gradient(135deg, #1a4731 0%, #2d7a3a 100%);
-    &::after { content: "🥬" / ""; }
-}
-
-.hm-promo--c {
-    background: linear-gradient(135deg, #3b1f6e 0%, #6b3fa0 100%);
-    &::after { content: "🏪" / ""; }
-}
+.hm-promo--a .hm-promo__icon { color: #fbbf24; }   // amber bolt
+.hm-promo--b .hm-promo__icon { color: #d9f99d; }   // pale moon
+.hm-promo--c .hm-promo__icon { color: #93c5fd; }   // light-blue card
 
 //  One treatment for all three, since all three are now dark.
 .hm-promo {
+    //  The badge. Translucent white by default — QA cycle 1 asked for a solid
+    //  colour PER BANNER instead, the same complaint it made about the hero's
+    //  "oversized semi-transparent container". The per-banner colours are
+    //  modifier classes so the CMS block chooses them, and each is paired with
+    //  a measured foreground rather than assuming white works on all three:
+    //    --a  #c2410c orange  + white  5.18:1
+    //    --b  #facc15 yellow  + navy  10.40:1   (white on it is 1.4:1)
+    //    --c  #1d4ed8 blue    + white  6.70:1
     .hm-promo__kicker {
         background: fade(#ffffff, 20%);
         border-radius: var(--hm-radius-xs);
@@ -1497,6 +1700,13 @@
         text-transform: uppercase;
     }
 
+    //  Cycle 2 recolours: flash goes the reference's light red (the same
+    //  discount-badge trade recorded at @hm-discount-bg), BNPL/COD goes the
+    //  reference's violet (white on #7c3aed is 5.24:1 — this one passes).
+    .hm-promo__kicker--flash    { background: var(--hm-discount-bg); color: #ffffff; }
+    .hm-promo__kicker--seasonal { background: var(--hm-promo-seasonal); color: var(--hm-primary); }
+    .hm-promo__kicker--bnpl     { background: #7c3aed; color: #ffffff; }
+
     .hm-promo__title {
         color: var(--hm-on-inverse);
         display: block;
@@ -1506,8 +1716,11 @@
         line-height: 1.2;
     }
 
+    //  White, not 70% white — QA cycle 1 asked for the subtext "in white font"
+    //  on all three banners. Each ground is a dark gradient, so this is a
+    //  contrast gain, not a risk.
     .hm-promo__text {
-        color: fade(#ffffff, 70%);
+        color: #ffffff;
         display: block;
         font-size: 1.2rem;
         margin-block-start: .4rem;
@@ -1593,15 +1806,21 @@
 }
 
 .hm-trust__item:nth-child(3) {
+    //  Blue, per QA cycle 1. Stroke #1d4ed8 on @hm-info-subtle is 6.0:1, well
+    //  clear of the 3:1 that 1.4.11 asks of a meaningful graphic.
     .hm-trust__glyph(
-        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c2410c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'/%3E%3Cpath d='M15 18H9'/%3E%3Cpath d='M19 18h2a1 1 0 0 0 1-1v-3.7a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14'/%3E%3Ccircle cx='17' cy='18' r='2'/%3E%3Ccircle cx='7' cy='18' r='2'/%3E%3C/svg%3E"),
-        @hm-accent-subtle);
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2'/%3E%3Cpath d='M15 18H9'/%3E%3Cpath d='M19 18h2a1 1 0 0 0 1-1v-3.7a1 1 0 0 0-.2-.6l-3.5-4.4A1 1 0 0 0 17.5 8H14'/%3E%3Ccircle cx='17' cy='18' r='2'/%3E%3Ccircle cx='7' cy='18' r='2'/%3E%3C/svg%3E"),
+        @hm-info-subtle);
 }
 
 .hm-trust__item:nth-child(4) {
+    //  Purple, per QA cycle 1 — and it had to move anyway: returns and delivery
+    //  were both blue once delivery changed, which is two of five items sharing
+    //  a colour in a row whose whole job is to look like five distinct things.
+    //  Stroke #7c3aed on @hm-trust-returns-subtle is 4.91:1.
     .hm-trust__glyph(
-        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/svg%3E"),
-        @hm-info-subtle);
+        url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/svg%3E"),
+        @hm-trust-returns-subtle);
 }
 
 .hm-trust__item:nth-child(5) {
@@ -1655,13 +1874,39 @@
     //  contributes no height of its own — without it the artwork overflowed.
     .hm-app { min-block-size: 39.5rem; }
 
+    //  THE MOCK SITS AGAINST THE CONTAINER, NOT THE BLEED. `.hm-app` takes
+    //  `.hm-band()`, so it spans the viewport — which meant `inset-inline-end:
+    //  12%` measured 12% of the WINDOW and parked the phone against the browser
+    //  edge, hundreds of pixels clear of the copy. QA cycle 1: "Re-align the
+    //  phone mockup image to sit properly next to the text instead of pushing
+    //  to the far right."
+    //
+    //  `50% - container/2` is the distance from the viewport edge in to the
+    //  container's trailing edge, so the mock lands flush with the content
+    //  column. `max()` keeps a 2rem gutter on a window narrower than the
+    //  container, where that expression goes negative.
     .hm-app::after {
         background: url('../images/hm-app-phone.svg') no-repeat center / contain;
         block-size: 37rem;
         content: '';
         inline-size: 14.2rem;
         inset-block-start: 50%;
-        inset-inline-end: 12%;
+        //  ESCAPED (~"...") — non-negotiably. Less has its own max() and
+        //  evaluates it at COMPILE time; handed 2rem against a var()-bearing
+        //  calc it cannot compare, it silently emitted plain `2rem`, and the
+        //  mock went back to hugging the viewport edge — the exact defect QA
+        //  filed, "fixed" in source but never in the shipped CSS. The escape
+        //  passes the expression to the browser untouched, where max() means
+        //  CSS max(). Found because the report came back, not by the compiler
+        //  saying anything.
+        //
+        //  + --hm-space-4: the inner containers carry that padding, so the
+        //  mock's edge lines up with the CONTENT edge the header, nav and
+        //  footer share, not the container's outer box.
+        //  + 12rem beyond the content edge: QA cycle 2 (1-L) arrowed the mock
+        //  INWARD — the reference parks it ~120px shy of the container's
+        //  trailing edge, closer to the copy, not flush against the edge.
+        inset-inline-end: ~"max(2rem, calc(50% - (var(--hm-container) / 2) + var(--hm-space-4) + 12rem))";
         pointer-events: none;
         position: absolute;
         transform: translateY(-50%);
@@ -2121,6 +2366,20 @@
     white-space: nowrap;
 }
 
+//  ...but NOT on the search results page, which now carries `.hm-plp` too.
+//  The clip above is paid for by the category hero band, which restates where
+//  you are. Search has no such band — its header says "N results for X" and
+//  never names the section — so clipping there would remove the only "Home /
+//  Search results for 'test'" trail on the page. Search keeps its breadcrumbs.
+.hm-plp.catalogsearch-result-index .breadcrumbs {
+    block-size: auto;
+    clip-path: none;
+    inline-size: auto;
+    overflow: visible;
+    position: static;
+    white-space: normal;
+}
+
 //
 //  Filter rail — Figma draws each filter as its own white card
 //  ---------------------------------------------
@@ -2310,6 +2569,19 @@
 .hm-page.vendor-page .toolbar-products .modes { margin: 0; order: 3; }
 .hm-plp .toolbar-products .field.limiter,
 .hm-page.vendor-page .toolbar-products .field.limiter { order: 4; }
+
+//  blank emits a float clearfix on this element — `::before` and `::after` with
+//  `content: ''; display: table`. In a FLEX container those are not clearfixes,
+//  they are two zero-width flex items, and because neither carries an `order`
+//  they both sort ahead of the count (order 1). They are invisible, but the
+//  12px `gap` still applies on both sides of them, so the result count sat 24px
+//  in from the toolbar's content edge while the view switcher stayed flush to
+//  the trailing edge — measured amount.x=385 against a content edge of 361.
+//  Nothing floats in here, so the clearfix has nothing to clear.
+.hm-plp .toolbar-products::before,
+.hm-plp .toolbar-products::after,
+.hm-page.vendor-page .toolbar-products::before,
+.hm-page.vendor-page .toolbar-products::after { content: none; }
 
 //  The bottom toolbar repeats the pager; Figma centres it and shows nothing else.
 .hm-plp .toolbar-products ~ .toolbar-products,
@@ -3653,13 +3925,23 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     font-weight: 700;
 }
 
-//  4. VENDOR NAME was 15/600 Playfair in navy; the reference sets 16/600 sans
-//     and colours it as a link. Sans at 16 matches the reference exactly. The
-//     colour is this theme's accent rather than the reference's blue — the
-//     seller credit on the PDP is already --hm-accent-strong at 5.18:1, and one
-//     seller name should not be two different colours in one checkout flow.
+//  4. VENDOR NAME is 16/600 sans, and BLUE.
+//
+//     It was accent orange, on the reasoning that one seller name should not be
+//     two different colours across a single flow while the PDP's seller credit
+//     stayed accent. That argument now points the other way: QA cycle 1 asked for
+//     blue here explicitly, the product card's `.hm-card__vendor` moved to blue
+//     with it, and leaving this orange would be the thing that makes the seller
+//     name two colours. --hm-vendor-name is #1d4ed8, 6.70:1 on white, and it is
+//     the same token the verified badge already uses.
+//
+//     Kept as a separate rule from the one in _hm-checkout.less rather than
+//     merged: that one carries the family and size the cart card needs, this one
+//     is the reference-parity correction on top, and the pair is emitted in that
+//     order. Both must name the colour or whichever is later silently wins —
+//     which is exactly how this rule came to be repainting it.
 .checkout-cart-index .hm-cart-group__vendor {
-    color: var(--hm-accent-strong);
+    color: var(--hm-vendor-name);
     font-family: var(--hm-font-sans);
     font-size: 1.6rem;
     font-weight: 600;
@@ -3961,16 +4243,21 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     padding-block: .2rem;
 }
 
-//  Carousel dots stay 6px to look at. `background-clip: content-box` keeps the
-//  paint inside the content box while padding pushes the button out to 24x24,
-//  so the dot looks identical and the target is four times taller.
-.hm-hero-carousel__dot {
-    background-clip: content-box;
-    block-size: 2.4rem;
-    box-sizing: border-box;
-    inline-size: 2.4rem;
-    padding: .9rem;
-}
+//  REMOVED — this rule was a second, conflicting fix for the same target-size
+//  finding, and it is what QA cycle 1 saw as "oversized solid white circle
+//  markers ... replace with small, rounded horizontal pill indicators".
+//
+//  The dot rule ~2000 lines above already solves 2.5.5 with a `::after` at
+//  `inset: -.9rem`, which grows the HIT AREA and leaves the painted dot alone.
+//  This rule instead grew the BUTTON to 24x24 and clipped the paint back with
+//  padding + background-clip. Visually equivalent for an inactive dot — but it
+//  also pinned `inline-size` to 2.4rem for every dot, so the selected dot's
+//  `inline-size: 2.4rem` (a 24x6 pill, the whole point) became a 24x24 box
+//  painting a 6x6 circle. Every dot rendered identical and the active state
+//  disappeared.
+//
+//  Deleted rather than corrected: two rules fixing one finding is how this
+//  happened, and the earlier one is the better mechanism.
 
 //  The seller search button was 16px wide, which is not a button.
 .seller-search-form .action.seller-search,
@@ -4215,3 +4502,382 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 .minicart-items .product-item-pricing .price-excluding-tax {
     margin-block-start: 0;
 }
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 1 — Featured Stores
+//  ---------------------------------------------------------------------------
+//  The verified mark sits on the avatar's trailing-bottom corner, overlapping it,
+//  which is why the avatar needed a positioned wrapper of its own — the avatar
+//  itself is a flex item in a column and cannot host an absolutely positioned
+//  child without also becoming the containing block for the card's other layers.
+//
+//  Logical inset properties, so the badge moves to the other corner in Arabic
+//  along with the rest of the card.
+//  Scoped to `.hm-stores` rather than to the featured rail alone: Top Vendors
+//  and New Stores render the same wrapper now, and three rails of vendor cards
+//  on one page should not have three different verified marks.
+.hm-stores {
+    .hm-stores__avatar-wrap {
+        display: inline-block;
+        flex: 0 0 auto;
+        position: relative;
+    }
+
+    .hm-stores__badge {
+        //  A ring in the card's own background colour separates the mark from the
+        //  logo underneath it — without it the check reads as part of the artwork.
+        background: var(--hm-surface);
+        border-radius: var(--hm-radius-full);
+        block-size: 2rem;
+        color: var(--hm-vendor-verified);
+        display: grid;
+        inline-size: 2rem;
+        inset-block-end: -.2rem;
+        inset-inline-end: -.2rem;
+        place-items: center;
+        position: absolute;
+
+        .hm-icon { block-size: 1.8rem; inline-size: 1.8rem; }
+    }
+
+    //  "Visit Store" — QA cycle 1 asked for the border and text colour to match
+    //  the reference. Navy on white is 15.89:1; the fill on hover keeps white on
+    //  navy at the same ratio, so the control reads the same either way.
+    .hm-stores__cta {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-primary);
+        border-radius: var(--hm-radius-sm);
+        color: var(--hm-primary);
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .hm-stores__link:hover .hm-stores__cta,
+    .hm-stores__link:focus-visible .hm-stores__cta {
+        background: var(--hm-primary);
+        color: var(--hm-on-primary);
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 2 — the three vendor rails (items 1-D, 1-J, 1-K)
+//  ---------------------------------------------------------------------------
+.hm-stores {
+    //  1-D: the verified mark is the reference's ORANGE check, not blue.
+    .hm-stores__badge { color: var(--hm-accent); }
+
+    //  1-D: "The visit store button doesn't match" — the reference's is a small
+    //  rounded pill with a light grey hairline and navy text, not a navy
+    //  outline. The navy fill on hover stays: it is this theme's press state.
+    .hm-stores__cta {
+        border: 1px solid var(--hm-border);
+        border-radius: var(--hm-radius-sm);
+        padding: .5rem var(--hm-space-4);
+    }
+
+    //  1-D: the single rating star renders FILLED and AMBER, like the
+    //  reference's. The colour is set here as well as in the two homepage-rail
+    //  scopes because the Featured rail sits outside both, and there the star
+    //  was inheriting the meta line's grey.
+    .hm-stores__star { color: var(--hm-rating-star); fill: currentColor; }
+
+    //  1-D: the stats line — package count and dispatch estimate side by side,
+    //  both muted grey (the dispatch line's green belongs to cycle 1 and is
+    //  overridden here; the truthfulness of the figure is unchanged).
+    .hm-stores__stats {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        display: flex;
+        font-size: 1.2rem;
+        gap: var(--hm-space-3);
+        justify-content: center;
+
+        .hm-stores__count,
+        .hm-stores__dispatch {
+            align-items: center;
+            color: var(--hm-foreground-muted);
+            display: inline-flex;
+            gap: .4rem;
+        }
+
+        .hm-icon { color: var(--hm-foreground-muted); }
+    }
+}
+
+//  1-J: Top Vendors names are near-black, orange on card hover.
+.hm-stores--hm-home-topvendors .hm-stores__name { color: var(--hm-foreground); }
+.hm-stores--hm-home-topvendors .hm-stores__link:hover .hm-stores__name { color: var(--hm-accent); }
+
+//  1-K: New Stores names stay white, orange on card hover. #f26522 is 5.04:1
+//  on the navy band — this is the one ground where the raw accent clears AA.
+.hm-stores--hm-home-newstores .hm-stores__name { color: var(--hm-on-inverse); }
+.hm-stores--hm-home-newstores .hm-stores__link:hover .hm-stores__name { color: var(--hm-accent); }
+
+//  1-K: the dark band's stats line takes the on-dark muted.
+.hm-stores--hm-home-newstores .hm-stores__stats,
+.hm-stores--hm-home-newstores .hm-stores__stats .hm-stores__count,
+.hm-stores--hm-home-newstores .hm-stores__stats .hm-stores__dispatch,
+.hm-stores--hm-home-newstores .hm-stores__stats .hm-icon { color: var(--hm-on-inverse-muted); }
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 1 — section badge and section foot
+//  ---------------------------------------------------------------------------
+//  The reference badges "Picked For You" and closes the row with a note and a
+//  "view all" link. Both are generic here — any rail can carry them from layout —
+//  because the alternative is a fourth bespoke rail template.
+//  The badge PRECEDES the title since QA cycle 2 (item 1-C arrowed it in front
+//  of "Picked For You", where the reference draws it), so the breathing space
+//  is on its trailing edge now.
+.hm-section__badge {
+    background: var(--hm-info-subtle);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-info);
+    font-size: 1.2rem;             // the theme's floor; the reference runs 10
+    font-weight: 700;
+    letter-spacing: .08em;
+    margin-inline-end: var(--hm-space-2);
+    padding: .3rem var(--hm-space-3);
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.hm-section__foot {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-3);
+    justify-content: space-between;
+    margin-block-start: var(--hm-space-4);
+}
+
+.hm-section__foot-note {
+    color: var(--hm-foreground-muted);
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.hm-section__foot-link {
+    align-items: center;
+    color: var(--hm-accent-strong);
+    display: inline-flex;
+    font-size: 1.3rem;
+    font-weight: 600;
+    gap: var(--hm-space-1);
+    text-decoration: none;
+
+    &:hover { color: var(--hm-accent-strong-hover); }
+}
+
+//  Picked For You sits on the navy band, so its badge and foot need the on-dark
+//  pairings — the light-surface values above are 1.6:1 there.
+//
+//  QA CYCLE 2, item 1-C: the badge is the reference's INDIGO-VIOLET pill with a
+//  live green dot, white type — the panel's "AI" accent family (the cart
+//  buttons and reason strips below share it).
+.hm-rail--hm-home-pickedforyou {
+    .hm-section__badge {
+        align-items: center;
+        background: linear-gradient(90deg, #6366f1, #8b5cf6);
+        color: #ffffff;
+        display: inline-flex;
+        gap: .6rem;
+
+        &::before {
+            background: #4ade80;
+            border-radius: 50%;
+            block-size: .6rem;
+            content: '';
+            display: inline-block;
+            inline-size: .6rem;
+        }
+    }
+
+    .hm-section__foot-note { color: var(--hm-on-inverse-muted); }
+
+    .hm-section__foot-link {
+        color: var(--hm-accent-on-dark);
+
+        &:hover { color: var(--hm-on-inverse); }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  Picked For You — the reference's own furniture
+//  ---------------------------------------------------------------------------
+//  Refresh control, search-term chips and the per-card reason tag. All three are
+//  generic (any rail can carry them from its block) but only Picked For You
+//  supplies the data today, which is why they are scoped to the panel below for
+//  colour and left unscoped for layout.
+.hm-section__refresh {
+    align-items: center;
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-foreground-muted);
+    display: inline-flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    gap: var(--hm-space-1);
+    margin-inline-start: auto;
+    padding: .4rem var(--hm-space-3);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover { color: var(--hm-foreground); }
+}
+
+.hm-section__tags {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    margin-block-end: var(--hm-space-4);
+}
+
+.hm-section__tags-label {
+    color: var(--hm-foreground-muted);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.hm-section__tag {
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-foreground);
+    font-size: 1.2rem;
+    padding: .4rem var(--hm-space-3);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover { background: var(--hm-accent-subtle); color: var(--hm-accent-strong); }
+}
+
+//  The card's reason line. Sits under the price row, muted, one line.
+.hm-card__reason {
+    color: var(--hm-foreground-muted);
+    display: block;
+    font-size: 1.2rem;
+    margin-block-start: var(--hm-space-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+//  On the navy panel every one of those needs its on-dark pairing — the light
+//  values above measure between 1.2:1 and 2.1:1 there.
+//
+//  QA CYCLE 2, item 1-C, measured off the reference:
+//    chips     white/6% fill, white/12% hairline, magnifier glyph, pill
+//    refresh   transparent, white/18% hairline, brightens on hover
+//    reason    violet strip (#a78bfa ≈ the reference's rgba(139,92,246,.8),
+//              one step lighter for the dark card), its own top hairline
+//    cart      indigo-tinted circle, solid #6366f1 on hover, ALWAYS visible —
+//              the reference hides the cart on its light cards but shows it
+//              permanently on this panel's cards, so the global hover-fade is
+//              overridden here
+//    names     the reference sets THIS rail's card names in the sans, smaller
+//              than the serif the light rails use
+.hm-rail--hm-home-pickedforyou {
+    .hm-section__refresh {
+        background: transparent;
+        border-color: fade(#ffffff, 18%);
+        color: fade(#ffffff, 65%);
+
+        &:hover { border-color: fade(#ffffff, 40%); color: var(--hm-on-inverse); }
+    }
+
+    .hm-section__tags-label { color: fade(#ffffff, 45%); }
+
+    .hm-section__tag {
+        align-items: center;
+        background: fade(#ffffff, 6%);
+        border: 1px solid fade(#ffffff, 12%);
+        color: fade(#ffffff, 72%);
+        display: inline-flex;
+        gap: .6rem;
+
+        .hm-icon { block-size: 1.2rem; inline-size: 1.2rem; }
+
+        &:hover { background: fade(#ffffff, 6%); border-color: fade(#ffffff, 30%); color: var(--hm-on-inverse); }
+    }
+
+    .hm-card__reason {
+        align-items: center;
+        border-block-start: 1px solid fade(#ffffff, 10%);
+        color: #a78bfa;
+        display: flex;
+        gap: .6rem;
+        padding-block-start: var(--hm-space-2);
+
+        .hm-icon { block-size: 1.2rem; flex-shrink: 0; inline-size: 1.2rem; }
+    }
+
+    .product-item .action.tocart {
+        background: fade(#6366f1, 24%);
+        border: 0;
+        border-radius: var(--hm-radius-full);
+        color: var(--hm-on-inverse);
+
+        &:hover { background: #6366f1; }
+    }
+
+    .product-item-info .action.tocart { opacity: 1; }
+
+    &.block.widget .product-item-name a.product-item-link {
+        font-family: var(--hm-font-body);
+        font-size: 1.3rem;
+        font-weight: 600;
+        min-block-size: 3.6rem;
+    }
+}
+
+//  The bundles landing page heading carries its emoji, like every other section
+//  heading in this theme and like the reference, which titles that page
+//  "🎁 Bundle Deals".
+//
+//  `content: "🎁" / ""` — the second value is the CSS alt text, empty on purpose
+//  so a screen reader reads "Bundle Deals" and not "wrapped gift Bundle Deals".
+//  Same form the homepage rails use; do not drop the `/ ""`.
+.cms-bundles .hm-bundle-hero__title::before {
+    content: "🎁" / "";
+    margin-inline-end: var(--hm-space-2);
+}
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 1 — the hero CTA arrow, and per-rail "See All" colour
+//  ---------------------------------------------------------------------------
+//  The CTA carries a trailing arrow, as the reference does. Inline-flex so the
+//  glyph sits on the text baseline rather than dropping below it.
+.hm-hero-carousel__cta {
+    align-items: center;
+    display: inline-flex;
+    gap: var(--hm-space-2);
+
+    .hm-icon { block-size: 1.6rem; inline-size: 1.6rem; }
+}
+
+//  The chevron is directional and must mirror in Arabic.
+[dir='rtl'] .hm-hero-carousel__cta .hm-icon,
+:lang(ar) .hm-hero-carousel__cta .hm-icon { transform: scaleX(-1); }
+
+//  "See All" is NOT one colour. QA cycle 1 asked for "the exact color style in
+//  Figma" on Grocery Essentials without naming a value; measured off the
+//  reference, the four CATEGORY rails each tint their link to the rail's own
+//  subject while every other rail keeps the accent orange:
+//
+//    Grocery Essentials  #2d7a3a  green    5.32:1 on white
+//    Fashion Trends      #9b2c5e  magenta  7.20:1
+//    Beauty & Cosmetics  #9b4b7a  plum     5.71:1
+//    Furniture Picks     #7c5a3a  brown    6.22:1
+//
+//  All four clear AA on the light band they sit on — measured, not assumed.
+//
+//  Picked For You is deliberately NOT included. The reference tints its link
+//  #6366f1, which is 3.56:1 against this theme's navy panel and fails; it keeps
+//  --hm-accent-on-dark, which is the same role at a passing ratio.
+.hm-rail--hm-home-rail-grocery   .hm-section__more { color: var(--hm-rail-grocery); }
+.hm-rail--hm-home-rail-fashion   .hm-section__more { color: var(--hm-rail-fashion); }
+.hm-rail--hm-home-rail-beauty    .hm-section__more { color: var(--hm-rail-beauty); }
+.hm-rail--hm-home-rail-furniture .hm-section__more { color: var(--hm-rail-furniture); }

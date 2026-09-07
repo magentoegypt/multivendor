@@ -30,7 +30,15 @@ if ($hmBrandsUrl !== '' && !preg_match('~^https?://~i', $hmBrandsUrl)) {
 ?>
 <section class="hm-brands" aria-labelledby="hm-brands-title">
     <div class="hm-section__head">
-        <h2 class="hm-section__title" id="hm-brands-title"><?= $escaper->escapeHtml(__('Top Brands')) ?></h2>
+        <?php /*
+            Heading is a layout argument so the brand name is not baked into a
+            template. QA cycle 1 asked for the reference's "Top Brands on
+            MECommerce"; the default carries it, and a store that wants the row
+            called something else sets `heading` in layout.
+        */ ?>
+        <h2 class="hm-section__title" id="hm-brands-title"><?= $escaper->escapeHtml(
+            (string) ($block->getData('heading') ?: __('Top Brands on Hub Market'))
+        ) ?></h2>
         <?php if ($hmBrandsUrl !== ''): ?>
             <a class="hm-section__more" href="<?= $escaper->escapeUrl($hmBrandsUrl) ?>">
                 <?= $escaper->escapeHtml(__('All Brands')) ?>
@@ -47,7 +55,14 @@ if ($hmBrandsUrl !== '' && !preg_match('~^https?://~i', $hmBrandsUrl)) {
                              alt="<?= $escaper->escapeHtmlAttr($b['name']) ?>"
                              loading="lazy" width="64" height="64"/>
                     <?php endif; ?>
-                    <span class="hm-brands__name"><?= $escaper->escapeHtml($b['name']) ?></span>
+                    <?php /* Through __() since QA cycle 2 (item 1-I): MGS_Brand
+                             stores ONE name per brand with no store scope, and
+                             every name in this catalog is the Arabic
+                             transliteration. The English store carries an
+                             en_US.csv row per brand name, so English gets
+                             "Western Digital" while the Arabic store falls
+                             through to the stored name untouched. */ ?>
+                    <span class="hm-brands__name"><?= $escaper->escapeHtml(__(trim($b['name']))) ?></span>
                 </a>
             </li>
         <?php endforeach; ?>

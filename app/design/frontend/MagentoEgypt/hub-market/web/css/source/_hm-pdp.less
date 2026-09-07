@@ -717,7 +717,16 @@
 
 .hm-pdp .hm-vendor-card__meta {
     align-items: center;
-    color: var(--hm-foreground-muted);
+    //  --hm-neutral-600, NOT --hm-foreground-muted. #6b7280 is 4.83:1 on white
+    //  and safe there, but this card's ground is the warm panel #f6f4f1, which
+    //  costs enough to drop it to 4.40:1 — measured by the parity harness, which
+    //  failed the PDP on exactly these two spans and nothing else. #535d70 on the
+    //  same panel is 6.04:1.
+    //
+    //  Same trap the homepage chips hit on their eight pastel washes; see the
+    //  note on .hm-chips__count in _hm-figma.less. Any muted text this theme puts
+    //  on a tinted surface needs re-measuring rather than inheriting.
+    color: var(--hm-neutral-600);
     display: flex;
     font-size: 1.3rem;
     gap: var(--hm-space-1);
@@ -948,6 +957,10 @@
     flex-wrap: wrap;
     margin-inline: 0;
 
+    //  QA cycle 2 star swap: on the PDP the SVG stars run a step larger than
+    //  the 14px card default so the row balances the serif title above it.
+    .hm-stars svg { block-size: 1.8rem; inline-size: 1.8rem; }
+
     .rating-summary,
     .rating-result {
         margin-inline: 0;
@@ -1092,4 +1105,61 @@
 
 .hm-pdp .product-info-main .hm-pdp__assurances {
     padding-block-start: var(--hm-space-4);
+}
+
+//
+//  QA CYCLE 2 — item 3-A: gallery without arrows
+//  ---------------------------------------------
+//  etc/view.xml turns the arrows off at the source (arrows/navarrows false),
+//  which stops fotorama CREATING the controls. The rules here are the
+//  belt-and-braces for cached JS config and for the fullscreen close ramp, and
+//  they tidy the stage the arrows used to pad:
+//    - the stage shows the image on the card surface, not the grey letterbox
+//      the framed 800x800 sources used to bring with them;
+//    - the thumb strip gets breathing room under the stage.
+.hm-pdp {
+    .fotorama__arr,
+    .fotorama__thumb__arr { display: none !important; }
+
+    .fotorama__stage { background: var(--hm-surface); }
+
+    .fotorama__nav-wrap { margin-block-start: var(--hm-space-3); }
+
+    .fotorama__thumb {
+        background: var(--hm-neutral-50);
+        border-radius: var(--hm-radius-sm);
+    }
+
+    .fotorama__nav__frame--thumb { padding-inline: .4rem; }
+
+    .fotorama__thumb-border {
+        border-color: var(--hm-accent);
+        border-radius: var(--hm-radius-sm);
+    }
+}
+
+//
+//  QA CYCLE 2 — item 3-C: "delete the empty space"
+//  ---------------------------------------------
+//  Measured live: 110px of nothing between the info tabs and Related Products
+//  — .product.info.detailed carried margin-bottom 30, its last tab another 24,
+//  and .block.related opened with margin-top 48, and inside the PDP grid none
+//  of them collapse. One 16px step is the rhythm the rest of the column uses.
+.catalog-product-view {
+    .product.info.detailed { margin-block-end: 0; }
+    .product.info.detailed .data.item.content { margin-block-end: 0; }
+    .block.related { margin-block-start: var(--hm-space-4); }
+}
+
+//  The 3-B hint line itself: muted, small, icon-led — the reference's own
+//  treatment of "Please select all options before adding to cart".
+.hm-options-hint {
+    align-items: center;
+    color: var(--hm-foreground-muted);
+    display: flex;
+    font-size: 1.3rem;
+    gap: var(--hm-space-2);
+    margin: 0 0 var(--hm-space-3);
+
+    .hm-icon { flex-shrink: 0; }
 }

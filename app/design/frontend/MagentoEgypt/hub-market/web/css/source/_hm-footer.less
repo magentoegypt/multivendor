@@ -66,8 +66,41 @@
     padding-inline-end: 0;
     text-decoration: none;
 
-    .hm-logo__mark { block-size: 2.8rem; inline-size: auto; }
     .hm-logo__word { display: inline-flex; }   // kept at every width, unlike the header
+
+    //  QA cycle 2 (1-L): text-only wordmark down here, measured off the
+    //  reference — display serif at 20px/800, first word in the accent, second
+    //  in white. The header's own lockup colours assume a white ground and the
+    //  second word there is navy, which would vanish on this navy band.
+    .hm-logo__word-lead,
+    .hm-logo__word-rest {
+        font-family: var(--hm-font-display);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .hm-logo__word-lead { color: var(--hm-accent); }        // 5.04:1 on navy
+    .hm-logo__word-rest { color: var(--hm-on-inverse); }
+}
+
+//  "ACCEPTED PAYMENTS" — the small caps label the reference sets between the
+//  country chips and the payment chips (QA cycle 2, 1-L).
+.hm-footer__pay-label {
+    color: var(--hm-neutral-400);   // 4.89:1 on navy, same as the column labels
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    margin: var(--hm-space-4) 0 0;
+    text-transform: uppercase;
+}
+
+//  Emoji category glyphs (cycle 2 swapped the sprite icons out — see the
+//  hm_footer_categories CMS block). Sized to match the link text.
+.hm-footer__cat-emoji {
+    flex: 0 0 auto;
+    font-size: 1.4rem;
+    line-height: 1;
 }
 
 .hm-footer__cols {
@@ -106,7 +139,26 @@
         font-size: 1.2rem;
         text-decoration: none;
 
-        &:hover { color: var(--hm-on-inverse); text-decoration: underline; }
+        &:hover { color: var(--hm-on-inverse); }
+    }
+
+    //  The CATEGORIES column carries a glyph beside each link — QA cycle 1
+    //  ("Display category links with icons"). Only this column: the other three
+    //  are plain lists in the reference too, and an icon on every footer link
+    //  would turn a quiet column into a menu.
+    //
+    //  The icon inherits the link's colour rather than taking one of its own, so
+    //  it brightens with the label on hover instead of staying dim beside it.
+    .hm-footer__cats a {
+        align-items: center;
+        display: inline-flex;
+        gap: var(--hm-space-2);
+
+        .hm-icon {
+            block-size: 1.6rem;
+            flex: 0 0 auto;
+            inline-size: 1.6rem;
+        }
     }
 }
 
@@ -280,7 +332,7 @@
         font-size: 1.2rem;
         text-decoration: none;
 
-        &:hover { color: var(--hm-on-inverse); text-decoration: underline; }
+        &:hover { color: var(--hm-on-inverse); }
     }
 }
 
@@ -357,3 +409,23 @@
 .hm-page .block.newsletter .action.subscribe {
     border-radius: var(--hm-radius);
 }
+
+//
+//  Footer link colours, restated to beat the inverse-surface blanket
+//  ---------------------------------------------
+//  `.hm-surface-inverse a:not(.hm-btn)` in _hm-components.less lands at (0,2,1)
+//  and .hm-footer carries hm-surface-inverse, so it was overriding the muted
+//  colour the column and legal links declare above at (0,1,1) — every footer
+//  link rendered white, and the contrast notes up there described a colour that
+//  never reached the page.
+//
+//  It only became visible when the hover underline came off: hover resolves to
+//  white too, so with the underline gone these links had no hover response at
+//  all. Restating them here scoped to .hm-footer puts the base at (0,2,1), which
+//  ties the blanket rule and wins on source order (_hm-footer is imported after
+//  _hm-components), and the hover at (0,3,1), which wins outright.
+.hm-footer .hm-footer__col a   { color: var(--hm-on-inverse-muted); }
+.hm-footer .hm-footer__legal a { color: var(--hm-neutral-400); }
+
+.hm-footer .hm-footer__col a:hover,
+.hm-footer .hm-footer__legal a:hover { color: var(--hm-on-inverse); }

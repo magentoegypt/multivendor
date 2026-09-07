@@ -138,12 +138,13 @@
         padding: var(--hm-space-3) var(--hm-space-6);
     }
 
-    //  The reference uses blue-600 here. This theme has no blue in its palette
-    //  and introducing one for a single link would give the page a third accent;
-    //  navy is the established link colour for structural navigation and clears
-    //  AA comfortably (15.89:1 on the strip).
+    //  The reference uses blue-600 here and this now follows it. The older note
+    //  here — "this theme has no blue in its palette" — was true when written
+    //  and stopped being true once the verified badge introduced #1d4ed8; the
+    //  vendor name reuses that exact token rather than adding a third accent.
+    //  QA cycle 1 filed the navy as a defect against the cart page explicitly.
     .hm-cart-group__vendor {
-        color: var(--hm-primary);
+        color: var(--hm-vendor-name);
         font-family: var(--hm-font-heading);
         font-size: 1.5rem;
         font-weight: 600;
@@ -367,6 +368,16 @@
             min-block-size: 4.8rem;
             padding-block: 0;
         }
+
+        //  "Update Shopping Cart" — off screen, per QA cycle 1, but STILL IN THE
+        //  DOM because hm-cart-qty.js commits the stepper by clicking it. See the
+        //  long note in cart/form.phtml: deleting the element makes every +/-
+        //  press a no-op. `display: none` and not an sr-only class, deliberately —
+        //  a keyboard user reaching a button that reloads the page after the
+        //  stepper already committed would be a worse experience than not
+        //  reaching it at all, and jQuery's .trigger('click') fires on a
+        //  display:none element regardless.
+        > .action.update.hm-cart__commit { display: none; }
     }
 
     //  (0,5,0) — blank floats this at (0,4,0) and is emitted later.
@@ -779,8 +790,13 @@
 //  the weight — and both properties, since it sets the physical one.
 @media (max-width: 767px) {
     .hm-header__action .minicart-wrapper .block-minicart {
-        inline-size: min(32rem, calc(100vw - 2.4rem));
-        width: min(32rem, calc(100vw - 2.4rem));
+        //  ESCAPED — Less owns min() and evaluates it at compile time; unable
+        //  to compare these units it silently emitted a flat 32rem, so the
+        //  viewport clamp never shipped and the panel overflowed a 320px
+        //  phone. Same compiler trap as the app-banner mock in _hm-figma.less;
+        //  the sweep that found this one started there.
+        inline-size: ~"min(32rem, calc(100vw - 2.4rem))";
+        width: ~"min(32rem, calc(100vw - 2.4rem))";
     }
 }
 
@@ -1161,6 +1177,82 @@ a.sms-login-field-ctrl {
     min-inline-size: 0;              // clears blank's min-width: 600px, which fights at 390
     padding: var(--hm-space-6);
     width: auto;
+}
+
+//
+//  CREATE ACCOUNT — the three findings from QA cycle 1
+//  ---------------------------------------------------------------------------
+//  1. THE MOBILE FIELD DID NOT SPAN. intl-tel-input wraps the control in its own
+//     `.intl-tel-input`, which ships `display: inline-block` and shrink-wraps —
+//     so a field that is `width: 100%` INSIDE that wrapper still renders at the
+//     wrapper's content width, sitting short beside full-width neighbours. Same
+//     defect the checkout address form had; same fix, applied to this form.
+//
+//  2. THE FLAG SAT ON THE FIRST DIGIT. intl-tel-input pins the flag absolutely
+//     over the first 48px and clears it with a padding of its own, which this
+//     theme's field padding overwrites. PHYSICAL `padding-left`, deliberately,
+//     and not the logical property used everywhere else in this theme: the flag
+//     is pinned to `left: 0` in BOTH directions — verified in the Arabic
+//     checkout — so a logical padding opens the gap on the wrong side in RTL and
+//     leaves the flag hard against the text. Identical reasoning to the note on
+//     .sms-address-mobile-container further down this file.
+//
+//  3. FIRST AND LAST NAME SIT SIDE BY SIDE, and the vertical rhythm tightens.
+//     Grid rather than floats so the two columns are equal without widths, and
+//     so it collapses to one column on a phone with no second rule.
+.customer-account-create {
+    .form.create.account,
+    .form.create.info {
+        .fieldset { margin-block-end: var(--hm-space-6); }
+
+        //  Figma's form runs a 16px gap between fields; blank ships 29px, which is
+        //  what QA saw as "excessive vertical gaps".
+        .field { margin-block-end: var(--hm-space-4); }
+
+        .fieldset > .legend {
+            font-size: 1.6rem;
+            margin-block-end: var(--hm-space-4);
+            padding-block-end: var(--hm-space-3);
+        }
+
+        //  Uniform control height across every field on the form, mobile included.
+        .field .control input[type='text'],
+        .field .control input[type='email'],
+        .field .control input[type='tel'],
+        .field .control input[type='password'] {
+            block-size: 4.8rem;
+            box-sizing: border-box;
+        }
+    }
+
+    //  1 + 2 — the mobile control.
+    .field.mobile .control .intl-tel-input {
+        display: block;
+        inline-size: 100%;
+
+        input { inline-size: 100%; }
+    }
+
+    .field.mobile .control input.hm-reg-mobile {
+        padding-left: 5.6rem;   // 48px of flag, plus 8px — see note 2
+    }
+
+    //  3 — the name row.
+    @media (min-width: 640px) {
+        .fieldset.create.info {
+            column-gap: var(--hm-space-4);
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+            //  Only the two name fields pair up. Everything else in this
+            //  fieldset — the legend, the newsletter choice, the tooltip — spans,
+            //  or a checkbox would end up sharing a row with a text input.
+            > * { grid-column: 1 / -1; }
+
+            > .field-name-firstname { grid-column: 1; }
+            > .field-name-lastname  { grid-column: 2; }
+        }
+    }
 }
 
 .customer-account-forgotpassword .column.main .form.password-forget {
@@ -2269,6 +2361,9 @@ a.sms-login-field-ctrl {
 
     .hm-review__value { color: var(--hm-foreground); font-size: 1.4rem; }
 
+    //  Stacked on a phone: two 50/50 buttons at 390 are 165px each, and "Place
+    //  Order" with its lock does not fit that. The row rule above takes over from
+    //  the tablet breakpoint.
     .hm-review__actions {
         display: flex;
         flex-direction: column;
@@ -2489,19 +2584,53 @@ a.sms-login-field-ctrl {
         gap: var(--hm-space-4);
     }
 
+    //  FIFTY-FIFTY. QA cycle 1 asked for it twice — once on the payment step
+    //  ("Make the Back and Review Order buttons equal in width and height (50/50
+    //  flex alignment)") and again on the review step. Back was `flex: 0 0 36%`
+    //  against a forward action that took the rest, so the pair read as a minor
+    //  and a major action rather than as two ends of one decision.
+    //
+    //  `flex: 1 1 0` and not `1 1 auto`: with `auto` the basis is the button's
+    //  own content width, so "Place Order" plus its lock icon would still come
+    //  out wider than "Back". A zero basis divides the row exactly.
+    .hm-continue-review__back,
+    .hm-review__back,
+    .hm-continue-review__button,
+    .hm-review__place {
+        border-radius: var(--hm-radius-sm);
+        flex: 1 1 0;
+        inline-size: auto;
+        min-block-size: 5rem;
+    }
+
     .hm-continue-review__back,
     .hm-review__back {
         background: transparent;
         border: 1px solid var(--hm-border-strong);
-        border-radius: var(--hm-radius-sm);
-        flex: 0 0 36%;
-        min-block-size: 5rem;
     }
 
-    .hm-continue-review__button,
+    //  The forward action on the payment step is BLUE, per QA cycle 1 — the same
+    //  blue "Continue to Payment" takes on the step before it, so the two moves
+    //  through the flow look like one action repeated. #1d4ed8 carries white at
+    //  6.70:1.
+    .hm-continue-review__button {
+        background: var(--hm-info);
+        border-color: var(--hm-info);
+        color: #ffffff;
+
+        &:hover:not(:disabled) { background: var(--hm-info-hover); border-color: var(--hm-info-hover); }
+    }
+
+    //  PLACE ORDER IS GREEN, and only this one. QA cycle 1 named it, and the
+    //  distinction is worth keeping: every other forward action in the flow is
+    //  reversible and blue; this is the irreversible one. White on #0f7b3f is
+    //  5.35:1, and the hover pair goes DARKER to 7.09:1 rather than lighter.
     .hm-review__place {
-        flex: 1 1 auto;
-        inline-size: auto;
+        background: var(--hm-success);
+        border-color: var(--hm-success);
+        color: #ffffff;
+
+        &:hover:not(:disabled) { background: var(--hm-success-hover); border-color: var(--hm-success-hover); }
     }
 
     .hm-review__place-icon { margin-inline-end: .8rem; }
@@ -2803,5 +2932,235 @@ a.sms-login-field-ctrl {
         &:empty { display: none; }
 
         > *:not(.actions-toolbar) { margin-block-start: var(--hm-space-3); }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 1 — the checkout findings
+//  ---------------------------------------------------------------------------
+//  Appended at the end of the file deliberately. Every rule below corrects a
+//  value set earlier in this same file at equal or higher specificity, so source
+//  order is what settles them; matching specificity higher up would mean
+//  rewriting rules that are correct for every page except this one.
+.hm-page.checkout-index-index {
+
+    //  STEP ICONS ARE BLUE.
+    //
+    //  The truck beside "Shipping Information" was --hm-accent (orange), which is
+    //  the colour this theme gives to COMMERCE actions — add to cart, price, the
+    //  hero CTA. On a checkout step heading it read as another button. Blue is
+    //  the reference's choice and also the honest one: these are wayfinding
+    //  marks, not things to press. #1d4ed8 is 6.70:1 on white.
+    .hm-step-title__icon { color: var(--hm-info); }
+
+    //  The payment step had NO icon at all — QA cycle 1: "Display the card icon
+    //  next to Payment Method and set its color to Blue."
+    //
+    //  Drawn as a background image rather than by forking core's
+    //  payment-methods/list.html for one glyph. That template is knockout, is
+    //  re-copied on upgrade, and carries the whole method loop; owning it to add
+    //  an <svg> would be a large maintenance surface for a decoration. Same
+    //  technique the features bar uses on the homepage.
+    //  `.payment-group`, NOT `.payment-methods`. Magento renders the payment
+    //  step heading inside `<div class="payment-group"><div class="step-title">`
+    //  — the methods list is a sibling below it. Verified against the live DOM
+    //  after the first selector matched nothing.
+    .checkout-payment-method .payment-group > .step-title {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-3);
+
+        &::before {
+            background: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d4ed8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect width='20' height='14' x='2' y='5' rx='2'/%3E%3Cline x1='2' x2='22' y1='10' y2='10'/%3E%3C/svg%3E") no-repeat center / contain;
+            block-size: 2rem;
+            content: '';
+            flex: 0 0 auto;
+            inline-size: 2rem;
+        }
+    }
+
+    //  THE SECURITY NOTICE reads as reassurance, not as a neutral grey strip.
+    //  QA cycle 1 asked for "a light blue background and blue lock icon".
+    //  --hm-info on --hm-info-subtle is 6.0:1; the body text stays on
+    //  --hm-foreground rather than the muted grey, which measured 3.9:1 against
+    //  the tint once the background stopped being white.
+    .hm-continue-review__note {
+        background: var(--hm-info-subtle);
+        color: var(--hm-foreground);
+    }
+
+    .hm-continue-review__note-icon { color: var(--hm-info); }
+
+    //  ADDRESS FORM RHYTHM. Figma runs 16px between fields and 24px between
+    //  groups; blank ships 29px on every field and 40px on the fieldset, which is
+    //  what QA saw as "large vertical margins between the form input fields".
+    //  The controls themselves are untouched — this is spacing only.
+    .opc-wrapper .form-shipping-address,
+    .opc-wrapper .form-login {
+        .fieldset { margin-block-end: var(--hm-space-6); }
+
+        > .fieldset > .field,
+        .fieldset > .field { margin-block-end: var(--hm-space-4); }
+
+        .fieldset > .field.choice { margin-block-end: var(--hm-space-3); }
+
+        //  The tooltip's own gutter reserved 40px above the field it belongs to.
+        .field-tooltip { inset-block-start: auto; }
+    }
+
+    //  ORDER SUMMARY ITEMS — image, then a text column, then the price, on one
+    //  baseline. QA cycle 1: "Clean up and structure the product list display
+    //  inside the Order Summary box (Image, Product Title, Qty, and Price)".
+    //
+    //  The row above already flexes; what it did not do was hold the three
+    //  columns to a consistent width, so a long product name pushed the price
+    //  out of alignment with the row beneath it. A grid with a fixed media
+    //  column and an auto price column keeps every row's price on the same
+    //  vertical line whatever the name does.
+    .opc-block-summary .minicart-items .product-item .product {
+        align-items: start;
+        column-gap: var(--hm-space-3);
+        display: grid;
+        grid-template-columns: 5.6rem minmax(0, 1fr) auto;
+    }
+
+    .opc-block-summary .minicart-items {
+        .product-image-container { inline-size: 5.6rem !important; }
+
+        //  The qty sits under the name rather than beside the price, which is
+        //  where the reference puts it and where it stops competing with the
+        //  amount for the same corner.
+        .product-item-inner {
+            display: block;
+            margin-block-end: 0;
+        }
+
+        .product-item-name-block { display: block; }
+
+        .details-qty {
+            color: var(--hm-foreground-muted);
+            font-size: 1.2rem;
+            margin-block-start: .4rem;
+        }
+
+        .subtotal {
+            grid-column: 3;
+            text-align: end;
+            white-space: nowrap;
+        }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 1 — the cart card
+//  ---------------------------------------------------------------------------
+//  "Fix the inner layout of the product item card. The details, quantity
+//  selector, trash icon, and prices are currently aligned randomly."
+//
+//  They were not random, they were unanchored. `.hm-cart-line` is
+//  `align-items: flex-start` — correct, and set for a good reason: the default
+//  stretch made the media column as tall as the tallest sibling and took the
+//  card to 293px against the reference's 199. But flex-start also collapses the
+//  ASIDE to its own content height, and `justify-content: space-between` on a
+//  box that is exactly as tall as its contents distributes nothing. So the bin,
+//  the stepper and the line total stacked at the top of the column with fixed
+//  gaps, level with nothing in the details beside them.
+//
+//  `align-self: stretch` on the aside ALONE is the fix: the media column keeps
+//  its flex-start (so the card height is unchanged), the aside grows to the
+//  row's height, and space-between then does what it was always meant to —
+//  bin level with the product title, line total level with the price.
+.hm-page.checkout-cart-index {
+    .hm-cart-line__aside {
+        align-self: stretch;
+
+        //  A guard for the short row: on a card with no description the body can
+        //  be shorter than the aside's own content, and space-between would then
+        //  spread three items across a box smaller than they need. The minimum
+        //  keeps the distribution meaningful rather than negative.
+        min-block-size: 9.6rem;   // the media column's height
+    }
+
+    //  The body becomes a column so the price can be pushed to its foot — which
+    //  is what puts it on the same line as the total opposite. `margin-block-start:
+    //  auto` on the price was already doing this, but only works inside a column
+    //  flex parent, and the body was a plain block.
+    .hm-cart-line__body {
+        display: flex;
+        flex-direction: column;
+        min-block-size: 9.6rem;
+    }
+
+    //  The three items in the trailing column each align to the trailing edge,
+    //  so their right edges form one line rather than three.
+    .hm-cart-line__aside > * { align-self: flex-end; }
+}
+
+//
+//  QA CYCLE 2 — item 5: checkout deltas
+//  ---------------------------------------------
+//  A) "Change the color of the continue button to pay": the SHIPPING step's
+//     "Continue to Payment" still wore the generic orange .action.primary —
+//     only the payment step's forward action had been given the flow blue in
+//     cycle 1. Both steps move the shopper forward through the same flow and
+//     now wear the same blue; Place Order alone stays green (irreversible).
+.opc-wrapper .actions-toolbar .action.continue.primary {
+    background: var(--hm-info);
+    border-color: var(--hm-info);
+    color: #ffffff;
+
+    &:hover:not(:disabled),
+    &:focus-visible {
+        background: var(--hm-info-hover);
+        border-color: var(--hm-info-hover);
+    }
+}
+
+//  B) "The summary order isn't showing correctly": the sidebar item row is an
+//     explicit three-part flex line — thumb, details, price — so the name no
+//     longer wraps into a sliver beside an over-wide image cell (blank lays
+//     this out as a table and the zoomed viewport QA tested at collapsed it).
+//     The item's three-column layout is already set by the cycle-1 grid rule
+//     (.opc-block-summary .minicart-items .product-item .product, track 5.6rem)
+//     — that rule out-specifies a plain .product selector, so the flex block
+//     that used to sit here never applied. The ACTUAL defect QA screenshotted
+//     was the IMAGE overflowing that 5.6rem cell onto the product name: the
+//     header-minicart DRAWER styles `.minicart-items img.product-image-photo`
+//     to 7.2rem !important, and the checkout summary reuses .minicart-items
+//     markup, so a 72px image sat in a 56px cell and spilled 16px over the
+//     name. Pin the wrapper AND the img to the cell within .opc-block-summary;
+//     the !important is only there to out-rank the drawer rule's own, and the
+//     extra class raises specificity above it (0,3,1 vs 0,2,1).
+.opc-block-summary .minicart-items .product-image-container,
+.opc-block-summary .minicart-items .product-image-wrapper,
+.opc-block-summary .minicart-items img.product-image-photo {
+    block-size: 5.6rem !important;
+    inline-size: 5.6rem !important;
+    object-fit: cover;
+}
+
+.opc-block-summary .minicart-items .product-item-name {
+    font-size: 1.3rem;
+    line-height: 1.45;
+    margin: 0;
+}
+
+//  The expandable "View Details" options block under the name: quiet rows,
+//  never overlapping the qty line.
+.opc-block-summary .minicart-items .product.options {
+    display: block;
+    font-size: 1.2rem;
+    margin-block-start: var(--hm-space-1);
+
+    .toggle { color: var(--hm-info); cursor: pointer; }
+
+    .item-options {
+        display: grid;
+        gap: .2rem var(--hm-space-2);
+        grid-template-columns: auto minmax(0, 1fr);
+        margin: var(--hm-space-1) 0 0;
+
+        dt { color: var(--hm-foreground-muted); font-weight: 400; }
+        dd { margin: 0; }
     }
 }

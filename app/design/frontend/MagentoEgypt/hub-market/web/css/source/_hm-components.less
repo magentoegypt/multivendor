@@ -196,6 +196,41 @@
     font-size: 1.3rem;
 }
 
+//  SVG star track — QA cycle 2 replaced the Luma icon-font stars with the
+//  reference's Lucide star shape (see Magento_Review/helper/summary_short.phtml,
+//  which owns the path). Fill fraction works by overlaying an identical amber
+//  row clipped to width:P%. The overlay anchors to the LOGICAL start so the
+//  fill grows from the correct end in RTL, and both rows share one flex layout
+//  so the clip always lines up star-for-star.
+.hm-stars {
+    display: inline-flex;
+    line-height: 0;
+    position: relative;
+
+    svg {
+        block-size: 1.4rem;
+        display: block;
+        flex-shrink: 0;
+        inline-size: 1.4rem;
+    }
+}
+
+.hm-stars__track,
+.hm-stars__fill {
+    display: inline-flex;
+    gap: .2rem;
+}
+
+.hm-stars__track { color: var(--hm-rating-star-empty); }
+
+.hm-stars__fill {
+    color: var(--hm-rating-star);
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    overflow: hidden;
+    position: absolute;
+}
+
 //
 //  Price
 //  ---------------------------------------------

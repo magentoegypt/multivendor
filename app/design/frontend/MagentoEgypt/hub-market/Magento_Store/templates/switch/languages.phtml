@@ -1,0 +1,39 @@
+<?php
+/**
+ * Hub Market — direct language link, replacing the dropdown switcher.
+ *
+ * QA cycle 2, item 1-A: "We need to remove the language change menu, it should
+ * say Arabic instead of English, and when we click on it, it should take us
+ * straight to the Arabic view." The reference renders exactly that — a plain
+ * "عربي" in the utility bar, no menu — and the mirror on the Arabic view is
+ * "English". So: one link per OTHER store view, labelled with the TARGET
+ * store's name (store 1 is named "عربي", store 3 "English" — the label IS the
+ * destination language, which is how the reference writes it too).
+ *
+ * The redirect URL comes from the same SwitcherUrlProvider view-model the
+ * dropdown used (stores/store/redirect + uenc of the current page), so the
+ * click lands on the SAME PAGE in the other language, not on the other home
+ * page. The view_model argument is wired in Magento_Theme/layout/default.xml
+ * and is mandatory — see the warning there; without it this template fatals
+ * on every page.
+ *
+ * FPC-safe: uenc is derived from the page being cached, so each cached page
+ * carries its own correct switch target.
+ *
+ * @var \Magento\Store\Block\Switcher $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$stores = $block->getStores();
+if (count($stores) <= 1) {
+    return;
+}
+?>
+<?php foreach ($stores as $_lang): ?>
+    <?php if ((int) $_lang->getId() === (int) $block->getCurrentStoreId()) { continue; } ?>
+    <a class="hm-utility__link hm-lang-direct"
+       lang="<?= $escaper->escapeHtmlAttr(strtok($_lang->getCode(), '_')) ?>"
+       href="<?= $escaper->escapeUrl($block->getViewModel()->getTargetStoreRedirectUrl($_lang)) ?>">
+        <?= $escaper->escapeHtml($_lang->getName()) ?>
+    </a>
+<?php endforeach; ?>

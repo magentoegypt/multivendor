@@ -83,26 +83,93 @@ $allStoresUrl = $block->getUrl('sellerlist');
             ?>
             <li class="hm-stores__item">
                 <a class="hm-stores__link" href="<?= $block->escapeUrl($block->getSellerPageUrl($seller)) ?>">
-                    <span class="hm-stores__avatar" aria-hidden="true">
-                        <?php if ($logo): ?>
-                            <img src="<?= $block->escapeUrl($logo) ?>" alt="" loading="lazy" width="56" height="56"/>
-                        <?php else: ?>
-                            <?= $block->escapeHtml($initial) ?>
-                        <?php endif; ?>
+                    <?php
+                    /*
+                     * The avatar carries a VERIFIED MARK. QA cycle 1: "Add the
+                     * checkmark verification badge over the store logo avatar."
+                     *
+                     * Every seller in this rail is a registered, approved vendor —
+                     * that is what getRegisteredSellerCollection() returns — so the
+                     * mark states a fact about the whole rail rather than a per-card
+                     * status. It sits OUTSIDE the aria-hidden avatar and carries its
+                     * own screen-reader text, because "verified" is meaning and the
+                     * logo is not.
+                     */
+                    ?>
+                    <span class="hm-stores__avatar-wrap">
+                        <span class="hm-stores__avatar" aria-hidden="true">
+                            <?php if ($logo): ?>
+                                <img src="<?= $block->escapeUrl($logo) ?>" alt="" loading="lazy" width="56" height="56"/>
+                            <?php else: ?>
+                                <?= $block->escapeHtml($initial) ?>
+                            <?php endif; ?>
+                        </span>
+                        <span class="hm-stores__badge">
+                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-vendor-verified"/></svg>
+                            <span class="hm-sr-only"><?= $block->escapeHtml(__('Verified seller')) ?></span>
+                        </span>
                     </span>
                     <span class="hm-stores__name"><?= $block->escapeHtml(__($sellerName)) ?></span>
                     <?php
                     /*
-                     * Rating comes back as raw HTML from
-                     * Vnecoms\VendorsSellerList\Block\SellerList::getReviewSellerHtml()
-                     * — there is no phtml behind it, which is why it can only be
-                     * reached from CSS (see _hm-vendor.less). Empty for a vendor
-                     * with no reviews, and the card is built to absorb that.
+                     * Star + score + count on ONE line, matching the reference and
+                     * the sibling rails — "★ 4.8 · 12 products". Data comes from
+                     * the vendor_meta view model, not from Vnecoms'
+                     * getReviewSellerHtml(): that returns pre-baked HTML with no
+                     * template behind it, which is why the old card could only
+                     * restyle it blind from CSS.
+                     *
+                     * Every piece is conditional. A vendor with no rated products
+                     * shows no star (an empty 0.0 would read as a terrible score,
+                     * not as no score), and a vendor with no shipping history and
+                     * no declared dispatch shows no estimate. The reference's
+                     * "30-60 min" figures are the mock's own placeholders; these
+                     * are computed from this store's real shipments or the
+                     * vendor's own declaration — see VendorMeta::loadDispatch().
+                     */
+                    $hmMeta     = $block->getData('vendor_meta');
+                    $hmVid      = (int) $seller->getId();
+                    $hmStars    = $hmMeta ? $hmMeta->getStars($hmVid) : null;
+                    $hmReviews  = $hmMeta ? $hmMeta->getReviewCount($hmVid) : 0;
+                    $hmDispatch = $hmMeta ? $hmMeta->getDispatch($hmVid) : '';
+                    ?>
+                    <?php
+                    /*
+                     * QA cycle 2, item 1-D reshaped these two lines to the
+                     * reference's exact layout:
+                     *
+                     *   line 1:  ★ 4.8              (star + score, nothing else)
+                     *   line 2:  ⧉ 156   ⏱ 30-60min (product count NEXT TO the
+                     *            package icon as a bare number — "not next to
+                     *            the reviews" — and the dispatch estimate next
+                     *            to the clock icon)
+                     *
+                     * The bare number keeps its meaning for assistive tech via
+                     * the sr-only word beside it. The dispatch figure is still
+                     * this store's real one, never the mock's placeholder.
                      */
                     ?>
-                    <?= /* @noEscape */ $block->getReviewSellerHtml($seller) ?>
                     <span class="hm-stores__meta">
-                        <?= $block->escapeHtml(__('%1 products', $block->getProductCount($seller))) ?>
+                        <?php if ($hmStars !== null && $hmReviews > 0): ?>
+                            <span class="hm-stores__rating"
+                                  aria-label="<?= $block->escapeHtmlAttr(__('Rated %1 out of 5 from %2 reviews', $hmStars, $hmReviews)) ?>">
+                                <svg class="hm-icon hm-icon--sm hm-stores__star" aria-hidden="true" focusable="false"><use href="#hm-star"/></svg>
+                                <span class="hm-stores__score"><?= $block->escapeHtml(number_format((float) $hmStars, 1)) ?></span>
+                            </span>
+                        <?php endif; ?>
+                    </span>
+                    <span class="hm-stores__stats">
+                        <span class="hm-stores__count">
+                            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-package"/></svg>
+                            <?= $block->escapeHtml((string) $block->getProductCount($seller)) ?>
+                            <span class="hm-sr-only"><?= $block->escapeHtml(__('products')) ?></span>
+                        </span>
+                        <?php if ($hmDispatch !== ''): ?>
+                            <span class="hm-stores__dispatch">
+                                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-clock"/></svg>
+                                <?= $block->escapeHtml($hmDispatch) ?>
+                            </span>
+                        <?php endif; ?>
                     </span>
                     <span class="hm-stores__cta"><?= $block->escapeHtml(__('Visit Store')) ?></span>
                 </a>

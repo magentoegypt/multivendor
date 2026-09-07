@@ -201,3 +201,11 @@ button {
     position: absolute;
     visibility: hidden;   // belt and braces; <use> still resolves from it
 }
+
+//  QA cycle 2, item 8 ("login — Required field always shows up"): the text the
+//  tester boxed is blank's static "* Required Fields" legend, drawn by
+//  `.fieldset:after { content: attr(data-hasrequired) }` on every form that
+//  carries a required input. It is not a validation message, but it reads like
+//  one sitting under the Sign In button. Hidden everywhere: required-ness is
+//  already marked per field by the asterisk on each label, which stays.
+.fieldset:after { display: none; }

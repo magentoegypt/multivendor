@@ -1,0 +1,84 @@
+<?php
+/**
+ * Hub Market — the rating block under the product title on the PDP.
+ *
+ * Overrides Magento_Review::helper/summary.phtml. Three QA cycle 1 findings:
+ *
+ * 1. THE SCORE IS SHOWN. The reference reads "4.7 (284 reviews)"; core shows
+ *    stars and a count with the numeric score nowhere on the page, even though
+ *    it holds the value. getRatingSummary() returns a PERCENTAGE despite the
+ *    name, so the score is that over 20.
+ *
+ * 2. THE COUNT IS PARENTHESISED and sits after the score.
+ *
+ * 3. "Add Your Review" IS GONE from this row. The review form is still reachable
+ *    — the count links to it, and the Reviews tab below carries the full form —
+ *    so nothing is lost but the duplicated inline link the reference omits.
+ *
+ * The schema.org aggregateRating markup is KEPT and improved: core expresses
+ * the value as "94% of 100", which is true but is not the rating a search
+ * engine should show. Emitting ratingValue 4.7 against bestRating 5 states the
+ * same fact in the units the vocabulary expects.
+ *
+ * @var \Magento\Review\Block\Product\ReviewRenderer $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$hmUrl     = $block->getReviewsUrl() . '#reviews';
+$hmUrlForm = $block->getReviewsUrl() . '#review-form';
+?>
+<?php if ($block->isReviewEnabled() && $block->getReviewsCount()): ?>
+    <?php
+    $hmCount   = (int) $block->getReviewsCount();
+    $hmPercent = (int) $block->getRatingSummary();
+    $hmScore   = round($hmPercent / 20, 1);
+    ?>
+    <?php
+    /*
+     * QA cycle 2: SVG stars (the Lucide star the reference renders), replacing
+     * the icon-font track — same overlay-clip mechanism as summary_short.phtml.
+     */
+    $hmStar = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">'
+        . '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1'
+        . ' .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122'
+        . ' 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16'
+        . ' 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
+    $hmRow = str_repeat($hmStar, 5);
+    ?>
+    <div class="product-reviews-summary hm-rating<?= !$hmPercent ? ' no-rating' : '' ?>"
+         itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+        <?php if ($hmPercent): ?>
+            <span class="hm-stars" role="img"
+                  aria-label="<?= $escaper->escapeHtmlAttr(__('%1 out of 5', $hmScore)) ?>">
+                <span class="hm-stars__track"><?= /* @noEscape */ $hmRow ?></span>
+                <span class="hm-stars__fill" style="width: <?= /* @noEscape */ $hmPercent ?>%;"><?= /* @noEscape */ $hmRow ?></span>
+            </span>
+            <?php /* The score the reference shows beside the stars. */ ?>
+            <span class="hm-rating__score" itemprop="ratingValue"><?= $escaper->escapeHtml($hmScore) ?></span>
+            <meta itemprop="bestRating" content="5"/>
+            <meta itemprop="worstRating" content="1"/>
+        <?php endif; ?>
+        <div class="reviews-actions">
+            <a class="action view" href="<?= $escaper->escapeUrl($hmUrl) ?>">
+                <?= $escaper->escapeHtml(
+                    $hmCount === 1 ? __('(%1 review)', $hmCount) : __('(%1 reviews)', $hmCount)
+                ) ?>
+                <meta itemprop="reviewCount" content="<?= $escaper->escapeHtmlAttr($hmCount) ?>"/>
+            </a>
+        </div>
+    </div>
+<?php elseif ($block->isReviewEnabled() && $block->getDisplayIfEmpty()): ?>
+    <?php /*
+        No reviews yet. The CARD renders an empty star track here so the grid
+        stays even, but the PDP has no grid to keep even and a row of five grey
+        stars beside a product title reads as a bad score rather than as
+        no score. The invitation to review is the honest thing to show.
+    */ ?>
+    <div class="product-reviews-summary empty">
+        <div class="reviews-actions">
+            <a class="action add" href="<?= $escaper->escapeUrl($hmUrlForm) ?>">
+                <?= $escaper->escapeHtml(__('Be the first to review this product')) ?>
+            </a>
+        </div>
+    </div>
+<?php endif; ?>

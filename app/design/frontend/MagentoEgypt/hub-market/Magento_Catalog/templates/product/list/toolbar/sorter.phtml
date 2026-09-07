@@ -1,0 +1,72 @@
+<?php
+/**
+ * Hub Market — PLP sort control.
+ *
+ * Figma draws ONE dropdown reading "Featured", with directional options inside
+ * it: Featured / Price: Low to High / Price: High to Low / Top Rated / Newest.
+ * Core draws three separate controls — a "Sort By" label, a select of bare
+ * attribute names, and a separate ascending/descending toggle button.
+ *
+ * The toggle is the part worth explaining. Removing it is only safe BECAUSE the
+ * options here carry their own direction: "Price: High to Low" is price+desc in
+ * one choice. Dropping core's toggle while leaving core's options would have
+ * taken away descending sort altogether, which is a functional regression
+ * dressed up as a design fix.
+ *
+ * "Top Rated" and "Newest" joined the list in QA cycle 2 (item 2-A). Cycle 1
+ * left them out because the collection could not honour them; the capability
+ * now exists — MagentoEgypt\HomeSections\Plugin\Catalog\ToolbarSortOptions
+ * registers both orders and performs the review_entity_summary join that a
+ * rating sort needs — so offering them is no longer offering a lie. They are
+ * still gated on getAvailableOrders() below, so if that plugin is ever
+ * disabled the options disappear rather than silently doing nothing.
+ *
+ * The Name pair is GONE for the same parity reason it existed: cycle 1 kept
+ * A-Z/Z-A from core's defaults, cycle 2 graded the open dropdown against the
+ * reference, which offers no name sort.
+ *
+ * `data-role` is deliberately NOT "sorter": that is what core's
+ * productListToolbarForm widget binds to, and it would fight this template's own
+ * handler over the same select.
+ *
+ * @var \Magento\Catalog\Block\Product\ProductList\Toolbar $block
+ */
+$hmCurrentOrder = (string) $block->getCurrentOrder();
+$hmCurrentDir   = strtolower((string) $block->getCurrentDirection()) === 'desc' ? 'desc' : 'asc';
+$hmAvailable    = $block->getAvailableOrders();
+
+/*
+ * Only offer an option whose attribute the toolbar will actually accept —
+ * getCurrentOrder() validates against getAvailableOrders() and silently falls
+ * back to the default when it does not match.
+ */
+$hmOptions = [];
+$hmOptions[] = ['order' => 'position', 'dir' => 'asc', 'label' => __('Featured')];
+if (isset($hmAvailable['price'])) {
+    $hmOptions[] = ['order' => 'price', 'dir' => 'asc', 'label' => __('Price: Low to High')];
+    $hmOptions[] = ['order' => 'price', 'dir' => 'desc', 'label' => __('Price: High to Low')];
+}
+if (isset($hmAvailable['top_rated'])) {
+    $hmOptions[] = ['order' => 'top_rated', 'dir' => 'desc', 'label' => __('Top Rated')];
+}
+if (isset($hmAvailable['created_at'])) {
+    $hmOptions[] = ['order' => 'created_at', 'dir' => 'desc', 'label' => __('Newest')];
+}
+?>
+<div class="toolbar-sorter sorter">
+    <?php /* The visible label is gone, but the control still needs an accessible
+             name — .hm-sr-only keeps it for screen readers only. */ ?>
+    <label class="hm-sr-only" for="sorter"><?= $block->escapeHtml(__('Sort By')) ?></label>
+    <select id="sorter"
+            class="sorter-options"
+            data-role="hm-sorter"
+            data-mage-init='{"js/plp-sorter":{}}'>
+        <?php foreach ($hmOptions as $hmOption): ?>
+            <?php $hmSelected = $hmCurrentOrder === $hmOption['order'] && $hmCurrentDir === $hmOption['dir']; ?>
+            <option value="<?= $block->escapeHtmlAttr($hmOption['order'] . ':' . $hmOption['dir']) ?>"
+                <?= $hmSelected ? 'selected="selected"' : '' ?>>
+                <?= $block->escapeHtml($hmOption['label']) ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+</div>

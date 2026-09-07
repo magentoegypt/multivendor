@@ -120,11 +120,26 @@ class Band extends Template
     /**
      * The accent, and a label colour measured against it.
      *
-     * Figma's own accents do not all pass: #f26522 is 3.15:1 against white,
-     * #c85c2c is 4.18:1 against white and 3.8:1 against navy — it fails BOTH, so
-     * there is no label colour that makes it legible. Rather than ship an
-     * unreadable button, a colour that cannot reach AA either way is refused and
-     * the theme's own accent-strong (#c2410c, 5.18:1 on white) stands in.
+     * THE LABEL IS WHITE, OR THE ACCENT CHANGES. It used to be whichever of
+     * white or navy measured better, which kept every configured hue but let
+     * the label flip: #f26522 is 3.15:1 against white and 5.05:1 against navy,
+     * so the "NEW SEASON" pill and the "Shop Fashion" button rendered with NAVY
+     * text on orange. QA cycle 1 filed that — the reference is unambiguous that
+     * the pill is orange with bold white type, and a label that changes colour
+     * per slide is not a design, it is an artefact of the measurement.
+     *
+     * QA CYCLE 2 AMENDMENT (86d45m4tj item 1-A): the AA fallback is GONE. The
+     * cycle-1 version substituted #c2410c whenever the configured accent could
+     * not carry white at 4.5:1, which turned the fashion slide's #f26522 CTA
+     * burnt-orange — and cycle 2 filed exactly that as "the orange color used
+     * throughout the site doesn't match the theme", with the hero CTA boxed in
+     * the screenshot. The configured accent now renders AS CONFIGURED, with
+     * white type, matching the reference build pixel-for-pixel.
+     *
+     * The trade is explicit: #f26522 under white type is 3.15:1, below AA for
+     * 12px bold. Parity with the reference was ruled to win over the contrast
+     * floor for this chrome (the CTA repeats the slide headline immediately
+     * above it, so no information is only in the low-contrast element).
      *
      * @return array{bg: string, fg: string}|null
      */
@@ -135,17 +150,9 @@ class Band extends Template
             return null;
         }
 
-        $white = $this->contrast($rgb, [255, 255, 255]);
-        $navy  = $this->contrast($rgb, [15, 33, 68]);
-
-        if (max($white, $navy) < 4.5) {
-            /* Unusable as configured — fall back to a pairing that is not. */
-            return ['bg' => '#c2410c', 'fg' => '#ffffff'];
-        }
-
         return [
             'bg' => sprintf('#%02x%02x%02x', ...$rgb),
-            'fg' => $white >= $navy ? '#ffffff' : '#0f2144',
+            'fg' => '#ffffff',
         ];
     }
 

@@ -13,4 +13,12 @@
                 type="MagentoEgypt\HomeSections\Plugin\CatalogWidget\EnforceProductsCount"
                 sortOrder="100"/>
     </type>
+
+    <!-- "Top Rated" / "Newest" sort options on the listing toolbar — QA cycle 2
+         item 2-A; see the plugin class for the review_entity_summary join and
+         why top_rated must be intercepted before core applies it. -->
+    <type name="Magento\Catalog\Block\Product\ProductList\Toolbar">
+        <plugin name="magentoegypt_toolbar_sort_options"
+                type="MagentoEgypt\HomeSections\Plugin\Catalog\ToolbarSortOptions"/>
+    </type>
 </config>

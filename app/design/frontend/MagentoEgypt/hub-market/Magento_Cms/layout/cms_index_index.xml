@@ -154,22 +154,44 @@
                         so one map serves Arabic and English, and it survives a
                         category being renamed. An unmapped category falls back to a
                         neutral tag glyph in the block rather than rendering blank.
+
+                        THE KEYS WERE WRONG, AND THAT WAS THE BUG QA FILED. This map
+                        used to name `toys`, `mobile-tablet` and `pharmacy`; the
+                        catalogue's actual level-2 keys are `games`, `electronics`
+                        and — for pharmacy — nothing at all. Every unmatched chip
+                        fell through to the tag glyph, which QA reported as "generic
+                        tag icons". Verified against the live category tree before
+                        rewriting rather than transcribed from the design.
+
+                        VALUES ARE EMOJI, matching the reference, which renders this
+                        row as 🛒 💊 🛋️ 👗 📦 🧸 ✨ 📱 — verified against
+                        doze-coyote-58038022.figma.site, not inferred. They were
+                        briefly sprite ids because QA asked for "SVG icons"; the
+                        reference has none here, and QA's own examples (pill, box,
+                        teddy bear) describe the emoji. Written as HTML entities so
+                        the XML stays 7-bit and no editor can mangle a surrogate pair.
+
+                        Electronics is 📱 in this row and 💻 in the nav bar — that
+                        is the reference's own pairing, not an inconsistency.
                     -->
                     <argument name="icons" xsi:type="array">
-                        <item name="super-market" xsi:type="string">🛒</item>
-                        <item name="clothes" xsi:type="string">👗</item>
-                        <item name="bags" xsi:type="string">👜</item>
-                        <item name="shoes" xsi:type="string">👟</item>
-                        <item name="furniture" xsi:type="string">🛋️</item>
-                        <item name="mobile-tablet" xsi:type="string">📱</item>
-                        <item name="computer" xsi:type="string">💻</item>
-                        <item name="sports" xsi:type="string">⚽</item>
-                        <item name="home-appliances" xsi:type="string">🏠</item>
-                        <item name="health" xsi:type="string">✨</item>
-                        <item name="toys" xsi:type="string">🧸</item>
-                        <item name="books" xsi:type="string">📚</item>
-                        <item name="cars" xsi:type="string">🚗</item>
-                        <item name="pharmacy" xsi:type="string">💊</item>
+                        <item name="super-market" xsi:type="string">&#128722;</item>
+                        <item name="pharmacy" xsi:type="string">&#128138;</item>
+                        <item name="furniture" xsi:type="string">&#128715;&#65039;</item>
+                        <item name="clothes" xsi:type="string">&#128087;</item>
+                        <item name="fmcg" xsi:type="string">&#128230;</item>
+                        <item name="games" xsi:type="string">&#129528;</item>
+                        <item name="health" xsi:type="string">&#10024;</item>
+                        <item name="electronics" xsi:type="string">&#128241;</item>
+                        <!-- Not in the reference row, but mapped so a promoted
+                             category never falls back to the neutral tag. -->
+                        <item name="home-appliances" xsi:type="string">&#127968;</item>
+                        <item name="mobile-tablet" xsi:type="string">&#128241;</item>
+                        <item name="computer" xsi:type="string">&#128187;</item>
+                        <item name="bags" xsi:type="string">&#128092;</item>
+                        <item name="shoes" xsi:type="string">&#128095;</item>
+                        <item name="accessories" xsi:type="string">&#128087;</item>
+                        <item name="sports" xsi:type="string">&#9917;</item>
                     </argument>
                     <!--
                         Chip tints, also keyed on URL KEY, as slots 0-7 into the
@@ -187,19 +209,43 @@
                     -->
                     <argument name="tints" xsi:type="array">
                         <item name="super-market" xsi:type="number">0</item>
-                        <item name="sports" xsi:type="number">0</item>
                         <item name="pharmacy" xsi:type="number">1</item>
-                        <item name="mobile-tablet" xsi:type="number">1</item>
                         <item name="furniture" xsi:type="number">2</item>
                         <item name="clothes" xsi:type="number">3</item>
-                        <item name="computer" xsi:type="number">4</item>
-                        <item name="shoes" xsi:type="number">5</item>
-                        <item name="toys" xsi:type="number">5</item>
+                        <item name="fmcg" xsi:type="number">4</item>
+                        <item name="games" xsi:type="number">5</item>
                         <item name="health" xsi:type="number">6</item>
+                        <item name="electronics" xsi:type="number">7</item>
                         <item name="home-appliances" xsi:type="number">6</item>
                         <item name="bags" xsi:type="number">7</item>
-                        <item name="books" xsi:type="number">4</item>
-                        <item name="cars" xsi:type="number">2</item>
+                        <item name="shoes" xsi:type="number">5</item>
+                        <item name="mobile-tablet" xsi:type="number">1</item>
+                        <item name="computer" xsi:type="number">4</item>
+                        <item name="sports" xsi:type="number">0</item>
+                    </argument>
+
+                    <!--
+                        THE ROW, in the reference's order. Doubles as an allow-list:
+                        naming eight keys is what takes "Home Appliances" and "Bags"
+                        out, which QA asked for, without touching catalogue
+                        positions and therefore without reordering the main menu.
+
+                        `pharmacy` and `fmcg` DO NOT EXIST in this catalogue. They
+                        are listed because the reference has them and because the
+                        block skips a key it cannot find — so the day those
+                        categories are created and filled, the chips appear in the
+                        right place with the right icon and tint, with no code
+                        change. Until then the row renders the six that exist.
+                    -->
+                    <argument name="order" xsi:type="array">
+                        <item name="1" xsi:type="string">super-market</item>
+                        <item name="2" xsi:type="string">pharmacy</item>
+                        <item name="3" xsi:type="string">furniture</item>
+                        <item name="4" xsi:type="string">clothes</item>
+                        <item name="5" xsi:type="string">fmcg</item>
+                        <item name="6" xsi:type="string">games</item>
+                        <item name="7" xsi:type="string">health</item>
+                        <item name="8" xsi:type="string">electronics</item>
                     </argument>
                 </arguments>
             </block>
@@ -232,6 +278,13 @@
                     -->
                     <argument name="template" xsi:type="string">MagentoEgypt_VendorExtend::widget/sellerlist.phtml</argument>
                     <!--
+                        Star rating + dispatch estimate for each card (QA cycle 1).
+                        A view model because the block's own API stops at name,
+                        logo, url and product count — see VendorMeta for why this
+                        route and not a constructor.
+                    -->
+                    <argument name="vendor_meta" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorMeta</argument>
+                    <!--
                         Without seller_ids the collection filters on is_home = 1.
                         That is an EAV attribute no vendor here has set, so the
                         rail came back empty. Curated ids are also editorially
@@ -240,7 +293,9 @@
                         numeric id. These are approved stores that have products.
                     -->
                     <argument name="title" xsi:type="string" translate="true">Featured Stores</argument>
-                    <argument name="subtitle" xsi:type="string" translate="true">Approved sellers with the widest ranges</argument>
+                    <!-- No subtitle: QA cycle 2 item 1-D — "we need remove
+                         'Approved sellers with the widest ranges'"; the
+                         reference heads this rail with the title alone. -->
                     <!--
                         FOUR ids, and the rail rendered THREE. `seno` was silently
                         dropped, and not by anything in this layout: the vendor
@@ -285,6 +340,13 @@
                    name="hm.home.bundles" after="hm.home.rail.furniture"
                    template="MagentoEgypt_HomeSections::bundle-deals.phtml">
                 <arguments>
+                    <!--
+                        The star renderer, as a VIEW MODEL rather than a
+                        constructor dependency — see ReviewStars for why both
+                        halves of that matter. Same route `vendor_names` takes
+                        into the product rails.
+                    -->
+                    <argument name="review_stars" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\ReviewStars</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                 </arguments>
             </block>
@@ -338,7 +400,7 @@
             <block class="Magento\CatalogWidget\Block\Product\ProductsList"
                    name="hm.home.rail.beauty" after="hm.home.rail.fashion">
                 <arguments>
-                    <argument name="title" xsi:type="string" translate="true">Beauty and Perfumes</argument>
+                    <argument name="title" xsi:type="string" translate="true">Beauty &amp; Cosmetics</argument>
                     <argument name="subtitle" xsi:type="string" translate="true">Curated beauty picks</argument>
                     <argument name="more_url" xsi:type="string">health.html</argument>
                     <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
@@ -405,7 +467,9 @@
                    name="hm.home.topvendors" after="hm.home.brands"
                    template="MagentoEgypt_HomeSections::new-stores.phtml">
                 <arguments>
-                    <argument name="subtitle" xsi:type="string" translate="true">Highest-rated sellers approved by Magento Egypt</argument>
+                    <!-- "verified", not "approved" (QA cycle 2 item 1-K), and the
+                         cycle-2 brand: Hub Market. -->
+                    <argument name="subtitle" xsi:type="string" translate="true">Highest-rated sellers verified by Hub Market</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                     <argument name="order_by" xsi:type="string">rating</argument>
                     <argument name="heading" xsi:type="string" translate="true">Top Vendors This Month</argument>
@@ -416,7 +480,7 @@
                    name="hm.home.newstores" after="hm.home.topvendors"
                    template="MagentoEgypt_HomeSections::new-stores.phtml">
                 <arguments>
-                    <argument name="subtitle" xsi:type="string" translate="true">Recently joined approved sellers</argument>
+                    <argument name="subtitle" xsi:type="string" translate="true">Recently joined verified sellers</argument>
                     <argument name="limit" xsi:type="number">4</argument>
                 </arguments>
             </block>
@@ -472,6 +536,15 @@
             <block class="MagentoEgypt\HomeSections\Block\PickedForYou"
                    name="hm.home.pickedforyou" after="hm.home.deals">
                 <arguments>
+                    <!--
+                        Section foot, per QA cycle 1 ("Recommendations update as
+                        you shop..." on the left, "View all recommendations ->"
+                        on the right). The NOTE comes from the block, because
+                        which sentence is true depends on whether the row is
+                        actually personalised yet; the link is static.
+                    -->
+                    <argument name="foot_url" xsi:type="string">all.html</argument>
+                    <argument name="foot_label" xsi:type="string" translate="true">View all recommendations</argument>
                     <argument name="title" xsi:type="string" translate="true">Picked For You</argument>
                     <!--
                         Figma's subtitle reads "Personalised recommendations based on

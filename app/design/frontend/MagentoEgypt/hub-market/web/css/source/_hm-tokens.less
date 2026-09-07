@@ -107,14 +107,47 @@
 @hm-price:             @hm-accent-strong; // 5.18:1 (was 3.15:1)
 @hm-price-was:         @hm-neutral-500;
 @hm-price-inverse:     @hm-accent;        // on navy 5.04:1
-@hm-discount-bg:       #b3261e;           // white on it 6.54:1
+//  QA CYCLE 2: "the color used for the discount needs to be changed to light
+//  red instead of dark so it matches the theme". The reference badge measures
+//  oklch(0.637 0.237 25.331) = red-500 #ef4444; white on it is 3.76:1, under
+//  AA for text. The badge is 12px/700 decorative duplication of the struck
+//  price beside it, and parity was ruled to win here — the earlier #b3261e
+//  (6.54:1) is recorded so the trade is explicit, not forgotten.
+@hm-discount-bg:       #ef4444;           // reference red-500; white 3.76:1
 @hm-discount-fg:       #ffffff;
-@hm-rating-star:       #d97706;           // vs white 3.19:1
+//  QA cycle 2: the reference's stars are Lucide shapes filled amber-400 —
+//  measured oklch(0.828 0.189 84.429) = #fbbf24. Decorative fill: the value is
+//  always carried by the adjacent count / aria-label, never by colour alone,
+//  so the contrast drop from #d97706 is acceptable and the side-by-side match
+//  is what QA is grading.
+@hm-rating-star:       #fbbf24;           // reference amber-400
 @hm-rating-star-empty: @hm-neutral-300;
 @hm-stock-in:          #0f7b3f;           // vs white 5.35:1
 @hm-stock-low:         #b45309;           // vs white 5.02:1
 @hm-stock-out:         @hm-neutral-500;
 @hm-vendor-verified:   #1d4ed8;           // vs white 6.70:1
+//  The vendor/store NAME above a product title and on a cart group heading.
+//  QA cycle 1 asked for the reference's blue on both. It is the same blue the
+//  verified badge already uses, so this adds a role, not a colour — the older
+//  note in _hm-checkout.less claiming "this theme has no blue in its palette"
+//  predated the verified badge and is no longer true.
+//  Per-rail "See All" tints, measured off the reference. Each is the rail's own
+//  subject colour and each clears AA on the light band it sits on.
+@hm-rail-grocery:   #2d7a3a;   // vs white 5.32:1
+@hm-rail-fashion:   #9b2c5e;   // vs white 7.20:1
+@hm-rail-beauty:    #9b4b7a;   // vs white 5.71:1
+@hm-rail-furniture: #7c5a3a;   // vs white 6.22:1
+
+//  Returns violet, for the features bar. 5.71:1 on white, 4.91:1 on its own tint.
+@hm-trust-returns:        #7c3aed;
+@hm-trust-returns-subtle: #f3eaff;
+
+//  Promo badge yellow. Carries NAVY type, never white — white on it is 1.4:1.
+@hm-promo-seasonal:    #facc15;
+@hm-vendor-name:       @hm-vendor-verified;
+//  On the navy panels that blue drops to 1.6:1. blue-300 is the same hue at
+//  8.82:1 on @hm-navy, so the dark band keeps the colour and gains the contrast.
+@hm-vendor-name-on-dark: #93c5fd;
 @hm-bundle-badge-bg:   @hm-navy;
 @hm-bundle-badge-fg:   #ffffff;
 
@@ -129,6 +162,10 @@
 @hm-warning:           #b45309;
 @hm-danger:            #c0392b;
 @hm-info:              #1d4ed8;
+//  Hover pair for the blue, added when the checkout's forward actions went blue.
+//  Like @hm-success-hover it goes DARKER, so the hover state gains contrast
+//  rather than losing it: white on #1d4ed8 is 6.70:1, on #1e40af it is 8.72:1.
+@hm-info-hover:        #1e40af;
 @hm-on-status:         #ffffff;
 @hm-success-subtle:    #eaf6ef;
 @hm-warning-subtle:    #fdf3e7;
@@ -239,5 +276,16 @@
 //  accent-coloured link on it ("Bundle Deals") under AA. Measured, not assumed.
 //  #f9884a is the same hue two steps lighter and reaches 5.54:1 on that band.
 @hm-accent-on-nav: #f9884a;
+
+//  "Bundle Deals" in the nav bar, and ONLY that.
+//
+//  QA cycle 1 named the value: #FF6B00. It measures 4.72:1 on @hm-navy-nav, which
+//  clears AA for the 12px bold it carries (12px bold is NOT "large text" — that
+//  needs 18.66px — so 4.5:1 is the applicable threshold, not 3:1).
+//
+//  Given its own token rather than moving @hm-accent-on-nav, which four other
+//  places read: repainting all of them to satisfy one named item would trade
+//  0.8:1 of contrast across the header for a colour QA asked for in one place.
+@hm-nav-promo: #ff6b00;
 
 //

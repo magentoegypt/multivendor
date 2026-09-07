@@ -1634,3 +1634,124 @@
     margin-right: 0;
     margin-inline-start: var(--hm-space-4);
 }
+
+//  ---------------------------------------------------------------------------
+//  QA CYCLE 2, item 6 — Add New Address: the number under the country flag
+//  ---------------------------------------------------------------------------
+//  Third appearance of the same intl-tel-input trap, after the checkout address
+//  form and the registration form: the SMS module's plugin pins the country
+//  flag over the first 48px of the phone field and clears it with its own
+//  padding, which the theme's field padding overrides — so the digits start
+//  under the flag. PHYSICAL padding-left on purpose: the flag is pinned to
+//  `left: 0` in both directions (verified in the Arabic checkout), so the
+//  logical property would open the gap on the wrong side in RTL. See the twin
+//  notes in _hm-checkout.less.
+.customer-address-form,
+.account[class*='address'] {
+    .form-address-edit .field.mobile .control .intl-tel-input,
+    .form-address-edit .control .intl-tel-input {
+        display: block;
+        inline-size: 100%;
+
+        input { inline-size: 100%; }
+    }
+
+    .form-address-edit input.mobile-number,
+    .form-address-edit .intl-tel-input input[type='tel'],
+    .form-address-edit .intl-tel-input input[type='text'] {
+        padding-left: 5.6rem;   // 48px of flag, plus 8px
+    }
+}
+
+//
+//  QA CYCLE 2 — item 7: "The wishlist isn't showing up properly"
+//  ---------------------------------------------
+//  The rail card CSS treats .action.tocart as a 36px icon-only square and
+//  clips its label for a sprite icon the RAIL templates inject — but the
+//  wishlist renders CORE markup, which has the label and no icon, so the
+//  button showed as a blank orange blob. Ditto the hover-fade: pointless on a
+//  page whose whole purpose is these controls. Everything here restores the
+//  wishlist card to a plain labelled form.
+.products-grid.wishlist {
+    .product-item-info { padding: var(--hm-space-3); }
+
+    //  A labelled, full-width button again — and always visible.
+    .product-item .action.tocart {
+        block-size: auto;
+        border-radius: var(--hm-radius-sm);
+        display: inline-flex;
+        inline-size: 100%;
+        justify-content: center;
+        min-block-size: 4rem;
+        opacity: 1;
+        padding: .8rem var(--hm-space-3);
+
+        span {
+            block-size: auto;
+            clip-path: none;
+            inline-size: auto;
+            overflow: visible;
+            position: static;
+            white-space: nowrap;
+        }
+    }
+
+    .product-item-inner { opacity: 1; }
+
+    //  The comment box reads as an optional note, not a bare exposed textarea.
+    .field.comment-box {
+        margin-block: var(--hm-space-2);
+
+        .label {
+            color: var(--hm-foreground-muted);
+            display: block;
+            font-size: 1.2rem;
+            margin-block-end: .4rem;
+        }
+
+        textarea {
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius-sm);
+            font-size: 1.3rem;
+            inline-size: 100%;
+            min-block-size: 6rem;
+            padding: var(--hm-space-2);
+        }
+    }
+
+    .box-tocart {
+        margin: 0;
+
+        .fieldset {
+            align-items: flex-end;
+            display: flex;
+            gap: var(--hm-space-2);
+            margin: 0;
+        }
+
+        .field.qty {
+            margin: 0;
+
+            .label { color: var(--hm-foreground-muted); font-size: 1.2rem; }
+
+            input.qty {
+                border: 1px solid var(--hm-border-subtle);
+                border-radius: var(--hm-radius-sm);
+                block-size: 4rem;
+                inline-size: 5.4rem;
+                text-align: center;
+            }
+        }
+
+        .product-item-actions { flex: 1 1 auto; margin: 0; }
+    }
+
+    //  Edit / Remove: quiet inline links under the card.
+    .product-item-actions .action.edit,
+    .product-item-actions .action.delete {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+
+        &:hover { color: var(--hm-accent); }
+    }
+}

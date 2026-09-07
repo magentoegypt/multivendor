@@ -13,10 +13,63 @@
 //  paints three distinct navies across the header stack and the old local
 //  `darken(@hm-navy, 4%)` only expressed one of them.
 
+//
+//  Sticky header  (QA cycle 1: "make the main header sticky/fixed on scroll")
+//  ---------------------------------------------
+//  Applied to `.page-header`, NOT to `.hm-header__main`, and that choice is the
+//  whole trick. A sticky element only sticks WITHIN ITS PARENT'S BOX: pinning
+//  the main band would hold it for the ~144px that `.hm-header` is tall and then
+//  let it scroll away, which reads as a broken sticky rather than as no sticky.
+//  `.page-header` is a direct child of `.page-wrapper`, which spans the document,
+//  so it pins for the whole scroll.
+//
+//  This works only because `.page-wrapper` is `overflow-x: clip` and not
+//  `hidden` — `hidden` makes it a scroll container and sticky resolves against
+//  that instead of the viewport. That was already deliberate; see the note on
+//  `.hm-band()` in _hm-figma.less. Do not "tidy" clip into hidden.
+//
+//  z-index 90: above page content, below the nav's own mega-dropdown (100,
+//  _hm-nav.less) which is a DESCENDANT and so paints inside this stacking
+//  context anyway, below the mobile drawer (999) and the skip link (1000).
+.page-header {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 90;
+}
+
+//  THE UTILITY STRIP SCROLLS AWAY; MAIN ROW AND NAV PIN.
+//
+//  Done by pinning the header at -3.6rem — exactly the strip's height, measured
+//  36px in both locales at desktop widths — so at rest the whole stack is
+//  visible and once you scroll, the strip parks just above the viewport while
+//  everything below it stays pinned. sticky only applies its offset at the
+//  scroll boundary, which is the entire trick.
+//
+//  This REPLACES a `@media (max-height: 700px) { display: none }` on the strip.
+//  That version solved the same problem — three pinned bands are a lot of a
+//  short laptop screen — but it hid the strip even at REST, and the strip
+//  carries the language switcher and Login/Register: any window under 701px of
+//  CSS height (devtools open, a bookmarks bar, 125% scaling) silently lost the
+//  only visible route to the Arabic store. Found in review, not by a bug
+//  report, which is the polite version of "a user found it".
+//
+//  Desktop-only: below 768px the strip is already display:none by the mobile
+//  header design (measured 0px), so the offset there would tuck the MAIN row
+//  instead. Mobile keeps top: 0 from the base rule above.
+@media (min-width: 768px) {
+    .page-header { inset-block-start: -3.6rem; }
+}
+
 .hm-header {
     background: var(--hm-primary);
     color: var(--hm-on-inverse);
     position: relative;
+
+    //  A pinned header needs an edge against scrolling content. Applied always
+    //  rather than on a "stuck" class: detecting stuck needs an IntersectionObserver
+    //  sentinel, and the shadow is invisible at rest against the page's own
+    //  background anyway.
+    box-shadow: 0 1px 0 fade(#000000, 8%), 0 4px 12px fade(#000000, 6%);
 }
 
 //  box-sizing matters here. Without it these are width:100% (of the viewport)
@@ -284,6 +337,20 @@
     //  `[ All Categories | field | Search ]` with no radius anywhere on it. Ours
     //  carried 6px on the outer corners, which is the single most visible
     //  difference in the header at 1:1.
+    //
+    //  SOLID WHITE, DARK TEXT — measured on the reference's input itself:
+    //  background rgb(255,255,255), value #1a1a2e, grey placeholder. The bar is
+    //  deliberately three-tone: dark category segment (white/10), WHITE field,
+    //  orange button.
+    //
+    //  This field spent a day as fade(#ffffff, 10%) with white type, and the
+    //  correction was reported three times before it landed, so the mistake is
+    //  recorded where it happened: QA's "the search word is written in black, we
+    //  want it in white" refers to the SEARCH BUTTON's label (which is white,
+    //  below), and the `bg-white/10` note further down describes the CATEGORY
+    //  SEGMENT. Both got read onto the input, and each verification measured the
+    //  change instead of the reference. If this field ever looks wrong again,
+    //  measure doze-coyote-58038022.figma.site's input first.
     input {
         background: var(--hm-surface);
         border: 0;
@@ -296,7 +363,7 @@
         position: static;
         width: 100%;
 
-        &::placeholder { color: var(--hm-placeholder); }
+        &::placeholder { color: var(--hm-placeholder); opacity: 1; }
     }
 
     //  Desktop takes Figma's exact metrics: a 40px bar with 14px type. The 44px /
@@ -322,10 +389,15 @@
     //  selector takes this to (0,3,0) and settles it without !important.
     .actions .action.search {
         align-items: center;
+        //  THE REFERENCE'S OWN #f26522, white label. QA cycle 2 item 1-A filed
+        //  the darkened family sitewide ("the orange color used throughout the
+        //  site doesn't match the theme") with this button boxed in the
+        //  screenshot, so the #c2410c AA reconciliation is reverted here.
+        //  White on #f26522 is 3.15:1 — recorded, deliberate, parity wins.
         background: var(--hm-accent);
         border: 0;
         border-radius: 0;             // square, with the rest of the bar
-        color: var(--hm-on-accent);   // navy on orange = 5.04:1
+        color: var(--hm-neutral-0);
         cursor: pointer;
         display: flex;
         font-size: 1.4rem;
@@ -340,13 +412,31 @@
         &:hover { background: var(--hm-accent-hover); }
         &:focus-visible { outline: 2px solid var(--hm-focus-ring-inverse); outline-offset: -3px; }
 
-        //  Magento's quickSearch widget disables this button until the field has
-        //  content — that is deliberate (it blocks empty searches), not a bug.
-        //  But blank renders the disabled state at opacity .5, which over the
-        //  navy header composites to #814332 and reads as broken rather than as
-        //  "type something first". Verified by sampling the rendered pixel.
+        //  THIS BUTTON MUST NEVER BE CLICK-TRANSPARENT.
+        //
+        //  It used to be, for the first three characters of every search, and
+        //  that was QA CL041-TC01 (ClickUp 86d45hdvn): "the button is
+        //  non-clickable and unresponsive".
+        //
+        //  form-mini.js sets `submitBtn.disabled = true` in _create() and only
+        //  clears it from a 300ms-DEBOUNCED handler. blank styles [disabled]
+        //  with `pointer-events: none`, so the button did not merely ignore
+        //  clicks — the hit-test at its own centre returned `div.actions`, its
+        //  parent, and no mousedown, click or submit event was produced at all.
+        //
+        //  What made it invisible was the rule that used to live here: a
+        //  comment asserting the disabled state was "deliberate, not a bug",
+        //  and `&:disabled { opacity: .85 }` to stop blank's .5 "reading as
+        //  broken" over the navy header. So it rendered as a full-strength
+        //  orange Search button that silently swallowed every click. The state
+        //  was dead and the styling insisted it was alive.
+        //
+        //  js/hm-search-live now keeps the button enabled, so the disabled
+        //  state should never occur. This is the belt to that braces: if
+        //  anything re-disables it, it stays clickable and merely dims.
         &:disabled {
-            opacity: .85;
+            opacity: .55;
+            pointer-events: auto;
         }
 
         @media (min-width: 768px) { min-block-size: 4rem; }
@@ -372,6 +462,132 @@
 
 @media (max-width: 767px) {
     .block-search .hm-search__label { .hm-sr-only-mixin(); }
+}
+
+//  Empty-submit feedback (see Magento_Search/templates/form.mini.phtml).
+//  Absolutely positioned so showing it cannot reflow the header band; the
+//  parent `.control` is already `position: relative`. Logical inset so it
+//  starts at the field's leading edge in both LTR and RTL.
+.block-search .hm-search__hint {
+    background: var(--hm-surface);
+    border-radius: 0 0 var(--hm-radius-sm, .4rem) var(--hm-radius-sm, .4rem);
+    box-shadow: 0 .2rem .8rem rgba(0, 0, 0, .18);
+    color: var(--hm-foreground);
+    font-size: 1.3rem;
+    inset-block-start: 100%;
+    inset-inline-start: 0;
+    line-height: 1.4;
+    margin: 0;
+    padding: var(--hm-space-2) var(--hm-space-4);
+    position: absolute;
+    z-index: 4;   //  above .search-autocomplete (3)
+
+    &[hidden] { display: none; }
+}
+
+//
+//  Search suggestions
+//  ---------------------------------------------
+//  This dropdown was rendering WHITE TEXT ON A WHITE BACKGROUND — measured
+//  colour rgb(255,255,255) on background rgb(255,255,255), a contrast ratio of
+//  1:1. QA saw an empty white panel with a single stray line across it.
+//
+//  Nothing was broken in the widget: the suggestions were present, correctly
+//  positioned and correctly sized the whole time. blank paints each row's
+//  background white but gives the list no colour of its own, so `color`
+//  inherited — and because this markup lives inside `.hm-header`, what it
+//  inherited was var(--hm-on-inverse), i.e. white. The "stray line" was blank's
+//  1px row border, the only part of the row with its own colour.
+//
+//  The theme had no rule for `.search-autocomplete` at all, which is how a
+//  whole component shipped invisible. So this block finishes it: legible first,
+//  then matched to the bar it hangs from — same white field, same square edges.
+.block-search .search-autocomplete {
+    //  blank pulls the panel UP by 15px below 768px (`margin-top: -15px`, reset
+    //  to 0 only at min-width 768) so it overlapped the field on phones.
+    //  Physical on purpose: this offset is vertical, so RTL does not touch it.
+    margin-top: 0;
+    //  form-mini.js sets position and width inline (it clones the field's
+    //  width); only stacking needs settling here. Above the category nav band
+    //  that sits directly under the header.
+    z-index: 5;
+
+    ul {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-block-start: 0;   //  reads as a continuation of the field
+        box-shadow: var(--hm-shadow-lg);
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    //  Specificity, deliberately: blank's row rule is
+    //  `.search-autocomplete ul li:not(:empty)` (0,2,2) and carries
+    //  `border: 1px solid #7d879c; background: #fff`, which boxed every row and
+    //  drew the stray line QA saw. `.block-search` + `ul li:not(:empty)` takes
+    //  this to (0,3,2) and settles it without !important.
+    ul li,
+    ul li:not(:empty) {
+        align-items: center;
+        background: var(--hm-surface);
+        border: 0;
+        border-block-end: 1px solid var(--hm-border-subtle);
+        //  THE FIX. Without this the row inherits the header's white, which is
+        //  what made the whole dropdown invisible against its own white rows.
+        color: var(--hm-foreground);
+        cursor: pointer;
+        display: flex;
+        font-size: 1.4rem;
+        gap: var(--hm-space-3);
+        justify-content: space-between;
+        line-height: 1.4;
+        min-block-size: 4rem;
+        //  blank hard-codes `6px 48px 6px 12px` — a 48px gutter reserved for the
+        //  result count on the PHYSICAL right, which is the wrong edge in
+        //  Arabic. The count is a flex item now and needs no reserved gutter.
+        padding: var(--hm-space-2) var(--hm-space-4);
+        //  blank sets `text-align: left`; that is the wrong edge in RTL.
+        text-align: start;
+
+        &:last-child { border-block-end: 0; }
+
+        //  `selected` is the widget's own keyboard-cursor class
+        //  (form-mini options.selectClass), so arrow-key navigation and hover
+        //  land on the same treatment.
+        &:hover,
+        &.selected {
+            background: var(--hm-surface-muted);
+            color: var(--hm-foreground);
+        }
+    }
+
+    .qs-option-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    //  Result count. blank absolutely positions this at `right: 7px` — physical,
+    //  so it lands on the wrong edge in Arabic. As a flex item it follows the
+    //  row's direction for free. Magento also leaves the element in place but
+    //  EMPTY when the suggest response carries no num_results (ours does not),
+    //  so it must collapse rather than hold open a gutter.
+    ul li .amount {
+        color: var(--hm-foreground-muted);
+        flex: 0 0 auto;
+        font-size: 1.2rem;
+        inset: auto;
+        position: static;
+
+        &:empty { display: none; }
+    }
+
+    //  Touch rows and 16px-safe text on phones, same floors as the field itself.
+    @media (max-width: 767px) {
+        ul li,
+        ul li:not(:empty) { font-size: 1.5rem; min-block-size: 4.4rem; }
+    }
 }
 
 //  Mixin so .label can be visually hidden without duplicating the rule.
@@ -733,28 +949,23 @@
     min-inline-size: 13rem;      // Figma min-w-[130px]
     padding-inline: var(--hm-space-3) var(--hm-space-6);
 
-    //  Figma sets `appearance-none` and shows NO indicator at all. A <select>
-    //  with no affordance is a real usability regression, not a style choice, so
-    //  the native control is suppressed and a faint chevron drawn in its place —
-    //  same visual weight as the reference, minus the guessing game.
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='rgba(255,255,255,.55)' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5 6 6.5l5-5'/%3E%3C/svg%3E");
-    background-position: right var(--hm-space-3) center;
-    background-repeat: no-repeat;
-    background-size: 1rem .7rem;
-
-    //  The chevron must follow the text edge under RTL, and `background-position`
-    //  has no logical form.
+    //  NO INDICATOR, per the reference and per QA cycle 1: "There's an arrow next
+    //  to this category that's not in the UI, we need to remove it and when we
+    //  click on the category button, the list should drop down."
     //
-    //  `:lang(ar)` is the half that actually matches. Nothing in this build emits
-    //  a `dir` attribute — direction is applied by `html:lang(ar)` in
-    //  _hm-root.less — so keyed on `[dir='rtl']` alone this rule never fired and
-    //  the chevron stayed pinned to the right edge in Arabic, on the wrong side
-    //  of a control whose text had already mirrored. Verified in the browser:
-    //  the element matches `:lang(ar) &` and does not match `[dir='rtl'] &`.
-    //  The attribute selector stays for the day the attribute is emitted.
-    [dir='rtl'] &,
-    :lang(ar) & { background-position: left var(--hm-space-3) center; }
+    //  This previously suppressed the native arrow and drew a faint chevron in
+    //  its place, on the reasoning that a <select> with no affordance is a
+    //  usability regression. That reasoning still holds and the trade is now
+    //  made the other way round on purpose — the reference is unambiguous and QA
+    //  filed it. What is NOT given up is the control itself: this stays a native
+    //  <select>, so clicking it drops the list open on every platform, it works
+    //  from the keyboard, and it uses the OS picker on mobile. QA's second
+    //  sentence describes what a native select already does.
+    //
+    //  The RTL background-position rules went with the chevron — there is no
+    //  background image left to place. `padding-inline` keeps its asymmetry so
+    //  the label does not sit hard against the divider.
+    appearance: none;
 
     //  The popup list is painted by the OS using the control's own colours, so a
     //  translucent-white control yields white-on-white options in some engines.

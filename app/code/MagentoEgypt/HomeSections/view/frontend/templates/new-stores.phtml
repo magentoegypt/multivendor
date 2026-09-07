@@ -23,7 +23,8 @@ if (!$stores) {
  * which breaks the aria-labelledby association: both sections would point at the
  * same node, so a screen reader announces the wrong name for one of them.
  */
-$heading  = (string) ($block->getData('heading') ?: __('New Stores'));
+//  Default carries the brand, per QA cycle 1; Top Vendors overrides it in layout.
+$heading  = (string) ($block->getData('heading') ?: __('New Stores on Hub Market'));
 $headingId = 'hm-stores-title-' . substr(md5($block->getNameInLayout() ?: $heading), 0, 8);
 ?>
 <?php $hmStoresSlug = preg_replace('/[^a-z0-9]+/', '-', strtolower((string) $block->getNameInLayout())); ?>
@@ -111,12 +112,39 @@ $hmIndex = 0;
                         $initial = '?';
                     }
                     ?>
-                    <span class="hm-stores__avatar" aria-hidden="true">
-                        <?php if ($s['logo']): ?>
-                            <img src="<?= $escaper->escapeUrl($s['logo']) ?>" alt=""
-                                 loading="lazy" width="56" height="56"/>
-                        <?php else: ?>
-                            <?= $escaper->escapeHtml($initial) ?>
+                    <?php
+                    /*
+                     * VERIFIED MARK on the avatar. QA cycle 1 asked for it on Top
+                     * Vendors alongside "actual vendor profile images"; the images
+                     * are a data question — not one vendor of the 25 on this
+                     * install has uploaded a logo, which is why these are letter
+                     * discs — but the mark is not, and every vendor in both of
+                     * these rails is approved.
+                     *
+                     * The `$s['logo']` branch below is already in place, so the
+                     * day artwork is uploaded the discs become photographs with no
+                     * code change.
+                     */
+                    ?>
+                    <span class="hm-stores__avatar-wrap">
+                        <span class="hm-stores__avatar" aria-hidden="true">
+                            <?php if ($s['logo']): ?>
+                                <img src="<?= $escaper->escapeUrl($s['logo']) ?>" alt=""
+                                     loading="lazy" width="56" height="56"/>
+                            <?php else: ?>
+                                <?= $escaper->escapeHtml($initial) ?>
+                            <?php endif; ?>
+                        </span>
+                        <?php if (!$hmIsNewStores): ?>
+                            <?php /* QA cycle 2 item 1-K: "Remove verification badge"
+                                     from the NEW STORES cards — there the "✓ VERIFIED"
+                                     text line below carries the same fact, so the
+                                     avatar mark was saying it twice. Top Vendors
+                                     keeps the mark (the reference draws it there). */ ?>
+                            <span class="hm-stores__badge">
+                                <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-vendor-verified"/></svg>
+                                <span class="hm-sr-only"><?= $escaper->escapeHtml(__('Verified seller')) ?></span>
+                            </span>
                         <?php endif; ?>
                     </span>
                     <span class="hm-stores__body">
@@ -149,9 +177,10 @@ $hmIndex = 0;
                         <span class="hm-stores__count"><?= $escaper->escapeHtml(__('%1 products', $s['products'])) ?></span>
                     </span>
                     <?php if ($hmIsNewStores): ?>
+                        <?php /* "Verified", not "Approved" — QA cycle 2 item 1-K. */ ?>
                         <span class="hm-stores__verified">
                             <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-check"/></svg>
-                            <?= $escaper->escapeHtml(__('Approved')) ?>
+                            <?= $escaper->escapeHtml(__('Verified')) ?>
                         </span>
                     <?php endif; ?>
                     <?php
@@ -163,6 +192,7 @@ $hmIndex = 0;
                      * to the grid, which pins the text stack instead.
                      */
                     ?>
+                    </span>
                 </a>
             </li>
         <?php endforeach; ?>

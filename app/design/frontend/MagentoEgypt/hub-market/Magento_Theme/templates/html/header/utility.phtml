@@ -120,8 +120,13 @@ declare(strict_types=1);
                     }
                 }
             </script>
+            <?php /* "Hub Market", not MECommerce — QA cycle 2 item 1-A reversed
+                     the cycle-1 reversal: every brand string on the storefront
+                     now reads Hub Market. The brand is part of the translated
+                     string here because the Arabic store writes the brand in
+                     Arabic script inside this label. */ ?>
             <a class="hm-utility__link hm-utility__link--sell" href="<?= $escaper->escapeUrl($block->getUrl('marketplace/seller/register')) ?>">
-                <?= $escaper->escapeHtml(__('Sell with us')) ?>
+                <?= $escaper->escapeHtml(__('Sell on Hub Market')) ?>
             </a>
             <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('sales/guest/form')) ?>">
                 <?= $escaper->escapeHtml(__('Track Order')) ?>

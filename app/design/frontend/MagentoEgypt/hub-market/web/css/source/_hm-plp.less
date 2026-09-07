@@ -224,15 +224,18 @@
     }
 }
 
+//  QA cycle 2, item 2-A: the sidebar heading is the reference's display serif
+//  at 14px/700 (matching "Price Range" / "Minimum Rating" there), not a plain
+//  sans label.
 .filter-options-title {
     color: var(--hm-foreground);
-    font-family: var(--hm-font-sans);
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-family: var(--hm-font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
     padding-block: var(--hm-space-3);
     text-align: start;
 
-    &:hover { color: var(--hm-accent-strong); }
+    &:hover { color: var(--hm-accent); }
 }
 
 .filter-options-item {
@@ -244,19 +247,75 @@
 .filter-options-content {
     padding-block-end: var(--hm-space-3);
 
-    .item { margin-block-end: var(--hm-space-2); }
+    //  QA cycle 2, item 2-A: the decorative checkbox and the label sat in
+    //  normal flow, so a long label ("Detergents & Laundry Supplies") wrapped
+    //  UNDER the box onto its own line — photographed as broken. The row is a
+    //  flex line now: box, then the link filling the rest, with any wrap
+    //  hanging inside the link's own column. The checkbox also takes the
+    //  reference's orange accent.
+    .item {
+        align-items: flex-start;
+        display: flex;
+        gap: var(--hm-space-2);
+        margin-block-end: var(--hm-space-2);
+    }
+
+    input[type='checkbox'] {
+        accent-color: var(--hm-accent);
+        flex: 0 0 auto;
+        margin-block-start: .5rem;
+    }
 
     a {
         color: var(--hm-foreground-muted);
         display: block;
+        flex: 1 1 auto;
         font-size: 1.4rem;
+        min-inline-size: 0;
         padding-block: .4rem;
         text-decoration: none;
 
-        &:hover { color: var(--hm-accent-strong); }
+        &:hover { color: var(--hm-accent); }
     }
 
     .count {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+}
+
+//  The price slider takes the reference's orange as well. The control is
+//  Mageplaza_LayeredNavigation's jQuery-UI slider (#ln_slider_price), so the
+//  painted parts are the ui-slider classes; accent-color covers any native
+//  range input that ever replaces it.
+.filter-options-content input[type='range'] { accent-color: var(--hm-accent); }
+
+.ln_slider_container {
+    .ui-slider {
+        background: var(--hm-neutral-200);
+        block-size: .4rem;
+        border: 0;
+        border-radius: var(--hm-radius-full);
+        margin-block: var(--hm-space-3) var(--hm-space-2);
+    }
+
+    .ui-slider-range { background: var(--hm-accent); }
+
+    .ui-slider-handle {
+        background: var(--hm-accent);
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        block-size: 1.6rem;
+        box-shadow: var(--hm-shadow-sm);
+        cursor: pointer;
+        inline-size: 1.6rem;
+        margin-block-start: -.6rem;
+        outline-offset: 2px;
+        top: auto;
+    }
+
+    #ln_slider_text_price,
+    .ln_slider_text {
         color: var(--hm-foreground-muted);
         font-size: 1.3rem;
     }
@@ -287,10 +346,15 @@
 
 .swatch-option {
     border: 1px solid var(--hm-border-strong);
-    border-radius: var(--hm-radius-xs);
-    min-block-size: 3.2rem;
-    min-inline-size: 3.2rem;
+    //  QA cycle 2, item 3-B: the reference draws its option chips as rounded
+    //  rectangles (~8px), a step larger, with a quiet border — not tight
+    //  2px-radius squares.
+    border-radius: var(--hm-radius-sm);
+    min-block-size: 3.4rem;
+    min-inline-size: 3.4rem;
     outline-offset: 2px;
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                background-color var(--hm-duration) var(--hm-ease);
 
     /*
      * Centre the label. Magento_Swatches ships these as `display: block`, so a
@@ -313,6 +377,13 @@
     &.selected {
         border-color: var(--hm-primary);
         box-shadow: 0 0 0 2px var(--hm-primary);
+    }
+
+    //  Cycle 2: a SELECTED text chip fills navy with white type (the
+    //  reference's active state), so selection never rides on the ring alone.
+    &.text.selected {
+        background: var(--hm-primary);
+        color: var(--hm-on-primary);
     }
 
     &.text {
@@ -345,6 +416,13 @@
     color: var(--hm-foreground);        // #1a1a2e on #fff — far clear of 4.5:1
 }
 
+//  …and the selected state must out-rank THAT rule too, or a chosen size chip
+//  snaps back to white the moment this (0,4,0) selector applies.
+.hm-page .swatch-attribute .swatch-option.text.selected {
+    background: var(--hm-primary);
+    color: var(--hm-on-primary);
+}
+
 //
 //  Empty state
 //  ---------------------------------------------
@@ -367,10 +445,12 @@
     opacity: 1;
 }
 
-.product-item-actions .actions-primary .action.tocart,
-.products-grid .product-item .action.tocart {
-    opacity: 1;
-}
+//  The cart button's own opacity:1 that used to sit here is GONE — it was the
+//  cycle-1 "permanently visible" rule, and at (0,4,0) it silently beat the
+//  cycle-2 hover-fade in _hm-figma.less (0,3,0), which is exactly how the
+//  button stayed visible after the reversal shipped. Visibility now has ONE
+//  owner: the any-hover block in _hm-figma.less (hover-only with a pointer,
+//  always-on for touch, always-on inside Picked For You and the wishlist).
 
 //  Some modules append an empty secondary action slot; hide it rather than
 //  leaving an empty 44px box next to wishlist and compare.
@@ -385,4 +465,95 @@
     }
 
     .catalog-category-view .page-title { font-size: 2.8rem; }
+}
+
+//
+//  QA CYCLE 2 — item 2-B: LIST VIEW rows
+//  ---------------------------------------------
+//  The rows were "not showing up evenly" — blank lays list items out with
+//  floats and lets the content stack decide the height, so rows ranged from
+//  120px to 600px depending on how much description each product carried (the
+//  template now also strips/clamps that text — see list.phtml). This grid
+//  gives every row the same three columns: image, details, price+actions.
+.products.list .product-item {
+    inline-size: 100%;
+    margin: 0 0 var(--hm-space-3);
+}
+
+.products.list .product-item-info {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    column-gap: var(--hm-space-5);
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr) auto;
+    inline-size: 100%;
+    padding: var(--hm-space-4);
+
+    .product-item-media,
+    .product-item-photo {
+        aspect-ratio: 1 / 1;
+        grid-column: 1;
+        grid-row: 1 / span 2;
+        inline-size: 16rem;
+    }
+
+    .product-item-details {
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-1);
+        grid-column: 2;
+        min-inline-size: 0;
+        padding: 0;
+    }
+
+    //  Price + cart move to their own trailing column, top-aligned, so every
+    //  row's buy area sits in the same place whatever the text does.
+    .hm-card__foot {
+        align-items: flex-end;
+        flex-direction: column;
+        grid-column: 3;
+        grid-row: 1;
+        justify-content: flex-start;
+        margin: 0;
+    }
+
+    //  In a row this wide the title does not need a reserved two-line box.
+    .product-item-name a.product-item-link { min-block-size: 0; }
+}
+
+.products.list .hm-list-desc {
+    color: var(--hm-foreground-muted);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    margin: 0;
+    overflow: hidden;
+}
+
+.products.list .product-item-description {
+    margin: var(--hm-space-1) 0 0;
+
+    .action.more {
+        color: var(--hm-accent);
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+}
+
+@media (max-width: 639px) {
+    .products.list .product-item-info {
+        grid-template-columns: 10rem minmax(0, 1fr);
+
+        .product-item-media,
+        .product-item-photo { inline-size: 10rem; grid-row: 1; }
+
+        .hm-card__foot {
+            align-items: flex-start;
+            flex-direction: row;
+            grid-column: 2;
+            grid-row: 2;
+        }
+    }
 }

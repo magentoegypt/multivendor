@@ -456,25 +456,40 @@
 
 .hm-brands__link {
     align-items: center;
-    background: var(--hm-surface);
+    //  QA cycle 2 item 1-I sized these against the reference: grey-50 fill,
+    //  grey-100 hairline, 16px radius, ~88px tall, and a lift on hover (the
+    //  "moving on the brands" note) — the reference tile rises with a soft
+    //  shadow rather than only recolouring its border.
+    background: var(--hm-neutral-50);
     border: 1px solid var(--hm-border-subtle);
-    border-radius: var(--hm-radius);
+    border-radius: var(--hm-radius-lg);
     display: flex;
     flex-direction: column;
     gap: var(--hm-space-2);
     justify-content: center;
-    min-block-size: 10rem;
-    padding: var(--hm-space-4) var(--hm-space-2);
+    min-block-size: 8.8rem;
+    padding: var(--hm-space-3) var(--hm-space-2);
     text-align: center;
     text-decoration: none;
-    transition: border-color var(--hm-duration) var(--hm-ease);
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease),
+                transform var(--hm-duration) var(--hm-ease);
 
     &:hover,
-    &:focus-visible { border-color: var(--hm-accent); text-decoration: none; }
+    &:focus-visible {
+        border-color: var(--hm-accent);
+        box-shadow: 0 8px 18px rgba(15, 33, 68, .08);
+        text-decoration: none;
+        transform: translateY(-3px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hm-brands__link, .hm-brands__link:hover { transform: none; }
 }
 
 .hm-brands__img {
-    block-size: 4.8rem;
+    block-size: 3.6rem;   // cycle 2: the reference tile is 88px tall in total
     inline-size: auto;
     max-inline-size: 100%;
     object-fit: contain;
@@ -924,27 +939,13 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
     margin-block-start: var(--hm-space-1);
 }
 
-.hm-stars {
-    color: var(--hm-neutral-300);
-    display: inline-block;
-    font-size: 1.3rem;
-    letter-spacing: .1em;
-    line-height: 1;
-    position: relative;
-
-    &::before { content: '★★★★★'; }
-}
-
-.hm-stars__fill {
-    color: var(--hm-rating-star, #d97706);   // 3.19:1 on white - a non-text indicator
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    overflow: hidden;
-    position: absolute;
-    white-space: nowrap;
-
-    &::before { content: '★★★★★'; }
-}
+//  The GLYPH-RUN `.hm-stars` component that lived here is GONE — QA cycle 2
+//  replaced the site's stars with the reference's Lucide SVG shape, and the
+//  new component in _hm-components.less reuses these exact class names. The
+//  two could not coexist: this block's `::before { content: '★★★★★' }` painted
+//  a second, smaller star run inside every SVG star row (photographed on the
+//  PDP as a doubled rating). No template emits the glyph markup any more —
+//  the store cards moved to a single #hm-star icon + numeric score in cycle 1.
 
 .hm-stores__score {
     color: var(--hm-foreground);

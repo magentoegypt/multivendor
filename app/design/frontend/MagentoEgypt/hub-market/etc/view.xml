@@ -1,128 +1,39 @@
 <?xml version="1.0"?>
 <!--
-/**
- * Hub Market — image dimensions.
- *
- * view.xml MERGES up the theme fallback chain, so only the ids that actually
- * change are declared here; everything else is inherited from Magento/blank.
- *
- * Magento/blank ships 240x300 (4:5 portrait) for product listings. This theme
- * uses 1:1 square instead: the catalogue spans grocery, electronics, fashion,
- * pharmacy and home appliances, and a portrait crop letterboxes or crops badly
- * across that mix. Square is also what the design's product card renders.
- *
- * Sizes are ~2x the rendered CSS box so the images stay sharp on high-DPI
- * screens (the card renders about 300 CSS px wide inside the 1440px container).
- */
+    Hub Market — view config deltas from Magento/blank. View config MERGES with
+    the parent per var, so only the changed values live here.
+
+    QA cycle 2, item 3-A ("the image to take its natural size and remove the
+    arrows we use to flip through", both arrows crossed out in the screenshot):
+
+    - gallery arrows off, on the stage and on the thumb strip. Navigation is
+      the thumbnails themselves plus keyboard arrows, exactly the reference.
+
+    - product_image_white_borders 0. The resizer was FRAMING every non-square
+      source into an 800x800 white canvas, so a portrait garment floated small
+      in a white sea and QA circled it as "not natural size". Without the
+      frame the resize keeps the source aspect. The changed setting changes
+      the image-cache hash, so first hits regenerate through pub/get.php on
+      demand (verified wired in pub/media/.htaccess) — do NOT mass-resize
+      2,300 products on this 2-core box for this.
 -->
-<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
+<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
     <media>
         <images module="Magento_Catalog">
-
-            <!-- Product listing: category grid, list and search results -->
-            <image id="category_page_grid" type="small_image">
-                <width>400</width>
-                <height>400</height>
-            </image>
-            <image id="category_page_list" type="small_image">
-                <width>400</width>
-                <height>400</height>
-            </image>
-            <!-- Requested by Smartwave_Filterproducts widgets for the alternative/hover image.
-                 Undefined here it resolves to an empty type and emits placeholder/.jpg (404). -->
-            <image id="category_page_grid-hover" type="small_image">
-                <width>400</width>
-                <height>400</height>
-            </image>
-
-            <!-- Product detail gallery -->
-            <image id="product_page_main_image" type="image">
-                <width>800</width>
-                <height>800</height>
-            </image>
-            <image id="product_page_main_image_default" type="image">
-                <width>800</width>
-                <height>800</height>
-            </image>
-            <image id="product_page_image_medium" type="image">
-                <width>800</width>
-                <height>800</height>
-            </image>
-            <!--
-                190, not 100. The reference runs three thumbnails across the
-                584px gallery column at 189 each; at 100 they rendered as a
-                cluster of stamps under a 592px photo. Fotorama takes its
-                thumbnail box straight from this entry (gallery.phtml passes it
-                through as thumbwidth/thumbheight), so the size has to change
-                here rather than in CSS — scaling a 100px source up would just
-                render it soft.
-            -->
-            <image id="product_page_more_views" type="thumbnail">
-                <width>190</width>
-                <height>190</height>
-            </image>
-            <!--
-                This is the one fotorama actually reads. GalleryOptions builds
-                `thumbwidth`/`thumbheight` from product_page_image_small — NOT
-                from product_page_more_views, which is the obvious-looking entry
-                and the one I changed first, to no effect.
-            -->
+            <!-- The gallery thumbnails: the reference runs three ~185px thumbs
+                 across the column, not a strip of 88px chips. -->
             <image id="product_page_image_small" type="thumbnail">
-                <width>190</width>
-                <height>190</height>
+                <width>170</width>
+                <height>170</height>
             </image>
-
-            <!-- Cart and mini-cart -->
-            <image id="mini_cart_product_thumbnail" type="thumbnail">
-                <width>120</width>
-                <height>120</height>
-            </image>
-            <image id="cart_page_product_thumbnail" type="small_image">
-                <width>160</width>
-                <height>160</height>
-            </image>
-            <image id="cart_cross_sell_products" type="small_image">
-                <width>300</width>
-                <height>300</height>
-            </image>
-
-            <!-- Related / upsell rails -->
-            <image id="related_products_list" type="small_image">
-                <width>300</width>
-                <height>300</height>
-            </image>
-            <image id="upsell_products_list" type="small_image">
-                <width>300</width>
-                <height>300</height>
-            </image>
-
-            <!-- Widgets used on the homepage rails -->
-            <image id="new_products_content_widget_grid" type="small_image">
-                <width>400</width>
-                <height>400</height>
-            </image>
-            <image id="recently_viewed_products_grid_content_widget" type="small_image">
-                <width>400</width>
-                <height>400</height>
-            </image>
-
-            <!-- Wishlist -->
-            <image id="wishlist_thumbnail" type="small_image">
-                <width>300</width>
-                <height>300</height>
-            </image>
-            <image id="wishlist_small_image" type="small_image">
-                <width>160</width>
-                <height>160</height>
-            </image>
-
-            <!-- Swatches -->
-            <image id="product_swatch_image_medium" type="image">
-                <width>400</width>
-                <height>400</height>
-            </image>
-
         </images>
     </media>
+    <vars module="Magento_Catalog">
+        <var name="gallery">
+            <var name="arrows">false</var>
+            <var name="navarrows">false</var>
+            <var name="navtype">thumbs</var>
+        </var>
+        <var name="product_image_white_borders">0</var>
+    </vars>
 </view>

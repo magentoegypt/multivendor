@@ -102,14 +102,50 @@ use Magento\Wishlist\Helper\Data;
         <?php if ($block->getTitle()): ?>
             <div class="block-title hm-section__head">
                 <div class="hm-section__heading">
-                    <?php /* Hub Market: <h2>, not <strong> — see the file header. */ ?>
-                    <h2><?= $escaper->escapeHtml(__($block->getTitle())) ?></h2>
+                    <?php
+                    /*
+                     * Optional chip beside the title. Supplied either by the block
+                     * (Picked For You computes it from which signal produced the
+                     * row) or as a plain layout argument for a static one.
+                     * method_exists rather than an interface: eight rails share
+                     * this template and only one of them has anything to say here.
+                     */
+                    $hmBadge = method_exists($block, 'getHeadBadge')
+                        ? (string) $block->getHeadBadge()
+                        : (string) $block->getData('head_badge');
+                    ?>
+                    <?php /* Hub Market: <h2>, not <strong> — see the file header.
+                             The badge sits BEFORE the title — QA cycle 2 item 1-C
+                             drew an arrow moving it there, and the reference
+                             renders "[● AI ENGINE] Picked For You" in that order.
+                             The dot is drawn by CSS (.hm-section__badge::before);
+                             it is decorative. */ ?>
+                    <h2>
+                        <?php if ($hmBadge !== ''): ?>
+                            <span class="hm-section__badge"><?= $escaper->escapeHtml($hmBadge) ?></span>
+                        <?php endif; ?>
+                        <?= $escaper->escapeHtml(__($block->getTitle())) ?>
+                    </h2>
                     <?php if ($hmSubtitle !== ''): ?>
                         <p class="hm-section__sub"><?= $escaper->escapeHtml(__($hmSubtitle)) ?></p>
                     <?php endif; ?>
                 </div>
                 <?php /* Rail extras (the deals countdown) sit beside the heading. */ ?>
                 <?= $block->getChildHtml('rail_extra') ?>
+                <?php
+                /*
+                 * "Refresh" — Picked For You only. It rotates which slice of the
+                 * ranked set the row shows; see PickedForYou::getRefreshUrl().
+                 * A link rather than a button because it navigates.
+                 */
+                $hmRefreshUrl = method_exists($block, 'getRefreshUrl') ? (string) $block->getRefreshUrl() : '';
+                ?>
+                <?php if ($hmRefreshUrl !== ''): ?>
+                    <a class="hm-section__refresh" href="<?= $escaper->escapeUrl($hmRefreshUrl) ?>">
+                        <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-refresh"/></svg>
+                        <?= $escaper->escapeHtml(__('Refresh')) ?>
+                    </a>
+                <?php endif; ?>
                 <?php if ($hmMoreUrl !== ''): ?>
                     <a class="hm-section__more" href="<?= $escaper->escapeUrl($hmMoreUrl) ?>">
                         <?= $escaper->escapeHtml($hmMoreLabel) ?>
@@ -118,6 +154,28 @@ use Magento\Wishlist\Helper\Data;
                 <?php endif; ?>
             </div>
         <?php endif ?>
+        <?php
+        /*
+         * Search-term chips, between the head and the row. Picked For You only —
+         * see PickedForYou::getSearchTags() on why the label is not always
+         * "YOUR SEARCHES".
+         */
+        $hmTags = method_exists($block, 'getSearchTags') ? $block->getSearchTags() : ['label' => '', 'terms' => []];
+        ?>
+        <?php if (!empty($hmTags['terms'])): ?>
+            <div class="hm-section__tags">
+                <span class="hm-section__tags-label"><?= $escaper->escapeHtml($hmTags['label']) ?>:</span>
+                <?php foreach ($hmTags['terms'] as $hmTag): ?>
+                    <?php /* Magnifier prefix per chip — QA cycle 2 item 1-C; the
+                             reference chips each open with the search glyph. */ ?>
+                    <a class="hm-section__tag" href="<?= $escaper->escapeUrl($hmTag['url']) ?>">
+                        <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-search"/></svg>
+                        <?= $escaper->escapeHtml($hmTag['term']) ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
         <div class="block-content">
             <?= /* @noEscape */ '<!-- ' . $image . '-->' ?>
             <div class="products-<?= /* @noEscape */ $mode ?> <?= /* @noEscape */ $mode ?>">
@@ -187,7 +245,19 @@ use Magento\Wishlist\Helper\Data;
                                     </a>
                                 </strong>
                                 <?php if ($templateType): ?>
-                                    <?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
+                                    <?php /*
+                                        THIRD ARGUMENT IS THE POINT. Core's ReviewRenderer returns an
+                                        empty string before it reaches any template when a product has
+                                        no rating summary:
+                                            if (null === getRatingSummary() && !$displayIfNoReviews) return '';
+                                        Passing true is the only way this theme's override of
+                                        summary_short.phtml gets to draw its empty five-star track, which
+                                        is what keeps every card in a row the same height. 94% of this
+                                        catalogue carries no review, so without it the rows render ragged —
+                                        the defect QA cycle 1 filed as "star ratings missing" against five
+                                        separate sections.
+                                    */ ?>
+                                    <?= $block->getReviewsSummaryHtml($_item, $templateType, true) ?>
                                 <?php endif; ?>
 
                                 <?= $block->getProductDetailsHtml($_item) ?>
@@ -260,6 +330,26 @@ use Magento\Wishlist\Helper\Data;
                                         </div>
                                     <?php endif; ?>
                                 </div>
+
+                                <?php
+                                /*
+                                 * Why this product is here — the reference's
+                                 * per-card tag. Only Picked For You supplies one;
+                                 * every other rail renders the card unchanged.
+                                 */
+                                $hmReason = method_exists($block, 'getReasonFor')
+                                    ? (string) $block->getReasonFor((int) $_item->getId())
+                                    : '';
+                                ?>
+                                <?php if ($hmReason !== ''): ?>
+                                    <?php /* Icon + violet strip with its own top hairline —
+                                             QA cycle 2 item 1-C, matching the reference's
+                                             separated reason footer. */ ?>
+                                    <span class="hm-card__reason">
+                                        <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-zap"/></svg>
+                                        <?= $escaper->escapeHtml($hmReason) ?>
+                                    </span>
+                                <?php endif; ?>
                             </div>
                         </div>
                         <?= ($iterator == count($items) + 1) ? '</li>' : '' ?>
@@ -267,6 +357,36 @@ use Magento\Wishlist\Helper\Data;
                 </ol>
             </div>
             <?= $block->getPagerHtml() ?>
+
+            <?php
+            /*
+             * Section foot — a note on the left, a "view all" link on the right.
+             * QA cycle 1 asked for it on Picked For You; written generically so
+             * any rail can carry one from layout.
+             */
+            $hmFootNote = method_exists($block, 'getFootNote')
+                ? (string) $block->getFootNote()
+                : (string) $block->getData('foot_note');
+            $hmFootUrl  = (string) $block->getData('foot_url');
+            ?>
+            <?php if ($hmFootNote !== '' || $hmFootUrl !== ''): ?>
+                <div class="hm-section__foot">
+                    <?php if ($hmFootNote !== ''): ?>
+                        <p class="hm-section__foot-note"><?= $escaper->escapeHtml(__($hmFootNote)) ?></p>
+                    <?php endif; ?>
+                    <?php if ($hmFootUrl !== ''): ?>
+                        <?php
+                        $hmFootHref = preg_match('~^https?://~i', $hmFootUrl)
+                            ? $hmFootUrl
+                            : rtrim($block->getBaseUrl(), '/') . '/' . ltrim($hmFootUrl, '/');
+                        ?>
+                        <a class="hm-section__foot-link" href="<?= $escaper->escapeUrl($hmFootHref) ?>">
+                            <?= $escaper->escapeHtml(__((string) ($block->getData('foot_label') ?: __('View all')))) ?>
+                            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 <?php endif;?>

@@ -36,6 +36,17 @@
 <?php $_product = $block->getProduct(); ?>
 <?php $buttonTitle = __('Add to Cart'); ?>
 <?php if ($_product->isSaleable()) :?>
+<?php if (in_array($_product->getTypeId(), ['configurable', 'bundle', 'new_bundle'], true)) : ?>
+    <?php /* QA cycle 2, item 3-B: the reference states the option requirement
+             up front instead of only complaining after a failed submit.
+             Rendered here (this template always renders inside the form)
+             rather than as a layout child of product.info.form.content, which
+             this build's form template never asks for by alias. */ ?>
+    <p class="hm-options-hint">
+        <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-info"/></svg>
+        <?= $block->escapeHtml(__('Please select all options before adding to cart')) ?>
+    </p>
+<?php endif; ?>
 <div class="box-tocart">
     <div class="fieldset">
         <?php if ($block->shouldRenderQuantity()) :?>

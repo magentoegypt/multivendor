@@ -133,11 +133,17 @@
                 <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
             </arguments>
         </referenceBlock>
-        <referenceBlock name="product.info.upsell">
-            <arguments>
-                <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
-            </arguments>
-        </referenceBlock>
+        <!--
+            Upsell — "We found other products you might like!" — REMOVED.
+
+            QA cycle 1: not part of the reference PDP. The title string comes from
+            MGS_ThemeSettings config (catalog/themesettings/upsell_title), so
+            changing config would only rename it; the block itself has to go.
+
+            `catalog.product.related` above is deliberately NOT removed — the
+            reference does carry a related row, and QA did not file it.
+        -->
+        <referenceBlock name="product.info.upsell" remove="true"/>
 
         <!-- Delivery, returns and payment, under the add-to-cart row. -->
         <referenceContainer name="product.info.main">
@@ -292,5 +298,11 @@
              such block, and the seller credit above the title already carries
              the attribution that matters. -->
         <referenceBlock name="product.info.vendor.profile.soldby" remove="true"/>
+
+        <!-- QA cycle 2 item 3-B ("Please select all options…" hint) renders
+             inline from this theme's product/view/addtocart.phtml — a layout
+             child of product.info.form.content was tried first and never
+             rendered, because this build's form template does not ask for that
+             container's children by alias. -->
     </body>
 </page>

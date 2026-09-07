@@ -21,6 +21,8 @@ $bundles = $block->getBundles();
 if (!$bundles) {
     return;
 }
+/* One rating query for the rail — see BundleDeals::getRatingFigures(). */
+$hmRatings = $block->getRatingFigures(array_column($bundles, 'id'));
 $headingId = 'hm-bundles-title';
 ?>
 <section class="hm-bundles" aria-labelledby="<?= $escaper->escapeHtmlAttr($headingId) ?>">
@@ -53,7 +55,15 @@ $headingId = 'hm-bundles-title';
                             <span class="hm-bundle__badges">
                                 <?php if ($b['discount'] > 0): ?>
                                     <span class="hm-bundle__badge hm-bundle__badge--pct">
-                                        <?= $escaper->escapeHtml(__('-%1%% Bundle', $b['discount'])) ?>
+                                        <?php /*
+                                            A single %, not sprintf's %%.
+                                            Magento's Phrase renders through
+                                            strtr, which replaces %1 and leaves
+                                            everything else alone — so %% reached
+                                            the storefront literally and the badge
+                                            read "-15%% Bundle". Verified live.
+                                        */ ?>
+                                        <?= $escaper->escapeHtml(__('-%1% Bundle', $b['discount'])) ?>
                                     </span>
                                 <?php endif; ?>
                                 <?php if ($b['saving']): ?>
@@ -67,13 +77,23 @@ $headingId = 'hm-bundles-title';
                         <span class="hm-bundle__count">
                             <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-package"/></svg>
                             <?php /*
-                                "N items" only when each required option contributes one
-                                product. A single-option bundle is a pick-one, so it says
-                                what it is instead of overcounting sevenfold.
+                                "N items" on every bundle, per QA cycle 1 and the
+                                reference.
+
+                                RECORDED, because it was argued the other way first:
+                                on a PICK-ONE bundle (a single required option with N
+                                choices) the shopper receives one of the N, not N, so
+                                this label overstates what is in the box. It used to
+                                read "Choose from N" for exactly that case. QA asked
+                                for the reference's wording on both and that call was
+                                confirmed, so both now read the same. `is_kit` is
+                                still computed and still correct if the distinction is
+                                wanted back.
+
+                                Lowercase "items" — QA cycle 2 graded the chip
+                                against the reference, which prints "4 items".
                             */ ?>
-                            <?= $b['is_kit']
-                                ? $escaper->escapeHtml(__('%1 items', $b['item_count']))
-                                : $escaper->escapeHtml(__('Choose from %1', $b['item_count'])) ?>
+                            <?= $escaper->escapeHtml(__('%1 items', $b['item_count'])) ?>
                         </span>
                     </span>
 
@@ -83,6 +103,46 @@ $headingId = 'hm-bundles-title';
                         <?php endif; ?>
 
                         <span class="hm-bundle__title"><?= $escaper->escapeHtml($b['name']) ?></span>
+
+                        <?php
+                        /*
+                         * Stars, rendered as SPANS — never through the shared
+                         * summary template. That template's count is an
+                         * <a class="action view">, and this whole card is already
+                         * an <a>; nesting them is invalid HTML and the parser
+                         * splits the card apart at the inner link (that was the
+                         * "Bundle section UI broken" report — three fragments per
+                         * card, prices and CTA orphaned outside). The markup
+                         * mirrors the shared template class-for-class so the
+                         * existing rating CSS applies unchanged; a count link is
+                         * pointless here anyway — the card itself navigates.
+                         *
+                         * The empty 0% track still renders, for the same
+                         * row-height reason as everywhere else.
+                         */
+                        $hmR     = $hmRatings[(int) $b['id']] ?? ['pct' => 0, 'count' => 0];
+                        $hmLabel = $hmR['count'] > 0
+                            ? __('%1 reviews, rated %2 out of 5', $hmR['count'], round($hmR['pct'] / 20, 1))
+                            : __('Not yet reviewed');
+                        /*
+                         * The same Lucide star row as summary_short.phtml (which
+                         * documents the SVG swap), still span-only — this card is
+                         * one <a> and must never gain an inner anchor.
+                         */
+                        $hmStar = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">'
+                            . '<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1'
+                            . ' .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122'
+                            . ' 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16'
+                            . ' 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
+                        $hmRow = str_repeat($hmStar, 5);
+                        ?>
+                        <span class="product-reviews-summary short hm-rating<?= $hmR['count'] > 0 ? '' : ' hm-rating--empty' ?>">
+                            <span class="hm-stars" role="img" aria-label="<?= $escaper->escapeHtmlAttr($hmLabel) ?>">
+                                <span class="hm-stars__track"><?= /* @noEscape */ $hmRow ?></span>
+                                <span class="hm-stars__fill" style="width: <?= (int) $hmR['pct'] ?>%;"><?= /* @noEscape */ $hmRow ?></span>
+                            </span>
+                            <span class="hm-rating__count"><?= $escaper->escapeHtml(__('(%1)', $hmR['count'])) ?></span>
+                        </span>
 
                         <?php if ($b['description']): ?>
                             <span class="hm-bundle__text"><?= $escaper->escapeHtml($b['description']) ?></span>
@@ -123,9 +183,27 @@ $headingId = 'hm-bundles-title';
                                     </span>
                                 <?php endif; ?>
                             </span>
+                            <?php /*
+                                "Add Bundle" with the cart icon, per QA cycle 1 and
+                                the reference.
+
+                                RECORDED, because this one is a real trade: every
+                                bundle in this catalogue carries at least one REQUIRED
+                                option, so this control cannot add to the cart — it
+                                navigates to the product page to configure first. The
+                                label therefore promises something the click does not
+                                do, which is why it read "View Bundle" until now. QA
+                                asked for the reference's wording and that call was
+                                confirmed.
+
+                                The mitigation is that the destination is one click
+                                from adding, and the page it lands on opens with the
+                                options. If this generates support tickets, "View
+                                Bundle" is the one-word revert.
+                            */ ?>
                             <span class="hm-bundle__cta">
-                                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-bundle"/></svg>
-                                <?= $escaper->escapeHtml(__('View Bundle')) ?>
+                                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-cart"/></svg>
+                                <?= $escaper->escapeHtml(__('Add Bundle')) ?>
                             </span>
                         </span>
                     </span>

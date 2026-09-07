@@ -128,16 +128,38 @@ $hmVendors = $block->getData('vendor_names');
                     </div>
                     <div class="product details product-item-details">
                         <?php $_productNameStripped = $block->stripTags($_product->getName(), null, true); ?>
-                        <?php if ($hmVendorName): ?>
-                            <span class="hm-card__vendor"><?= $escaper->escapeHtml($hmVendorName) ?></span>
-                        <?php endif; ?>
+                        <?php /*
+                            RENDERED EVEN WHEN EMPTY, for the same reason the review
+                            summary below passes `true`: the slot has to hold its
+                            height or the cards in a row stop lining up. This was
+                            wrapped in `if ($hmVendorName)`, so a card whose product
+                            has no vendor lost the line entirely and pulled its name,
+                            stars and swatches 24px up relative to its neighbours —
+                            measured on the search results page, names at y=1208 on
+                            vendorless cards against y=1232 on the rest of the row.
+                            Not every product in this catalogue has a vendor_id, so
+                            this is the normal case, not an edge one.
+                        */ ?>
+                        <span class="hm-card__vendor"><?= $hmVendorName ? $escaper->escapeHtml($hmVendorName) : '' ?></span>
                         <strong class="product name product-item-name">
                             <a class="product-item-link"
                                href="<?= $escaper->escapeUrl($_product->getProductUrl()) ?>">
                                 <?=/* @noEscape */ $_helper->productAttribute($_product, $_product->getName(), 'name')?>
                             </a>
                         </strong>
-                        <?= $block->getReviewsSummaryHtml($_product, $templateType) ?>
+                        <?php /*
+                            THIRD ARGUMENT IS THE POINT. Core's ReviewRenderer returns an
+                            empty string before it reaches any template when a product has
+                            no rating summary:
+                                if (null === getRatingSummary() && !$displayIfNoReviews) return '';
+                            Passing true is the only way this theme's override of
+                            summary_short.phtml gets to draw its empty five-star track, which
+                            is what keeps every card in a row the same height. 94% of this
+                            catalogue carries no review, so without it the rows render ragged —
+                            the defect QA cycle 1 filed as "star ratings missing" against five
+                            separate sections.
+                        */ ?>
+                        <?= $block->getReviewsSummaryHtml($_product, $templateType, true) ?>
 
                         <?= $block->getProductDetailsHtml($_product) ?>
 
@@ -213,12 +235,55 @@ $hmVendors = $block->getData('vendor_names');
                                         ) : '' ?>
                                 </div>
                                 <?php if ($showDescription): ?>
+                                    <?php
+                                    /*
+                                     * QA cycle 2, item 2-B: "List View isn't showing up
+                                     * evenly." It wasn't — this slot rendered the RAW
+                                     * short_description HTML, and this catalog's
+                                     * descriptions range from two sentences to a full
+                                     * nutrition-facts <table>, so every row was a
+                                     * different height (one row in the recording is
+                                     * mostly table). Three rules make the rows even:
+                                     *
+                                     * 1. TEXT ONLY. Tags are stripped, so a table can
+                                     *    never render here. The PDP still shows the
+                                     *    full formatted description.
+                                     * 2. CLAMPED to ~160 characters (the CSS line-clamp
+                                     *    is the second fence).
+                                     * 3. LANGUAGE-GUARDED. Most descriptions here are
+                                     *    Arabic-only; dumped into the English view they
+                                     *    read as garbage (QA crossed exactly that out
+                                     *    on the cart too). On a non-Arabic store an
+                                     *    Arabic-dominant description is dropped — the
+                                     *    row keeps its Learn More link. The Arabic
+                                     *    store shows everything: English fallback copy
+                                     *    is normal there and was never flagged.
+                                     */
+                                    $hmDescHtml = (string) $_helper->productAttribute(
+                                        $_product,
+                                        $_product->getShortDescription(),
+                                        'short_description'
+                                    );
+                                    $hmDescText = trim((string) preg_replace(
+                                        '/\s+/u',
+                                        ' ',
+                                        html_entity_decode(strip_tags($hmDescHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8')
+                                    ));
+                                    if (mb_strlen($hmDescText) > 160) {
+                                        $hmDescText = mb_substr($hmDescText, 0, 157) . '…';
+                                    }
+                                    $hmSample  = mb_substr($hmDescText, 0, 120);
+                                    $hmArabic  = (int) preg_match_all('/[\x{0600}-\x{06FF}]/u', $hmSample);
+                                    $hmLatin   = (int) preg_match_all('/[A-Za-z]/u', $hmSample);
+                                    $hmRtlView = str_starts_with((string) $_product->getStore()->getConfig('general/locale/code'), 'ar');
+                                    if (!$hmRtlView && $hmArabic > $hmLatin) {
+                                        $hmDescText = '';
+                                    }
+                                    ?>
                                     <div class="product description product-item-description">
-                                        <?= /* @noEscape */ $_helper->productAttribute(
-                                            $_product,
-                                            $_product->getShortDescription(),
-                                            'short_description'
-                                        ) ?>
+                                        <?php if ($hmDescText !== ''): ?>
+                                            <p class="hm-list-desc"><?= $escaper->escapeHtml($hmDescText) ?></p>
+                                        <?php endif; ?>
                                         <a href="<?= $escaper->escapeUrl($_product->getProductUrl()) ?>"
                                            title="<?= /* @noEscape */ $_productNameStripped ?>"
                                            class="action more"><?= $escaper->escapeHtml(__('Learn More')) ?></a>

@@ -29,27 +29,31 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
         <div class="hm-footer__brand">
             <?php
             /*
-             * Brand lockup. Figma opens the footer with the wordmark; this column
-             * previously started with a bare sentence and carried no mark at all,
-             * so the footer had no brand anchor on any page.
+             * Brand lockup — TEXT ONLY since QA cycle 2 (86d45m4tj item 1-L, and
+             * item 1-A's brand ruling: everything reads "Hub Market" now).
              *
-             * Same mark and same classes as the header (see Magento_Theme/
-             * templates/html/header/logo.phtml). The wordmark itself is written
-             * out twice, though, so changing the brand means changing it in BOTH
-             * files — it has already drifted once.
+             * The reference's footer carries NO logo image at all: it opens with
+             * the serif wordmark, first word in the accent orange, second in
+             * white ("ME"/"Commerce" there, "Hub"/"Market" here). The logo
+             * image this column used to render reads MAGENTO EGYPT and would
+             * contradict the wordmark beside it; the header still shows that
+             * artwork, which is a known inconsistency only new artwork can fix
+             * (recorded in the copyright note below).
+             *
+             * Not translated, deliberately — same reasoning as
+             * header/logo.phtml: a brand is a name, and half-transliterating a
+             * two-word name is worse than leaving it in Latin script on the
+             * Arabic store.
              */
             ?>
             <a class="hm-footer__logo hm-logo--lockup" dir="ltr"
                href="<?= $escaper->escapeUrl($block->getBaseUrl()) ?>"
                aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
-                <img class="hm-logo__mark"
-                     src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-mark.png')) ?>"
-                     alt="" aria-hidden="true" width="248" height="148"/>
                 <span class="hm-logo__word" aria-hidden="true">
-                    <?php /* Not translated - see header/logo.phtml. */ ?>
-                    <span class="hm-logo__word-lead">Magento</span><span
-                          class="hm-logo__word-rest">Egypt</span>
+                    <span class="hm-logo__word-lead">Hub</span><span
+                          class="hm-logo__word-rest">Market</span>
                 </span>
+                <span class="hm-sr-only">Hub Market</span>
             </a>
 
             <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)
@@ -80,19 +84,30 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
                 <?php
                 /*
                  * The brand is a PARAMETER, not part of the translated string.
-                 * It read "MECommerce" — the Figma reference build's brand,
-                 * which is a mock's placeholder and not this store's. The
-                 * merchant's own logo artwork reads "MAGENTO EGYPT".
                  *
-                 * Passing it as %2 keeps the sentence translatable while the
-                 * brand itself never goes through __(), for the same reason
-                 * documented in header/logo.phtml: a module shipping an ar_SA
-                 * entry for one word of a two-word brand renders it half
-                 * transliterated.
+                 * THIRD BRAND STATE, each one QA-directed — the history matters
+                 * because this line has now changed three times:
+                 *   1. "Magento Egypt"  (the merchant's logo artwork)
+                 *   2. "MECommerce"     (QA cycle 1: match the reference)
+                 *   3. "Hub Market"     (QA cycle 2, 86d45m4tj item 1-A:
+                 *      'We need to change from "mecommerce" to "Hub Market"')
+                 * Do not change it again without a ticket in hand.
+                 *
+                 * "Powered by Magento 2." is appended per the reference's own
+                 * copyright line, and it is simply true of this store.
+                 *
+                 * KNOWN INCONSISTENCY, recorded so it is not rediscovered as a
+                 * bug: the header logo is an IMAGE and still reads MAGENTO
+                 * EGYPT. Resolving that needs new logo artwork, which is not a
+                 * code change.
+                 *
+                 * Passing the brand as %2 keeps the sentence translatable while
+                 * the brand itself never goes through __() — see
+                 * header/logo.phtml for why a brand must not be translated.
                  */
                 ?>
                 <?= $escaper->escapeHtml(
-                    __('Copyright © %1 %2. All rights reserved.', date('Y'), 'Magento Egypt')
+                    __('Copyright © %1 %2. All rights reserved. Powered by Magento 2.', date('Y'), 'Hub Market')
                 ) ?>
             </p>
             <div class="hm-footer__legal">
