@@ -59,6 +59,22 @@ if (!empty($manifest['bundle_product_id'])) {
     }
 }
 
+if (!empty($manifest['hero_backups'])) {
+    foreach ($manifest['hero_backups'] as $bannerId => $fields) {
+        echo "[hero] restoring banner {$bannerId}: " . json_encode($fields, JSON_UNESCAPED_UNICODE) . "\n";
+        if (!$dryRun) {
+            $conn->update(
+                $resource->getTableName('magentoegypt_hero_banner'),
+                $fields,
+                ['banner_id = ?' => (int) $bannerId]
+            );
+        }
+    }
+    if (!$dryRun) {
+        unset($manifest['hero_backups']);
+    }
+}
+
 if (!empty($manifest['special_to_date_entity_ids'])) {
     $ids = array_map('intval', $manifest['special_to_date_entity_ids']);
     echo "[deals] deleting special_to_date on " . count($ids) . " products (was NULL)\n";

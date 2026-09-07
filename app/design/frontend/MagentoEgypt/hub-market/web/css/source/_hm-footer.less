@@ -66,7 +66,7 @@
     padding-inline-end: 0;
     text-decoration: none;
 
-    .hm-logo__word { display: inline-flex; }   // kept at every width, unlike the header
+    .hm-logo__word { display: inline-flex; gap: .35rem; }   // kept at every width; two words now
 
     //  QA cycle 2 (1-L): text-only wordmark down here, measured off the
     //  reference — display serif at 20px/800, first word in the accent, second
@@ -86,12 +86,15 @@
 
 //  "ACCEPTED PAYMENTS" — the small caps label the reference sets between the
 //  country chips and the payment chips (QA cycle 2, 1-L).
-.hm-footer__pay-label {
+//  `.hm-footer__brand .hm-footer__pay-label`, not the bare class: the brand
+//  column zeroes every <p> margin at (0,1,1), which silently beat this label's
+//  (0,1,0) margin and left it jammed against the country chips above it.
+.hm-footer__brand .hm-footer__pay-label {
     color: var(--hm-neutral-400);   // 4.89:1 on navy, same as the column labels
     font-size: 1.1rem;
     font-weight: 600;
     letter-spacing: .12em;
-    margin: var(--hm-space-4) 0 0;
+    margin: var(--hm-space-5) 0 var(--hm-space-2);
     text-transform: uppercase;
 }
 
@@ -128,7 +131,7 @@
     ul {
         display: flex;
         flex-direction: column;
-        gap: 1rem;                            // Figma space-y-2.5
+        gap: .8rem;                           // a shade under Figma space-y-2.5: the reference rows measure ~34px
         list-style: none;
         margin: 0;
         padding: 0;

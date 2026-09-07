@@ -223,7 +223,7 @@
     align-items: baseline;
     font-family: var(--hm-font-display);
     font-size: 2rem;
-    gap: .2rem;                  // Figma gap-0.5 between the two brand words
+    gap: .35rem;                 // two real words now ("Hub Market") — a touch over Figma's gap-0.5
     letter-spacing: -.02em;
     line-height: 1.1;
     white-space: nowrap;
@@ -240,8 +240,10 @@
 }
 
 @media (max-width: 767px) {
-    //  The wordmark alone would push the search field off a phone. Keep the mark.
-    .hm-logo__word { display: none; }
+    //  There is no emblem any more (the reference header is text-only, see
+    //  logo.phtml), so the wordmark IS the brand and must stay visible on a
+    //  phone; it steps down to 1.6rem to leave the search field its room.
+    .hm-logo__word { font-size: 1.6rem; }
     .hm-logo--lockup { border-inline-end: 0; padding-inline-end: 0; }
 }
 
@@ -754,20 +756,13 @@
     gap: 0;   // the per-link padding above supplies the rhythm
 }
 
-//  "Sell with us" is the one acquisition link in the rail, so it gets the accent
-//  treatment. @hm-accent is 5.04:1 on navy — safe as text here, unlike on white.
-.hm-utility__link--sell {
-    color: var(--hm-accent);
-    font-weight: 700;
-
-    //  Brightens within the accent family instead of going white like the other
-    //  utility links. That restated accent was deliberate — it stops
-    //  .hm-utility__link:hover turning the one CTA in the bar the same colour as
-    //  its neighbours — but it also meant the hover changed nothing except the
-    //  underline, so removing underlines sitewide left it inert. --hm-accent-on-nav
-    //  is the lighter orange already used for Bundle Deals on the navy nav.
-    &:hover, &:focus-visible { color: var(--hm-accent-on-nav); }
-}
+//  "Sell on Hub Market" is styled like every other utility link — muted white,
+//  brightening to white on hover — and carries NO accent. It used to be bold
+//  orange, and QA cycle 2 item 1-A ("the color used in the 'sell' sentence
+//  isn't the same as the one in the theme") was right: compared band by band,
+//  the reference sets it in the same muted white as Login / Register / Track
+//  Order. The class survives for the phone rule below, which keeps this one
+//  link visible when the rest of the rail is hidden.
 
 @media (max-width: 767px) {
     //  The promise line and five links will not co-exist on a phone. Keep the

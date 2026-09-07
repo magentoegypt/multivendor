@@ -463,12 +463,15 @@
     background: var(--hm-neutral-50);
     border: 1px solid var(--hm-border-subtle);
     border-radius: var(--hm-radius-lg);
+    //  A FIXED 8.8rem (the reference tile, measured), not a minimum: with a
+    //  minimum the logo, gap and padding stacked to ~116px on the live band.
+    block-size: 8.8rem;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: var(--hm-space-2);
+    gap: .6rem;
     justify-content: center;
-    min-block-size: 8.8rem;
-    padding: var(--hm-space-3) var(--hm-space-2);
+    padding: .8rem var(--hm-space-2);
     text-align: center;
     text-decoration: none;
     transition: border-color var(--hm-duration) var(--hm-ease),
@@ -489,7 +492,7 @@
 }
 
 .hm-brands__img {
-    block-size: 3.6rem;   // cycle 2: the reference tile is 88px tall in total
+    block-size: 3.2rem;   // cycle 2: the reference tile is 88px tall in total
     inline-size: auto;
     max-inline-size: 100%;
     object-fit: contain;
@@ -497,7 +500,8 @@
 
 .hm-brands__name {
     color: var(--hm-foreground);
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    line-height: 1.2;
     font-weight: 600;
     //  Brand names here are Arabic; isolate so a latin name inside an Arabic
     //  run does not reorder.
@@ -998,6 +1002,10 @@ html:lang(ar) .hm-hero-carousel__nav .hm-icon { transform: scaleX(-1); }
     //  lines so it holds the band against the phone mock beside it. At the 3.2
     //  it shipped with, the copy block sat visually lighter than the artwork.
     font-size: 3.6rem;
+    //  Capped so it actually BREAKS into those two lines ("Shop From All
+    //  Vendors / in One App") the way the reference wraps it; uncapped it ran
+    //  as one 575px line and the band lost the reference's stacked shape.
+    max-inline-size: 42rem;   // breaks before "in", exactly where the reference does
     font-weight: 700;
     line-height: 1.25;                      // 45/36, measured
     margin: var(--hm-space-2) 0;

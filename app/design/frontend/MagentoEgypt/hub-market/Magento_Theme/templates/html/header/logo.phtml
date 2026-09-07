@@ -58,18 +58,29 @@ $useLockup = true;
  * until some module ships one again. The reference build keeps its
  * wordmark in Latin script in both locales for the same reason.
  */
-$brandLead = 'Magento';
-$brandRest = 'Egypt';
+/*
+ * "Hub" + "Market" — THE THIRD BRAND STATE, each one QA-directed:
+ *   1. Magento|Egypt   (the merchant's logo artwork)
+ *   2. ME|Commerce     (QA cycle 1: match the reference)
+ *   3. Hub|Market      (QA cycle 2, 86d45m4tj item 1-A: 'change from
+ *                       "mecommerce" to "Hub Market"' — everywhere, and the
+ *                       header is the most visible instance of all)
+ * Split at the word joint so the lead carries the accent, exactly as the
+ * reference splits its own two-part mark. The bidi and transliteration
+ * reasoning above is unchanged. Do not change it again without a ticket.
+ */
+$brandLead = 'Hub';
+$brandRest = 'Market';
 ?>
 <a class="hm-logo<?= $useLockup ? ' hm-logo--lockup' : '' ?>"
    dir="ltr"
    href="<?= $escaper->escapeUrl($block->getUrl('')) ?>"
    aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
     <?php if ($useLockup): ?>
-        <?php /* Decorative: the accessible name is on the link above. */ ?>
-        <img class="hm-logo__mark"
-             src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-mark.png')) ?>"
-             alt="" aria-hidden="true" width="248" height="148"/>
+        <?php /* No emblem. Compared band by band against the prototype (QA
+                 cycle 2): the reference header is the text wordmark alone, and
+                 the cropped MAGENTO EGYPT mark contradicted the wordmark it
+                 sat beside. hm-logo-mark.png stays on disk, unreferenced. */ ?>
         <span class="hm-logo__word" aria-hidden="true">
             <span class="hm-logo__word-lead"><?= $escaper->escapeHtml($brandLead) ?></span><span
                   class="hm-logo__word-rest"><?= $escaper->escapeHtml($brandRest) ?></span>

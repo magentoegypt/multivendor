@@ -539,7 +539,7 @@
 .hm-bundle__saving { flex-basis: 100%; }
 
 .hm-bundle__price {
-    color: var(--hm-price);
+    color: var(--hm-foreground);   // reference check (cycle 2): the bundle price is NAVY, like every card price
     font-size: 1.8rem;
     font-variant-numeric: tabular-nums;
     font-weight: 700;
@@ -1190,7 +1190,12 @@
     .hm-rating__count { display: none; }
 
     &.block.widget .price-box .price { color: var(--hm-accent); font-size: 1.5rem; }
-    .price-box .old-price .price { font-size: 1.1rem; }
+
+    //  Reference check (cycle 2): the bestseller card shows the current price
+    //  ONLY — no discount badge and no struck price. Hidden here rather than
+    //  removed from the card template the other rails share.
+    .price-box .old-price,
+    .hm-badge--discount { display: none; }
 
     .product-item-details { padding: var(--hm-space-2) var(--hm-space-3) var(--hm-space-3); }
 }
@@ -1652,9 +1657,11 @@
         inset-block-start: var(--hm-space-3);
         inset-inline-end: var(--hm-space-4);
         //  QA cycle 2 item 1-G boxed all three icons: the reference tints each
-        //  glyph in its own colour at near-full strength — an orange bolt, a
-        //  pale moon, a light-blue card — not a ghosted white outline.
-        opacity: .9;
+        //  glyph in its own colour — an orange bolt, a pale moon, a light-blue
+        //  card — but as a QUIET WATERMARK, not at full strength. Compared band
+        //  by band against the prototype, the glyphs sit at roughly a third
+        //  strength on their gradients. The tints are set per tile below.
+        opacity: .38;
         pointer-events: none;
         position: absolute;
         z-index: 0;
@@ -1887,9 +1894,9 @@
     //  container, where that expression goes negative.
     .hm-app::after {
         background: url('../images/hm-app-phone.svg') no-repeat center / contain;
-        block-size: 37rem;
+        block-size: 39rem;    // reference mock measures ~145 x 390
         content: '';
-        inline-size: 14.2rem;
+        inline-size: 14.5rem;
         inset-block-start: 50%;
         //  ESCAPED (~"...") — non-negotiably. Less has its own max() and
         //  evaluates it at COMPILE time; handed 2rem against a var()-bearing
@@ -1903,10 +1910,11 @@
         //  + --hm-space-4: the inner containers carry that padding, so the
         //  mock's edge lines up with the CONTENT edge the header, nav and
         //  footer share, not the container's outer box.
-        //  + 12rem beyond the content edge: QA cycle 2 (1-L) arrowed the mock
-        //  INWARD — the reference parks it ~120px shy of the container's
-        //  trailing edge, closer to the copy, not flush against the edge.
-        inset-inline-end: ~"max(2rem, calc(50% - (var(--hm-container) / 2) + var(--hm-space-4) + 12rem))";
+        //  + 24rem beyond the content edge: QA cycle 2 (1-L) arrowed the mock
+        //  INWARD, and the band-by-band comparison against the prototype
+        //  measured its mock a full ~240px in from the container's trailing
+        //  edge, sitting close beside the copy — the first 12rem was half way.
+        inset-inline-end: ~"max(2rem, calc(50% - (var(--hm-container) / 2) + var(--hm-space-4) + 24rem))";
         pointer-events: none;
         position: absolute;
         transform: translateY(-50%);
@@ -4604,6 +4612,37 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     }
 }
 
+//  Reference check (cycle 2) — Featured Stores, compared band by band: the
+//  store name is set in the display serif, and "Visit Store" is an ORANGE
+//  outlined pill (orange hairline, orange label) that fills orange on hover —
+//  not the navy-text button QA cycle 1 asked for and not the grey hairline the
+//  first cycle-2 pass tried. Scoped to the Featured rail; Top Vendors and New
+//  Stores carry no button.
+.hm-stores--featured {
+    .hm-stores__name {
+        font-family: var(--hm-font-display);
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .hm-stores__cta {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius-full);
+        color: var(--hm-accent);
+        font-size: 1.2rem;
+        font-weight: 600;
+        padding: .5rem var(--hm-space-4);
+    }
+
+    .hm-stores__link:hover .hm-stores__cta,
+    .hm-stores__link:focus-visible .hm-stores__cta {
+        background: var(--hm-accent);
+        border-color: var(--hm-accent);
+        color: #ffffff;
+    }
+}
+
 //  1-J: Top Vendors names are near-black, orange on card hover.
 .hm-stores--hm-home-topvendors .hm-stores__name { color: var(--hm-foreground); }
 .hm-stores--hm-home-topvendors .hm-stores__link:hover .hm-stores__name { color: var(--hm-accent); }
@@ -4693,10 +4732,21 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
         }
     }
 
-    .hm-section__foot-note { color: var(--hm-on-inverse-muted); }
+    //  Reference check (cycle 2): the foot note is small and quiet with a
+    //  sparkle in front, and the "view all" link is the panel's INDIGO, not
+    //  the orange the light rails use. indigo-300 (#a5b4fc) on the navy band
+    //  is 7.6:1 — the reference's own #6366f1 was 3.56:1, which is why the
+    //  link had been kept orange; this hue reads as the reference's while
+    //  clearing AA. `/ ""` is the sparkle's empty alt text.
+    .hm-section__foot-note {
+        color: fade(#ffffff, 45%);
+        font-size: 1.2rem;
+
+        &::before { content: "✨" / ""; margin-inline-end: .6rem; }
+    }
 
     .hm-section__foot-link {
-        color: var(--hm-accent-on-dark);
+        color: #a5b4fc;
 
         &:hover { color: var(--hm-on-inverse); }
     }
@@ -4881,3 +4931,34 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 .hm-rail--hm-home-rail-fashion   .hm-section__more { color: var(--hm-rail-fashion); }
 .hm-rail--hm-home-rail-beauty    .hm-section__more { color: var(--hm-rail-beauty); }
 .hm-rail--hm-home-rail-furniture .hm-section__more { color: var(--hm-rail-furniture); }
+
+//  ---------------------------------------------------------------------------
+//  Reference check (cycle 2) — the FOUR CATEGORY RAILS are the reference's
+//  compact card variant
+//  ---------------------------------------------------------------------------
+//  Compared band by band against the prototype: on Grocery Essentials, Fashion
+//  Trends, Beauty & Cosmetics and Furniture Picks the reference shows the cart
+//  button PERMANENTLY, draws smaller stars with NO review count, and packs the
+//  text tighter, so its rail card runs ~50px shorter than ours did. Today's
+//  Deals and Popular Products keep the full card (count shown, cart on hover)
+//  — that split is exactly how QA phrased items 1-B and 1-E. Scoped to the four
+//  rails only.
+.hm-rail--hm-home-rail-grocery,
+.hm-rail--hm-home-rail-fashion,
+.hm-rail--hm-home-rail-beauty,
+.hm-rail--hm-home-rail-furniture {
+    //  (0,3,0) — out-ranks the any-hover fade, like the Picked For You override.
+    .product-item-info .action.tocart { opacity: 1; }
+
+    .hm-rating__count { display: none; }
+    .hm-stars svg { block-size: 1.2rem; inline-size: 1.2rem; }
+
+    .product-item-details {
+        gap: .2rem;
+        padding: 1.2rem 1.4rem 1.4rem;
+    }
+
+    &.block.widget .product-item-name a.product-item-link { min-block-size: 0; }
+
+    .hm-card__foot { padding-block-start: .4rem; }
+}
