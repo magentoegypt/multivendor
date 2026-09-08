@@ -358,6 +358,24 @@
     .hm-pdp .hm-pdp__seller-name:visited { color: var(--hm-accent-strong); }
 
     //
+    //  PRODUCT item 1 — the gallery thumbnail strip's phantom height
+    //  ---------------------------------------------
+    //  etc/view.xml switches the phone breakpoint from blank's dots back to
+    //  thumbs and sizes them at 96px. Fotorama lays the strip out correctly —
+    //  the shaft measures 100px and holds three thumbs across — but it then
+    //  writes an INLINE height on `.fotorama__nav` computed from the pre-
+    //  breakpoint thumb size: 964px, leaving ~860px of blank page between the
+    //  gallery and the product name. It reads as the "white space" the client
+    //  filed, only worse.
+    //
+    //  Height auto lets the shaft state the height. It has to out-weigh an
+    //  inline style, hence !important; nothing else here needs it. Fotorama
+    //  only uses the nav box for vertical thumb scrolling, which a horizontal
+    //  strip never does, so selecting a thumb and swiping the strip both still
+    //  work — verified on a 4-image product.
+    .fotorama__nav--thumbs { block-size: auto !important; }
+
+    //
     //  PRODUCT item 5 — customer review photos
     //  ---------------------------------------------
     //  Lof_ProductReviews renders review photos into an owl-carousel that is

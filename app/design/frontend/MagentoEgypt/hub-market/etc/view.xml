@@ -33,22 +33,41 @@
             <var name="arrows">false</var>
             <var name="navarrows">false</var>
             <var name="navtype">thumbs</var>
-            <!--
-                Keep the thumbnail strip on a phone. Magento/blank's view.xml
-                switches `nav` to `dots` under 768px, which on this catalogue
-                loses the only cue that a product HAS more images — the client
-                filed exactly that (CL036-DEV01.03 item 1). Same three-thumb
-                strip as the desktop reference, just narrower.
-            -->
-            <var name="breakpoints">
-                <var name="mobile">
-                    <var name="conditions">
-                        <var name="max-width">767px</var>
-                    </var>
+        </var>
+
+        <!--
+            Keep the thumbnail strip on a phone. Magento/blank's view.xml
+            switches `nav` to `dots` under 768px, which on this catalogue loses
+            the only cue that a product HAS more images — the client filed
+            exactly that (CL036-DEV01.03 item 1). Same thumb strip as the
+            desktop reference, just narrower.
+
+            `breakpoints` is a SIBLING of `gallery`, not a child of it. That is
+            where Magento/blank declares it and where the gallery block reads it
+            from. Nested inside `gallery` it merges to `gallery/breakpoints`, a
+            path nothing reads, so blank's `dots` silently keeps winning and the
+            override looks applied while the phone still renders dots.
+        -->
+        <var name="breakpoints">
+            <var name="mobile">
+                <var name="conditions">
+                    <var name="max-width">767px</var>
+                </var>
+                <var name="options">
                     <var name="options">
-                        <var name="options">
-                            <var name="nav">thumbs</var>
-                        </var>
+                        <var name="nav">thumbs</var>
+                        <!--
+                            Without these the strip inherits the desktop thumb
+                            size and renders 172px tiles: two fill the width and
+                            the nav alone is 174px tall, which is not the small
+                            strip the reference shows. 96px puts three across
+                            with the fourth just breaking the edge, so it reads
+                            as scrollable. getBreakpoints() json-encodes this
+                            node as-is, so these are passed straight to fotorama
+                            under its own option names.
+                        -->
+                        <var name="thumbwidth">96</var>
+                        <var name="thumbheight">96</var>
                     </var>
                 </var>
             </var>
