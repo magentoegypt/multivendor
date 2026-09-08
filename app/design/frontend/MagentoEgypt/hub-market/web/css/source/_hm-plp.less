@@ -428,6 +428,22 @@
     .swatch-option { margin-block: 0; }
 }
 
+//  The filter rail carries the same two-chip-sizes problem the card did: its
+//  text filters (XS, 32) come out 48x44 against the colour filters' 40x38,
+//  because Magento pads `.text` by 4px/12px and a colour chip by 1px/2px on the
+//  same content square. Same correction, same arithmetic — an 8px inline pad on
+//  Magento's 22px min content width lands on 40, a 1px block pad on 38.
+//
+//  Only the box is touched. The rail's row spacing is left as it is: unlike the
+//  card and the product page its rows were never touching (13px apart), so
+//  there is nothing to fix and no reason to restyle a control this rule set does
+//  not otherwise own.
+.filter-options .swatch-option.text,
+.filter-content .swatch-option.text {
+    padding-block: 1px;
+    padding-inline: var(--hm-space-2);
+}
+
 //  Hover, everywhere a chip appears — cards, search, home rails and the product
 //  page. Magento ships
 //

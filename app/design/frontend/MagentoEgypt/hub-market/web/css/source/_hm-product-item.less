@@ -325,15 +325,28 @@
 //
 //  It cannot be scoped to `.product-item`, which is why the obvious rule looks
 //  right and does nothing: swatch-renderer.js appends ONE tooltip node to
-//  <body> and moves it around with inline left/top, so it is never a descendant
-//  of the card being hovered. Scope by page instead: everywhere the chips are a
-//  preview the tooltip goes, and the product page — the one place a colour's
-//  name is worth reading — keeps it.
+//  <body>, shared by every swatch on the page, and moves it around with inline
+//  left/top — so it is never a descendant of the thing being hovered.
+//
+//  Scoping by page instead (`body:not(.catalog-product-view)`) was the first
+//  attempt and it over-reached: the layered navigation renders swatches too, and
+//  its COLOUR filters carry no visible label — the tooltip is the only place
+//  their name appears. Hiding it there cost real information rather than
+//  removing a duplicate. Confirmed by watching the node: hovering a filter
+//  swatch, the JS still writes `display:block` and the text "Black".
+//
+//  So key it on what is being hovered, not on which page it is. `:has()` lets
+//  the body-level node answer for the chip: a chip on a CARD is always inside
+//  `.product-item`, in any context — listing, search, home rail, the related
+//  strip on a product page — while the product page's own chips and the filter
+//  rail's are not. Both of those keep their tooltip.
+//
+//  Where `:has()` is unsupported the rule simply never matches and the tooltip
+//  behaves as Magento ships it, which is the state this started from.
 //
 //  `!important` is not decoration: the JS writes `display:block` inline on the
 //  node when it shows it, and nothing short of !important outranks that.
-body:not(.catalog-product-view) .swatch-option-tooltip,
-body:not(.catalog-product-view) .swatch-option-tooltip-layered { display: none !important; }
+body:has(.product-item .swatch-option:hover) .swatch-option-tooltip { display: none !important; }
 
 //
 //  LIST MODE
