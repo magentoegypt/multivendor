@@ -1366,32 +1366,95 @@ a.sms-login-field-ctrl {
 @media (max-width: 767px) {
     .checkout-cart-index {
         .hm-cart-line {
+            align-items: start;
             display: grid;
             //  Thumb stays beside the text; the aside spans both columns below.
-            grid-template-columns: 7.2rem minmax(0, 1fr);
+            grid-template-columns: 8rem minmax(0, 1fr);
             gap: var(--hm-space-3);
             padding: var(--hm-space-4);
         }
 
-        .hm-cart-line__media .product-item-photo {
-            block-size: 7.2rem;
-            inline-size: 7.2rem;
+        //  The desktop rules pin the image AND both of Magento's wrapper spans
+        //  to 9.6rem with !important, because the renderer writes the size from
+        //  view.xml as inline style. Sizing the anchor alone therefore left a
+        //  96px image inside an 80px box; the same !important has to answer it
+        //  here, on the same three selectors.
+        .hm-cart-line__media .product-item-photo,
+        .hm-cart-line__media .product-image-container,
+        .hm-cart-line__media .product-image-wrapper,
+        .hm-cart-line__media img.product-image-photo {
+            block-size: 8rem !important;
+            inline-size: 8rem !important;
         }
 
+        //  One foot row under both columns, and it WRAPS. Unwrapped the three
+        //  children measure 138 + 80 + 166 = 384 inside 358 of usable width, so
+        //  something had to give: the stepper and the line total share the first
+        //  line, and the wishlist/remove pair takes its own beneath them.
         .hm-cart-line__aside {
             align-items: center;
+            column-gap: var(--hm-space-3);
             flex-direction: row;
+            flex-wrap: wrap;
             grid-column: 1 / -1;
-            justify-content: space-between;
+            justify-content: flex-start;
+            //  Desktop floors this at 9.6rem to match the thumb; a wrapped row
+            //  is as tall as its content.
+            min-block-size: 0;
+            row-gap: var(--hm-space-3);
         }
+
+        //  `.item-actions` is a plain layout wrapper, so `display: contents`
+        //  drops it and lets the TOOLBAR be the foot row's third item. The row
+        //  then wraps on real content: a guest gets stepper / total / bin on one
+        //  line, and only a signed-in customer — who also gets the 122px "Move
+        //  to Wishlist" — pushes past 326px and takes a second line. Reserving a
+        //  whole line for a lone 44px bin cost a row of empty card on every
+        //  guest cart.
+        //
+        //  The toolbar is deliberately NOT lifted as well. `getActions()` leads
+        //  with `.gift-options-cart-item`, a Knockout container that renders
+        //  nothing here but is still a box: as a row item it took a 12px gap of
+        //  its own and pushed the stepper 12px off the thumb above it. Left
+        //  inside the toolbar, that gap falls where nothing can see it.
+        .hm-cart-line__aside .item-actions { display: contents; }
 
         //  Remove leads the trailing column on desktop; in a horizontal row it
         //  belongs at the end, away from the stepper it would otherwise sit
         //  beside — a delete control adjacent to a minus button is a mis-tap
-        //  waiting to happen.
-        .hm-cart-line__aside .item-actions { order: 3; }
-        .hm-cart-line__total { order: 2; }
+        //  waiting to happen. The auto margin, not space-between, does the
+        //  spreading: space-between would strand the total mid-row.
         .hm-qty { order: 1; }
+
+        .hm-cart-line__total {
+            margin-inline-start: auto;
+            order: 2;
+            text-align: end;
+        }
+
+        //  `flex: 1 1 auto` is what anchors the bin to the card's trailing edge
+        //  on BOTH lines. Flexible lengths resolve before auto margins, so the
+        //  toolbar — not the total's `margin-inline-start: auto` — takes the
+        //  row's free space; it ends flush right either way, and `flex-end`
+        //  inside it keeps the bin at its own trailing edge. The visible effect
+        //  on a guest's single line is that the total parks beside the stepper
+        //  rather than mid-row, which reads as quantity-and-price together.
+        .hm-cart-line__aside .item-actions .actions-toolbar {
+            flex: 1 1 auto;
+            justify-content: flex-end;
+            order: 3;
+        }
+
+        .hm-cart-line__aside .action-towishlist { margin-inline-end: auto; }
+
+        //  Two lines is the ceiling at this width; past that a long name pushes
+        //  the price and the whole foot row off the first screen.
+        .hm-cart-line .product-item-name a {
+            display: -webkit-box;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+        }
 
         .hm-cart-group__head { padding-inline: var(--hm-space-4); }
 
@@ -2159,81 +2222,94 @@ a.sms-login-field-ctrl {
 //  finding its own height, and the aside's content is pinned to the top so the
 //  bin sits level with the title and the total follows the qty immediately
 //  instead of drifting to the bottom of an over-tall column.
+//  GATED to desktop. Everything below reasons about a THREE-column line: a
+//  96px thumb, a body that stretches so its price lands level with the total,
+//  and an aside stacked at the trailing edge. None of that survives a 390px
+//  phone — and because this block carried no media query and is written after
+//  the max-width:767px cart block ~800 lines up, it won at EVERY width and
+//  that mobile block has never once applied. The phone kept the desktop grid,
+//  which left the body 76px wide: product names set one word per line and
+//  broke mid-word, and the description clamped to two words.
+@media (min-width: 768px) {
+    .checkout-cart-index {
+        //  Stretch, not start: the reference aligns the line total with the price,
+        //  and it can only do that if both columns are the row's full height and
+        //  each pushes its last row to the foot. With `start` the body stopped at
+        //  its own content and the price sat 45px above the total.
+        .hm-cart-line {
+            align-items: stretch;
+            column-gap: var(--hm-space-5);
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+        }
+
+        //  The thumb keeps its own height rather than stretching to the row.
+        .hm-cart-line__media {
+            align-self: start;
+            grid-column: 1;
+        }
+
+        .hm-cart-line__body {
+            display: flex;
+            flex-direction: column;
+            grid-column: 2;
+        }
+
+        //  Pushed to the foot of the body column, level with the line total, with
+        //  the struck compare-at sitting beside it on the same baseline.
+        .hm-cart-line__body .hm-cart-line__price {
+            align-items: baseline;
+            column-gap: var(--hm-space-3);
+            display: flex;
+            flex-wrap: wrap;
+            margin-block-start: auto;
+        }
+
+        //  The aside stacks to the trailing edge, as the reference draws it: bin at
+        //  the top level with the title, stepper under it, line total at the foot
+        //  level with the price.
+        //
+        //  This was a ROW for a while. The reason was real — stacked, it summed to
+        //  136px against a body only ~50px tall, so the total ended up 86px below
+        //  the price it should sit level with — but the diagnosis was not: that was
+        //  read as "no product on this catalogue has a description". 158 products of
+        //  2304 have a short_description, and 2075 have a description. The template
+        //  now falls back to the latter, so the body carries the reference's blurb
+        //  on nine lines in ten and the two columns are the same height again.
+        //
+        //  `space-between` still needs a floor for the tenth: without it a line whose
+        //  product has no copy at all collapses the stack back onto itself. The
+        //  media column is 96px, so the row is never shorter than that anyway.
+        .hm-cart-line__aside {
+            align-items: flex-end;
+            display: flex;
+            flex-direction: column;
+            gap: var(--hm-space-3);
+            grid-column: 3;
+            justify-content: space-between;
+            min-block-size: 9.6rem;
+            row-gap: var(--hm-space-3);
+        }
+
+        //  Bin first, then the stepper, then the line total — top to bottom.
+        .hm-cart-line__aside .item-actions     { order: 1; }
+        .hm-cart-line__aside .field.qty        { order: 2; }
+        .hm-cart-line__aside .hm-cart-line__total {
+            min-inline-size: 8rem;
+            order: 3;
+            text-align: end;
+        }
+
+    }
+}
+
+//  Width-independent, so OUTSIDE the gate above: the reference has no Edit on a
+//  cart line at any size — the product page is a click away on the title and the
+//  thumb — and the bin only ever needed its own line height, not the 56px block
+//  it and Edit shared.
 .checkout-cart-index {
-    //  Stretch, not start: the reference aligns the line total with the price,
-    //  and it can only do that if both columns are the row's full height and
-    //  each pushes its last row to the foot. With `start` the body stopped at
-    //  its own content and the price sat 45px above the total.
-    .hm-cart-line {
-        align-items: stretch;
-        column-gap: var(--hm-space-5);
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr) auto;
-    }
-
-    //  The thumb keeps its own height rather than stretching to the row.
-    .hm-cart-line__media {
-        align-self: start;
-        grid-column: 1;
-    }
-
-    .hm-cart-line__body {
-        display: flex;
-        flex-direction: column;
-        grid-column: 2;
-    }
-
-    //  Pushed to the foot of the body column, level with the line total, with
-    //  the struck compare-at sitting beside it on the same baseline.
-    .hm-cart-line__body .hm-cart-line__price {
-        align-items: baseline;
-        column-gap: var(--hm-space-3);
-        display: flex;
-        flex-wrap: wrap;
-        margin-block-start: auto;
-    }
-
-    //  The aside stacks to the trailing edge, as the reference draws it: bin at
-    //  the top level with the title, stepper under it, line total at the foot
-    //  level with the price.
-    //
-    //  This was a ROW for a while. The reason was real — stacked, it summed to
-    //  136px against a body only ~50px tall, so the total ended up 86px below
-    //  the price it should sit level with — but the diagnosis was not: that was
-    //  read as "no product on this catalogue has a description". 158 products of
-    //  2304 have a short_description, and 2075 have a description. The template
-    //  now falls back to the latter, so the body carries the reference's blurb
-    //  on nine lines in ten and the two columns are the same height again.
-    //
-    //  `space-between` still needs a floor for the tenth: without it a line whose
-    //  product has no copy at all collapses the stack back onto itself. The
-    //  media column is 96px, so the row is never shorter than that anyway.
-    .hm-cart-line__aside {
-        align-items: flex-end;
-        display: flex;
-        flex-direction: column;
-        gap: var(--hm-space-3);
-        grid-column: 3;
-        justify-content: space-between;
-        min-block-size: 9.6rem;
-        row-gap: var(--hm-space-3);
-    }
-
-    //  Bin first, then the stepper, then the line total — top to bottom.
-    .hm-cart-line__aside .item-actions     { order: 1; }
-    .hm-cart-line__aside .field.qty        { order: 2; }
-    .hm-cart-line__aside .hm-cart-line__total {
-        min-inline-size: 8rem;
-        order: 3;
-        text-align: end;
-    }
-
-    //  The reference has no Edit on a cart line; the product page is a click
-    //  away on the title and the thumb.
     .hm-cart-line__aside .item-actions .action-edit { display: none; }
 
-    //  The bin and Edit sat in a 56px block of their own; they only need their
-    //  own line height.
     .hm-cart-line__aside .item-actions {
         gap: var(--hm-space-3);
         margin: 0;
@@ -3081,6 +3157,13 @@ a.sms-login-field-ctrl {
 //  its flex-start (so the card height is unchanged), the aside grows to the
 //  row's height, and space-between then does what it was always meant to —
 //  bin level with the product title, line total level with the price.
+//  GATED, for the same reason as the block above and it out-ranks it: at (0,3,0)
+//  this beat the phone's rules on specificity, not order, so `min-block-size:
+//  9.6rem` floored a wrapped row at the thumb's height and — the visible one —
+//  `align-self: flex-end` on every child pushed the line total to the BOTTOM of
+//  the stepper beside it instead of its middle. Both are right for a column and
+//  wrong for a row.
+@media (min-width: 768px) {
 .hm-page.checkout-cart-index {
     .hm-cart-line__aside {
         align-self: stretch;
@@ -3105,6 +3188,7 @@ a.sms-login-field-ctrl {
     //  The three items in the trailing column each align to the trailing edge,
     //  so their right edges form one line rather than three.
     .hm-cart-line__aside > * { align-self: flex-end; }
+}
 }
 
 //
