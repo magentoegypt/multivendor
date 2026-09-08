@@ -327,12 +327,20 @@
 
         .product-item-actions .action { margin-right: 0; }
 
-        //  The add-to-cart row is a core <fieldset>, and blank gives every
-        //  fieldset 24px of padding plus `min-width: min-content`. Measured on
-        //  the real page it came out 224px wide inside a 217px card and pushed
-        //  the button past the card's edge. Zero the padding, let it shrink,
-        //  and leave the spacing to the row's own gap — the qty field's
-        //  trailing padding was doubling it.
+        //  The add-to-cart row is a core <fieldset>, and OUR OWN account rule
+        //  is what inflates it: `.account .column.main .fieldset` in
+        //  _hm-account.less turns account forms into white cards with 24px of
+        //  padding, which is right for Edit Account Information and wrong for
+        //  the four-control fieldset core nests inside every wishlist card.
+        //  With `min-width: min-content` it measured 224px inside a 217px card
+        //  and pushed the button past the edge. Zero the padding, let it
+        //  shrink, and leave the spacing to the row's own gap — the qty
+        //  field's trailing padding was doubling it.
+        //
+        //  It is desktop-only (the account card rule lives in styles-l), and it
+        //  needs a real signed-in page to see: injecting the markup elsewhere
+        //  does not land it inside `.column.main`, so the selector never
+        //  matches and the row looks fine.
         .box-tocart .fieldset {
             min-inline-size: 0;
             padding: 0;
