@@ -354,3 +354,87 @@
         .box-tocart .product-item-actions { min-inline-size: 0; }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  Picked For You — the AI ENGINE badge and the card's cart button
+//  ---------------------------------------------------------------------------
+//  Measured off the prototype at 1440 on 2026-09-08. Two things were off, and
+//  a third that only makes sense alongside them.
+//
+//  THE BADGE. Ours ran a size larger with a green status dot and the wrong end
+//  stop on the gradient. The prototype: 10px/700 uppercase, 0.1em tracking,
+//  4px 12px, indigo-500 to purple-500, and a WHITE dot with a pulsing halo —
+//  the Tailwind `animate-ping` pattern, which reads as "live", where a green
+//  dot reads as a status light.
+//
+//  10px is under this theme's 12px type floor. It is a decorative badge beside
+//  a 20px heading, the client asked for the prototype's treatment by name, and
+//  the accessible name comes from the heading it labels — but it is a
+//  deliberate exception, not an oversight.
+.hm-rail--hm-home-pickedforyou .hm-section__badge {
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    font-size: 1rem;
+    letter-spacing: .1em;
+    line-height: 1.5;
+    padding: .4rem var(--hm-space-3);
+
+    &::before {
+        background: #ffffff;
+        //  The halo is drawn on the dot itself rather than as a second node,
+        //  since the dot is already a pseudo-element.
+        box-shadow: 0 0 0 0 fade(#ffffff, 60%);
+    }
+}
+
+//  The pulse. Paused for anyone who asked for less motion — it is decoration
+//  and it never stops on its own.
+@keyframes hm-pfy-ping {
+    75%, 100% { box-shadow: 0 0 0 .5rem fade(#ffffff, 0); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .hm-rail--hm-home-pickedforyou .hm-section__badge::before {
+        animation: hm-pfy-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite;
+    }
+}
+
+//  THE CART BUTTON. Ours was a 36px circle with a white glyph on one fixed
+//  indigo tint. The prototype's is 28px with a 14px glyph, and the tint AND the
+//  glyph both take the card's own accent — the same accent its reason line
+//  uses. Four accents cycle across the row, so the button is coloured by
+//  position, not by a single rail colour.
+.hm-rail--hm-home-pickedforyou.block.widget .product-item .action.tocart {
+    block-size: 2.8rem;
+    inline-size: 2.8rem;
+    min-block-size: 0;
+    min-inline-size: 0;
+
+    .hm-icon {
+        block-size: 1.4rem;
+        inline-size: 1.4rem;
+    }
+}
+
+//  The cycle. `.hm-pfy-accent()` keeps the button and the reason line on one
+//  colour so a pink cart can never sit above a violet reason.
+.hm-pfy-accent(@c) {
+    .action.tocart {
+        background: fade(@c, 20%);
+        color: @c;
+
+        &:hover,
+        &:focus-visible {
+            background: @c;
+            color: var(--hm-on-inverse);
+        }
+    }
+
+    .hm-card__reason { color: fade(@c, 80%); }
+}
+
+.hm-rail--hm-home-pickedforyou.block.widget .product-items > .product-item {
+    &:nth-child(4n + 1) { .hm-pfy-accent(#6366f1); }   // indigo-500
+    &:nth-child(4n + 2) { .hm-pfy-accent(#8b5cf6); }   // violet-500
+    &:nth-child(4n + 3) { .hm-pfy-accent(#ec4899); }   // pink-500
+    &:nth-child(4n + 4) { .hm-pfy-accent(#f26522); }   // the brand orange
+}
