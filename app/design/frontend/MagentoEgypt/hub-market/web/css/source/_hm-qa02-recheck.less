@@ -438,3 +438,53 @@
     &:nth-child(4n + 3) { .hm-pfy-accent(#ec4899); }   // pink-500
     &:nth-child(4n + 4) { .hm-pfy-accent(#f26522); }   // the brand orange
 }
+
+//  Picked For You — the card's vertical rhythm and its price
+//  ---------------------------------------------
+//  The prototype's card is 454px tall against our 504. None of that was one
+//  big gap; it was a flex `gap` applied to every child on top of the margins,
+//  2px of extra padding, and a price four sizes too large.
+//
+//  Measured stack, top to bottom: 12px of padding, vendor with 2px under it,
+//  name with 8px, the rating row with 12px, the price row, then the reason
+//  line 10px below with a 10px gap above its own hairline.
+//
+//  The `gap` has to go rather than shrink: the card also carries an EMPTY
+//  swatch container between the rating and the price, so a uniform gap paid
+//  for it twice — 16px of nothing.
+.hm-rail--hm-home-pickedforyou.block.widget {
+    .product-item .product-item-details {
+        gap: 0;
+        padding: var(--hm-space-3);
+    }
+
+    .product-item .hm-card__vendor        { margin-block-end: .2rem; }
+    .product-item .product-item-name      { margin-block-end: .8rem; }
+    .product-item .product-reviews-summary { margin-block-end: 1.2rem; }
+
+    .product-item .hm-card__foot {
+        margin-block-start: 0;
+        padding-block-start: 0;
+    }
+
+    //  14px, not 18. On a 300px dark card the prototype keeps the price the
+    //  same size as the name it sits under and lets weight carry it, which is
+    //  why ours read as shouting next to it.
+    .product-item .price-box {
+        gap: .6rem;
+
+        .price { font-size: 1.4rem; }
+
+        //  The struck price is the quietest thing on the card, not a second
+        //  price: 10px at 30% white, against our 12px near-solid grey.
+        .old-price .price {
+            color: fade(#ffffff, 30%);
+            font-size: 1rem;
+        }
+    }
+
+    .product-item .hm-card__reason {
+        margin-block-start: 1rem;
+        padding-block-start: 1rem;
+    }
+}
