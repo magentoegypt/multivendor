@@ -326,5 +326,23 @@
         }
 
         .product-item-actions .action { margin-right: 0; }
+
+        //  The add-to-cart row is a core <fieldset>, and blank gives every
+        //  fieldset 24px of padding plus `min-width: min-content`. Measured on
+        //  the real page it came out 224px wide inside a 217px card and pushed
+        //  the button past the card's edge. Zero the padding, let it shrink,
+        //  and leave the spacing to the row's own gap — the qty field's
+        //  trailing padding was doubling it.
+        .box-tocart .fieldset {
+            min-inline-size: 0;
+            padding: 0;
+        }
+
+        .box-tocart .field.qty {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box-tocart .product-item-actions { min-inline-size: 0; }
     }
 }
