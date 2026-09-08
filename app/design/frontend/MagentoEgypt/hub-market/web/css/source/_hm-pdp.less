@@ -371,6 +371,70 @@
 .hm-pdp .product-info-main .product-info-stock-sku:not(:has(.stock.unavailable)) { display: none; }
 
 //
+//  The seller card, measured against the prototype's own
+//  ---------------------------------------------
+//  Same panel, same padding, same square avatar and full-width outline button
+//  as before — what did not match was everything inside it. Measured on
+//  /product/1 at 390 (left) against ours (right):
+//
+//    name     14/500 #0a0a0a        16/700 --hm-foreground
+//    badge    14px  #c85c2c         16px  --hm-accent (#f26522)
+//    meta     12px  #9e9890         13px  --hm-neutral-600
+//    star     filled, in that grey  16px hollow terracotta
+//    avatar   44, no fill or rule   44 on a white tile with a hairline
+//    button   14/400 #0a0a0a        14/600 --hm-foreground
+//
+//  The result read as a heavier, louder card than the prototype's, which is
+//  what the client filed. The glyph changes are in the templates: the badge is
+//  now lucide's circle-check-big rather than its scalloped badge-check, and the
+//  star is a text ★ rather than the stroke-only sprite icon.
+//  `.hm-page` prefix: the card's own block further down this file sets the
+//  name at 16/700 with the same (0,3,0) weight and comes LATER, so an equal
+//  selector loses on source order — the first pass shipped every other value
+//  here and left the name heavy.
+.hm-page.hm-pdp .vendor-profile-container {
+    .vendor-profile-logo img {
+        background: none;
+        border: 0;
+    }
+
+    .vendor-title {
+        font-size: 1.4rem;
+        font-weight: 500;
+        gap: .6rem;
+    }
+
+    .vendor-title a { color: #0a0a0a; }
+
+    .hm-vendor-card__check .hm-icon {
+        block-size: 1.4rem;
+        color: #c85c2c;
+        inline-size: 1.4rem;
+    }
+
+    .hm-vendor-card__meta {
+        color: #9e9890;
+        font-size: 1.2rem;
+    }
+
+    //  The star belongs to the sentence: same colour, same size, no gap of its
+    //  own beyond the space around it.
+    .hm-vendor-card__star {
+        color: inherit;
+        font-size: inherit;
+        line-height: 1;
+    }
+
+    .hm-vendor-card__visit,
+    .hm-vendor-card__visit:link,
+    .hm-vendor-card__visit:visited {
+        border-color: #0a0a0a;
+        color: #0a0a0a;
+        font-weight: 400;
+    }
+}
+
+//
 //  Related / upsell rails inherit the card component from _hm-product-item.less
 //  ---------------------------------------------
 .block.related,

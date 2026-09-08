@@ -42,7 +42,16 @@ if ($hmStars === null && $hmProducts === 0) {
     <?php if ($hmStars !== null): ?>
         <span class="hm-vendor-card__rating">
             <?= $escaper->escapeHtml(number_format((float) $hmStars, 1)) ?>
-            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-star"/></svg>
+            <?php /*
+                A FILLED GLYPH, not the sprite's star. The prototype writes this
+                line as one text node — "4.8 ★ · 156 products" — so its star is
+                the same size and the same grey as the words either side of it.
+                The sprite's #hm-star is stroke-only (`fill="none"` sits on the
+                symbol, which a `fill` on the outer svg cannot reach), so it
+                rendered as a large hollow outline in a different colour, which
+                is what the client filed.
+            */ ?>
+            <span class="hm-vendor-card__star" aria-hidden="true">&#9733;</span>
             <span class="hm-sr-only"><?= $escaper->escapeHtml(__('average rating from %1 reviews', $hmStats['reviews'])) ?></span>
         </span>
     <?php endif; ?>
