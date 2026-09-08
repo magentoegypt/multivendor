@@ -1,0 +1,697 @@
+//
+//  Hub Market — mobile parity, second pass
+//  _____________________________________________
+//
+//  Imported after _hm-mobile.less (the first mobile pass on CL036-DEV01.01 /
+//  .02 / .03) and settles what that pass left open or got wrong, every value
+//  measured off the Figma prototype at 390px on 2026-09-08. It is a separate
+//  partial because the two passes were written concurrently by two sessions;
+//  where a rule here repeats a selector from the first pass at the same
+//  specificity, source order is what decides, and that is deliberate.
+//
+//  Item numbers are the client's, per ticket, so the tickets can be walked
+//  against this file.
+//
+
+//  ---------------------------------------------------------------------------
+//  Card chrome on touch  (home 5, category 3, product 4)
+//  ---------------------------------------------------------------------------
+//  The prototype's full product cards reveal the heart and the cart button on
+//  hover ONLY (`opacity-0 group-hover:opacity-100`), so a phone never shows
+//  either — the client crossed both out. The four tinted category rails, Picked
+//  For You and Bundle Deals keep their always-on cart, exactly as the prototype.
+//
+//  `hover: none` rather than a width: a laptop with a touch screen still
+//  reports hover, a 10" tablet does not, and that is the prototype's own gate.
+@media (hover: none) {
+    //  (0,5,0) — has to out-rank the (0,5,0) display:flex on the home rails,
+    //  and does so by source order.
+    //  `!important` on purpose: the wishlist button has four different
+    //  display:flex rules across the card families (the PLP/related markup
+    //  nests it in .actions-secondary at (0,4,1)), and on a touch device it
+    //  must lose to all of them — the prototype never shows it there.
+    .hm-page .product-item .action.towishlist.hm-card__wish,
+    .hm-page .product-item .actions-secondary > .action.towishlist.hm-card__wish { display: none !important; }
+
+    .hm-rail--hm-home-deals .product-item .action.tocart,
+    .hm-rail--hm-home-featured .product-item .action.tocart,
+    .hm-plp .products-grid .product-item .action.tocart,
+    .hm-pdp .block.related .product-item .action.tocart,
+    .hm-pdp .block.upsell .product-item .action.tocart { display: none; }
+}
+
+//  Phone-only, off everywhere else.
+.hm-nav__quick { display: none; }
+
+@media (max-width: 767px) {
+
+    //  -----------------------------------------------------------------------
+    //  HOME 1 — header arrangement: logo / cart / menu
+    //  -----------------------------------------------------------------------
+    //  Prototype header at 390px: the account and wishlist controls are
+    //  display:none, the cart keeps its label and count, and a 24px hamburger
+    //  sits at the trailing edge. Account and Wishlist move into the menu sheet.
+    .hm-header__action:not(.hm-header__action--cart) { display: none; }
+
+    //  Logo, then the cart at the trailing edge with room for the hamburger —
+    //  the actions box used to sit right after the logo because the search
+    //  field is the row's only growing item and it wraps onto its own line.
+    .hm-header__actions {
+        gap: .4rem;
+        margin-inline-end: 5.2rem;
+        margin-inline-start: auto;
+    }
+
+    //  THE HAMBURGER IS THE <summary> of the category <details>, lifted out of
+    //  the nav band into the header's top row with absolute positioning (the
+    //  sticky .hm-header is the containing block once .hm-nav__menu drops its
+    //  position: relative below). Native disclosure: opens with no script, so a
+    //  tap before the page's JS has bound still works, and aria-expanded is the
+    //  browser's own. Icon only, like the prototype; the label stays for
+    //  screen readers.
+    .hm-nav__trigger {
+        align-items: center;
+        background: none;
+        border: 0;
+        color: var(--hm-on-inverse);
+        cursor: pointer;
+        display: inline-flex;
+        //  2.2rem, not 1.2rem: the cart beside it is a two-line control (icon
+        //  over label, 64px tall from 1.2rem down), so a hamburger pinned to
+        //  the same 1.2rem sits 10px above the cart's centre and the pair reads
+        //  as misaligned — the client filed exactly that. 1.2 + (64 - 44) / 2
+        //  centres the 44px box on the cart block, which is how the prototype
+        //  has it: logo, cart and hamburger all share one centre line.
+        inset-block-start: 2.2rem;
+        inset-inline-end: 1.6rem;
+        justify-content: center;
+        list-style: none;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+        padding: 0;
+        position: absolute;
+        z-index: 3;
+
+        .hm-icon { block-size: 2.4rem; color: inherit; inline-size: 2.4rem; }
+        .hm-nav__chevron { display: none; }
+
+        .hm-nav__trigger-label {
+            block-size: 1px;
+            clip-path: inset(50%);
+            inline-size: 1px;
+            overflow: hidden;
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        &:hover,
+        &:focus-visible { color: var(--hm-accent); }
+    }
+
+    .hm-nav__menu[open] .hm-nav__trigger { color: var(--hm-accent); }
+
+    //  -----------------------------------------------------------------------
+    //  HOME 1 + 2 — the category row: plain wrapped links, as the prototype
+    //  -----------------------------------------------------------------------
+    //  Prototype: `flex items-center flex-wrap`, every link 12px/500 at 65%
+    //  white with a 10px 14px padding and NO fill; "All Categories" is the
+    //  first link and "Bundle Deals" (12px bold, orange) closes the last row at
+    //  the trailing edge. The first pass drew the row as pill chips under an
+    //  "All Categories" disclosure; the disclosure keeps its tree but is now
+    //  opened from the header's menu button, so its own trigger goes.
+    .hm-nav__inner {
+        align-items: center;
+        column-gap: 0;
+        flex-wrap: wrap;
+        min-block-size: 0;
+        padding-block: .2rem .4rem;
+        row-gap: 0;
+    }
+
+    //  The <details> is now only the panel's host (its summary lives in the
+    //  header row): static so the summary and panel position against the
+    //  header, and an empty last flex row in the nav band.
+    .hm-nav__menu {
+        flex: 0 0 100%;
+        min-block-size: 0;
+        order: 99;
+        position: static;
+    }
+
+    .hm-nav__all,
+    .hm-nav__inline-link {
+        align-items: center;
+        background: none;
+        border: 0;
+        border-radius: 0;
+        color: var(--hm-on-inverse-muted);
+        display: inline-flex;
+        font-size: 1.2rem;
+        font-weight: 500;
+        gap: .6rem;
+        line-height: 1.6rem;
+        min-block-size: 0;
+        padding: 1rem 1.4rem;
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover,
+        &:focus-visible { background: none; color: var(--hm-on-inverse); }
+    }
+
+    //  The <ul> dissolves so its items and "All Categories" share one wrapping
+    //  row with Bundle Deals — the prototype's markup is one flat flex row.
+    .hm-nav__inline { display: contents; }
+    .hm-nav__inline-item { display: block; margin: 0; }
+    .hm-nav__inline-icon { margin: 0; }
+    .hm-nav__break { display: none; }
+
+    .hm-nav__promo {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-inline-start: auto;
+        min-block-size: 0;
+        padding: 1rem 1.6rem;
+    }
+
+    //  The category tree as a sheet under the sticky header: absolute against
+    //  the header, starting at its bottom edge (100%) and filling the rest of
+    //  the viewport (100dvh minus the header's own height, which is what the
+    //  100% in the calc resolves to for an absolutely positioned box). Scrolls
+    //  inside itself; js/hm-header-menu.js locks the page behind it.
+    .hm-nav__menu[open] .hm-nav__panel {
+        block-size: ~"calc(100dvh - 100%)";
+        border-radius: 0;
+        box-shadow: none;
+        inset-block-start: 100%;
+        inset-inline: 0;
+        max-block-size: none;
+        overflow-y: auto;
+        position: absolute;
+        z-index: 100;
+    }
+
+    .hm-menu-open,
+    .hm-menu-open body { overflow: hidden; }
+
+    //  Account / Wishlist at the top of the sheet (they left the header row).
+    .hm-nav__quick {
+        display: flex;
+        gap: .8rem;
+        list-style: none;
+        margin: 0 0 var(--hm-space-4);
+        padding: 0;
+
+        > li { flex: 1 1 0; margin: 0; }
+    }
+
+    .hm-nav__quick-link {
+        align-items: center;
+        background: var(--hm-surface-muted);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        display: flex;
+        font-size: 1.3rem;
+        font-weight: 600;
+        gap: .8rem;
+        justify-content: center;
+        min-block-size: 4.4rem;
+        text-decoration: none;
+
+        .hm-icon { block-size: 1.8rem; inline-size: 1.8rem; }
+
+        &:hover { color: var(--hm-accent-strong); text-decoration: none; }
+    }
+
+    //  -----------------------------------------------------------------------
+    //  HOME 4 — category tiles: name only, as the prototype's phone tiles
+    //  -----------------------------------------------------------------------
+    .hm-chips__count { display: none; }
+
+    .hm-chips__link {
+        block-size: 8.8rem;
+        box-sizing: border-box;
+        justify-content: center;
+        min-block-size: 0;
+        padding-block: 1rem;
+    }
+
+    .hm-chips__name { min-block-size: 0; }
+
+    //  -----------------------------------------------------------------------
+    //  Card price row on phones  (home 5/6, category 3)
+    //  -----------------------------------------------------------------------
+    //  The desktop rules put price and cart on one row; below 768px the foot
+    //  fell back to block flow and the cart dropped under the price. The
+    //  prototype's rails keep the small cart at the trailing end of the price
+    //  line, and Picked For You its indigo one.
+    //  (0,3,0)/(0,4,0): `.product-item .hm-card__foot { flex-wrap: wrap }` and
+    //  `.product-item .hm-card__foot .price-box { flex: 1 1 100% }` are what
+    //  pushed the cart under the price on every phone card.
+    .hm-page .product-item .hm-card__foot {
+        align-items: center;
+        display: flex;
+        flex-wrap: nowrap;
+        gap: var(--hm-space-2);
+        justify-content: space-between;
+        margin-block-start: auto;
+        padding-block-start: var(--hm-space-2);
+
+        .price-box { flex: 0 1 auto; margin: 0; min-inline-size: 0; }
+        .product-item-inner { flex: 0 0 auto; margin: 0; }
+        .product-item-actions { display: flex; margin: 0; }
+        .actions-primary { display: block; }
+    }
+
+    //  -----------------------------------------------------------------------
+    //  HOME 5 — Today's Deals head: link on the title row, countdown under it
+    //  -----------------------------------------------------------------------
+    .hm-rail--hm-home-deals.block.widget {
+        .block-title.hm-section__head {
+            align-items: center;
+            flex-wrap: wrap;
+            row-gap: var(--hm-space-2);
+
+            //  A forced line break between the title row and the countdown.
+            &::after { content: ''; flex-basis: 100%; order: 1; }
+        }
+
+        .hm-section__heading { flex: 1 1 0; min-inline-size: 0; }
+        .hm-section__more { flex-shrink: 0; order: 0; white-space: nowrap; }
+        .hm-countdown { margin-inline-end: auto; order: 2; }
+    }
+
+    //  -----------------------------------------------------------------------
+    //  HOME 6 — Picked For You: type and element order
+    //  -----------------------------------------------------------------------
+    //  Prototype at 390px: heading row, two-line subtitle, then Refresh on its
+    //  own line at the leading edge (12px/500, 8px 16px, hairline pill), the
+    //  searches label on its own line, chips at 34px, cards with the price and
+    //  the indigo cart on one line and no heart.
+    .hm-rail--hm-home-pickedforyou.block.widget {
+        .block-title.hm-section__head { flex-wrap: wrap; row-gap: var(--hm-space-3); }
+        .hm-section__heading { flex: 1 1 100%; }
+
+        .hm-section__refresh {
+            font-weight: 500;
+            margin-inline-start: 0;
+            padding: .8rem 1.6rem;
+        }
+
+        .hm-section__tags { gap: .8rem; }
+        .hm-section__tags-label { flex-basis: 100%; }
+
+        .hm-section__tag {
+            font-size: 1.3rem;
+            padding: .8rem 1.4rem;
+        }
+
+        .product-item-details { padding: 1.4rem; }
+        .price-box .price { font-size: 1.6rem; }
+    }
+
+    //  -----------------------------------------------------------------------
+    //  HOME 8 — Top Brands: one-line head, pastel bubble tiles
+    //  -----------------------------------------------------------------------
+    //  Prototype: 18px heading and the link on ONE 28px row; tiles 4-up,
+    //  grey-50 with a grey-100 hairline, 16px radius, 12px padding, an 8px
+    //  gap, a 40px pastel circle carrying the mark, and an 11px/600 name.
+    .hm-brands .hm-section__head {
+        align-items: center;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+
+    .hm-brands .hm-section__title { font-size: 1.8rem; }
+    .hm-brands .hm-section__more { flex-shrink: 0; white-space: nowrap; }
+
+    .hm-brands__list { gap: 1.2rem; }
+
+    .hm-brands__link {
+        block-size: auto;
+        border-radius: 1.6rem;
+        gap: .8rem;
+        min-block-size: 8.8rem;
+        padding: 1.2rem;
+    }
+
+    .hm-brands__img {
+        background: fade(#1428a0, 8%);
+        block-size: 4rem;
+        border-radius: 50%;
+        box-sizing: border-box;
+        inline-size: 4rem;
+        max-inline-size: 4rem;
+        object-fit: contain;
+        padding: .7rem;
+    }
+
+    //  Four tints in rotation, as the prototype's per-brand pastels.
+    .hm-brands__item:nth-child(4n+2) .hm-brands__img { background: fade(#ef4444, 8%); }
+    .hm-brands__item:nth-child(4n+3) .hm-brands__img { background: fade(#f59e0b, 10%); }
+    .hm-brands__item:nth-child(4n+4) .hm-brands__img { background: fade(#10b981, 10%); }
+
+    .hm-brands__name {
+        //  12px, not the prototype's 11: the theme's documented type floor.
+        font-size: 1.2rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-inline-size: 100%;
+    }
+
+    //  -----------------------------------------------------------------------
+    //  HOME 10 — New Stores: two columns, row cards, two-line heading
+    //  -----------------------------------------------------------------------
+    //  The first pass stacked these full-width, which is the TOP VENDORS ask
+    //  (item 9), not this one: the prototype keeps New Stores at two 173px
+    //  columns with a 12px gap. Card: white/6% fill, white/10% hairline, 16px
+    //  radius, 14px padding, 44px avatar, 14px/700 name on one line, muted
+    //  meta. The heading runs at 20px over two lines with the link beside it.
+    //  Same head for Top Vendors (item 9): title beside its link, never under it.
+    .hm-stores--hm-home-topvendors,
+    .hm-stores--hm-home-newstores {
+        .hm-section__head {
+            align-items: center;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
+        .hm-section__heading { flex: 1 1 0; min-inline-size: 0; }
+        .hm-section__title { font-size: 2rem; line-height: 1.4; }
+        .hm-section__more { flex-shrink: 0; white-space: nowrap; }
+    }
+
+    .hm-stores--hm-home-newstores {
+
+        .hm-stores__list {
+            gap: 1.2rem;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .hm-stores__link {
+            align-items: center;
+            border-radius: 1.6rem;
+            column-gap: 1.2rem;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            padding: 1.4rem;
+            text-align: start;
+        }
+
+        .hm-stores__avatar-wrap,
+        .hm-stores__avatar {
+            block-size: 4.4rem;
+            inline-size: 4.4rem;
+        }
+
+        .hm-stores__body { gap: .2rem; min-inline-size: 0; }
+
+        .hm-stores__name {
+            font-size: 1.4rem;
+            max-inline-size: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .hm-stores__meta,
+        .hm-stores__count { font-size: 1.2rem; }
+        .hm-stores__verified { font-size: 1.2rem; }
+    }
+
+    //  -----------------------------------------------------------------------
+    //  CATEGORY 2 — toolbar: Filters pill + count, sort select below
+    //  -----------------------------------------------------------------------
+    //  Prototype toolbar card: `Filters` (14px/500, 6px 12px, 12px radius,
+    //  gray-200 hairline) beside "6 results", and the sort select on the next
+    //  row with no label. The grid/list switch does not exist on the phone.
+    .hm-plp .toolbar-products,
+    .hm-page.vendor-page .toolbar-products {
+        justify-content: flex-start;
+
+        .modes { display: none; }
+        .toolbar-amount { flex: 0 0 auto; margin: 0; order: 2; }
+        .toolbar-sorter { flex: 0 0 100%; margin: 0; order: 3; }
+        .sorter-label,
+        .sorter-action { display: none; }
+
+        .sorter-options {
+            background-color: var(--hm-surface);
+            block-size: auto;
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: 1.2rem;
+            color: var(--hm-foreground);
+            font-size: 1.4rem;
+            font-weight: 500;
+            inline-size: auto;
+            min-block-size: 3.6rem;
+            min-inline-size: 16rem;
+            padding: .6rem 1.2rem;
+        }
+
+        .hm-filters-toggle {
+            border-radius: 1.2rem;
+            font-size: 1.4rem;
+            font-weight: 500;
+            padding: .6rem 1.2rem;
+        }
+    }
+
+    //  The drawer. `.page-products .columns` is `position: relative; z-index: 1`
+    //  (blank), a stacking context: the sidebar's z-index 1000 ranked only
+    //  inside it, under the sticky header (root context, 90) and under the
+    //  body-level scrim (999). The scrim now lives beside the sidebar (see
+    //  js/hm-mobile-filters.js) and the columns rise above the header while
+    //  the drawer is open, so drawer > scrim > everything else.
+    .hm-filters-open .page-products .columns { z-index: 1001; }
+
+    .hm-filters-ready .hm-plp .sidebar-main {
+        padding-block-start: 5.6rem;
+
+        .block.filter { margin: 0; }
+        .block.filter .filter-title { display: none; }
+        .block.filter .filter-content { display: block; }
+    }
+
+    .hm-filters-close {
+        font-size: 2.4rem;
+        inset-block-start: .6rem;
+        inset-inline-end: .6rem;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+        z-index: 1;
+    }
+
+    //  -----------------------------------------------------------------------
+    //  CATEGORY 4 — pagination: 36px rounded squares, current one navy
+    //  -----------------------------------------------------------------------
+    //  Measured: 36x36, 12px radius, 14px/500; current is #0f2144 with white
+    //  text, the rest white with a gray-200 hairline and gray-600 text, 6px
+    //  apart, centred. The first pass drew 40px circles with an orange current.
+    .pages .items { gap: .6rem; }
+
+    .pages .item {
+        a.page,
+        strong.page,
+        &.pages-item-next .action,
+        &.pages-item-previous .action {
+            background: var(--hm-surface);
+            block-size: 3.6rem;
+            border-color: var(--hm-border-subtle);
+            border-radius: 1.2rem;
+            box-sizing: border-box;
+            color: var(--hm-neutral-600);
+            font-size: 1.4rem;
+            font-weight: 500;
+            inline-size: 3.6rem;
+            min-block-size: 3.6rem;
+            min-inline-size: 3.6rem;
+            padding: 0;
+        }
+
+        &.current strong.page,
+        &.current .page {
+            background: var(--hm-primary);
+            border-color: var(--hm-primary);
+            color: var(--hm-on-primary, #fff);
+        }
+
+        a.page:hover,
+        .page:hover,
+        &.pages-item-next .action:hover,
+        &.pages-item-previous .action:hover {
+            background: var(--hm-surface-muted);
+            border-color: var(--hm-border-subtle);
+            color: var(--hm-foreground);
+        }
+
+        &.current .page:hover {
+            background: var(--hm-primary);
+            border-color: var(--hm-primary);
+            color: var(--hm-on-primary, #fff);
+        }
+    }
+
+    //  -----------------------------------------------------------------------
+    //  PRODUCT 2 — seller line in the accent the cards already use
+    //  -----------------------------------------------------------------------
+    //  The first pass chose the darker accent for AA; the prototype (and every
+    //  vendor line on the product cards) is the lighter #f26522, and the client
+    //  compares by eye. 12px bold uppercase on white.
+    .hm-pdp .hm-pdp__seller-name,
+    .hm-pdp .hm-pdp__seller-name:link,
+    .hm-pdp .hm-pdp__seller-name:visited { color: var(--hm-accent); }
+
+    //  -----------------------------------------------------------------------
+    //  PRODUCT 3 — the seller box: warm off-white, filled star
+    //  -----------------------------------------------------------------------
+    .hm-pdp .hm-vendor-card__rating .hm-icon {
+        color: #c85c2c;
+        fill: currentColor;
+    }
+
+    //  -----------------------------------------------------------------------
+    //  PRODUCT 4 — Related / More like this: one card per row
+    //  -----------------------------------------------------------------------
+    //  (0,4,0), the same weight as the two-column rule at 1023px; later wins.
+    .hm-pdp .block.related .product-items,
+    .hm-pdp .block.upsell .product-items { grid-template-columns: minmax(0, 1fr); }
+
+    //  -----------------------------------------------------------------------
+    //  PRODUCT 5 — customer reviews: photo strip and toolbar
+    //  -----------------------------------------------------------------------
+    //  Lof_ProductReviews ships the photos as `.lof-review-customize` and its
+    //  script rebuilds them at runtime into `.lof-review-gallery > ul.owl-
+    //  carousel` — so the owl carousel DOES initialise on a phone: its
+    //  prev/next boxes overlaid the photos, its dots hung below, the stage ran
+    //  past the viewport, and each thumbnail took its owl-item width (a 500px
+    //  PNG in the third review rendered full size). The carousel is flattened
+    //  into a wrapping strip of 8rem thumbnails; the lightbox links are
+    //  untouched. Inline owl styles need the !important.
+    .review-list {
+        .lof-review-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .8rem;
+            margin-block: var(--hm-space-3);
+        }
+
+        .lof-review-gallery .owl-carousel {
+            display: block;
+            flex: 1 1 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .lof-review-gallery .owl-stage-outer { overflow: visible; }
+
+        .lof-review-gallery .owl-stage {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .8rem;
+            inline-size: auto !important;
+            transform: none !important;
+        }
+
+        .lof-review-gallery .owl-item {
+            flex: 0 0 auto;
+            inline-size: auto !important;
+        }
+
+        .lof-review-gallery .item,
+        .lof-review-gallery .gallery-item,
+        .lof-review-gallery .gallery-image {
+            display: block;
+            inline-size: auto;
+            margin: 0;
+        }
+
+        .lof-review-gallery .gallery-image img {
+            block-size: 8rem;
+            border-radius: .6rem;
+            display: block;
+            inline-size: 8rem;
+            max-inline-size: none;
+            object-fit: cover;
+        }
+
+        .lof-review-gallery .owl-nav,
+        .lof-review-gallery .owl-dots { display: none; }
+
+        //  The sort select and keyword field live in the list's .block-title
+        //  beside the heading; one control per line, full width.
+        .block-title {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--hm-space-3);
+
+            > strong,
+            > h2,
+            > h3 { flex: 1 1 100%; }
+        }
+
+        .sort-order-reviews,
+        .filter-reviews,
+        .limiter {
+            align-items: stretch;
+            display: flex;
+            flex: 1 1 100%;
+            flex-direction: column;
+            gap: .4rem;
+            margin: 0;
+        }
+
+        .lof-sort-order,
+        .lof-keyword,
+        .limiter-options {
+            flex: 1 1 auto;
+            inline-size: 100%;
+            max-inline-size: 100%;
+            min-inline-size: 0;
+        }
+    }
+}
+
+//  PRODUCT 3 (continued) — the seller box itself. Prototype: warm off-white
+//  #f6f4f1 with a black/8% hairline and 20px padding; ours was the grey
+//  surface tint with the lighter hairline.
+@media (max-width: 767px) {
+    .hm-pdp .vendor-profile-container {
+        background: #f6f4f1;
+        border-color: rgba(0, 0, 0, .08);
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  Loose ends after the client review
+//  ---------------------------------------------------------------------------
+@media (max-width: 767px) {
+    //  Full-card price row: "EGP 2,250" at 16px bold plus "EGP 3,000" at 12px
+    //  ran 7px past the 143px card interior and the old price dropped under the
+    //  price; the prototype keeps both on one line. One step down on the price
+    //  keeps the pair on a line up to five digits. The old price stays at the
+    //  theme's 12px floor.
+    .hm-rail--hm-home-deals .product-item .price-box,
+    .hm-rail--hm-home-featured .product-item .price-box,
+    .hm-plp .products-grid .product-item .price-box,
+    .hm-pdp .block.related .product-item .price-box,
+    .hm-pdp .block.upsell .product-item .price-box {
+        column-gap: .4rem;
+        row-gap: 0;
+
+        .price { font-size: 1.5rem; letter-spacing: -.01em; }
+        .old-price .price { font-size: 1.2rem; letter-spacing: 0; }
+    }
+
+    //  Header cart label: the prototype's phone header reads "Cart", the
+    //  desktop keeps "My Cart". Both strings render from minicart.phtml and
+    //  swap here, so each is translated on its own.
+    //  (0,5,0) so the phone swap out-ranks the unconditional hide below,
+    //  which follows it in source order.
+    .hm-page .minicart-wrapper .action.showcart .hm-minicart__label--full { display: none; }
+    .hm-page .minicart-wrapper .action.showcart .hm-minicart__label--short { display: inline; }
+}
+
+.minicart-wrapper .action.showcart .hm-minicart__label--short { display: none; }

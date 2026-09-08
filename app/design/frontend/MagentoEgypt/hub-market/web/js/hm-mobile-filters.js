@@ -49,7 +49,15 @@ define(['jquery', 'mage/translate'], function ($, $t) {
             $toggle.attr('aria-expanded', open ? 'true' : 'false');
 
             if (open) {
-                $scrim = $('<div class="hm-filters-scrim"></div>').appendTo('body').on('click', function () {
+                // Appended beside the sidebar, NOT to <body>: `.page-products
+                // .columns` is `position: relative; z-index: 1`, a stacking
+                // context of its own, so the drawer's z-index 1000 only ranks
+                // inside it. A body-level scrim (999, root context) painted
+                // OVER the drawer and swallowed every tap, and the sticky
+                // header (root, 90) covered its top 500px. Sharing the
+                // context fixes the first; _hm-mobile-parity.less raises
+                // .columns above the header while open for the second.
+                $scrim = $('<div class="hm-filters-scrim"></div>').appendTo($sidebar.parent()).on('click', function () {
                     setOpen(false);
                 });
                 //  Move focus into the drawer so a keyboard or screen-reader

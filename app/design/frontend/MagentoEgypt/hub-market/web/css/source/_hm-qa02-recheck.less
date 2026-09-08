@@ -1,0 +1,330 @@
+//
+//  Hub Market — QA cycle 2 re-check (2026-09-08, desktop)
+//  _____________________________________________
+//
+//  The client walked the QA02 list again and saw open points. Every rule here
+//  is a point that was still short of the prototype on the live desktop site
+//  when re-measured, keyed to the QA02 item number. Imported last.
+//
+
+//  8 — "* Required Fields" on the login form. blank prints it from
+//  `.login-container .fieldset:after` (0,2,1) and the theme's earlier
+//  `.fieldset:after { display: none }` (0,1,1) never out-ranked it, so the
+//  legend the client boxed was still there. The prototype has no such note.
+.fieldset[data-hasrequired]:after,
+.login-container .fieldset:after,
+.form-login .fieldset:after,
+.form-create-account .fieldset:after,
+.form-edit-account .fieldset:after,
+.form-address-edit .fieldset:after { display: none; }
+
+//  3A — the product image fills the stage. Fotorama sizes the <img> to its
+//  natural pixels and centres it, so a 400px source sat in a 592px white box
+//  — the white space the client crossed out. The prototype's stage is a
+//  filled square (object-cover). Fullscreen keeps fotorama's own sizing.
+.hm-pdp .fotorama:not(.fotorama--fullscreen) .fotorama__stage__frame .fotorama__img {
+    block-size: 100% !important;
+    inline-size: 100% !important;
+    inset: 0 !important;
+    max-inline-size: none;
+    object-fit: cover;
+    transform: none !important;
+}
+
+//  3A / 3B — the seller line above the title is the accent orange at every
+//  width (the prototype: "TECHGEAR PRO ✓" in #f26522). It was grey on desktop.
+.hm-pdp .hm-pdp__seller-name,
+.hm-pdp .hm-pdp__seller-name:link,
+.hm-pdp .hm-pdp__seller-name:visited { color: var(--hm-accent); }
+
+//  1H — Best Selling cards carry no wishlist heart in the prototype (zero
+//  buttons on the card); ours revealed one on hover.
+.hm-rail--hm-home-bestsellers.block.widget .product-items .action.towishlist.hm-card__wish { display: none; }
+
+//  1I — brand tiles: the prototype's mark sits in a 40px pastel circle at every
+//  width, not only on phones.
+.hm-brands__link { gap: .8rem; }
+
+.hm-brands__img {
+    background: fade(#1428a0, 8%);
+    block-size: 4rem;
+    border-radius: 50%;
+    box-sizing: border-box;
+    inline-size: 4rem;
+    max-inline-size: 4rem;
+    object-fit: contain;
+    padding: .7rem;
+}
+
+.hm-brands__item:nth-child(4n+2) .hm-brands__img { background: fade(#ef4444, 8%); }
+.hm-brands__item:nth-child(4n+3) .hm-brands__img { background: fade(#f59e0b, 10%); }
+.hm-brands__item:nth-child(4n+4) .hm-brands__img { background: fade(#10b981, 10%); }
+
+//  1J — "the vendor's picture in its natural place": the prototype's avatar
+//  straddles the bottom edge of the banner (56px, white ring); ours sat fully
+//  below it.
+.hm-stores--hm-home-topvendors {
+    .hm-stores__avatar-wrap {
+        margin-block-start: -3.2rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hm-stores__avatar {
+        background: var(--hm-surface);
+        block-size: 5.6rem;
+        border: 3px solid var(--hm-surface);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .12);
+        inline-size: 5.6rem;
+    }
+}
+
+//  1A — "the orange used throughout the site doesn't match the theme". The
+//  section links ("View All →", "All Bundles →") and the Bundle Deals nav item
+//  were the darker text orange / #ff6b00; the prototype uses one #f26522 for
+//  all of them, on light and navy bands alike.
+.hm-page .hm-section__more,
+.hm-page .hm-section__more:link,
+.hm-page .hm-section__more:visited { color: var(--hm-accent); }
+.hm-page .hm-section__more:hover { color: var(--hm-accent-strong); }
+.hm-page .hm-nav__promo,
+.hm-page .hm-nav__promo:link,
+.hm-page .hm-nav__promo:visited { color: var(--hm-accent); }
+
+//  2B — list view "isn't showing up evenly": rows took their content height
+//  (204px without a swatch strip, 246px with one). One height for all rows.
+.hm-plp .products.wrapper.products-list .product-item-info { min-block-size: 24.6rem; }
+
+//  4 — cart: the configurable options list read as a block of label/value
+//  pairs under the description (crossed out by the client). One muted line.
+.cart.item .item-options {
+    color: var(--hm-foreground-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1.2rem;
+    gap: .2rem 1.2rem;
+    margin: .4rem 0 0;
+
+    dt,
+    dd { display: inline; margin: 0; }
+    dt { font-weight: 600; }
+    dt::after { content: ':'; }
+}
+
+//  3B — configurable options, drawn as the prototype draws them
+//  ---------------------------------------------
+//  Label row (COLOR … Select Color), a full-width select, then the chips.
+//  js/hm-configurable-options.js builds the select and the right-hand hint
+//  from Magento's swatch chips and keeps them in step.
+.hm-pdp .product-options-wrapper .swatch-attribute {
+    display: grid;
+    gap: .8rem 1.2rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    margin-block-end: var(--hm-space-4);
+
+    .swatch-attribute-label {
+        color: var(--hm-foreground);
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .hm-option__hint {
+        color: var(--hm-foreground-muted);
+        font-size: 1.2rem;
+        text-align: end;
+    }
+
+    //  Magento's own "selected value" echo duplicates the hint.
+    .swatch-attribute-selected-option { display: none; }
+
+    .hm-option__select,
+    .swatch-select,
+    .swatch-attribute-options { grid-column: 1 / -1; }
+
+    .swatch-attribute-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .8rem;
+        margin: 0;
+    }
+
+    //  Chips: outlined, text only — the prototype names colours rather than
+    //  painting them, so colour swatches show their label too.
+    //  (0,5,0) with the extra .swatch-attribute-options hop: Magento_Swatches
+    //  and _hm-plp both size these at (0,4,0) and were winning.
+    .swatch-attribute-options .swatch-option,
+    .swatch-attribute-options .swatch-option.text,
+    .swatch-attribute-options .swatch-option.color,
+    .swatch-attribute-options .swatch-option.image {
+        //  Image swatches arrive with an inline `style="width:30px; height:20px"`
+        //  from the renderer, so the box sizes need !important to win.
+        background: var(--hm-surface) !important;
+        background-image: none !important;
+        block-size: auto !important;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: .8rem;
+        box-shadow: none;
+        box-sizing: border-box;
+        color: var(--hm-foreground);
+        font-size: 1.2rem;
+        font-weight: 500;
+        inline-size: auto !important;
+        line-height: 1.6rem;
+        margin: 0;
+        min-block-size: 0 !important;
+        min-inline-size: 0 !important;
+        outline: 0;
+        overflow: visible;
+        padding: .8rem 1.2rem;
+        text-align: center;
+
+        &.color::after,
+        &.image::after { content: attr(data-option-label); }
+
+        &:hover:not(.disabled) { border-color: var(--hm-primary); }
+
+        &.selected {
+            background: var(--hm-primary) !important;
+            border-color: var(--hm-primary);
+            color: var(--hm-on-primary, #fff);
+        }
+
+        &.disabled {
+            color: var(--hm-foreground-muted);
+            cursor: not-allowed;
+            opacity: .6;
+            text-decoration: line-through;
+            &::after { text-decoration: line-through; }
+        }
+    }
+}
+
+.hm-pdp .product-options-wrapper .hm-option__select,
+.hm-pdp .product-options-wrapper select.swatch-select,
+.hm-pdp .product-options-wrapper select.super-attribute-select {
+    background-color: var(--hm-surface);
+    block-size: 4.8rem;
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: 1rem;
+    color: var(--hm-foreground);
+    font-size: 1.4rem;
+    inline-size: 100%;
+    padding: 0 1.6rem;
+}
+
+//  Add to Cart waits for the options: greyed and inert, as the prototype.
+.hm-pdp #product-addtocart-button[disabled],
+.hm-pdp #product-addtocart-button.hm-is-gated {
+    background: var(--hm-neutral-200, #e5e7eb);
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--hm-foreground-muted);
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+//  4 — cart: the shipping estimator stays in the DOM (its template defines
+//  window.checkoutConfig for the cart scripts) but the prototype's summary
+//  has no "Estimate Shipping and Tax" accordion.
+.cart-summary .block.shipping,
+.cart-summary #block-shipping { display: none; }
+
+//  ---------------------------------------------------------------------------
+//  6 — Add New Address: the number sitting under the country flag
+//  ---------------------------------------------------------------------------
+//  The cycle-2 rule was scoped to `.customer-address-form` / `.account[class*=
+//  'address']` — body classes this page does not reliably carry — so it could
+//  miss entirely. Scope instead on the form itself and on `vsms-field-container`,
+//  the class the SMS module's own script puts on the field it builds, so the
+//  rule cannot be missed whatever the body ends up called.
+//
+//  Specificity, not source order, is what settles this one: the page pulls in
+//  `Vnecoms_Sms::css/intlTelInput.css` and `::css/styles.css` from its own
+//  layout, and those land AFTER the theme's sheets in <head>.
+.form-address-edit,
+.vsms-field-container {
+    //  The widget wraps the field in an inline-block that shrink-wraps, and the
+    //  vendor pins the input to 250px on this page. Full width, as every other
+    //  field on the form.
+    .intl-tel-input {
+        display: block;
+        inline-size: 100%;
+    }
+
+    //  PHYSICAL padding, deliberately — the twin of the checkout rule. The flag
+    //  is pinned `left: 0` in both directions, so a logical padding-inline-start
+    //  opens the gap on the wrong side in Arabic and leaves the digits under the
+    //  flag. 46px of flag (allow-dropdown) plus 10px.
+    .intl-tel-input input,
+    input.mobile-number {
+        box-sizing: border-box;
+        inline-size: 100%;
+        padding-left: 5.6rem;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  7 — "The wishlist isn't showing up properly"
+//  ---------------------------------------------------------------------------
+//  Magento/blank still ships LUMA'S ROW LAYOUT for this grid: an 80px photo
+//  floated left, the name/price indented 95px to clear it, a floated
+//  box-tocart, and the qty field hidden outright. Those rules compile AFTER the
+//  theme's own wishlist block (offset ~737k against ~534k in styles-m.css), so
+//  inside our card grid the photo floated into a 200px column, the name started
+//  95px in with nothing to its left, and the quantity control was gone.
+//
+//  Import order cannot win this one, so every rule below carries `.hm-page` to
+//  sit one class above blank's. Physical margins where blank set physical
+//  margins — zeroing `margin-inline-start` would leave its `margin-left: 95px`
+//  standing in Arabic.
+.hm-page {
+    .products-grid.wishlist {
+        margin-bottom: var(--hm-space-6);
+        margin-right: 0;
+
+        .product-item {
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius);
+            box-sizing: border-box;
+            inline-size: auto;
+            padding: var(--hm-space-3);
+        }
+
+        //  blank gives the first row its own top hairline for the row list.
+        .product-item:first-child { border-top: 1px solid var(--hm-border-subtle); }
+
+        .product-item-photo {
+            display: block;
+            float: none;
+            margin: 0 0 var(--hm-space-3);
+        }
+
+        .product-image-container { max-width: none; }
+
+        .product-item-name,
+        .product-item-description,
+        .product-item .price-box,
+        .product-item-tooltip { margin-left: 0; }
+
+        .product-item .box-tocart {
+            float: none;
+            margin-right: 0;
+        }
+
+        //  Core renders a quantity control on every saleable wishlist item;
+        //  blank hides it because its row layout had nowhere to put it.
+        .product-item .field.qty { display: block; }
+
+        //  blank spaced these two links with `margin-right: 15px`, which the
+        //  line above cancels; a gap on the row replaces it and mirrors in
+        //  Arabic, where a physical right margin would sit on the wrong side.
+        .product-item-inner > .product-item-actions {
+            display: flex;
+            gap: var(--hm-space-4);
+        }
+
+        .product-item-actions .action { margin-right: 0; }
+    }
+}

@@ -62,7 +62,11 @@ $hmVendors = $block->getData('vendor_names');
         $viewMode = 'list';
         $imageDisplayArea = 'category_page_list';
         $showDescription = true;
-        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::FULL_VIEW;
+        //  QA cycle 2 item 2-B: the list rows used the FULL summary, which for an
+        //  unreviewed product prints "Be the first to review this product" where
+        //  every grid card shows an empty five-star row and (0). Same short
+        //  summary in both modes, so the rows line up.
+        $templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
     }
     /**
      * Position for actions regarding image size changing in vde if needed

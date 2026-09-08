@@ -32,7 +32,16 @@
          */
         ?>
         <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-cart"/></svg>
-        <span class="text"><?= $block->escapeHtml(__('My Cart')) ?></span>
+        <?php /*
+            Two labels, one shown at a time: the prototype's phone header reads
+            "Cart" (CL036-DEV01.01 item 1), the desktop keeps "My Cart". Swapped
+            by _hm-mobile-parity.less below 768px so each string is translated on
+            its own rather than rewritten with CSS.
+        */ ?>
+        <span class="text">
+            <span class="hm-minicart__label hm-minicart__label--full"><?= $block->escapeHtml(__('My Cart')) ?></span>
+            <span class="hm-minicart__label hm-minicart__label--short"><?= $block->escapeHtml(__('Cart')) ?></span>
+        </span>
         <?php
         /*
          * Hub Market: ONE change from core — the live-region attributes below.

@@ -31,4 +31,12 @@ $accountUrl  = $block->getUrl('customer/account');
     <div class="hm-header__action hm-header__action--cart">
         <?= $block->getChildHtml('minicart') ?>
     </div>
+
+    <?php /*
+        Phones (CL036-DEV01.01 item 1): the prototype's phone header is logo /
+        cart / hamburger. The account and wishlist links above are hidden below
+        768px by _hm-mobile-parity.less and reappear at the top of the category
+        sheet (topmenu.phtml, .hm-nav__quick); the hamburger itself is the
+        category <details>' own <summary>, lifted into this row by CSS.
+    */ ?>
 </div>

@@ -24,12 +24,179 @@ declare(strict_types=1);
 $columnsLimit = $block->getColumnsLimit() ?: 0;
 $menuHtml = trim($block->getHtml('level-top', 'submenu', $columnsLimit));
 $bundlesUrl = $block->getUrl('bundles');
+$searchUrl = $block->getUrl('search');
+/*
+ * Inline category links (Figma: the row of categories in the nav bar).
+ * Read from the SAME menu tree the panel renders, so they cannot drift
+ * from it, and capped so the bar does not wrap on a laptop. Categories
+ * with no children still appear — the cap is about width, not depth.
+ */
+/*
+ * Category icons for this bar — EMOJI, matching the reference.
+ *
+ * MEASURED, NOT INFERRED: doze-coyote-58038022.figma.site renders this bar
+ * as 🛒 Grocery, 💊 Pharmacy, 🛋️ Furniture, 👗 Fashion, 📦 FMCG,
+ * 🧸 Kids & Toys, ✨ Cosmetics, 💻 Electronics & Tech, 🏠 Home Appliances,
+ * 🎁 Bundle Deals — nine emoji, zero SVG.
+ *
+ * These were briefly sprite symbols because QA cycle 1 asked to "update
+ * category icons to match Figma SVGs". The reference has no SVGs here; the
+ * defect QA actually saw was the GENERIC TAG fallback, caused by the map
+ * below being keyed on url-keys this catalogue does not use. The keying is
+ * fixed and the glyphs are back to the reference's.
+ *
+ * KEYED ON THE URL-KEY, NOT THE DISPLAY NAME. Four categories have a name
+ * that diverges from their key, because the names were changed to Figma's
+ * wording and the keys deliberately were not — changing those would 301
+ * live category URLs for a label change:
+ *
+ *     super-market -> "Grocery"              games -> "Kids & Toys"
+ *     health       -> "Cosmetics"      electronics -> "Electronics & Tech"
+ *
+ * Keys are also the only stable identifier across store views: the Arabic
+ * names are "ملابس", "حقائب", "أحذية", so a name-matched icon appeared in
+ * English and vanished entirely on /ar/. Verified: both locales emit
+ * /clothes.html and /super-market.html.
+ */
+$hmNavIcons = [
+    //  Exactly the reference's glyphs, in its own pairing.
+    'super-market'    => "\u{1F6D2}",          // 🛒  Grocery
+    'pharmacy'        => "\u{1F48A}",          // 💊  Pharmacy
+    'furniture'       => "\u{1F6CB}\u{FE0F}",  // 🛋️  Furniture
+    'clothes'         => "\u{1F457}",          // 👗  Fashion
+    'fmcg'            => "\u{1F4E6}",          // 📦  FMCG
+    'games'           => "\u{1F9F8}",          // 🧸  Kids & Toys
+    'health'          => "\u{2728}",           // ✨  Cosmetics
+    'electronics'     => "\u{1F4BB}",          // 💻  Electronics & Tech
+    'home-appliances' => "\u{1F3E0}",          // 🏠  Home Appliances
+    //  Not in the reference bar, mapped so they never fall back to the tag.
+    'bags'            => "\u{1F45C}",
+    'shoes'           => "\u{1F45F}",
+    'mobile-tablet'   => "\u{1F4F1}",
+    'computer'        => "\u{1F4BB}",
+    'sports'          => "\u{26BD}",
+];
+
+/*
+ * THE BAR IS AN EXPLICIT LIST, IN THE REFERENCE'S ORDER — not the first N
+ * children by catalogue position.
+ *
+ * QA cycle 1 named the order and asked for Bags and Shoes to come out. They
+ * were never chosen: the bar took the first nine menu children, and Bags and
+ * Shoes sit at positions 8 and 9 while Figma's own categories sit at 17-29
+ * and never reached the cap. Ordering by hand here rather than by editing
+ * catalogue positions keeps the change on this bar — positions also drive
+ * the category tree, the sitemap and the chip row.
+ *
+ * `pharmacy` and `fmcg` DO NOT EXIST in this catalogue. They are listed
+ * because the reference has them and because a key with no matching category
+ * is simply skipped, so they appear in the right slot the day they are
+ * created. Seven of the reference's nine render today.
+ */
+$hmNavOrder = [
+    'super-market', 'pharmacy', 'furniture', 'clothes', 'fmcg',
+    'games', 'health', 'electronics', 'home-appliances',
+];
+
+/*
+ * The url-key, recovered from the node's URL. The menu tree carries no key
+ * of its own — node ids are "category-node-101" — and the last path segment
+ * is the key by construction on this install (no nested category URLs; the
+ * suffix is .html).
+ */
+$hmUrlKey = static function (string $url): string {
+    $path = (string) parse_url($url, PHP_URL_PATH);
+    $last = basename(rtrim($path, '/'));
+
+    return strtolower(preg_replace('/\.html?$/i', '', $last));
+};
+
+$hmByKey = [];
+foreach ($block->getMenu()->getChildren() as $child) {
+    // NOT filtered on getIsActive(): on a menu node that flag means
+    // "the current page is inside this branch", not "this category is
+    // enabled". Filtering on it returned an empty row on every page
+    // except the one you were already in.
+    $key = $hmUrlKey((string) $child->getUrl());
+    if ($key !== '') {
+        $hmByKey[$key] = $child;
+    }
+}
+
+$inline = [];
+foreach ($hmNavOrder as $key) {
+    if (!isset($hmByKey[$key])) {
+        continue;   // not in this catalogue — see the note on $hmNavOrder
+    }
+    $child = $hmByKey[$key];
+    $inline[] = [
+        'name' => (string) $child->getName(),
+        'url'  => (string) $child->getUrl(),
+        'icon' => $hmNavIcons[$key] ?? '',
+    ];
+}
+
+
+/*
+ * THE PHONE SHEET'S ROWS, with the same emoji the nav bar uses.
+ *
+ * CL036-DEV01.01 item 2: "the category, when we open it, doesn't show
+ * correctly. We need it to appear like the theme." The prototype's sheet is a
+ * flat list of top-level categories, each led by its glyph — the same ten rows
+ * as the bar above it. The tree itself comes from the menu block as a finished
+ * HTML string, so the glyph is spliced into each top-level anchor rather than
+ * rendered: re-implementing getHtml() here to add one span would fork the menu.
+ *
+ * Keyed on the node's own URL, which is what the anchor carries verbatim
+ * (`<a href="https://…/super-market.html" class="level-top">`) and which
+ * $hmByKey already holds for every top-level category. One replacement per
+ * category, on the FIRST match only, so a child anchor pointing at the same
+ * URL cannot pick up a second glyph.
+ *
+ * Untouched when the category has no glyph — Bags, Shoes and the rest simply
+ * render as text rows, as they do in the bar.
+ */
+$hmPanelHtml = $menuHtml;
+
+foreach ($hmByKey as $hmKey => $hmChild) {
+    $hmIcon = $hmNavIcons[$hmKey] ?? '';
+    if ($hmIcon === '') {
+        continue;
+    }
+
+    $hmPanelHtml = (string) preg_replace(
+        '~(<a\b[^>]*href="' . preg_quote((string) $hmChild->getUrl(), '~') . '"[^>]*>)~',
+        '$1<span class="hm-nav__panel-icon" aria-hidden="true">' . $hmIcon . '</span>',
+        $hmPanelHtml,
+        1
+    );
+}
 ?>
 <?php if ($menuHtml !== ''): ?>
 <nav class="hm-nav" aria-label="<?= $escaper->escapeHtmlAttr(__('Category navigation')) ?>">
     <div class="hm-nav__inner">
 
-        <details class="hm-nav__menu" data-mage-init='{"HubMarket_DynamicMenu/js/category-menu":{}}'>
+        <?php
+        /*
+         * TWO controls, one shown at a time — see the breakpoint pair in
+         * _hm-nav.less.
+         *
+         * Figma makes "All Categories" a plain link to /search: no hamburger, no
+         * chevron, no dropdown (verified by probing the reference — hovering it
+         * adds no nodes, it really is just an anchor). That is what renders from
+         * 992px up.
+         *
+         * Below 992px the disclosure below stays, because .hm-nav__inline is
+         * display:none there and the panel is then the ONLY category navigation
+         * the storefront has. Swapping it for a link at every width would match
+         * the reference and leave phones with no way to browse categories at all.
+         */
+        ?>
+        <a class="hm-nav__all" href="<?= $escaper->escapeUrl($searchUrl) ?>">
+            <?= $escaper->escapeHtml(__('All Categories')) ?>
+        </a>
+
+        <details class="hm-nav__menu" data-mage-init='{"HubMarket_DynamicMenu/js/category-menu":{},"js/hm-header-menu":{}}'>
             <summary class="hm-nav__trigger" aria-controls="hm-category-panel">
                 <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-menu"/></svg>
                 <span class="hm-nav__trigger-label"><?= $escaper->escapeHtml(__('All Categories')) ?></span>
@@ -40,97 +207,49 @@ $bundlesUrl = $block->getUrl('bundles');
 
             <div class="hm-nav__panel" id="hm-category-panel">
                 <div class="hm-nav__panel-inner">
+                    <?php /*
+                        Phone-only: the header hides Account and Wishlist below
+                        768px (the prototype's phone header is logo / cart /
+                        hamburger), so they live at the top of the menu sheet.
+                        display:none from 768px up — _hm-mobile-parity.less.
+                    */ ?>
+                    <ul class="hm-nav__quick" aria-label="<?= $escaper->escapeHtmlAttr(__('Your account')) ?>">
+                        <li>
+                            <a class="hm-nav__quick-link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
+                                <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-account"/></svg>
+                                <?= $escaper->escapeHtml(__('Account')) ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="hm-nav__quick-link" href="<?= $escaper->escapeUrl($block->getUrl('wishlist')) ?>">
+                                <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>
+                                <?= $escaper->escapeHtml(__('Wishlist')) ?>
+                            </a>
+                        </li>
+                    </ul>
                     <ul class="hm-nav__grid navigation" data-action="navigation">
-                        <?= /* @noEscape */ $menuHtml ?>
+                        <?php /* The sheet's first row in the prototype, above the categories. */ ?>
+                        <li class="level0 level-top hm-nav__panel-all">
+                            <a class="level-top" href="<?= $escaper->escapeUrl($searchUrl) ?>">
+                                <span><?= $escaper->escapeHtml(__('All Categories')) ?></span>
+                            </a>
+                        </li>
+                        <?= /* @noEscape */ $hmPanelHtml ?>
                         <?= $block->getChildHtml() ?>
                     </ul>
                 </div>
             </div>
         </details>
 
-        <?php
-        /*
-         * Inline category links (Figma: the row of categories in the nav bar).
-         * Read from the SAME menu tree the panel renders, so they cannot drift
-         * from it, and capped so the bar does not wrap on a laptop. Categories
-         * with no children still appear — the cap is about width, not depth.
-         */
-        /*
-         * Category emoji, as Figma shows in this bar.
-         *
-         * Figma's categories are NOT this store's categories — it draws Grocery,
-         * Pharmacy, FMCG, Kids & Toys, Cosmetics; this catalogue has clothes, bags,
-         * shoes, mobile&tablet, sports. So four glyphs are Figma's exact choices for
-         * the concepts that do overlap (furniture, computer, home appliances,
-         * fashion) and the rest are picked to match its visual vocabulary.
-         *
-         * Matched on a NORMALISED name so an admin renaming "computer" to
-         * "Computers" does not silently drop the icon. Unknown categories simply get
-         * no emoji rather than a wrong one.
-         */
-        $hmEmojiMap = [
-            'clothes'    => "\u{1F457}",  // 👗  Figma: Fashion
-            'fashion'    => "\u{1F457}",  // 👗
-            'bags'       => "\u{1F45C}",  // 👜
-            'shoes'      => "\u{1F45F}",  // 👟
-            'furniture'  => "\u{1F6CB}\u{FE0F}", // 🛋️  Figma exact
-            'mobile'     => "\u{1F4F1}",  // 📱
-            'computer'   => "\u{1F4BB}",  // 💻  Figma exact
-            'sports'     => "\u{26BD}",   // ⚽
-            'home'       => "\u{1F3E0}",  // 🏠  Figma exact
-            'grocery'    => "\u{1F6D2}",  // 🛒  Figma exact
-            'beauty'     => "\u{2728}",   // ✨  Figma: Cosmetics
-            'toys'       => "\u{1F9F8}",  // 🧸
-            'pharmacy'   => "\u{1F48A}",  // 💊
-        ];
-        /*
-         * MATCH ON THE URL, NOT THE DISPLAY NAME.
-         *
-         * The first version matched the category name, which meant the icons
-         * appeared in English and vanished entirely on /ar/ — the Arabic names are
-         * "ملابس", "حقائب", "أحذية", none of which contain "clothes" or "bags".
-         *
-         * URL keys are NOT localised on this install (verified: both locales emit
-         * /clothes.html, /bags.html, /mobile-tablet.html), so the URL is the stable
-         * identifier across store views. The name is still checked as a fallback so
-         * a category whose url-key does not match can still be mapped.
-         */
-        $hmCategoryEmoji = static function (string $name, string $url) use ($hmEmojiMap): string {
-            $haystack = strtolower(trim($url) . ' ' . trim($name));
-            foreach ($hmEmojiMap as $needle => $glyph) {
-                if (str_contains($haystack, $needle)) {
-                    return $glyph;
-                }
-            }
-            return '';
-        };
-
-        $inline = [];
-        foreach ($block->getMenu()->getChildren() as $child) {
-            // NOT filtered on getIsActive(): on a menu node that flag means
-            // "the current page is inside this branch", not "this category is
-            // enabled". Filtering on it returned an empty row on every page
-            // except the one you were already in.
-            $inline[] = [
-                'name'  => (string) $child->getName(),
-                'url'   => (string) $child->getUrl(),
-                'emoji' => $hmCategoryEmoji((string) $child->getName(), (string) $child->getUrl()),
-            ];
-            if (count($inline) >= 8) {
-                break;
-            }
-        }
-        ?>
         <?php if ($inline): ?>
             <ul class="hm-nav__inline">
                 <?php foreach ($inline as $item): ?>
                     <li class="hm-nav__inline-item">
                         <a class="hm-nav__inline-link" href="<?= $escaper->escapeUrl($item['url']) ?>">
-                            <?php /* aria-hidden: a screen reader would otherwise read
-                                     "womans clothes clothes" — the glyph is decoration,
-                                     the link text already names the category. */ ?>
-                            <?php if ($item['emoji'] !== ''): ?>
-                                <span class="hm-nav__inline-icon" aria-hidden="true"><?= $escaper->escapeHtml($item['emoji']) ?></span>
+                            <?php /* aria-hidden: the glyph is decoration and the link
+                                     text already names the category. */ ?>
+                            <?php if ($item['icon'] !== ''): ?>
+                                <span class="hm-nav__inline-icon" aria-hidden="true"><?= $escaper->escapeHtml($item['icon']) ?></span>
                             <?php endif; ?>
                             <?= $escaper->escapeHtml($item['name']) ?>
                         </a>
@@ -139,8 +258,38 @@ $bundlesUrl = $block->getUrl('bundles');
             </ul>
         <?php endif; ?>
 
+        <?php
+        /*
+         * 🎁, matching the reference, which renders this as "🎁 Bundle Deals" in
+         * the same emoji system as the nine categories beside it.
+         *
+         * aria-hidden for the same reason as the category glyphs — a screen reader
+         * would otherwise announce "wrapped gift Bundle Deals".
+         */
+        ?>
+        <?php
+        /*
+         * A FLEX LINE BREAK, so Bundle Deals starts a second row.
+         *
+         * Measured on the reference: the nav band is 81px tall, the category row
+         * sits at y=101 and "🎁 Bundle Deals" at y=143, hard against the
+         * container's trailing edge. It is a row of its own, not a trailing item.
+         *
+         * Ours used to land on the SAME row and only because this catalogue is two
+         * categories short — with the reference's nine, the row would have wrapped
+         * on its own. Making the break explicit means the band looks right at seven
+         * categories and still looks right at nine, instead of silently changing
+         * shape when Pharmacy and FMCG are created.
+         *
+         * A zero-height 100%-basis flex item is the only way to force a line break
+         * in a flex row; `flex-basis: 100%` on the promo itself would stretch the
+         * anchor across the full width and make the whole strip clickable.
+         */
+        ?>
+        <span class="hm-nav__break" aria-hidden="true"></span>
+
         <a class="hm-nav__promo" href="<?= $escaper->escapeUrl($bundlesUrl) ?>">
-            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-bundle"/></svg>
+            <span class="hm-nav__promo-icon" aria-hidden="true"><?= $escaper->escapeHtml("\u{1F381}") ?></span>
             <?= $escaper->escapeHtml(__('Bundle Deals')) ?>
         </a>
     </div>

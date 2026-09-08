@@ -112,6 +112,30 @@
         -->
         <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
 
+        <!--
+            Cross-sell — "More Choices:" — REMOVED, per QA cycle 1: the reference
+            cart ends at the summary. Same story as the PDP upsell, and the same
+            reason config is not the lever: MGS_ThemeSettings supplies the title
+            (catalog/themesettings/crosssell_title), not the block.
+
+            checkout/cart/crosssell_enabled would also switch it off, but in
+            admin rather than in the theme — which would silently change the Luma
+            website on this same installation too.
+        -->
+        <referenceBlock name="checkout.cart.crosssell" remove="true"/>
+
+        <!--
+            QA cycle 2 item 4: the prototype's order summary is totals, the two
+            buttons and the trust bullets — no "Estimate Shipping and Tax" and
+            no "Apply Discount Code" accordions. Coupons still apply at checkout
+            payment step if that block is ever restored there.
+        -->
+        <!-- NOT the shipping estimator block: cart/shipping.phtml is where
+             window.checkoutConfig is written for every cart-page script, and
+             removing it threw "reading 'quoteData'" on load. It is hidden in
+             _hm-qa02-recheck.less instead. -->
+        <referenceBlock name="checkout.cart.coupon" remove="true"/>
+
         <move element="checkout.cart.shipping" destination="cart.summary" after="checkout.cart.summary.trust"/>
         <move element="checkout.cart.coupon"   destination="cart.summary" after="checkout.cart.shipping"/>
     </body>

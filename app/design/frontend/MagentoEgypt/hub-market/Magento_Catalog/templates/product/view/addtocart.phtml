@@ -46,6 +46,15 @@
         <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-info"/></svg>
         <?= $block->escapeHtml(__('Please select all options before adding to cart')) ?>
     </p>
+    <?php /* QA cycle 2 item 3-B: select + chips per attribute and a gated
+             Add to Cart — see web/js/hm-configurable-options.js. */ ?>
+    <script type="text/x-magento-init">
+    {
+        ".product-options-wrapper": {
+            "js/hm-configurable-options": {}
+        }
+    }
+    </script>
 <?php endif; ?>
 <div class="box-tocart">
     <div class="fieldset">
