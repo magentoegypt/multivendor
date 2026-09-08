@@ -972,24 +972,15 @@
 //  A product with options nests a SECOND element carrying the class `product`
 //  (`<div class="product options">`, the "View Details" accordion) inside the
 //  row, so the row rules above were landing on it too and stacking its toggle
-//  on top of its own content. Both are now `:not(.options)`, and the accordion
-//  gets the quiet treatment the prototype's summary implies.
+//  on top of its own content. Both are `:not(.options)` for that reason, and
+//  they stay that way even though the accordion itself is now hidden.
+//
+//  The prototype's summary is name / qty / price and nothing else, and the
+//  client asked for the accordion gone, so it does not render here. The chosen
+//  options are still shown on the cart page and on the order, which is where
+//  this row links to; only the duplicate in the summary goes.
 .hm-page.checkout-index-index .opc-block-summary .minicart-items .product-item .product.options {
-    display: block;
-    font-size: 1.2rem;
-    margin-block-start: .6rem;
-
-    .toggle {
-        color: var(--hm-neutral-600);
-        cursor: pointer;
-        font-size: 1.2rem;
-        font-weight: 500;
-    }
-
-    .content {
-        color: var(--hm-neutral-600);
-        margin-block-start: .4rem;
-    }
+    display: none;
 }
 
 //  Two leftovers, both from `_hm-figma.less`'s `.minicart-items .details-qty`,
@@ -1011,29 +1002,5 @@
     .minicart-items-wrapper {
         max-block-size: none;
         overflow: visible;
-    }
-
-    //  Option pairs read as one row each — "Size: S" over "Color: Blue" —
-    //  rather than wrapping mid-pair in a 275px column. Blank FLOATS both the
-    //  term and the value, which a grid does not honour: the floats reversed
-    //  the two columns, printing the value under the term it did not belong to.
-    //  So the floats come off and the pair stays inline, with a hard break
-    //  after each value.
-    .minicart-items .product.options .content .item-options {
-        display: block;
-        margin: 0;
-
-        dt, dd {
-            clear: none;
-            display: inline;
-            float: none;
-            font-size: 1.2rem;
-            font-weight: 400;
-            margin: 0;
-        }
-
-        dt { text-transform: capitalize; }
-        dt::after { content: ': '; }
-        dd::after { content: '\A'; display: inline; white-space: pre; }
     }
 }
