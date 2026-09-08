@@ -414,4 +414,54 @@
 
     .review-list select,
     .review-list input.lof-keyword { max-inline-size: 100%; }
+
+    //
+    //  PRODUCT item 1 — the gallery panel
+    //  ---------------------------------------------
+    //  "Change the way we display the images to match the theme." The strip is
+    //  handled in etc/view.xml; this is the stage behind the photo. Ours paints
+    //  it `--hm-surface` (pure white), so a cut-out product on a white file has
+    //  no edge at all and the image reads as floating in the page. The
+    //  prototype sits it on a warm panel — measured `bg-[#f6f4f1]`, square
+    //  corners, image `object-fit: cover` — which is what gives the gallery its
+    //  boundary there.
+    //
+    //  The literal rather than a token: none of the neutrals is this colour
+    //  (--hm-surface-muted is #f5f7fa, a cool grey) and inventing a token for
+    //  one prototype value would be worse than naming it here. Phone only,
+    //  because the desktop gallery was signed off in an earlier parity pass and
+    //  this ticket is the mobile one.
+    .hm-pdp .fotorama__stage,
+    .hm-pdp .fotorama__stage__frame { background: #f6f4f1; }
+
+    //
+    //  PRODUCT item 3 — the seller card
+    //  ---------------------------------------------
+    //  Same content as the prototype's, three steps heavier: a 7.2rem round
+    //  avatar against its 44px square, 24px of padding against 20px, and a
+    //  white panel where the prototype uses the same warm #f6f4f1 with a
+    //  hairline. The card ends up dominating the space under the buy box
+    //  instead of sitting quietly beneath it.
+    //
+    //  Measured off the prototype: `border border-black/8 p-5 bg-[#f6f4f1]`,
+    //  square corners, 44x44 cover avatar.
+    //
+    //  The root is Vnecoms' `.vendor-profile-container`, NOT `.hm-vendor-card`
+    //  — only the card's inner bits carry the theme's `hm-vendor-card__*`
+    //  classes, so a rule hung on the block root matches nothing and looks
+    //  applied while changing not one pixel. _hm-pdp.less already grids this
+    //  container and its 20px padding and square corners are right; the deltas
+    //  against the prototype are the panel tone (ours is --hm-surface-muted,
+    //  #f5f7fa, a COOL grey against the prototype's warm #f6f4f1) and the logo,
+    //  which runs 56px here against 44.
+    .hm-pdp .vendor-profile-container {
+        background: #f6f4f1;
+        border-color: rgba(0, 0, 0, .08);
+
+        .vendor-profile-logo img {
+            block-size: 4.4rem;
+            border-radius: 0;
+            inline-size: 4.4rem;
+        }
+    }
 }

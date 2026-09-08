@@ -26,6 +26,29 @@
                 <width>170</width>
                 <height>170</height>
             </image>
+
+            <!--
+                Related / upsell cards. Magento/blank asks for a 152x190 source
+                here, which was fine when the strip was four across; on a phone
+                the parity pass gives each related card the full column, so that
+                152px source was being painted into a 303px square — a 113x140
+                file stretched 2.7x. That blur and stretch is what the client
+                filed as the related products "showing with a lot of errors"
+                (CL036-DEV01.03 item 4).
+
+                300 square matches the largest box the card is drawn in and the
+                square aspect the grid uses, so nothing is upscaled or letter-
+                boxed. Cache entries regenerate on demand through pub/get.php,
+                as the note below explains — no mass resize.
+            -->
+            <image id="related_products_list" type="small_image">
+                <width>300</width>
+                <height>300</height>
+            </image>
+            <image id="upsell_products_list" type="small_image">
+                <width>300</width>
+                <height>300</height>
+            </image>
         </images>
     </media>
     <vars module="Magento_Catalog">
