@@ -1,0 +1,84 @@
+<?php
+/**
+ * Hub Market — final price, with the listing's struck-through regular price restored.
+ *
+ * Copy of Magento_Catalog::product/price/final_price.phtml with one line changed:
+ * how "is this discounted" is decided. See the sibling override under
+ * Smartwave_Dailydeals for the full write-up — that copy is the one actually
+ * rendering today, because Smartwave\Dailydeals\Plugin\FinalPricePlugin swaps
+ * this template out whenever daily deals are enabled, which they are.
+ *
+ * This file exists so the repair does not silently disappear the day someone
+ * turns daily deals off in admin. Keep the two in step.
+ *
+ * Short version: `FinalPriceBox::hasSpecialPrice()` answers from a pre-built
+ * `special_price_map` on listings instead of comparing prices, and
+ * `SpecialPriceBulkResolver::generateSpecialPriceMap()` builds that map with
+ * `price.website_id = $storeId` — a store id in a website id's place. The English
+ * store is id 3 on website 1, so nothing matched and every listing lost its
+ * regular price; Arabic is store 1 on website 1, so it happened to work.
+ *
+ * @var \Magento\Catalog\Pricing\Render\FinalPriceBox $block
+ */
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Framework\Pricing\Price\PriceInterface $priceModel */
+$priceModel = $block->getPriceType('regular_price');
+
+/** @var \Magento\Framework\Pricing\Price\PriceInterface $finalPriceModel */
+$finalPriceModel = $block->getPriceType('final_price');
+$idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
+$schema = ($block->getZone() == 'item_view') ? true : false;
+
+//  `hasSpecialPrice()` is still asked first, so a correct core keeps deciding and
+//  this clause short-circuits away once the resolver is fixed upstream.
+$hmHasSpecialPrice = $block->hasSpecialPrice();
+
+if (!$hmHasSpecialPrice && $priceModel && $finalPriceModel) {
+    $hmRegularAmount = $priceModel->getAmount();
+    $hmFinalAmount   = $finalPriceModel->getAmount();
+
+    if ($hmRegularAmount && $hmFinalAmount) {
+        $hmHasSpecialPrice = $hmFinalAmount->getValue() < $hmRegularAmount->getValue();
+    }
+}
+?>
+<?php if ($hmHasSpecialPrice) :?>
+    <span class="special-price">
+        <?= /* @noEscape */ $block->renderAmount($finalPriceModel->getAmount(), [
+            'display_label'     => __('Special Price'),
+            'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
+            'price_type'        => 'finalPrice',
+            'include_container' => true,
+            'schema' => $schema
+        ]); ?>
+    </span>
+    <span class="old-price">
+        <?= /* @noEscape */ $block->renderAmount($priceModel->getAmount(), [
+            'display_label'     => __('Regular Price'),
+            'price_id'          => $block->getPriceId('old-price-' . $idSuffix),
+            'price_type'        => 'oldPrice',
+            'include_container' => true,
+            'skip_adjustments'  => false
+        ]); ?>
+    </span>
+<?php else :?>
+    <?= /* @noEscape */ $block->renderAmount($finalPriceModel->getAmount(), [
+        'price_id'          => $block->getPriceId('product-price-' . $idSuffix),
+        'price_type'        => 'finalPrice',
+        'include_container' => true,
+        'schema' => $schema
+    ]); ?>
+<?php endif; ?>
+
+<?php if ($block->showMinimalPrice()) :?>
+    <?php if ($block->getUseLinkForAsLowAs()) :?>
+        <a href="<?= $block->escapeUrl($block->getSaleableItem()->getProductUrl()) ?>" class="minimal-price-link">
+            <?= /* @noEscape */ $block->renderAmountMinimal() ?>
+        </a>
+    <?php else :?>
+        <span class="minimal-price-link">
+            <?= /* @noEscape */ $block->renderAmountMinimal() ?>
+        </span>
+    <?php endif?>
+<?php endif; ?>
