@@ -194,6 +194,40 @@
             color: var(--hm-on-primary);
         }
 
+        //  The prototype's pager moves on straight arrows, not chevrons.
+        //  Magento/blank draws these two with an icon-font glyph on ::before
+        //  (`content: '\e608'` / `'\e617'` in icons-blank-theme, at 46px), so
+        //  there is no element to hang an SVG on — the arrow is a mask over
+        //  currentColor, which keeps the hover and RTL colour changes working.
+        //  Left and right are separate masks rather than one mask plus a flip,
+        //  so that the RTL rule in _hm-components.less can mirror BOTH without
+        //  having to undo a transform of ours.
+        .action.next::before,
+        .action.previous::before {
+            background-color: currentColor;
+            block-size: 1.6rem;
+            content: '';
+            display: block;
+            inline-size: 1.6rem;
+            margin: 0;
+            -webkit-mask-position: center;
+            mask-position: center;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+
+        .action.next::before {
+            -webkit-mask-image: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M5%2012h14M13%206l6%206-6%206%22/%3E%3C/svg%3E)";
+            mask-image: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M5%2012h14M13%206l6%206-6%206%22/%3E%3C/svg%3E)";
+        }
+
+        .action.previous::before {
+            -webkit-mask-image: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M19%2012H5M11%2018l-6-6%206-6%22/%3E%3C/svg%3E)";
+            mask-image: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M19%2012H5M11%2018l-6-6%206-6%22/%3E%3C/svg%3E)";
+        }
+
         a.page:hover { border-color: var(--hm-accent); color: var(--hm-accent-strong); }
     }
 }

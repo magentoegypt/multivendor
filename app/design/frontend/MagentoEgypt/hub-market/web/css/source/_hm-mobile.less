@@ -523,6 +523,58 @@
     .hm-pdp .product-info-main .page-title-wrapper h1 { font-size: 3rem; }
 
     //
+    //  The sticky header was taking 346px of an 844px viewport
+    //  ---------------------------------------------
+    //  Both this header and the prototype's pin the WHOLE thing, category band
+    //  included — that part is not the difference. The difference is the top
+    //  block: 156px here against the prototype's 108, and the whole of it comes
+    //  from three places, measured at 390:
+    //
+    //    cart control   64 vs 36 — .minicart-wrapper carries `margin-top: 12`
+    //                   and a 44px floor, so icon(20) + gap(2) + label(18)
+    //                   sits in a 64px tower. The prototype's is
+    //                   `flex flex-col items-center gap-0.5`, 36 tall.
+    //    row gap        24 vs 8  — the flex `gap: 12` AND the search field's
+    //                   own `margin-top: 12` both apply between the two rows.
+    //    search field   44 vs 40
+    //
+    //  12 + 36 + 8 + 40 + 12 = 108, which takes the pinned header to 297px
+    //  (35% of the viewport) — below the prototype's own 315.
+    //
+    //  The input stays at 16px even though the prototype's is 14: iOS Safari
+    //  zooms the page on focus for any input under 16px, and that trade is not
+    //  worth four pixels.
+    .hm-page .hm-header__inner { gap: .8rem; }
+    .hm-page .block-search { margin-block-start: 0; }
+
+    .hm-page .hm-header__action--cart {
+        min-block-size: 0;
+        padding: 0;
+    }
+
+    .hm-page .hm-header__action--cart .minicart-wrapper {
+        block-size: auto;
+        margin: 0;
+        min-block-size: 0;
+    }
+
+    .hm-page .hm-header__action--cart .action.showcart {
+        block-size: auto;
+        min-block-size: 0;
+    }
+
+    .hm-page .hm-search .input-text,
+    .hm-page .hm-search .action.search {
+        block-size: 4rem;
+        min-block-size: 0;
+    }
+
+    //  The hamburger is absolutely positioned and was centred on the 64px cart
+    //  tower (1.2 + (64 - 44) / 2 = 2.2rem). The row is 36 tall now, so the
+    //  centre moves: 1.2 + (36 - 44) / 2 = 0.8rem.
+    .hm-page .hm-nav__trigger { inset-block-start: .8rem; }
+
+    //
     //  HOME item 2 — the category sheet behind the hamburger
     //  ---------------------------------------------
     //  "The category, when we open it, doesn't show correctly. We need it to
@@ -745,6 +797,23 @@
             min-block-size: 3.6rem;
             min-inline-size: 3.6rem;
         }
+
+        //  ...and the two arrow cells are the SAME square as the numbers. They
+        //  came out 48 wide against the numbers' 36: blank draws their glyph at
+        //  46px in its icon font with `margin: 0 0 0 -6px`, and that oversized
+        //  content plus the cell's own inline padding pushed the box out. With
+        //  the glyph now a 16px mask, fixing the width and dropping the padding
+        //  is all that is left.
+        //  `margin: 0` is the other half of it: blank pushes these two off the
+        //  numbers with `.pages .action.next { margin-left: 12px }` and
+        //  `.previous { margin-right: 12px }`, which on a row that already has
+        //  a 6px gap read as the arrows sitting adrift of the pager.
+        &.pages-item-next .action,
+        &.pages-item-previous .action {
+            inline-size: 3.6rem;
+            margin: 0;
+            padding: 0;
+        }
     }
 
     //  The leading arrow. The prototype shows "<- 1 2 3 ->" on page 1 with the
@@ -758,16 +827,14 @@
         align-items: center;
         border: 1px solid var(--hm-border-subtle);
         border-radius: var(--hm-radius);
-        color: var(--hm-neutral-600, var(--hm-foreground-muted));
-        //  The same glyph blank gives the real previous link
-        //  (`.pages .action.previous:before`), so the drawn arrow and the live
-        //  one are the same shape. U+2190 was the first attempt and rendered
-        //  as an empty box: DM Sans has no arrows, and the pager inherits it.
-        content: '\e617';
+        //  The same arrow the real previous link now carries, so the drawn
+        //  cell and the live one are one shape. A background-image, not a mask:
+        //  this pseudo IS the bordered cell, and a mask would clip its border
+        //  away with everything else. The stroke colour is baked in for that
+        //  reason — background-image cannot take currentColor.
+        background: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236b7280%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M19%2012H5M11%2018l-6-6%206-6%22/%3E%3C/svg%3E) center / 1.6rem no-repeat";
+        content: '';
         display: flex;
-        font-family: 'icons-blank-theme';
-        font-size: 4.6rem;
-        line-height: 1;
         justify-content: center;
         align-self: center;
         block-size: 3.6rem;
@@ -780,6 +847,6 @@
     //  selector that actually matches here.
     html:lang(ar) .pages .items:not(:has(.pages-item-previous))::before,
     [dir='rtl'] .pages .items:not(:has(.pages-item-previous))::before {
-        content: '\e608';
+        transform: scaleX(-1);
     }
 }

@@ -146,7 +146,23 @@
 
     //  The arrow points along the reading direction, so it mirrors in RTL.
     .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
-    [dir='rtl'] & .hm-icon { transform: scaleX(-1); }
+}
+
+//  ...and this is where it is done, because `[dir='rtl'] & .hm-icon` inside the
+//  block above never fired: Magento renders `<html lang="ar">` with NO dir
+//  attribute on this install (see _hm-root.less, which sets `direction` from the
+//  language for exactly that reason), so every bare `[dir='rtl']` selector in
+//  the theme is dead. Measured on /ar/ before the fix: twelve "عرض الكل" arrows
+//  on the home page, computed `transform: none`, all still pointing right while
+//  the text beside them reads right-to-left.
+//
+//  `.hm-section__foot-link` carries the same arrow and never had a rule at all —
+//  the same sweep found it — so both are answered here.
+[dir='rtl'] .hm-section__more .hm-icon,
+[dir='rtl'] .hm-section__foot-link .hm-icon,
+:lang(ar) .hm-section__more .hm-icon,
+:lang(ar) .hm-section__foot-link .hm-icon {
+    transform: scaleX(-1);
 }
 
 //
