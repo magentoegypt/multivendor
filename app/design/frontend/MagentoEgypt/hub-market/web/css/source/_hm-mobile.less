@@ -571,8 +571,63 @@
 
     //  The hamburger is absolutely positioned and was centred on the 64px cart
     //  tower (1.2 + (64 - 44) / 2 = 2.2rem). The row is 36 tall now, so the
-    //  centre moves: 1.2 + (36 - 44) / 2 = 0.8rem.
-    .hm-page .hm-nav__trigger { inset-block-start: .8rem; }
+    //  centre moves: 1.2 + (36 - 44) / 2 = 0.8rem. `fixed`, not `absolute`,
+    //  for the reason below: it has to stay in the pinned row while the band
+    //  it lives in scrolls away.
+    .hm-page .hm-nav__trigger {
+        inset-block-start: .8rem;
+        position: fixed;
+        z-index: 91;
+    }
+
+    //
+    //  ONLY THE TOP ROW PINS; THE CATEGORY BAND SCROLLS AWAY
+    //  ---------------------------------------------
+    //  The prototype pins its whole header, band included — 315px of an 844px
+    //  viewport. Ours came to 300 after the trim above, and that is still a
+    //  third of a phone screen held permanently by chrome. Nothing is lost by
+    //  letting the band go: the sheet behind the hamburger is a full top-level
+    //  category list (24 rows against the band's 9) and the band itself still
+    //  sits at the top of every page, it just scrolls like the page does.
+    //
+    //  NOT done by moving `position: sticky` onto `.hm-header__main`.
+    //  _hm-header.less explains why `.page-header` is the sticky element: a
+    //  sticky box only sticks within its PARENT's box, and `.hm-header__main`'s
+    //  parent is `.hm-header`, ~300px tall — it would pin for 300px of scroll
+    //  and then leave, which reads as broken rather than as absent. Nor can the
+    //  negative-offset trick the desktop uses for the utility strip help here:
+    //  that tucks the TOP of the sticky box out of view, and the band is at the
+    //  bottom.
+    //
+    //  So the row is taken out of flow and its space reserved on the header
+    //  behind it. Both numbers are 11rem BY CONSTRUCTION rather than by
+    //  measurement — the row is given that height and the header that padding —
+    //  so a seam between them is not possible. The content needs 108
+    //  (12 + 36 + 8 + 40 + 12), so nothing clips.
+    //
+    //  z-index 90 is the value `.page-header` had, so the row keeps its place
+    //  in the stack: above page content, below the filter drawer (999) and its
+    //  scrim, which is what stops it floating over an open drawer.
+    .hm-page .page-header { position: static; }
+
+    .hm-page .hm-header { padding-block-start: 11rem; }
+
+    .hm-page .hm-header__main {
+        block-size: 11rem;
+        inset-block-start: 0;
+        inset-inline: 0;
+        position: fixed;
+        z-index: 90;
+    }
+
+    //  The sheet hangs off the pinned row, not off the band it is markup-wise
+    //  inside — that band may be anywhere on screen, or off it, by the time the
+    //  hamburger is tapped. Same 11rem, same reason.
+    .hm-page .hm-nav__menu[open] .hm-nav__panel {
+        block-size: ~"calc(100dvh - 11rem)";
+        inset-block-start: 11rem;
+        position: fixed;
+    }
 
     //
     //  HOME item 2 — the category sheet behind the hamburger
@@ -816,13 +871,15 @@
         }
     }
 
-    //  The leading arrow. The prototype shows "<- 1 2 3 ->" on page 1 with the
-    //  back arrow inert; Magento renders `.pages-item-previous` only from page
-    //  2 on, so on page 1 the row starts at "1" and reads as a different
-    //  control from the reference. Drawn as a pseudo-element on the list, and
-    //  ONLY when the real item is absent, so from page 2 the genuine link
-    //  takes its place. Decoration, not a control: it is inert by
-    //  construction, which is what a previous-page button on page 1 is.
+    //  The two end arrows. The prototype shows "<- 1 2 3 ->" whatever page you
+    //  are on, with the arrow that has nowhere to go simply inert. Magento
+    //  renders `.pages-item-previous` only from page 2 on and `.pages-item-next`
+    //  only up to the second-to-last, so ours lost the back arrow on page 1 and
+    //  the forward arrow on the last page, and the row changed shape as you
+    //  paged. Both are drawn as pseudo-elements on the list, and ONLY when the
+    //  real item is absent, so the genuine link takes over the moment there is
+    //  one. Decoration, not controls: inert by construction, which is exactly
+    //  what a previous button on page 1 and a next button on the last page are.
     .pages .items:not(:has(.pages-item-previous))::before {
         align-items: center;
         border: 1px solid var(--hm-border-subtle);
@@ -842,11 +899,32 @@
         order: -1;
     }
 
+    .pages .items:not(:has(.pages-item-next))::after {
+        align-items: center;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        //  The same arrow the real previous link now carries, so the drawn
+        //  cell and the live one are one shape. A background-image, not a mask:
+        //  this pseudo IS the bordered cell, and a mask would clip its border
+        //  away with everything else. The stroke colour is baked in for that
+        //  reason — background-image cannot take currentColor.
+        background: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%236b7280%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M5%2012h14M13%206l6%206-6%206%22/%3E%3C/svg%3E) center / 1.6rem no-repeat";
+        content: '';
+        display: flex;
+        justify-content: center;
+        align-self: center;
+        block-size: 3.6rem;
+        inline-size: 3.6rem;
+        order: 99;
+    }
+
     //  The glyph is physical, so it has to flip: in Arabic the previous page is
     //  to the RIGHT. Same pairing as the drawer above — `html:lang(ar)` is the
     //  selector that actually matches here.
     html:lang(ar) .pages .items:not(:has(.pages-item-previous))::before,
-    [dir='rtl'] .pages .items:not(:has(.pages-item-previous))::before {
+    html:lang(ar) .pages .items:not(:has(.pages-item-next))::after,
+    [dir='rtl'] .pages .items:not(:has(.pages-item-previous))::before,
+    [dir='rtl'] .pages .items:not(:has(.pages-item-next))::after {
         transform: scaleX(-1);
     }
 }
