@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * No setup_version on purpose. This module ships a controller, a view model and
+ * templates only: no schema, no data patches, nothing for setup:upgrade to do.
+ * Declaring a version it never applies makes DbStatusValidator report the schema
+ * out of date and 500 the entire storefront.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_SearchLanding">
+        <sequence>
+            <module name="Magento_Catalog"/>
+            <!--
+                Magento_Search owns the `search` frontName. This module adds a
+                controller to that same route (see etc/frontend/routes.xml), so it
+                has to load after the route it is extending exists.
+            -->
+            <module name="Magento_Search"/>
+            <module name="Magento_CatalogSearch"/>
+            <!--
+                The vendor panel reads ves_vendor_entity and references
+                Vnecoms\Vendors\Model\Vendor::STATUS_APPROVED, so that module has
+                to be loaded before this one.
+            -->
+            <module name="Vnecoms_Vendors"/>
+            <!--
+                The result card prints the seller line through
+                HomeSections' VendorNames view model — the same batch map the
+                PLP and the homepage rails use, rather than a second lookup path.
+            -->
+            <module name="MagentoEgypt_HomeSections"/>
+        </sequence>
+    </module>
+</config>

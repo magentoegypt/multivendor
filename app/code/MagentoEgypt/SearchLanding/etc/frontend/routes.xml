@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Adds this module to Magento_Search's EXISTING `search` route rather than
+ * claiming a frontName of its own, because the reference build puts the landing
+ * page at /search and that path is already half-taken: Magento_Search serves
+ * /search/term/popular from it.
+ *
+ * `before="Magento_Search"` means this module is asked first for every search/*
+ * action. It only answers search/index/index; anything else — term/popular above
+ * all — finds no matching controller here and falls straight through to
+ * Magento_Search, which still serves it.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="standard">
+        <route id="search" frontName="search">
+            <module name="MagentoEgypt_SearchLanding" before="Magento_Search"/>
+        </route>
+    </router>
+</config>

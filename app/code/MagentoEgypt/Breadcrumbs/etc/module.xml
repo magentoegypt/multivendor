@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * No setup_version on purpose — this module ships a single plugin, so there is
+ * nothing for setup:upgrade to apply and declaring a version it never applies
+ * makes DbStatusValidator report the schema out of date and 500 the storefront.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_Breadcrumbs">
+        <sequence>
+            <module name="Magento_Catalog"/>
+        </sequence>
+    </module>
+</config>

@@ -1,0 +1,217 @@
+<?php
+/**
+ * Live-search result panels — injected into /search by web/js/live-search.js.
+ *
+ * The product panel reuses the storefront's own card markup (product-item /
+ * product-item-info / hm-card__*) rather than inventing a card for this page, so
+ * it inherits the PLP's styling, its vendor line, its discount badge and its
+ * price box with no new CSS and no second definition to keep in step.
+ *
+ * The tab counts are rendered HERE, not in JS, so they arrive translated and
+ * correctly pluralised for the store view that asked for them.
+ *
+ * @var \MagentoEgypt\SearchLanding\Block\Ajax\Results $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+$query      = $block->getQueryText();
+$products   = $block->getProducts();
+$productN   = $block->getProductCount();
+$vendors    = $block->getVendors();
+$categories = $block->getCategories();
+$total      = $productN + count($vendors) + count($categories);
+$imageId    = 'category_page_grid';
+?>
+<div class="hm-live" data-total="<?= (int) $total ?>">
+
+    <?php /* The tab row sits INSIDE the white band with the field, not on the grey
+             below it — see _hm-search-landing.less. This wrapper is what carries
+             that white past the tabs' own rule. */ ?>
+    <div class="hm-live__head">
+    <div class="hm-live__tabs" role="tablist">
+        <button class="hm-live__tab is-active" type="button" role="tab"
+                aria-selected="true" aria-controls="hm-live-products" data-panel="products">
+            <?= $escaper->escapeHtml(__('Products (%1)', $productN)) ?>
+        </button>
+        <button class="hm-live__tab" type="button" role="tab"
+                aria-selected="false" aria-controls="hm-live-vendors" data-panel="vendors">
+            <?= $escaper->escapeHtml(__('Vendors (%1)', count($vendors))) ?>
+        </button>
+        <button class="hm-live__tab" type="button" role="tab"
+                aria-selected="false" aria-controls="hm-live-categories" data-panel="categories">
+            <?= $escaper->escapeHtml(__('Categories (%1)', count($categories))) ?>
+        </button>
+    </div>
+    </div><?php /* .hm-live__head */ ?>
+
+    <p class="hm-live__summary" aria-live="polite">
+        <?= $escaper->escapeHtml(__('%1 results for "%2"', $total, $query)) ?>
+    </p>
+
+    <?php // ---------- Products ---------- ?>
+    <div class="hm-live__panel is-active" id="hm-live-products" role="tabpanel" data-panel="products">
+        <?php if ($products !== null && count($products)): ?>
+            <ol class="products list items product-items hm-live__grid">
+                <?php foreach ($products as $product): ?>
+                    <?php
+                    $pricing  = $block->getPricing($product);
+                    $discount = $pricing['discount'];
+                    ?>
+                    <li class="product-item">
+                        <div class="product-item-info">
+                            <div class="product-item-media">
+                                <a href="<?= $escaper->escapeUrl($block->getProductUrl($product)) ?>"
+                                   class="product-item-photo">
+                                    <?= $block->getImage($product, $imageId)->toHtml() ?>
+                                </a>
+                                <?php if ($discount > 0): ?>
+                                    <span class="hm-badge hm-badge--discount">
+                                        <?= $escaper->escapeHtml(__('-%1%', $discount)) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="product-item-details">
+                                <?php /* The seller line, above the title exactly as the
+                                         PLP and the homepage rails place it — on a
+                                         marketplace it is what tells two identical
+                                         listings apart. .hm-card__vendor is already
+                                         styled by _hm-product-item.less. */ ?>
+                                <?php $hmVendor = $block->getVendorName($product); ?>
+                                <?php if ($hmVendor): ?>
+                                    <span class="hm-card__vendor"><?= $escaper->escapeHtml($hmVendor) ?></span>
+                                <?php endif; ?>
+                                <strong class="product-item-name">
+                                    <a class="product-item-link"
+                                       title="<?= $escaper->escapeHtmlAttr($product->getName()) ?>"
+                                       href="<?= $escaper->escapeUrl($block->getProductUrl($product)) ?>">
+                                        <?= $escaper->escapeHtml($product->getName()) ?>
+                                    </a>
+                                </strong>
+                                <?php
+                                /*
+                                 * Stars, hand-rendered for the same reason the price
+                                 * is — the renderer needs a full page layout. The
+                                 * markup mirrors what the PLP emits so the theme's
+                                 * existing rating CSS applies unchanged.
+                                 *
+                                 * The `id` is prefixed rather than Magento's bare
+                                 * `rating-result_<id>`: this panel is injected into a
+                                 * page that can hold other rating blocks, and a
+                                 * duplicate id is invalid HTML.
+                                 */
+                                $rating  = (int) $product->getData('rating_summary');
+                                $reviews = (int) $product->getData('reviews_count');
+                                ?>
+                                <?php if ($rating > 0): ?>
+                                    <div class="product-reviews-summary short">
+                                        <div class="rating-summary">
+                                            <span class="label"><span><?= $escaper->escapeHtml(__('Rating:')) ?></span></span>
+                                            <div class="rating-result"
+                                                 id="hm-live-rating-<?= (int) $product->getId() ?>"
+                                                 title="<?= $escaper->escapeHtmlAttr($rating . '%') ?>">
+                                                <span style="width:<?= (int) $rating ?>%">
+                                                    <span><?= $escaper->escapeHtml($rating . '%') ?></span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <?php if ($reviews > 0): ?>
+                                            <div class="reviews-actions">
+                                                <span class="action view">
+                                                    <?= $escaper->escapeHtml(__('%1 Reviews', $reviews)) ?>
+                                                </span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="hm-card__foot">
+                                    <?php /* .price-box / .price / .old-price .price are the
+                                             hooks _hm-product-item.less already styles, so this
+                                             inherits the PLP's price colours and tabular figures
+                                             without a rule of its own. See Results::formatPrice()
+                                             for why the renderer is not used here. */ ?>
+                                    <span class="price-box">
+                                        <span class="price">
+                                            <?= $escaper->escapeHtml($block->formatPrice($pricing['final'])) ?>
+                                        </span>
+                                        <?php if ($discount > 0): ?>
+                                            <span class="old-price">
+                                                <span class="price">
+                                                    <?= $escaper->escapeHtml($block->formatPrice($pricing['regular'])) ?>
+                                                </span>
+                                            </span>
+                                        <?php endif; ?>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+
+            <?php if ($productN > \MagentoEgypt\SearchLanding\Block\Ajax\Results::PRODUCT_LIMIT): ?>
+                <a class="hm-live__more" href="<?= $escaper->escapeUrl($block->getFullResultsUrl()) ?>">
+                    <?= $escaper->escapeHtml(__('See all %1 products', $productN)) ?>
+                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false">
+                        <use href="#hm-arrow-right"/>
+                    </svg>
+                </a>
+            <?php endif; ?>
+        <?php else: ?>
+            <p class="hm-live__empty">
+                <?= $escaper->escapeHtml(__('No products match "%1".', $query)) ?>
+            </p>
+        <?php endif; ?>
+    </div>
+
+    <?php // ---------- Vendors ---------- ?>
+    <div class="hm-live__panel" id="hm-live-vendors" role="tabpanel" data-panel="vendors" hidden>
+        <?php if ($vendors): ?>
+            <ul class="hm-live__list">
+                <?php foreach ($vendors as $vendor): ?>
+                    <li class="hm-live__list-item">
+                        <a class="hm-live__row" href="<?= $escaper->escapeUrl($vendor['url']) ?>">
+                            <svg class="hm-icon hm-icon--sm hm-live__row-icon" aria-hidden="true" focusable="false">
+                                <use href="#hm-store"/>
+                            </svg>
+                            <span class="hm-live__row-name"><?= $escaper->escapeHtml($vendor['name']) ?></span>
+                            <?php if ($vendor['city'] !== null): ?>
+                                <span class="hm-live__row-meta"><?= $escaper->escapeHtml($vendor['city']) ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p class="hm-live__empty">
+                <?= $escaper->escapeHtml(__('No vendors match "%1".', $query)) ?>
+            </p>
+        <?php endif; ?>
+    </div>
+
+    <?php // ---------- Categories ---------- ?>
+    <div class="hm-live__panel" id="hm-live-categories" role="tabpanel" data-panel="categories" hidden>
+        <?php if ($categories): ?>
+            <ul class="hm-live__list">
+                <?php foreach ($categories as $category): ?>
+                    <li class="hm-live__list-item">
+                        <a class="hm-live__row" href="<?= $escaper->escapeUrl($category['url']) ?>">
+                            <svg class="hm-icon hm-icon--sm hm-live__row-icon" aria-hidden="true" focusable="false">
+                                <use href="#hm-grid"/>
+                            </svg>
+                            <span class="hm-live__row-name"><?= $escaper->escapeHtml($category['name']) ?></span>
+                            <span class="hm-live__row-meta">
+                                <?= $escaper->escapeHtml(__('%1 items', $category['count'])) ?>
+                            </span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p class="hm-live__empty">
+                <?= $escaper->escapeHtml(__('No categories match "%1".', $query)) ?>
+            </p>
+        <?php endif; ?>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * GET /search — the landing page behind "All Categories" in the nav bar.
+ *
+ * The handle is `search_index_index` and not `searchlanding_index_index`: the
+ * handle is built from the ROUTE id, and this module joins Magento_Search's
+ * existing `search` route rather than declaring one of its own.
+ *
+ * page.main.title is removed and the template carries its own <h1>. Leaving both
+ * would put two h1s on the page, which the parity harness gates on — and the
+ * reference draws no visible page title here at all, so ours is .hm-sr-only.
+ */
+-->
+<page layout="1column"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Search</title>
+    </head>
+    <body>
+        <attribute name="class" value="hm-page-search-landing"/>
+
+        <referenceBlock name="page.main.title" remove="true"/>
+
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.search.landing"
+                   template="MagentoEgypt_SearchLanding::landing.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">
+                        MagentoEgypt\SearchLanding\ViewModel\Landing
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

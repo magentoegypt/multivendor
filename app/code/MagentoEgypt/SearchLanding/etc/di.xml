@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Supplies the live-search block with the CATALOG SEARCH collection factory
+ * rather than the plain product one it is type-hinted against.
+ *
+ * These are virtual types declared in module-catalog-search/etc/di.xml — they
+ * have no class file, so they cannot appear as constructor type-hints without
+ * breaking setup:di:compile. Injecting here is the supported way to consume one.
+ *
+ * SearchCollectionFactory, NOT CollectionFactory. The two build the same class
+ * but with different `searchRequestName`s, and that one argument decides whether
+ * a search term does anything at all:
+ *
+ *   CollectionFactory       -> catalog_view_container  (category browsing)
+ *   SearchCollectionFactory -> quick_search_container  (search)
+ *
+ * With the former, addSearchFilter() is accepted and then silently ignored —
+ * every query returned Products (0) while /catalogsearch/result/?q=bag returned
+ * 24 for the same term. No error, just an empty panel.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="MagentoEgypt\SearchLanding\Block\Ajax\Results">
+        <arguments>
+            <argument name="fulltextCollectionFactory" xsi:type="object">
+                Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory
+            </argument>
+        </arguments>
+    </type>
+</config>

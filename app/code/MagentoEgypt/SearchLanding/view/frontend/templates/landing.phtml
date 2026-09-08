@@ -1,0 +1,175 @@
+<?php
+/**
+ * Hub Market — /search landing page.
+ *
+ * Figma's layout, with two deliberate differences, both recorded here because
+ * they are the kind of thing that looks like a mistake later:
+ *
+ *   · The <h1> is .hm-sr-only. The reference draws no page title at all, but a
+ *     page with no h1 fails the parity harness and leaves screen-reader users
+ *     with nothing naming the page. Hidden satisfies both.
+ *
+ *   · Recent Searches ships EMPTY and hidden, and the JS reveals it. The
+ *     reference hard-codes three rows; a real visitor on their first session has
+ *     no history, and printing invented history would be a lie the shopper can
+ *     immediately catch by clicking it.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+/** @var \MagentoEgypt\SearchLanding\ViewModel\Landing $viewModel */
+$viewModel = $block->getData('view_model');
+
+$trending   = $viewModel->getTrendingSearches();
+$categories = $viewModel->getPopularCategories();
+?>
+<div class="hm-search-landing">
+
+    <h1 class="hm-sr-only"><?= $escaper->escapeHtml(__('Search')) ?></h1>
+
+    <?php /* The JS mounts HERE because this element contains the field; it finds
+             the results and defaults containers below by id. */ ?>
+    <div class="hm-search-hero"
+         data-live-url="<?= $escaper->escapeHtmlAttr($viewModel->getLiveSearchUrl()) ?>"
+         <?php /* Translated server-side — the JS has no access to __() and the
+                  page is store-scoped anyway. */ ?>
+         data-searching-label="<?= $escaper->escapeHtmlAttr(__('Searching…')) ?>"
+         data-mage-init='{"MagentoEgypt_SearchLanding/js/live-search":{}}'>
+        <form class="hm-search-hero__form"
+              action="<?= $escaper->escapeUrl($viewModel->getSearchActionUrl()) ?>"
+              method="get"
+              role="search">
+            <label class="hm-sr-only" for="hm-search-hero-input">
+                <?= $escaper->escapeHtml(__('Search for products, vendors, or categories')) ?>
+            </label>
+            <svg class="hm-icon hm-search-hero__icon" aria-hidden="true" focusable="false">
+                <use href="#hm-search"/>
+            </svg>
+            <?php /* type="search" and not "text": it gives mobile keyboards a
+                     Search key and lets the browser offer its own clear control. */ ?>
+            <input class="hm-search-hero__input"
+                   id="hm-search-hero-input"
+                   type="search"
+                   name="q"
+                   autocomplete="off"
+                   placeholder="<?= $escaper->escapeHtmlAttr(__('Search for products, vendors, or categories...')) ?>"/>
+
+            <?php /* Inline progress at the field's trailing edge. Reuses the
+                     theme's .hm-spinner, which already carries the
+                     prefers-reduced-motion guard. aria-hidden because the
+                     status region below is what actually announces. */ ?>
+            <span class="hm-spinner hm-search-hero__spinner" aria-hidden="true"></span>
+
+            <?php /* role="status" is polite by default — it waits for a pause
+                     rather than cutting across whatever is being read, which is
+                     right for something that fires on every debounced keystroke. */ ?>
+            <span class="hm-sr-only" role="status" data-role="hm-live-status"></span>
+        </form>
+    </div>
+
+    <?php
+    /*
+     * Results sit OUTSIDE .hm-search-landing__body, and that placement is the
+     * whole point.
+     *
+     * The body column is capped at 768px because that is what the reference uses
+     * for Trending / Recent / Popular. Its RESULTS, though, run the full 1248px
+     * container. Nesting the results inside the body inherited the 768 cap and
+     * squeezed the grid to three 245px cards where the reference draws four at
+     * 294 — the layout looked deliberate and was just inherited.
+     */
+    ?>
+    <div class="hm-search-landing__results" id="hm-live-results" hidden></div>
+
+    <div class="hm-search-landing__body">
+
+        <div id="hm-search-defaults">
+
+        <?php if ($trending): ?>
+            <section class="hm-search-block" aria-labelledby="hm-trending-title">
+                <h2 class="hm-search-block__title" id="hm-trending-title">
+                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false">
+                        <use href="#hm-trending"/>
+                    </svg>
+                    <?= $escaper->escapeHtml(__('Trending Searches')) ?>
+                </h2>
+                <ul class="hm-search-pills">
+                    <?php foreach ($trending as $term): ?>
+                        <li class="hm-search-pills__item">
+                            <?php /* The result count rides in the title, not the
+                                     label: Figma's pill is the bare phrase, and
+                                     appending "(24)" would widen every pill and
+                                     wrap the row. */ ?>
+                            <a class="hm-search-pill"
+                               href="<?= $escaper->escapeUrl($term['url']) ?>"
+                               title="<?= $escaper->escapeHtmlAttr(
+                                   __('%1 results', $term['count'])
+                               ) ?>">
+                                <?= $escaper->escapeHtml($term['text']) ?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </section>
+        <?php endif; ?>
+
+        <section class="hm-search-block"
+                 id="hm-recent-block"
+                 hidden
+                 aria-labelledby="hm-recent-title"
+                 data-mage-init='{"MagentoEgypt_SearchLanding/js/recent-searches":{"mode":"render"}}'>
+            <h2 class="hm-search-block__title" id="hm-recent-title">
+                <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false">
+                    <use href="#hm-clock"/>
+                </svg>
+                <?= $escaper->escapeHtml(__('Recent Searches')) ?>
+            </h2>
+            <?php /* data-search-url carries the endpoint so the JS never has to
+                     build a store-scoped URL itself — /en/ and /ar/ differ. */ ?>
+            <ul class="hm-search-recent"
+                id="hm-recent-list"
+                data-search-url="<?= $escaper->escapeHtmlAttr($viewModel->getSearchActionUrl()) ?>"></ul>
+        </section>
+
+        <?php if ($categories): ?>
+            <section class="hm-search-block" aria-labelledby="hm-popular-title">
+                <h2 class="hm-search-block__title" id="hm-popular-title">
+                    <?= $escaper->escapeHtml(__('Popular Categories')) ?>
+                </h2>
+                <ul class="hm-search-cats">
+                    <?php foreach ($categories as $category): ?>
+                        <li class="hm-search-cats__item">
+                            <a class="hm-search-cat" href="<?= $escaper->escapeUrl($category['url']) ?>">
+                                <span class="hm-search-cat__media">
+                                    <?php /* alt="" — the name below is the link's
+                                             accessible text, so alt text here would
+                                             make a screen reader say it twice. */ ?>
+                                    <img class="hm-search-cat__img"
+                                         src="<?= $escaper->escapeUrl($category['image']) ?>"
+                                         alt=""
+                                         loading="lazy"
+                                         width="480" height="288"/>
+                                </span>
+                                <span class="hm-search-cat__body">
+                                    <span class="hm-search-cat__name">
+                                        <?= $escaper->escapeHtml($category['name']) ?>
+                                    </span>
+                                    <span class="hm-search-cat__count">
+                                        <?= $escaper->escapeHtml(
+                                            __('%1 items', number_format($category['count']))
+                                        ) ?>
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </section>
+        <?php endif; ?>
+
+        </div><?php /* #hm-search-defaults */ ?>
+
+    </div>
+</div>

@@ -1,0 +1,63 @@
+<?php
+/**
+ * Hub Market — product page breadcrumb.
+ *
+ * REPLACES CORE'S JAVASCRIPT VERSION. Core prints an empty `<div class=
+ * "breadcrumbs">` and hands a config to the `breadcrumbs` widget, which builds
+ * Home + product name in the browser and only ever emits a category when
+ * `catalog/seo/product_use_categories` is on — a setting whose actual job is to
+ * put the category path into product URLs. So the design's "Home / Category /
+ * Product" was unreachable through configuration.
+ *
+ * Rendering here instead means the crumbs are in the initial HTML rather than
+ * assembled after hydration, which is also what a crawler reads.
+ *
+ * MARKUP IS CORE'S. The `.breadcrumbs > .items > .item` structure is what
+ * _hm-figma.less already styles and what Magento's own CSS expects, so this
+ * changes where the crumbs come from without changing what they look like.
+ *
+ * @var \Magento\Theme\Block\Html\Breadcrumbs $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+/** @var \MagentoEgypt\Breadcrumbs\ViewModel\ProductCrumbs $crumbsModel */
+$crumbsModel = $block->getData('product_crumbs');
+$crumbs = $crumbsModel ? $crumbsModel->getCrumbs() : [];
+
+if (count($crumbs) < 2) {
+    return;
+}
+$last = count($crumbs) - 1;
+?>
+<div class="breadcrumbs">
+    <ul class="items">
+        <?php foreach ($crumbs as $i => $crumb): ?>
+            <?php
+            /*
+             * `item home` on the first and `item product` on the last are the
+             * hooks core's own stylesheets and several extensions key on — worth
+             * keeping even though this template does not need them itself.
+             */
+            $classes = 'item';
+            if ($i === 0) {
+                $classes .= ' home';
+            } elseif ($i === $last) {
+                $classes .= ' product';
+            } else {
+                $classes .= ' category';
+            }
+            ?>
+            <li class="<?= $escaper->escapeHtmlAttr($classes) ?>">
+                <?php if ($i !== $last && !empty($crumb['link'])): ?>
+                    <a href="<?= $escaper->escapeUrl($crumb['link']) ?>">
+                        <?= $escaper->escapeHtml($crumb['label']) ?>
+                    </a>
+                <?php else: ?>
+                    <?php /* <strong>, matching core: the current page is not a link. */ ?>
+                    <strong><?= $escaper->escapeHtml($crumb['label']) ?></strong>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>

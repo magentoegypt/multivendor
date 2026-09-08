@@ -1,0 +1,18 @@
+<?php
+/**
+ * Records the current search onto the visitor's recent-searches list.
+ *
+ * Mounted on the search RESULTS page, not on the landing page, because that is
+ * where a search actually lands. Reading ?q= off this page catches every route
+ * into search — the header field, the landing hero, a trending pill, a bookmarked
+ * result URL — instead of hooking one particular form and silently missing the
+ * others.
+ *
+ * Renders nothing: it is a mount point for the JS and no more.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+?>
+<div hidden data-mage-init='{"MagentoEgypt_SearchLanding/js/recent-searches":{"mode":"record"}}'></div>

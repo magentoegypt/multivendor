@@ -1,0 +1,39 @@
+<?php
+/**
+ * Hub Market category navigation.
+ *
+ * The menu tree is provided by Magento's Topmenu block. Only active categories
+ * with "Include in Menu" enabled are rendered, in their backend sort order.
+ *
+ * @var $block \Magento\Theme\Block\Html\Topmenu
+ */
+
+$columnsLimit = $block->getColumnsLimit() ?: 0;
+$menuHtml = trim($block->getHtml('level-top', 'submenu', $columnsLimit));
+?>
+
+<?php if ($menuHtml !== ''): ?>
+    <details class="hub-market-category-menu"
+             data-mage-init='{"HubMarket_DynamicMenu/js/category-menu":{}}'>
+        <summary class="hub-market-menu-trigger" aria-controls="hub-market-category-panel">
+            <span class="hub-market-menu-trigger__icon" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </span>
+            <span class="hub-market-menu-trigger__label"><?= $block->escapeHtml(__('All Categories')) ?></span>
+            <span class="hub-market-menu-trigger__chevron" aria-hidden="true"></span>
+        </summary>
+
+        <div class="hub-market-menu-panel" id="hub-market-category-panel">
+            <div class="hub-market-menu-panel__inner">
+                <nav class="navigation hub-market-navigation"
+                     data-action="navigation"
+                     aria-label="<?= $block->escapeHtmlAttr(__('All Categories')) ?>">
+                    <ul class="hub-market-category-grid">
+                        <?= /* @noEscape */ $menuHtml ?>
+                        <?= $block->getChildHtml() ?>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </details>
+<?php endif; ?>

@@ -1,0 +1,137 @@
+<?php
+/**
+ * Hub Market — search chrome on the real results page.
+ *
+ * Same markup as the live panel on /search, so the two read as one feature: the
+ * hero field, the tab row in its white band, and the "N results for …" line.
+ * What differs is what sits under the Products tab — here it is Magento's own
+ * grid, with its toolbar, sorting, layered navigation and pagination, rather
+ * than a twelve-item preview.
+ *
+ * The vendor and category panels ARE rendered here (they are short lists that
+ * need no paging); the products panel is the page itself, which is why the JS
+ * toggles `.columns` rather than a panel of its own.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+/** @var \MagentoEgypt\SearchLanding\ViewModel\ResultsHeader $viewModel */
+$viewModel = $block->getData('results_header');
+if (!$viewModel) {
+    return;
+}
+
+$query = $viewModel->getQueryText();
+if ($query === '') {
+    return;
+}
+
+$vendors    = $viewModel->getVendors();
+$categories = $viewModel->getCategories();
+?>
+<div class="hm-srp" data-mage-init='{"MagentoEgypt_SearchLanding/js/results-tabs":{}}'>
+
+    <?php /* The layout removes Magento's page-title block, which carried the
+             page's only <h1>. This replaces it: hidden, because the design puts
+             the visible summary in the "N results for …" line below, but a page
+             still needs exactly one heading naming it — and the parity harness
+             gates on that count. */ ?>
+    <h1 class="hm-sr-only">
+        <?= $escaper->escapeHtml(__('Search results for: \'%1\'', $query)) ?>
+    </h1>
+
+    <div class="hm-search-hero">
+        <form class="hm-search-hero__form"
+              action="<?= $escaper->escapeUrl($viewModel->getSearchActionUrl()) ?>"
+              method="get"
+              role="search">
+            <label class="hm-sr-only" for="hm-srp-search">
+                <?= $escaper->escapeHtml(__('Search for products, vendors, or categories')) ?>
+            </label>
+            <svg class="hm-icon hm-search-hero__icon" aria-hidden="true" focusable="false">
+                <use href="#hm-search"/>
+            </svg>
+            <?php /* Pre-filled so the shopper can refine rather than retype. */ ?>
+            <input class="hm-search-hero__input"
+                   id="hm-srp-search"
+                   type="search"
+                   name="q"
+                   autocomplete="off"
+                   value="<?= $escaper->escapeHtmlAttr($query) ?>"
+                   placeholder="<?= $escaper->escapeHtmlAttr(__('Search for products, vendors, or categories...')) ?>"/>
+        </form>
+    </div>
+
+    <div class="hm-live__head">
+        <div class="hm-live__tabs" role="tablist">
+            <?php /* The count is substituted by results-tabs.js from the
+                     toolbar's data-total. The LABEL is still translated here, so
+                     the JS only ever swaps a number into a finished string. */ ?>
+            <button class="hm-live__tab is-active" type="button" role="tab"
+                    aria-selected="true" data-panel="products"
+                    data-label="<?= $escaper->escapeHtmlAttr(__('Products (%1)', '%1')) ?>">
+                <?= $escaper->escapeHtml(__('Products')) ?>
+            </button>
+            <button class="hm-live__tab" type="button" role="tab"
+                    aria-selected="false" data-panel="vendors">
+                <?= $escaper->escapeHtml(__('Vendors (%1)', count($vendors))) ?>
+            </button>
+            <button class="hm-live__tab" type="button" role="tab"
+                    aria-selected="false" data-panel="categories">
+                <?= $escaper->escapeHtml(__('Categories (%1)', count($categories))) ?>
+            </button>
+        </div>
+    </div>
+
+    <?php /* data-facets is what this page CAN count; the JS adds the product
+             total to it once the toolbar has published one. */ ?>
+    <p class="hm-live__summary"
+       data-label="<?= $escaper->escapeHtmlAttr(__('%1 results for "%2"', '%1', $query)) ?>"
+       data-facets="<?= (int) $viewModel->getFacetTotal() ?>"></p>
+
+    <div class="hm-srp__panel" data-panel="vendors" role="tabpanel" hidden>
+        <?php if ($vendors): ?>
+            <ul class="hm-live__list">
+                <?php foreach ($vendors as $vendor): ?>
+                    <li class="hm-live__list-item">
+                        <a class="hm-live__row" href="<?= $escaper->escapeUrl($vendor['url']) ?>">
+                            <svg class="hm-icon hm-icon--sm hm-live__row-icon" aria-hidden="true" focusable="false">
+                                <use href="#hm-store"/>
+                            </svg>
+                            <span class="hm-live__row-name"><?= $escaper->escapeHtml($vendor['name']) ?></span>
+                            <?php if ($vendor['city'] !== null): ?>
+                                <span class="hm-live__row-meta"><?= $escaper->escapeHtml($vendor['city']) ?></span>
+                            <?php endif; ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p class="hm-live__empty"><?= $escaper->escapeHtml(__('No vendors match "%1".', $query)) ?></p>
+        <?php endif; ?>
+    </div>
+
+    <div class="hm-srp__panel" data-panel="categories" role="tabpanel" hidden>
+        <?php if ($categories): ?>
+            <ul class="hm-live__list">
+                <?php foreach ($categories as $category): ?>
+                    <li class="hm-live__list-item">
+                        <a class="hm-live__row" href="<?= $escaper->escapeUrl($category['url']) ?>">
+                            <svg class="hm-icon hm-icon--sm hm-live__row-icon" aria-hidden="true" focusable="false">
+                                <use href="#hm-grid"/>
+                            </svg>
+                            <span class="hm-live__row-name"><?= $escaper->escapeHtml($category['name']) ?></span>
+                            <span class="hm-live__row-meta">
+                                <?= $escaper->escapeHtml(__('%1 items', $category['count'])) ?>
+                            </span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php else: ?>
+            <p class="hm-live__empty"><?= $escaper->escapeHtml(__('No categories match "%1".', $query)) ?></p>
+        <?php endif; ?>
+    </div>
+</div>
