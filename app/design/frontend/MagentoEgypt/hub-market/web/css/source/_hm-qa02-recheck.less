@@ -826,3 +826,214 @@
         }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  Checkout — the Order Summary line item
+//  ---------------------------------------------------------------------------
+//  Measured against the prototype's /checkout at 1440. The panel itself already
+//  matched (white, 12px radius, 24px of padding); the ROW inside it did not.
+//
+//  Prototype row: a 64px photo with a 4px radius, then a column holding the
+//  name on one truncated line at 14px/500, "Qty: 2" at 12px grey under it, and
+//  the price at 14px/600 under that — all left-aligned, 12px between rows and
+//  no rule between them.
+//
+//  Ours: a 56px square photo, a 13px name that wrapped, a quantity that had
+//  collapsed to a 4px-wide box (the label and value were both `display: block`
+//  inside an `inline-flex` with `overflow: hidden`, so "Qty" and "1" stacked
+//  and were clipped), and the price pushed to the right edge in accent orange
+//  at 16px, which read as a second total rather than a line item.
+.hm-page.checkout-index-index .opc-block-summary {
+
+    //  No rule between rows, and 12px of air instead of 24px of padding.
+    .minicart-items .product-item {
+        border: 0;
+        display: block;
+        margin-block-end: var(--hm-space-3);
+        padding: 0;
+
+        &:last-child { margin-block-end: 0; }
+    }
+
+    .product:not(.options) {
+        align-items: flex-start;
+        display: flex;
+        gap: var(--hm-space-3);
+    }
+
+    //  64px, and the !important is not decorative: the cycle-2 fix that stopped
+    //  the drawer's own thumbnail rules overflowing this panel set 56px the
+    //  same way, and it is still the rule being answered here.
+    .product-image-container,
+    .product-image-wrapper,
+    img.product-image-photo {
+        block-size: 6.4rem !important;
+        border-radius: .4rem;
+        inline-size: 6.4rem !important;
+        object-fit: cover;
+        overflow: hidden;
+    }
+
+    .product-item-details {
+        display: block;
+        min-inline-size: 0;
+        padding: 0;
+    }
+
+    .product-item-inner,
+    .product-item-name-block { display: block; }
+
+    //  One line, clipped — a long name must not push the price down the panel.
+    .product-item-name {
+        font-size: 1.4rem;
+        font-weight: 500;
+        margin: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .details-qty {
+        color: var(--hm-neutral-600);
+        display: block;
+        font-size: 1.2rem;
+        inline-size: auto;
+        margin-block: .2rem 0;
+        overflow: visible;
+        white-space: nowrap;
+
+        .label,
+        .value { display: inline; }
+
+        //  The prototype writes "Qty: 2"; the markup gives us "Qty" and "2" as
+        //  two elements, so the colon belongs to the label.
+        .label::after { content: ':'; }
+    }
+
+    //  Left-aligned and in the body ink. Orange on the right made it read as a
+    //  running total rather than this line's price.
+    .subtotal {
+        text-align: start;
+
+        .price,
+        .price-excluding-tax,
+        .price-including-tax {
+            color: var(--hm-foreground);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+    }
+
+    //  The prototype's heading has no rule under it.
+    > .title {
+        border-block-end: 0;
+        margin-block-end: var(--hm-space-4);
+        padding-block-end: 0;
+    }
+}
+
+//  Four of the rules above landed one class too low, and one aimed at a class
+//  the markup does not carry. Answering each with the selector that actually
+//  wins, all under `.minicart-items .product-item`:
+//
+//  - `.product` is a GRID whose first track is pinned to 56px, so widening the
+//    photo alone left it overflowing a 56px column.
+//  - The photo has NO class of its own — `img.product-image-photo` matched
+//    nothing here; it is the wrapper's only child.
+//  - The quantity LABEL is screen-reader-only, so the row rendered as a bare
+//    "1". The prototype writes "Qty: 2", which needs the label back in view.
+//  - `.subtotal` keeps its own right alignment.
+.hm-page.checkout-index-index .opc-block-summary .minicart-items .product-item {
+    .product:not(.options) { grid-template-columns: 6.4rem minmax(0, 1fr); }
+
+    .product-image-container,
+    .product-image-wrapper,
+    .product-image-wrapper img {
+        block-size: 6.4rem !important;
+        border-radius: .4rem;
+        inline-size: 6.4rem !important;
+        object-fit: cover;
+        overflow: hidden;
+    }
+
+    .details-qty .label {
+        block-size: auto;
+        clip-path: none;
+        inline-size: auto;
+        margin: 0;
+        overflow: visible;
+        position: static;
+        white-space: nowrap;
+    }
+
+    .subtotal { text-align: start; }
+}
+
+//  A product with options nests a SECOND element carrying the class `product`
+//  (`<div class="product options">`, the "View Details" accordion) inside the
+//  row, so the row rules above were landing on it too and stacking its toggle
+//  on top of its own content. Both are now `:not(.options)`, and the accordion
+//  gets the quiet treatment the prototype's summary implies.
+.hm-page.checkout-index-index .opc-block-summary .minicart-items .product-item .product.options {
+    display: block;
+    font-size: 1.2rem;
+    margin-block-start: .6rem;
+
+    .toggle {
+        color: var(--hm-neutral-600);
+        cursor: pointer;
+        font-size: 1.2rem;
+        font-weight: 500;
+    }
+
+    .content {
+        color: var(--hm-neutral-600);
+        margin-block-start: .4rem;
+    }
+}
+
+//  Two leftovers, both from `_hm-figma.less`'s `.minicart-items .details-qty`,
+//  which draws the MINICART DRAWER's qty stepper: a bordered, rounded shell
+//  around a number input with its label hidden. The checkout summary prints a
+//  plain "Qty: 2" with no input, so that shell rendered as an empty rounded box
+//  across the column. The hidden label is the same rule, undone above.
+//
+//  The item list also carried blank's `max-height: 370px; overflow-y: auto`,
+//  which put a second scrollbar inside the panel. The prototype lists every
+//  line item and lets the page scroll.
+.hm-page.checkout-index-index .opc-block-summary {
+    .minicart-items .details-qty {
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+    }
+
+    .minicart-items-wrapper {
+        max-block-size: none;
+        overflow: visible;
+    }
+
+    //  Option pairs read as one row each — "Size: S" over "Color: Blue" —
+    //  rather than wrapping mid-pair in a 275px column. Blank FLOATS both the
+    //  term and the value, which a grid does not honour: the floats reversed
+    //  the two columns, printing the value under the term it did not belong to.
+    //  So the floats come off and the pair stays inline, with a hard break
+    //  after each value.
+    .minicart-items .product.options .content .item-options {
+        display: block;
+        margin: 0;
+
+        dt, dd {
+            clear: none;
+            display: inline;
+            float: none;
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin: 0;
+        }
+
+        dt { text-transform: capitalize; }
+        dt::after { content: ': '; }
+        dd::after { content: '\A'; display: inline; white-space: pre; }
+    }
+}
