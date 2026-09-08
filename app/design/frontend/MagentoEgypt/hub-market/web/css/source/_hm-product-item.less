@@ -272,6 +272,21 @@
         margin-block: 0;
         margin-inline: 0 var(--hm-space-2);   // logical, so Arabic mirrors
     }
+
+    //  ...but zeroing every margin above also removed the only thing separating
+    //  one ATTRIBUTE from the next. A card carrying two of them — Fiona Fitness
+    //  Short has size then colour — rendered the colour row hard against the
+    //  last size row (measured: 0px between the groups, against ~7px between
+    //  the wrapped rows inside the size group). The two attributes read as one
+    //  block of boxes, and the tighter spacing fell exactly where the bigger
+    //  break belonged.
+    //
+    //  Adjacent sibling, so this costs nothing on the single-attribute card
+    //  that motivated the zeroing in the first place: its row stays 36px and
+    //  the grid's equalised row height is unchanged. Only a second group pays
+    //  the 8px, and it pays it on top — no trailing space to re-open the void
+    //  above the price.
+    .swatch-attribute + .swatch-attribute { margin-block-start: var(--hm-space-2); }
 }
 
 //
