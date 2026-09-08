@@ -59,22 +59,23 @@
                         <!--
                             Without these the strip inherits the desktop thumb
                             size and renders 172px tiles: two fill the width and
-                            the nav alone is 174px tall, which is not the small
-                            strip the reference shows. 96px puts three across
-                            with the fourth just breaking the edge, so it reads
-                            as scrollable. getBreakpoints() json-encodes this
-                            node as-is, so these are passed straight to fotorama
-                            under its own option names.
+                            the nav alone is 174px tall, which is nothing like
+                            the small strip the prototype shows.
+
+                            118 is arithmetic, not taste. Fotorama lays frames
+                            out on a pitch of thumbwidth + thumbmargin (2), and
+                            the strip is the 360px stage: 3 x (118 + 2) = 360,
+                            so three thumbs fill the row exactly and the fourth
+                            begins precisely at the edge rather than peeking
+                            through it. At 96 and again at 112 a sliver of the
+                            fourth showed and the row read as four, which the
+                            client filed twice. A fifth image still scrolls.
+
+                            getBreakpoints() json-encodes this node as-is, so
+                            these reach fotorama under its own option names.
                         -->
-                        <!--
-                            112, not 96: at 96 a fourth thumbnail breaks the
-                            edge of the 360px strip and the row reads as four,
-                            which the client filed. 3 x 112 plus fotorama's 2px
-                            margins is 342 of 360, so exactly three sit in the
-                            strip and a fifth image still scrolls.
-                        -->
-                        <var name="thumbwidth">112</var>
-                        <var name="thumbheight">112</var>
+                        <var name="thumbwidth">118</var>
+                        <var name="thumbheight">118</var>
                     </var>
                 </var>
             </var>
