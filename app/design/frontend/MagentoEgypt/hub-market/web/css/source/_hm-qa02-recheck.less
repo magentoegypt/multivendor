@@ -536,3 +536,23 @@
         }
     }
 }
+
+//  The card's cart button — a white glyph on the orange
+//  ---------------------------------------------
+//  The button takes `--hm-on-accent`, which is NAVY: chosen because navy on
+//  #f26522 measures 5.1:1 against white's 3.1:1. That reasoning holds for
+//  button TEXT, which has to clear 4.5:1 — but this control carries no text,
+//  only a 12-16px glyph, and a graphic needs 3:1 (WCAG 1.4.11). White clears
+//  it, and the client asked for white.
+//
+//  Scoped to the card button rather than flipped at the token: --hm-on-accent
+//  is also the search button's label, the hero CTAs and the bundle CTA, and
+//  those are text that still wants the higher ratio.
+//
+//  Picked For You is untouched — its buttons are accent-tinted with a matching
+//  glyph, set at a far higher specificity a few rules above.
+.hm-page .product-item .action.tocart,
+.hm-page .product-item .action.tocart:hover,
+.hm-page .product-item .action.tocart:focus-visible {
+    color: #ffffff;
+}
