@@ -242,8 +242,16 @@
 @media (max-width: 767px) {
     //  There is no emblem any more (the reference header is text-only, see
     //  logo.phtml), so the wordmark IS the brand and must stay visible on a
-    //  phone; it steps down to 1.6rem to leave the search field its room.
-    .hm-logo__word { font-size: 1.6rem; }
+    //  phone.
+    //
+    //  It used to step down to 1.6rem "to leave the search field its room",
+    //  which was wrong on both counts: the search field wraps onto its own line
+    //  at this width so it never competed for the space, and the shrunken
+    //  wordmark left a visible hole between itself and the cart — the client
+    //  filed both the size and the gap. Measured on the prototype at 390px the
+    //  lockup is 20px/800+700 Playfair over 138px; this matches it, and the
+    //  wider wordmark closes most of the gap by itself.
+    .hm-logo__word { font-size: 2rem; }
     .hm-logo--lockup { border-inline-end: 0; padding-inline-end: 0; }
 }
 

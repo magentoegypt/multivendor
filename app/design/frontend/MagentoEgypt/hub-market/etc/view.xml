@@ -66,8 +66,15 @@
                             node as-is, so these are passed straight to fotorama
                             under its own option names.
                         -->
-                        <var name="thumbwidth">96</var>
-                        <var name="thumbheight">96</var>
+                        <!--
+                            112, not 96: at 96 a fourth thumbnail breaks the
+                            edge of the 360px strip and the row reads as four,
+                            which the client filed. 3 x 112 plus fotorama's 2px
+                            margins is 342 of 360, so exactly three sit in the
+                            strip and a fifth image still scrolls.
+                        -->
+                        <var name="thumbwidth">112</var>
+                        <var name="thumbheight">112</var>
                     </var>
                 </var>
             </var>
