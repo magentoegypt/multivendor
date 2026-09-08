@@ -556,3 +556,81 @@
 .hm-page .product-item .action.tocart:focus-visible {
     color: #ffffff;
 }
+
+//  ---------------------------------------------------------------------------
+//  1-G — the three promo tiles: container, emoji and colours
+//  ---------------------------------------------------------------------------
+//  Re-raised by the client after the first pass. Measured against the
+//  prototype at 1440, every value below came off it.
+//
+//  CONTAINER. 144px tall (h-36) against our 140 minimum that grew to 158, and
+//  20px of padding all round rather than 16/20. The content sits on the
+//  bottom edge, which `justify-content: flex-end` gives us without touching
+//  the markup.
+//
+//  EMOJI. The prototype draws a real emoji at 48px, faint, in the top-right —
+//  not a tinted sprite icon. The glyphs are in the CMS block now (⚡ 🌙 💳);
+//  what is left here is the size, the placement and the opacity, which differ
+//  per tile: the bolt sits 16px down at 30%, the moon and the card 12px down
+//  at 25%.
+//
+//  COLOURS. The kicker is the piece that was furthest off — ours ran 12px on
+//  a hard red / yellow / solid purple. The prototype sets 9px with 0.1em of
+//  tracking on a 4px radius, and picks a pill that belongs to its own tile:
+//  amber with DARK GREEN text on the grocery tile, light purple with deep
+//  purple text on the payments one. The subtext also drops to 55% white so
+//  the title carries the tile on its own.
+.hm-promo {
+    //  border-box, or the 144px is the CONTENT height and the 20px of padding
+    //  lands on top of it — which is exactly how the tile measured 184.
+    block-size: 14.4rem;
+    box-sizing: border-box;
+    justify-content: flex-end;
+    min-block-size: 0;
+    padding: var(--hm-space-5);
+}
+
+//  Everything below carries the `.hm-promo` parent on purpose: the rules it is
+//  replacing are written as `.hm-promo .hm-promo__kicker` and win on
+//  specificity however late this file is imported.
+
+.hm-promo .hm-promo__icon {
+    block-size: auto;
+    font-size: 4.8rem;
+    inline-size: auto;
+    inset-block-start: var(--hm-space-4);
+    inset-inline-end: var(--hm-space-4);
+    line-height: 1;
+    opacity: .3;
+    user-select: none;
+}
+
+.hm-promo--b .hm-promo__icon,
+.hm-promo--c .hm-promo__icon {
+    inset-block-start: var(--hm-space-3);
+    opacity: .25;
+}
+
+//  The navy tile's gradient ran to a violet that belongs to no other tile;
+//  the prototype keeps it in the blue family.
+.hm-promo--a { background: linear-gradient(135deg, #0f2144 0%, #1e3a6e 100%); }
+
+.hm-promo .hm-promo__kicker {
+    border-radius: .4rem;
+    font-size: .9rem;
+    letter-spacing: .1em;
+    line-height: 1.5;
+    margin-block-end: .6rem;
+    padding: .2rem var(--hm-space-2);
+}
+
+.hm-promo .hm-promo__kicker--flash    { background: #ef4444; color: #ffffff; }
+.hm-promo .hm-promo__kicker--seasonal { background: #ffb900; color: #1a4731; }
+.hm-promo .hm-promo__kicker--bnpl     { background: #dab2ff; color: #59168b; }
+
+.hm-promo .hm-promo__title {
+    font-size: 1.8rem;
+    line-height: 1.25;
+}
+
+.hm-promo .hm-promo__text { color: fade(#ffffff, 55%); }
