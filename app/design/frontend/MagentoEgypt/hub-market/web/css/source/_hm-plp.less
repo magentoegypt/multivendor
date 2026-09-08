@@ -469,18 +469,23 @@
 
 //
 //  QA CYCLE 2 — item 2-B: LIST VIEW rows
+//  SCOPE: `.products-list` is the WRAPPER class that exists only in list mode.
+//  The <ol> is `products list items product-items` in BOTH modes, so a
+//  `.products.list` selector hits the grid too — it turned every grid card into
+//  a 160px/7px/0 three-column row and stacked titles one letter per line
+//  (QA CL036-TC06, category and search alike).
 //  ---------------------------------------------
 //  The rows were "not showing up evenly" — blank lays list items out with
 //  floats and lets the content stack decide the height, so rows ranged from
 //  120px to 600px depending on how much description each product carried (the
 //  template now also strips/clamps that text — see list.phtml). This grid
 //  gives every row the same three columns: image, details, price+actions.
-.products.list .product-item {
+.products.wrapper.products-list .product-item {
     inline-size: 100%;
     margin: 0 0 var(--hm-space-3);
 }
 
-.products.list .product-item-info {
+.products.wrapper.products-list .product-item-info {
     background: var(--hm-surface);
     border: 1px solid var(--hm-border-subtle);
     column-gap: var(--hm-space-5);
@@ -521,7 +526,7 @@
     .product-item-name a.product-item-link { min-block-size: 0; }
 }
 
-.products.list .hm-list-desc {
+.products.wrapper.products-list .hm-list-desc {
     color: var(--hm-foreground-muted);
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -532,7 +537,7 @@
     overflow: hidden;
 }
 
-.products.list .product-item-description {
+.products.wrapper.products-list .product-item-description {
     margin: var(--hm-space-1) 0 0;
 
     .action.more {
@@ -543,7 +548,7 @@
 }
 
 @media (max-width: 639px) {
-    .products.list .product-item-info {
+    .products.wrapper.products-list .product-item-info {
         grid-template-columns: 10rem minmax(0, 1fr);
 
         .product-item-media,

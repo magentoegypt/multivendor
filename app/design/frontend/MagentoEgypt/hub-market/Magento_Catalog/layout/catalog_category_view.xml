@@ -73,5 +73,18 @@
         -->
         <referenceBlock name="catalog.compare.sidebar" remove="true"/>
         <referenceBlock name="wishlist_sidebar" remove="true"/>
+
+        <!--
+            Mobile filter drawer (CL036-DEV01.02 item 2). Renders no markup; it
+            attaches js/hm-mobile-filters to the sidebar, which adds the
+            "Filters" pill to the toolbar and takes the rail off-canvas under
+            768px. Desktop is untouched, and with JS off the rail renders in
+            place exactly as before.
+        -->
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.plp.mobile.filters"
+                   template="Magento_LayeredNavigation::mobile-filters.phtml"/>
+        </referenceContainer>
     </body>
 </page>

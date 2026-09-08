@@ -41,3 +41,8 @@
 //  them, so it has to settle the cascade — and keeping it separate means the
 //  parity delta is one file to read and one line to revert.
 @import '_hm-figma.less';
+
+//  LAST of all. The mobile parity pass (CL036-DEV01.01/.02/.03) corrects the
+//  narrow-viewport layout on top of everything above, including _hm-figma's
+//  geometry, so it has to be able to out-specify it at equal weight.
+@import '_hm-mobile.less';

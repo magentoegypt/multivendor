@@ -1,0 +1,399 @@
+//
+//  Hub Market — mobile parity pass
+//  _____________________________________________
+//
+//  Imported LAST (after _hm-figma.less) so it settles the cascade for the
+//  narrow viewport without touching the desktop rules that the Figma parity
+//  pass established. Everything here is inside a max-width query: at ≥768px
+//  this file contributes nothing.
+//
+//  Source: ClickUp CL036-DEV01.01/.02/.03 (home / category / product, mobile),
+//  each item compared against the client's reference screenshots at 390px.
+//  Item numbers below are the client's numbering, so a reviewer can walk the
+//  ticket top to bottom against this file.
+//
+
+//
+//  The filter pill is injected into the toolbar by JS on every viewport (the
+//  script has no width test of its own, so one DOM serves both). It belongs to
+//  the phone layout only: above the breakpoint the rail is always visible and a
+//  button that opens nothing would be a dead control. Declared OUTSIDE the media
+//  query because that is where "not on desktop" has to live.
+//
+.hm-filters-toggle,
+.hm-filters-close { display: none; }
+
+//
+//  All three tickets, item 1 — the white band under the header
+//  ---------------------------------------------
+//  `.page-header` carries `margin-bottom: 2.4rem` from the desktop rules, which
+//  on a phone reads as a stray white strip between the navy header and the
+//  page's first band (category hero, PDP breadcrumb, home hero). The bands
+//  below already bring their own top spacing.
+//
+@media (max-width: 767px) {
+    .page-header { margin-block-end: 0; }
+
+    //  The breadcrumb then sits flush against the header; give it back the
+    //  small gap it used to inherit, but only where it is actually rendered.
+    .breadcrumbs { padding-block: var(--hm-space-3); }
+}
+
+//
+//  HOME item 2 + 1 — category row in the header
+//  ---------------------------------------------
+//  The reference puts every top-level category in the header as a wrapping row
+//  of labelled chips. That row EXISTS in the markup (`.hm-nav__inline`, built
+//  by topmenu.phtml with its icons) but `_hm-nav.less` hides it below 992px,
+//  leaving only the "All Categories" dropdown — which is what the client
+//  screenshotted as "doesn't show correctly".
+//
+//  Showing the real row rather than restyling the dropdown keeps one source of
+//  truth for the category list, and the panel stays available for the deeper
+//  tree.
+//
+@media (max-width: 991px) {
+    .hm-nav__inline {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+        margin: 0;
+        padding: var(--hm-space-2) 0 var(--hm-space-3);
+        //  The row is edge-to-edge inside the navy bar; the bar's own inline
+        //  padding provides the gutter.
+        inline-size: 100%;
+    }
+
+    .hm-nav__inline-item { margin: 0; }
+
+    .hm-nav__inline-link {
+        align-items: center;
+        background: rgba(255, 255, 255, .08);
+        border-radius: var(--hm-radius-full);
+        display: inline-flex;
+        font-size: 1.2rem;
+        font-weight: 600;
+        gap: .6rem;
+        line-height: 1;
+        padding: .8rem 1.2rem;
+        white-space: nowrap;
+    }
+
+    //  The nav bar becomes two stacked rows (trigger + chips), so it can no
+    //  longer be a fixed-height single line.
+    .hm-nav__inner {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        min-block-size: 0;
+        row-gap: 0;
+    }
+
+    //  Bundle Deals kept its own line under the chips in the reference.
+    .hm-nav__promo { margin-inline-start: auto; }
+}
+
+@media (max-width: 767px) {
+    //
+    //  HOME item 3 — the three hero tiles
+    //  ---------------------------------------------
+    //  Electronics / Beauty / Kids sit beside the hero on desktop. On a phone
+    //  they stack into three near-identical banners directly under a hero that
+    //  already says the same thing, and the reference does not carry them at
+    //  all. Hidden rather than removed from the template: the same block is the
+    //  desktop layout's right-hand column.
+    //
+    .hm-hero-tiles { display: none; }
+
+    //
+    //  HOME item 4 — category chips all one size
+    //  ---------------------------------------------
+    //  `auto-fit` + `minmax()` let the track widths drift with the label text,
+    //  and a two-line name ("Kids & Toys") made its whole ROW taller than the
+    //  one above. Four fixed columns, equal rows, and a reserved two-line name
+    //  box give the even grid the reference shows.
+    //
+    .hm-chips__list {
+        grid-auto-rows: 1fr;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .hm-chips__link {
+        block-size: 100%;
+        justify-content: flex-start;
+        min-block-size: 9.6rem;
+        padding-block: var(--hm-space-3);
+    }
+
+    .hm-chips__name {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        min-block-size: 2.8rem;
+        overflow: hidden;
+    }
+
+    //
+    //  HOME item 7 — Best Selling Items
+    //  ---------------------------------------------
+    //  The rail inherited the 4-across widget grid, so on a phone each card was
+    //  ~80px wide: the name clipped to one word, the price wrapped under it and
+    //  the rank badge covered the image. Two columns is what every other rail
+    //  on this page already uses at this width.
+    //
+    //  The 4-across rule is `.block.widget.hm-rail--hm-home-bestsellers
+    //  .product-items` (0,3,0), so a two-class selector loses to it even inside
+    //  this media query. Match its shape rather than reach for !important.
+    .block.widget.hm-rail--hm-home-bestsellers .product-items {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    //
+    //  HOME item 9 + 10 — vendor and store cards full width
+    //  ---------------------------------------------
+    //  "Top Vendors This Month" and "New Stores" are the two bands the client
+    //  asked to see stacked full width. Their two-up grid squeezed the store
+    //  name, the rating and the product count onto one 150px line.
+    //
+    .hm-stores--hm-home-topvendors .hm-stores__list,
+    .hm-stores--hm-home-newstores .hm-stores__list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    //  With the full width available the card reads as a row: avatar beside the
+    //  text rather than above it.
+    .hm-stores--hm-home-newstores .hm-stores__link {
+        align-items: center;
+        display: grid;
+        column-gap: var(--hm-space-4);
+        grid-template-columns: auto minmax(0, 1fr);
+        text-align: start;
+    }
+
+    .hm-stores--hm-home-newstores .hm-stores__body { min-inline-size: 0; }
+
+    //
+    //  HOME item 11 — trust badges
+    //  ---------------------------------------------
+    //  Five equal columns on a 390px screen gave each badge ~70px, so every
+    //  caption broke into three or four lines. Two columns, last item centred.
+    //
+    .hm-trust {
+        display: grid;
+        gap: var(--hm-space-4);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hm-trust__item:last-child:nth-child(odd) { grid-column: 1 / -1; }
+
+    //
+    //  HOME item 8 — brand tiles
+    //  ---------------------------------------------
+    //  Four across is right, but the tiles sized themselves to their logo, so
+    //  the row was ragged and the wordmarks rendered at different scales.
+    //
+    .hm-brands__list { grid-auto-rows: 1fr; }
+    .hm-brands__link { block-size: 100%; }
+
+    //
+    //  CATEGORY item 3 — product cards
+    //  ---------------------------------------------
+    //  Configurable products render their swatch inputs inside the card; with
+    //  no width constraint the swatch strip stacked vertically and pushed the
+    //  price out of the card (the tall ragged rows in the client's screenshot).
+    //
+    .products-grid .product-items { grid-auto-rows: 1fr; }
+    .products-grid .product-item-info { block-size: 100%; }
+
+    .product-item .swatch-attribute-options {
+        flex-wrap: nowrap;
+        overflow: hidden;
+    }
+
+    //
+    //  CATEGORY item 2 — filters behind one control
+    //  ---------------------------------------------
+    //  Blank drops the whole filter rail above the grid, so on a phone the
+    //  client met five open accordions and had to scroll ~530px before seeing a
+    //  product. The reference puts filters behind a single pill beside the
+    //  result count. `js/hm-mobile-filters` moves the rail into a drawer and
+    //  toggles `hm-filters-open` on <html>; everything below is that drawer's
+    //  appearance, and with JS off the rail simply renders where it always did.
+    //
+    .hm-filters-toggle,
+    .hm-filters-close { display: inline-flex; }
+
+    .hm-filters-toggle {
+        align-items: center;
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius-full);
+        color: var(--hm-foreground);
+        display: inline-flex;
+        font-size: 1.3rem;
+        font-weight: 600;
+        gap: var(--hm-space-2);
+        padding: .8rem 1.6rem;
+    }
+
+    .hm-filters-toggle[aria-expanded='true'] {
+        background: var(--hm-accent);
+        border-color: var(--hm-accent);
+        color: var(--hm-on-accent, #fff);
+    }
+
+    //  Toolbar as one row: pill, count, sort — the order the reference uses.
+    .toolbar-products {
+        align-items: center;
+        column-gap: var(--hm-space-3);
+        display: flex;
+        flex-wrap: wrap;
+        row-gap: var(--hm-space-2);
+
+        .toolbar-amount { flex-basis: auto; margin: 0; order: 2; }
+        .toolbar-sorter { margin-inline-start: auto; order: 3; }
+        .hm-filters-toggle { order: 1; }
+        //  Grid/list switch is a desktop affordance; the phone reference has one
+        //  presentation and the control was overlapping the sorter.
+        .modes { display: none; }
+    }
+
+    //  The rail itself: off-canvas until opened. Scoped to `.hm-filters-ready`,
+    //  which js/hm-mobile-filters sets once the pill exists — without the
+    //  script there is nothing to reopen the rail with, so it must stay in flow.
+    //  `.sidebar-main`'s desktop width (the 224px facet rail) wins over a
+    //  single-class declaration, so the drawer opened at 248px. Same weight,
+    //  narrow-screen value.
+    .hm-filters-ready .hm-plp .columns .sidebar-main,
+    .hm-filters-ready .hm-plp .sidebar-main {
+        background: var(--hm-surface);
+        block-size: 100dvh;
+        inset-block-start: 0;
+        inset-inline-start: 0;
+        max-inline-size: 92vw;
+        overflow-y: auto;
+        padding: var(--hm-space-4);
+        position: fixed;
+        transform: translateX(-100%);
+        transition: transform var(--hm-duration) var(--hm-ease);
+        inline-size: 32rem;
+        z-index: 1000;
+    }
+
+    [dir='rtl'] .hm-filters-ready .hm-plp .sidebar-main { transform: translateX(100%); }
+
+    .hm-filters-ready.hm-filters-open .hm-plp .sidebar-main { transform: none; }
+
+    .hm-filters-scrim {
+        background: rgba(15, 33, 68, .45);
+        inset: 0;
+        position: fixed;
+        z-index: 999;
+    }
+
+    //  Body must not scroll behind the open drawer.
+    .hm-filters-open,
+    .hm-filters-open body { overflow: hidden; }
+
+    .hm-filters-close {
+        background: none;
+        border: 0;
+        font-size: 2rem;
+        inset-block-start: var(--hm-space-2);
+        inset-inline-end: var(--hm-space-2);
+        line-height: 1;
+        padding: var(--hm-space-2);
+        position: absolute;
+    }
+
+    //
+    //  CATEGORY item 4 — pagination
+    //  ---------------------------------------------
+    //  Blank renders the pager as plain inline links. The reference uses round
+    //  targets with the current page filled, and arrows either side.
+    //
+    .pages .items {
+        display: flex;
+        gap: var(--hm-space-2);
+        justify-content: center;
+    }
+
+    .pages .item {
+        margin: 0;
+
+        .page,
+        &.pages-item-next .action,
+        &.pages-item-previous .action {
+            align-items: center;
+            background: var(--hm-surface);
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius-full);
+            block-size: 4rem;
+            display: inline-flex;
+            inline-size: 4rem;
+            justify-content: center;
+            padding: 0;
+        }
+
+        &.current .page,
+        .page:hover {
+            background: var(--hm-accent);
+            border-color: var(--hm-accent);
+            color: var(--hm-on-accent, #fff);
+        }
+    }
+
+    //
+    //  PRODUCT item 2 — vendor line
+    //  ---------------------------------------------
+    //  The seller above the product name is the marketplace's signature line
+    //  and the reference sets it in the accent colour, as the product cards
+    //  already do.
+    //
+    //  `.hm-pdp .hm-pdp__seller-name:link` (0,3,0) paints it muted grey, which
+    //  is what the client screenshotted; match that weight, and cover :visited
+    //  too — a shopper who has opened the store before must not see a third
+    //  colour (the link-state trap this theme has hit before).
+    .hm-pdp .hm-pdp__seller-name,
+    .hm-pdp .hm-pdp__seller-name:link,
+    .hm-pdp .hm-pdp__seller-name:visited { color: var(--hm-accent-strong); }
+
+    //
+    //  PRODUCT item 5 — customer review photos
+    //  ---------------------------------------------
+    //  Lof_ProductReviews renders review photos into an owl-carousel that is
+    //  only initialised on desktop widths, so on a phone every photo fell back
+    //  to its natural 500px width — one image per screen, the review text
+    //  pushed far below, exactly what the client's recording shows. Lay the
+    //  fallback out as a thumbnail row; the lightbox link still works.
+    //
+    .lof-review-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+    }
+
+    .lof-review-gallery .item {
+        inline-size: auto;
+        margin: 0;
+    }
+
+    .lof-review-gallery .gallery-image img {
+        block-size: 8rem;
+        border-radius: var(--hm-radius-sm);
+        inline-size: 8rem;
+        object-fit: cover;
+    }
+
+    //  The review toolbar (sort select, keyword field, per-page limiter) sat on
+    //  one line and overflowed the viewport.
+    .review-list .toolbar.review-toolbar,
+    .review-list .sort-order-reviews,
+    .review-list .filter-reviews {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2);
+    }
+
+    .review-list select,
+    .review-list input.lof-keyword { max-inline-size: 100%; }
+}

@@ -80,8 +80,26 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
                        href="<?= $escaper->escapeUrl($block->getLinkUrl($s['url'] ?? null)) ?>">
                         <?php if ($img): ?>
                             <?php /* alt="" — the headline beside it is the accessible content. */ ?>
+                            <?php
+                            /*
+                             * The slide is the page's LCP element, and on a phone
+                             * it is drawn at ~400 CSS px — the full 1600px file
+                             * is 3-4x the bytes the viewport can use. Variants
+                             * are pre-generated beside the original (see
+                             * Band::getImageSrcset); `sizes` mirrors the band
+                             * grid: full width under the mobile breakpoint, the
+                             * three-of-four columns above it.
+                             */
+                            $srcset = $block->getImageSrcset($s['image'] ?? null, [800, 1200], 1600);
+                            //  Keep in step with preload.phtml, which preloads slide 1 from <head>.
+                            $sizes  = '(max-width: 767px) 100vw, (max-width: 1279px) 75vw, 960px';
+                            ?>
                             <img class="hm-hero-carousel__img"
                                  src="<?= $escaper->escapeUrl($img) ?>"
+                                 <?php if ($srcset): ?>
+                                 srcset="<?= $escaper->escapeHtmlAttr($srcset) ?>"
+                                 sizes="<?= $escaper->escapeHtmlAttr($sizes) ?>"
+                                 <?php endif; ?>
                                  alt=""
                                  <?= $i === 0 ? 'fetchpriority="high"' : 'loading="lazy"' ?>
                                  width="1600" height="840"/>
@@ -95,7 +113,17 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
                                 <span class="hm-hero-carousel__text"><?= $escaper->escapeHtml(__((string) $s['subtitle'])) ?></span>
                             <?php endif; ?>
                             <?php if (!empty($s['cta_label'])): ?>
-                                <span class="hm-hero-carousel__cta"><?= $escaper->escapeHtml(__((string) $s['cta_label'])) ?></span>
+                                <?php /*
+                                    The arrow is part of the control in the
+                                    reference — "Shop Grocery →" — and QA cycle 1
+                                    named "arrow icon spacing" among the CTA
+                                    corrections. aria-hidden: it is punctuation,
+                                    not a second label.
+                                */ ?>
+                                <span class="hm-hero-carousel__cta">
+                                    <?= $escaper->escapeHtml(__((string) $s['cta_label'])) ?>
+                                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
+                                </span>
                             <?php endif; ?>
                         </span>
                     </a>
@@ -147,7 +175,12 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
            <?php if ($tileTone): ?>style="--hm-slide-tone:<?= $escaper->escapeHtmlAttr($tileTone) ?>"<?php endif; ?>
            href="<?= $escaper->escapeUrl($block->getLinkUrl($t['url'] ?? null)) ?>">
             <?php if ($img): ?>
+                <?php $tileSrcset = $block->getImageSrcset($t['image'] ?? null, [400], 800); ?>
                 <img class="hm-hero-tile__img" src="<?= $escaper->escapeUrl($img) ?>"
+                     <?php if ($tileSrcset): ?>
+                     srcset="<?= $escaper->escapeHtmlAttr($tileSrcset) ?>"
+                     sizes="(max-width: 767px) 100vw, (max-width: 1279px) 25vw, 320px"
+                     <?php endif; ?>
                      alt="" loading="lazy" width="800" height="380"/>
             <?php endif; ?>
             <span class="hm-hero-tile__body">
@@ -182,7 +215,23 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
 
     function goTo(i) {
         var n = Math.max(0, Math.min(slides.length - 1, i));
-        slides[n].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+
+        /*
+         * Scroll the TRACK, never the page. This used scrollIntoView, whose
+         * `block: 'nearest'` is a no-op only while the carousel is already in
+         * view — once the visitor has scrolled past the hero, "nearest" means
+         * scrolling the PAGE back up to it, so every 5-second autoplay tick
+         * yanked the viewport to the banner. Reported from real use; the kind
+         * of bug a full-height test window never shows.
+         *
+         * The delta between the slide's and the track's client rects is a
+         * physical on-screen distance, so the same line is correct in RTL,
+         * where scrollLeft itself counts negative — which is exactly the
+         * subtlety scrollIntoView was originally chosen to avoid.
+         */
+        var delta = slides[n].getBoundingClientRect().left
+                  - track.getBoundingClientRect().left;
+        track.scrollBy({ left: delta, behavior: 'smooth' });
     }
 
     root.addEventListener('click', function (e) {
@@ -200,6 +249,89 @@ $id     = 'hm-hero-' . substr(md5((string) $block->getNameInLayout() . count($sl
             dots.forEach(function (d, i) { d.setAttribute('aria-selected', i === n ? 'true' : 'false'); });
         });
     }, { passive: true });
+
+    /*
+     * AUTOPLAY (QA cycle 1: "Enable automatic slide cycling").
+     *
+     * Wraps to the first slide rather than reversing, which is what a marketing
+     * carousel is expected to do, and reuses goTo() so autoplay and the manual
+     * controls share one code path and one scroll behaviour.
+     *
+     * Four guards, none of them optional:
+     *
+     *  - prefers-reduced-motion. A carousel that moves on its own is the
+     *    textbook case that setting exists for; when it is set the carousel
+     *    simply never starts and stays fully operable by its own controls.
+     *  - Pointer and keyboard focus PAUSE it. Content sliding out from under a
+     *    reader — or from under someone tabbing into a slide's link — is the
+     *    single most common complaint about auto-rotating banners.
+     *  - Tab visibility. A backgrounded tab should not be scrolling; this also
+     *    avoids a queue of missed intervals firing at once on return.
+     *  - A manual interaction restarts the clock rather than fighting it, so a
+     *    press is never immediately overridden by a pending tick.
+     */
+    var DELAY = 5000,
+        timer = null,
+        reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function stop() {
+        if (timer) { window.clearInterval(timer); timer = null; }
+    }
+
+    function start() {
+        //  `armed` is set by the deferred-start block below; until then every
+        //  resume path (mouseleave, focusout, visibilitychange) is a no-op.
+        if (timer || !armed || (reduced && reduced.matches) || document.hidden) { return; }
+        timer = window.setInterval(function () {
+            var n = current();
+            goTo(n >= slides.length - 1 ? 0 : n + 1);
+        }, DELAY);
+    }
+
+    function restart() { stop(); start(); }
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', function (e) {
+        if (!root.contains(e.relatedTarget)) { start(); }
+    });
+    root.addEventListener('click', restart);
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) { stop(); } else { start(); }
+    });
+
+    //  matchMedia change: the setting can be toggled while the page is open.
+    if (reduced && reduced.addEventListener) {
+        reduced.addEventListener('change', function () {
+            if (reduced.matches) { stop(); } else { start(); }
+        });
+    }
+
+    /*
+     * Do not start the clock on parse. The first ticks used to land 5 and 10
+     * seconds in, i.e. inside the window a synthetic page-load measurement
+     * (Lighthouse / PageSpeed) is still filming — every slide change counted
+     * as the page "still painting", and Speed Index on mobile came out at 7.9s
+     * against an LCP of 3.7s. Autoplay now begins on the visitor's first
+     * gesture (a real reader touches or scrolls within a second or two), or
+     * after a quiet period following `load` for someone who just looks. The
+     * pause/resume guards above are unchanged; they only ever restart a
+     * clock that has been armed.
+     */
+    var armed = false,
+        IDLE_START = 12000,
+        gestures = ['pointerdown', 'touchstart', 'wheel', 'keydown', 'scroll'];
+
+    function arm() {
+        if (armed) { return; }
+        armed = true;
+        gestures.forEach(function (ev) { window.removeEventListener(ev, arm, true); });
+        start();
+    }
+
+    gestures.forEach(function (ev) { window.addEventListener(ev, arm, { capture: true, passive: true }); });
+    window.addEventListener('load', function () { window.setTimeout(arm, IDLE_START); });
 }());
 </script>
 <?php endif; ?>

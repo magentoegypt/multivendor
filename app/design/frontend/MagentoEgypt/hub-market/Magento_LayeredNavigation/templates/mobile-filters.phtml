@@ -1,0 +1,19 @@
+<?php
+/**
+ * Hub Market — bootstraps the mobile filter drawer.
+ *
+ * Renders no markup. It exists only to attach js/hm-mobile-filters to the
+ * sidebar, because the sidebar container itself is core markup this theme does
+ * not override — adding a template here is cheaper, and clearer to revert, than
+ * copying Magento's container just to hang one data-mage-init on it.
+ *
+ * See CL036-DEV01.02 item 2.
+ */
+?>
+<script type="text/x-magento-init">
+{
+    ".sidebar.sidebar-main": {
+        "js/hm-mobile-filters": {}
+    }
+}
+</script>

@@ -85,6 +85,58 @@ class Band extends Template
     }
 
     /**
+     * `srcset` for a stored media path, built from pre-generated width variants
+     * that sit beside the original as `<name>-<width>.<ext>` (e.g.
+     * hero/hero-grocery-800.webp). Only variants that exist on disk are listed,
+     * and the original is always appended as the widest candidate, so a row
+     * whose image was uploaded without variants degrades to plain `src`.
+     *
+     * Returns null when no variant exists, so the template can omit the
+     * attribute entirely rather than emit a one-entry srcset.
+     *
+     * @param int[] $widths candidate widths, ascending
+     */
+    public function getImageSrcset(?string $path, array $widths, int $originalWidth): ?string
+    {
+        $path = trim((string) $path);
+        if ($path === '' || preg_match('~^https?://~i', $path)) {
+            return null;
+        }
+
+        $dot = strrpos($path, '.');
+        if ($dot === false) {
+            return null;
+        }
+        $stem = substr($path, 0, $dot);
+        $ext  = substr($path, $dot);
+
+        try {
+            $media = $this->_filesystem->getDirectoryRead(
+                \Magento\Framework\App\Filesystem\DirectoryList::MEDIA
+            );
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        $candidates = [];
+        foreach ($widths as $w) {
+            if ($w >= $originalWidth) {
+                continue;
+            }
+            $variant = $stem . '-' . $w . $ext;
+            if ($media->isFile(ltrim($variant, '/'))) {
+                $candidates[] = $this->getImageUrl($variant) . ' ' . $w . 'w';
+            }
+        }
+        if ($candidates === []) {
+            return null;
+        }
+        $candidates[] = $this->getImageUrl($path) . ' ' . $originalWidth . 'w';
+
+        return implode(', ', $candidates);
+    }
+
+    /**
      * Destination for a row. Relative paths are resolved against the store's base
      * URL rather than through the URL builder — these point at category and CMS
      * pages, not at routes, and getUrl() would prepend routing segments to them.

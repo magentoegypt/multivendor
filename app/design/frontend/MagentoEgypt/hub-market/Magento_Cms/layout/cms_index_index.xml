@@ -44,6 +44,18 @@
     <body>
         <attribute name="class" value="hm-home"/>
 
+        <!--
+            0. LCP PRELOAD for the first hero slide. Lives in head.additional
+            because Magento assembles <head> before it renders the body, so the
+            band block cannot add the asset itself. Same Band block, second
+            template — see MagentoEgypt_HeroBanner::preload.phtml.
+        -->
+        <referenceContainer name="head.additional">
+            <block class="MagentoEgypt\HeroBanner\Block\Band"
+                   name="hm.home.hero.preload"
+                   template="MagentoEgypt_HeroBanner::preload.phtml"/>
+        </referenceContainer>
+
         <referenceContainer name="content">
 
             <!--
@@ -606,6 +618,15 @@
                    name="hm.home.deals" after="hm.home.categories">
                 <arguments>
                     <argument name="title" xsi:type="string" translate="true">Today's Deals</argument>
+                    <!--
+                        The reference's deals band carries an "All Deals" link on
+                        the right of its heading, and the client filed its absence
+                        (CL036-DEV01.01 item 5). grid.phtml renders the link only
+                        when more_url is set; every other rail on this page
+                        already passes one.
+                    -->
+                    <argument name="more_url" xsi:type="string">all.html</argument>
+                    <argument name="more_label" xsi:type="string" translate="true">All Deals</argument>
                     <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
                     <argument name="products_count" xsi:type="number">4</argument>
                     <argument name="show_pager" xsi:type="number">0</argument>

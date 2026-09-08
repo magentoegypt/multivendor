@@ -1,0 +1,34 @@
+<?php
+/**
+ * Hub Market — LCP preload for the first hero slide.
+ *
+ * Rendered from `head.additional`, not from band.phtml: Magento assembles
+ * <head> (renderHeadContent / renderHeadAssets / head.additional) BEFORE it
+ * renders the body, so a page asset added while the band renders never
+ * reaches the head. This block re-reads the same rows and emits one
+ * <link rel="preload"> for slide 1.
+ *
+ * Why it matters: the slide is the LCP element but sits ~200 KB into the
+ * document, behind the inline SVG sprite and the category nav, so the preload
+ * scanner reaches it late (Lighthouse mobile: 1.1 s "resource load delay").
+ * With imagesrcset/imagesizes the browser fetches the same candidate the
+ * <img> will pick, so nothing is downloaded twice.
+ *
+ * @var \MagentoEgypt\HeroBanner\Block\Band $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$slides = $block->getSlides();
+$first  = $slides[0] ?? null;
+$img    = $first ? $block->getImageUrl($first['image'] ?? null) : null;
+if (!$img) {
+    return;
+}
+$srcset = $block->getImageSrcset($first['image'] ?? null, [800, 1200], 1600);
+$sizes  = '(max-width: 767px) 100vw, (max-width: 1279px) 75vw, 960px';
+?>
+<link rel="preload" as="image" fetchpriority="high"
+      href="<?= $escaper->escapeUrl($img) ?>"
+      <?php if ($srcset): ?>
+      imagesrcset="<?= $escaper->escapeHtmlAttr($srcset) ?>"
+      imagesizes="<?= $escaper->escapeHtmlAttr($sizes) ?>"
+      <?php endif; ?>/>
