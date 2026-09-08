@@ -351,6 +351,26 @@
 .hm-pdp .product-info-main .product-reviews-summary { --hm-rating-star: #c85c2c; }
 
 //
+//  No SKU, and no "IN STOCK" badge when the product is in stock
+//  ---------------------------------------------
+//  The prototype's product page carries neither: under the price it goes
+//  straight from the rating row to the short description. Ours printed
+//  "IN STOCK   Product SKU clothes127" between them, which is warehouse data in
+//  the middle of the buying decision.
+//
+//  The negative state STAYS. "Out of stock" is the only thing on the page that
+//  explains why there is no Add to Cart button, and the prototype has no
+//  equivalent because every product in it is buyable. So the SKU goes always,
+//  the badge goes only when it says the product is available, and the row
+//  itself collapses when that leaves it empty.
+.hm-pdp .product-info-main .product-info-stock-sku {
+    .product.attribute.sku { display: none; }
+    .stock.available { display: none; }
+}
+
+.hm-pdp .product-info-main .product-info-stock-sku:not(:has(.stock.unavailable)) { display: none; }
+
+//
 //  Related / upsell rails inherit the card component from _hm-product-item.less
 //  ---------------------------------------------
 .block.related,

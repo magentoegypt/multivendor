@@ -26,6 +26,24 @@ if (!$hmProduct) {
 }
 
 /*
+ * The store's own language. Used for one thing only: refusing Arabic copy on a
+ * store that does not read it — see the script check in the cleaner below.
+ *
+ * Read off the product's own store rather than through the locale resolver.
+ * The resolver would have to arrive as a layout argument, and Magento 2.4
+ * accepts only `Block\ArgumentInterface` implementations there — passing
+ * `Locale\ResolverInterface` logs "Instance of ArgumentInterface is expected"
+ * and drops the whole block, which is how the summary vanished from every
+ * product page for one deploy. Wrapping it in a ViewModel would mean a new
+ * class with a constructor dependency, and this install runs in production
+ * mode, so that is a di:compile — a lot of machinery for a locale string.
+ * `Store::getConfig()` is public API and store-scoped, which is exactly what is
+ * needed here.
+ */
+$hmStore = $hmProduct->getStore();
+$hmStoreArabic = $hmStore && str_starts_with((string) $hmStore->getConfig('general/locale/code'), 'ar');
+
+/*
  * BOTH sources go through the same cleaner.
  *
  * The first version trusted short_description and only cleaned the description
@@ -35,7 +53,7 @@ if (!$hmProduct) {
  * "&lt;section class=&quot;…" text. Whichever field supplies the text, it gets
  * the same treatment.
  */
-$hmClean = static function (string $raw): string {
+$hmClean = static function (string $raw) use ($hmStoreArabic): string {
     /*
      * DECODE FIRST. Several products store their markup escaped — `&lt;br/&gt;`
      * rather than `<br/>`. strip_tags sees that as ordinary text and leaves it,
@@ -66,6 +84,35 @@ $hmClean = static function (string $raw): string {
     if (!preg_match('/\p{L}/u', $out) || preg_match('/[{}<>]|#html-body/', $out)) {
         return '';
     }
+
+    /*
+     * AND NOT IN THE WRONG SCRIPT. This catalogue was imported from an Arabic
+     * source: `short_description` is mostly a scraped spec block and only 3 of
+     * 2,304 products carry an English override, so the English store fell back
+     * to the default value and printed Arabic under an English title and an
+     * English price. Counted before the fix: 145 of the 2,300 products on this
+     * website did that.
+     *
+     * Half the letters is the test rather than "contains any Arabic", so a
+     * brand or a size in Arabic inside an otherwise English sentence still
+     * reads. Rejecting here rather than at the end means the fallback keeps
+     * looking: a product whose short_description is Arabic but whose
+     * description is English now shows the English one.
+     *
+     * ONE-DIRECTIONAL, deliberately. The mirror rule — refusing Latin copy on
+     * the Arabic store — would blank the summary on the store this catalogue is
+     * actually written for wherever only English copy exists, which trades a
+     * real defect for a bigger one. English on an Arabic page is readable;
+     * Arabic on an English page is not.
+     */
+    if (!$hmStoreArabic) {
+        $arabic = preg_match_all('/\p{Arabic}/u', $out);
+        $letters = preg_match_all('/\p{L}/u', $out);
+        if ($letters > 0 && $arabic / $letters > 0.5) {
+            return '';
+        }
+    }
+
     return $out;
 };
 
