@@ -311,29 +311,10 @@
         padding-inline: var(--hm-space-2);
     }
 
-    //  Hover. Magento ships
-    //
-    //      .swatch-option:not(.disabled):hover { border:1px solid #fff; outline:1px solid #999 }
-    //
-    //  which blanks the chip's OWN border to white and draws a 1px grey line
-    //  2px outside it. The box the eye was tracking disappears and a second,
-    //  larger, differently-shaped one appears around where it was — the chip
-    //  looks like it detached from itself. The grey is also off-palette.
-    //
-    //  Keep the chip and darken its border instead: the shape never moves, and
-    //  hover, selected (navy fill) and rest stay one family.
-    //
-    //  Weighted to (0,4,0) to match Magento's own `:not(.disabled)` rather than
-    //  depending on which stylesheet the merge happens to emit last.
-    .swatch-option:not(.disabled):hover {
-        border-color: var(--hm-primary);
-        color: var(--hm-foreground);
-    }
-
-    //  Drop the offset ring only when the chip is not keyboard-focused, so
-    //  hovering a focused chip never eats its focus indicator.
-    .swatch-option:not(.disabled):hover:not(:focus-visible) { outline: 0; }
-
+    //  Hover is deliberately NOT here. It started card-scoped, then the product
+    //  page turned out to carry the same Magento default, so the rule moved to
+    //  the shared swatch block in _hm-plp.less and every context picks it up.
+    //  Only the chip's BOX is card-specific, and that stays above.
 }
 
 //  Swatch tooltip on a card

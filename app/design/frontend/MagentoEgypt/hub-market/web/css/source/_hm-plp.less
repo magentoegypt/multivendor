@@ -399,6 +399,62 @@
     }
 }
 
+//  Wrapped rows
+//  ---------------------------------------------
+//  When an attribute has more chips than fit, the rows it wraps onto had no
+//  usable separation: 0px on a card (this theme zeroes the option margins there
+//  to keep the grid's equalised row height down) and 6px on the product page,
+//  which against a 44px chip reads as touching. Either way the second row looks
+//  like it belongs to whatever is under it rather than to the chip above.
+//
+//  `row-gap` rather than a bottom margin on the chips, because a margin also
+//  lands under the LAST row — which is exactly the height the card compaction
+//  was protecting, and it would re-open the void above the price. A row gap is
+//  spacing BETWEEN rows and adds nothing when an attribute fits on one line.
+//
+//  Scoped to where product chips live. Layered navigation renders the same
+//  `.swatch-attribute-options` class in the filter rail, and its layout is not
+//  this rule's business.
+.product-item .swatch-attribute-options,
+.product-info-main .swatch-attribute-options,
+.product-add-form .swatch-attribute-options {
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: var(--hm-space-2);
+
+    //  Row spacing is row-gap's job now; Magento's 6px bottom margin would
+    //  stack on top of it and give 14px between rows but 6px after the last.
+    .swatch-option { margin-block: 0; }
+}
+
+//  Hover, everywhere a chip appears — cards, search, home rails and the product
+//  page. Magento ships
+//
+//      .swatch-option:not(.disabled):hover { border:1px solid #fff; outline:1px solid #999 }
+//
+//  which blanks the chip's OWN border to white and draws a 1px grey line 2px
+//  outside it. The box the eye was tracking disappears and a second, larger,
+//  differently-shaped one takes its place around where it was, in a grey that is
+//  not in the palette — the chip reads as having detached from itself.
+//
+//  Keep the chip and darken its border instead: the shape never moves, and rest,
+//  hover and selected (navy fill) stay one family. The chip's SIZE is not set
+//  here — the card shrinks its box to match the colour chips, the product page
+//  keeps the larger one — because only the state is shared, not the geometry.
+//
+//  `.hm-page` for the same reason the rules below carry it: Magento's own
+//  selector is (0,3,0) thanks to `:not(.disabled)`, so an unprefixed rule ties
+//  and leaves the winner to whichever stylesheet the merge emits last.
+.hm-page .swatch-option:not(.disabled):hover {
+    border-color: var(--hm-primary);
+    color: var(--hm-foreground);
+}
+
+//  Drop the offset ring only when the chip is not keyboard-focused, so hovering
+//  a focused chip never eats its focus indicator.
+.hm-page .swatch-option:not(.disabled):hover:not(:focus-visible) { outline: 0; }
+
 //  The `.text` rule above is (0,2,0) and LOSES. Magento_Swatches ships
 //
 //      .swatch-attribute.size .swatch-option,
