@@ -287,6 +287,29 @@
     //  the 8px, and it pays it on top — no trailing space to re-open the void
     //  above the price.
     .swatch-attribute + .swatch-attribute { margin-block-start: var(--hm-space-2); }
+
+    //  Two chip sizes on one card: the text chips measured 48x44 against the
+    //  colour chips' 40x38 — 6px taller and 8px wider — so the size row read as
+    //  a different, heavier control than the colour row directly under it.
+    //
+    //  All of the difference is padding. Both boxes are content-box on the same
+    //  3.4rem content square; the colour chip adds 1px/2px, the text chip 4px
+    //  and (from _hm-plp.less) 12px. Magento gives `.text` a 22px min content
+    //  width, so 8px inline + the 1px borders lands on exactly 40px, and 1px
+    //  block padding on exactly 38px — the colour chip's box, matched rather
+    //  than approximated.
+    //
+    //  Sized down to the colour chip rather than the other way about: the
+    //  reference draws small colour squares, and 38px stays well clear of the
+    //  24px pointer-target floor. A longer label still grows the box from that
+    //  22px floor, so XL and 3XL are unaffected.
+    //
+    //  Card-scoped on purpose. The PDP's chips are a separate, deliberately
+    //  larger control and are not touched here.
+    .swatch-option.text {
+        padding-block: 1px;
+        padding-inline: var(--hm-space-2);
+    }
 }
 
 //
