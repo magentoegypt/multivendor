@@ -634,3 +634,195 @@
 }
 
 .hm-promo .hm-promo__text { color: fade(#ffffff, 55%); }
+
+//  ---------------------------------------------------------------------------
+//  My Wish List — the prototype's card
+//  ---------------------------------------------------------------------------
+//  The prototype has no /wishlist route; its wishlist is a TAB inside /profile,
+//  which is why this was never compared before. Measured there at 1440.
+//
+//  Its card is a different animal from ours: a white panel with a hairline and
+//  a 12px radius, a full-bleed square photo across the top, then 16px of body
+//  holding the name, the seller and one row of price against a blue Add to
+//  Cart. Removing an item is a filled heart floating on the photo, not a text
+//  link. There is no comment box, no quantity and no Edit.
+//
+//  Everything carries `.hm-page` for the same reason the rules above it do —
+//  Magento/blank's Luma wishlist block compiles after the theme.
+.hm-page .products-grid.wishlist {
+    .product-items {
+        gap: var(--hm-space-6);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    //  The card itself: no padding, because the photo runs to its edges.
+    .product-item {
+        background: var(--hm-surface);
+        border: 1px solid rgba(0, 0, 0, .09);
+        border-radius: 1.2rem;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    .product-item:first-child { border-top: 1px solid rgba(0, 0, 0, .09); }
+
+    //  THERE IS NO `.product-item-details` IN WISHLIST MARKUP. The photo, the
+    //  name, the price and the actions are direct children of
+    //  `.product-item-info`, which blank additionally pins to 240px inside a
+    //  293px card. So the card body IS that element: it becomes the grid, the
+    //  photo spans it edge to edge, and the rest is inset by hand.
+    .product-item-info {
+        align-items: center;
+        column-gap: var(--hm-space-3);
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        inline-size: 100%;
+        max-inline-size: none;
+        padding: 0;
+        position: relative;
+        row-gap: 0;
+    }
+
+    .product-item-photo {
+        aspect-ratio: 1;
+        display: block;
+        grid-column: 1 / -1;
+        inline-size: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .product-image-container,
+    .product-image-wrapper {
+        block-size: 100%;
+        inline-size: 100%;
+        max-inline-size: none;
+        padding: 0 !important;
+    }
+
+    .product-image-photo {
+        block-size: 100%;
+        inline-size: 100%;
+        object-fit: cover;
+    }
+
+    //  Name across the top, then price against the button on one row.
+    .product-item-name {
+        grid-column: 1 / -1;
+        margin-block: var(--hm-space-4) .8rem;
+        padding-inline: var(--hm-space-4);
+    }
+
+    .product-item-name a.product-item-link {
+        font-size: 1.8rem;
+        font-weight: 500;
+    }
+
+    //  The prototype's wishlist card carries no rating, no note and no
+    //  quantity — the panel is a shortlist, not an order form.
+    .product-reviews-summary,
+    .field.comment-box,
+    .product-item-comment,
+    .box-tocart .field.qty,
+    .product-item-actions .action.edit { display: none; }
+
+    .price-box {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0;
+        grid-column: 1;
+        margin-block-end: var(--hm-space-4);
+        padding-inline-start: var(--hm-space-4);
+    }
+
+    .price-box .price { font-size: 1.8rem; font-weight: 700; }
+
+    .price-box .old-price .price {
+        color: var(--hm-neutral-600);
+        font-size: 1.4rem;
+        font-weight: 400;
+    }
+
+    .product-item-inner {
+        display: block;
+        grid-column: 2;
+        margin-block-end: var(--hm-space-4);
+        padding-inline-end: var(--hm-space-4);
+    }
+
+    //  Blue, and only as wide as its label — ours filled the whole row.
+    .product-item .action.tocart {
+        background: #2563eb;
+        border-color: #2563eb;
+        border-radius: var(--hm-radius-full);
+        color: #ffffff;
+        inline-size: auto;
+        min-block-size: 3.6rem;
+        padding: .6rem var(--hm-space-4);
+        white-space: nowrap;
+
+        &:hover,
+        &:focus-visible { background: #1d4ed8; border-color: #1d4ed8; }
+    }
+
+    //  With the note and the quantity gone, "Update Wish List" has nothing left
+    //  to submit, so it goes with them. "Share" and "Add All to Cart" stay:
+    //  the prototype models neither, but both do real work and neither
+    //  conflicts with the card above.
+    ~ .actions-toolbar .action.update,
+    + .actions-toolbar .action.update { display: none; }
+
+    //  "Remove item" becomes the heart on the photo. The label stays in the
+    //  DOM for anyone not looking at the screen; the glyph is a mask so it
+    //  takes its colour from the rule rather than from a second asset.
+    .product-item-inner > .product-item-actions {
+        display: block;
+        margin: 0;
+    }
+
+    .product-item-actions .action.delete {
+        align-items: center;
+        background: var(--hm-surface);
+        block-size: 3.6rem;
+        border-radius: var(--hm-radius-full);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+        display: flex;
+        inline-size: 3.6rem;
+        //  The theme's 44px touch floor would otherwise stretch the circle.
+        min-block-size: 3.6rem;
+        min-inline-size: 3.6rem;
+        inset-block-start: var(--hm-space-3);
+        inset-inline-end: var(--hm-space-3);
+        justify-content: center;
+        margin: 0;
+        position: absolute;
+        z-index: 2;
+
+        &:hover { background: #fef2f2; }
+
+        > span {
+            block-size: 1px;
+            clip-path: inset(50%);
+            inline-size: 1px;
+            overflow: hidden;
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        &::before {
+            background-color: #dc2626;
+            block-size: 2rem;
+            content: '';
+            display: block;
+            inline-size: 2rem;
+            -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCcgZmlsbD0nYmxhY2snPjxwYXRoIGQ9J00xOSAxNGMxLjQ5LTEuNDYgMy0zLjIxIDMtNS41QTUuNSA1LjUgMCAwIDAgMTYuNSAzYy0xLjc2IDAtMyAuNS00LjUgMi0xLjUtMS41LTIuNzQtMi00LjUtMkE1LjUgNS41IDAgMCAwIDIgOC41YzAgMi4zIDEuNSA0LjA1IDMgNS41bDcgN1onLz48L3N2Zz4=");
+            mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHZpZXdCb3g9JzAgMCAyNCAyNCcgZmlsbD0nYmxhY2snPjxwYXRoIGQ9J00xOSAxNGMxLjQ5LTEuNDYgMy0zLjIxIDMtNS41QTUuNSA1LjUgMCAwIDAgMTYuNSAzYy0xLjc2IDAtMyAuNS00LjUgMi0xLjUtMS41LTIuNzQtMi00LjUtMkE1LjUgNS41IDAgMCAwIDIgOC41YzAgMi4zIDEuNSA0LjA1IDMgNS41bDcgN1onLz48L3N2Zz4=");
+            -webkit-mask-position: center;
+            mask-position: center;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+    }
+}
