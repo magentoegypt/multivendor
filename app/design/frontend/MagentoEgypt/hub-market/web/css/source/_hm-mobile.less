@@ -464,4 +464,41 @@
             inline-size: 4.4rem;
         }
     }
+
+    //
+    //  PRODUCT item 4 — the related rail was 55px narrower than the column
+    //  ---------------------------------------------
+    //  Every related card came out 305px wide inside a 360px column, so the
+    //  rail sat left with a strip of dead page beside it and its images were
+    //  drawn 303 square while the rest of the PDP ran the full width. It reads
+    //  as the block being broken, which is how QA filed it.
+    //
+    //  Not a rule on the rail. `_hm-pdp.less` gives the desktop PDP a two
+    //  column grid and, so the media and info columns do not stretch to each
+    //  other's height, `align-items: start`. Magento/blank then flips the SAME
+    //  element to `display: flex; flex-direction: column` under 768px — and in
+    //  a flex column `start` stops meaning "do not stretch heights" and starts
+    //  meaning "shrink every child to its own content width". The two columns
+    //  keep their width because their content fills them; the rail, whose only
+    //  child is a one-column grid, collapses onto the card.
+    //
+    //  So restore the flex default the phone layout wants. Scoped to the
+    //  breakpoint where the container is a flex column at all, and placed after
+    //  the _hm-pdp.less import so it takes the tie at equal specificity.
+    .catalog-product-view .column.main { align-items: stretch; }
+
+    //
+    //  The product title is a desktop size on a phone
+    //  ---------------------------------------------
+    //  The prototype's h1 is `text-3xl md:text-4xl`: 36px on a desktop, 30px
+    //  at 390. Ours runs 36px at every width, so the title eats two thirds of
+    //  the first screen under the gallery and the price below it no longer
+    //  reads as the loudest thing in the column.
+    //
+    //  _hm-pdp.less already tried this at 991px, but with
+    //  `.catalog-product-view .page-title-wrapper .page-title` (0,3,0) — and
+    //  _hm-figma.less sets the size on `.hm-pdp .product-info-main
+    //  .page-title-wrapper h1` (0,4,1), which wins at every width, so that
+    //  override has never applied. Match the winning selector.
+    .hm-pdp .product-info-main .page-title-wrapper h1 { font-size: 3rem; }
 }

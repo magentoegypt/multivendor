@@ -36,18 +36,19 @@
                 filed as the related products "showing with a lot of errors"
                 (CL036-DEV01.03 item 4).
 
-                300 square matches the largest box the card is drawn in and the
-                square aspect the grid uses, so nothing is upscaled or letter-
-                boxed. Cache entries regenerate on demand through pub/get.php,
+                400 square covers the largest box the card is drawn in — the
+                full column on a phone, ~358px once the card border is off —
+                with headroom, and matches the square aspect the grid uses, so
+                nothing is upscaled or letter-boxed. Cache entries regenerate on demand through pub/get.php,
                 as the note below explains — no mass resize.
             -->
             <image id="related_products_list" type="small_image">
-                <width>300</width>
-                <height>300</height>
+                <width>400</width>
+                <height>400</height>
             </image>
             <image id="upsell_products_list" type="small_image">
-                <width>300</width>
-                <height>300</height>
+                <width>400</width>
+                <height>400</height>
             </image>
         </images>
     </media>
