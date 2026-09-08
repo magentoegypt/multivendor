@@ -849,7 +849,9 @@
     .minicart-items .product-item {
         border: 0;
         display: block;
-        margin-block-end: var(--hm-space-3);
+        //  !important at the client's instruction: blank's own row spacing was
+        //  landing on this after the theme's.
+        margin-block-end: var(--hm-space-3) !important;
         padding: 0;
 
         &:last-child { margin-block-end: 0; }

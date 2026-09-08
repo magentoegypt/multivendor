@@ -453,6 +453,17 @@
         &:hover { color: var(--hm-danger); opacity: .75; }
     }
 
+    //  The 44px touch floor comes from the global `button, .action,
+    //  [role='button']` rule. The delete button re-centres itself inside that
+    //  box with `inline-flex` + `align-items: center`, so its trash glyph sits
+    //  in the middle; the wishlist link took the same 44px but stayed
+    //  `display: block`, so its text sat at the TOP of the box and read 10px
+    //  above the trash beside it. Same box, same centring.
+    .action.action-towishlist {
+        align-items: center;
+        display: inline-flex;
+    }
+
     .action.action-edit {
         color: var(--hm-foreground-muted);
         font-size: 1.3rem;
