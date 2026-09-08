@@ -1,0 +1,770 @@
+//
+//  Hub Market — /search landing page
+//  _____________________________________________
+//
+//  The page behind "All Categories" in the nav bar. Measured against the Figma
+//  reference at 1920 (its own layout, not guessed):
+//
+//    hero input   x=336  w=1248  h=54   radius 12  border 1  pad 12/16/12/48  18px
+//    body column  x=576  w=768          — narrower than the header's 1280
+//    headings     Playfair Display 18px/600
+//    pill         h=42   pad 8/16       radius full  16px/500
+//    recent card  radius 12  border 1   rows h=49  pad 12/16  16px/500
+//    cat cards    3 up, w=243           gap ~20
+//
+//  The 768px body column is the part worth flagging: everything else on this
+//  storefront runs to the 1280 container, so a naive port would have stretched
+//  these three sections the full width and looked nothing like the reference.
+//
+
+.hm-page-search-landing {
+    .column.main { padding-block: 0; }
+}
+
+//  MUTED, not --hm-background. The reference separates this page into two
+//  grounds: the search field sits on white, everything under it (suggestions and
+//  results alike) on a light grey, with a hairline between them. Painting both
+//  white — which is what --hm-background resolves to — lost that separation and
+//  the field read as floating in the middle of the page rather than sitting in
+//  its own band.
+//
+//  --hm-surface-muted (#f5f7fa) against the reference's gray-50 (#f9fafb), and
+//  --hm-border-subtle (#e8ecf3) against its rgba(0,0,0,.09) over white (#e8e8e8)
+//  — both already in the token set, both within a couple of levels.
+//  FULL-BLEED, both bands. The reference paints these edge to edge; ours sat
+//  inside .column.main's 1248px, so the white band and the grey ground both
+//  stopped 336px short of each edge and the page showed white gutters down
+//  either side of its own background.
+//
+//  The margin/padding pair is the theme's existing band idiom (see .hm-band() in
+//  _hm-figma.less): percentages resolve against the containing block, so
+//  `50% - 50vw` and `50vw - 50%` cancel exactly and restore the original 1248
+//  content box inside a 100vw band. The scrollbar overhang 50vw introduces is
+//  already clipped by `.page-wrapper { overflow-x: clip }`.
+.hm-search-landing {
+    background: var(--hm-surface-muted);
+    margin-inline: calc(50% - 50vw);
+    padding-block-end: var(--hm-space-16);
+    padding-inline: calc(50vw - 50%);
+}
+
+//
+//  Hero
+//  ---------------------------------------------
+//  Full container width, unlike the three sections below it.
+//  Asymmetric padding: 24px above the field, 16px below.
+//
+//  The reference spaces the two states differently — 16px from the field to the
+//  tabs when results are showing, 57px to "Trending Searches" when they are not.
+//  Splitting it this way lets the band own the tight gap and the default column
+//  add the rest, instead of one 24px value that made the results sit 56px down.
+//  Bleeds again on its own account: the landing above restores a 1248 content
+//  box, so without this the white band would stop at that box and only the grey
+//  would reach the edges.
+.hm-search-hero {
+    background: var(--hm-surface);
+    border-block-end: 1px solid var(--hm-border-subtle);
+    margin-inline: calc(50% - 50vw);
+    padding-block: var(--hm-space-6) var(--hm-space-4);
+    padding-inline: calc(50vw - 50%);
+}
+
+//  No padding of its own at container width. `.column.main` is already exactly
+//  1248px wide starting at x=336 on a 1920 viewport, which IS the reference's
+//  hero geometry — adding 16px here inset the field to 1216 and pushed it 16px
+//  right of where Figma puts it. The padding comes back below the container
+//  width, where main has none to give and the field would otherwise touch the
+//  viewport edges.
+//  The gutter is a custom property because the ICON's inset has to track it.
+//  The icon is positioned against the FORM, but it has to sit a fixed distance
+//  inside the INPUT — and the input's left edge moves with this padding. Setting
+//  the two independently is what put the glyph hard against the placeholder at
+//  container width (0px between them) while leaving 16px below it.
+.hm-search-hero__form {
+    --hm-hero-gutter: 0px;
+
+    margin-inline: auto;
+    max-inline-size: var(--hm-container);
+    padding-inline: var(--hm-hero-gutter);
+    position: relative;
+}
+
+@media (max-width: 1279px) {
+    .hm-search-hero__form { --hm-hero-gutter: var(--hm-space-4); }
+}
+
+//  Inline progress, trailing edge of the field.
+//
+//  Hidden until the JS adds .is-loading to the band. Positioned with
+//  `inset-block-start: calc(50% - half its height)` rather than
+//  `translateY(-50%)`: .hm-spinner animates `transform: rotate()`, and a
+//  transform used for centring would be overwritten the moment the animation
+//  ran, dropping the spinner to the bottom edge.
+//  border-box so the declared 2.4rem is the RENDERED size. .hm-spinner is
+//  content-box, so its 2px border was adding on and the circle came out 30px —
+//  which also threw the centring, because the calc below subtracts half of 2.4rem.
+.hm-search-hero__spinner {
+    box-sizing: border-box;
+    display: none;
+    inset-block-start: calc(50% - 1.2rem);
+    inset-inline-end: 1.6rem;
+    position: absolute;
+}
+
+.hm-search-hero.is-loading {
+    .hm-search-hero__spinner { display: block; }
+
+    //  Reserve the trailing space only while it is spinning, so a long query
+    //  cannot run underneath it — and the resting field keeps the reference's
+    //  1.6rem trailing padding rather than carrying a permanent gap.
+    .hm-search-hero__input { padding-inline-end: 4.8rem; }
+}
+
+//  Inset rather than a flex sibling: the icon must not take part in layout, or
+//  the input stops filling the row and the placeholder shifts under it.
+.hm-search-hero__icon {
+    block-size: 2rem;
+    color: var(--hm-icon-muted);
+    inline-size: 2rem;
+    inset-block-start: 50%;
+    //  inset-inline-start, not left — in RTL the glyph belongs on the right, and
+    //  the input's padding below flips with it.
+    //
+    //  1.8rem INSIDE the input, at every width — the gutter term cancels out the
+    //  form padding that shifts the input's edge. Leaves 10px between the glyph
+    //  and the placeholder against the input's 4.8rem inline-start padding.
+    inset-inline-start: calc(var(--hm-hero-gutter) + 1.8rem);
+    pointer-events: none;
+    position: absolute;
+    transform: translateY(-50%);
+}
+
+//  TWO classes deliberately, not one. `_hm-base.less` styles form controls
+//  through `input[type="search"]` — specificity (0,1,1) — which beats a lone
+//  class (0,1,0) and was silently winning on height (44 not 54), font-size (16
+//  not 18) AND padding. That last one is the one that mattered: its `padding:
+//  10px 14px` shorthand overrode the 48px inline-start inset this field needs,
+//  so the placeholder ran underneath the search glyph. (0,2,0) clears it.
+.hm-search-hero .hm-search-hero__input {
+    background: var(--hm-surface);
+    block-size: 5.4rem;
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-body);
+    font-size: 1.8rem;
+    inline-size: 100%;
+    padding-block: 1.2rem;
+    padding-inline: 4.8rem 1.6rem;
+
+    &::placeholder { color: var(--hm-placeholder); }
+
+    //  BLUE ring, and the border stays put.
+    //
+    //  Figma focuses this field with `box-shadow: 0 0 0 2px #2b7fff` and leaves
+    //  the 1px grey border alone. The previous rule recoloured the border to the
+    //  accent and laid a near-white accent-subtle ring over it, which read as the
+    //  field changing shape rather than gaining focus.
+    //
+    //  --hm-info (#1d4ed8) rather than Figma's exact #2b7fff: it is the theme's
+    //  existing blue, so the palette stays closed, and it measures 6.6:1 on white
+    //  against #2b7fff's 3.1:1 — a focus indicator is exactly the thing that must
+    //  not be the faintest mark on the page.
+    //  border-color is RESTATED here, not just omitted. `_hm-base.less` styles
+    //  form controls through `input[type="search"]:focus { border: 1px solid
+    //  #c2410c }` — dropping the old accent border from this rule did not restore
+    //  the grey, it just handed the colour to that one, and the field kept
+    //  flipping orange on focus under a blue ring.
+    &:focus {
+        border-color: var(--hm-border-subtle);
+        box-shadow: 0 0 0 var(--hm-focus-ring-width) var(--hm-info);
+        outline: none;
+    }
+
+    //  Chrome's own clear button sits on the wrong side in RTL and inherits no
+    //  colour from the theme. The type stays `search` for the mobile keyboard.
+    &::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+}
+
+//
+//  Body column
+//  ---------------------------------------------
+//  40px on top of the band's 16 = the 57px the reference leaves between the
+//  field and "Trending Searches" on the default (unqueried) state.
+.hm-search-landing__body {
+    margin-inline: auto;
+    max-inline-size: 76.8rem;
+    padding-block-start: var(--hm-space-10);
+    padding-inline: var(--hm-space-4);
+}
+
+//  Results run the FULL container, not the 768px body column — see the note in
+//  landing.phtml. Same inset as the hero above it, so the tab bar starts on the
+//  same x as the search field.
+//  No top padding — the hero band's 16px below the field IS the gap the
+//  reference draws between the field and the tab row.
+.hm-search-landing__results {
+    margin-inline: auto;
+    max-inline-size: var(--hm-container);
+    padding-inline: var(--hm-space-4);
+}
+
+@media (min-width: 1280px) {
+    .hm-search-landing__results { padding-inline: 0; }
+}
+
+.hm-search-block + .hm-search-block { margin-block-start: var(--hm-space-8); }
+
+.hm-search-block__title {
+    align-items: center;
+    color: var(--hm-foreground);
+    display: flex;
+    font-family: var(--hm-font-heading);
+    font-size: 1.8rem;
+    font-weight: 600;
+    gap: var(--hm-space-2);
+    margin: 0 0 var(--hm-space-4);
+
+    .hm-icon { color: var(--hm-accent); flex: none; }
+}
+
+//
+//  Trending pills
+//  ---------------------------------------------
+.hm-search-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-search-pills__item { margin: 0; }
+
+//  box-sizing: border-box explicitly. Without it the pill inherits content-box
+//  here, so `min-block-size: 4.2rem` sized the CONTENT and the padding and border
+//  stacked on top — a 60px pill against the reference's 42.
+.hm-search-pill {
+    align-items: center;
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-full);
+    box-sizing: border-box;
+    color: var(--hm-foreground);
+    display: inline-flex;
+    font-size: 1.6rem;
+    font-weight: 500;
+    min-block-size: 4.2rem;
+    padding-block: .8rem;
+    padding-inline: 1.6rem;
+    text-decoration: none;
+    transition: border-color var(--hm-duration-fast) var(--hm-ease),
+                color var(--hm-duration-fast) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible {
+        border-color: var(--hm-accent);
+        color: var(--hm-accent-strong);
+        text-decoration: none;
+    }
+}
+
+//
+//  Recent searches
+//  ---------------------------------------------
+//  Painted by JS from localStorage; the section is `hidden` in the markup and
+//  only revealed when there is something to show.
+.hm-search-recent {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    list-style: none;
+    margin: 0;
+    overflow: hidden;   // keeps the first/last rows inside the rounded corners
+    padding: 0;
+}
+
+.hm-search-recent__item {
+    margin: 0;
+
+    + .hm-search-recent__item { border-block-start: 1px solid var(--hm-border-subtle); }
+}
+
+//  border-box for the same reason as .hm-search-pill above — content-box made
+//  `min-block-size: 4.9rem` a 73px row against the reference's 49. This partial
+//  is the only place in the theme that leans on min-block-size for exact row
+//  heights, so both spots need it stated.
+.hm-search-recent__link {
+    align-items: center;
+    box-sizing: border-box;
+    color: var(--hm-foreground);
+    display: flex;
+    font-size: 1.6rem;
+    font-weight: 500;
+    gap: var(--hm-space-2);
+    min-block-size: 4.9rem;
+    padding-block: 1.2rem;
+    padding-inline: 1.6rem;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--hm-surface-muted);
+        color: var(--hm-accent-strong);
+        text-decoration: none;
+    }
+}
+
+.hm-search-recent__icon { color: var(--hm-icon-muted); flex: none; }
+
+//
+//  Popular categories
+//  ---------------------------------------------
+.hm-search-cats {
+    display: grid;
+    gap: var(--hm-space-5);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hm-search-cats__item { margin: 0; }
+
+.hm-search-cat {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    display: block;
+    overflow: hidden;
+    text-decoration: none;
+    transition: box-shadow var(--hm-duration-fast) var(--hm-ease);
+
+    &:hover,
+    &:focus-visible {
+        box-shadow: var(--hm-shadow);
+        text-decoration: none;
+    }
+}
+
+.hm-search-cat__media {
+    aspect-ratio: 5 / 3;
+    background: var(--hm-surface-muted);
+    display: block;
+    overflow: hidden;
+}
+
+.hm-search-cat__img {
+    block-size: 100%;
+    display: block;
+    inline-size: 100%;
+    //  The category images on this catalog are wide merchandising crops
+    //  (2000x800). `cover` keeps them filling the tile instead of letterboxing.
+    object-fit: cover;
+    transition: transform var(--hm-duration) var(--hm-ease);
+
+    .hm-search-cat:hover & { transform: scale(1.04); }
+}
+
+.hm-search-cat__body {
+    display: block;
+    padding: var(--hm-space-3);
+}
+
+.hm-search-cat__name {
+    color: var(--hm-foreground);
+    display: block;
+    font-family: var(--hm-font-heading);
+    font-size: 1.7rem;
+    font-weight: 600;
+    line-height: var(--hm-leading-snug);
+
+    .hm-search-cat:hover & { color: var(--hm-accent-strong); }
+}
+
+.hm-search-cat__count {
+    color: var(--hm-foreground-muted);
+    display: block;
+    font-size: 1.4rem;
+    margin-block-start: .2rem;
+}
+
+//
+//  Search RESULTS page (catalogsearch/result)
+//  ---------------------------------------------
+//  The same chrome as /search, sitting above Magento's real grid. The hero band
+//  and the tab head bleed through their own rules; what this adds is the
+//  container treatment for the two elements that live outside them, and the page
+//  ground the reference draws behind its search results.
+.catalogsearch-result-index .page-wrapper { background: var(--hm-surface-muted); }
+
+.hm-srp {
+    .hm-live__summary,
+    .hm-srp__panel {
+        margin-inline: auto;
+        max-inline-size: var(--hm-container);
+        padding-inline: var(--hm-space-4);
+    }
+
+    //  Restated because .hm-live__summary already sets a `margin` shorthand, and
+    //  the `margin-inline: auto` above would otherwise be overwritten by it
+    //  depending on source order.
+    .hm-live__summary {
+        margin-block: var(--hm-space-8) var(--hm-space-4);
+        margin-inline: auto;
+    }
+
+    .hm-srp__panel { padding-block-end: var(--hm-space-12); }
+}
+
+//  The grid, its toolbar and the filter rail all sit in `.columns`; the tabs
+//  hide that wholesale when Vendors or Categories is selected, so its own top
+//  margin must not leave a gap above the panel that replaces it.
+.catalogsearch-result-index .columns[hidden] { display: none; }
+
+//
+//  Live search results
+//  ---------------------------------------------
+//  Injected by web/js/live-search.js, replacing the default sections while a
+//  query is active.
+//
+//  The active tab is BLUE, matching the reference.
+//
+//  An earlier version of this file used the accent here and argued the reference's
+//  blue was an off-palette stray. The colour was the right thing to question and
+//  the wrong call to make unilaterally: blue is what the design specifies for a
+//  selected tab, and the theme already carries a blue token, so nothing about
+//  keeping the palette closed required overriding it.
+//
+//  --hm-info (#1d4ed8) rather than the reference's #155dfc — same intent, one
+//  token instead of a new hex, and 6.6:1 on white against #155dfc's 4.6:1.
+//  The tab row belongs to the WHITE band, not the grey ground. The reference
+//  runs its `bg-white` block from the top of the field down past the tabs
+//  (181..335 with the field at 205..259 and the tabs at 275..310), so the white
+//  carries 25px beyond the tabs' own rule before the grey starts.
+//
+//  Bleeds on its own account for the same reason .hm-search-hero does: the
+//  containers above restore a 1248 content box, so without this the white would
+//  stop there while the grey reached the edges.
+.hm-live__head {
+    background: var(--hm-surface);
+    margin-inline: calc(50% - 50vw);
+    padding-block-end: var(--hm-space-6);
+    padding-inline: calc(50vw - 50%);
+}
+
+//  The hero's own bottom border is suppressed while results are showing — the
+//  white is continuous from the field through the tabs there, and leaving the
+//  border in drew a hairline across the middle of one band. `:has()` rather than
+//  a JS class: the results markup arrives by fetch, and this keeps the styling
+//  a property of the DOM rather than something the script has to remember.
+//
+//  THE SEARCH RESULTS PAGE NEEDS THE SAME THING and was not getting it. Its
+//  markup is server-rendered and emits `.hm-live__head` / `.hm-live__tabs` —
+//  there is no element whose class is plain `hm-live`, so `:has(.hm-live)`
+//  never matched and the hairline stayed, sitting between the field and the
+//  tabs in the middle of one continuous white band. Reported twice.
+//
+//  Matched on the body class rather than by widening the `:has()`, because on
+//  this page nothing arrives by fetch — the condition the `:has()` exists to
+//  track does not apply here.
+.hm-search-landing:has(.hm-live) .hm-search-hero,
+.catalogsearch-result-index .hm-search-hero { border-block-end-color: transparent; }
+
+.hm-live__tabs {
+    //  NO RAIL, by choice. This carried `border-block-end: 1px solid` under the
+    //  whole strip.
+    //
+    //  Do not restore it to fix a stray line under the search field — that line
+    //  was NOT this. It was `.hm-search-hero`'s own bottom border, suppressed
+    //  further up this file; this rule was removed first on a misreading and the
+    //  hairline survived it. Two different borders, ~34px apart.
+    //
+    //  It stays gone on its own merit: the head band is one unbroken white
+    //  surface from the field down to the results, so a full-width rule had
+    //  nothing to separate, and the active tab's 2px marker (.hm-live__tab,
+    //  below) is the affordance. The rail was only ever the track it sat on.
+    display: flex;
+    gap: var(--hm-space-4);
+}
+
+.hm-live__tab {
+    background: none;
+    border: 0;
+    border-block-end: 2px solid transparent;
+    //  0, not inherited. These are <button>s, so the theme's global button radius
+    //  applied 12px and rounded the ends of the 2px underline — the rail read as a
+    //  pill sitting under the label instead of a straight tab marker. The
+    //  reference draws it square.
+    border-radius: 0;
+    color: var(--hm-foreground-muted);
+    cursor: pointer;
+    font-family: var(--hm-font-body);
+    font-size: 1.6rem;
+    font-weight: 500;
+    margin-block-end: -1px;   // sits the rail on the container's own border
+    //  3.4rem, the reference's exact tab height. The theme's global 4.4rem button
+    //  minimum is a 2.5.5 (AAA) target-size choice and made this row 44px;
+    //  dropping it to 0 then undershot to 30. 34px still clears the 24px AA
+    //  minimum (2.5.8) that actually applies to these.
+    box-sizing: border-box;
+    min-block-size: 3.4rem;
+    padding: 0 .4rem .8rem;
+
+    //  RESTATES background and border, it does not merely set a colour. Magento's
+    //  generic button hover supplies `background: #e8ecf3` and a 1px grey border,
+    //  which put a filled box behind the hovered tab and replaced the 2px rail
+    //  with a 1px outline. A tab is a text control; only its colour should move.
+    &:hover {
+        background: none;
+        border: 0;
+        border-block-end: 2px solid transparent;
+        color: var(--hm-foreground);
+    }
+
+    //  After :hover so the active rail survives being hovered.
+    &.is-active,
+    &.is-active:hover {
+        border-block-end-color: var(--hm-info);
+        color: var(--hm-info);
+    }
+
+    //  Focus uses the tab's OWN rail, not a box.
+    //
+    //  A 2px outline offset 2px drew a rectangle around the label — foreign to a
+    //  control whose whole visual language is an underline, and the thing that
+    //  made the focused tab look like a form field. Note it only ever appeared
+    //  from the keyboard: `:focus-visible` does not match a mouse click on a
+    //  button, which is why clicking a tab shows nothing.
+    //
+    //  Removing it outright was not an option — a keyboard user has to be able to
+    //  see where they are (WCAG 2.4.7). So the rail goes to 4px instead, which
+    //  reads as "this one" against both the inactive tabs' transparent rail and
+    //  the active tab's 2px. That last part matters: focusing the tab that is
+    //  ALREADY active still changes something, which a colour-only treatment
+    //  would not.
+    //
+    //  border-box plus min-block-size means the thicker border eats into the
+    //  content box rather than growing the element, so the row does not shift.
+    &:focus-visible {
+        border-block-end-color: var(--hm-info);
+        border-block-end-width: 4px;
+        color: var(--hm-info);
+        outline: none;
+    }
+}
+
+//  TWO classes, to out-specify `._keyfocus *:focus`.
+//
+//  The box around a focused tab was never this file's outline — that computed to
+//  `outline-style: none`. Magento puts `_keyfocus` on <body> during keyboard
+//  navigation and then paints `box-shadow: 0 0 0 2px #c2410c` on ANY focused
+//  descendant, with the generic button focus adding a grey fill underneath. An
+//  orange ring and a grey box, on a control whose focus treatment is a blue rail.
+//
+//  `._keyfocus *:focus` is (0,2,0) and so is `.hm-live__tab:focus-visible`, so a
+//  reset inside that block would tie and lose on source order. `.hm-live__tabs
+//  .hm-live__tab` is (0,3,0) and wins outright.
+.hm-live__tabs .hm-live__tab {
+    &:focus,
+    &:focus-visible {
+        background: none;
+        //  The three borders that are NOT the rail. Magento's generic button
+        //  focus adds `border: 1px solid #7d879c`, which drew a grey rectangle
+        //  round the label once the orange ring and grey fill were dealt with —
+        //  the third layer of the same box. border-block-end is deliberately left
+        //  alone here so the rail rules above still own it.
+        border-block-start: 0;
+        border-inline: 0;
+        box-shadow: none;
+    }
+}
+
+//  32px below the band edge — with the head's 24px white tail above it that
+//  reproduces the reference's 57px from the tab rule to the heading.
+.hm-live__summary {
+    color: var(--hm-foreground);
+    font-family: var(--hm-font-heading);
+    font-size: 2rem;
+    font-weight: 600;
+    margin: var(--hm-space-8) 0 var(--hm-space-4);
+}
+
+//  The product panel reuses .product-item from the PLP, so it needs no card
+//  rules of its own — only the grid that lays them out.
+//
+//  FOUR up with a 24px gap: the reference draws 294px cards across its 1248px
+//  results column (4 x 294 + 3 x 24 = 1248 exactly). At three-up in the old 768
+//  column they came out 245.
+.hm-live__grid {
+    display: grid;
+    gap: var(--hm-space-6);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > .product-item { margin: 0; width: auto; }
+}
+
+.hm-live__list {
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    list-style: none;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.hm-live__list-item {
+    margin: 0;
+
+    + .hm-live__list-item { border-block-start: 1px solid var(--hm-border-subtle); }
+}
+
+.hm-live__row {
+    align-items: center;
+    box-sizing: border-box;
+    color: var(--hm-foreground);
+    display: flex;
+    font-size: 1.6rem;
+    gap: var(--hm-space-2);
+    min-block-size: 4.9rem;
+    padding-block: 1.2rem;
+    padding-inline: 1.6rem;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--hm-surface-muted);
+        color: var(--hm-accent-strong);
+        text-decoration: none;
+    }
+}
+
+.hm-live__row-icon { color: var(--hm-icon-muted); flex: none; }
+.hm-live__row-name { font-weight: 500; }
+
+//  margin-inline-start: auto — pushes the meta to the row's end and mirrors in
+//  RTL, which `margin-left` would not.
+.hm-live__row-meta {
+    color: var(--hm-foreground-muted);
+    font-size: 1.4rem;
+    margin-inline-start: auto;
+}
+
+.hm-live__empty {
+    color: var(--hm-foreground-muted);
+    font-size: 1.6rem;
+    margin: 0;
+    padding-block: var(--hm-space-6);
+    text-align: center;
+}
+
+.hm-live__more {
+    align-items: center;
+    color: var(--hm-accent-strong);
+    display: inline-flex;
+    font-size: 1.6rem;
+    font-weight: 600;
+    gap: var(--hm-space-1);
+    margin-block-start: var(--hm-space-5);
+    text-decoration: none;
+
+    &:hover { color: var(--hm-accent-strong-hover); }
+}
+
+//  Dim rather than blank while a request is in flight: replacing results with a
+//  spinner on every keystroke flickers, and the previous answer is usually still
+//  the right one by the time the next lands.
+//  SCOPED to the live-results region. Unscoped, this matched <body>: Magento's
+//  `loaderAjax` widget sets aria-busy="true" on <body> for the lifetime of EVERY
+//  AJAX request, so each header-search keystroke (suggest request) faded the
+//  whole page to 55% and back — the "screen flashes white while typing" bug
+//  (QA CL036-TC06). live-search.js sets the attribute on #hm-live-results only.
+.hm-search-landing__results[aria-busy="true"] { opacity: .55; transition: opacity var(--hm-duration-fast) var(--hm-ease); }
+
+//
+//  Narrow
+//  ---------------------------------------------
+@media (max-width: 1023px) {
+    .hm-live__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+    .hm-live__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .hm-live__tabs { gap: var(--hm-space-3); }
+
+    .hm-live__tab { font-size: 1.4rem; }
+}
+
+@media (max-width: 479px) {
+    .hm-live__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 767px) {
+    .hm-search-cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .hm-search-hero__input { font-size: 1.6rem; }
+}
+
+@media (max-width: 479px) {
+    .hm-search-cats { grid-template-columns: minmax(0, 1fr); }
+}
+
+//
+//  Search suggestions — "Did you mean", "Related search terms"
+//  ---------------------------------------------
+//  Magento renders both as a definition list: <dl class="block"> with a
+//  <dt class="title"> and one <dd class="item"> per term. Both elements are
+//  block-level by default, so five related terms became five full-width rows
+//  and the two lists together pushed the first product card most of a screen
+//  down the page.
+//
+//  These are one-word links, not content — they belong on the same line as
+//  their own heading. Laid out here rather than in a template override because
+//  the markup is core's and is fine as it is; only its display was wrong.
+//  Scoped to `.search.results`, which is the wrapper Magento actually puts these
+//  in — they sit at .column.main > #layer-product-list > .search.results, so a
+//  direct child selector on .column.main matched nothing.
+.catalogsearch-result-index .search.results > dl.block {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2) var(--hm-space-3);
+    margin: 0 0 var(--hm-space-4);
+
+    > .title {
+        color: var(--hm-foreground);
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 0;
+
+        //  Reads as a label for the row that follows it.
+        &::after { content: ':'; }
+    }
+
+    > .item {
+        margin: 0;
+
+        a {
+            background: var(--hm-surface);
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius-full);
+            color: var(--hm-accent-strong);
+            display: inline-block;
+            font-size: 1.3rem;
+            line-height: 1.4;
+            padding: var(--hm-space-1) var(--hm-space-3);
+            text-decoration: none;
+
+            &:hover,
+            &:focus-visible {
+                background: var(--hm-surface-muted);
+                text-decoration: underline;
+            }
+        }
+    }
+}
