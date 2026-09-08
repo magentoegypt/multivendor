@@ -457,9 +457,9 @@
 .hm-brands__link {
     align-items: center;
     //  QA cycle 2 item 1-I sized these against the reference: grey-50 fill,
-    //  grey-100 hairline, 16px radius, ~88px tall, and a lift on hover (the
-    //  "moving on the brands" note) — the reference tile rises with a soft
-    //  shadow rather than only recolouring its border.
+    //  grey-100 hairline, 16px radius, 88px tall. The hover ("moving on the
+    //  brands") is the reference's own, read off its tile with a mouse-profile
+    //  probe — see below.
     background: var(--hm-neutral-50);
     border: 1px solid var(--hm-border-subtle);
     border-radius: var(--hm-radius-lg);
@@ -474,21 +474,22 @@
     padding: .8rem var(--hm-space-2);
     text-align: center;
     text-decoration: none;
-    transition: border-color var(--hm-duration) var(--hm-ease),
-                box-shadow var(--hm-duration) var(--hm-ease),
-                transform var(--hm-duration) var(--hm-ease);
+    transition: background-color var(--hm-duration) var(--hm-ease),
+                border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
 
+    //  Reference motion — the prototype tile is
+    //      hover:border-[#f26522]/30 hover:bg-white hover:shadow-sm
+    //  the grey tile turns white, its hairline tints orange and it gains the
+    //  lightest shadow. It does NOT rise: the earlier translateY(-3px) was a
+    //  guess made before the hover state could be measured.
     &:hover,
     &:focus-visible {
-        border-color: var(--hm-accent);
-        box-shadow: 0 8px 18px rgba(15, 33, 68, .08);
+        background: var(--hm-surface);
+        border-color: fade(#f26522, 30%);
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px -1px rgba(0, 0, 0, .1);
         text-decoration: none;
-        transform: translateY(-3px);
     }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .hm-brands__link, .hm-brands__link:hover { transform: none; }
 }
 
 .hm-brands__img {

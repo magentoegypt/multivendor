@@ -245,6 +245,15 @@
 @hm-shadow:    0 4px 12px rgba(15, 33, 68, .08);
 @hm-shadow-lg: 0 12px 32px rgba(15, 33, 68, .12);
 
+//  The PROTOTYPE's own hover shadows — Tailwind's shadow-sm / -md / -lg, read
+//  off its cards with a mouse-profile probe (a touch-mode probe never sees a
+//  hover state, which is how the earlier "lift" guess got in). Used for hover
+//  states only, so the cards move exactly as the reference's do; the motion
+//  notes sit with the rules in _hm-figma.less.
+@hm-shadow-ref-sm: 0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px -1px rgba(0, 0, 0, .1);
+@hm-shadow-ref-md: 0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -2px rgba(0, 0, 0, .1);
+@hm-shadow-ref-lg: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
+
 @hm-duration-fast: 120ms;
 @hm-duration:      200ms;
 @hm-ease: cubic-bezier(.4, 0, .2, 1);

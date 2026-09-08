@@ -264,8 +264,10 @@
         background: fade(#ffffff, 6%);
         border-color: fade(#ffffff, 10%);
 
-        &:hover,
-        &:focus-within { border-color: fade(#ffffff, 28%); box-shadow: none; }
+        //  Hover state lives in the MOTION section at the end of this file, at
+        //  (0,5,0): it has to out-rank the global light-card hover, which is
+        //  later in the file than this block and was painting an orange
+        //  hairline and a light-surface shadow onto the dark card.
     }
 
     //  `.block.widget` — NOT decoration. Every card foreground below competes
@@ -365,10 +367,13 @@
     transition: border-color var(--hm-duration) var(--hm-ease),
                 box-shadow var(--hm-duration) var(--hm-ease);
 
+    //  Reference motion: `hover:shadow-lg hover:border-[#f26522]/20`, image
+    //  scale-105 (below), title to orange. No lift, and the hairline only
+    //  TINTS orange — a solid orange border read as a selected state.
     &:hover,
     &:focus-visible {
-        border-color: var(--hm-accent);
-        box-shadow: var(--hm-shadow-lg);
+        border-color: fade(#f26522, 20%);
+        box-shadow: @hm-shadow-ref-lg;
     }
 }
 
@@ -726,9 +731,17 @@
         }
 
         //  QA cycle 2, item 1-B: "the product name to change to orange when we
-        //  hover over it". The reference's own orange; hover state, so the
-        //  resting contrast is unaffected.
+        //  hover over it". The reference's own orange, and — measured from its
+        //  `group-hover:text-[#f26522]` — it fires when the CARD is hovered,
+        //  not only the name link itself (the follow-up "move cards not fixed"
+        //  was partly this: hovering the image left the name dark). Hover
+        //  state only, so the resting contrast is unaffected.
         a.product-item-link:hover { color: var(--hm-accent); }
+    }
+
+    .product-item-info:hover .product-item-name a.product-item-link,
+    .product-item-info:focus-within .product-item-name a.product-item-link {
+        color: var(--hm-accent);
     }
 
     //  Price row: price block on the lead edge, actions on the trailing edge.
@@ -1002,7 +1015,7 @@
 //  geometries between them.
 .product-item .action.tocart {
     block-size: 3.6rem;
-    border-radius: var(--hm-radius);
+    border-radius: .8rem;   // reference: `rounded-lg` (8px) on the 36px full-card button
     inline-size: 3.6rem;
     min-block-size: 0;
     min-inline-size: 0;
@@ -1040,23 +1053,34 @@
     .product-item-info:focus-within .action.tocart { opacity: 1; }
 }
 
-//  QA cycle 2, item 1-B: card hover motion. The reference card transitions at
-//  200ms and lifts with a soft shadow while the image scales (the scale is
-//  further down, on .product-image-photo). Applied to every product card, so
-//  the rails, the listing, related and cross-sell all move the same way.
+//  CARD HOVER — THE REFERENCE'S MOTION, read from its own Tailwind classes
+//  with a mouse-profile probe (QA cycle 2: "how it moves" / "moving on the
+//  card", items 1-B, 1-C, 1-E, 3-D, and the follow-up "move cards not fixed").
+//
+//  The prototype card does NOT lift. Its root is
+//      hover:shadow-lg hover:border-[#f26522]/20 transition-all duration-200
+//  its image is `group-hover:scale-105 transition-transform duration-500`
+//  (kept — the scale rule sits on .product-image-photo above), its name goes
+//  orange and its two controls fade in. The translateY(-4px) + custom shadow
+//  that used to be here was a guess made from a touch-mode probe that could
+//  never see the hover state at all — and it is exactly what QA meant by "the
+//  movement on the card is different". This is the FULL card (Today's Deals,
+//  Popular, listing, related, cross-sell); the rail, bestseller, Picked For
+//  You and store variants carry their own recipes further down.
 .product-item .product-item-info {
-    transition: box-shadow var(--hm-duration) var(--hm-ease),
-                transform var(--hm-duration) var(--hm-ease);
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
 }
 
-.product-item .product-item-info:hover {
-    box-shadow: 0 12px 24px rgba(15, 33, 68, .10);
-    transform: translateY(-4px);
+.product-item .product-item-info:hover,
+.product-item .product-item-info:focus-within {
+    border-color: fade(#f26522, 20%);
+    box-shadow: @hm-shadow-ref-lg;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .product-item .product-item-info,
-    .product-item .product-item-info:hover { transform: none; transition: none; }
+    .product-item .product-image-photo,
+    .product-item .product-item-info:hover .product-image-photo { transform: none; transition: none; }
 }
 
 //  Vendor line — ORANGE, and this went round twice, so the measurement is
@@ -1198,6 +1222,13 @@
     .hm-badge--discount { display: none; }
 
     .product-item-details { padding: var(--hm-space-2) var(--hm-space-3) var(--hm-space-3); }
+
+    //  Reference motion for this card: `hover:shadow-md hover:border-[#f26522]/20`.
+    .product-item-info:hover,
+    .product-item-info:focus-within {
+        border-color: fade(#f26522, 20%);
+        box-shadow: @hm-shadow-ref-md;
+    }
 }
 
 //  Swatches inside a homepage rail. Figma's cards carry none, and they are the
@@ -1481,9 +1512,18 @@
     padding: var(--hm-space-4);
     text-align: center;
     text-decoration: none;
-    transition: border-color var(--hm-duration) var(--hm-ease);
+    transition: border-color var(--hm-duration) var(--hm-ease),
+                box-shadow var(--hm-duration) var(--hm-ease);
 
-    &:hover { border-color: var(--hm-accent); }
+    //  Reference motion (mouse-profile probe): `hover:shadow-md
+    //  hover:border-[#f26522]/20`; the avatar ring tints orange/30 and the
+    //  name goes orange (both in the MOTION section at the end of this file).
+    //  No lift, and the hairline tints rather than turning solid orange.
+    &:hover,
+    &:focus-visible {
+        border-color: fade(#f26522, 20%);
+        box-shadow: @hm-shadow-ref-md;
+    }
 
     //
     //  Top Vendors — Figma's card is a cover band with the avatar overlapping it
@@ -4948,7 +4988,35 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 .hm-rail--hm-home-rail-beauty,
 .hm-rail--hm-home-rail-furniture {
     //  (0,3,0) — out-ranks the any-hover fade, like the Picked For You override.
-    .product-item-info .action.tocart { opacity: 1; }
+    //  The rail's button is the reference's SMALL one: `w-6 h-6 rounded-md`,
+    //  always visible, darkening only on its own hover.
+    .product-item-info .action.tocart {
+        block-size: 2.4rem;
+        border-radius: .6rem;
+        inline-size: 2.4rem;
+        opacity: 1;
+
+        .hm-icon { block-size: 1.2rem; inline-size: 1.2rem; }
+    }
+
+    //  Rail motion (reference root: `hover:shadow-md hover:border-[#f26522]/25`)
+    //  — one step lighter than the full card. Same specificity as the global
+    //  full-card hover; this block is later in the file, so it wins.
+    .product-item-info:hover,
+    .product-item-info:focus-within {
+        border-color: fade(#f26522, 25%);
+        box-shadow: @hm-shadow-ref-md;
+    }
+
+    //  The reference rail keeps its name dark on hover; only the full card
+    //  turns it orange. (0,5,1) to out-rank the card-hover name rule.
+    &.block.widget .product-item-info:hover .product-item-name a.product-item-link,
+    &.block.widget .product-item-name a.product-item-link:hover { color: var(--hm-foreground); }
+
+    //  The reference rail card carries the small cart button ONLY — no
+    //  wishlist heart (its full card has both). (0,6,0): the disc's own
+    //  `display: flex` rule is (0,5,0) and a plain scoped hide lost to it.
+    &.block.widget .product-items .action.towishlist.hm-card__wish { display: none; }
 
     .hm-rating__count { display: none; }
     .hm-stars svg { block-size: 1.2rem; inline-size: 1.2rem; }
@@ -4962,3 +5030,40 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 
     .hm-card__foot { padding-block-start: .4rem; }
 }
+
+//  ---------------------------------------------------------------------------
+//  Reference MOTION — the remaining card families
+//  ---------------------------------------------------------------------------
+//  All read off the prototype with a mouse-profile probe; none of them lifts.
+//
+//  Picked For You (dark glass card): `hover:border-white/20 hover:bg-white/10`
+//  and NO shadow. (0,5,0) so it out-ranks the global light-card hover.
+.hm-rail--hm-home-pickedforyou.block.widget .product-item-info:hover,
+.hm-rail--hm-home-pickedforyou.block.widget .product-item-info:focus-within {
+    background: fade(#ffffff, 10%);
+    border-color: fade(#ffffff, 20%);
+    box-shadow: none;
+}
+
+//  Featured store card: the name goes orange with the card, as on Top Vendors.
+.hm-stores--featured .hm-stores__link:hover .hm-stores__name,
+.hm-stores--featured .hm-stores__link:focus-visible .hm-stores__name { color: var(--hm-accent); }
+
+//  The store avatar carries the reference's 2px grey ring that tints orange/30
+//  on card hover (`border-2 border-gray-100 group-hover:border-[#f26522]/30`).
+//  Featured only: Top Vendors' cut-out ring is surface-coloured by a more
+//  specific rule and stays that way.
+.hm-stores--featured .hm-stores__avatar {
+    border: 2px solid var(--hm-border-subtle);
+    box-sizing: border-box;
+    transition: border-color var(--hm-duration) var(--hm-ease);
+}
+
+.hm-stores--featured .hm-stores__link:hover .hm-stores__avatar,
+.hm-stores--featured .hm-stores__link:focus-visible .hm-stores__avatar { border-color: fade(#f26522, 30%); }
+
+//  Category chips: `hover:shadow-md`, nothing else moves.
+.hm-chips__link { transition: box-shadow var(--hm-duration) var(--hm-ease); }
+
+.hm-chips__link:hover,
+.hm-chips__link:focus-visible { box-shadow: @hm-shadow-ref-md; }

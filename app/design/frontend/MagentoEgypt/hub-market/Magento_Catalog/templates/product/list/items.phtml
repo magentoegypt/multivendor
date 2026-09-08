@@ -65,7 +65,16 @@ switch ($type = $block->getType()) {
             $canItemsAddToCart = $block->canItemsAddToCart();
 
             $showAddTo = true;
-            $showCart = false;
+            /*
+             * TRUE since the reference-motion pass (QA cycle 2, item 3-D): the
+             * prototype's Related card is the same full card as everywhere
+             * else — wishlist disc and a fade-in cart button — where core (and
+             * this template until now) rendered Magento's "check items to add
+             * to the cart" checkbox instead, so the related row had no cart
+             * control at all. With $showCart on, the per-item checkbox branch
+             * below is skipped and the standard button branch renders.
+             */
+            $showCart = true;
             /*
              * SHORT_VIEW, not null.
              *
@@ -97,7 +106,16 @@ switch ($type = $block->getType()) {
             $canItemsAddToCart = $block->canItemsAddToCart();
 
             $showAddTo = true;
-            $showCart = false;
+            /*
+             * TRUE since the reference-motion pass (QA cycle 2, item 3-D): the
+             * prototype's Related card is the same full card as everywhere
+             * else — wishlist disc and a fade-in cart button — where core (and
+             * this template until now) rendered Magento's "check items to add
+             * to the cart" checkbox instead, so the related row had no cart
+             * control at all. With $showCart on, the per-item checkbox branch
+             * below is skipped and the standard button branch renders.
+             */
+            $showCart = true;
             $templateType = ReviewRendererInterface::SHORT_VIEW;
             $description = false;
         }
@@ -281,7 +299,7 @@ $_item = null;
                 <?php endif; ?>
             </div>
             <div class="block-content content" aria-labelledby="block-<?= $block->escapeHtmlAttr($class) ?>-heading">
-                <?php if ($type == 'related' && $canItemsAddToCart):?>
+                <?php if ($type == 'related' && $canItemsAddToCart && !$showCart):?>
                     <div class="block-actions">
                         <?= $block->escapeHtml(__('Check items to add to the cart or')) ?>
                         <button type="button" class="action select"
@@ -384,11 +402,23 @@ $_item = null;
                                     </strong>
 
                                     <?php if ($templateType):?>
-                                        <?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
+                                        <?php /*
+                                            THIRD ARGUMENT IS THE POINT. Core's ReviewRenderer returns an
+                                            empty string before it reaches any template when a product has
+                                            no rating summary:
+                                                if (null === getRatingSummary() && !$displayIfNoReviews) return '';
+                                            Passing true is the only way this theme's override of
+                                            summary_short.phtml gets to draw its empty five-star track, which
+                                            is what keeps every card in a row the same height. 94% of this
+                                            catalogue carries no review, so without it the rows render ragged —
+                                            the defect QA cycle 1 filed as "star ratings missing" against five
+                                            separate sections.
+                                        */ ?>
+                                        <?= $block->getReviewsSummaryHtml($_item, $templateType, true) ?>
                                     <?php endif; ?>
 
                                     <?php if ($canItemsAddToCart && !$_item->isComposite() && $_item->isSaleable()
-                                        && $type == 'related'):?>
+                                        && $type == 'related' && !$showCart):?>
                                         <?php if (!$_item->getRequiredOptions()):?>
                                             <div class="field choice related">
                                                 <input
