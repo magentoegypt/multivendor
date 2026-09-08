@@ -86,6 +86,32 @@ $hmClean = static function (string $raw) use ($hmStoreArabic): string {
     }
 
     /*
+     * AND NOT A SPEC TABLE. Much of this catalogue's short_description is a
+     * scraped `label: value label: value` block — phone specs, bag dimensions,
+     * fragrance notes. Run through the cleaner it becomes one long colon-strewn
+     * line under the price, and every one of those attributes is already in the
+     * More Information table a few hundred pixels below it. 112 of the 2,191
+     * products with any text at all are shaped this way.
+     *
+     * Three colons and at most one sentence ending. Both halves are needed:
+     * real copy on this catalogue runs 4 to 9 sentence endings against 1 or 2
+     * colons, while a spec block runs 3 to 13 colons against none.
+     *
+     * The sentence test requires whitespace or end-of-string after the stop, or
+     * "6.7 بوصة" and "7.3cm/2.9inch" count as sentences and the phone and shoe
+     * dumps read as prose — that miscount alone hid six of these.
+     *
+     * Deliberately conservative. Several descriptions open with a readable lead
+     * and a couple of policy bullets before turning into a spec list; those
+     * carry 3 sentence endings, survive this test, and keep the lead that the
+     * 200-character trim below actually shows.
+     */
+    $colons = preg_match_all('/[:：]/u', $out);
+    if ($colons >= 3 && preg_match_all('/[.!?؟۔](?:\s|$)/u', $out) <= 1) {
+        return '';
+    }
+
+    /*
      * AND NOT IN THE WRONG SCRIPT. This catalogue was imported from an Arabic
      * source: `short_description` is mostly a scraped spec block and only 3 of
      * 2,304 products carry an English override, so the English store fell back
