@@ -336,6 +336,21 @@
 .review-control-vote label:before { color: var(--hm-rating-star); }
 
 //
+//  The PDP's own rating row is the ONE place the prototype is not amber
+//  ---------------------------------------------
+//  CL036-DEV01.03 item 2, "update the star shapes and number of reviews so they
+//  show correctly according to the theme". Measured on the prototype's product
+//  page: the rating beside the title is `fill-[#c85c2c]` — terracotta, the same
+//  family as its "MORE LIKE THIS" eyebrow — over `text-black/15` empties, while
+//  its product CARDS use `fill-amber-400`, which is #fbbf24 and exactly the
+//  token we already ship. So the cards were never wrong; only this row was.
+//
+//  Done by re-declaring the token on the block rather than by restyling the
+//  stars: `.hm-stars__fill` already reads `--hm-rating-star`, so the whole
+//  component follows and nothing else on the page moves.
+.hm-pdp .product-info-main .product-reviews-summary { --hm-rating-star: #c85c2c; }
+
+//
 //  Related / upsell rails inherit the card component from _hm-product-item.less
 //  ---------------------------------------------
 .block.related,
