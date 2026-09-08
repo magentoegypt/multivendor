@@ -102,7 +102,16 @@ class NewStores extends Template
         }
 
         $names = $this->fetchAttribute(array_column($rows, 'entity_id'), 'store_name');
-        $logos = $this->fetchAttribute(array_column($rows, 'entity_id'), 'logo');
+        /*
+         * ves_vendor_config, NOT the EAV attribute. No `logo` EAV attribute
+         * exists on this install — the attribute fetch always returned nothing,
+         * which is why these cards could only ever show letter discs. The vendor
+         * panel writes uploads to `general/store_information/logo` in
+         * ves_vendor_config with files under ves_vendors/logo/, and that is the
+         * source Vnecoms' own SellerList::getSellerImageUrl() reads. One source,
+         * both rails.
+         */
+        $logos = $this->fetchLogoConfig(array_column($rows, 'entity_id'));
         $counts  = array_column($rows, 'products', 'entity_id');
         $ratings  = $this->fetchRatings(array_column($rows, 'entity_id'));
         // Declared beats derived: a seller's own commitment outranks an average
@@ -120,7 +129,7 @@ class NewStores extends Template
             $out[] = [
                 'name'     => (string) ($names[$id] ?? $r['company'] ?? $r['vendor_id']),
                 'url'      => $this->getUrl('shop/' . $r['vendor_id']),
-                'logo'     => $logo ? $mediaUrl . 'ves_vendor/' . ltrim((string) $logo, '/') : null,
+                'logo'     => $logo ? $mediaUrl . 'ves_vendors/logo/' . ltrim((string) $logo, '/') : null,
                 'products' => (int) ($counts[$id] ?? 0),
                 'stars'    => $ratings[$id]['stars'] ?? null,
                 'reviews'  => $ratings[$id]['count'] ?? 0,
@@ -167,6 +176,33 @@ class NewStores extends Template
      *
      * @return array<int,string> entity_id => value
      */
+    /**
+     * Store logos from vendor config — the table the vendor panel writes.
+     *
+     * @param int[] $entityIds
+     * @return array<int, string> vendor id -> bare filename under ves_vendors/logo/
+     */
+    private function fetchLogoConfig(array $entityIds): array
+    {
+        if (!$entityIds) {
+            return [];
+        }
+        try {
+            $conn = $this->resource->getConnection();
+
+            return array_filter($conn->fetchPairs(
+                $conn->select()
+                    ->from($this->resource->getTableName('ves_vendor_config'), ['vendor_id', 'value'])
+                    ->where('path = ?', 'general/store_information/logo')
+                    ->where('store_id = ?', 0)
+                    ->where('vendor_id IN (?)', $entityIds)
+            ));
+        } catch (\Throwable $e) {
+            $this->_logger->warning('Hub Market store logos: ' . $e->getMessage());
+            return [];
+        }
+    }
+
     private function fetchAttribute(array $entityIds, string $code): array
     {
         $conn = $this->resource->getConnection();
@@ -230,6 +266,9 @@ class NewStores extends Template
                         'total' => 'COUNT(DISTINCT r.review_id)',
                     ])
                 ->where('r.status_id = ?', 1)
+                //  Default-scope summary only — the store-2 rows are all zero and
+                //  dilute the average. Same fix as VendorMeta::loadRatings().
+                ->where('s.store_id = ?', 0)
                 ->where('pe.vendor_id IN (?)', $entityIds)
                 ->group('pe.vendor_id');
 

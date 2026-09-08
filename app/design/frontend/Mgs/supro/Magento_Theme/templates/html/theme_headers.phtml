@@ -277,15 +277,10 @@
                 </div>
                 <?php endif ?>
             </div>
-            <div class="middle-header">
-                <?= $this->getLayout()->createBlock('MGS\Mmegamenu\Block\Vertical')->setData('menu_id',2)->setTemplate('MGS_Mmegamenu::vertical.phtml')->toHtml(); ?>
-                <div class="horizontal-menu<?php if(!$block->getChildHtml('megamenu')): ?> mgt-menu<?php endif ?>">
+            <div class="middle-header hub-market-menu-row">
+                <div class="horizontal-menu mgt-menu hub-market-menu-host">
                     <button class="close-menu-site" id="close-menu-site"><span class="icon-cross2"></span></button>
-                    <?php if($block->getChildHtml('megamenu')): ?>
-                        <?= $block->getChildHtml('megamenu') ?>
-                    <?php else: ?>
-                        <?= $block->getChildHtml('store.menu') ?>
-                    <?php endif ?>
+                    <?= $block->getChildHtml('hub.market.topnav') ?>
                 </div>
             </div>
         </div>

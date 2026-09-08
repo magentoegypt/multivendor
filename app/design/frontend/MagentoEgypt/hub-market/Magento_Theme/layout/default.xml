@@ -213,20 +213,24 @@
         </referenceContainer>
 
         <!--
-            Newsletter signup, moved INSIDE hm.footer.
+            Newsletter signup, REMOVED.
 
-            Magento_Newsletter declares form.subscribe as a direct child of the
-            `footer` container, so it rendered as a SIBLING after hm.footer — i.e.
-            after the copyright rule, outside the footer's own container. Once
-            .footer.content stopped constraining width (see _hm-thirdparty.less,
-            where blank's border and padding on that wrapper are removed so the
-            footer grid can align with the header), the block had nothing left to
-            size it and its input ran off the right edge of the viewport.
+            QA cycle 1 filed it twice — once against the footer and once against
+            the PDP — because the reference build has no newsletter block at all.
+            It used to be MOVED here instead: Magento_Newsletter declares
+            form.subscribe as a direct child of the `footer` container, so it
+            rendered as a sibling after hm.footer, outside the footer's own
+            container, and its input ran off the right edge of the viewport.
+            That move is now moot.
 
-            Moving rather than restyling in place: the block belongs in the footer's
-            grid, and footer.phtml renders it as its own row above the bottom rule.
+            Removed as a BLOCK rather than hidden in CSS, per this theme's usual
+            rule: a display:none block still costs its query and still lands in
+            the accessibility tree. footer.phtml keeps its `newsletter` child
+            branch — it renders nothing when the child is absent, and leaving it
+            means re-enabling the signup is a one-line layout change rather than
+            a template edit.
         -->
-        <move element="form.subscribe" destination="hm.footer" as="newsletter"/>
+        <referenceBlock name="form.subscribe" remove="true"/>
 
         <!--
             No override needed for the skip-link target: Magento's main container

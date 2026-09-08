@@ -103,10 +103,15 @@
 							</ol>
 							<?php if($useSlider): ?>
 								<script type="text/javascript">
+									<?php /* `mgsowlcarousel` removed. MGS_Brand is still enabled, but
+									   the alias came from MGS_ThemeSettings / MGS_Fbuilder, disabled in
+									   the Phase L decommission - so this 404'd on every brand and
+									   related-products render. The callback never ran, so the carousel
+									   was already inert; guarded rather than restored. */ ?>
 									require([
-										'jquery',
-										'mgsowlcarousel'
+										'jquery'
 									], function ($) {
+										if (typeof $.fn.owlCarousel !== 'function') { return; }
 										$('#product-slider-<?php echo $type ?>').owlCarousel({
 											items: <?php echo $perRowDefault; ?>,
 											autoplay: <?php echo $autoPlay ? 'true' : 'false' ?>,

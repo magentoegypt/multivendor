@@ -217,3 +217,21 @@ a.scroll-to-top {
 
     &::before { content: none; }
 }
+
+//
+//  Smartwave megamenu — the last hover underline
+//  ---------------------------------------------
+//  Smartwave_Megamenu's _module.less is collected into every theme by
+//  //@magento_import, so its CSS ships here even though the Smartwave/porto
+//  theme files are gone and this theme renders its own topmenu. `sw-megamenu`
+//  appears nowhere in the storefront HTML — checked on the home and category
+//  pages — so this rule is inert.
+//
+//  It is closed out anyway because it was the ONE underline-on-hover left in the
+//  stylesheet once @link__hover__text-decoration was turned off, and leaving a
+//  single exception in place is how it comes back. Prefixed with .hm-page to
+//  clear the original's (0,6,3) without depending on partial import order.
+.hm-page .sw-megamenu.navigation li.level0.fullwidth .submenu a:hover > span,
+.hm-page .sw-megamenu.navigation li.level0.staticwidth .submenu a:hover > span {
+    text-decoration: none;
+}

@@ -129,7 +129,19 @@ $canItemsAddToCart = false;
                                     <?= $block->escapeHtml($_item->getName()) ?></a>
                                 </strong>
                                 <?php if ($templateType): ?>
-                                    <?= $block->getReviewsSummaryHtml($_item, $templateType) ?>
+                                    <?php /*
+                                        THIRD ARGUMENT IS THE POINT. Core's ReviewRenderer returns an
+                                        empty string before it reaches any template when a product has
+                                        no rating summary:
+                                            if (null === getRatingSummary() && !$displayIfNoReviews) return '';
+                                        Passing true is the only way this theme's override of
+                                        summary_short.phtml gets to draw its empty five-star track, which
+                                        is what keeps every card in a row the same height. 94% of this
+                                        catalogue carries no review, so without it the rows render ragged —
+                                        the defect QA cycle 1 filed as "star ratings missing" against five
+                                        separate sections.
+                                    */ ?>
+                                    <?= $block->getReviewsSummaryHtml($_item, $templateType, true) ?>
                                 <?php endif; ?>
 
                                 <div class="hm-card__foot">

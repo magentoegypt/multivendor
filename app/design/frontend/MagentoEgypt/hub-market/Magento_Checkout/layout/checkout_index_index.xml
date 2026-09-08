@@ -138,8 +138,42 @@
                                         </item>
                                         <item name="billing-step" xsi:type="array">
                                             <item name="children" xsi:type="array">
+                                                <!--
+                                                    DISCOUNT CODE, REMOVED.
+
+                                                    QA cycle 1: "Completely remove the
+                                                    Apply Discount Code dropdown/option
+                                                    below the payment methods." The
+                                                    reference has no coupon field in
+                                                    checkout.
+
+                                                    `componentDisabled` rather than a
+                                                    `<referenceBlock remove>`: this is a
+                                                    UI-component node inside a jsLayout
+                                                    array, not a layout block, so there is
+                                                    no block name to reference. Disabling
+                                                    it stops the component being
+                                                    instantiated at all, which is cheaper
+                                                    than rendering it and hiding it, and
+                                                    leaves no empty container behind.
+
+                                                    THE COUPON FEATURE IS NOT SWITCHED
+                                                    OFF — the cart page still carries its
+                                                    own "Apply Discount Code" block and
+                                                    any active cart price rule still
+                                                    applies. Only this entry point goes.
+                                                -->
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
+                                                        <item name="afterMethods" xsi:type="array">
+                                                            <item name="children" xsi:type="array">
+                                                                <item name="discount" xsi:type="array">
+                                                                    <item name="config" xsi:type="array">
+                                                                        <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
                                                         <item name="hm-continue-to-review" xsi:type="array">
                                                             <item name="component" xsi:type="string">MagentoEgypt_CheckoutExtend/js/view/continue-to-review</item>
                                                             <item name="displayArea" xsi:type="string">afterMethods</item>

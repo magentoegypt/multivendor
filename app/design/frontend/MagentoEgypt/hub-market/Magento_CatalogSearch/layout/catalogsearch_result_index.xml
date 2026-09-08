@@ -6,10 +6,81 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!--
+            The search results page IS a product listing — same list.phtml, same
+            toolbar, same filter rail, same cards — but it never carried the
+            `hm-plp` body class the category listing sets, and every one of this
+            theme's listing rules is scoped to `.hm-plp`. So none of them applied
+            here and the page fell back to Magento/blank.
+
+            What that looked like: the toolbar is `display:flex` with
+            `justify-content: space-between`, but the rules that give its children
+            their order and the `margin-inline-start:auto` that pins the sorter to
+            the trailing edge live under `.hm-plp`. Without them the view toggle,
+            the result count and the sort control floated in the middle of a
+            960px column — measured 145px of dead space at BOTH ends — and the
+            bottom toolbar's pager and limiter did the same. The filter rail and
+            the card grid were unstyled for the same reason.
+
+            One class, because the fix belongs where the omission is: any future
+            listing work then reaches this page for free instead of needing its
+            selectors widened one at a time.
+        -->
+        <attribute name="class" value="hm-plp"/>
+
         <referenceBlock name="search_result_list">
             <arguments>
                 <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
             </arguments>
         </referenceBlock>
+
+        <!--
+            Records the current ?q= onto the visitor's recent-searches list, which
+            /search then renders. It has to sit HERE rather than on the landing
+            page: this is where a search actually lands, so this is the only place
+            that sees the term. Renders no markup.
+        -->
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.search.recorder"
+                   template="MagentoEgypt_SearchLanding::recorder.phtml"/>
+        </referenceContainer>
+
+        <!--
+            The design's search chrome — hero field, tabs, "N results for …" —
+            above the real results. `columns.top` and not `main`: `main` is the
+            content COLUMN inside `.columns`, which would put the hero beside the
+            filter rail; columns.top is the slot above both columns.
+
+            Magento's own 36px "Search results for: 'bag'" heading is removed
+            because this block supplies the line the design uses in its place —
+            leaving both would put two summaries of the same thing on one page,
+            and the page-title block also carries the <h1> the parity gate counts.
+        -->
+        <referenceBlock name="page.main.title" remove="true"/>
+
+        <!--
+            Same removal the category listing already makes: Magento adds
+            "Compare Products" and "My Wish List" to the rail, and on this
+            catalogue both render as empty boxes above the fold. Removed in
+            layout rather than hidden in CSS — display:none still builds both
+            blocks and the wishlist one queries the customer's list. Neither
+            feature is lost; both remain on the cards and in the header.
+        -->
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+
+        <referenceContainer name="columns.top">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.search.results.header"
+                   before="-"
+                   template="MagentoEgypt_SearchLanding::results-header.phtml">
+                <arguments>
+                    <argument name="results_header" xsi:type="object">
+                        MagentoEgypt\SearchLanding\ViewModel\ResultsHeader
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
     </body>
 </page>

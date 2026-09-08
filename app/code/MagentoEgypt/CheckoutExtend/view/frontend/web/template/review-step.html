@@ -1,13 +1,13 @@
 <li id="checkout-step-review"
     class="checkout-review-step"
     data-bind="visible: hmIsVisible">
+    <!--
+        No icon on this heading. QA cycle 1: "Remove the icon next to the Review
+        Your Order heading" — the reference's step titles are plain text, and the
+        other two steps never had one, so this was the only heading in the flow
+        carrying a glyph.
+    -->
     <div class="step-title hm-step-title" data-role="title">
-        <svg class="hm-step-title__icon" width="20" height="20" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-             stroke-linejoin="round" aria-hidden="true" focusable="false">
-            <path d="M9 11l3 3 8-8"/>
-            <path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>
-        </svg>
         <span data-bind="i18n: 'Review Your Order'"></span>
     </div>
 
@@ -22,10 +22,15 @@
                 <!-- ko if: getEmail() -->
                 <div class="hm-review__value" data-bind="text: getEmail()"></div>
                 <!-- /ko -->
-                <!-- ko if: getShippingMethodTitle() -->
-                <div class="hm-review__value hm-review__value--muted"
-                     data-bind="text: getShippingMethodTitle()"></div>
-                <!-- /ko -->
+                <!--
+                    The shipping METHOD is deliberately not repeated here. It read
+                    "Flat Rate - Fixed" directly under the delivery address, which
+                    QA cycle 1 asked to remove: it is carrier configuration rather
+                    than anything the customer chose by that name, and the amount
+                    it produces is already itemised in the order summary beside
+                    this panel. getShippingMethodTitle() stays on the component —
+                    nothing else changes — so restoring it is one line.
+                -->
             </div>
             <!-- /ko -->
 

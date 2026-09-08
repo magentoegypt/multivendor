@@ -11,9 +11,20 @@
  * empty scaffolding categories (Promotions, Sale) that would otherwise render as
  * chips leading nowhere.
  *
- * THE GLYPH IS DECORATIVE. `aria-hidden` on the wrapper is not belt-and-braces:
- * screen readers announce emoji as words, so an unmarked 🛒 makes this link read
- * as "shopping trolley Grocery 2400 items". The name and count carry the meaning.
+ * THE GLYPH IS AN EMOJI, and that is deliberate — VERIFIED AGAINST THE REFERENCE,
+ * not inferred. doze-coyote-58038022.figma.site renders this row as eight emoji
+ * chips (🛒 💊 🛋️ 👗 📦 🧸 ✨ 📱), and the nav bar above it the same way.
+ *
+ * These were briefly converted to sprite SVGs because QA cycle 1 asked for
+ * "custom SVG icons". That was a misreading on our side: QA's own examples —
+ * "pill for Pharmacy, box for FMCG, teddy bear for Kids & Toys" — describe the
+ * emoji it was looking at. The real defect QA saw was a GENERIC TAG glyph, which
+ * came from the icon map being keyed on url-keys this catalogue does not use.
+ * That keying is fixed; the glyphs are back to matching the reference.
+ *
+ * aria-hidden: screen readers announce emoji as words, so an unmarked 🛒 makes
+ * this link read as "shopping trolley Grocery 2400 items". The name and count
+ * carry the meaning.
  *
  * @var \MagentoEgypt\HomeSections\Block\CategoryChips $block
  * @var \Magento\Framework\Escaper $escaper
@@ -31,8 +42,15 @@ if (!$categories) {
                    href="<?= $escaper->escapeUrl($c['url']) ?>">
                     <span class="hm-chips__icon" aria-hidden="true"><?= $escaper->escapeHtml($c['icon']) ?></span>
                     <span class="hm-chips__name"><?= $escaper->escapeHtml($c['name']) ?></span>
+                    <?php /*
+                        "5+ items", not "5 items" — the reference writes the count
+                        as an open-ended floor ("2,400+ items") and QA filed the
+                        exact wording. The number is still the REAL category count;
+                        the "+" reflects that a category listing keeps growing, and
+                        does not inflate anything.
+                    */ ?>
                     <span class="hm-chips__count">
-                        <?= $escaper->escapeHtml(__('%1 items', $c['count'])) ?>
+                        <?= $escaper->escapeHtml(__('%1+ items', $c['count'])) ?>
                     </span>
                 </a>
             </li>

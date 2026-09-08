@@ -30,21 +30,30 @@
  * genuinely existed rather than blanket-adding regions.
  */
 ?>
-<p class="toolbar-amount" id="toolbar-amount" aria-live="polite" aria-atomic="true">
-    <?php if ($block->getLastPageNum() > 1):?>
+<?php
+/*
+ * Hub Market: the COUNT, not the range.
+ *
+ * Core prints "Items 1-12 of 47" once a listing paginates. Figma prints "6
+ * results" — the total, whatever page you are on. The range is not just longer;
+ * it answers a question ("which slice am I looking at?") that the pagination
+ * below already answers, while burying the one shoppers actually scan for.
+ *
+ * The three-branch structure stays because the singular still has to read "1
+ * result" rather than "1 results", and Arabic needs its own two forms.
+ */
+?>
+<?php /* data-total: the search results header reads this rather than counting
+         again. It is the only place on the page that has genuinely counted, and
+         asking the search layer separately re-runs the search early enough to
+         change it. Digits, not the formatted string, so the reader does not have
+         to parse Arabic-Indic numerals. */ ?>
+<p class="toolbar-amount" id="toolbar-amount" aria-live="polite" aria-atomic="true"
+   data-total="<?= (int) $block->getTotalNum() ?>">
+    <?php if ($block->getTotalNum() == 1):?>
         <?= $block->escapeHtml(
             __(
-                'Items %1-%2 of %3',
-                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getFirstNum()) . '</span>',
-                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getLastNum()) . '</span>',
-                '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getTotalNum()) . '</span>'
-            ),
-            ['span']
-        ) ?>
-    <?php elseif ($block->getTotalNum() == 1):?>
-        <?= $block->escapeHtml(
-            __(
-                '%1 Item',
+                '%1 result',
                 '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getTotalNum()) . '</span>'
             ),
             ['span']
@@ -52,7 +61,7 @@
     <?php else:?>
         <?= $block->escapeHtml(
             __(
-                '%1 Items',
+                '%1 results',
                 '<span class="toolbar-number">' . $localeFormatter->formatNumber($block->getTotalNum()) . '</span>'
             ),
             ['span']

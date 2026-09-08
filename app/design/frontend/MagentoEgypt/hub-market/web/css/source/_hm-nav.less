@@ -25,12 +25,70 @@
 //  56px was ours; Figma's row is `py-2.5` around 12px type plus a 2px underline
 //  rail — 38px. The extra 18px is why our header stood 173px against the
 //  reference's 181px WITH an extra band folded in.
+//  WRAPS, and Bundle Deals is what wraps. The reference does the same thing —
+//  its band is 81px, not 40px, because nine categories plus the trigger plus the
+//  promo do not fit 1280px either. Ours fits on one row with about 4px to spare,
+//  so the wrap is a fallback rather than the normal state; what matters is that
+//  it wraps instead of clipping. The row used to be `nowrap` with `overflow-x:
+//  auto` on the list, which silently cut the ninth category in half behind a
+//  hidden scrollbar — visibly broken in a way a taller band is not.
+//
+//  No `gap` and no `space-between`: the 16px gaps were what pushed the row 28px
+//  over 1280 in the first place, and the items already carry Figma's `px-3.5`.
+//  Bundle Deals is placed by an auto margin so it sits hard right on whichever
+//  row it lands on — `space-between` would have flushed it LEFT once it wrapped.
 .hm-nav__inner {
     align-items: center;
     display: flex;
-    gap: var(--hm-space-4);
-    justify-content: space-between;
+    flex-wrap: wrap;
     min-block-size: 0;
+}
+
+//
+//  "All Categories" — link above 992px, disclosure below
+//  ---------------------------------------------
+//  The reference has no dropdown at all: its All Categories is an <a href="/search">
+//  styled exactly like the category links beside it (12px/500, muted, 2px rail).
+//  Matched here from 992px up.
+//
+//  The disclosure is kept below 992px on purpose. .hm-nav__inline is display:none
+//  there, so the panel is the only category navigation on a phone — following the
+//  reference to the letter at every width would have removed it outright.
+//
+//  The two rules are exact complements of the .hm-nav__inline breakpoint, so
+//  exactly one control is ever in the row.
+.hm-nav__all { display: none; }
+
+@media (min-width: 992px) {
+    .hm-nav__menu { display: none; }
+
+    .hm-nav__all {
+        align-items: center;
+        border-block-end: 2px solid transparent;
+        color: var(--hm-on-inverse-muted);
+        display: inline-flex;
+        font-size: 1.2rem;
+        font-weight: 500;
+        min-block-size: 3.8rem;
+        padding-inline: 1.4rem;
+        text-decoration: none;
+        white-space: nowrap;
+
+        &:hover,
+        &:focus-visible {
+            border-block-end-color: var(--hm-accent);
+            color: var(--hm-on-inverse);
+            text-decoration: none;
+        }
+    }
+
+    //  Active state — Figma paints it accent-on-accent when you are on /search.
+    //  Keyed on the body class the landing page's layout sets, so it needs no JS
+    //  and survives full-page cache.
+    .hm-page-search-landing .hm-nav__all {
+        border-block-end-color: var(--hm-accent);
+        color: var(--hm-accent-on-nav);
+    }
 }
 
 //
@@ -82,21 +140,42 @@
 //  --hm-accent-on-nav, not --hm-accent: the nav band is @hm-navy-nav, a step
 //  lighter than the header, and the fill orange measures 4.28:1 against it.
 //  See the token's own note.
+//  The break that puts Bundle Deals on row two. Zero height so it costs the band
+//  nothing beyond the row it creates; `flex-basis: 100%` is what forces the wrap.
+.hm-nav__break {
+    block-size: 0;
+    flex: 1 0 100%;
+}
+
 .hm-nav__promo {
     align-items: center;
-    color: var(--hm-accent-on-nav);
+    //  #ff6b00. The REFERENCE uses #f26522 here — measured, not assumed — but on
+    //  the @hm-navy-nav band that is 4.28:1 and fails AA for 12px bold, which this
+    //  theme gates on. #ff6b00 is QA's named value, 4.72:1 on the same band, and
+    //  sits between the two visually. The reference's own choice is the one thing
+    //  in this bar that cannot be copied exactly without shipping a contrast
+    //  failure.
+    color: var(--hm-nav-promo);
     display: flex;
     font-size: 1.2rem;
     font-weight: 700;
-    gap: var(--hm-space-2);
+    margin-inline-start: auto;   // hard right on whichever row it lands on
     min-block-size: 3.8rem;
     padding-inline: 1.4rem;
     text-decoration: none;
     white-space: nowrap;
 
-    &:hover { color: var(--hm-accent-on-nav); text-decoration: underline; }
+    //  No `gap`: the glyph carries its own margin-inline-end, the same 4px the
+    //  category items use. Keeping gap as well spaced it 12px and made Bundle
+    //  Deals sit looser than every other item in the row.
 
-    .hm-icon--sm { block-size: 1.4rem; inline-size: 1.4rem; }
+    //  Brightens to white, the same move the category links beside it make.
+    //  Its hover previously declared the accent it was ALREADY painted, so the
+    //  underline was doing all the work; removing the underline sitewide left
+    //  this the one link in the row with no hover response at all. White rather
+    //  than a deeper orange because --hm-accent-on-nav was picked for contrast
+    //  against the navy and every accent below it reads worse there, not better.
+    &:hover { color: var(--hm-on-inverse); }
 }
 
 //
@@ -229,19 +308,18 @@
 //  Inline category links  (Figma: the category row in the nav bar)
 //  ---------------------------------------------
 //  Read from the same menu tree as the dropdown panel, so the two cannot drift.
+//  Sized to its content, not `flex: 1`. Growing it to fill the row left the auto
+//  margin on the promo with nothing to push against, and made the list — rather
+//  than Bundle Deals — the thing that wrapped, which strands a lone category on
+//  row 2 with the promo still centred beside it.
 .hm-nav__inline {
     align-items: center;
     display: flex;
-    flex: 1;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     gap: var(--hm-space-1);
     list-style: none;
     margin: 0;
-    overflow-x: auto;
     padding: 0;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar { display: none; }
 }
 
 .hm-nav__inline-item { margin: 0; }
@@ -272,14 +350,22 @@
 }
 
 //  Below the panel breakpoint the dropdown carries navigation; a scrolling row
-//  of eight categories competes with it and eats the whole bar.
+//  of nine categories competes with it and eats the whole bar.
 @media (max-width: 991px) {
     .hm-nav__inline { display: none; }
 }
 
-//  Category emoji in the inline nav (Figma parity). Sized down slightly so the
-//  glyph reads as an icon beside the label rather than competing with it.
-.hm-nav__inline-icon {
+//  Category emoji in the inline nav, matching the reference. Sized down slightly
+//  so the glyph reads as an icon beside the label rather than competing with it.
+//
+//  These were briefly sprite SVGs; the reference uses emoji here and in the chip
+//  row, so they are back. See the note above $hmNavIcons in topmenu.phtml.
+//
+//  Bundle Deals shares the rule rather than carrying its own: it sits in the same
+//  band as the categories, so its glyph has to be the same size and take the same
+//  gap or it reads as a different kind of item.
+.hm-nav__inline-icon,
+.hm-nav__promo-icon {
     font-size: 1.3rem;
     line-height: 1;
     margin-inline-end: .4rem;

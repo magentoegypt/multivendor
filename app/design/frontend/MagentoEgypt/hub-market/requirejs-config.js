@@ -56,6 +56,18 @@ var config = {
      */
     config: {
         mixins: {
+            /*
+             * Header search button. form-mini.js disables the submit button in
+             * _create() and only re-enables it from a 300ms-debounced handler.
+             * blank styles [disabled] with `pointer-events: none`, so until you
+             * typed 3 characters the button was CLICK-TRANSPARENT — the hit-test
+             * at its own centre returned `div.actions` and no submit ever fired.
+             * The theme had overridden only the disabled OPACITY, so it looked
+             * like a live orange button. QA CL041-TC01 / ClickUp 86d45hdvn.
+             */
+            'Magento_Search/js/form-mini': {
+                'js/hm-search-live': true
+            },
             'Amasty_Gdpr/js/model/consents-assigner': {
                 'Amasty_CheckoutCore/js/model/consents-assigner-mixin': false
             },

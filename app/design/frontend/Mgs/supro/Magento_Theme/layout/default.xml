@@ -8,10 +8,12 @@
 <page layout="3columns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
 	<head>
 		<remove src="Magento_Swatches::css/swatches.css"/>
+		<css src="css/hub-market-menu.css"/>
 	</head>
 	<body>
 		<move element="breadcrumbs" destination="page.main.title"/>
 		<referenceBlock name="theme.headers">
+			<block class="HubMarket\DynamicMenu\Block\Topmenu" name="hub.market.topnav" template="Magento_Theme::html/topmenu.phtml" ttl="3600"/>
 			<block class="Magento\Store\Block\Switcher" name="store_language_copy" template="Magento_Store::switch/languages_copy.phtml"/>
 			<block class="Magento\Directory\Block\Currency" name="currency_copy" template="Magento_Directory::currency_copy.phtml"/>
 		</referenceBlock>

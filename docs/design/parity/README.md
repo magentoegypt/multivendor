@@ -20,9 +20,38 @@ consistent it is. The census reads the computed styles.
 
 ## Running it
 
-The storefront **403s from the application server** — the WAF blocks its own
-host. All verification therefore runs from a developer browser via the Chrome
-MCP. This is the only supported channel.
+**This runs headlessly, from the application server.** An earlier version of this
+note said the storefront 403s from the app server and that a developer browser
+driving the Chrome MCP was the only supported channel. That was half true and is
+now out of date: the WAF rejects a *default* client, not the host. Send a real
+browser User-Agent and it answers — `curl` needs `-A`, and puppeteer-core driving
+the system Chrome is a real browser already.
+
+```bash
+node docs/design/parity/capture.mjs /tmp/parity-run
+```
+
+[capture.mjs](capture.mjs) loads home / PLP / PDP / register at 1440 and 390, in
+both `en` and `ar`, injects `harness.js` on each and writes one JSON census per
+combination — 16 files, about 100 seconds. Two companion walks cover what a
+static capture cannot, because both need a cart:
+
+```bash
+node docs/design/parity/checkout-walk.mjs          # cart + checkout step 1
+node docs/design/parity/checkout-payment-walk.mjs  # through to the payment step
+```
+
+Both stop before Place Order. This is a live store and a smoke test must not
+create a real order.
+
+**One trap, if you extend these.** The phone field is owned by the SMS module's
+intlTelInput, and its validator reads the plugin's parsed state rather than the
+input's value. Setting `.value` and firing `change` leaves that state empty, so
+validation fails, the submit is blocked, and — because the message container is
+not rendered — there is no inline error and no network request. The button just
+does nothing. `page.type()` it instead.
+
+To compare against the reference build by hand:
 
 1. Open the reference page, paste the contents of `harness.js` into the Chrome
    MCP `javascript_tool`, and save the returned JSON as

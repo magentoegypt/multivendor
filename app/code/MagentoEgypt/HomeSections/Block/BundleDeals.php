@@ -42,6 +42,7 @@ declare(strict_types=1);
 namespace MagentoEgypt\HomeSections\Block;
 
 use Magento\Catalog\Helper\Image as ImageHelper;
+use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\ResourceConnection;
@@ -49,6 +50,7 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Store\Model\StoreManagerInterface;
+use MagentoEgypt\HomeSections\ViewModel\ReviewStars;
 use MagentoEgypt\HomeSections\ViewModel\VendorNames;
 use Psr\Log\LoggerInterface;
 
@@ -62,6 +64,77 @@ class BundleDeals extends Template
 
     /** @var array<int, array<string, mixed>>|null */
     private ?array $bundles = null;
+
+    /**
+     * Star rating for a bundle card.
+     *
+     * This block extends Template rather than AbstractProduct — it builds its own
+     * rows from a collection — so it does not inherit AbstractProduct's version of
+     * this method. Delegating to the same ReviewRendererInterface keeps the markup
+     * identical to every other card on the storefront, which matters because the
+     * theme's summary_short.phtml override is what supplies the "(N)" format and
+     * the empty-state track.
+     *
+     * THE RENDERER ARRIVES AS A LAYOUT ARGUMENT, NOT THROUGH THE CONSTRUCTOR.
+     * Adding a constructor parameter to a block would need `setup:di:compile` to
+     * take effect in production, and that wipes `generated/` — a multi-minute 500
+     * on a live storefront for one star rating. The layout-argument route is also
+     * already this section's convention: `vendor_names` reaches four rails the
+     * same way. It degrades to no rating rather than to a fatal if the argument
+     * is ever dropped.
+     */
+    public function getReviewsSummaryHtml(Product $product): string
+    {
+        $stars = $this->getData('review_stars');
+
+        return $stars instanceof ReviewStars ? $stars->forProduct($product) : '';
+    }
+
+    /**
+     * Rating figures for the card, as DATA — not rendered HTML.
+     *
+     * The bundle card is one <a>. The shared summary template renders its count
+     * as an <a class="action view">, and an anchor inside an anchor is invalid
+     * HTML: the parser closes the card at the inner link, which shattered every
+     * bundle into three sibling fragments (measured 504px + 30px + 2px) and
+     * spilled the prices and CTA outside the card — the "Bundle section UI
+     * broken" report. The template now renders spans from these figures instead;
+     * getReviewsSummaryHtml() above stays for any non-anchor context.
+     *
+     * One query for the whole rail, default-scope summary only — the store-2
+     * rows are all zero and dilute the average (same trap VendorMeta hit).
+     *
+     * @param int[] $productIds
+     * @return array<int, array{pct: int, count: int}>
+     */
+    public function getRatingFigures(array $productIds): array
+    {
+        if (!$productIds) {
+            return [];
+        }
+        try {
+            $conn = $this->resource->getConnection();
+            $rows = $conn->fetchAll(
+                $conn->select()
+                    ->from(['s' => $this->resource->getTableName('review_entity_summary')],
+                        ['entity_pk_value', 'rating_summary', 'reviews_count'])
+                    ->where('s.entity_type = ?', 1)
+                    ->where('s.store_id = ?', 0)
+                    ->where('s.entity_pk_value IN (?)', $productIds)
+            );
+            $out = [];
+            foreach ($rows as $row) {
+                $out[(int) $row['entity_pk_value']] = [
+                    'pct'   => (int) $row['rating_summary'],
+                    'count' => (int) $row['reviews_count'],
+                ];
+            }
+            return $out;
+        } catch (\Throwable $e) {
+            $this->logger->warning('Hub Market bundle ratings: ' . $e->getMessage());
+            return [];
+        }
+    }
 
     public function __construct(
         Context $context,
@@ -186,6 +259,13 @@ class BundleDeals extends Template
                 'regular'     => $regular > 0 ? $this->priceCurrency->format($regular, false) : null,
                 'saving'      => $saving > 0 ? $this->priceCurrency->format($saving, false) : null,
                 'discount'    => $saving > 0 && $regular > 0 ? (int) round($saving / $regular * 100) : 0,
+                /*
+                 * The product itself, for the rating block. Carried rather than
+                 * pre-rendered because the renderer needs a template and this
+                 * method runs inside a cached data build — rendering here would
+                 * bake one store's stars into every store's cached row.
+                 */
+                'product'     => $product,
             ];
 
             if (count($out) >= $limit) {
@@ -368,12 +448,27 @@ class BundleDeals extends Template
     private function getRegularTotal(array $options, array $children, bool $isKit): float
     {
         /*
-         * A single-option bundle is a chooser, not a basket — there is no
-         * "buying these separately" total to compare against, because the
-         * customer only ever takes one.
+         * A single-option bundle is a chooser, not a basket, so there is no
+         * "everything separately" total. What IS honest for it: the card quotes
+         * "From <min final>", so the strike-through pairs it with "From
+         * <min regular>" over the same choices. That pairing can only ever
+         * UNDERSTATE a real pick's saving, never overstate it — if child A is
+         * 100/100 and child B is 200 struck to 90, the card says 90 was 100
+         * (save 10) while picking B actually saves 110. Gated like everything
+         * else on the delta being real, so a chooser with no discounted child
+         * still shows no strike at all.
          */
         if (!$isKit) {
-            return 0.0;
+            $minRegular = null;
+            foreach (($options[0]['product_ids'] ?? []) as $childId) {
+                $price = $children[$childId]['price'] ?? null;
+                if ($price === null || $price <= 0) {
+                    continue;
+                }
+                $minRegular = $minRegular === null ? $price : min($minRegular, $price);
+            }
+
+            return (float) ($minRegular ?? 0.0);
         }
 
         $total = 0.0;

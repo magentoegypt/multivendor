@@ -91,6 +91,20 @@ $isSuggestionsAllowed = $searchViewModel && $searchViewModel->isSuggestionsAllow
                         <?php endif; ?>
                     />
                     <div id="search_autocomplete" class="search-autocomplete"></div>
+                    <?php
+                    /*
+                     * Empty-submit feedback. Core `_onSubmit` preventDefaults an
+                     * empty query and says nothing, which is indistinguishable
+                     * from the dead-button bug this template's button used to
+                     * have (QA CL041-TC01). js/hm-search-live fills this in.
+                     *
+                     * Lives inside `.control` — which is already
+                     * `position: relative` — so it can be positioned under the
+                     * bar without becoming a fourth flex child of the form and
+                     * breaking the [ categories | field | Search ] row.
+                     */
+                    ?>
+                    <p class="hm-search__hint" role="status" aria-live="polite" hidden></p>
                 </div>
             </div>
             <div class="actions">

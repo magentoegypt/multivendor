@@ -32,6 +32,11 @@ PALETTE = {
     '#1a1a2e': 'neutral-900', '#7d879c': 'border-strong',
     '#b3261e': 'discount', '#d97706': 'rating-star', '#0f7b3f': 'stock-in',
     '#b45309': 'stock-low', '#1d4ed8': 'verified', '#c0392b': 'danger',
+    '#93c5fd': 'vendor-name-on-dark', '#facc15': 'promo-seasonal',
+    '#7c3aed': 'trust-returns', '#f3eaff': 'trust-returns-subtle',
+    '#ff6b00': 'nav-promo', '#1e40af': 'info-hover',
+    '#2d7a3a': 'rail-grocery', '#9b2c5e': 'rail-fashion',
+    '#9b4b7a': 'rail-beauty', '#7c5a3a': 'rail-furniture',
 }
 ALLOWED_FONTS = {'DM Sans', 'Playfair Display', 'IBM Plex Sans Arabic'}
 

@@ -69,7 +69,19 @@
 @link__visited__color:              @hm-accent-strong;
 @link__active__color:               @hm-accent-strong-hover;
 @link__text-decoration:             none;
-@link__hover__text-decoration:      underline;
+//  No underline on hover, anywhere. Set here rather than fought with an override
+//  block, because this one variable feeds blank's `a:hover, .alink:hover` plus
+//  every .lib-link() call in core — the button-as-link actions, the remove
+//  controls, the MAP popups, the dialog close. Flipping the variable takes all
+//  of them out at the source; a late `text-decoration: none` would have had to
+//  restate each selector and would still miss the next one core adds.
+//
+//  The hover COLOUR shift above is what carries the affordance now. Four links
+//  had the underline as their ONLY hover feedback and would have been left with
+//  a dead hover — .hm-section__link, .hm-section__more, .hm-live__more and the
+//  vendor links on the PDP. Each now shifts to @hm-accent-strong-hover instead,
+//  which is the token .hm-section__more was already using.
+@link__hover__text-decoration:      none;
 
 //  Focus. The generated design shipped a 1.6:1 ring, which is effectively
 //  invisible; this is 5.18:1 on white.
@@ -206,4 +218,8 @@
 @breadcrumbs__color:                @hm-foreground-muted;
 @breadcrumbs-link__color:           @hm-foreground-muted;
 @breadcrumbs-link__hover__color:    @hm-accent-strong;
+//  The breadcrumb trail keeps its own copy of the hover decoration rather than
+//  reading @link__hover__text-decoration, so turning that one off left the trail
+//  as the last underlining links on the site.
+@breadcrumbs-link__hover__text-decoration: none;
 @breadcrumbs-current__color:        @hm-foreground;

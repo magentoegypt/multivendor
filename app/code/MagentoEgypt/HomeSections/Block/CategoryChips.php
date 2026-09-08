@@ -21,7 +21,17 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class CategoryChips extends Template
 {
-    /** Used when layout supplies no glyph for a category's URL key. */
+    /**
+     * Emoji used when layout supplies no glyph for a category's URL key.
+     *
+     * This fallback is what QA cycle 1 actually saw and reported as "generic tag
+     * icons": the glyph map was keyed on URL keys that this catalogue does not
+     * use (`toys`, `mobile-tablet`, `pharmacy`), so the categories that DO exist
+     * — `games`, `electronics` — matched nothing and fell through to here. The
+     * map in layout is now keyed on the real url_keys; see cms_index_index.xml.
+     * The glyphs are emoji because THE REFERENCE USES EMOJI — see the note in
+     * category-chips.phtml on why they briefly were not.
+     */
     private const FALLBACK_ICON = '🏷️';
 
     private CollectionFactory $collectionFactory;
@@ -46,7 +56,7 @@ class CategoryChips extends Template
      * leading to an empty listing. Filtering on the product count keeps the row
      * honest.
      *
-     * @return array<int, array{id:int,name:string,url:string,count:int,image:?string}>
+     * @return array<int, array{id:int,url_key:string,name:string,url:string,count:int,icon:string,tint:int}>
      */
     public function getCategories(): array
     {
@@ -64,6 +74,27 @@ class CategoryChips extends Template
         $icons = (array) ($this->getData('icons') ?: []);
         $tints = (array) ($this->getData('tints') ?: []);
 
+        /*
+         * EXPLICIT ORDER, when layout supplies one.
+         *
+         * `order` is a list of URL keys. It is both an allow-list and a sort:
+         * a category not named in it does not render, and the ones that are
+         * render in the order given regardless of catalogue `position`.
+         *
+         * Added for QA cycle 1, which asked for a specific eight in a specific
+         * order and for two others ("Home Appliances", "Bags") to come out.
+         * Doing that by editing category positions would have reordered the
+         * main menu and every other position-driven surface with it; doing it
+         * here keeps the change on the homepage where it was asked for.
+         *
+         * A url_key listed but absent from the catalogue is simply skipped, so
+         * this list can name categories that do not exist yet.
+         */
+        $order = array_values(array_filter(array_map('strval', (array) ($this->getData('order') ?: []))));
+        if ($order) {
+            $collection->addAttributeToFilter('url_key', ['in' => $order]);
+        }
+
         $out   = [];
         $index = 0;
         foreach ($collection as $category) {
@@ -73,10 +104,11 @@ class CategoryChips extends Template
             }
             $urlKey = (string) $category->getUrlKey();
             $out[]  = [
-                'id'    => (int) $category->getId(),
-                'name'  => (string) $category->getName(),
-                'url'   => $category->getUrl(),
-                'count' => $count,
+                'id'      => (int) $category->getId(),
+                'url_key' => $urlKey,
+                'name'    => (string) $category->getName(),
+                'url'     => $category->getUrl(),
+                'count'   => $count,
                 /*
                  * Figma's chip carries a flat glyph, not a photograph, and that is
                  * the better source here as well as the matching one: the category
@@ -99,9 +131,21 @@ class CategoryChips extends Template
                 'tint'  => array_key_exists($urlKey, $tints) ? (int) $tints[$urlKey] % 8 : $index % 8,
             ];
             $index++;
-            if (count($out) >= $limit) {
+            if (!$order && count($out) >= $limit) {
                 break;
             }
+        }
+
+        /*
+         * Sorted AFTER the loop rather than by ordering the SQL: `IN` does not
+         * preserve the order of its list in any engine, and FIELD() would tie
+         * the block to MySQL.
+         */
+        if ($order) {
+            $rank = array_flip($order);
+            usort($out, static fn (array $a, array $b): int
+                => ($rank[$a['url_key']] ?? PHP_INT_MAX) <=> ($rank[$b['url_key']] ?? PHP_INT_MAX));
+            $out = array_slice($out, 0, $limit);
         }
 
         return $out;
@@ -122,7 +166,11 @@ class CategoryChips extends Template
              * the key — otherwise editing layout leaves the cached row showing the
              * old icons until the block cache happens to expire.
              */
-            md5(json_encode([$this->getData('icons') ?: [], $this->getData('tints') ?: []])),
+            md5(json_encode([
+                $this->getData('icons') ?: [],
+                $this->getData('tints') ?: [],
+                $this->getData('order') ?: [],
+            ])),
         ];
     }
 

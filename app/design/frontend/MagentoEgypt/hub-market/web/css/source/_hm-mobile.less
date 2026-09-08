@@ -283,7 +283,23 @@
         z-index: 1000;
     }
 
-    [dir='rtl'] .hm-filters-ready .hm-plp .sidebar-main { transform: translateX(100%); }
+    //  RTL. `[dir='rtl']` on its own NEVER MATCHES on this install: Magento
+    //  renders `<html lang="ar">` with no dir attribute and _hm-root.less sets
+    //  `direction` from `html:lang(ar)` — the same trap _hm-home.less documents
+    //  for the hero scrims. With the override dead, the Arabic drawer took the
+    //  LTR rule: `inset-inline-start: 0` resolves to `left: 70px` in RTL (390
+    //  viewport, 320 drawer) and `translateX(-100%)` then parks it at x=-250,
+    //  leaving 70px of open drawer down the left of every Arabic category page.
+    //  Measured, not guessed: computed transform was matrix(1,0,0,1,-320,0).
+    //  NO SPACE before .hm-filters-ready: js/hm-mobile-filters sets that class
+    //  on <html> itself, so `html:lang(ar) .hm-filters-ready` asks for a
+    //  DESCENDANT that carries it and matches nothing. Cost an entire deploy to
+    //  spot — the rule compiled, shipped, and quietly did not apply.
+    //  `:not(.hm-filters-open)` because this rule is (0,5,1) and the open-state
+    //  rule below is (0,4,0): without it the Arabic drawer wins in BOTH states
+    //  and can never be opened at all.
+    html:lang(ar).hm-filters-ready:not(.hm-filters-open) .hm-plp .sidebar-main,
+    [dir='rtl'].hm-filters-ready:not(.hm-filters-open) .hm-plp .sidebar-main { transform: translateX(100%); }
 
     .hm-filters-ready.hm-filters-open .hm-plp .sidebar-main { transform: none; }
 
@@ -646,5 +662,124 @@
         font-size: 1rem;
         font-weight: 500;
         letter-spacing: .1em;
+    }
+
+    //
+    //  CATEGORY item 2 — the toolbar row, and item 4 — the pager
+    //  ---------------------------------------------
+    //  The filter rail is already behind one "Filters" pill (further up this
+    //  file). What still did not match the prototype was the row that pill
+    //  sits in, measured at 390:
+    //
+    //    prototype   Filters (89x34, 12px radius, hairline, sliders glyph)
+    //                · "6 results" · the sort select — ONE row, 12px gaps,
+    //                sitting on the page
+    //    ours        the same three controls inside a white rounded CARD, the
+    //                pill a 44px full-radius lozenge with no glyph, and the
+    //                sort select on a SECOND row
+    //
+    //  The wrap was not a flex-wrap bug: the select's intrinsic width is its
+    //  longest option ("Price: Low to High", ~190px), and 67 + 56 + 190 plus
+    //  gaps overflows the 326px the card leaves. Capping the select is what
+    //  puts the row back together.
+    //
+    .hm-plp .toolbar-products,
+    .hm-page.vendor-page .toolbar-products {
+        background: transparent;
+        border: 0;
+        padding: 0;
+    }
+
+    .hm-filters-toggle {
+        border-radius: var(--hm-radius);
+        font-size: 1.4rem;
+        font-weight: 500;
+        gap: .6rem;
+        min-block-size: 3.4rem;
+        padding: 0 1.2rem;
+
+        //  The prototype leads the pill with a sliders glyph. The button is
+        //  built in js/hm-mobile-filters.js as text only, so the glyph is a
+        //  mask on a pseudo-element rather than another element in the DOM —
+        //  a mask, not a background-image, so it inherits the button's colour
+        //  through the pressed state.
+        &::before {
+            background-color: currentColor;
+            block-size: 1.6rem;
+            content: '';
+            display: inline-block;
+            flex: 0 0 auto;
+            inline-size: 1.6rem;
+            -webkit-mask: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%3E%3Cpath%20d=%22M21%204h-7M10%204H3M21%2012h-9M8%2012H3M21%2020h-5M12%2020H3%22/%3E%3Ccircle%20cx=%2212%22%20cy=%224%22%20r=%222%22/%3E%3Ccircle%20cx=%2210%22%20cy=%2212%22%20r=%222%22/%3E%3Ccircle%20cx=%2214%22%20cy=%2220%22%20r=%222%22/%3E%3C/svg%3E) center / contain no-repeat";
+            mask: ~"url(data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%222%22%20stroke-linecap=%22round%22%3E%3Cpath%20d=%22M21%204h-7M10%204H3M21%2012h-9M8%2012H3M21%2020h-5M12%2020H3%22/%3E%3Ccircle%20cx=%2212%22%20cy=%224%22%20r=%222%22/%3E%3Ccircle%20cx=%2210%22%20cy=%2212%22%20r=%222%22/%3E%3Ccircle%20cx=%2214%22%20cy=%2220%22%20r=%222%22/%3E%3C/svg%3E) center / contain no-repeat";
+        }
+    }
+
+    //  One row, and the sort control at the trailing edge of it.
+    //  _hm-mobile-parity.less gives the sorter `flex: 0 0 100%` from a LATER
+    //  import at the same (0,3,0) weight, which is what puts it on a line of
+    //  its own; the body class takes the tie. 89 + 12 + 56 + 12 + 130 = 299 in
+    //  a 360px row, so nothing wraps.
+    .hm-page.hm-plp .toolbar-products .toolbar-sorter,
+    .hm-page.vendor-page .toolbar-products .toolbar-sorter {
+        block-size: 3.4rem;
+        flex: 0 0 auto;
+        margin-inline-start: auto;
+
+        .sorter-options {
+            block-size: 3.4rem;
+            border-radius: var(--hm-radius);
+            inline-size: 13rem;
+            min-block-size: 0;
+        }
+    }
+
+    //  Item 4 — the pager. The prototype's cells are 36 square on a 42px
+    //  pitch; ours ran 36x45 because the theme floors every pager control at
+    //  the 44px touch target. 36 is the reference and still clears the 24px
+    //  minimum, and the cells are spaced, so the exemption does not apply.
+    .pages .item {
+        strong.page,
+        a.page,
+        .action {
+            min-block-size: 3.6rem;
+            min-inline-size: 3.6rem;
+        }
+    }
+
+    //  The leading arrow. The prototype shows "<- 1 2 3 ->" on page 1 with the
+    //  back arrow inert; Magento renders `.pages-item-previous` only from page
+    //  2 on, so on page 1 the row starts at "1" and reads as a different
+    //  control from the reference. Drawn as a pseudo-element on the list, and
+    //  ONLY when the real item is absent, so from page 2 the genuine link
+    //  takes its place. Decoration, not a control: it is inert by
+    //  construction, which is what a previous-page button on page 1 is.
+    .pages .items:not(:has(.pages-item-previous))::before {
+        align-items: center;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        color: var(--hm-neutral-600, var(--hm-foreground-muted));
+        //  The same glyph blank gives the real previous link
+        //  (`.pages .action.previous:before`), so the drawn arrow and the live
+        //  one are the same shape. U+2190 was the first attempt and rendered
+        //  as an empty box: DM Sans has no arrows, and the pager inherits it.
+        content: '\e617';
+        display: flex;
+        font-family: 'icons-blank-theme';
+        font-size: 4.6rem;
+        line-height: 1;
+        justify-content: center;
+        align-self: center;
+        block-size: 3.6rem;
+        inline-size: 3.6rem;
+        order: -1;
+    }
+
+    //  The glyph is physical, so it has to flip: in Arabic the previous page is
+    //  to the RIGHT. Same pairing as the drawer above — `html:lang(ar)` is the
+    //  selector that actually matches here.
+    html:lang(ar) .pages .items:not(:has(.pages-item-previous))::before,
+    [dir='rtl'] .pages .items:not(:has(.pages-item-previous))::before {
+        content: '\e608';
     }
 }

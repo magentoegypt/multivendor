@@ -123,18 +123,29 @@ $hmGroups  = $hmVendors
             </button>
         <?php endif ?>
         <?php /*
-            Kept, and kept HERE. The stepper commits on its own (see
-            hm-cart-qty.js), so this is now a belt-and-braces control rather than
-            the only way to change a quantity — but it is still the only thing
-            that commits a value typed straight into the field, and it cannot
-            move into the summary rail because the rail is outside this form.
+            HIDDEN, NOT DELETED — and this is the one place in this theme where
+            that distinction goes the other way from the usual rule.
+            
+            QA cycle 1 asked for "Update Shopping Cart" to be removed: the
+            reference cart has no such button, because its stepper commits on
+            press. So does ours (hm-cart-qty.js) — but it commits by CLICKING
+            THIS BUTTON. The button carries `name="update_cart_action"
+            value="update_qty"`, and a programmatic form.submit() drops a submit
+            button's name/value pair, so the controller would receive no action
+            and silently do nothing. Delete this element and the stepper stops
+            working; every +/- press becomes a no-op.
+            
+            It is therefore kept in the DOM as the commit target and taken off
+            screen in _hm-checkout.less. A typed quantity is covered too — the
+            `change` handler in hm-cart-qty.js commits on blur/Enter, which an
+            earlier version of this comment predated.
         */ ?>
         <button type="submit"
                 name="update_cart_action"
                 data-cart-item-update=""
                 value="update_qty"
                 title="<?= $escaper->escapeHtmlAttr(__('Update Shopping Cart')) ?>"
-                class="action update">
+                class="action update hm-cart__commit">
             <span><?= $escaper->escapeHtml(__('Update Shopping Cart')) ?></span>
         </button>
         <input type="hidden" value="" id="update_cart_action_container" data-cart-item-update=""/>
