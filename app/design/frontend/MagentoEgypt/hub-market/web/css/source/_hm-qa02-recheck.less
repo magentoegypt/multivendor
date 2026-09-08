@@ -373,6 +373,11 @@
 //  deliberate exception, not an oversight.
 .hm-rail--hm-home-pickedforyou .hm-section__badge {
     background: linear-gradient(90deg, #6366f1, #a855f7);
+    //  The badge is a child of the <h2>, so with no family of its own it
+    //  inherited the display SERIF and set "AI ENGINE" in Playfair. The
+    //  prototype sets it in the sans, which is also what a label of this size
+    //  needs — a serif at 10px with 0.1em tracking loses its counters.
+    font-family: var(--hm-font-sans);
     font-size: 1rem;
     letter-spacing: .1em;
     line-height: 1.5;
@@ -486,5 +491,48 @@
     .product-item .hm-card__reason {
         margin-block-start: 1rem;
         padding-block-start: 1rem;
+    }
+}
+
+//  Picked For You — the three supporting lines
+//  ---------------------------------------------
+//  Applied on the client's instruction after the spacing pass, and measured
+//  off the prototype: vendor 10px/400 at 35% white, review count 9px at the
+//  same 35%, reason line 9px.
+//
+//  TWO DELIBERATE EXCEPTIONS, both scoped to this rail alone:
+//
+//  1. These sit under the theme's 12px type floor, as the AI ENGINE badge
+//     above already does. They are supporting lines on a dark card whose
+//     product name, price and controls all clear the floor comfortably.
+//  2. The vendor line goes muted white here while every other card on the
+//     site keeps the orange QA asked for in cycle 1. That is the prototype's
+//     own treatment for this panel — orange on the navy card competes with
+//     the accent the cart button and reason line already carry — and it is
+//     why the selector is pinned to `.hm-rail--hm-home-pickedforyou` rather
+//     than to `.hm-card__vendor`.
+.hm-rail--hm-home-pickedforyou.block.widget {
+    .product-item .hm-card__vendor {
+        color: fade(#ffffff, 35%);
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    .product-item .hm-rating__count {
+        color: fade(#ffffff, 35%);
+        font-size: .9rem;
+        line-height: 1.5;
+    }
+
+    .product-item .hm-card__reason {
+        font-size: .9rem;
+        line-height: 1.25;
+
+        //  The glyph tracks the text down, or it starts to lead the line.
+        .hm-icon {
+            block-size: 1rem;
+            inline-size: 1rem;
+        }
     }
 }
