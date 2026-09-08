@@ -175,15 +175,19 @@
     //  HOME item 11 — trust badges
     //  ---------------------------------------------
     //  Five equal columns on a 390px screen gave each badge ~70px, so every
-    //  caption broke into three or four lines. Two columns, last item centred.
+    //  caption broke into three or four lines. Two columns, as the prototype.
+    //
+    //  The odd fifth badge stays in the LEFT column. It used to span the row
+    //  (`:last-child:nth-child(odd) { grid-column: 1 / -1 }`), which centres
+    //  WhatsApp Support under the two columns above it and reads as a footer to
+    //  the block rather than the fifth of five. Measured on the prototype at
+    //  390: five 167px cells, the fifth at x=16 like the first and third.
     //
     .hm-trust {
         display: grid;
         gap: var(--hm-space-4);
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    .hm-trust__item:last-child:nth-child(odd) { grid-column: 1 / -1; }
 
     //
     //  HOME item 8 — brand tiles
@@ -501,4 +505,146 @@
     //  .page-title-wrapper h1` (0,4,1), which wins at every width, so that
     //  override has never applied. Match the winning selector.
     .hm-pdp .product-info-main .page-title-wrapper h1 { font-size: 3rem; }
+
+    //
+    //  HOME item 2 — the category sheet behind the hamburger
+    //  ---------------------------------------------
+    //  "The category, when we open it, doesn't show correctly. We need it to
+    //  appear like the theme." Ours opened a 4,600px WHITE panel: every
+    //  top-level category as a bold 15px heading with its whole subtree already
+    //  expanded beneath it, so the sheet was a sitemap you scrolled rather than
+    //  a menu you chose from.
+    //
+    //  The prototype's sheet, measured at 390: the header's own navy
+    //  (#0f2144 — our --hm-surface-inverse to the byte) with a white/10
+    //  hairline at the top, one row per TOP-LEVEL category, each 40px tall,
+    //  14px/400 in white/75, inset 16px, no separators, no children. Account
+    //  links sit at the end behind their own hairline, not as buttons at the
+    //  top.
+    //
+    //  Children are not lost — every category page lists its own
+    //  subcategories, and the nav band above the sheet carries the same
+    //  top-level row. The sheet is a category picker, which is all the
+    //  prototype makes it.
+    //
+    //  Specificity: the panel is styled at (0,3,1) in _hm-nav.less
+    //  (`.hm-page .hm-nav__grid > li > a.level-top`, itself written to beat
+    //  blank's `.navigation .level0 > .level-top` from _responsive.less), and
+    //  _hm-mobile-parity.less styles the quick links at (0,1,0) from a LATER
+    //  import. Both are answered below rather than with !important.
+    //
+    .hm-nav__panel {
+        background: var(--hm-surface-inverse);
+        border-block-start: 1px solid fade(#ffffff, 10%);
+        box-shadow: none;
+        color: var(--hm-on-inverse);
+    }
+
+    .hm-nav__panel-inner {
+        display: flex;
+        flex-direction: column;
+        padding: var(--hm-space-2) 0 var(--hm-space-6);
+    }
+
+    //  Categories first, account links after them, whatever the markup order.
+    .hm-nav__panel .hm-nav__grid  { order: 1; }
+    .hm-nav__panel .hm-nav__quick { order: 2; }
+
+    //  `.navigation { background: #fff }` (blank, 0,1,0) paints the list white
+    //  behind the navy panel, and white/75 rows on white is an empty sheet —
+    //  which is exactly what the first pass shipped. `.navigation` also draws
+    //  `border-top` on every `.level0`, so zeroing only the block-end border
+    //  leaves the hairlines the prototype does not have.
+    .hm-nav__panel .hm-nav__grid.navigation { background: transparent; }
+
+    .hm-nav__panel .hm-nav__grid > li {
+        border: 0;
+        border-radius: 0;
+        margin-block-end: 0;
+        padding: 0;
+
+        &:hover { border-color: transparent; }
+    }
+
+    .hm-page .hm-nav__panel .hm-nav__grid > li > a.level-top,
+    .hm-nav__panel .hm-nav__grid > li > a.level-top {
+        align-items: center;
+        border-block-end: 0;
+        color: fade(#ffffff, 75%);
+        display: flex;
+        font-size: 1.4rem;
+        font-weight: 400;
+        margin-block-end: 0;
+        min-block-size: 4rem;
+        padding: 0 var(--hm-space-4);
+
+        gap: 1rem;
+        text-transform: none;
+
+        &:hover { color: var(--hm-on-inverse); }
+    }
+
+    //  blank sets `.navigation .level0 > .level-top { text-transform: uppercase;
+    //  padding: 8px 48px 8px 15px }` and hangs a 42px icon-font chevron off
+    //  `.navigation .parent .level-top:after` — the prototype's rows are
+    //  sentence case with nothing on the right, and the chevron pointed at a
+    //  subtree that is not there any more.
+    .hm-nav__panel .hm-nav__grid .parent > a.level-top::after { content: none; }
+
+    //  The glyph, spliced into the anchor by topmenu.phtml.
+    .hm-nav__panel-icon {
+        font-size: 1.6rem;
+        line-height: 1;
+    }
+
+    //  "All Categories" leads the sheet and carries no glyph, so its label
+    //  lines up with the ones below it on its own.
+    .hm-nav__panel-all > a.level-top { color: fade(#ffffff, 75%); }
+
+    //  The subtree. `ul.level0.submenu` is the level-1 list; _hm-nav.less
+    //  already hides level 2 and deeper.
+    .hm-nav__panel .hm-nav__grid ul.submenu { display: none; }
+
+    //  Account and Wishlist as rows, not pills — the prototype's sheet ends
+    //  with plain links under a hairline.
+    .hm-page .hm-nav__panel .hm-nav__quick {
+        border-block-start: 1px solid fade(#ffffff, 10%);
+        display: block;
+        margin: var(--hm-space-2) 0 0;
+        padding-block-start: var(--hm-space-2);
+
+        > li { margin: 0; }
+    }
+
+    .hm-page .hm-nav__panel .hm-nav__quick-link {
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        color: fade(#ffffff, 65%);
+        font-size: 1.4rem;
+        font-weight: 400;
+        justify-content: flex-start;
+        min-block-size: 4rem;
+        padding: 0 var(--hm-space-4);
+
+        &:hover { color: var(--hm-on-inverse); }
+    }
+
+    //
+    //  HOME item 6 — "Picked For You": the searches label
+    //  ---------------------------------------------
+    //  The section's order already matches (pill and title, sub, Refresh on its
+    //  own row, the search chips, then the cards); the label above the chips
+    //  did not. Ours renders it at 12px/700, .08em, white/45 — the prototype
+    //  sets it 10px/500, .1em, white/30, which is a caption over the chips
+    //  rather than a second heading competing with "Picked For You".
+    //
+    //  (0,2,0) to match _hm-figma.less's own `.hm-rail--hm-home-pickedforyou
+    //  .hm-section__tags-label`, from a later import.
+    .hm-rail--hm-home-pickedforyou .hm-section__tags-label {
+        color: fade(#ffffff, 30%);
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: .1em;
+    }
 }
