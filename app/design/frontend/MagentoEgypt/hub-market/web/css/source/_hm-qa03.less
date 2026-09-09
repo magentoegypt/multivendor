@@ -289,7 +289,10 @@
 .fotorama__nav__frame--thumb {
     .fotorama__img {
         block-size: 100% !important;
-        border-radius: var(--hm-radius-sm);
+        //  Square: the gallery carries no rounding at all now (see the PDP
+        //  gallery block lower in this file). This was 6px from the first 3-A
+        //  pass and is the last rounded corner left in the strip.
+        border-radius: 0;
         inline-size: 100% !important;
         object-fit: cover;
     }
@@ -2060,26 +2063,30 @@
 .hm-pdp {
     .fotorama__thumb-border { display: none !important; }
 
-    //  `.product.media` in the selector on purpose. `_hm-figma.less` squares
-    //  the stage at (0,4,0) — "the reference puts the photo straight on the
-    //  page. The radius stays on the thumbs, which the reference does round" —
-    //  and it is right about the reference: measured, the prototype's stage
-    //  image has radius 0. This reverses that on the client's instruction, so
-    //  it has to match that weight, and the placeholder is included or the
-    //  corners square themselves again before fotorama initialises.
+    //  SQUARE, everywhere in the gallery — the client's call, and it puts the
+    //  stage back where `_hm-figma.less` had it ("the reference puts the photo
+    //  straight on the page") and squares the thumbs too, which that file
+    //  rounds. Measured, the prototype is square on both, so this also happens
+    //  to be the reference.
+    //
+    //  Listed rather than left to the earlier rules because several of them
+    //  round these elements from different files: `_hm-pdp.less` rounds the
+    //  stage, `_hm-figma.less` rounds `.fotorama__thumb`, and the 3-A pass in
+    //  this file rounded the thumb images.
     .product.media .fotorama__stage,
     .product.media .gallery-placeholder,
     .fotorama__stage__frame,
-    .fotorama__stage .fotorama__img {
-        border-radius: var(--hm-radius);
+    .fotorama__stage .fotorama__img,
+    .fotorama__thumb {
+        border-radius: 0;
         overflow: hidden;
     }
 
     .fotorama__nav__frame--thumb {
-        border-radius: var(--hm-radius-sm);
+        border-radius: 0;
         overflow: hidden;
 
-        .fotorama__img { border-radius: var(--hm-radius-sm); }
+        .fotorama__img { border-radius: 0; }
 
         //  No active marker at all, at the client's request. Fotorama's own
         //  `.fotorama__thumb-border` stays hidden above (it was landing 10px
