@@ -99,6 +99,15 @@
                    name="hm.plp.filters.head"
                    before="-"
                    template="Magento_LayeredNavigation::mobile-filters.phtml"/>
+
+            <!--
+                QA03 2-A: the price caption. See
+                Magento_LayeredNavigation::price-slider-label.phtml — it only
+                emits an x-magento-init for js/hm-price-slider-label.
+            -->
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.price.slider.label"
+                   template="Magento_LayeredNavigation::price-slider-label.phtml"/>
         </referenceContainer>
 
         <referenceContainer name="columns">

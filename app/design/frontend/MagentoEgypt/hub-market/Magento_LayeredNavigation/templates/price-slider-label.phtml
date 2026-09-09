@@ -1,0 +1,23 @@
+<?php
+/**
+ * Attaches js/hm-price-slider-label to the layered-navigation block.
+ *
+ * `#layered-filter-block` is Mageplaza_AjaxLayer's own wrapper id — the module
+ * that actually renders this storefront's filter panel — so the script is
+ * scoped to the panel rather than hunting the whole document.
+ *
+ * The caption is passed in translated: it is the only English in the module.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<script type="text/x-magento-init">
+{
+    "#layered-filter-block": {
+        "hmPriceSliderLabel": {
+            "capLabel": <?= /* @noEscape */ json_encode(__('Up to %1')) ?>
+        }
+    }
+}
+</script>

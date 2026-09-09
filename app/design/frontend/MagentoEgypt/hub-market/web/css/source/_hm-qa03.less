@@ -1379,3 +1379,30 @@
 .hm-cart-line__body:not(:has(.hm-cart-line__desc)) .hm-cart-line__price {
     margin-block-start: var(--hm-space-2);
 }
+
+//  The price caption, split the prototype's way: the floor at the leading edge,
+//  "Up to X" at the trailing one. js/hm-price-slider-label writes the two spans
+//  and keeps them in step; Mageplaza's own single-string caption stays in the
+//  DOM (it is what the script reads) but is taken out of view.
+.hm-plp .filter-options-item[attribute='price'] {
+    .hm-price-range {
+        color: var(--hm-foreground-muted);
+        display: flex;
+        font-size: 1.2rem;
+        gap: var(--hm-space-2);
+        justify-content: space-between;
+        margin-block-start: var(--hm-space-2);
+    }
+
+    .hm-price-range__cap { font-weight: 600; }
+
+    //  Hidden, not removed: the script reads its text on every slide.
+    .hm-price-range__raw {
+        block-size: 1px;
+        clip-path: inset(50%);
+        inline-size: 1px;
+        overflow: hidden;
+        position: absolute;
+        white-space: nowrap;
+    }
+}
