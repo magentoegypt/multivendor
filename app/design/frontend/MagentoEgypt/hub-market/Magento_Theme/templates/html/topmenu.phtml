@@ -143,7 +143,21 @@ foreach ($block->getMenu()->getChildren() as $child) {
 $hmMegaCols = 4;
 $hmMegaLinks = 8;
 
-$hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks): array {
+/*
+ * THE COLUMN'S PICTURE (CL036-DEV01.15 follow-up: "show image with relevant
+ * sub category link").
+ *
+ * The menu tree carries a name, a url and an id and nothing else — the catalog
+ * plugin builds it that way — so the id is the only thread back to the
+ * category. It arrives as `category-node-117`; anything else in the tree (the
+ * root, a node another module injected) has no numeric id and simply gets no
+ * picture rather than a wrong one.
+ */
+$hmNodeCategoryId = static function ($node): int {
+    return preg_match('/(\d+)$/', (string) $node->getId(), $m) ? (int) $m[1] : 0;
+};
+
+$hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks, $hmNodeCategoryId): array {
     $cols = [];
     foreach ($node->getChildren() as $sub) {
         if (count($cols) >= $hmMegaCols) {
@@ -157,6 +171,7 @@ $hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks): array {
             $links[] = ['name' => (string) $leaf->getName(), 'url' => (string) $leaf->getUrl()];
         }
         $cols[] = [
+            'id'    => $hmNodeCategoryId($sub),
             'name'  => (string) $sub->getName(),
             'url'   => (string) $sub->getUrl(),
             'links' => $links,
@@ -180,6 +195,23 @@ foreach ($hmNavOrder as $key) {
     ];
 }
 
+
+/*
+ * One lookup for every column in the menu, not one per column: the block takes
+ * the whole list and answers with a map. See the note on `getCategoryThumbnails`
+ * for why a subcategory's picture usually comes from its first product.
+ */
+$hmMegaIds = [];
+foreach ($inline as $hmItem) {
+    foreach ($hmItem['mega'] as $hmCol) {
+        if ($hmCol['id']) {
+            $hmMegaIds[] = $hmCol['id'];
+        }
+    }
+}
+$hmThumbs = $hmMegaIds && method_exists($block, 'getCategoryThumbnails')
+    ? $block->getCategoryThumbnails($hmMegaIds)
+    : [];
 
 /*
  * THE PHONE SHEET'S ROWS, with the same emoji the nav bar uses.
@@ -344,7 +376,17 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                                         <?php foreach ($item['mega'] as $col): ?>
                                             <div class="hm-nav__mega-col">
                                                 <a class="hm-nav__mega-head" href="<?= $escaper->escapeUrl($col['url']) ?>">
-                                                    <?= $escaper->escapeHtml($col['name']) ?>
+                                                    <?php /* Decorative: the link's own text names the category, so a
+                                                             screen reader announcing the picture as well would say it
+                                                             twice. Dimensions are on the tag so the panel does not
+                                                             reflow as the images arrive. */ ?>
+                                                    <?php if (!empty($hmThumbs[$col['id']])): ?>
+                                                        <img class="hm-nav__mega-thumb"
+                                                             src="<?= $escaper->escapeUrl($hmThumbs[$col['id']]) ?>"
+                                                             alt="" aria-hidden="true"
+                                                             width="48" height="48" loading="lazy">
+                                                    <?php endif; ?>
+                                                    <span class="hm-nav__mega-head-text"><?= $escaper->escapeHtml($col['name']) ?></span>
                                                 </a>
                                                 <?php if ($col['links']): ?>
                                                     <ul class="hm-nav__mega-list">
