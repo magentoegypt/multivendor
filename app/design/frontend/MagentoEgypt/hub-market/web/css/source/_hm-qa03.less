@@ -453,11 +453,25 @@
     //  airy look, not the gap between rows: ours were already 3px apart where
     //  the prototype leaves 6. The 32 came from 4px of link padding on a 24px
     //  line box.
+    //  Measured on the TEXT, not the wrapper — an earlier pass read 16px off
+    //  the prototype's <label> box and set that, when the label's own span is
+    //  14px/500 in a darker grey. The colour is Tailwind's gray-600, which is
+    //  what `oklch(0.446 0.03 256.802)` resolves to; ours was gray-500 and read
+    //  a step too light beside it.
+    //
+    //  No padding on the link either: the row was 32px tall against the
+    //  prototype's 16, and that height was the airy look — the gaps were
+    //  already tighter than the reference.
     .filter-options-content .items .item > a {
-        font-size: 1.6rem;
-        line-height: 1.2;
+        color: #4b5563;
+        font-size: 1.4rem;
+        font-weight: 500;
+        line-height: 1.4;
         padding: 0;
     }
+
+    //  14px, matching the prototype's block heading.
+    .filter-options-title { font-size: 1.4rem; }
 
     //  6px between rows, the prototype's own gap.
     .filter-options-content .items .item { margin-block-end: .6rem; }
@@ -1629,7 +1643,7 @@
 
 .hm-fstars__on { color: #fbbf24; }
 .hm-fstars__off { color: var(--hm-border-strong); }
-.hm-fstars__text { color: var(--hm-foreground); }
+.hm-fstars__text { color: #4b5563; }
 
 //
 //  WISHLIST — the two toolbar buttons
