@@ -1110,3 +1110,96 @@
         position: static;
     }
 }
+
+//
+//  CL036-DEV01.14 follow-up 2 — three alignment faults in the mini-cart
+//  _____________________________________________
+//
+//  1. THE ITEM LIST WAS 24px WIDER THAN EVERYTHING ELSE, on both sides.
+//     Blank gives the list `margin: 0 -24px; padding: 15px` — a full-bleed
+//     hairline drawn by pulling the box out to the panel's edges and putting
+//     the padding back. That arithmetic assumed blank's own 24px panel padding.
+//     The compacting pass took the panel to 16px and did not follow, so every
+//     line started 24px left of the totals above it and its quantity stepper
+//     ran 10px past their right edge. Measured: totals 1078..1410, item
+//     1054..1434.
+//
+//     The hairline stays full width — it reads well — but the padding now
+//     matches the pull, so the content inside lines up with the rest.
+.hm-page .minicart-wrapper .minicart-items-wrapper {
+    margin-inline: ~"calc(-1 * var(--hm-space-4))";
+    padding-inline: var(--hm-space-4);
+}
+
+//  2. THE SUBTOTAL TOOK THREE LINES for two values: the item count, then
+//     "Subtotal :" on its own line, then the amount under it — 75px to say
+//     "1 item, EGP 28". The label and the amount belong on one line.
+.hm-page .minicart-wrapper .block-content > .subtotal {
+    align-items: baseline;
+    display: flex;
+    gap: var(--hm-space-2);
+    justify-content: flex-end;
+
+    .label { margin: 0; }
+    .amount { display: inline; inline-size: auto; }
+}
+
+//  3. AND 31px OF NOTHING SAT BETWEEN THE TOTALS AND THE CHECKOUT BUTTON.
+//     Blank stacks its own margins here — the actions wrapper, the .primary
+//     inside it, and the button each contribute one — which on a page is a
+//     button set apart from the numbers and in a 320px panel is a hole. One
+//     gap, not three.
+//  THE GAP GOES ON THE BUTTON, NOT ON `.actions`, because there are TWO
+//  `.actions` divs as direct children of `.block-content` — the checkout one
+//  and an empty one Knockout leaves behind from the empty-cart branch. A margin
+//  on the selector hit both, and two stacked 12px margins were 24 of the 32px
+//  hole between the totals and the button. The empty div is 0px tall and
+//  invisible; it just must not be given spacing.
+.hm-page .minicart-wrapper .block-content > .actions {
+    margin-block-start: 0;
+
+    //  margin-BLOCK only. Zeroing the shorthand also removed the 12px side
+    //  insets blank puts on `.primary`, and the button immediately grew past
+    //  the panel's padding into its edge.
+    > .primary { margin-block: 0; }
+}
+
+.hm-page .minicart-wrapper #top-cart-btn-checkout {
+    margin-block: var(--hm-space-3) 0;
+}
+
+//
+//  5. EVERY ROW ON THE SAME INSET.
+//
+//  Three different ones were in play, all inherited: the totals carry blank's
+//  `margin: 0 12px`, the actions wrapper is pulled out to the panel edge, and
+//  the item list is pulled out further still. Measured left edges: totals 1078,
+//  actions 1066, item 1066, against a content box starting at 1070. Nothing
+//  lined up with anything.
+//
+//  One inset now — the panel's own padding — with the item list keeping its
+//  full-bleed hairline by pulling out and padding back by the same amount.
+.hm-page .minicart-wrapper .block-content {
+    > .items-total,
+    > .subtotal,
+    > .actions { margin-inline: 0; }
+
+    > .actions > .primary { margin-inline: 0; }
+}
+
+//  4. "View and Edit Cart" centred under the rail, as asked. It is the only
+//     thing on its row and it read as a stray link hanging off the left.
+.hm-page .minicart-wrapper .hm-minicart__foot .actions,
+.hm-page .minicart-wrapper .hm-minicart__foot .secondary { text-align: center; }
+
+//
+//  TODAY'S DEALS COUNTDOWN — the pill outlived its own timer
+//  ---------------------------------------------------------------------------
+//  `deals-countdown.phtml` sets `el.hidden = true` once the deadline passes,
+//  which is right. It just never took effect: `.hm-countdown` carries
+//  `display: inline-flex`, and a class rule beats the user-agent's
+//  `[hidden] { display: none }`. So an expired countdown left a pill on the
+//  page reading "remaining" with nothing in front of it.
+//
+//  The deadline being wrong in the first place is fixed in DealsCountdown.php.
+.hm-countdown[hidden] { display: none !important; }
