@@ -151,12 +151,26 @@ class VendorMeta implements ArgumentInterface
         }
         $this->dispatch = [];
 
+        /*
+         * THE DURATION ONLY, not a sentence (CL036-QA01 item 12).
+         *
+         * These read "Ships in 2-3 business days" and sat on a stats line beside
+         * the product count, on a card 139px wide at 390px. Nothing that long
+         * fits, so the line broke mid-phrase — "Ships within" above "24h" — and
+         * threw the cards it happened to on 22px taller than their neighbours.
+         * That ragged rail is what the tester filed.
+         *
+         * The reference's equivalent is "30–60 min": a clock glyph and a
+         * duration, no verb. The glyph is already there and already carries the
+         * meaning, so the verb was only ever costing width. The full sentence is
+         * kept as the element's title in the template, for anyone who wants it.
+         */
         $declaredLabels = [
-            'same_day' => (string) __('Ships same day'),
-            'next_day' => (string) __('Ships next business day'),
-            'days_2_3' => (string) __('Ships in 2-3 business days'),
-            'days_3_5' => (string) __('Ships in 3-5 business days'),
-            'days_5_7' => (string) __('Ships in 5-7 business days'),
+            'same_day' => (string) __('Same day'),
+            'next_day' => (string) __('Next business day'),
+            'days_2_3' => (string) __('2-3 days'),
+            'days_3_5' => (string) __('3-5 days'),
+            'days_5_7' => (string) __('5-7 days'),
         ];
 
         try {
@@ -211,8 +225,8 @@ class VendorMeta implements ArgumentInterface
                     continue;
                 }
                 $this->dispatch[$id] = $hours <= 24
-                    ? (string) __('Ships within 24h')
-                    : (string) __('Ships in ~%1 days', (int) ceil($hours / 24));
+                    ? (string) __('24h')
+                    : (string) __('~%1 days', (int) ceil($hours / 24));
             }
         } catch (\Throwable $e) {
             $this->logger->warning('Hub Market vendor meta (dispatch): ' . $e->getMessage());

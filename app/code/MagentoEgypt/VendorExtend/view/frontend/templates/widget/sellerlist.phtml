@@ -165,7 +165,12 @@ $allStoresUrl = $block->getUrl('sellerlist');
                             <span class="hm-sr-only"><?= $block->escapeHtml(__('products')) ?></span>
                         </span>
                         <?php if ($hmDispatch !== ''): ?>
-                            <span class="hm-stores__dispatch">
+                            <?php /* The visible text is the duration alone —
+                                     see VendorMeta::loadDispatch() for why. The
+                                     title carries the sentence for anyone who
+                                     wants it, and names what the glyph means. */ ?>
+                            <span class="hm-stores__dispatch"
+                                  title="<?= $block->escapeHtmlAttr(__('Dispatch time: %1', $hmDispatch)) ?>">
                                 <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-clock"/></svg>
                                 <?= $block->escapeHtml($hmDispatch) ?>
                             </span>
