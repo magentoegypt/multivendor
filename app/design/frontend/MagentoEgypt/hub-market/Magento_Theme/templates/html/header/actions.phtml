@@ -15,13 +15,74 @@ declare(strict_types=1);
 /** @var \Magento\Customer\Model\Context $customerContext */
 $wishlistUrl = $block->getUrl('wishlist');
 $accountUrl  = $block->getUrl('customer/account');
+$loginUrl    = $block->getUrl('customer/account/login');
+$registerUrl = $block->getUrl('customer/account/create');
+$ordersUrl   = $block->getUrl('sales/order/history');
+$logoutUrl   = $block->getUrl('customer/account/logout');
 ?>
 <div class="hm-header__actions">
 
-    <a class="hm-header__action" href="<?= $escaper->escapeUrl($accountUrl) ?>">
-        <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-account"/></svg>
-        <span class="hm-header__action-label"><?= $escaper->escapeHtml(__('Account')) ?></span>
-    </a>
+    <?php
+    /*
+     * CL036-DEV01.05 — the account icon carries a menu.
+     *
+     * WHICH HALF SHOWS IS DECIDED IN THE BROWSER, NOT HERE. This header sits
+     * inside Magento's full-page cache, so a PHP `if` on the session would bake
+     * the first visitor's state into the cached page and serve it to everyone.
+     * Both halves ship in the cached HTML and Knockout picks one from the
+     * `customer` customer-data section, which is per-visitor and lives in
+     * localStorage — the same mechanism the minicart uses.
+     *
+     * The `customer` scope this binds to is registered ONCE, by the
+     * x-magento-init in utility.phtml. Both bands are children of the same
+     * `hm.header` container in default.xml and nothing removes the utility one,
+     * so it is always on the page; registering it a second time here would give
+     * the scope two component instances.
+     *
+     * The member half carries an inline `display: none` so a guest never sees a
+     * flash of "My Orders" before Knockout binds — the cached HTML is
+     * guest-shaped and guests are the common case.
+     *
+     * Opens on hover and on keyboard focus, in CSS (`:hover`, `:focus-within`).
+     * No JS: the trigger stays a real link to the account page, so the control
+     * still does something useful with the menu closed, with JS blocked, or on
+     * a touch device where there is no hover. The rail itself is desktop-only —
+     * _hm-mobile-parity.less hides it under 768px, where these destinations live
+     * in the menu sheet instead.
+     */
+    ?>
+    <div class="hm-header__action hm-header__action--account">
+        <a class="hm-account__trigger" href="<?= $escaper->escapeUrl($accountUrl) ?>" aria-haspopup="true">
+            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-account"/></svg>
+            <span class="hm-header__action-label"><?= $escaper->escapeHtml(__('Account')) ?></span>
+        </a>
+
+        <div class="hm-account__menu" data-bind="scope: 'customer'">
+            <div class="hm-account__group" data-bind="visible: !customer().fullname">
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($loginUrl) ?>">
+                    <?= $escaper->escapeHtml(__('Login')) ?>
+                </a>
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($registerUrl) ?>">
+                    <?= $escaper->escapeHtml(__('Register')) ?>
+                </a>
+            </div>
+
+            <div class="hm-account__group" style="display: none" data-bind="visible: customer().fullname">
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($accountUrl) ?>">
+                    <?= $escaper->escapeHtml(__('My Account')) ?>
+                </a>
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($ordersUrl) ?>">
+                    <?= $escaper->escapeHtml(__('My Orders')) ?>
+                </a>
+                <?php /* Logout accepts GET in 2.4.8 (Controller\Account\Logout
+                         implements HttpGetActionInterface), so a plain link
+                         avoids baking a form key into cached HTML. */ ?>
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($logoutUrl) ?>">
+                    <?= $escaper->escapeHtml(__('Sign Out')) ?>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <a class="hm-header__action" href="<?= $escaper->escapeUrl($wishlistUrl) ?>">
         <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>

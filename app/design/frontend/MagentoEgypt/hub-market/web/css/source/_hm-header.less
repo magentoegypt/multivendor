@@ -294,6 +294,82 @@
     }
 }
 
+//
+//  Account menu  (CL036-DEV01.05)
+//  ---------------------------------------------
+//  The icon keeps its own layout on `.hm-account__trigger`; the wrapper only
+//  becomes the positioning context. It KEEPS `.hm-header__action` so the phone
+//  rule that hides everything but the cart
+//  (`.hm-header__action:not(.hm-header__action--cart)`) still catches it —
+//  hiding only the inner link would leave an empty flex item behind and open a
+//  16px hole in the phone header's action row.
+.hm-header__action--account { position: relative; }
+
+.hm-account__trigger {
+    align-items: center;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    justify-content: center;
+    text-decoration: none;
+
+    .hm-icon { block-size: 2rem; inline-size: 2rem; }
+
+    &:hover,
+    &:focus-visible { color: var(--hm-accent); }
+}
+
+//  Hidden by `visibility`, not `display`, so the panel keeps a box for the
+//  transition and stays out of the accessibility tree while closed.
+.hm-account__menu {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius);
+    box-shadow: var(--hm-shadow-lg);
+    inset-block-start: 100%;
+    inset-inline-end: 0;
+    min-inline-size: 18rem;
+    opacity: 0;
+    padding: var(--hm-space-2);
+    position: absolute;
+    transform: translateY(.4rem);
+    transition: opacity var(--hm-duration-fast) var(--hm-ease),
+                transform var(--hm-duration-fast) var(--hm-ease),
+                visibility var(--hm-duration-fast) var(--hm-ease);
+    visibility: hidden;
+    z-index: 120;
+}
+
+//  `:focus-within` is what makes this reachable by keyboard: tabbing from the
+//  trigger into the links holds the panel open without a line of JS.
+.hm-header__action--account:hover .hm-account__menu,
+.hm-header__action--account:focus-within .hm-account__menu {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+}
+
+.hm-account__link {
+    align-items: center;
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-foreground);
+    display: flex;
+    font-size: 1.4rem;
+    font-weight: 500;
+    min-block-size: 4rem;
+    padding-inline: var(--hm-space-3);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover,
+    &:focus-visible {
+        background: var(--hm-surface-muted);
+        color: var(--hm-accent-strong);
+        text-decoration: none;
+    }
+}
+
 .hm-header__action-label {
     //  12px is the theme's documented type floor (see PHASE-M-REPORT, step 3).
     //  This was 1.1rem — the smallest text on the storefront and the only rule in
