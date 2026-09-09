@@ -303,3 +303,62 @@
 .hm-page .products.wrapper.products-list .product-item-media {
     inline-size: 12rem;
 }
+
+//
+//  1-J — TOP VENDORS: star shape, and avatars that read as different sizes
+//  ---------------------------------------------------------------------------
+//  The sprite's `#hm-star` is a Lucide outline: `fill="none" stroke="currentColor"
+//  stroke-width="2"`. The theme colours it amber, so it paints amber fill AND a
+//  2px amber stroke — a blobby star with the points rounded off. The prototype's
+//  is the same silhouette with no stroke, which is what gives it crisp points.
+//  Dropping the stroke is the whole difference; the glyph itself is right.
+.hm-stores__star {
+    stroke: none;
+    stroke-width: 0;
+}
+
+//  "The images are uploaded too big." They are — one vendor's logo is a
+//  full-bleed square while the other three are small marks with white margin
+//  baked into the file, so at the same 40px box that one reads twice the size.
+//  No crop setting equalises that (`cover` and `contain` agree on a square
+//  source in a square box), so the plate supplies the margin instead: the
+//  avatar keeps its white ground and insets whatever it is given.
+//
+//  This normalises the presentation; the underlying asset is still oversized
+//  and worth replacing, which is called out in the handback.
+.hm-stores__avatar {
+    box-sizing: border-box;
+    padding: .4rem;
+
+    img {
+        block-size: 100%;
+        inline-size: 100%;
+        object-fit: contain;
+    }
+}
+
+//
+//  1-K — NEW STORES: "the size and shape of the container isn't the theme's"
+//  ---------------------------------------------------------------------------
+//  Measured against the prototype's card, which is
+//  `flex items-center gap-3 bg-white/6 border border-white/10 rounded-xl p-3.5`:
+//
+//                     prototype     here
+//    card               303x79      303x96
+//    radius               16px        12px
+//    padding              14px        16px
+//    avatar         44 rounded    48 CIRCLE
+//
+//  The fill and the border already matched; it is the box that did not.
+.hm-stores--hm-home-newstores {
+    .hm-stores__link {
+        border-radius: 1.6rem;
+        padding: 1.4rem;
+    }
+
+    .hm-stores__avatar {
+        block-size: 4.4rem;
+        border-radius: 1.2rem;
+        inline-size: 4.4rem;
+    }
+}
