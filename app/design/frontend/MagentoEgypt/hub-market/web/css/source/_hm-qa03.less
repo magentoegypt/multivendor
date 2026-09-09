@@ -977,3 +977,136 @@
     .price-label { display: none; }
 }
 
+
+//
+//  CL036-DEV01.14 follow-up — the mini-cart has to fit a desktop viewport
+//  _____________________________________________
+//
+//  Measured before this block, on a 900px viewport with ONE line in the basket:
+//  the dropdown opened 780px tall and ended 24px from the bottom of the window.
+//  A second line pushed it off the screen, and there was nothing to stop it —
+//  the item list had no height cap at all, so the panel simply grew with the
+//  basket.
+//
+//  Two things, and the first matters more than the trimming:
+//
+//  1. THE PANEL IS NOW BOUNDED AND THE ITEM LIST IS THE PART THAT SCROLLS.
+//     Everything else — the shipping strip, the totals, the checkout button,
+//     the recommendations, the link — stays put, and only the lines between
+//     them scroll. That is the behaviour a mini-cart is supposed to have and it
+//     is what stops the panel ever running off the bottom of the window,
+//     whatever the basket holds.
+//
+//  2. The spacing throughout was drawn for a page, not for a 320px panel.
+//
+.hm-page .minicart-wrapper .block-minicart {
+    display: flex;
+    flex-direction: column;
+    //  12rem covers the dropdown's own offset under the header (~96px on
+    //  desktop) plus a margin off the bottom edge. dvh, not vh, so a mobile
+    //  browser's collapsing toolbar does not clip it.
+    max-block-size: ~"calc(100dvh - 12rem)";
+    padding: var(--hm-space-4);
+}
+
+//  The Knockout scope div between the panel and its contents has to carry the
+//  column too, or the flex chain breaks at it and nothing below can shrink.
+.hm-page .minicart-wrapper #minicart-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 0;
+    flex: 1 1 auto;
+}
+
+.hm-page .minicart-wrapper .block-minicart .block-content {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 0;
+    flex: 1 1 auto;
+}
+
+//  `min-block-size: 0` is the whole trick: a flex item's default minimum is its
+//  content, so without it the list refuses to shrink and pushes the panel open
+//  instead of scrolling.
+.hm-page .minicart-wrapper .minicart-items-wrapper {
+    flex: 1 1 auto;
+    min-block-size: 8rem;
+    overflow-y: auto;
+    padding: var(--hm-space-3) var(--hm-space-3) 0;
+}
+
+//  Everything that must keep its size while the list gives.
+.hm-page .minicart-wrapper .block-minicart .block-title,
+.hm-page .minicart-wrapper .hm-minicart__ship,
+.hm-page .minicart-wrapper .items-total,
+.hm-page .minicart-wrapper .block-content > .subtotal,
+.hm-page .minicart-wrapper .block-content > .actions,
+.hm-page .minicart-wrapper .hm-minicart__foot { flex: 0 0 auto; }
+
+//
+//  The trimming. Each of these was measured; the comment is the old value.
+//
+.hm-page .minicart-wrapper .block-minicart .block-title {
+    margin-block-end: var(--hm-space-2);          //  16
+    padding-block-end: var(--hm-space-2);         //  12
+}
+
+.hm-page .minicart-wrapper .hm-minicart__ship {
+    margin-block-end: var(--hm-space-2);          //  12
+    padding-block-end: var(--hm-space-2);         //  12
+}
+
+.hm-page .minicart-wrapper .hm-minicart__ship-text { margin-block-end: .6rem; }
+
+.hm-page .minicart-wrapper .block-content > .subtotal { margin-block-end: var(--hm-space-2); }
+
+.hm-page .minicart-wrapper .block-content > .actions {
+    margin-block-start: var(--hm-space-2);        //  15
+}
+
+.hm-page .minicart-wrapper #top-cart-btn-checkout {
+    margin-block-end: var(--hm-space-2);          //  15
+    min-block-size: 0;
+    padding-block: var(--hm-space-3);             //  14
+}
+
+.hm-page .minicart-wrapper .minicart-items .product-item { padding-block-end: var(--hm-space-3); }   //  24
+
+.hm-page .minicart-wrapper .hm-minicart__foot {
+    margin-block-start: var(--hm-space-2);        //  12
+    padding-block-start: var(--hm-space-2);       //  12
+}
+
+.hm-page .minicart-wrapper .hm-minicart__reco-title { margin-block-end: var(--hm-space-2); }
+
+.hm-page .minicart-wrapper .hm-minicart__foot .actions { margin-block-start: var(--hm-space-3); }
+
+//  The tiles were square, so their height followed the panel's width: a 320px
+//  dropdown gave ~100px thumbnails and a 187px rail. A fixed height decouples
+//  the two and the rail comes down to about 110px.
+//
+//  IT HAS TO BE THE CONTAINER, NOT THE <img>. Magento's image helper does not
+//  emit a bare image — it wraps it in
+//  `span.product-image-container > span.product-image-wrapper > img`, and sizes
+//  it with the old padding-ratio trick: an INLINE `padding-bottom: 100%` on the
+//  wrapper with the image absolutely positioned inside. Setting a height on the
+//  img alone changes nothing, which is exactly what the first attempt did — the
+//  rule compiled, applied, and the rail stayed 187px. `!important` because the
+//  padding it has to beat is an inline style.
+.hm-page .minicart-wrapper .hm-minicart__reco-link {
+    .product-image-container,
+    .product-image-wrapper {
+        block-size: 7rem;
+        display: block;
+        inline-size: 100% !important;
+        padding: 0 !important;
+    }
+
+    .product-image-photo {
+        aspect-ratio: auto;
+        block-size: 100%;
+        inline-size: 100%;
+        object-fit: cover;
+        position: static;
+    }
+}
