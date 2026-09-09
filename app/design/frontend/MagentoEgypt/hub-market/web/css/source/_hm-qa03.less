@@ -688,53 +688,141 @@
 }
 
 
-//  3-A, second pass: the strip is STRETCHED to the stage rather than pinned to
-//  a pixel width.
+//  3-A, second pass: re-sized after the media column moved.
 //
-//  The first pass sized it in view.xml — 3 x 192 + 2 x 8 = 592 — which was
-//  exact for the media column as it measured then. The column has since become
-//  656 (a PDP layout change from the parallel session's work), and a strip cut
-//  to 592 was suddenly 64px short of the image it is meant to line up with:
-//  the same defect the tester filed, back again from the other side.
+//  The first pass cut the strip to 3 x 192 + 2 x 8 = 592, exact for the media
+//  column as it measured then. The column has since become 656 (a PDP layout
+//  change from the parallel session), leaving the strip 64px short of the image
+//  it lines up with — the tester's own defect, back from the other side.
 //
-//  Flex removes the coupling. The thumbs divide whatever the stage measures, so
-//  the strip cannot drift out of alignment when the column moves again. The
-//  `!important` answers fotorama, which writes its width and margin as inline
-//  style on every frame.
+//  Re-cut to the new width: 3 x 212 + 2 x 10 = 656. Sized through view.xml, not
+//  CSS, deliberately. An attempt to make the strip flexible instead — flex on
+//  the shaft, `auto` sizes on the frames — was abandoned: fotorama writes width
+//  AND height as inline style on every frame and the inner image is sized as a
+//  percentage of the frame, so releasing both dimensions collapsed the thumbs
+//  to zero. It also depends on a sibling count that cannot be expressed, since
+//  fotorama inserts `.fotorama__thumb-border` as the shaft's first child.
 //
-//  Guarded to galleries of five or fewer. Beyond that the strip is meant to
-//  scroll, and stretching would shrink each thumb toward nothing.
-.hm-pdp .fotorama__nav__shaft {
-    display: flex;
-    gap: .8rem;
-    inline-size: 100%;
+//  The cost is that this is pinned to a 656px column. If that column moves
+//  again, these two numbers move with it.
+
+
+//
+//  CL036-DEV01.15 — mega menu on hover
+//  _____________________________________________
+//
+//  Hovering a top-level category in the band opens its subcategories in columns
+//  with an optional promotional panel beside them, instead of making the visitor
+//  load the category page to find out what is in it.
+//
+//  DESKTOP ONLY, and by pointer capability rather than width alone. `hover:
+//  hover` excludes touch devices, where there is no hover state to leave and a
+//  panel that opens on first tap swallows the tap that was meant to navigate.
+//  Phones and tablets keep the category sheet behind the menu button, which is
+//  the control designed for them.
+//
+//  HIDDEN BY DEFAULT, OUTSIDE THE QUERY, and this is the important half.
+//
+//  The panels are in the markup on every device. If the only `display: none`
+//  lived inside the media query below, then anywhere that query did not match —
+//  a phone, a tablet, a touchscreen laptop whose primary pointer reports
+//  `hover: none` — all six panels would render as open boxes stacked down the
+//  page. That is exactly what happened on the first pass, caught in headless
+//  Chrome, which reports `hover: none` itself. The safe fallback for a hover
+//  panel is invisible, so hiding belongs here and only REVEALING belongs there.
+.hm-nav__mega { display: none; }
+
+@media (min-width: 992px) and (hover: hover) {
+    //  The containing block for every panel. `.hm-nav__inner` is a horizontal
+    //  scroller below 1400px (CL036-DEV01.10) and would clip an absolutely
+    //  positioned child — but a positioned box whose containing block is an
+    //  ANCESTOR of the scroller escapes that clip, and this is that ancestor.
+    //  Nothing between here and the panel may be positioned or the clip returns.
+    .hm-page .hm-nav { position: relative; }
+
+    .hm-page .hm-nav__mega {
+        background: var(--hm-surface);
+        border-block-start: 1px solid rgba(255, 255, 255, .08);
+        box-shadow: var(--hm-shadow-lg);
+        color: var(--hm-foreground);
+        inset-block-start: 100%;
+        inset-inline: 0;
+        position: absolute;
+        z-index: 100;
+    }
+
+    //  :focus-within as well as :hover — the panel is reachable by tabbing, and
+    //  a keyboard user who tabs into a column can read it.
+    .hm-page .hm-nav__inline-item--has-mega:hover .hm-nav__mega,
+    .hm-page .hm-nav__inline-item--has-mega:focus-within .hm-nav__mega {
+        display: block;
+    }
+
+    //  The chip keeps the accent underline the mockup draws under the open
+    //  category, so it is obvious which panel is showing.
+    .hm-page .hm-nav__inline-item--has-mega:hover > .hm-nav__inline-link,
+    .hm-page .hm-nav__inline-item--has-mega:focus-within > .hm-nav__inline-link {
+        box-shadow: inset 0 -2px 0 0 var(--hm-nav-promo);
+        color: var(--hm-on-inverse);
+    }
+
+    .hm-nav__mega-inner {
+        display: grid;
+        gap: var(--hm-space-8);
+        grid-template-columns: minmax(0, 1fr);
+        margin-inline: auto;
+        max-inline-size: var(--hm-container);
+        padding: var(--hm-space-6) var(--hm-space-8);
+    }
+
+    //  The promo sits beside the columns when there is one, and the columns take
+    //  the full width when there is not — the CMS block is optional.
+    .hm-nav__mega-inner:has(.hm-nav__mega-promo) {
+        grid-template-columns: minmax(0, 1fr) 28rem;
+    }
+
+    .hm-nav__mega-cols {
+        display: grid;
+        gap: var(--hm-space-6) var(--hm-space-8);
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+
+    .hm-nav__mega-head,
+    .hm-nav__mega-head:visited {
+        color: var(--hm-foreground);
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-block-end: var(--hm-space-3);
+        text-decoration: none;
+    }
+
+    .hm-nav__mega-head:hover { color: var(--hm-accent); }
+
+    .hm-nav__mega-list {
+        display: grid;
+        gap: .6rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .hm-nav__mega-link,
+    .hm-nav__mega-link:visited {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        text-decoration: none;
+    }
+
+    .hm-nav__mega-link:hover { color: var(--hm-accent); }
+
+    .hm-nav__mega-promo {
+        align-self: start;
+        background: var(--hm-surface-muted);
+        border-radius: var(--hm-radius);
+        overflow: hidden;
+
+        img { display: block; inline-size: 100%; }
+        p { margin: 0; }
+    }
 }
-
-.hm-pdp .fotorama__nav__frame--thumb:first-child:nth-last-child(-n+5),
-.hm-pdp .fotorama__nav__frame--thumb:first-child:nth-last-child(-n+5) ~ .fotorama__nav__frame--thumb {
-    //  block-size too, not just inline-size: fotorama writes BOTH as inline
-    //  style from the view.xml thumb size, and an inline height beats
-    //  `aspect-ratio` — which is why the frames came back 216 wide by 272 tall
-    //  once the widths were freed. Letting the height compute is what makes the
-    //  square the tester asked for ("just in a square shape").
-    block-size: auto !important;
-    flex: 1 1 0;
-    inline-size: auto !important;
-    margin: 0 !important;
-
-    //  `aspect-ratio: 1` alone did not hold the square: with `height: auto` the
-    //  frame's `min-height: auto` lets it grow to its content, and the content
-    //  is a 256px thumbnail source, so the box came back 216 wide by 272 tall.
-    //  A zero minimum lets the ratio decide instead.
-    min-block-size: 0 !important;
-
-    //  The shaft supplies the gap now, so the frame's own padding would double
-    //  it — and it is asymmetric (8px on three sides), which is what made the
-    //  first and last thumbs different widths from the middle one.
-    padding: 0 !important;
-}
-
-//  The strip's own boxes are sized from the same inline style and would keep
-//  the taller frame's height as dead space underneath.
-.hm-pdp .fotorama__nav,
-.hm-pdp .fotorama__nav-wrap { block-size: auto !important; }

@@ -36,8 +36,8 @@
                      overwritten (set to 400 here first, and the rendered config
                      came back "thumbwidth":400 while "thumbmargin":8 — declared
                      in the same block — went through untouched). -->
-                <width>192</width>
-                <height>192</height>
+                <width>212</width>
+                <height>212</height>
             </image>
 
             <!--
@@ -70,10 +70,12 @@
             <var name="arrows">false</var>
             <var name="navarrows">false</var>
             <var name="navtype">thumbs</var>
-            <!-- Three thumbs spanning the 592px stage exactly: 3x192 + 2x8.
-                 Only the margin is settable here; the width and height come from
-                 `product_page_image_small` above. -->
-            <var name="thumbmargin">8</var>
+            <!-- Three thumbs spanning the media column exactly:
+                 3 x 212 + 2 x 10 = 656. Only the margin is settable here; the
+                 width and height come from `product_page_image_small` above,
+                 because Magento's gallery block derives thumbwidth/thumbheight
+                 from that image and writes them over any set here. -->
+            <var name="thumbmargin">10</var>
         </var>
 
         <!--
