@@ -715,11 +715,17 @@
 //  with an optional promotional panel beside them, instead of making the visitor
 //  load the category page to find out what is in it.
 //
-//  DESKTOP ONLY, and by pointer capability rather than width alone. `hover:
-//  hover` excludes touch devices, where there is no hover state to leave and a
-//  panel that opens on first tap swallows the tap that was meant to navigate.
-//  Phones and tablets keep the category sheet behind the menu button, which is
-//  the control designed for them.
+//  DESKTOP ONLY, and by pointer capability rather than width alone: a panel that
+//  opens on hover is useless where nothing can hover, and on touch the tap meant
+//  to navigate would be spent opening it. Phones and tablets keep the category
+//  sheet behind the menu button, which is the control designed for them.
+//
+//  `any-hover`, not `hover`. `hover` asks about the PRIMARY pointer, so a
+//  touchscreen laptop — touch primary, trackpad secondary — reports `hover:
+//  none` and would lose the menu on a device perfectly able to use it.
+//  `any-hover: hover` asks whether the visitor can hover AT ALL, which is the
+//  actual question. It costs nothing on a true touch-only device: the panel
+//  still only opens if something hovers.
 //
 //  HIDDEN BY DEFAULT, OUTSIDE THE QUERY, and this is the important half.
 //
@@ -732,7 +738,7 @@
 //  panel is invisible, so hiding belongs here and only REVEALING belongs there.
 .hm-nav__mega { display: none; }
 
-@media (min-width: 992px) and (hover: hover) {
+@media (min-width: 992px) and (any-hover: hover) {
     //  The containing block for every panel. `.hm-nav__inner` is a horizontal
     //  scroller below 1400px (CL036-DEV01.10) and would clip an absolutely
     //  positioned child — but a positioned box whose containing block is an
@@ -742,7 +748,9 @@
 
     .hm-page .hm-nav__mega {
         background: var(--hm-surface);
-        border-block-start: 1px solid rgba(255, 255, 255, .08);
+        //  The panel is a white card under a navy band; a white hairline was
+        //  invisible on it. The subtle border token reads against the surface.
+        border-block-end: 1px solid var(--hm-border-subtle);
         box-shadow: var(--hm-shadow-lg);
         color: var(--hm-foreground);
         inset-block-start: 100%;
@@ -781,11 +789,19 @@
         grid-template-columns: minmax(0, 1fr) 28rem;
     }
 
+    //  FLEX, NOT A 1fr GRID. `auto-fit` with `minmax(16rem, 1fr)` stretches
+    //  whatever columns exist across the whole panel, so Fashion's two columns
+    //  sat 700px apart on a 1440 screen with the second one marooned mid-panel.
+    //  Fixed-width columns packed from the start read as a menu; stretched ones
+    //  read as a mistake. They still wrap and still shrink below 20rem if a
+    //  category name is long.
     .hm-nav__mega-cols {
-        display: grid;
-        gap: var(--hm-space-6) var(--hm-space-8);
-        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-6) var(--hm-space-10);
     }
+
+    .hm-nav__mega-col { flex: 0 1 20rem; min-inline-size: 0; }
 
     .hm-nav__mega-head,
     .hm-nav__mega-head:visited {

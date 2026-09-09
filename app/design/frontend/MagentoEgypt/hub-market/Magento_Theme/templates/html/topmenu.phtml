@@ -123,6 +123,49 @@ foreach ($block->getMenu()->getChildren() as $child) {
     }
 }
 
+/*
+ * MEGA MENU COLUMNS (CL036-DEV01.15).
+ *
+ * One column per level-3 category, its level-4 children listed under it. This
+ * catalogue really is three deep where it matters — Fashion has Women's
+ * Clothing (8) and Men's Clothing (7) beneath it, which is the exact shape the
+ * ticket's mockup shows — and a level-3 category with no children of its own
+ * still earns a column heading that links to itself.
+ *
+ * Capped at four columns and eight links, because this is a hover panel and not
+ * a sitemap: Fashion would otherwise open a 17-column wall. The cap is on
+ * DISPLAY only; "View all" at the foot of the panel goes to the full category.
+ *
+ * Categories with no children get no panel at all — $mega stays empty and the
+ * template skips the markup, so hovering Electronics & Tech does nothing rather
+ * than opening an empty box.
+ */
+$hmMegaCols = 4;
+$hmMegaLinks = 8;
+
+$hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks): array {
+    $cols = [];
+    foreach ($node->getChildren() as $sub) {
+        if (count($cols) >= $hmMegaCols) {
+            break;
+        }
+        $links = [];
+        foreach ($sub->getChildren() as $leaf) {
+            if (count($links) >= $hmMegaLinks) {
+                break;
+            }
+            $links[] = ['name' => (string) $leaf->getName(), 'url' => (string) $leaf->getUrl()];
+        }
+        $cols[] = [
+            'name'  => (string) $sub->getName(),
+            'url'   => (string) $sub->getUrl(),
+            'links' => $links,
+        ];
+    }
+
+    return $cols;
+};
+
 $inline = [];
 foreach ($hmNavOrder as $key) {
     if (!isset($hmByKey[$key])) {
@@ -133,6 +176,7 @@ foreach ($hmNavOrder as $key) {
         'name' => (string) $child->getName(),
         'url'  => (string) $child->getUrl(),
         'icon' => $hmNavIcons[$key] ?? '',
+        'mega' => $hmMega($child),
     ];
 }
 
@@ -244,7 +288,7 @@ foreach ($hmByKey as $hmKey => $hmChild) {
         <?php if ($inline): ?>
             <ul class="hm-nav__inline">
                 <?php foreach ($inline as $item): ?>
-                    <li class="hm-nav__inline-item">
+                    <li class="hm-nav__inline-item<?= $item['mega'] ? ' hm-nav__inline-item--has-mega' : '' ?>">
                         <a class="hm-nav__inline-link" href="<?= $escaper->escapeUrl($item['url']) ?>">
                             <?php /* aria-hidden: the glyph is decoration and the link
                                      text already names the category. */ ?>
@@ -253,6 +297,74 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                             <?php endif; ?>
                             <?= $escaper->escapeHtml($item['name']) ?>
                         </a>
+
+                        <?php
+                        /*
+                         * THE MEGA PANEL (CL036-DEV01.15), opened on hover and on
+                         * keyboard focus — `:focus-within` in _hm-nav.less, so it
+                         * is reachable by tabbing and not a pointer-only feature.
+                         *
+                         * It is a CHILD of this <li> so the CSS needs no JavaScript
+                         * and no per-category selectors: hovering the chip or the
+                         * panel keeps :hover on the same element. But it is
+                         * POSITIONED against `.hm-nav`, which is the one ancestor
+                         * outside `.hm-nav__inner` — the band is a horizontal
+                         * scroller under 1400px, and an absolutely positioned box
+                         * whose containing block is an ancestor OF the scroller is
+                         * not clipped by it. Positioning it against the <li>
+                         * instead would put it inside the scroller and cut it off.
+                         */
+                        ?>
+                        <?php if ($item['mega']): ?>
+                            <div class="hm-nav__mega">
+                                <div class="hm-nav__mega-inner">
+                                    <div class="hm-nav__mega-cols">
+                                        <?php foreach ($item['mega'] as $col): ?>
+                                            <div class="hm-nav__mega-col">
+                                                <a class="hm-nav__mega-head" href="<?= $escaper->escapeUrl($col['url']) ?>">
+                                                    <?= $escaper->escapeHtml($col['name']) ?>
+                                                </a>
+                                                <?php if ($col['links']): ?>
+                                                    <ul class="hm-nav__mega-list">
+                                                        <?php foreach ($col['links'] as $leaf): ?>
+                                                            <li>
+                                                                <a class="hm-nav__mega-link" href="<?= $escaper->escapeUrl($leaf['url']) ?>">
+                                                                    <?= $escaper->escapeHtml($leaf['name']) ?>
+                                                                </a>
+                                                            </li>
+                                                        <?php endforeach; ?>
+                                                    </ul>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+
+                                    <?php
+                                    /*
+                                     * The promotional panel the mockup puts beside
+                                     * the columns. A CMS block so marketing owns the
+                                     * copy and the link, not a template: one block
+                                     * for the whole menu (`hm_mega_promo`), because
+                                     * ten per-category blocks is ten things to keep
+                                     * current and the ticket asks for "a promotional
+                                     * banner/highlight section", singular.
+                                     *
+                                     * Rendered only when the block EXISTS and has
+                                     * content — an unconfigured store gets columns
+                                     * that fill the panel rather than a hole where a
+                                     * banner should be.
+                                     */
+                                    $hmPromo = trim((string) $block->getLayout()
+                                        ->createBlock(\Magento\Cms\Block\Block::class)
+                                        ->setBlockId('hm_mega_promo')
+                                        ->toHtml());
+                                    ?>
+                                    <?php if ($hmPromo !== ''): ?>
+                                        <div class="hm-nav__mega-promo"><?= /* @noEscape */ $hmPromo ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     </li>
                 <?php endforeach; ?>
             </ul>
