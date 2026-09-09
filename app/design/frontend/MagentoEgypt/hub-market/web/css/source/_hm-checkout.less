@@ -559,6 +559,125 @@
         text-align: center;
     }
 
+    //
+    //  Discount code  (CL036-DEV01.04)
+    //  ---------------------------------------------
+    //  One row in the gap the client marked, between Continue Shopping and the
+    //  trust list: field, then Apply. Core's own markup is untouched (the
+    //  discountCode widget is bound to those ids), so the shape comes entirely
+    //  from here — `.fieldset.coupon` becomes the flex row and core's
+    //  `.actions-toolbar` / `.primary` wrappers dissolve into it with
+    //  `display: contents`, which is what lets the button sit beside the input
+    //  rather than under it without touching the template's structure.
+    //
+    //  The label is present but visually hidden. The rail has no room for a
+    //  heading — the whole point of the cycle-2 removal was 101px of chrome in
+    //  front of the numbers — and the field carries the same words as its
+    //  placeholder, so a screen reader still gets a real name for it.
+    .hm-cart-discount {
+        //  Closed off with the same hairline the trust list below it uses, so
+        //  the rail reads as three separated groups — numbers and buttons, the
+        //  discount field, then the reassurance — rather than the field being
+        //  tacked onto the Continue Shopping button.
+        border-block-start: 1px solid var(--hm-border-subtle);
+        margin-block-start: var(--hm-space-6);
+        padding-block-start: var(--hm-space-6);
+
+        //  Blank ships `.cart-summary .block > .content { display: none }` for
+        //  the collapsible pattern this block used to be. With the disclosure
+        //  gone there is nothing left to open it, so the field rendered into a
+        //  zero-height box — present in the DOM, invisible on the page.
+        > .content { display: block; }
+
+        .fieldset.coupon {
+            display: flex;
+            gap: var(--hm-space-2);
+            margin: 0;
+        }
+
+        .field {
+            flex: 1 1 auto;
+            margin: 0;
+            min-inline-size: 0;
+        }
+
+        .label {
+            border: 0;
+            clip-path: inset(50%);
+            block-size: 1px;
+            inline-size: 1px;
+            overflow: hidden;
+            position: absolute;
+            white-space: nowrap;
+        }
+
+        .control { margin: 0; }
+
+        //  `display: contents` on both wrappers: the button is nested as
+        //  .actions-toolbar > .primary > button, and neither box is wanted in
+        //  the flex row.
+        //
+        //  The CHILD combinator matters. The button's own class list is
+        //  `action apply primary`, so a descendant `.actions-toolbar .primary`
+        //  matches the button as well as the div around it — and `display:
+        //  contents` on the button erases the button's own box, which is how
+        //  the first pass shipped a row with no visible control in it.
+        .actions-toolbar,
+        .actions-toolbar > .primary { display: contents; }
+    
+
+        .hm-cart-discount__input {
+            background: var(--hm-surface);
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius-sm);
+            block-size: 4.4rem;
+            color: var(--hm-foreground);
+            font-size: 1.4rem;
+            inline-size: 100%;
+            padding-inline: var(--hm-space-3);
+
+            &:focus-visible {
+                border-color: var(--hm-accent);
+                outline: 0;
+            }
+
+            //  Vnecoms lists applied codes in its own child block rather than
+            //  echoing them back into the field, so this state is rare — but
+            //  core disables the input when a code is on the quote and it must
+            //  not then look editable.
+            &[disabled] {
+                background: var(--hm-surface-muted);
+                color: var(--hm-foreground-muted);
+            }
+        }
+
+        .hm-cart-discount__action {
+            //  `inline-size: auto` is load-bearing. Blank ships
+            //  `.actions-toolbar > .primary .action { width: 100% }` for phones,
+            //  and with the wrappers dissolved by `display: contents` the button
+            //  becomes a flex item of this row — so on a 390px screen it took
+            //  the whole width and squeezed the field to 26px. Nested one level
+            //  deeper than the standalone rule was, to win that tie outright.
+            background: var(--hm-surface);
+            inline-size: auto;
+            border: 1px solid var(--hm-border-strong);
+            border-radius: var(--hm-radius-sm);
+            block-size: 4.4rem;
+            color: var(--hm-foreground);
+            cursor: pointer;
+            flex: 0 0 auto;
+            font-size: 1.4rem;
+            font-weight: 600;
+            padding-inline: var(--hm-space-4);
+
+            &:hover {
+                background: var(--hm-foreground);
+                border-color: var(--hm-foreground);
+                color: var(--hm-surface);
+            }
+        }
+    }
+
     //  Trust list, closing the rail as the reference does. The third line is
     //  this marketplace's actual promise and the one piece of reference content
     //  the live page had no counterpart for.

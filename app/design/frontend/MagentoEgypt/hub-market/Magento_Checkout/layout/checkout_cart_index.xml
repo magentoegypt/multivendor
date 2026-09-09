@@ -125,18 +125,40 @@
         <referenceBlock name="checkout.cart.crosssell" remove="true"/>
 
         <!--
-            QA cycle 2 item 4: the prototype's order summary is totals, the two
-            buttons and the trust bullets — no "Estimate Shipping and Tax" and
-            no "Apply Discount Code" accordions. Coupons still apply at checkout
-            payment step if that block is ever restored there.
-        -->
-        <!-- NOT the shipping estimator block: cart/shipping.phtml is where
-             window.checkoutConfig is written for every cart-page script, and
-             removing it threw "reading 'quoteData'" on load. It is hidden in
-             _hm-qa02-recheck.less instead. -->
-        <referenceBlock name="checkout.cart.coupon" remove="true"/>
+            THE DISCOUNT FIELD IS BACK, AND DELIBERATELY SO. Read this before
+            removing it again.
 
+            QA cycle 2 item 4 took it out: "the prototype's order summary is
+            totals, the two buttons and the trust bullets — no Estimate Shipping
+            and Tax and no Apply Discount Code accordions". CL036-DEV01.04 asks
+            for the opposite — the client wants a discount-code input in exactly
+            the gap that removal left, between Continue Shopping and the trust
+            bullets — so the client's later instruction wins over the earlier
+            parity call. The prototype still does not have one; that is not a
+            reason to drop it a second time.
+
+            It is no longer an accordion. cycle 2's objection was to 101px of
+            collapsed heading in front of the numbers, and the ticket asks for a
+            field, not a disclosure, so the template is overridden in this theme
+            to render the input inline. The form, its ids and the discountCode
+            widget are untouched.
+
+            THE TEMPLATE TO OVERRIDE IS VNECOMS', NOT CORE'S. The block is core's
+            `checkout.cart.coupon`, but module-vendors-coupon's own layout calls
+            setTemplate on it and points it at
+            Vnecoms_VendorsCoupon::cart/coupon.phtml, so a theme override of
+            Magento_Checkout::cart/coupon.phtml resolves perfectly well and is
+            then never asked for. The override lives at
+            Vnecoms_VendorsCoupon/templates/cart/coupon.phtml, and it keeps that
+            module's coupon_detail child — this is a marketplace and a shopper
+            can hold one coupon per vendor.
+
+            The shipping estimator stays removed from view but NOT from the DOM:
+            cart/shipping.phtml is where window.checkoutConfig is written for
+            every cart-page script, and removing it threw "reading 'quoteData'"
+            on load. It is hidden in _hm-qa02-recheck.less instead.
+        -->
         <move element="checkout.cart.shipping" destination="cart.summary" after="checkout.cart.summary.trust"/>
-        <move element="checkout.cart.coupon"   destination="cart.summary" after="checkout.cart.shipping"/>
+        <move element="checkout.cart.coupon"   destination="cart.summary" before="checkout.cart.summary.trust"/>
     </body>
 </page>

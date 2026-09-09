@@ -1,0 +1,80 @@
+<?php
+/**
+ * Hub Market — the cart summary's discount code field (CL036-DEV01.04).
+ *
+ * OVERRIDES THE VNECOMS TEMPLATE, NOT CORE'S. `checkout.cart.coupon` is a core
+ * block, but module-vendors-coupon's own checkout_cart_index.xml calls
+ * setTemplate on it and points it at Vnecoms_VendorsCoupon::cart/coupon.phtml —
+ * so a theme override of Magento_Checkout::cart/coupon.phtml resolves correctly
+ * and is then never asked for. (Written the wrong way round first; the giveaway
+ * on the rendered page was the `vendor-coupon-list` markup, which core has no
+ * concept of.)
+ *
+ * WHAT CHANGES: the collapsible accordion goes and the field renders inline.
+ * Core and Vnecoms both hide this behind an "Apply Discount Code" heading; QA
+ * cycle 2 removed the whole block for that reason, and CL036-DEV01.04 asks for
+ * the field itself in the gap between Continue Shopping and the trust bullets.
+ *
+ * WHAT DOES NOT CHANGE: the form action, its id, the `discountCode` widget and
+ * every selector it is configured with — #coupon_code, #remove-coupon,
+ * button.action.apply, and #cancel-coupon-btn, which lives in the coupon_detail
+ * child below. The widget is what applies and cancels; renaming any of those
+ * leaves a field that looks right and does nothing.
+ *
+ * The child list stays too: this is a marketplace, a shopper can hold one
+ * coupon per vendor, and that block is what shows them with their own remove
+ * links. The input is left empty exactly as Vnecoms leaves it — applied codes
+ * are listed there rather than echoed back into the field.
+ *
+ * @var \Magento\Checkout\Block\Cart\Coupon $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+?>
+<div class="block discount hm-cart-discount" id="block-discount">
+    <div class="content" data-role="content">
+        <form id="discount-coupon-form"
+              class="hm-cart-discount__form"
+              action="<?= $escaper->escapeUrl($block->getUrl('checkout/cart/couponPost')) ?>"
+              method="post"
+              data-mage-init='{"discountCode":{"couponCodeSelector": "#coupon_code",
+                                               "removeCouponSelector": "#remove-coupon",
+                                               "applyButton": "button.action.apply",
+                                               "cancelButton": "#cancel-coupon-btn"}}'>
+
+            <?= /* @noEscape */ $block->getChildHtml('coupon_detail') ?>
+
+            <div class="fieldset coupon">
+                <input type="hidden" name="remove" id="remove-coupon" value="0"/>
+
+                <div class="field">
+                    <?php /* Visually hidden: the rail has no room for a heading —
+                             removing 101px of chrome from in front of the numbers
+                             is what cycle 2 was about — and the placeholder
+                             carries the same words for sighted users. */ ?>
+                    <label for="coupon_code" class="label">
+                        <span><?= $escaper->escapeHtml(__('Discount code')) ?></span>
+                    </label>
+                    <div class="control">
+                        <input type="text"
+                               class="input-text hm-cart-discount__input"
+                               id="coupon_code"
+                               name="coupon_code"
+                               value=""
+                               placeholder="<?= $escaper->escapeHtmlAttr(__('Discount code')) ?>"/>
+                    </div>
+                </div>
+
+                <div class="actions-toolbar">
+                    <div class="primary">
+                        <button type="button"
+                                class="action apply primary hm-cart-discount__action"
+                                value="<?= $escaper->escapeHtmlAttr(__('Apply Discount')) ?>">
+                            <span><?= $escaper->escapeHtml(__('Apply')) ?></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
