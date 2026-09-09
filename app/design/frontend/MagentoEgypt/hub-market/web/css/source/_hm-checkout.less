@@ -3385,3 +3385,16 @@ a.sms-login-field-ctrl {
         dd { margin: 0; }
     }
 }
+
+//  The discount field's bottom margin, answered on WEIGHT rather than order.
+//
+//  `.hm-cart-discount .field { margin: 0 }` above is (0,4,0), and so is
+//  Magento/blank's `.cart-summary .block .fieldset .field { margin: 0 0 12px }`
+//  — which lands in styles-l.css AFTER the theme's copy, so on desktop blank
+//  won the tie and the field kept 12px under it (a 44px input inside a 56px
+//  fieldset). This is the same emit-order trap the top of this file documents
+//  for the cart rail; the answer is the same, an extra class rather than
+//  !important. Measured on the live cart before and after.
+.checkout-cart-index .cart-summary .hm-cart-discount__form .fieldset .field {
+    margin: 0;
+}
