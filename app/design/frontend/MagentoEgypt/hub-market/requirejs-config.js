@@ -151,6 +151,16 @@ var config = {
                 //  Keeps the summary totals visible on step one — see the file.
                 'Magento_Checkout/js/summary-total-mixin': true
             },
+            'Magento_Checkout/js/view/summary/shipping': {
+                /*
+                 * ...but NOT the shipping row, which has nothing true to say
+                 * until the quote has been costed with a method. Without this
+                 * the row printed "EGP 0" beside a methods panel offering
+                 * "Flat Rate EGP 5". See the file for why that was reported as
+                 * a language bug and why it is not one.
+                 */
+                'Magento_Checkout/js/summary-shipping-mixin': true
+            },
             'Magento_Checkout/js/view/summary/cart-items': {
                 'Amasty_CheckoutCore/js/view/summary/cart-items-mixin': false
             },
