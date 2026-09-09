@@ -539,7 +539,9 @@
         //  dark as the checkboxes and radios beside it.
         .ui-slider {
             background: var(--hm-foreground) !important;
-            block-size: .8rem;
+            //  6px. Measured off the prototype's own rendering at 2x and halved
+            //  — not judged from a screenshot, which had me at 8.
+            block-size: .6rem;
             border: 0;
             border-radius: var(--hm-radius-full);
         }
@@ -560,11 +562,17 @@
         .ui-slider-handle {
             background: var(--hm-accent);
             border: 0;
-            block-size: 2rem !important;
+            //  15px by the same measurement; I had it at 20.
+            block-size: 1.5rem !important;
             border-radius: var(--hm-radius-full);
-            inline-size: 2rem !important;
+            inline-size: 1.5rem !important;
             inset-block-start: 50%;
-            margin-inline-start: -1rem;
+            //  jQuery UI hangs a `margin-top: -6px` on the handle, which was
+            //  pulling it 6px above the rail even though `inset-block-start:
+            //  50%` and the -50% translate had already centred it. The inline
+            //  margin still does the HORIZONTAL centring — half the handle.
+            margin-block-start: 0;
+            margin-inline-start: -.75rem;
             transform: translateY(-50%);
         }
     }
