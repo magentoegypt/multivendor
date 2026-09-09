@@ -448,8 +448,21 @@
     //
     //  Mageplaza does mark the active option `checked` (verified on a filtered
     //  URL), so the selected state is real and not decoration.
-    //  16px, the prototype's option text.
-    .filter-options-content .items .item > a { font-size: 1.6rem; }
+    //  16px, the prototype's option text — and no padding on the link. The
+    //  row was 32px tall against the prototype's 16, and that height was the
+    //  airy look, not the gap between rows: ours were already 3px apart where
+    //  the prototype leaves 6. The 32 came from 4px of link padding on a 24px
+    //  line box.
+    .filter-options-content .items .item > a {
+        font-size: 1.6rem;
+        line-height: 1.2;
+        padding: 0;
+    }
+
+    //  6px between rows, the prototype's own gap.
+    .filter-options-content .items .item { margin-block-end: .6rem; }
+
+    .filter-options-content .items .item:last-child { margin-block-end: 0; }
 
     .filter-options-content .items .item > input[type='checkbox'] {
         appearance: none;
@@ -1602,9 +1615,13 @@
 
 //  Amber on, grey off — the prototype's 12px stars at this row's size.
 .hm-fstars {
-    //  1.4rem: a ★ glyph paints a little smaller than its font-size, so this
-    //  lands on the prototype's 12px star icons beside a 16px label.
-    font-size: 1.4rem;
+    //  1.8rem. Measured like-for-like by rendering both at 2x and counting the
+    //  GOLD PIXELS rather than trusting the box: the prototype's star icon is a
+    //  12px SVG that paints 9px of gold, and our ★ at 1.4rem painted only 7.
+    //  A glyph fills less of its em box than an icon fills its viewBox, so the
+    //  font-size has to run ahead of the icon size to match on screen.
+    font-size: 1.8rem;
+    line-height: 1;
     letter-spacing: .05em;
     line-height: 1;
     white-space: nowrap;
