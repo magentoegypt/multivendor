@@ -794,6 +794,6 @@
 //  In practice this almost never runs: the disclosure's own summary is 0x0 from
 //  992px up on this theme, so the panel is only reachable there by keyboard.
 //  That is exactly the case worth not breaking.
-@media (min-width: 992px) and (max-width: 1399px) {
+@media screen and (min-width: 992px) and (max-width: 1399px) {
     .hm-page .hm-nav__inner:has(.hm-nav__menu[open]) { overflow: visible; }
 }

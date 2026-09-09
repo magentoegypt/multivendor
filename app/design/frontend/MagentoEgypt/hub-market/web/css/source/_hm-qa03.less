@@ -1608,7 +1608,7 @@
 //  Full width, an equal share each, and the labels held on one line at the
 //  smaller type step — which makes the heights match without stretching
 //  anything.
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .wishlist-index-index .actions-toolbar {
         display: flex;
         inline-size: 100%;
@@ -1646,3 +1646,145 @@
 //  Nothing becomes unreachable — the header's account menu and, on a phone, the
 //  bottom bar's Account tab both still reach every page this listed.
 .hm-page.account .block-collapsible-nav { display: none; }
+
+//  ===========================================================================
+//  TICKET 25 — Product display (mobile), test run 86d4a6ph1 items 4, 6 and 7
+//  ===========================================================================
+
+//
+//  25.4 — Related Products: the photo is cropped, not shown whole
+//  ---------------------------------------------------------------------------
+//  An earlier item on this same ticket set the related / upsell rails to one
+//  card per row on a phone (_hm-mobile-parity.less, "PRODUCT 4"). That made the
+//  card's square stage 358px wide, and the card component crops to fill it
+//  (`object-fit: cover`, _hm-product-item.less). A 323x400 portrait source
+//  therefore loses 20% of its height — on the tester's shot, the model's head
+//  and legs.
+//
+//  The tester asked for the whole picture WITHOUT changing the card's
+//  dimensions, so the stage keeps its 1/1 aspect ratio and only the fit
+//  changes. The letterbox is painted in the card's own surface rather than
+//  `--hm-surface-muted`, because a grey band under a product shot on a white
+//  card reads as a broken image; matching the card makes the picture simply
+//  sit in its space.
+//
+//  Scoped to the phone rails only. The grids elsewhere are two- and four-up,
+//  where the stage is small enough that `cover` is what keeps the row even —
+//  that treatment is the approved design and is not in scope here.
+@media screen and (max-width: 767px) {
+    .hm-pdp .block.related .product-item .product-item-photo,
+    .hm-pdp .block.upsell .product-item .product-item-photo,
+    .hm-pdp .block.related .product-item .product-image-container,
+    .hm-pdp .block.upsell .product-item .product-image-container {
+        background: var(--hm-surface);
+    }
+
+    .hm-pdp .block.related .product-item .product-image-photo,
+    .hm-pdp .block.upsell .product-item .product-image-photo {
+        object-fit: contain;
+    }
+}
+
+//
+//  25.6 — "Sold by N other sellers": price, button and link collide
+//  ---------------------------------------------------------------------------
+//  Vnecoms renders this as a four-column table. Under 480px its own stylesheet
+//  hides the price and add-to-cart COLUMNS and re-renders both inside the
+//  seller-description cell as `.addition-mobile-info` — but leaves that a
+//  `display: flex` ROW. In a 226px cell (the logo column eats 114px of a 390px
+//  screen) the three children get 46px, 82px and 78px: the price is clipped,
+//  "View This Product" wraps onto three lines, and the button sits flush
+//  against both with no gap, which is what reads as an overlap.
+//
+//  The row becomes a column. Nothing is hidden and no template changes — the
+//  three controls simply get the cell's full width, one under the other.
+@media screen and (max-width: 767px) {
+    //  Reclaim the width the logo column was taking. 72px still shows the
+    //  vendor's mark; the table's own `width: 100px` was written for desktop.
+    .hm-page .price-comparison .pc_vendor-offers .vendor_info {
+        inline-size: 7.2rem;
+        padding-inline: 0;
+        vertical-align: top;
+    }
+
+    .hm-page .price-comparison .pc_vendor-offers .vendor_info img {
+        block-size: auto;
+        max-inline-size: 100%;
+    }
+
+    .hm-page .price-comparison .addition-mobile-info {
+        align-items: stretch;
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-3);
+        margin-block-start: var(--hm-space-4);
+
+        //  `.price-box { margin-right: 20px }` is the module's row spacing and
+        //  is meaningless once these stack.
+        .price-box { margin-inline: 0; }
+
+        //  The add-to-cart form carries an inline `style="margin-bottom:10px"`,
+        //  which only an important declaration can reach. The gap above spaces
+        //  the stack now.
+        form { margin-block-end: 0 !important; }
+
+        button.action.primary {
+            inline-size: 100%;
+            justify-content: center;
+            white-space: normal;
+        }
+
+        //  The link was competing with the button for horizontal room; on its
+        //  own line it no longer wraps at all.
+        > a {
+            display: inline-block;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+    }
+
+    //  The header row named only two of the four columns and the other two are
+    //  gone at this width, so it is a "Logo | Seller's Description" label over
+    //  a single seller. The block's own title already says what the table is.
+    .hm-page .price-comparison .pc_vendor-offers thead { display: none; }
+
+    .hm-page .price-comparison .pc_vendor-offers .product-item td {
+        padding: var(--hm-space-4) var(--hm-space-2);
+    }
+}
+
+//
+//  25.7 — PDP rating row: stars, "4.5" and "(2 reviews)" off one baseline
+//  ---------------------------------------------------------------------------
+//  blank gives `.reviews-actions` `line-height: 28px` for its table-cell
+//  layout, and the anchor inside it is a BLOCK 44px tall. A block lays its
+//  line box out from the top, so the text sat 8px above the middle of its own
+//  box — and since the row centres BOXES (`align-items: center`), centring a
+//  44px box whose glyphs are not centred inside it lifted "(2 reviews)" clear
+//  of the "4.5" beside it.
+//
+//  Making the anchor a centred flex container puts its glyphs in the middle of
+//  its box. Both texts are then 14px, centred, in a row that centres boxes —
+//  and two identical font sizes centred on the same line have, by definition,
+//  the same baseline. The 44px tap target is left alone.
+.hm-pdp .product-info-main .product-reviews-summary {
+    align-items: center;
+
+    .reviews-actions { align-items: center; line-height: 1.5; }
+
+    .reviews-actions a {
+        align-items: center;
+        display: inline-flex;
+        line-height: 1.5;
+        margin-inline-end: 0;
+    }
+
+    //  14px text on a 14px line-height has no half-leading, so its box centre
+    //  sat below the anchor's. Same leading on both puts the two centres — and
+    //  so the two baselines — on one line.
+    .hm-rating__score { line-height: 1.5; }
+
+    //  The star row is 18px against 21px of text; centred is the only sane
+    //  vertical relationship, and it is what the row already does.
+    .hm-stars { align-self: center; }
+}
