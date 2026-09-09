@@ -143,21 +143,7 @@ foreach ($block->getMenu()->getChildren() as $child) {
 $hmMegaCols = 4;
 $hmMegaLinks = 8;
 
-/*
- * THE COLUMN'S PICTURE (CL036-DEV01.15 follow-up: "show image with relevant
- * sub category link").
- *
- * The menu tree carries a name, a url and an id and nothing else — the catalog
- * plugin builds it that way — so the id is the only thread back to the
- * category. It arrives as `category-node-117`; anything else in the tree (the
- * root, a node another module injected) has no numeric id and simply gets no
- * picture rather than a wrong one.
- */
-$hmNodeCategoryId = static function ($node): int {
-    return preg_match('/(\d+)$/', (string) $node->getId(), $m) ? (int) $m[1] : 0;
-};
-
-$hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks, $hmNodeCategoryId): array {
+$hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks): array {
     $cols = [];
     foreach ($node->getChildren() as $sub) {
         if (count($cols) >= $hmMegaCols) {
@@ -171,7 +157,6 @@ $hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks, $hmNodeCategor
             $links[] = ['name' => (string) $leaf->getName(), 'url' => (string) $leaf->getUrl()];
         }
         $cols[] = [
-            'id'    => $hmNodeCategoryId($sub),
             'name'  => (string) $sub->getName(),
             'url'   => (string) $sub->getUrl(),
             'links' => $links,
@@ -188,6 +173,7 @@ foreach ($hmNavOrder as $key) {
     }
     $child = $hmByKey[$key];
     $inline[] = [
+        'key'  => $key,
         'name' => (string) $child->getName(),
         'url'  => (string) $child->getUrl(),
         'icon' => $hmNavIcons[$key] ?? '',
@@ -195,23 +181,6 @@ foreach ($hmNavOrder as $key) {
     ];
 }
 
-
-/*
- * One lookup for every column in the menu, not one per column: the block takes
- * the whole list and answers with a map. See the note on `getCategoryThumbnails`
- * for why a subcategory's picture usually comes from its first product.
- */
-$hmMegaIds = [];
-foreach ($inline as $hmItem) {
-    foreach ($hmItem['mega'] as $hmCol) {
-        if ($hmCol['id']) {
-            $hmMegaIds[] = $hmCol['id'];
-        }
-    }
-}
-$hmThumbs = $hmMegaIds && method_exists($block, 'getCategoryThumbnails')
-    ? $block->getCategoryThumbnails($hmMegaIds)
-    : [];
 
 /*
  * THE PHONE SHEET'S ROWS, with the same emoji the nav bar uses.
@@ -337,6 +306,32 @@ foreach ($hmByKey as $hmKey => $hmChild) {
             ->createBlock(\Magento\Cms\Block\Block::class)
             ->setBlockId('hm_mega_promo')
             ->toHtml());
+
+        /*
+         * THE PROMO CARD'S PICTURE.
+         *
+         * The client asked for the image to sit in the promotional panel, not
+         * beside each subcategory link — a menu of little tiles read as clutter,
+         * and in this catalogue they all resolved to the same product shot
+         * because these subcategories share their first product's photography.
+         *
+         * KEYED ON THE URL-KEY, for the same reason the glyphs above are: it is
+         * the only identifier stable across store views, and four of these
+         * categories have a display name that deliberately diverges from it.
+         *
+         * The artwork is the home page's own — one picture per top-level
+         * category, already sized and already in the browser's cache by the
+         * time anyone opens the menu. A category with no picture listed here
+         * simply gets the text card, which is what the mockup drew anyway.
+         */
+        $hmMegaPromoImages = [
+            'super-market' => 'hero/hero-grocery.webp',
+            'clothes'      => 'hero/hero-fashion.webp',
+            'furniture'    => 'hero/hero-furniture.webp',
+            'health'       => 'hero/tile-beauty.webp',
+            'electronics'  => 'hero/tile-electronics.webp',
+            'games'        => 'hero/tile-kids.webp',
+        ];
         ?>
 
         <?php if ($inline): ?>
@@ -376,17 +371,7 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                                         <?php foreach ($item['mega'] as $col): ?>
                                             <div class="hm-nav__mega-col">
                                                 <a class="hm-nav__mega-head" href="<?= $escaper->escapeUrl($col['url']) ?>">
-                                                    <?php /* Decorative: the link's own text names the category, so a
-                                                             screen reader announcing the picture as well would say it
-                                                             twice. Dimensions are on the tag so the panel does not
-                                                             reflow as the images arrive. */ ?>
-                                                    <?php if (!empty($hmThumbs[$col['id']])): ?>
-                                                        <img class="hm-nav__mega-thumb"
-                                                             src="<?= $escaper->escapeUrl($hmThumbs[$col['id']]) ?>"
-                                                             alt="" aria-hidden="true"
-                                                             width="48" height="48" loading="lazy">
-                                                    <?php endif; ?>
-                                                    <span class="hm-nav__mega-head-text"><?= $escaper->escapeHtml($col['name']) ?></span>
+                                                    <?= $escaper->escapeHtml($col['name']) ?>
                                                 </a>
                                                 <?php if ($col['links']): ?>
                                                     <ul class="hm-nav__mega-list">
@@ -404,7 +389,20 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                                     </div>
 
                                     <?php if ($hmPromo !== ''): ?>
-                                        <div class="hm-nav__mega-promo"><?= /* @noEscape */ $hmPromo ?></div>
+                                        <?php $hmPromoImage = $hmMegaPromoImages[$item['key']] ?? ''; ?>
+                                        <div class="hm-nav__mega-promo">
+                                            <?php /* Decorative — the card's own heading and link carry the message,
+                                                     so a screen reader announcing the picture too would only repeat
+                                                     it. Dimensions on the tag so the panel does not reflow as the
+                                                     picture arrives. */ ?>
+                                            <?php if ($hmPromoImage !== '' && method_exists($block, 'getMediaUrl')): ?>
+                                                <img class="hm-nav__mega-promo-img"
+                                                     src="<?= $escaper->escapeUrl($block->getMediaUrl($hmPromoImage)) ?>"
+                                                     alt="" aria-hidden="true"
+                                                     width="280" height="140" loading="lazy">
+                                            <?php endif; ?>
+                                            <?= /* @noEscape */ $hmPromo ?>
+                                        </div>
                                     <?php endif; ?>
                                 </div>
                             </div>
