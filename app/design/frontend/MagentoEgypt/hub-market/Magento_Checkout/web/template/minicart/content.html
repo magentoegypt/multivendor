@@ -57,6 +57,14 @@
     </div>
 
     <if args="getCartParam('summary_count')">
+      <!--
+        The count and the subtotal are ONE row. They are separate siblings in
+        core's template and `.block-content` is a flex column, so they stacked:
+        "1 Item in Cart" on one line and "Subtotal: EGP 28" under it. Wrapped
+        rather than fought with CSS — there is no way to pair two siblings on a
+        line without a box around them.
+      -->
+      <div class="hm-minicart__summary">
         <div class="items-total">
             <span class="count" if="maxItemsToDisplay < getCartLineItemsCount()" text="maxItemsToDisplay"></span>
             <translate args="'of'" if="maxItemsToDisplay < getCartLineItemsCount()"></translate>
@@ -70,6 +78,8 @@
         </div>
 
         <each args="getRegion('subtotalContainer')" render=""></each>
+      </div>
+
         <each args="getRegion('extraInfo')" render=""></each>
 
         <div class="actions" if="getCartParam('possible_onepage_checkout')">

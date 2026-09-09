@@ -1323,3 +1323,59 @@
 //
 //  The deadline being wrong in the first place is fixed in DealsCountdown.php.
 .hm-countdown[hidden] { display: none !important; }
+
+//
+//  CL036-DEV01.17 — the printable receipt
+//  _____________________________________________
+//
+//  The layout half of this is fixed elsewhere and is worth stating here because
+//  it is the interesting part: every one of this theme's mobile blocks was
+//  written `@media (max-width: 767px)`, and that is TRUE WHEN PRINTING — paper
+//  is about 660px wide at A4 with default margins. So a printed receipt got the
+//  phone layout: the item table stacked one label per line, the address panels
+//  one per row, and pages of white space. Magento blank's own mobile rules are
+//  `@media only screen and (max-width: 767px)` and never applied. All 61 of the
+//  theme's are scoped to `screen` now, which fixes every printable page at once
+//  rather than patching this one.
+//
+//  What is left for print itself:
+//
+@media print {
+    //  Belt and braces beside the layout removals in Magento_Sales/layout/*.
+    //  A print stylesheet costs nothing and covers any page that grows a bottom
+    //  bar later.
+    .hm-bottomnav { display: none !important; }
+
+    //  The wordmark's second half is white — it sits on navy in the header — and
+    //  on paper that is white on white, so the logo read "Hub" with a gap after
+    //  it. Ink, not paper, for anything that has to survive a printer.
+    .hm-logo__word,
+    .hm-logo__word-rest { color: #000 !important; }
+
+    //  Backgrounds are not printed by default, so a white-on-accent chip comes
+    //  out white on white too. The order status pill is the one that matters on
+    //  a receipt.
+    .order-status {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+    }
+}
+
+//  The mini-cart's count and subtotal share a line.
+.hm-page .minicart-wrapper .hm-minicart__summary {
+    align-items: baseline;
+    display: flex;
+    gap: var(--hm-space-3);
+    justify-content: space-between;
+
+    .items-total,
+    .subtotal { margin: 0; }
+}
+
+//  A cart line with no usable description should not hold the gap open.
+//  `.hm-cart-line__price` is pushed to the foot of the body with
+//  `margin-block-start: auto` so it lands level with the line total opposite —
+//  right when there is copy above it, and a band of nothing when there is not.
+.hm-cart-line__body:not(:has(.hm-cart-line__desc)) .hm-cart-line__price {
+    margin-block-start: var(--hm-space-2);
+}

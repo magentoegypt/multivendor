@@ -151,7 +151,13 @@ if ($product) {
             <?php endif; ?>
         </strong>
 
-        <?php if ($hmDesc !== null): ?>
+        <?php /*
+            `!== null` was not enough. The language guard above blanks an
+            Arabic-dominant description on the English store by setting it to an
+            EMPTY STRING, not null, so the paragraph still rendered — an empty
+            <p> holding open a band of nothing between the name and the price.
+        */ ?>
+        <?php if ($hmDesc !== null && trim($hmDesc) !== ''): ?>
             <p class="hm-cart-line__desc"><?= $escaper->escapeHtml($hmDesc) ?></p>
         <?php endif; ?>
 
