@@ -1,0 +1,305 @@
+//
+//  Hub Market — QA cycle 3 (test run TR03 / bug 86d4a6whv)
+//  ---------------------------------------------------------------------------
+//  Answers the nine items the tester left open, in the tester's numbering.
+//  Every measurement here was taken against the prototype at
+//  https://doze-coyote-58038022.figma.site/ at 1440, not inferred.
+//
+
+//
+//  1-C — PICKED FOR YOU: "a lot of empty spaces on the card"
+//  ---------------------------------------------------------------------------
+//  The two copy changes are in cms_index_index.xml and PickedForYou.php. The
+//  space is this: `.product-item-name a.product-item-link` carries
+//  `min-height: 36px` — two lines at the card's 17.55px line-height — so a
+//  one-line name reserves an 18px band of nothing beneath it. It is there to
+//  keep card feet level across a row, which the prototype achieves differently:
+//  its names are one line and its details column is a flex box whose foot is
+//  pushed down. Same result, no reserved gap.
+//
+//  Scoped to this rail because 1-C is the only card the tester marked; the
+//  other rails passed this cycle and a global change would re-open them.
+//  The rail's own rule is `.hm-rail--hm-home-pickedforyou.block.widget ...` at
+//  (0,5,1) — the widget classes are attached, not descendants — so the reset has
+//  to carry them too. The grocery, fashion, beauty and furniture rails already
+//  sit at `min-block-size: 0`; this only brings Picked For You into line.
+.hm-rail--hm-home-pickedforyou.block.widget {
+    .product-item-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .product-item-name a.product-item-link {
+        min-block-size: 0;
+        min-height: 0;
+    }
+
+    //  Whatever the name costs, the price row and the reason strip still land
+    //  at the foot of the card, so a row of mixed name lengths stays level.
+    .hm-card__foot { margin-block-start: auto; }
+}
+
+//
+//  1-G — PROMO TILES: "the container colors are different from the theme"
+//  ---------------------------------------------------------------------------
+//  The gradients were already byte-identical to the prototype's — measured on
+//  both sides, `linear-gradient(135deg, #0f2144 0%, #1e3a6e 100%)` on tile A
+//  and likewise for B and C. What the tester could see and the stylesheet could
+//  not is that the prototype paints a FOURTH layer the theme never had: a child
+//  `<div class="absolute inset-0 opacity-20 bg-[radial-gradient(...)]">`
+//  computing to `radial-gradient(at 100% 0px, #f26522, transparent)`, i.e. the
+//  brand orange washed out of the top-right corner at 20%.
+//
+//  It reads as a warm lift toward that corner — sampling the tester's two
+//  screenshots along tile A gives #1e2745 → #403d59 on the prototype against
+//  #102347 → #1a3463 here, and the page white is #ffffff in both, so it was a
+//  real difference and not a capture artefact.
+//
+//  Painted as ::after rather than markup because the tiles come from the
+//  `hm_home_promos` CMS blocks — one row per store view — and CSS covers both.
+.hm-promo {
+    position: relative;
+
+    &::after {
+        background: radial-gradient(ellipse at top right, #f26522, rgba(0, 0, 0, 0));
+        content: '';
+        inset: 0;
+        opacity: .2;
+        pointer-events: none;
+        position: absolute;
+        z-index: 0;
+    }
+
+    //  The wash sits under the emoji and the copy, as it does in the prototype
+    //  where it is the tile's first child.
+    .hm-promo__icon,
+    .hm-promo__body,
+    .hm-promo__kicker,
+    .hm-promo__title,
+    .hm-promo__text {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+//
+//  4 — CART: "we need to remove the wishlist move"
+//  ---------------------------------------------------------------------------
+//  The prototype's cart line carries a bin and nothing else. Hidden rather than
+//  unhooked from layout for the same reason Edit is: both come out of
+//  `getActions()`, which renders them from their own block templates, and the
+//  control keeps its accessible name for anyone who reaches it another way.
+.checkout-cart-index .hm-cart-line__aside .item-actions .action-towishlist {
+    display: none;
+}
+
+//
+//  4 — CART: "the card sizes are bigger than the theme with very large gaps"
+//  ---------------------------------------------------------------------------
+//  Measured: our line is 819x192 against the prototype's ~135. The height is
+//  set by the ASIDE, not the body — bin 44 + 12 + stepper 44 + 12 + total 24 =
+//  136, and 24px of padding each side takes it to 192. The prototype stacks the
+//  same three controls in ~94.
+//
+//  The 44px came from a deliberate decision recorded in `_hm-checkout.less`
+//  ("the theme's touch floor... the two most-pressed controls on the page").
+//  That decision is kept where it earns its place — the phone layout, which has
+//  its own block below 768 — and relaxed to 3.6rem on the pointer layout the
+//  tester is looking at. 36px is still well clear of the 24px WCAG 2.5.8 AA
+//  floor; it is AAA (2.5.5) that wants 44.
+@media (min-width: 768px) {
+    .checkout-cart-index {
+        .hm-cart-line { padding: var(--hm-space-5); }
+
+        //  Both were floored at the thumb's 96px to give `space-between`
+        //  something to distribute. With the wishlist link gone the aside is
+        //  three items, not four, and the floor now only pads the card out.
+        .hm-cart-line__aside,
+        .hm-cart-line__body { min-block-size: 0; }
+
+        .hm-cart-line__aside {
+            gap: var(--hm-space-2);
+            row-gap: var(--hm-space-2);
+        }
+
+        .hm-cart-line__aside .action-delete,
+        .hm-qty__btn {
+            min-block-size: 3.6rem;
+            min-inline-size: 3.6rem;
+        }
+
+        .hm-qty input.qty { min-block-size: 3.6rem; }
+    }
+}
+
+//  The empty box the tester drew on the second cart line: a product with no
+//  usable description still rendered the paragraph's margin. Collapse the slot
+//  when it has nothing in it.
+.hm-cart-line__desc:empty { display: none; margin: 0; }
+
+//
+//  2-B — CATEGORY LIST VIEW: "there are a lot of empty spaces"
+//  ---------------------------------------------------------------------------
+//  The row is a `180px 766px` grid, so every row is at least 180 + 32 of
+//  padding = 212 tall around ~100px of text. The prototype's row is ~156 with a
+//  96px thumb, and it puts the price under the rating on the LEFT rather than
+//  across the row in a foot that spans the full 766.
+@media (min-width: 768px) {
+    //  `.hm-page .products.wrapper.products-list .product-item-info` (0,5,0)
+    //  sets the 18rem track that makes the row 180px tall; a bare
+    //  `.products.wrapper.products-list` (0,4,0) never reaches it.
+    .hm-page .products.wrapper.products-list {
+        .product-item-info {
+            align-items: center;
+            grid-template-columns: 12rem minmax(0, 1fr);
+        }
+
+        .product-item-photo,
+        .product-item-photo .product-image-container,
+        .product-item-photo .product-image-wrapper,
+        .product-item-photo img.product-image-photo {
+            block-size: 12rem !important;
+            inline-size: 12rem !important;
+        }
+
+        //  The foot spanned the row and pushed the price to the far edge, which
+        //  is what left the gap between the name and the price. Prototype keeps
+        //  the price directly under the rating.
+        .hm-card__foot {
+            justify-content: flex-start;
+            margin-block-start: var(--hm-space-2);
+        }
+    }
+}
+
+//  The row's remaining height was not the thumb at all: `.hm-card__foot` was
+//  826px wide and 99 TALL, because the price, the cart button and the (empty)
+//  description slot were wrapping onto three lines inside it, with the price
+//  pushed to x=875 by an auto margin. One nowrap row, led from the left.
+.hm-page .products.wrapper.products-list {
+    .hm-card__foot {
+        align-items: center;
+        column-gap: var(--hm-space-4);
+        //  It was not wrapping — it was a COLUMN. nowrap on a column stacks
+        //  just as firmly; the direction is what had to change.
+        flex-direction: row;
+        flex-wrap: nowrap;
+        margin-block-start: var(--hm-space-2);
+
+        .price-box,
+        .special-price { margin-inline-start: 0; }
+
+        //  Nothing renders in it on this catalogue — the language guard in
+        //  list.phtml drops Arabic-only copy on the English store — so it only
+        //  contributed a wrap opportunity.
+        .product-item-description:empty { display: none; }
+    }
+}
+
+//
+//  1-F — BUNDLE DEALS: "the size and appearance of the card are different"
+//  ---------------------------------------------------------------------------
+//  The element order is fixed in bundle-deals.phtml (stars moved below the
+//  thumbnails). Two things left, both visible on the tester's screenshot:
+//
+//  A bundle whose price string is long — "From EGP 170" rather than "EGP 61" —
+//  wrapped its struck compare-at onto a second line and pushed "Add Bundle"
+//  down with it, so three of the four cards had a two-line price block and the
+//  fourth had one. The prototype keeps price, compare-at and the button on one
+//  line in every card.
+.hm-bundle__foot {
+    align-items: center;
+    column-gap: var(--hm-space-3);
+
+    //  `.hm-bundle__saving` is a CHILD of `.hm-bundle__prices`, not a sibling of
+    //  it — so `nowrap` on the foot drags "You save EGP 30" up onto the price
+    //  line and squeezes it into a three-word column against the button. The
+    //  wrap stays; what changes is WHERE it is allowed to happen.
+    .hm-bundle__prices {
+        align-items: baseline;
+        column-gap: .6rem;
+        display: flex;
+        flex: 1 1 auto;
+        flex-wrap: wrap;
+        min-inline-size: 0;
+    }
+
+    //  Always its own line, so every card breaks in the same place.
+    .hm-bundle__saving { flex-basis: 100%; }
+
+    //  And the compare-at keeps the price company on line one. It was dropping
+    //  because the widest card needed 175px of a 147px row: "From EGP 170" at
+    //  18px is 118 and "EGP 200" is 49. Egyptian bundles carry a "From" prefix
+    //  the prototype's "$849.99" does not, so the room is bought back from the
+    //  type and the button rather than by reflowing the row.
+    .hm-bundle__price { font-size: 1.6rem; }
+    .hm-bundle__was { font-size: 1.1rem; white-space: nowrap; }
+
+    .hm-bundle__cta,
+    > a,
+    > button {
+        flex: 0 0 auto;
+        padding-inline: var(--hm-space-3);
+        white-space: nowrap;
+    }
+}
+
+//  And the cards themselves ended at different heights because two of the four
+//  bundles carry no description. Pin the foot to the bottom of the body so the
+//  price rows line up across the row whatever the copy above them does.
+.hm-bundle__body {
+    display: flex;
+    flex-direction: column;
+
+    .hm-bundle__foot { margin-block-start: auto; }
+}
+
+//
+//  7 — WISHLIST: "the wishlist still isn't showing up properly"
+//  ---------------------------------------------------------------------------
+//  The card in the tester's screenshot is a DOWNLOADABLE product, and what
+//  breaks it is `Magento_Wishlist::options_list.phtml`: a `.tooltip.wrapper`
+//  holding a "See Details" toggle and a `.tooltip.content` panel of "Options
+//  Details / Downloads". Blank keeps that panel hidden until hover and positions
+//  it absolutely; inside this card's grid it rendered in flow, pushed the
+//  Add to Cart button out of the card and spilled past its lower edge.
+//
+//  The prototype's wishlist card is image / name / price / cart / remove and
+//  carries no options tooltip at all, so it does not render here. The chosen
+//  options are still on the product page and travel with the item into the cart.
+.hm-page .products-grid.wishlist .product-item-tooltip { display: none; }
+
+//
+//  3-A — PDP GALLERY: thumbnails must span the main image, square, uncropped
+//  ---------------------------------------------------------------------------
+//  Sizes come from etc/view.xml (192 wide, 8 margin, 400px source). These two
+//  rules are what stop fotorama distorting them: it writes width and height as
+//  INLINE style on both the frame and the <img>, and its own `.fotorama__img`
+//  is `object-fit: fill`, so a non-square source was being squashed to fit
+//  rather than filled and cropped square.
+.fotorama__nav__frame--thumb {
+    .fotorama__img {
+        block-size: 100% !important;
+        border-radius: var(--hm-radius-sm);
+        inline-size: 100% !important;
+        object-fit: cover;
+    }
+
+    //  Square, and no rounding on the frame itself — the tester saw the corners
+    //  reading as a curve.
+    aspect-ratio: 1;
+    border-radius: 0;
+    overflow: hidden;
+}
+
+//  And the list row's own floor. `.hm-plp .products.wrapper.products-list
+//  .product-item-info` carries `min-block-size: 24.6rem` — 246px around ~109px
+//  of text, which is the "lot of empty spaces" the tester drew a box around.
+//  The media column keeps the row honest at 12rem instead of 16.
+.hm-plp .products.wrapper.products-list .product-item-info {
+    min-block-size: 0;
+}
+
+.hm-page .products.wrapper.products-list .product-item-media {
+    inline-size: 12rem;
+}

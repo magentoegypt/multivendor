@@ -23,8 +23,21 @@
             <!-- The gallery thumbnails: the reference runs three ~185px thumbs
                  across the column, not a strip of 88px chips. -->
             <image id="product_page_image_small" type="thumbnail">
-                <width>170</width>
-                <height>170</height>
+                <!-- QA03 item 3-A: "the 3 small images should take the width of
+                     the large image". They did not — three 170px thumbs plus
+                     margins came to 514 inside a 592 stage. 592 = 3x192 + 2x8,
+                     so the strip is declared at 192 with an 8px margin in the
+                     gallery vars below.
+
+                     The SIZE HAS TO LIVE HERE, not in those vars: Magento's
+                     gallery block derives `thumbwidth`/`thumbheight` from this
+                     image and writes them into the gallery config AFTER the
+                     view.xml gallery vars, so a `thumbwidth` declared there is
+                     overwritten (set to 400 here first, and the rendered config
+                     came back "thumbwidth":400 while "thumbmargin":8 — declared
+                     in the same block — went through untouched). -->
+                <width>192</width>
+                <height>192</height>
             </image>
 
             <!--
@@ -57,6 +70,10 @@
             <var name="arrows">false</var>
             <var name="navarrows">false</var>
             <var name="navtype">thumbs</var>
+            <!-- Three thumbs spanning the 592px stage exactly: 3x192 + 2x8.
+                 Only the margin is settable here; the width and height come from
+                 `product_page_image_small` above. -->
+            <var name="thumbmargin">8</var>
         </var>
 
         <!--

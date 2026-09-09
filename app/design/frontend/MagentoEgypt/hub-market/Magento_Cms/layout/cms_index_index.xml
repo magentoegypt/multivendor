@@ -559,13 +559,17 @@
                     <argument name="foot_label" xsi:type="string" translate="true">View all recommendations</argument>
                     <argument name="title" xsi:type="string" translate="true">Picked For You</argument>
                     <!--
-                        Figma's subtitle reads "Personalised recommendations based on
-                        your search history and behaviour" beside an "AI ENGINE" badge.
-                        There is no model here: the rail is Magento's own
-                        recently-viewed index. The subtitle therefore says what the
-                        section actually does, and the badge is not reproduced.
+                        QA03 item 1-C asked for Figma's exact subtitle, so that is
+                        what ships. Recording what it claims against what runs, for
+                        whoever reads this next: there is no model and no per-visitor
+                        personalisation here. The rail is Magento's own
+                        recently-viewed index, and the "Your searches" chips beside it
+                        come from the store-wide `search_query` table ordered by
+                        popularity — the same list for every visitor. The copy and the
+                        AI ENGINE badge are presentational until something behind them
+                        actually personalises.
                     -->
-                    <argument name="subtitle" xsi:type="string" translate="true">Based on the products you have been viewing</argument>
+                    <argument name="subtitle" xsi:type="string" translate="true">Personalised recommendations based on your search history &amp; behaviour</argument>
                     <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
                     <argument name="products_count" xsi:type="number">4</argument>
                     <argument name="show_pager" xsi:type="number">0</argument>

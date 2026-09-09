@@ -222,7 +222,7 @@ class PickedForYou extends BestSellers
      */
     public function getSearchTags(): array
     {
-        $out = ['label' => (string) __('Popular searches'), 'terms' => []];
+        $out = ['label' => (string) __('Your searches'), 'terms' => []];
 
         try {
             $conn = $this->hmResource->getConnection();

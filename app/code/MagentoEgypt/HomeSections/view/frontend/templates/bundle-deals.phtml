@@ -136,14 +136,6 @@ $headingId = 'hm-bundles-title';
                             . ' 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg>';
                         $hmRow = str_repeat($hmStar, 5);
                         ?>
-                        <span class="product-reviews-summary short hm-rating<?= $hmR['count'] > 0 ? '' : ' hm-rating--empty' ?>">
-                            <span class="hm-stars" role="img" aria-label="<?= $escaper->escapeHtmlAttr($hmLabel) ?>">
-                                <span class="hm-stars__track"><?= /* @noEscape */ $hmRow ?></span>
-                                <span class="hm-stars__fill" style="width: <?= (int) $hmR['pct'] ?>%;"><?= /* @noEscape */ $hmRow ?></span>
-                            </span>
-                            <span class="hm-rating__count"><?= $escaper->escapeHtml(__('(%1)', $hmR['count'])) ?></span>
-                        </span>
-
                         <?php if ($b['description']): ?>
                             <span class="hm-bundle__text"><?= $escaper->escapeHtml($b['description']) ?></span>
                         <?php endif; ?>
@@ -161,6 +153,24 @@ $headingId = 'hm-bundles-title';
                                 <?php endif; ?>
                             </span>
                         <?php endif; ?>
+
+                        <?php /*
+                            QA03 item 1-F: "the arrangement of elements in the card
+                            isn't the same as the theme." The stars belong BELOW the
+                            item thumbnails, immediately above the price — that is
+                            where the prototype puts them. They used to sit directly
+                            under the title. Moved in the markup rather than reordered
+                            with flex `order`, so the reading order a screen reader
+                            follows matches what is on screen.
+                        */ ?>
+                        <span class="product-reviews-summary short hm-rating<?= $hmR['count'] > 0 ? '' : ' hm-rating--empty' ?>">
+                            <span class="hm-stars" role="img" aria-label="<?= $escaper->escapeHtmlAttr($hmLabel) ?>">
+                                <span class="hm-stars__track"><?= /* @noEscape */ $hmRow ?></span>
+                                <span class="hm-stars__fill" style="width: <?= (int) $hmR['pct'] ?>%;"><?= /* @noEscape */ $hmRow ?></span>
+                            </span>
+                            <span class="hm-rating__count"><?= $escaper->escapeHtml(__('(%1)', $hmR['count'])) ?></span>
+                        </span>
+
 
                         <span class="hm-bundle__foot">
                             <span class="hm-bundle__prices">
