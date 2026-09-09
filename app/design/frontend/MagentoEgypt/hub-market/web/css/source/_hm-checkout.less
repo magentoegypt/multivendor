@@ -583,6 +583,13 @@
         margin-block-start: var(--hm-space-6);
         padding-block-start: var(--hm-space-6);
 
+        //  Vnecoms' list of applied vendor coupons sits above the field and
+        //  ships as an empty <ul> when nothing is applied — and its own
+        //  coupon.css gives that <ul> `margin: 0 0 30px`, so an empty list left
+        //  30px of dead space between the hairline and the input. Gone unless it
+        //  actually holds a coupon.
+        .vendor-coupon-list:not(:has(li)) { display: none; }
+
         //  Blank ships `.cart-summary .block > .content { display: none }` for
         //  the collapsible pattern this block used to be. With the disclosure
         //  gone there is nothing left to open it, so the field rendered into a

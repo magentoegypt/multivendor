@@ -158,6 +158,46 @@
             every cart-page script, and removing it threw "reading 'quoteData'"
             on load. It is hidden in _hm-qa02-recheck.less instead.
         -->
+        <!--
+            THE DISCOUNT TOTAL WAS PRINTED TWICE.
+
+            With a coupon applied the summary listed "Discount (MF20) -EGP 43"
+            on two consecutive rows. Both are real components, and both are
+            supposed to be the same one.
+
+            Magento_SalesRule declares its discount at
+                block-totals.children.discount
+            Vnecoms_VendorsCoupon declares its subclass — same component, richer
+            template, expandable per-vendor breakdown — at
+                block-totals.children.before_grandtotal.children.discount
+            Different node paths, so the vendor module never overwrote the core
+            node the way it clearly meant to; it just registered a second one
+            beside it. Every multi-vendor cart on this install has shown the
+            duplicate.
+
+            Vnecoms' is the one to keep: this is a marketplace, a cart can carry
+            one coupon per seller, and with vendors/vendorscoupon/show_discount_detail
+            on its row expands into the per-seller split. Core's plain row is the
+            redundant half, so it is switched off here rather than in the vendor
+            module — componentDisabled is the jsLayout equivalent of remove="true"
+            and leaves both modules' files untouched.
+        -->
+        <referenceBlock name="checkout.cart.totals">
+            <arguments>
+                <argument name="jsLayout" xsi:type="array">
+                    <item name="components" xsi:type="array">
+                        <item name="block-totals" xsi:type="array">
+                            <item name="children" xsi:type="array">
+                                <item name="discount" xsi:type="array">
+                                    <item name="componentDisabled" xsi:type="boolean">true</item>
+                                </item>
+                            </item>
+                        </item>
+                    </item>
+                </argument>
+            </arguments>
+        </referenceBlock>
+
         <move element="checkout.cart.shipping" destination="cart.summary" after="checkout.cart.summary.trust"/>
         <move element="checkout.cart.coupon"   destination="cart.summary" before="checkout.cart.summary.trust"/>
     </body>
