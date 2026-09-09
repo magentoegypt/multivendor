@@ -72,7 +72,16 @@
 
     //  The wash sits under the emoji and the copy, as it does in the prototype
     //  where it is the tile's first child.
-    .hm-promo__icon,
+    //
+    //  The ICON is raised with z-index ALONE. It is already
+    //  `position: absolute` with `inset-inline-end`, and an earlier version of
+    //  this rule set `position: relative` on it along with the rest — which
+    //  dropped it out of absolute positioning and back into normal flow, so the
+    //  emoji rendered at the start of the tile instead of its top trailing
+    //  corner. z-index applies to an absolutely positioned box perfectly well;
+    //  the position never needed touching.
+    .hm-promo__icon { z-index: 1; }
+
     .hm-promo__body,
     .hm-promo__kicker,
     .hm-promo__title,
