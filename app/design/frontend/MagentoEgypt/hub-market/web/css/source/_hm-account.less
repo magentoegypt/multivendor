@@ -566,6 +566,38 @@
         .sidebar-main { inline-size: 23.077%; }   // 288/1248
         .column.main  { inline-size: 76.923%; }
     }
+
+    //
+    //  THE SECOND SIDEBAR (CL036-DEV01.18).
+    //
+    //  blank floats `.sidebar-main` and `.column.main` and says nothing about
+    //  `.sidebar-additional`, so that third column stayed in normal flow and
+    //  cleared both floats — landing full width at the very bottom of the page.
+    //  On a category page that is where "Recently Ordered" turned up: a stray
+    //  card under the pager, a screen and a half below the filters it belongs
+    //  with. Reported against the Arabic store, but it is not an RTL fault —
+    //  the same thing happens in English, and the same block on the ACCOUNT
+    //  page is fine because that layout is an explicit grid that places it.
+    //
+    //  Same column as the filters, stacked under them: same float side, same
+    //  width, same gutter, and `clear` on that side so it drops below the
+    //  filter rail rather than trying to sit beside it. Logical values
+    //  throughout, so it mirrors in Arabic exactly as the columns above do.
+    //
+    //  Floated only from 768px. Below that there are no columns — blank stacks
+    //  everything full width — and a float with an auto width would shrink-wrap
+    //  the card to its content.
+    .sidebar-additional {
+        padding-left: 0;
+        padding-right: 0;
+
+        @media (min-width: 768px) {
+            clear: inline-start;
+            float: inline-start;
+            inline-size: 23.077%;
+            padding-inline-end: var(--hm-space-8);
+        }
+    }
 }
 
 //

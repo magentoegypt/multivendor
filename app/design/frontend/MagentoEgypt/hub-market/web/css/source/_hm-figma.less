@@ -2474,7 +2474,16 @@
 //  Scoped with .hm-page.hm-plp.page-layout-2columns-left so it is (0,4,0) and
 //  cannot be outranked by the account rule again.
 .hm-page.hm-plp.page-layout-2columns-left {
-    .sidebar-main {
+    //  The SECOND sidebar takes the rail's width too (CL036-DEV01.18). The
+    //  generic 2-columns rule in _hm-account.less floats it under the filters
+    //  at 23.077%, which is the ACCOUNT rail's width — 318px here against this
+    //  rail's 248px. Too wide to fit the 280px the main column leaves beside
+    //  it, so the float was pushed below the product grid and "Recently
+    //  Ordered" landed at the very bottom of the page again, just further down
+    //  than before. Matching the rail is what actually puts it under the
+    //  filters. Same (0,4,0) scope, and for the same reason as the note above.
+    .sidebar-main,
+    .sidebar-additional {
         //  24.8rem = 22.4rem of rail + 2.4rem gutter, border-box.
         inline-size: 24.8rem;
         padding-inline-end: 2.4rem;
@@ -4224,15 +4233,6 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //  above, since these land at (0,2,0) and source order decides.
 .hm-nav__promo:visited {
     color: var(--hm-accent-on-nav);
-}
-
-//  Bundle Deals in the utility rail (CL036-DEV01.09). Same value its unvisited
-//  rule sets in _hm-header.less — without this line the base
-//  `.hm-utility__link:visited` above wins at equal weight on source order and
-//  the one accented item in the rail turns muted white the moment anyone
-//  follows it.
-.hm-utility__link--deals:visited {
-    color: var(--hm-nav-promo);
 }
 
 //  "Sell on Hub Market" is NOT one of them, despite what this block used to
