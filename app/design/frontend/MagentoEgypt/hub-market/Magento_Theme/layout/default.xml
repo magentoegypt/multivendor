@@ -277,5 +277,27 @@
         <referenceBlock name="related.product.addto.compare" remove="true"/>
         <referenceBlock name="upsell.product.addto.compare" remove="true"/>
         <referenceBlock name="crosssell.product.addto.compare" remove="true"/>
+
+        <!--
+            MOBILE BOTTOM NAVIGATION (CL036-DEV01.13).
+
+            In `before.body.end`, not in the header or the footer. It is
+            `position: fixed` under 768px and hidden above it, so where it sits
+            in the document affects nothing visually — but it must not be inside
+            `.page-wrapper`, whose descendants are re-stacked by the filter
+            drawer and the category sheet. At the end of the body it keeps its
+            own place in the root stacking context, below both of those and
+            above the page.
+
+            Cacheable: the template branches only on the request's full action
+            name to mark the current tab, never on the session. The cart count
+            is customer-data, painted client-side like every other count on the
+            storefront.
+        -->
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.bottom.nav"
+                   template="Magento_Theme::html/bottom-nav.phtml"/>
+        </referenceContainer>
     </body>
 </page>

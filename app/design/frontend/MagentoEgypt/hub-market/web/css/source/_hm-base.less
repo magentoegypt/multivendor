@@ -168,6 +168,21 @@ img {
     max-width: var(--hm-container);
 }
 
+//  A real gutter once the shell is full width (CL036-DEV01.12). With the cap at
+//  1920 the content reaches the viewport edges on any ordinary screen, and
+//  blank's 16px is a phone value — at 1920 it puts a product card 16px from the
+//  browser chrome.
+//
+//  `body.hm-page` — (0,2,1) — and both halves are load-bearing. `.hm-page`
+//  outranks blank's own `.page-main { padding-left/right: 16px }`, which is
+//  (0,1,0) but arrives in styles-l.css AFTER this file. The `body` element
+//  selector then outranks `.hm-home .page-main`, a (0,2,0) rule later in the
+//  cascade that pins the home page to 16px at every width — without it this
+//  gutter applied everywhere EXCEPT the page the ticket screenshotted.
+@media (min-width: 1200px) {
+    body.hm-page .page-main { padding-inline: var(--hm-space-8); }
+}
+
 //
 //  Disabled primary actions
 //  ---------------------------------------------

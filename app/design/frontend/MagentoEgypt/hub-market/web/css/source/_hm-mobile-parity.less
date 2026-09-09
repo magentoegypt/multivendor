@@ -706,7 +706,17 @@
 //  everything the scroller needs is stated once here at (0,2,0) — `.hm-page` is
 //  on <body> — which outranks both.
 //
-@media (max-width: 991px) {
+//  UP TO 1399, not 991. The ten links need 1199px at the phone's chip sizing and
+//  more at the desktop's, so anything narrower than that wrapped: measured at
+//  exactly 992px the band was three rows and 125px tall, which is an iPad in
+//  landscape. One row that scrolls beats three that do not at every width below
+//  the one where the row genuinely fits.
+//
+//  1400 is where it provably fits: the row's natural width measured 1280 or less
+//  at desktop chip sizing, and CL036-DEV01.12 widened the shell to 1920, so a
+//  1400 viewport leaves 1368 of container. Below that the scroller takes over.
+//
+@media (max-width: 1399px) {
     .hm-page .hm-nav__inner {
         align-items: center;
         flex-wrap: nowrap;
@@ -773,4 +783,17 @@
         order: 0;
         padding: 0;
     }
+}
+
+//  From 992px the category panel is a DROPDOWN — `position: absolute` against
+//  the band — where below it is a fixed full-screen sheet, and a fixed box
+//  ignores a scroll container while an absolute one inside it does not. So for
+//  the one range where the band both scrolls and hosts an absolute panel, the
+//  scroller stands down while the panel is open rather than clipping it.
+//
+//  In practice this almost never runs: the disclosure's own summary is 0x0 from
+//  992px up on this theme, so the panel is only reachable there by keyboard.
+//  That is exactly the case worth not breaking.
+@media (min-width: 992px) and (max-width: 1399px) {
+    .hm-page .hm-nav__inner:has(.hm-nav__menu[open]) { overflow: visible; }
 }

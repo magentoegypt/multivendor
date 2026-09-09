@@ -487,3 +487,157 @@
         }
     }
 }
+
+//
+//  CL036-DEV01.11 part 2 — "My Account appears sunk underneath the categories bar"
+//  _____________________________________________
+//
+//  Blank's phone treatment of the account navigation is a collapsed disclosure
+//  pulled OUT OF FLOW and hung off the top of the page:
+//
+//      @media (max-width: 767px) {
+//          .account .page-main   { padding-top: 41px; position: relative }
+//          .block-collapsible-nav{ left: 0; position: absolute; top: -21px;
+//                                  width: 100%; z-index: 5 }
+//          .block-collapsible-nav .content { display: none }
+//      }
+//
+//  A 41px slot is reserved at the top of .page-main and the bar is dropped into
+//  it at top:-21px. That works on stock Luma. It does not work here: this theme
+//  puts the customer identity band in `columns.top` — the first thing inside
+//  .page-main — and pins the header at 110px, so the absolute bar lands over the
+//  band with the fixed header clipping its top edge. Which is precisely the
+//  screenshot: a half-visible "My Account ⌄" wedged under the category strip.
+//
+//  Put back in flow, opened, and moved above the account content, which is what
+//  the reference shows on a phone: identity card, then the navigation card, then
+//  Shopping Stats, then the page. `.hm-page` throughout for weight — every rule
+//  above is blank's and compiles after this theme's own account file.
+//
+@media (max-width: 767px) {
+    .hm-page.account .page-main { padding-top: 0; }
+
+    .hm-page .block-collapsible-nav {
+        inline-size: auto;
+        position: static;
+    }
+
+    //  The disclosure's own trigger. It exists to open the content this rule
+    //  keeps open, so it has nothing left to do — and the reference has no such
+    //  bar. `> .title`, not `.title`, so the block titles of the panels INSIDE
+    //  the navigation are untouched.
+    .hm-page .block-collapsible-nav > .title { display: none; }
+    .hm-page .block-collapsible-nav > .content { display: block; }
+
+    //  Above the account content. `.columns` is blank's default block box at
+    //  this width — the theme's two-column grid is declared inside
+    //  `@media (min-width: 768px)` and correctly does not apply here — so it
+    //  becomes a column flexbox purely to get `order` on the sidebar.
+    .hm-page.account .columns {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .hm-page.account .columns > .sidebar-main { order: -1; }
+}
+
+//
+//  CL036-DEV01.13 — mobile bottom navigation
+//  _____________________________________________
+//
+//  Hidden by default and shown only under 768px, the same way the filter
+//  drawer's controls are: the markup renders on every viewport because a
+//  template has no width test, and above the breakpoint the header carries all
+//  five destinations already.
+//
+.hm-bottomnav { display: none; }
+
+@media (max-width: 767px) {
+    .hm-bottomnav {
+        align-items: stretch;
+        background: var(--hm-surface);
+        border-block-start: 1px solid var(--hm-border-subtle);
+        box-shadow: 0 -2px 12px rgba(15, 33, 68, .06);
+        display: flex;
+        inset-block-end: 0;
+        inset-inline: 0;
+        //  Below the filter drawer (1000) and its scrim (999) and below the
+        //  category sheet, so an open panel covers this rather than the bar
+        //  floating over a modal surface. Above ordinary page content.
+        position: fixed;
+        z-index: 80;
+
+        //  Home-indicator safe area on iOS. Falls back to zero everywhere else,
+        //  so this costs nothing on Android or in a desktop emulator.
+        padding-block-end: env(safe-area-inset-bottom, 0px);
+    }
+
+    .hm-bottomnav__item {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        display: flex;
+        flex: 1 1 0;
+        flex-direction: column;
+        gap: .2rem;
+        justify-content: center;
+        min-block-size: 5.6rem;
+        min-inline-size: 0;
+        padding-block: .6rem;
+        text-decoration: none;
+
+        .hm-icon { block-size: 2.2rem; inline-size: 2.2rem; }
+
+        &:hover,
+        &:focus-visible { color: var(--hm-accent); text-decoration: none; }
+    }
+
+    //  Visited must be restated or blank's blanket `a:visited` repaints four of
+    //  the five tabs the moment a shopper has been to them — the trap
+    //  _hm-figma.less documents at length for the header rails.
+    .hm-bottomnav__item:visited { color: var(--hm-foreground-muted); }
+
+    .hm-bottomnav__item--current,
+    .hm-bottomnav__item--current:visited { color: var(--hm-accent); }
+
+    .hm-bottomnav__icon {
+        display: block;
+        line-height: 0;
+        position: relative;
+    }
+
+    .hm-bottomnav__label {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.2;
+        max-inline-size: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    //  `display: block` below outranks the UA's `[hidden] { display: none }`,
+    //  so without this the badge painted a literal "0" on an empty cart — which
+    //  is exactly what the first render did.
+    .hm-bottomnav__count[hidden] { display: none; }
+
+    .hm-bottomnav__count {
+        background: var(--hm-accent);
+        border-radius: var(--hm-radius-full);
+        color: var(--hm-on-accent, #fff);
+        display: block;
+        font-size: 1rem;
+        font-weight: 700;
+        inset-block-start: -.6rem;
+        inset-inline-start: 1.2rem;
+        line-height: 1.6rem;
+        min-inline-size: 1.6rem;
+        padding-inline: .3rem;
+        position: absolute;
+        text-align: center;
+    }
+
+    //  Room for the bar at the foot of every page, or it covers the last row of
+    //  the footer on every screen. On the footer's own padding rather than the
+    //  body so a page that ends in a full-bleed band still ends in one.
+    .hm-page .page-wrapper { padding-block-end: 5.6rem; }
+}

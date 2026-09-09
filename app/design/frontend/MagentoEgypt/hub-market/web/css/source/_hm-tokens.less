@@ -258,16 +258,28 @@
 @hm-duration:      200ms;
 @hm-ease: cubic-bezier(.4, 0, .2, 1);
 
+//  1920, NOT the reference's 1280 — CL036-DEV01.12, "make website full width".
+//
 //  Figma's shell is Tailwind `max-w-7xl` (80rem = 1280px) with `px-4`, measured
 //  on the reference build at a 1440 viewport: content spans 1280px with an 80px
-//  margin each side. This theme shipped 1440px, so every band ran 1408px wide —
-//  128px wider than the design at the same viewport. Nothing else lined up while
-//  that was true: the rails fitted a different number of cards, the hero was
-//  wider than its art direction, and the section gutters read as too tight.
+//  margin each side. That is what this was, and it is why the rails fitted the
+//  number of cards the design shows. The client has asked for the opposite: on a
+//  1920 screen the boxed shell left ~320px of empty grey down each side and they
+//  want the viewport used. Client instruction beats reference parity, the same
+//  call as the cart's discount field and Bundle Deals — but it does mean the
+//  bands here are wider than the Figma build at the same viewport BY DESIGN, and
+//  anyone comparing the two band-by-band from now on should expect that.
+//
+//  Capped rather than uncapped. Past about 1920 a product rail stops reading as
+//  a rail and body copy runs to unreadable line lengths, so the layout fills any
+//  ordinary screen — 1366, 1440, 1600, 1920 — edge to edge inside its gutter and
+//  then centres on an ultrawide instead of stretching further.
 //
 //  It feeds @layout__max-width as well, so page-main follows on every page, not
-//  just the homepage.
-@hm-container: 1280px;
+//  just the homepage. The deliberately narrow single-column pages — checkout and
+//  the order-success page — set their own max-inline-size and are unaffected;
+//  a 1920-wide checkout form is not what anybody asked for.
+@hm-container: 1920px;
 
 //
 //  Header bands — Figma paints THREE navies, not one

@@ -650,9 +650,30 @@
 //  Everything carries `.hm-page` for the same reason the rules above it do —
 //  Magento/blank's Luma wishlist block compiles after the theme.
 .hm-page .products-grid.wishlist {
+    //  ONE COLUMN ON A PHONE — CL036-DEV01.11 part 1, "My Wish List is not
+    //  displaying correctly, layout appears broken".
+    //
+    //  This was a flat `repeat(3, minmax(0, 1fr))` at every width. At 390px that
+    //  is three ~110px tracks, and the card inside one is what the tester
+    //  screenshotted: a thumbnail the size of a stamp, a price clipped mid-word
+    //  and an Add to Cart button wider than the card it sits in. Nothing about
+    //  the card was wrong; it was being asked to render at a third of a phone.
+    //
+    //  The reference puts ONE card per row on a phone — photo across the top,
+    //  then the name with the price against the button — which is exactly the
+    //  card built below, at the width it was drawn for. Three tracks are a
+    //  desktop figure and now say so.
     .product-items {
         gap: var(--hm-space-6);
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 600px) {
+        .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (min-width: 992px) {
+        .product-items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     //  The card itself: no padding, because the photo runs to its edges.

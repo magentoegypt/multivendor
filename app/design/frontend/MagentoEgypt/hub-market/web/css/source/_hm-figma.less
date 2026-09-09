@@ -731,9 +731,19 @@
     //  14px is comfortably legible; the rule it replaces was a preference, not a
     //  measurement.
     //
-    //  min-block-size holds two lines so a one-line and a two-line title produce
-    //  the same card height. Without it a rail of mixed titles staggers its price
-    //  rows, which is what made the live grids look ragged.
+    //  THE TWO-LINE RESERVATION IS GONE — CL036-QA01 item 7, "we need to remove
+    //  the white spaces inside each card". This used to carry
+    //  `min-block-size: 3.8rem` so a one-line and a two-line title produced the
+    //  same card height and the price rows lined up across a rail. The cost is
+    //  what the tester boxed: on every card with a one-line name, an empty
+    //  second line sat between the title and the stars — 19px of nothing in the
+    //  middle of the card, and it read as a mistake rather than as alignment.
+    //
+    //  Checked against the reference before reversing it: the prototype does not
+    //  reserve the line either. Its Best Sellers rail puts the stars directly
+    //  under a one-line title and directly under a two-line one, so the star and
+    //  price rows genuinely do sit at different heights there. Staggered rows are
+    //  the design; the empty line was ours.
     .product-item-name {
         margin: 0;
 
@@ -742,7 +752,6 @@
             font-size: 1.4rem;
             font-weight: 500;
             line-height: 1.35;
-            min-block-size: 3.8rem;
             transition: color var(--hm-duration) var(--hm-ease);
         }
 
@@ -1220,11 +1229,15 @@
     .product-item .action.tocart,
     .actions-primary { display: none; }
 
+    //  No two-line reservation here either — CL036-QA01 item 7. This rail kept
+    //  its own copy of the `min-block-size` the base card rule used to carry, so
+    //  removing it there left Best Selling, the rail the tester actually
+    //  screenshotted, exactly as it was. See the note on `.product-item-name` in
+    //  the base card block for why the reference settles this.
     &.block.widget .product-item-name a.product-item-link {
         font-family: var(--hm-font-body);
         font-size: 1.2rem;
         font-weight: 600;
-        min-block-size: 3.4rem;
     }
 
     .hm-rating__count { display: none; }
@@ -3025,6 +3038,14 @@
 //  White on --hm-discount-bg is 6.54:1. Figma's chip is `bg-[#f26522]` with white
 //  on it, which is 3.15:1 and fails.
 .hm-pdp__save {
+    //  A CHIP, so it must shrink to its label. `.product-info-price` is a flex
+    //  COLUMN, whose default `align-items: stretch` made this span as wide as
+    //  the whole price block — at the old 1280 shell that was already a 600px
+    //  red bar, and CL036-DEV01.12's full-width shell took it to 892px, where it
+    //  reads as a promotional banner rather than a discount badge. Everything
+    //  else here — the nowrap, the small radius, the 8px inline padding — was
+    //  already written for a chip.
+    align-self: flex-start;
     background: var(--hm-discount-bg);
     border-radius: var(--hm-radius-sm);
     color: var(--hm-discount-fg);
@@ -4714,6 +4735,53 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
         font-weight: 600;
         padding: .5rem var(--hm-space-4);
     }
+
+    //
+    //  CL036-QA01 item 12 — "the elements are arranged randomly and don't match
+    //  the theme"
+    //  ---------------------------------------------
+    //  Two separate faults, both visible in the tester's screenshot of this rail
+    //  beside the reference's.
+    //
+    //  The stats line broke MID-PHRASE. `.hm-stores__stats` is a nowrap flex row
+    //  and its children are inline-flex, so when "📦 9  🕐 Ships within 24h" did
+    //  not fit a 139px card at 390px, the only thing that could give was the
+    //  dispatch TEXT — it wrapped to "Ships within" / "24h" and threw that one
+    //  card 22px taller than its neighbour. The reference's equivalent reads
+    //  "156 · 30–60 min", short enough never to break. Ours cannot be made that
+    //  short without losing the sentence (it is generated and translated), so
+    //  instead the two stats are allowed to fall onto SEPARATE LINES and each is
+    //  kept whole. A clean second line reads as layout; a broken phrase reads as
+    //  a bug.
+    //
+    //  And "Visit Store" floated. Not every vendor has a dispatch estimate —
+    //  VendorMeta returns '' when there is nothing honest to say, so MIA and
+    //  ronza have no clock line at all — which left their buttons sitting a row
+    //  higher than ENARA's and loly's. `margin-block-start: auto` pins the
+    //  button to the bottom of whatever height the grid gives the card, so the
+    //  four buttons line up whether or not the line above them exists.
+    .hm-stores__stats {
+        flex-wrap: wrap;
+        row-gap: var(--hm-space-1);
+
+        .hm-stores__count,
+        .hm-stores__dispatch { white-space: nowrap; }
+    }
+
+    //  Every card the same height, not just the two sharing a row. With the
+    //  stats line free to take two lines on a narrow card, and only some
+    //  vendors having a dispatch estimate at all, the default `auto` rows gave
+    //  the rail a 236px row above a 210px one — four cards at three different
+    //  internal rhythms, which is the "arranged randomly" in the report.
+    //  `1fr` makes every row the height of the tallest card in the rail.
+    .hm-stores__list { grid-auto-rows: 1fr; }
+
+    //  The auto margin only has slack to work with if the <a> actually fills the
+    //  grid cell. The <li> stretches to the row height on its own; the link
+    //  inside it does not unless told to.
+    .hm-stores__link { block-size: 100%; }
+
+    .hm-stores__cta { margin-block-start: auto; }
 
     .hm-stores__link:hover .hm-stores__cta,
     .hm-stores__link:focus-visible .hm-stores__cta {

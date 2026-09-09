@@ -1,0 +1,81 @@
+<?php
+/**
+ * Hub Market — mobile bottom navigation (CL036-DEV01.13).
+ *
+ * A fixed five-item tab bar under 768px. It carries the two destinations the
+ * phone header had to drop when it was trimmed to 110px — Wishlist and Account,
+ * both `display: none` on a phone in _hm-header.less — plus Home, Categories and
+ * Cart, which is the set a shopper reaches for without scrolling back up.
+ *
+ * ENTIRELY SERVER-RENDERED, including which tab is current. The full action name
+ * is a request property, not a session one, so it is safe inside the full-page
+ * cache: two visitors looking at the same URL always get the same answer. The
+ * only thing JavaScript touches is the cart count, which is a progressive
+ * enhancement — with it absent the bar still renders and every link still works.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+$hmAction = (string) $block->getRequest()->getFullActionName();
+
+/*
+ * "Categories" points at the same URL as the band's "All Categories" chip
+ * rather than trying to open the header's <details> sheet from down here.
+ * Opening it would mean a click handler, a scroll-to-top and a dependency on
+ * the header's markup surviving; a link to the catalogue does the same job with
+ * none of that, and it is what the chip beside it already does.
+ */
+$hmItems = [
+    [
+        'url'    => $block->getUrl(''),
+        'icon'   => 'hm-store',
+        'label'  => __('Home'),
+        'active' => $hmAction === 'cms_index_index',
+    ],
+    [
+        'url'    => $block->getUrl('catalogsearch/result', ['_query' => ['q' => '']]),
+        'icon'   => 'hm-grid',
+        'label'  => __('Categories'),
+        'active' => in_array($hmAction, ['catalog_category_view', 'catalogsearch_result_index'], true),
+    ],
+    [
+        'url'    => $block->getUrl('checkout/cart'),
+        'icon'   => 'hm-cart',
+        'label'  => __('Cart'),
+        'active' => $hmAction === 'checkout_cart_index',
+        'count'  => true,
+    ],
+    [
+        'url'    => $block->getUrl('wishlist'),
+        'icon'   => 'hm-wishlist',
+        'label'  => __('Wishlist'),
+        'active' => str_starts_with($hmAction, 'wishlist_'),
+    ],
+    [
+        'url'    => $block->getUrl('customer/account'),
+        'icon'   => 'hm-account',
+        'label'  => __('Account'),
+        'active' => str_starts_with($hmAction, 'customer_'),
+    ],
+];
+?>
+<nav class="hm-bottomnav" aria-label="<?= $escaper->escapeHtmlAttr(__('Primary')) ?>"
+     data-mage-init='{"js/hm-bottom-nav": {}}'>
+    <?php foreach ($hmItems as $hmItem): ?>
+        <a class="hm-bottomnav__item<?= $hmItem['active'] ? ' hm-bottomnav__item--current' : '' ?>"
+           href="<?= $escaper->escapeUrl($hmItem['url']) ?>"
+           <?= $hmItem['active'] ? 'aria-current="page"' : '' ?>>
+            <span class="hm-bottomnav__icon">
+                <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#<?= $escaper->escapeHtmlAttr($hmItem['icon']) ?>"/></svg>
+                <?php if (!empty($hmItem['count'])): ?>
+                    <?php /* Hidden until the script finds a non-zero count, so a
+                             guest with an empty cart never sees a stray "0". */ ?>
+                    <span class="hm-bottomnav__count" hidden></span>
+                <?php endif; ?>
+            </span>
+            <span class="hm-bottomnav__label"><?= $escaper->escapeHtml($hmItem['label']) ?></span>
+        </a>
+    <?php endforeach; ?>
+</nav>
