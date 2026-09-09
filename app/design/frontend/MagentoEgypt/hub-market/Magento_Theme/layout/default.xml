@@ -44,6 +44,9 @@
                 <block class="Magento\Framework\View\Element\Template"
                        name="hm.header.utility"
                        template="Magento_Theme::html/header/utility.phtml">
+                    <!-- Auth state; see the note on hm.header.actions.auth. -->
+                    <block class="Magento\Customer\Block\Account\AuthorizationLink"
+                           name="hm.header.utility.auth" as="authState"/>
                     <block class="Magento\Customer\Block\Account\Navigation"
                            name="hm.top.links" as="topLinks">
                         <arguments>
@@ -112,7 +115,19 @@
                         <block class="Magento\Framework\View\Element\Template"
                                name="hm.header.actions"
                                after="-"
-                               template="Magento_Theme::html/header/actions.phtml"/>
+                               template="Magento_Theme::html/header/actions.phtml">
+                            <!--
+                                Auth state for the account menu. Rendered by
+                                nobody — the template only asks it isLoggedIn(),
+                                which reads Magento\Framework\App\Http\Context.
+                                That is the ONE auth signal a full-page-cached
+                                page may branch on, because the FPC varies its
+                                entries by that context (see the note in
+                                actions.phtml).
+                            -->
+                            <block class="Magento\Customer\Block\Account\AuthorizationLink"
+                                   name="hm.header.actions.auth" as="authState"/>
+                        </block>
                     </container>
                 </container>
 

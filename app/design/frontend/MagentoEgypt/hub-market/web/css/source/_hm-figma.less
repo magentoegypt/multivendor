@@ -4185,8 +4185,17 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 
 .hm-nav__trigger:visited,
 .hm-header__action:visited,
+.hm-account__trigger:visited,
 .hm-footer__social-link:visited {
     color: var(--hm-on-inverse);
+}
+
+//  The account menu's own links, for the same reason: `.hm-account__link` sets
+//  its colour at (0,1,0) and blank's blanket `a:visited` is (0,1,1), so a
+//  customer who had been to My Orders once found that row painted a different
+//  colour from the rest of the menu.
+.hm-account__link:visited {
+    color: var(--hm-foreground);
 }
 
 //  The two deliberate calls to action, which keep their accent rather than

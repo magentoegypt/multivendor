@@ -19,6 +19,24 @@ $loginUrl    = $block->getUrl('customer/account/login');
 $registerUrl = $block->getUrl('customer/account/create');
 $ordersUrl   = $block->getUrl('sales/order/history');
 $logoutUrl   = $block->getUrl('customer/account/logout');
+
+/*
+ * WHICH HALF OF THE MENU TO RENDER.
+ *
+ * `Magento\Customer\Block\Account\AuthorizationLink::isLoggedIn()` reads
+ * `Magento\Framework\App\Http\Context`, NOT the customer session. That
+ * distinction is the whole reason this is safe inside full-page cache: the FPC
+ * varies its entries by that context (Customer\Model\App\Action\ContextPlugin
+ * registers CONTEXT_AUTH as a vary key), so guests and signed-in customers get
+ * separate cached copies. Branching on the SESSION would bake one visitor's
+ * state into the shared page; branching on the CONTEXT cannot.
+ *
+ * Only the boolean is safe to use here. The customer's NAME is not — the FPC
+ * varies on "is anyone logged in", not on WHO — so any personal detail still has
+ * to come from customer-data in the browser.
+ */
+$authState  = $block->getChildBlock('authState');
+$isLoggedIn = $authState !== false && $authState->isLoggedIn();
 ?>
 <div class="hm-header__actions">
 
@@ -26,29 +44,26 @@ $logoutUrl   = $block->getUrl('customer/account/logout');
     /*
      * CL036-DEV01.05 — the account icon carries a menu.
      *
-     * WHICH HALF SHOWS IS DECIDED IN THE BROWSER, NOT HERE. This header sits
-     * inside Magento's full-page cache, so a PHP `if` on the session would bake
-     * the first visitor's state into the cached page and serve it to everyone.
-     * Both halves ship in the cached HTML and Knockout picks one from the
-     * `customer` customer-data section, which is per-visitor and lives in
-     * localStorage — the same mechanism the minicart uses.
-     *
-     * The `customer` scope this binds to is registered ONCE, by the
-     * x-magento-init in utility.phtml. Both bands are children of the same
-     * `hm.header` container in default.xml and nothing removes the utility one,
-     * so it is always on the page; registering it a second time here would give
-     * the scope two component instances.
-     *
-     * The member half carries an inline `display: none` so a guest never sees a
-     * flash of "My Orders" before Knockout binds — the cached HTML is
-     * guest-shaped and guests are the common case.
-     *
      * Opens on hover and on keyboard focus, in CSS (`:hover`, `:focus-within`).
      * No JS: the trigger stays a real link to the account page, so the control
      * still does something useful with the menu closed, with JS blocked, or on
      * a touch device where there is no hover. The rail itself is desktop-only —
      * _hm-mobile-parity.less hides it under 768px, where these destinations live
      * in the menu sheet instead.
+     *
+     * The first cut of this shipped BOTH halves and let Knockout choose from the
+     * `customer` customer-data section, mirroring the utility strip above. QA
+     * signed in and the menu still offered Login / Register — and so did the
+     * strip, which has worked that way since it was built. The section is
+     * per-visitor and lives in localStorage, and it only refreshes when the
+     * action that changed it is listed in a sections.xml; something in this
+     * store's login path leaves it holding the guest copy. Server-side it is
+     * correct: asked directly for customer 84, the section returns
+     * {"fullname":"test dev5",...}.
+     *
+     * So the menu no longer asks the browser. $isLoggedIn above comes from the
+     * cache context, which is decided per request on the server and cannot go
+     * stale.
      */
     ?>
     <div class="hm-header__action hm-header__action--account">
@@ -57,17 +72,8 @@ $logoutUrl   = $block->getUrl('customer/account/logout');
             <span class="hm-header__action-label"><?= $escaper->escapeHtml(__('Account')) ?></span>
         </a>
 
-        <div class="hm-account__menu" data-bind="scope: 'customer'">
-            <div class="hm-account__group" data-bind="visible: !customer().fullname">
-                <a class="hm-account__link" href="<?= $escaper->escapeUrl($loginUrl) ?>">
-                    <?= $escaper->escapeHtml(__('Login')) ?>
-                </a>
-                <a class="hm-account__link" href="<?= $escaper->escapeUrl($registerUrl) ?>">
-                    <?= $escaper->escapeHtml(__('Register')) ?>
-                </a>
-            </div>
-
-            <div class="hm-account__group" style="display: none" data-bind="visible: customer().fullname">
+        <div class="hm-account__menu">
+            <?php if ($isLoggedIn): ?>
                 <a class="hm-account__link" href="<?= $escaper->escapeUrl($accountUrl) ?>">
                     <?= $escaper->escapeHtml(__('My Account')) ?>
                 </a>
@@ -80,7 +86,14 @@ $logoutUrl   = $block->getUrl('customer/account/logout');
                 <a class="hm-account__link" href="<?= $escaper->escapeUrl($logoutUrl) ?>">
                     <?= $escaper->escapeHtml(__('Sign Out')) ?>
                 </a>
-            </div>
+            <?php else: ?>
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($loginUrl) ?>">
+                    <?= $escaper->escapeHtml(__('Login')) ?>
+                </a>
+                <a class="hm-account__link" href="<?= $escaper->escapeUrl($registerUrl) ?>">
+                    <?= $escaper->escapeHtml(__('Register')) ?>
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 

@@ -14,6 +14,13 @@
  * @var \Magento\Framework\Escaper $escaper
  */
 declare(strict_types=1);
+
+/*
+ * See the long note on the auth links below: this boolean comes from the cache
+ * CONTEXT, which the full-page cache varies on, not from the customer session.
+ */
+$authState  = $block->getChildBlock('authState');
+$isLoggedIn = $authState !== false && $authState->isLoggedIn();
 ?>
 <div class="hm-header__utility">
     <div class="hm-header__utility-inner">
@@ -67,35 +74,34 @@ declare(strict_types=1);
             /*
              * Auth-dependent links.
              *
-             * THIS CANNOT BE A PHP `if`. The header is inside Magento's full-page
-             * cache, so a server-rendered branch would bake ONE visitor's state into
-             * the cached page and serve it to everyone — the first guest to warm the
-             * cache would hand every logged-in customer a "Login" link, or worse.
+             * THE BOOLEAN COMES FROM THE CACHE CONTEXT, NOT THE SESSION. This
+             * header sits inside full-page cache, so a PHP `if` on
+             * Customer\Model\Session would bake one visitor's state into the
+             * shared page. `AuthorizationLink::isLoggedIn()` instead reads
+             * Magento\Framework\App\Http\Context, and the FPC varies its
+             * entries by that context — guests and signed-in customers get
+             * separate cached copies, which is exactly what core's own
+             * authorization-link.phtml relies on.
              *
-             * Both states therefore ship in the cached HTML and Knockout picks one
-             * from the `customer` customer-data section, which is per-visitor and
-             * lives in localStorage. This is the same mechanism the minicart uses,
-             * and mirrors core's own header.phtml (module-theme, .greet.welcome).
+             * This used to ship BOTH branches and let Knockout pick from the
+             * `customer` customer-data section. QA signed in and this strip
+             * still read "Login | Register" (CL036-DEV01.05 follow-up): that
+             * section is per-visitor, lives in localStorage, and only refreshes
+             * when the action that changed it is listed in a sections.xml —
+             * something in this store's login path leaves it holding the guest
+             * copy. It is NOT a server problem: asked directly, the section
+             * returns {"fullname":"test dev5",...} for that customer.
              *
-             * The member branch carries an inline `display:none` so a GUEST never
-             * sees a flash of "Sign Out" before Knockout binds — the cached HTML is
-             * guest-shaped and guests are the common case. A logged-in customer may
-             * still see a brief guest state; core has the same behaviour.
+             * The NAME still comes from Knockout, and must: the FPC varies on
+             * "is anyone signed in", not on WHO, so rendering a first name here
+             * would serve one customer's name to the next. When the section is
+             * stale the bound label simply falls back to the server-rendered
+             * "My Account", which is why that text is written out rather than
+             * left to the binding.
              */
             ?>
             <span class="hm-utility__auth" data-bind="scope: 'customer'">
-                <span class="hm-utility__guest" data-bind="visible: !customer().fullname">
-                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login')) ?>">
-                        <?= $escaper->escapeHtml(__('Login')) ?>
-                    </a>
-                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
-                        <?= $escaper->escapeHtml(__('Register')) ?>
-                    </a>
-                </span>
-                <span class="hm-utility__member" style="display: none" data-bind="visible: customer().fullname">
-                    <?php /* Label is server-rendered as well as bound, so the link is
-                             never empty if Knockout is slow, blocked or errors. KO
-                             replaces it with the customer's first name once bound. */ ?>
+                <?php if ($isLoggedIn): ?>
                     <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
                         <span data-bind="text: customer().firstname || '<?= $escaper->escapeJs(__('My Account')) ?>'"><?= $escaper->escapeHtml(__('My Account')) ?></span>
                     </a>
@@ -105,7 +111,14 @@ declare(strict_types=1);
                     <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/logout')) ?>">
                         <?= $escaper->escapeHtml(__('Sign Out')) ?>
                     </a>
-                </span>
+                <?php else: ?>
+                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login')) ?>">
+                        <?= $escaper->escapeHtml(__('Login')) ?>
+                    </a>
+                    <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
+                        <?= $escaper->escapeHtml(__('Register')) ?>
+                    </a>
+                <?php endif; ?>
             </span>
             <script type="text/x-magento-init">
                 {
