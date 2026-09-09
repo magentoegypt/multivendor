@@ -1779,26 +1779,50 @@
 //
 //  Nothing becomes unreachable on a phone — the header's account menu and the
 //  bottom bar's Account tab both still reach every page this listed.
-@media screen and (max-width: 767px) {
-    .hm-page.account .block-collapsible-nav { display: none; }
-}
+//
+//  AND NOW IT IS BACK ON A PHONE TOO. QA cycle 1 (test run 86d4aeqw4) attached
+//  the reference frame for this screen, and it carries the account links —
+//  "Addresses", "Settings" — above the Shopping Stats card, which is also where
+//  the "below the account" in that ticket's wording points. The client has
+//  confirmed the reference is what they want here.
+//
+//  So the rule below is now DESKTOP-ONLY nothing: the navigation shows at every
+//  width, and this block is left in place, commented, because it has been
+//  reversed twice and the next person deserves the history rather than a silent
+//  absence.
+//
+//  @media screen and (max-width: 767px) {
+//      .hm-page.account .block-collapsible-nav { display: none; }
+//  }
 
 //
-//  ACCOUNT — Shopping Stats goes UNDER the page content on a phone
+//  ACCOUNT — Shopping Stats goes ABOVE the page content on a phone
 //  ---------------------------------------------------------------------------
-//  Client's request. The rail was ordered above the account content on the
-//  mobile pass because it then carried the navigation and the reference put
-//  that first. With the navigation gone at this width the rail is Shopping
-//  Stats alone — a summary, which belongs after the thing it summarises, not
-//  ahead of it.
+//  THIS RULE HAS BEEN BOTH WAYS TODAY, so the history matters more than usual.
 //
-//  Explicit orders rather than deleting the `-1`: blank gives `.column.main`
-//  and `.sidebar-main` the SAME order (1), so with the override removed the two
-//  would be separated only by source order, and this file would be silently
-//  depending on the DOM order a layout XML happens to produce.
+//  It was ordered above the content on the mobile pass, because the rail then
+//  carried the navigation and the reference puts that first. The client then
+//  asked for Shopping Stats moved BELOW the content, and it was. QA cycle 1 on
+//  test run 86d4aeqw4 has now failed that: "shopping stats: It will be at the
+//  top of the page above the products and below the account", and the
+//  reference frame attached to it shows exactly that order — account, then the
+//  stats card, then "My Wishlist" and its products.
+//
+//  QA and the reference agree with each other, so the rail goes back on top.
+//  The client's contrary instruction is flagged with them rather than quietly
+//  overridden; if they hold to it, swap these two orders back and nothing else
+//  needs to move.
+//
+//  The navigation stays hidden at this width — that was a separate request and
+//  QA did not raise it.
+//
+//  Explicit orders on all three rather than a bare `-1`: blank gives
+//  `.column.main` and `.sidebar-main` the SAME order (1), so anything less
+//  would leave the two separated only by the DOM order a layout XML happens to
+//  produce.
 @media screen and (max-width: 767px) {
-    .hm-page.account .columns > .column.main        { order: 1; }
-    .hm-page.account .columns > .sidebar-main       { order: 2; }
+    .hm-page.account .columns > .sidebar-main       { order: 1; }
+    .hm-page.account .columns > .column.main        { order: 2; }
     .hm-page.account .columns > .sidebar-additional { order: 3; }
 }
 
