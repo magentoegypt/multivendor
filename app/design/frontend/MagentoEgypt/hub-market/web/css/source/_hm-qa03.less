@@ -2060,7 +2060,15 @@
 .hm-pdp {
     .fotorama__thumb-border { display: none !important; }
 
-    .fotorama__stage,
+    //  `.product.media` in the selector on purpose. `_hm-figma.less` squares
+    //  the stage at (0,4,0) — "the reference puts the photo straight on the
+    //  page. The radius stays on the thumbs, which the reference does round" —
+    //  and it is right about the reference: measured, the prototype's stage
+    //  image has radius 0. This reverses that on the client's instruction, so
+    //  it has to match that weight, and the placeholder is included or the
+    //  corners square themselves again before fotorama initialises.
+    .product.media .fotorama__stage,
+    .product.media .gallery-placeholder,
     .fotorama__stage__frame,
     .fotorama__stage .fotorama__img {
         border-radius: var(--hm-radius);
@@ -2073,11 +2081,13 @@
 
         .fotorama__img { border-radius: var(--hm-radius-sm); }
 
-        &.fotorama__active {
-            outline: 2px solid var(--hm-accent);
-            //  Inside the box, so the ring hugs the image instead of adding to
-            //  the frame's footprint and nudging the row.
-            outline-offset: -2px;
-        }
+        //  No active marker at all, at the client's request. Fotorama's own
+        //  `.fotorama__thumb-border` stays hidden above (it was landing 10px
+        //  off its thumbnail), and the outline that replaced it is gone too.
+        //
+        //  Noting the cost: nothing now shows which thumbnail is being viewed.
+        //  The reference marks it with a ring, and a keyboard user has only the
+        //  focus ring to go on. Restoring it is the two lines below this note.
+        &.fotorama__active { outline: 0; }
     }
 }
