@@ -2147,3 +2147,43 @@
 @media (max-width: 767px) {
     .hm-page .product-item .hm-card__foot { padding-block-start: 0; }
 }
+
+//
+//  HEADER — no rule under the header band
+//  ---------------------------------------------------------------------------
+//  Client's request. The line is Magento blank's own
+//  `.page-header { border-bottom: 1px solid #e8ecf3 }`, which was written for a
+//  white header; this theme's header ends in the navy category band, so the
+//  line reads as a seam rather than a divider.
+//
+//  `.hm-page` for weight — blank's rule is (0,1,0) and this is (0,2,0), so it
+//  wins on specificity rather than on source order, which matters because this
+//  file's position relative to blank's is not guaranteed.
+//
+//  Only the border goes. blank's `margin-bottom: 24px` on the same rule is what
+//  separates the header from the page content and was not part of the request.
+.hm-page .page-header { border-bottom: none; }
+
+//
+//  PLP — the empty card that printed after the pager
+//  ---------------------------------------------------------------------------
+//  Client's request: "remove extra spacing after pagination on PLP". It was not
+//  spacing. It was the "Recently Ordered" card rendering EMPTY.
+//
+//  `Magento_Sales`'s reorder sidebar is Knockout-bound, and when the customer
+//  has no last-ordered items it puts `no-display` on its title AND its content
+//  — but the OUTER `.block.block-reorder` still renders. This theme gives that
+//  outer element the panel treatment (1px border, 12px radius, 20px block
+//  padding, 20px bottom margin), so what reached the page was a 42px bordered
+//  box inside a 62px sidebar, directly under the pager.
+//
+//  Hidden on the condition that actually describes the fault: no block-content
+//  that is not `no-display`. That is self-healing — the moment Knockout has
+//  items and drops the class, the card returns on its own, so this cannot
+//  suppress a real "Recently Ordered" list.
+//
+//  Not scoped to the PLP: an empty bordered box is wrong on the account pages
+//  and the order views too, and it is the same block on all of them.
+.hm-page .block.block-reorder:not(:has(> .block-content:not(.no-display))) {
+    display: none;
+}
