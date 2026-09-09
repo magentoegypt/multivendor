@@ -16,12 +16,14 @@ class Rating extends AbstractIdFilter
     /** Entity type 1 is `product` in `review_entity`. */
     private const ENTITY_TYPE_PRODUCT = 1;
 
-    /** @var array<string, array{label: string, min: int}> */
+    /**
+     * @var array<string, array{stars: int, text: string, min: int}>
+     */
     private const LEVELS = [
-        '45' => ['label' => '★★★★★ 4.5+', 'min' => 90],
-        '40' => ['label' => '★★★★☆ 4+',   'min' => 80],
-        '35' => ['label' => '★★★☆☆ 3.5+', 'min' => 70],
-        'all' => ['label' => 'All ratings', 'min' => 0],
+        '45'  => ['stars' => 4, 'text' => '4.5+', 'min' => 90],
+        '40'  => ['stars' => 4, 'text' => '4+',   'min' => 80],
+        '35'  => ['stars' => 3, 'text' => '3.5+', 'min' => 70],
+        'all' => ['stars' => 0, 'text' => 'All ratings', 'min' => 0],
     ];
 
     /**
@@ -39,12 +41,33 @@ class Rating extends AbstractIdFilter
         return __('Minimum Rating');
     }
 
+    /**
+     * Labels carry MARKUP, so the stars can be gold and the threshold dark, as
+     * the prototype draws them. Mageplaza's filter template prints the label
+     * unescaped (`/** @noEscape *\/ $filterItem->getLabel()`), and the
+     * active-filter chip runs it through `stripTags()` first — so the option
+     * list gets the spans and the chip gets "★★★★☆ 4.5+" as plain text.
+     *
+     * Nothing here comes from a request: the star counts and the wording are
+     * the constant above, and the only translated part is escaped by __() the
+     * same as anywhere else.
+     */
     protected function hmOptions(): array
     {
         $out = [];
 
         foreach (self::LEVELS as $value => $level) {
-            $out[$value] = (string) __($level['label']);
+            $text = (string) __($level['text']);
+
+            if ($level['stars'] < 1) {
+                $out[$value] = $text;
+                continue;
+            }
+
+            $out[$value] = '<span class="hm-fstars" aria-hidden="true">'
+                . '<span class="hm-fstars__on">' . str_repeat('★', $level['stars']) . '</span>'
+                . '<span class="hm-fstars__off">' . str_repeat('★', 5 - $level['stars']) . '</span>'
+                . '</span> <span class="hm-fstars__text">' . $text . '</span>';
         }
 
         return $out;

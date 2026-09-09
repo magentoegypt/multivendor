@@ -1483,3 +1483,38 @@
     //  reappears as a gap above the foot.
     .hm-page .block.widget .product-item .product-item-details { justify-content: flex-start; }
 }
+
+//  FILTER OPTION ROWS — control and label on one line, stars in gold.
+//
+//  Two reports: the control did not sit on the label's line, and the stars were
+//  grey where the prototype's are amber. The stars were literal ★ characters
+//  inheriting the link's colour, so there was nothing to colour separately —
+//  Rating.php now emits them as their own spans (its template prints labels
+//  unescaped, and the active-filter chip strips tags, so both surfaces are
+//  safe).
+.hm-plp .filter-options-content .items .item {
+    align-items: center;
+    display: flex;
+    gap: var(--hm-space-2);
+
+    > a {
+        align-items: center;
+        display: flex;
+        gap: .5rem;
+    }
+
+    //  The gap owns the spacing now.
+    > input[type='checkbox'] { margin: 0; }
+}
+
+//  Amber on, grey off — the prototype's 12px stars at this row's size.
+.hm-fstars {
+    font-size: 1.3rem;
+    letter-spacing: .05em;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.hm-fstars__on { color: #fbbf24; }
+.hm-fstars__off { color: var(--hm-border-strong); }
+.hm-fstars__text { color: var(--hm-foreground); }
