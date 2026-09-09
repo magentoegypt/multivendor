@@ -1,0 +1,46 @@
+<?php
+/**
+ * Hub Market — the foot of the mini-cart (CL036-DEV01.14).
+ *
+ * Two of the ticket's four points live here:
+ *
+ *   3. "You might also like" — a product rail under the basket.
+ *   4. "View and Edit Cart", moved down here so it sits BELOW that rail, which
+ *      is the order the mock-up shows. Core renders it inside the Knockout
+ *      content template; this theme's copy of that template drops it and says
+ *      so. It is rendered unconditionally below, so it cannot go missing.
+ *
+ * SERVER-RENDERED, AND DELIBERATELY NOT PERSONALISED. The obvious build is
+ * "related to what is in the basket", which means per-visitor markup — and this
+ * block sits in the header of a full-page-cached page, so per-visitor markup
+ * here would be one shopper's recommendations served to the next. The rail is a
+ * catalogue widget instead: the same products for everyone, cached with the
+ * page, correct for every visitor. If personalised recommendations are wanted
+ * later they have to arrive through customer-data like the basket itself does.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+$hmRail = trim((string) $block->getChildHtml('minicart.recommendations'));
+$hmCartUrl = $block->getUrl('checkout/cart');
+?>
+<div class="hm-minicart__foot">
+    <?php if ($hmRail !== ''): ?>
+        <section class="hm-minicart__reco" aria-labelledby="hm-minicart-reco-title">
+            <h3 class="hm-minicart__reco-title" id="hm-minicart-reco-title">
+                <?= $escaper->escapeHtml(__('You might also like')) ?>
+            </h3>
+            <?= /* @noEscape */ $hmRail ?>
+        </section>
+    <?php endif; ?>
+
+    <div class="actions">
+        <div class="secondary">
+            <a class="action viewcart" href="<?= $escaper->escapeUrl($hmCartUrl) ?>">
+                <span><?= $escaper->escapeHtml(__('View and Edit Cart')) ?></span>
+            </a>
+        </div>
+    </div>
+</div>

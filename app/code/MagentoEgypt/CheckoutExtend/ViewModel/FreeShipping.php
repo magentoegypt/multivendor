@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace MagentoEgypt\CheckoutExtend\ViewModel;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\Http\Context as HttpContext;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\Locale\FormatInterface;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory as RuleCollectionFactory;
 use Magento\Store\Model\StoreManagerInterface;
@@ -31,12 +34,92 @@ class FreeShipping implements ArgumentInterface
 {
     private ?array $state = null;
 
+    private ?float $thresholdCache = null;
+
+    private bool $thresholdResolved = false;
+
+    private HttpContext $httpContext;
+
+    private FormatInterface $localeFormat;
+
+    /*
+     * THE LAST TWO ARGUMENTS ARE OPTIONAL ON PURPOSE, and this is not laziness.
+     *
+     * This install runs production mode with compiled DI. Magento's compiled
+     * object factory reads each class's constructor arguments from
+     * generated/metadata, and this class is IN that map with four arguments —
+     * from the last compile. Adding a fifth REQUIRED argument would make the
+     * factory call the constructor with the four it knows about and fail with
+     * an ArgumentCountError, and `setup:di:compile` on this two-core box means
+     * taking the storefront down while it runs.
+     *
+     * Optional-with-ObjectManager-fallback is Magento's own idiom for exactly
+     * this — core uses it throughout to add constructor dependencies without
+     * breaking installs that have not recompiled. Once a compile does happen
+     * these resolve through DI normally and the fallback never runs.
+     */
     public function __construct(
         private readonly CheckoutSession $checkoutSession,
         private readonly RuleCollectionFactory $ruleCollectionFactory,
         private readonly StoreManagerInterface $storeManager,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        ?HttpContext $httpContext = null,
+        ?FormatInterface $localeFormat = null
     ) {
+        $this->httpContext  = $httpContext ?: ObjectManager::getInstance()->get(HttpContext::class);
+        $this->localeFormat = $localeFormat ?: ObjectManager::getInstance()->get(FormatInterface::class);
+    }
+
+    /**
+     * The free-shipping threshold on its own, with NO reference to the quote.
+     *
+     * The mini-cart needs this and only this from the server. Everything else —
+     * how much the shopper has in the basket, how much is left to go — is read
+     * client-side from the `cart` customer-data section, because the mini-cart
+     * sits in the header of a full-page-cached page and per-visitor figures
+     * baked into it would be one shopper's numbers shown to the next.
+     *
+     * Safe to render into a cached page: the only thing it varies on is the
+     * customer group, which the full-page cache already varies its entries by
+     * (Magento\Customer\Model\Context::CONTEXT_GROUP), and it is read here
+     * from that same cache context rather than from the session — asking the
+     * session would start one, and starting a session on a cacheable page
+     * creates a quote for every crawler that touches the site.
+     *
+     * @return float|null null when the store offers no unprompted free shipping
+     */
+    public function getThreshold(): ?float
+    {
+        if ($this->thresholdResolved) {
+            return $this->thresholdCache;
+        }
+        $this->thresholdResolved = true;
+
+        try {
+            $group = (int) $this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_GROUP);
+            $this->thresholdCache = $this->lowestThreshold($group);
+        } catch (\Throwable $e) {
+            $this->logger->warning('hm free-shipping threshold unreadable: ' . $e->getMessage());
+            $this->thresholdCache = null;
+        }
+
+        return $this->thresholdCache;
+    }
+
+    /**
+     * The store's price format, in the shape Magento_Catalog/js/price-utils
+     * expects. The mini-cart bar has to render "Add EGP 42 more" from a number
+     * it computes in the browser, so it needs the same formatting rules the
+     * rest of the storefront uses rather than a hand-rolled currency string.
+     */
+    public function getPriceFormat(): array
+    {
+        try {
+            return $this->localeFormat->getPriceFormat();
+        } catch (\Throwable $e) {
+            $this->logger->warning('hm price format unreadable: ' . $e->getMessage());
+            return [];
+        }
     }
 
     /** Has the quote already earned free shipping? */

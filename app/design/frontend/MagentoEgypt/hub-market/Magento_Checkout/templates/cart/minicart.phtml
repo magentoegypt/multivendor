@@ -105,10 +105,30 @@ script;
     <?php endif ?>
     <?= /* @noEscape */ $secureRenderer->renderTag('script', [], 'window.checkout = ' .
      /* @noEscape */ $block->getSerializedConfig(), false); ?>
+    <?php
+    /*
+     * Hub Market: the free-shipping strip's two server-side facts
+     * (CL036-DEV01.14). The threshold comes from the cart price rule, never a
+     * literal — see MagentoEgypt\CheckoutExtend\ViewModel\FreeShipping — and
+     * the price format is the store's own, so the amount is written the same way
+     * every other price on the site is.
+     *
+     * Both are safe inside the full-page cache: the threshold varies only by
+     * customer group, which the cache varies on already, and the format varies
+     * by store view. Nothing about THIS visitor's basket is rendered here; the
+     * subtotal is read in the browser from customer-data.
+     */
+    $hmFreeShipping = $block->getData('free_shipping');
+    $hmThreshold = $hmFreeShipping ? $hmFreeShipping->getThreshold() : null;
+    ?>
     <script type="text/x-magento-init">
     {
         "[data-block='minicart']": {
-            "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>
+            "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>,
+            "js/hm-minicart-extras": {
+                "threshold": <?= /* @noEscape */ $hmThreshold !== null ? json_encode($hmThreshold) : '0' ?>,
+                "priceFormat": <?= /* @noEscape */ json_encode($hmFreeShipping ? $hmFreeShipping->getPriceFormat() : []) ?>
+            }
         },
         "*": {
             "Magento_Ui/js/block-loader": "<?= $block->escapeJs(

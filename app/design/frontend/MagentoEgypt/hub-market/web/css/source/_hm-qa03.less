@@ -842,3 +842,165 @@
         p { margin: 0; }
     }
 }
+
+//
+//  CL036-DEV01.14 — mini-cart preview
+//  _____________________________________________
+//
+//  Free-shipping strip, low-stock badge, and the "You might also like" rail with
+//  "View and Edit Cart" beneath it.
+//
+
+//  The strip. Inert until js/hm-minicart-extras has a true statement to make —
+//  the element ships with `hidden`, and nothing below removes that.
+.hm-minicart__ship {
+    border-block-end: 1px solid var(--hm-border-subtle);
+    margin-block-end: var(--hm-space-3);
+    padding-block-end: var(--hm-space-3);
+}
+
+.hm-minicart__ship-text {
+    font-size: 1.3rem;
+    margin: 0 0 var(--hm-space-2);
+}
+
+.hm-minicart__ship-track {
+    background: var(--hm-surface-muted);
+    border-radius: var(--hm-radius-full);
+    block-size: .6rem;
+    overflow: hidden;
+}
+
+.hm-minicart__ship-fill {
+    background: var(--hm-success);
+    display: block;
+    //  The width is written by the script as an inline `inline-size`, so it
+    //  mirrors correctly in Arabic without the script knowing about direction.
+    block-size: 100%;
+    inline-size: 0;
+    transition: inline-size var(--hm-duration) var(--hm-ease);
+}
+
+.hm-minicart__ship--won .hm-minicart__ship-text { color: var(--hm-success); }
+
+//  Low stock on a line. Amber on a pale amber ground rather than the red of an
+//  error: this is a nudge, not a failure, and the line is still purchasable.
+.hm-minicart__stock {
+    align-items: center;
+    //  `fit-content`, not an auto margin or `align-self`. The line's details box
+    //  is a GRID on this card, and a grid item stretches its column by default —
+    //  the badge came out 194px wide, a full-width amber bar rather than a chip.
+    //  `align-self` is the wrong axis there and `justify-self` would be the right
+    //  one only while the box stays a grid; sizing to content is true in both.
+    inline-size: fit-content;
+    background: var(--hm-warning-bg, rgba(245, 158, 11, .12));
+    border-radius: var(--hm-radius-sm);
+    color: var(--hm-warning-fg, #92400e);
+    display: inline-flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    gap: .4rem;
+    margin: var(--hm-space-1) 0 0;
+    padding: .2rem .6rem;
+
+    .hm-icon { block-size: 1.4rem; inline-size: 1.4rem; }
+}
+
+//  The foot: the rail, then the link.
+.hm-minicart__foot {
+    border-block-start: 1px solid var(--hm-border-subtle);
+    margin-block-start: var(--hm-space-3);
+    padding-block-start: var(--hm-space-3);
+}
+
+.hm-minicart__reco-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 var(--hm-space-3);
+}
+
+//  The rail is the same CatalogWidget block the home page uses, so it arrives
+//  wearing the home page's grid. In a 320px dropdown that grid is wrong at every
+//  breakpoint; this restates it as three small tiles and drops everything the
+//  card carries that will not fit — the seller, the rating, the buttons.
+.hm-minicart__reco {
+    .products-grid .product-items {
+        display: grid;
+        gap: var(--hm-space-2);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .product-item { inline-size: auto; margin: 0; }
+
+    .product-item-info { display: block; padding: 0; }
+
+    .product-item-photo { display: block; margin: 0; }
+
+    //  The card's body is built for a rail tile: a flex column with its own
+    //  gaps, padding and minimum height, all sized for a 300px card. Inside a
+    //  110px dropdown tile that made the body 190px tall inside a 164px card,
+    //  so the price fell out of the bottom of the tile — visible in the DOM,
+    //  invisible on screen. Everything but the price is hidden here, so the body
+    //  can go back to being a plain block that is as tall as its one child.
+    .product-item-details {
+        display: block;
+        gap: 0;
+        min-block-size: 0;
+        padding: 0;
+    }
+
+    .hm-card__foot {
+        display: block;
+        margin: 0;
+        padding: 0;
+    }
+
+    .product-image-container,
+    .product-image-wrapper { block-size: auto; inline-size: 100%; padding: 0 !important; }
+
+    .product-image-photo {
+        aspect-ratio: 1;
+        border-radius: var(--hm-radius-sm);
+        inline-size: 100%;
+        object-fit: cover;
+    }
+
+    //  Price only under each tile, as the mock-up shows.
+    //
+    //  `.product-item` in the middle of each selector is not decoration: the
+    //  rail arrives wearing the home page's card rules, and several of those —
+    //  the rating row and the swatches especially — are written as
+    //  `.block.widget .product-item .thing`, which is (0,3,0). A two-class
+    //  selector here loses to them however late this file is imported. Measured,
+    //  not guessed: the first pass hid the name and the wishlist heart, and left
+    //  the stars and the swatch chips showing.
+    .product-item .product-item-name,
+    .product-item .hm-card__vendor,
+    .product-item .product-reviews-summary,
+    .product-item .hm-rating,
+    .product-item .hm-stars,
+    .product-item [class^='swatch-opt'],
+    .product-item .swatch-attribute,
+    .product-item .product-item-inner,
+    .product-item .product-item-actions,
+    .product-item .hm-card__wish,
+    .product-item .hm-card__badge,
+    .product-item .hm-card__discount { display: none; }
+
+    .price-box {
+        margin: var(--hm-space-1) 0 0;
+        text-align: center;
+
+        .price { font-size: 1.2rem; font-weight: 600; }
+        .old-price { display: none; }
+    }
+
+    //  The widget renders its own heading and "view all"; the section supplies
+    //  those, so core's are surplus.
+    .block-title,
+    .products-grid + .toolbar,
+    .widget-title { display: none; }
+}

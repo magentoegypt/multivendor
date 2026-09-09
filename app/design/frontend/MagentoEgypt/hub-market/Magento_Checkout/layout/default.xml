@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — mini-cart enhancements (CL036-DEV01.14).
+ *
+ * Four points on that ticket. Two are markup in this theme's Knockout templates
+ * (the free-shipping strip and the low-stock badge); the other two are the
+ * blocks declared here.
+ *
+ * `minicart.addons` is core's own container inside the dropdown, declared in
+ * Magento_Checkout's default.xml and rendered by minicart.phtml right after the
+ * Knockout content. Nothing had ever been put in it.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <!--
+            The free-shipping threshold and the store's price format, handed to
+            the mini-cart so js/hm-minicart-extras can turn a subtotal into
+            "Add EGP 42 more for free shipping".
+
+            ONLY the threshold comes from the server. The subtotal, and therefore
+            the remaining amount and the bar's width, are read in the browser
+            from the `cart` customer-data section — this block is inside the
+            full-page cache, and a per-visitor figure rendered here would be one
+            shopper's number shown to the next. The threshold itself is safe:
+            it varies only by customer group, which the cache already varies on.
+
+            FreeShipping is an existing, already-compiled view model. It gained
+            getThreshold() and getPriceFormat() for this; its constructor did not
+            change in a way that needs a di:compile, and its own file says why
+            that matters on this install.
+        -->
+        <referenceBlock name="minicart">
+            <arguments>
+                <argument name="free_shipping" xsi:type="object">
+                    MagentoEgypt\CheckoutExtend\ViewModel\FreeShipping
+                </argument>
+            </arguments>
+        </referenceBlock>
+
+        <referenceContainer name="minicart.addons">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.minicart.addons"
+                   template="Magento_Checkout::cart/minicart-addons.phtml">
+                <!--
+                    "You might also like". A plain catalogue widget, newest
+                    first, four products — the same block type the home page
+                    rails use, so the card markup and its CSS already exist.
+
+                    THREE products, because the dropdown fits three tiles on one
+                    row and a fourth wraps to a row of its own looking like a
+                    mistake.
+
+                    Not personalised, on purpose: see the note in the template.
+                    `show_pager` off and a small count because this renders in a
+                    320px dropdown, and every product here is a query on a page
+                    that is otherwise pure cache.
+                -->
+                <block class="Magento\CatalogWidget\Block\Product\ProductsList"
+                       name="hm.minicart.recommendations"
+                       as="minicart.recommendations">
+                    <arguments>
+                        <argument name="products_count" xsi:type="number">3</argument>
+                        <argument name="show_pager" xsi:type="number">0</argument>
+                        <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                        <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

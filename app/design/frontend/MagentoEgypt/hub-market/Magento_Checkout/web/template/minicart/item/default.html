@@ -57,6 +57,21 @@
             </div>
             <!-- /ko -->
 
+            <!--
+                Hub Market: LOW STOCK (CL036-DEV01.14). `hm_stock_left` is put on
+                the line by
+                MagentoEgypt\CheckoutExtend\Plugin\Checkout\CustomerData\ItemComparePrice,
+                and only when there is something honest to say — stock is managed,
+                backorders are off, the figure is real and it is low. So the badge
+                needs no threshold test of its own: if the key is there, show it.
+            -->
+            <!-- ko if: item.hm_stock_left -->
+                <p class="hm-minicart__stock">
+                    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-alert"/></svg>
+                    <!-- ko text: $t('Only %1 left').replace('%1', item.hm_stock_left) --><!-- /ko -->
+                </p>
+            <!-- /ko -->
+
             <div class="product-item-pricing">
                 <!-- ko if: canApplyMsrp -->
 

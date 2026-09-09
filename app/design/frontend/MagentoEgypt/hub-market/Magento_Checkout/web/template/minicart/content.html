@@ -1,0 +1,130 @@
+<!--
+/**
+ * Hub Market — mini-cart contents (CL036-DEV01.14).
+ *
+ * Core's template with two changes, both marked below:
+ *
+ *  1. A free-shipping progress strip at the top. It is INERT MARKUP, not a
+ *     Knockout binding: the figures come from js/hm-minicart-extras, which
+ *     subscribes to the same `cart` customer-data section this template reads
+ *     and writes the text and the bar width. Nothing here can throw if that
+ *     script never loads — the strip simply stays hidden.
+ *
+ *  2. "View and Edit Cart" moved OUT, to the mini-cart addons block, so it can
+ *     sit under the "You might also like" rail the way the ticket's mock-up
+ *     shows. It is not lost: Magento_Checkout::cart/minicart-addons.phtml
+ *     renders it unconditionally, and that block is declared on the `default`
+ *     handle beside this one.
+ */
+-->
+<div class="block-title">
+    <strong>
+        <span class="text" translate="'My Cart'"></span>
+        <span
+            class="qty empty"
+            text="getCartParam('summary_count')"
+            data-bind="css: { empty: !!getCartParam('summary_count') == false },
+                       attr: { title: $t('Items in Cart') }">
+        </span>
+    </strong>
+</div>
+
+<div class="block-content">
+    <button type="button"
+            id="btn-minicart-close"
+            class="action close"
+            data-action="close"
+            data-bind="
+                attr: {
+                    title: $t('Close')
+                },
+                click: closeMinicart()
+            ">
+        <span translate="'Close'"></span>
+    </button>
+
+    <!--
+        1. FREE SHIPPING PROGRESS. Hidden until the script has something true to
+        say, which means: the store has a threshold, the cart is under it, and
+        the section has loaded. `hidden` rather than a class so it is out of the
+        accessibility tree too.
+    -->
+    <div class="hm-minicart__ship" data-role="hm-minicart-freeship" hidden>
+        <p class="hm-minicart__ship-text" data-role="hm-minicart-freeship-text"></p>
+        <div class="hm-minicart__ship-track">
+            <span class="hm-minicart__ship-fill" data-role="hm-minicart-freeship-fill"></span>
+        </div>
+    </div>
+
+    <if args="getCartParam('summary_count')">
+        <div class="items-total">
+            <span class="count" if="maxItemsToDisplay < getCartLineItemsCount()" text="maxItemsToDisplay"></span>
+            <translate args="'of'" if="maxItemsToDisplay < getCartLineItemsCount()"></translate>
+            <span class="count" text="getCartParam('summary_count').toLocaleString(window.LOCALE)"></span>
+                <!-- ko if: (getCartParam('summary_count') > 1) -->
+                    <span translate="'Items in Cart'"></span>
+                <!--/ko-->
+                <!-- ko if: (getCartParam('summary_count') <= 1) -->
+                    <span translate="'Item in Cart'"></span>
+                <!--/ko-->
+        </div>
+
+        <each args="getRegion('subtotalContainer')" render=""></each>
+        <each args="getRegion('extraInfo')" render=""></each>
+
+        <div class="actions" if="getCartParam('possible_onepage_checkout')">
+            <div class="primary">
+                <button
+                        id="top-cart-btn-checkout"
+                        type="button"
+                        class="action primary checkout"
+                        data-action="close"
+                        data-bind="
+                            attr: {
+                                title: $t('Proceed to Checkout')
+                            },
+                            click: closeMinicart()
+                        "
+                        translate="'Proceed to Checkout'">
+                </button>
+                <div data-bind="html: getCartParamUnsanitizedHtml('extra_actions')"></div>
+            </div>
+        </div>
+    </if>
+
+    <if args="getCartParam('summary_count')">
+        <strong class="subtitle" translate="'Recently added item(s)'"></strong>
+        <div data-action="scroll" class="minicart-items-wrapper">
+            <ol id="mini-cart" class="minicart-items" data-bind="foreach: { data: getCartItems(), as: 'item' }">
+                <each args="$parent.getRegion($parent.getItemRenderer(item.product_type))"
+                      render="{name: getTemplate(), data: item, afterRender: function() {$parents[1].initSidebar()}}"></each>
+            </ol>
+        </div>
+    </if>
+
+    <ifnot args="getCartParam('summary_count')">
+        <strong class="subtitle empty"
+                translate="'You have no items in your shopping cart.'"></strong>
+        <if args="getCartParam('cart_empty_message')">
+            <p class="minicart empty text" text="getCartParam('cart_empty_message')"></p>
+            <div class="actions">
+                <div class="secondary">
+                    <a class="action viewcart" data-bind="attr: {href: shoppingCartUrl}">
+                        <span translate="'View and Edit Cart'"></span>
+                    </a>
+                </div>
+            </div>
+        </if>
+    </ifnot>
+
+    <!--
+        2. The "View and Edit Cart" block that stood here is rendered by
+        Magento_Checkout::cart/minicart-addons.phtml instead, below the
+        recommendations. See the note at the head of this file.
+    -->
+
+    <div id="minicart-widgets" class="minicart-widgets" if="regionHasElements('promotion')">
+        <each args="getRegion('promotion')" render=""></each>
+    </div>
+</div>
+<each args="getRegion('sign-in-popup')" render=""></each>
