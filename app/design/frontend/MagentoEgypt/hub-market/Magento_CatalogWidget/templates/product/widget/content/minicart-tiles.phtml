@@ -1,0 +1,57 @@
+<?php
+/**
+ * Hub Market — the mini-cart's "You might also like" tiles (CL036-DEV01.14).
+ *
+ * A DELIBERATELY MINIMAL TEMPLATE, and the reason is page weight.
+ *
+ * This rail first used the widget's own grid.phtml, the same one the home page
+ * rails use. That renders a complete product card each — wishlist and compare
+ * controls, swatch renderers, a review summary, an add-to-cart form with its
+ * post params, an image container carrying its own inline <style> — and the
+ * mini-cart then hid almost all of it with CSS. Measured on the home page: 34KB
+ * of markup on EVERY page of the site to show three thumbnails and three
+ * prices, on a page where PageSpeed has already been fought for once.
+ *
+ * This renders the four things the mock-up shows and nothing else. It is ~2KB.
+ *
+ * @var \Magento\CatalogWidget\Block\Product\ProductsList $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+
+$hmCollection = $block->getProductCollection();
+
+if (!$hmCollection || !$hmCollection->count()) {
+    return;
+}
+?>
+<ul class="hm-minicart__reco-list">
+    <?php foreach ($hmCollection->getItems() as $hmProduct): ?>
+        <li class="hm-minicart__reco-item">
+            <a class="hm-minicart__reco-link" href="<?= $escaper->escapeUrl($hmProduct->getProductUrl()) ?>">
+                <?php
+                /*
+                 * `getImage()` with a small image id so the thumbnail is resized
+                 * to the size it renders at rather than a card-sized file scaled
+                 * down in the browser. `mini_cart_product_thumbnail` is blank's
+                 * own id (75x75) and is exactly what this is for.
+                 */
+                ?>
+                <?= $block->getImage($hmProduct, 'mini_cart_product_thumbnail')->toHtml() ?>
+                <span class="hm-minicart__reco-name"><?= $escaper->escapeHtml($hmProduct->getName()) ?></span>
+                <span class="hm-minicart__reco-price">
+                    <?php
+                    /*
+                     * Second argument is the price TYPE and it is optional; the
+                     * zone defaults to ZONE_ITEM_LIST, which is what a rail
+                     * wants. Passing a made-up constant here took the whole
+                     * storefront to a 500 for a minute — every page renders this
+                     * block, so a fatal in this template is a fatal everywhere.
+                     */
+                    ?>
+                    <?= /* @noEscape */ $block->getProductPriceHtml($hmProduct, 'widget-product-grid') ?>
+                </span>
+            </a>
+        </li>
+    <?php endforeach; ?>
+</ul>

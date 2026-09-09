@@ -47,7 +47,8 @@
                 <!--
                     "You might also like". A plain catalogue widget, newest
                     first, four products — the same block type the home page
-                    rails use, so the card markup and its CSS already exist.
+                    rails use, with a template of its own — see the note on that
+                    argument.
 
                     THREE products, because the dropdown fits three tiles on one
                     row and a fourth wraps to a row of its own looking like a
@@ -64,7 +65,17 @@
                     <arguments>
                         <argument name="products_count" xsi:type="number">3</argument>
                         <argument name="show_pager" xsi:type="number">0</argument>
-                        <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                        <!--
+                            NOT grid.phtml. The widget's own card template ships
+                            wishlist and compare controls, swatch renderers, a
+                            review summary, an add-to-cart form and an image
+                            container with inline CSS — 34KB of markup on EVERY
+                            page of the site, measured, nearly all of it then
+                            hidden again by the mini-cart's stylesheet. The
+                            template below renders the four things the mock-up
+                            actually shows.
+                        -->
+                        <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/minicart-tiles.phtml</argument>
                         <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
                     </arguments>
                 </block>

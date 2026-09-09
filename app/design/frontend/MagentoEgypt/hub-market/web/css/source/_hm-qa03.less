@@ -913,94 +913,67 @@
     padding-block-start: var(--hm-space-3);
 }
 
+//  The link under the tiles needs air; without it "View and Edit Cart" sat
+//  20px under a row of prices and read as a fourth price.
+.hm-minicart__foot .actions { margin-block-start: var(--hm-space-4); }
+
 .hm-minicart__reco-title {
     font-size: 1.3rem;
     font-weight: 700;
     margin: 0 0 var(--hm-space-3);
 }
 
-//  The rail is the same CatalogWidget block the home page uses, so it arrives
-//  wearing the home page's grid. In a 320px dropdown that grid is wrong at every
-//  breakpoint; this restates it as three small tiles and drops everything the
-//  card carries that will not fit — the seller, the rating, the buttons.
-.hm-minicart__reco {
-    .products-grid .product-items {
-        display: grid;
-        gap: var(--hm-space-2);
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
+//  The tiles. Their markup is this theme's own (see
+//  Magento_CatalogWidget::product/widget/content/minicart-tiles.phtml), so this
+//  lays out what is there rather than unpicking a product card — the first
+//  version fought the home-page rail rules for every element it wanted gone,
+//  needed (0,3,0) selectors to win, and still shipped the whole card's markup.
+.hm-minicart__reco-list {
+    display: grid;
+    gap: var(--hm-space-2);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
-    .product-item { inline-size: auto; margin: 0; }
+.hm-minicart__reco-item { margin: 0; }
 
-    .product-item-info { display: block; padding: 0; }
+.hm-minicart__reco-link {
+    color: var(--hm-foreground);
+    display: block;
+    text-decoration: none;
 
-    .product-item-photo { display: block; margin: 0; }
+    &:hover .hm-minicart__reco-name { color: var(--hm-accent); }
 
-    //  The card's body is built for a rail tile: a flex column with its own
-    //  gaps, padding and minimum height, all sized for a 300px card. Inside a
-    //  110px dropdown tile that made the body 190px tall inside a 164px card,
-    //  so the price fell out of the bottom of the tile — visible in the DOM,
-    //  invisible on screen. Everything but the price is hidden here, so the body
-    //  can go back to being a plain block that is as tall as its one child.
-    .product-item-details {
-        display: block;
-        gap: 0;
-        min-block-size: 0;
-        padding: 0;
-    }
-
-    .hm-card__foot {
-        display: block;
-        margin: 0;
-        padding: 0;
-    }
-
-    .product-image-container,
-    .product-image-wrapper { block-size: auto; inline-size: 100%; padding: 0 !important; }
-
-    .product-image-photo {
+    img {
         aspect-ratio: 1;
         border-radius: var(--hm-radius-sm);
+        display: block;
         inline-size: 100%;
         object-fit: cover;
     }
-
-    //  Price only under each tile, as the mock-up shows.
-    //
-    //  `.product-item` in the middle of each selector is not decoration: the
-    //  rail arrives wearing the home page's card rules, and several of those —
-    //  the rating row and the swatches especially — are written as
-    //  `.block.widget .product-item .thing`, which is (0,3,0). A two-class
-    //  selector here loses to them however late this file is imported. Measured,
-    //  not guessed: the first pass hid the name and the wishlist heart, and left
-    //  the stars and the swatch chips showing.
-    .product-item .product-item-name,
-    .product-item .hm-card__vendor,
-    .product-item .product-reviews-summary,
-    .product-item .hm-rating,
-    .product-item .hm-stars,
-    .product-item [class^='swatch-opt'],
-    .product-item .swatch-attribute,
-    .product-item .product-item-inner,
-    .product-item .product-item-actions,
-    .product-item .hm-card__wish,
-    .product-item .hm-card__badge,
-    .product-item .hm-card__discount { display: none; }
-
-    .price-box {
-        margin: var(--hm-space-1) 0 0;
-        text-align: center;
-
-        .price { font-size: 1.2rem; font-weight: 600; }
-        .old-price { display: none; }
-    }
-
-    //  The widget renders its own heading and "view all"; the section supplies
-    //  those, so core's are surplus.
-    .block-title,
-    .products-grid + .toolbar,
-    .widget-title { display: none; }
 }
+
+//  The name is present for a screen reader and for anyone who wants to know
+//  what they are clicking, clamped to one line so three tiles stay one row.
+.hm-minicart__reco-name {
+    display: block;
+    font-size: 1.1rem;
+    margin-block-start: var(--hm-space-1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hm-minicart__reco-price {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 600;
+
+    .price-box { margin: 0; }
+    .price { font-size: 1.2rem; font-weight: 600; }
+    .old-price,
+    .price-label { display: none; }
+}
+
