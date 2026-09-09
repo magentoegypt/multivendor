@@ -999,6 +999,27 @@
 //
 //  2. The spacing throughout was drawn for a page, not for a 320px panel.
 //
+//  CLOSED until the wrapper says otherwise.
+//
+//  The rule below is what makes the panel a flex column, and it was
+//  unconditional — `.hm-page .minicart-wrapper .block-minicart` at (0,3,0),
+//  which beats Magento/blank's closed state,
+//  `.minicart-wrapper .block-minicart { display: none }` at (0,2,0). So the
+//  panel was DISPLAYED from first paint and only appeared shut once jQuery UI
+//  wrapped it in a hidden dialog container. Sampled on every animation frame of
+//  a cold load: visible at 390x221 from 630ms to 2729ms — a 2.1-second flash of
+//  the mini-cart, recommendations and all, on every page.
+//
+//  The open state needs `!important`, and it earns it. Hiding the panel in the
+//  stylesheet changes what jQuery's `.show()` does: an element hidden by a RULE
+//  rather than by an inline style gets an inline `display: block` written onto
+//  it when the dropdown opens. Without the override the panel opened as a plain
+//  block and lost the flex column below — which is what gives it its
+//  max-height and its own scroll. Verified both ways: with the guard alone the
+//  open panel computed `display: block`.
+.hm-page .minicart-wrapper:not(.active) .block-minicart { display: none; }
+.hm-page .minicart-wrapper.active .block-minicart { display: flex !important; }
+
 .hm-page .minicart-wrapper .block-minicart {
     display: flex;
     flex-direction: column;
