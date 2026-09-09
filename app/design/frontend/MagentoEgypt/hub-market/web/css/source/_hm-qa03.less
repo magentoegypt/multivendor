@@ -1780,20 +1780,27 @@
 //  Nothing becomes unreachable on a phone — the header's account menu and the
 //  bottom bar's Account tab both still reach every page this listed.
 //
-//  AND NOW IT IS BACK ON A PHONE TOO. QA cycle 1 (test run 86d4aeqw4) attached
-//  the reference frame for this screen, and it carries the account links —
-//  "Addresses", "Settings" — above the Shopping Stats card, which is also where
-//  the "below the account" in that ticket's wording points. The client has
-//  confirmed the reference is what they want here.
+//  HIDDEN ON A PHONE, THIRD AND CURRENT ANSWER. The history, because this rule
+//  has now been reversed twice and the reasons matter more than the CSS:
 //
-//  So the rule below is now DESKTOP-ONLY nothing: the navigation shows at every
-//  width, and this block is left in place, commented, because it has been
-//  reversed twice and the next person deserves the history rather than a silent
-//  absence.
+//    1. Hidden at every width — client's original request.
+//    2. Shown at every width — QA cycle 1 (test run 86d4aeqw4) failed the
+//       screen and its reference frame carries the account links above the
+//       Shopping Stats card.
+//    3. Hidden below 768px, shown on desktop — the client's decision after
+//       seeing (2). The reference is not the authority when the client
+//       contradicts it, which is the same call already made for the cart's
+//       discount field and the PDP's button colour.
 //
-//  @media screen and (max-width: 767px) {
-//      .hm-page.account .block-collapsible-nav { display: none; }
-//  }
+//  Only the NAV goes. `.sidebar-main` also holds the theme's own `.hm-stats`
+//  card, which is not navigation and stays — and which QA separately requires
+//  ABOVE the products, so the ordering block below is unaffected by this.
+//
+//  Nothing becomes unreachable on a phone: the header's account menu and the
+//  bottom bar's Account tab both still reach every page this listed.
+@media screen and (max-width: 767px) {
+    .hm-page.account .block-collapsible-nav { display: none; }
+}
 
 //
 //  ACCOUNT — Shopping Stats goes ABOVE the page content on a phone
@@ -2128,4 +2135,15 @@
         //  focus ring to go on. Restoring it is the two lines below this note.
         &.fotorama__active { outline: 0; }
     }
+}
+
+//  Mobile home cards: the space under the rating was doubled.
+//
+//  `.product-item-details` is a flex column with `gap: 8px`, and
+//  `.hm-card__foot` then adds `padding-top: 8px` on top of it — 16px between
+//  the stars and the price. The padding is not separating anything: the foot
+//  carries no border-top (checked on the bestsellers, deals and grocery rails,
+//  all three identical). The gap alone does the job.
+@media (max-width: 767px) {
+    .hm-page .product-item .hm-card__foot { padding-block-start: 0; }
 }
