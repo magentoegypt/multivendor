@@ -397,16 +397,44 @@
     //  what survives is Price Range / Minimum Rating / Availability / Vendors,
     //  in that order, on every category.
     //
-    //  Worth stating plainly: this DOES remove working facets. A shopper on a
-    //  fashion category can no longer filter by size or material. That is what
-    //  matching the prototype's panel costs, and it is a content decision
-    //  rather than a technical one.
+    //  Size and material are kept on the client's instruction — they are real
+    //  facets a shopper uses, and the prototype simply has no equivalent. Listed
+    //  by exact code rather than matched on a pattern like [attribute*='size']:
+    //  the set is short and knowable, and a pattern would quietly admit whatever
+    //  is added next.
+    //
+    //  The six are every filterable size/material attribute on this catalogue.
+    //  `material` and `Matrial` are BOTH filterable and both mean the same
+    //  thing — the second is a misspelling that was never cleaned up, so a
+    //  category carrying both will show two blocks that ought to be one. That
+    //  is catalogue data, not something to paper over here.
     .filter-options-item { display: none; }
 
     .filter-options-item[attribute='price'],
     .filter-options-item[attribute='rating'],
     .filter-options-item[attribute='availability'],
-    .filter-options-item[attribute='vendor'] { display: block; }
+    .filter-options-item[attribute='vendor'],
+    .filter-options-item[attribute='size'],
+    .filter-options-item[attribute='clothes_size'],
+    .filter-options-item[attribute='bag_size'],
+    .filter-options-item[attribute='screen_Size'],
+    .filter-options-item[attribute='material'],
+    .filter-options-item[attribute='Matrial'] { display: block; }
+
+    //  Magento emits attribute filters BEFORE price, so without this the kept
+    //  facets would open the panel and push Price Range down — the opposite of
+    //  the prototype's order. A flex column lets the reference's four sit on top
+    //  in their own order and the extras follow.
+    .filter-options {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-options-item { order: 5; }
+    .filter-options-item[attribute='price'] { order: 1; }
+    .filter-options-item[attribute='rating'] { order: 2; }
+    .filter-options-item[attribute='availability'] { order: 3; }
+    .filter-options-item[attribute='vendor'] { order: 4; }
 
     //  Mageplaza prints a decorative `<input type="checkbox" aria-hidden>` ahead
     //  of every option link — the link is the control, the input is paint. That
