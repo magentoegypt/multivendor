@@ -1518,3 +1518,131 @@
 .hm-fstars__on { color: #fbbf24; }
 .hm-fstars__off { color: var(--hm-border-strong); }
 .hm-fstars__text { color: var(--hm-foreground); }
+
+//
+//  WISHLIST — the two toolbar buttons
+//  ---------------------------------------------------------------------------
+//  "Share Wish List" and "Add All to Cart" were two full-width outlined boxes,
+//  stacked, and read as panels rather than controls. Core stacks them because
+//  `.actions-toolbar > .primary` is a plain block and each button is
+//  full-width; the theme's button tokens never reached them because the
+//  wishlist page's buttons carry `.action.share` / `.action.tocart` and not
+//  `.action.primary`.
+//
+//  The fill is applied at every width, not just on a phone: a control that does
+//  not look like a control is the same fault on a desktop. Only the side-by-side
+//  layout is width-dependent.
+.wishlist-index-index {
+    .actions-toolbar > .primary {
+        //  stretch and nowrap together are what keep the two the same height:
+        //  measured on the live page they were 66 and 78, because "Share Wish
+        //  List" wrapped to two lines at its width and "Add All to Cart" did
+        //  not. One line each, one height each.
+        align-items: stretch;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-3);
+
+        > .action {
+            align-items: center;
+            //  A FIXED height, not `align-items: stretch`. Both buttons have
+            //  identical padding, border, line-height and a 20px inner span,
+            //  and still measured 46 and 58 — and the shorter one would not
+            //  stretch to meet the taller. Rather than keep hunting the extra
+            //  12px, the row is pinned: 4.4rem is the theme's touch target and
+            //  the labels are centred inside it.
+            block-size: 4.4rem;
+            display: inline-flex;
+            justify-content: center;
+            min-block-size: 4.4rem;
+            white-space: nowrap;
+        }
+    }
+
+    //  Add All to Cart is the page's primary action and takes the accent.
+    .actions-toolbar .action.tocart {
+        background: var(--hm-accent);
+        border: 1px solid var(--hm-accent);
+        border-radius: var(--hm-radius);
+        color: #ffffff;
+        font-weight: 600;
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-5);
+
+        &:hover:not(:disabled),
+        &:focus-visible {
+            background: var(--hm-accent-strong);
+            border-color: var(--hm-accent-strong);
+            color: #ffffff;
+        }
+    }
+
+    //  Share is the quieter of the two: filled, but in the surface tone with a
+    //  real border, so it still reads as a button beside the accent one.
+    .actions-toolbar .action.share {
+        background: var(--hm-surface-muted);
+        border: 1px solid var(--hm-border-strong);
+        border-radius: var(--hm-radius);
+        color: var(--hm-foreground);
+        font-weight: 600;
+        min-block-size: 4.4rem;
+        padding-inline: var(--hm-space-5);
+
+        &:hover:not(:disabled),
+        &:focus-visible {
+            background: var(--hm-surface);
+            border-color: var(--hm-accent);
+            color: var(--hm-accent-strong);
+        }
+    }
+}
+
+//  Side by side on a phone, filling the row.
+//
+//  Three things were wrong and only the first was layout. `.primary` is
+//  `flex: 0 1 auto`, so it sat at its content width and left the rest of the
+//  row empty; the two labels are three words each and wrapped to two lines at
+//  the width that gave them; and with one wrapping and one not, the buttons
+//  came out 66 and 78 tall beside each other.
+//
+//  Full width, an equal share each, and the labels held on one line at the
+//  smaller type step — which makes the heights match without stretching
+//  anything.
+@media (max-width: 767px) {
+    .wishlist-index-index .actions-toolbar {
+        display: flex;
+        inline-size: 100%;
+    }
+
+    .wishlist-index-index .actions-toolbar > .primary {
+        align-items: stretch;
+        display: flex;
+        flex: 1 1 auto;
+        flex-wrap: nowrap;
+        gap: var(--hm-space-3);
+        inline-size: 100%;
+
+        > .action {
+            align-items: center;
+            display: inline-flex;
+            flex: 1 1 0;
+            font-size: 1.3rem;
+            justify-content: center;
+            min-inline-size: 0;
+            padding-inline: var(--hm-space-3);
+            text-align: center;
+            white-space: nowrap;
+        }
+    }
+}
+
+//
+//  ACCOUNT — the left navigation is hidden on every account page
+//  ---------------------------------------------------------------------------
+//  Client's request. Only the NAV goes: `.sidebar-main` on these pages also
+//  holds the theme's own `.hm-stats` card (orders and wishlist counts), which
+//  is not navigation and stays. The column keeps its place in the grid for it.
+//
+//  Nothing becomes unreachable — the header's account menu and, on a phone, the
+//  bottom bar's Account tab both still reach every page this listed.
+.hm-page.account .block-collapsible-nav { display: none; }
