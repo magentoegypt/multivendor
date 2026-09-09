@@ -451,9 +451,13 @@
     .filter-options-content .items .item > input[type='checkbox'] {
         appearance: none;
         -webkit-appearance: none;
-        background: var(--hm-surface);
+        //  UNCHECKED IS FILLED DARK, not an outline — the client supplied the
+        //  two states directly and they supersede my earlier reading of the
+        //  prototype's screenshot, where the control sampled as a grey outline
+        //  on white (#767676 edges) at the size it was captured.
+        background: var(--hm-foreground);
         block-size: 1.6rem;
-        border: 1.5px solid var(--hm-border-strong);
+        border: 1.5px solid var(--hm-foreground);
         border-radius: .3rem;
         flex: 0 0 auto;
         inline-size: 1.6rem;
@@ -484,14 +488,19 @@
 
     //  Minimum Rating is single-choice in the prototype and reads as radios:
     //  a circle, and a filled dot rather than a tick when chosen.
+    //  Minimum Rating reads as a radio: a filled dark circle when it is not
+    //  chosen, and an ORANGE RING around a dark centre when it is — not the
+    //  orange disc with a white dot the first pass drew.
     .filter-options-item[attribute='rating'] .items .item > input[type='checkbox'] {
         border-radius: var(--hm-radius-full);
 
         &:checked {
-            background: var(--hm-accent);
-            box-shadow: inset 0 0 0 3px var(--hm-surface);
+            background: var(--hm-foreground);
+            border-color: var(--hm-accent);
+            border-width: 3px;
         }
 
+        //  No tick on a radio.
         &:checked::after { content: none; }
     }
 
@@ -514,8 +523,36 @@
     .filter-options-item[attribute='price'] {
         .ui-slider-handle:first-of-type { display: none; }
 
+        //  The fill runs from the leading edge to the handle, both in the
+        //  accent, on a rounded track — the control supplied.
+        .ui-slider {
+            block-size: .6rem;
+            border: 0;
+            border-radius: var(--hm-radius-full);
+        }
+
+        //  The fill had no HEIGHT — jQuery UI sizes `.ui-slider-range` from the
+        //  track's own height, and once the track was re-sized to 6px the range
+        //  was left at 0, so the orange never showed and the control read as a
+        //  plain grey rail. Pinned to the track's full height instead of
+        //  inheriting a number that is no longer there.
         .ui-slider-range {
+            background: var(--hm-accent);
+            block-size: 100%;
+            border-radius: var(--hm-radius-full);
+            inset-block: 0;
             inset-inline-start: 0 !important;
+        }
+
+        .ui-slider-handle {
+            background: var(--hm-accent);
+            border: 0;
+            block-size: 1.8rem !important;
+            border-radius: var(--hm-radius-full);
+            inline-size: 1.8rem !important;
+            inset-block-start: 50%;
+            margin-inline-start: -.9rem;
+            transform: translateY(-50%);
         }
     }
 
@@ -949,15 +986,43 @@
 
     .hm-nav__mega-col { flex: 0 1 20rem; min-inline-size: 0; }
 
+    //  The head is now a picture beside a label, so it lays out as a row.
+    //  `align-items: center` rather than baseline: the thumbnail is 48px
+    //  against one line of 15px text, and a two-word category that wraps should
+    //  stay centred against the square, not hang off its first line.
     .hm-nav__mega-head,
     .hm-nav__mega-head:visited {
+        align-items: center;
         color: var(--hm-foreground);
-        display: block;
+        display: flex;
         font-size: 1.5rem;
         font-weight: 700;
+        gap: var(--hm-space-3);
         margin-block-end: var(--hm-space-3);
         text-decoration: none;
     }
+
+    //  CL036-DEV01.15 follow-up: "show image with relevant sub category link".
+    //
+    //  `contain`, not `cover`: most of these come from a product shot on white,
+    //  and cropping a phone or a dress to fill a 48px square makes a tile that
+    //  says nothing. The muted ground is what gives it an edge when the source
+    //  has none of its own.
+    //
+    //  `flex: none` because the label is allowed to wrap and a flex item with
+    //  an intrinsic width would otherwise be the thing that shrinks.
+    .hm-nav__mega-thumb {
+        background: var(--hm-surface-muted);
+        block-size: 4.8rem;
+        border-radius: var(--hm-radius-sm);
+        flex: none;
+        inline-size: 4.8rem;
+        object-fit: contain;
+    }
+
+    //  Wrapping happens here, not on the anchor, so the picture keeps its own
+    //  column when a name runs to two lines.
+    .hm-nav__mega-head-text { min-inline-size: 0; }
 
     .hm-nav__mega-head:hover { color: var(--hm-accent); }
 
@@ -1441,7 +1506,14 @@
         margin-block-start: var(--hm-space-2);
     }
 
-    .hm-price-range__cap { font-weight: 600; }
+    //  The cap is the live value and carries the accent, as supplied; the floor
+    //  stays quiet beside it.
+    .hm-price-range__cap {
+        color: var(--hm-accent);
+        font-weight: 600;
+    }
+
+    .hm-price-range__floor { color: var(--hm-foreground-muted); }
 
     //  Hidden, not removed: the script reads its text on every slide.
     .hm-price-range__raw {
@@ -1882,4 +1954,35 @@
     font-size: 1.4rem;
     font-weight: 600;
     margin-block-start: auto;
+}
+
+//  Requested directly: the filter block's content sits flush, with the card's
+//  own padding doing the spacing.
+.hm-plp .filter-options-content {
+    margin: 0;
+}
+
+//
+//  CL036-DEV01.17 follow-up — the wordmark on the print page's own screen view
+//  ---------------------------------------------------------------------------
+//  `@media print` already puts the logo in ink, which fixes the PAPER. But the
+//  tester's Arabic capture is the print page ON SCREEN, and that page has no
+//  navy header — it is white, and the wordmark's second half is white too, so
+//  "Hub Market" reads as "Hub" with a gap after it before anyone reaches the
+//  print dialog.
+//
+//  Scoped to the print CONTROLLERS' body classes rather than to a colour test,
+//  because these are the only pages that render the header logo against paper
+//  white. The lead word keeps the accent — it is 5.04:1 on white as well as on
+//  navy, and it is the brand's own colour.
+.sales-order-print,
+.sales-order-printinvoice,
+.sales-order-printshipment,
+.sales-order-printcreditmemo,
+.sales-guest-print,
+.sales-guest-printinvoice,
+.sales-guest-printshipment,
+.sales-guest-printcreditmemo {
+    .hm-logo__word,
+    .hm-logo__word-rest { color: var(--hm-foreground); }
 }
