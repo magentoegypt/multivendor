@@ -394,19 +394,84 @@
     //  Mageplaza prints a decorative `<input type="checkbox" aria-hidden>` ahead
     //  of every option link — the link is the control, the input is paint. That
     //  is exactly what the prototype draws, so it is styled rather than hidden.
+    //
+    //  Drawn from scratch with `appearance: none`. The first attempt only set
+    //  `accent-color` and a `border-radius`, which cannot work: a NATIVE
+    //  checkbox ignores border-radius, so the rating options stayed square when
+    //  they are meant to read as radios. Nothing is painted by the browser here
+    //  any more — the box, the tick and the dot are all ours.
+    //
+    //  Mageplaza does mark the active option `checked` (verified on a filtered
+    //  URL), so the selected state is real and not decoration.
     .filter-options-content .items .item > input[type='checkbox'] {
-        accent-color: var(--hm-accent);
-        block-size: 1.4rem;
-        inline-size: 1.4rem;
-        margin-inline-end: var(--hm-space-2);
+        appearance: none;
+        -webkit-appearance: none;
+        background: var(--hm-surface);
+        block-size: 1.6rem;
+        border: 1.5px solid var(--hm-border-strong);
+        border-radius: .3rem;
+        flex: 0 0 auto;
+        inline-size: 1.6rem;
+        margin: 0 var(--hm-space-2) 0 0;
+        //  The link is the control; this is paint in front of it.
         pointer-events: none;
+        position: relative;
         vertical-align: middle;
+
+        &:checked {
+            background: var(--hm-accent);
+            border-color: var(--hm-accent);
+        }
+
+        //  The tick.
+        &:checked::after {
+            block-size: .8rem;
+            border: solid #ffffff;
+            border-width: 0 2px 2px 0;
+            content: '';
+            inline-size: .4rem;
+            inset-block-start: .1rem;
+            inset-inline-start: .5rem;
+            position: absolute;
+            transform: rotate(45deg);
+        }
     }
 
-    //  Minimum Rating is single-choice in the prototype and reads as radios.
-    //  The markup is the same checkbox; only its shape changes.
+    //  Minimum Rating is single-choice in the prototype and reads as radios:
+    //  a circle, and a filled dot rather than a tick when chosen.
     .filter-options-item[attribute='rating'] .items .item > input[type='checkbox'] {
         border-radius: var(--hm-radius-full);
+
+        &:checked {
+            background: var(--hm-accent);
+            box-shadow: inset 0 0 0 3px var(--hm-surface);
+        }
+
+        &:checked::after { content: none; }
+    }
+
+    //  "also remove count from filter items" — the prototype lists the option
+    //  and nothing else. Mageplaza renders `<span class="count">7 <span
+    //  class="filter-count-label">items</span></span>` inside each link.
+    .filter-options-content .count { display: none; }
+
+    //  PRICE: one handle, not two.
+    //
+    //  The prototype's control is a single `<input type="range" min="0"
+    //  max="2000">` — a MAXIMUM, with the track filled from the left. Mageplaza
+    //  renders a jQuery UI range slider with a handle at each end. The lower
+    //  handle is hidden and the fill pinned to the left edge so the control
+    //  reads the same way; the upper handle still does the filtering.
+    //
+    //  It is hidden rather than removed because the slider's JS owns both
+    //  handles — and it sits at the collection's own minimum, so nothing is
+    //  filtered out by leaving it there.
+    .filter-options-item[attribute='price'] {
+        .ui-slider-handle:first-of-type { display: none; }
+
+        .ui-slider-range {
+            inset-inline-start: 0 !important;
+        }
     }
 
     //  The prototype's slider is the brand orange on a light track, and shows
@@ -523,7 +588,7 @@
 //  Shopping Stats, then the page. `.hm-page` throughout for weight — every rule
 //  above is blank's and compiles after this theme's own account file.
 //
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-page.account .page-main { padding-top: 0; }
 
     .hm-page .block-collapsible-nav {
@@ -561,7 +626,7 @@
 //
 .hm-bottomnav { display: none; }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     //  ONE number for the bar's height and for the room reserved under the page,
     //  because they must agree exactly. They did not on the first pass: the bar
     //  was left to size itself from its contents and came out 69px (a 5.6rem
@@ -688,23 +753,57 @@
 }
 
 
-//  3-A, second pass: re-sized after the media column moved.
+//  3-A, third pass: the strip DIVIDES the stage, at any width.
 //
-//  The first pass cut the strip to 3 x 192 + 2 x 8 = 592, exact for the media
-//  column as it measured then. The column has since become 656 (a PDP layout
-//  change from the parallel session), leaving the strip 64px short of the image
-//  it lines up with — the tester's own defect, back from the other side.
+//  Twice this was cut to a pixel width — 3 x 192 + 2 x 8 for a 592px column,
+//  then 3 x 212 + 2 x 10 for 656 — and twice it stopped matching: first when
+//  the column moved, then simply at a window that was not 1440. Measured across
+//  viewports with the fixed strip in place, the stage runs 576 / 619 / 656 /
+//  736 / 896 at 1280 / 1366 / 1440 / 1600 / 1920 while the strip stays 656 —
+//  overflowing by 80px at the low end and falling 240px short at the high end.
+//  A fixed thumb width cannot span a fluid column; it agrees at one viewport.
 //
-//  Re-cut to the new width: 3 x 212 + 2 x 10 = 656. Sized through view.xml, not
-//  CSS, deliberately. An attempt to make the strip flexible instead — flex on
-//  the shaft, `auto` sizes on the frames — was abandoned: fotorama writes width
-//  AND height as inline style on every frame and the inner image is sized as a
-//  percentage of the frame, so releasing both dimensions collapsed the thumbs
-//  to zero. It also depends on a sibling count that cannot be expressed, since
-//  fotorama inserts `.fotorama__thumb-border` as the shaft's first child.
+//  So the shaft is a flex row and the thumbs divide it. An earlier attempt at
+//  this collapsed them to 0x0, and the reason is worth keeping: fotorama sizes
+//  the inner <img> as `block-size: 100%` OF THE FRAME, so freeing the frame's
+//  height at the same time leaves each depending on the other and both resolve
+//  to nothing. The square therefore lives on the IMAGE — `aspect-ratio` with a
+//  width-driven height — and the frame's height follows the image rather than
+//  the other way round.
 //
-//  The cost is that this is pinned to a 656px column. If that column moves
-//  again, these two numbers move with it.
+//  `!important` throughout because fotorama writes width, height and margin as
+//  inline style on every frame.
+.hm-pdp .fotorama__nav__shaft {
+    display: flex;
+    gap: 1rem;
+    inline-size: 100%;
+}
+
+.hm-pdp .fotorama__nav__frame--thumb {
+    block-size: auto !important;
+    flex: 1 1 0;
+    inline-size: auto !important;
+    margin: 0 !important;
+    min-block-size: 0 !important;
+    //  The shaft's gap does the spacing now; fotorama's own padding is
+    //  asymmetric (8px on three sides) and would double it unevenly.
+    padding: 0 !important;
+}
+
+//  The square lives HERE, on the image — this is the half that was missing
+//  when the thumbs collapsed.
+.hm-pdp .fotorama__nav__frame--thumb .fotorama__thumb,
+.hm-pdp .fotorama__nav__frame--thumb .fotorama__img {
+    aspect-ratio: 1;
+    block-size: auto !important;
+    inline-size: 100% !important;
+    object-fit: cover;
+}
+
+//  The strip's own boxes carry the same inline height and would hold the old
+//  measurement as dead space under the thumbs.
+.hm-pdp .fotorama__nav,
+.hm-pdp .fotorama__nav-wrap { block-size: auto !important; }
 
 
 //
