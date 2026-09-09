@@ -26,6 +26,11 @@ $hmAction = (string) $block->getRequest()->getFullActionName();
  * Opening it would mean a click handler, a scroll-to-top and a dependency on
  * the header's markup surviving; a link to the catalogue does the same job with
  * none of that, and it is what the chip beside it already does.
+ *
+ * `getUrl('search')` — the search LANDING page, which this theme builds as a
+ * browse-everything page. NOT `catalogsearch/result` with an empty q: Magento
+ * rejects an empty query and 302s it straight back to the home page, which is
+ * what the first version of this tab did.
  */
 $hmItems = [
     [
@@ -35,10 +40,16 @@ $hmItems = [
         'active' => $hmAction === 'cms_index_index',
     ],
     [
-        'url'    => $block->getUrl('catalogsearch/result', ['_query' => ['q' => '']]),
+        'url'    => $block->getUrl('search'),
         'icon'   => 'hm-grid',
         'label'  => __('Categories'),
-        'active' => in_array($hmAction, ['catalog_category_view', 'catalogsearch_result_index'], true),
+        //  `search_index_index` is this theme's own landing page (the `search`
+        //  route, MagentoEgypt_SearchLanding), which is where the tab goes.
+        'active' => in_array(
+            $hmAction,
+            ['search_index_index', 'catalog_category_view', 'catalogsearch_result_index'],
+            true
+        ),
     ],
     [
         'url'    => $block->getUrl('checkout/cart'),

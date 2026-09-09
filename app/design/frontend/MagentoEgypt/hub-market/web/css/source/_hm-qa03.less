@@ -553,10 +553,25 @@
 .hm-bottomnav { display: none; }
 
 @media (max-width: 767px) {
+    //  ONE number for the bar's height and for the room reserved under the page,
+    //  because they must agree exactly. They did not on the first pass: the bar
+    //  was left to size itself from its contents and came out 69px (a 5.6rem
+    //  item plus .6rem of padding top and bottom plus the 1px rule), while the
+    //  reserve below was written as a flat 5.6rem. The last 13px of the footer
+    //  sat under the bar on every page. Measured on the cart, scrolled to the
+    //  end: footer bottom 788, bar top 775.
+    :root { --hm-bottomnav-block-size: calc(5.8rem + env(safe-area-inset-bottom, 0px)); }
+
     .hm-bottomnav {
         align-items: stretch;
         background: var(--hm-surface);
+        block-size: var(--hm-bottomnav-block-size);
         border-block-start: 1px solid var(--hm-border-subtle);
+        //  Not inherited here — blank sets border-box on components, not
+        //  universally — so without it the 1px rule above sat OUTSIDE the
+        //  declared height and the bar was 59px against a 58px reserve. One
+        //  pixel of the footer stayed under it.
+        box-sizing: border-box;
         box-shadow: 0 -2px 12px rgba(15, 33, 68, .06);
         display: flex;
         inset-block-end: 0;
@@ -567,20 +582,28 @@
         position: fixed;
         z-index: 80;
 
-        //  Home-indicator safe area on iOS. Falls back to zero everywhere else,
-        //  so this costs nothing on Android or in a desktop emulator.
+        //  Home-indicator safe area on iOS, counted into the height above so
+        //  the reserve follows it. Falls back to zero everywhere else, so this
+        //  costs nothing on Android or in a desktop emulator.
         padding-block-end: env(safe-area-inset-bottom, 0px);
     }
 
     .hm-bottomnav__item {
         align-items: center;
+        //  Same reason as the bar: with content-box the .6rem of padding was
+        //  added to the 5.6rem floor and every tab came out 68px inside a 58px
+        //  bar, overflowing it.
+        box-sizing: border-box;
         color: var(--hm-foreground-muted);
         display: flex;
         flex: 1 1 0;
         flex-direction: column;
         gap: .2rem;
         justify-content: center;
-        min-block-size: 5.6rem;
+        //  4.4rem, the pointer-target floor this theme holds itself to. The bar
+        //  is taller than that and the items stretch to fill it, so this is only
+        //  a floor, not the height.
+        min-block-size: 4.4rem;
         min-inline-size: 0;
         padding-block: .6rem;
         text-decoration: none;
@@ -637,7 +660,7 @@
     }
 
     //  Room for the bar at the foot of every page, or it covers the last row of
-    //  the footer on every screen. On the footer's own padding rather than the
-    //  body so a page that ends in a full-bleed band still ends in one.
-    .hm-page .page-wrapper { padding-block-end: 5.6rem; }
+    //  the footer on every screen. Same variable as the bar's own height, so the
+    //  two cannot drift apart again.
+    .hm-page .page-wrapper { padding-block-end: var(--hm-bottomnav-block-size); }
 }
