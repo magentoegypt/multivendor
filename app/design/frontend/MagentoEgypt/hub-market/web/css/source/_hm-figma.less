@@ -4198,15 +4198,30 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     color: var(--hm-foreground);
 }
 
-//  The two deliberate calls to action, which keep their accent rather than
-//  drifting to blank's slightly darker visited orange. After the modifier's
-//  base class above, since both land at (0,2,0) and source order decides.
+//  The deliberate calls to action, which keep their accent rather than drifting
+//  to blank's slightly darker visited orange. After the modifier's base class
+//  above, since these land at (0,2,0) and source order decides.
 .hm-nav__promo:visited {
     color: var(--hm-accent-on-nav);
 }
 
+//  Bundle Deals in the utility rail (CL036-DEV01.09). Same value its unvisited
+//  rule sets in _hm-header.less — without this line the base
+//  `.hm-utility__link:visited` above wins at equal weight on source order and
+//  the one accented item in the rail turns muted white the moment anyone
+//  follows it.
+.hm-utility__link--deals:visited {
+    color: var(--hm-nav-promo);
+}
+
+//  "Sell on Hub Market" is NOT one of them, despite what this block used to
+//  say. QA cycle 2 item 1-A repainted it in the rail's muted white, but only
+//  the unvisited state — it kept `color: var(--hm-accent)` here, so the link
+//  read muted white until a visitor followed it once and orange from then on,
+//  a colour change on a single link with no meaning behind it. Matched to the
+//  unvisited colour, which is the one the rail was measured against.
 .hm-utility__link--sell:visited {
-    color: var(--hm-accent);
+    color: var(--hm-on-inverse-muted);
 }
 
 //

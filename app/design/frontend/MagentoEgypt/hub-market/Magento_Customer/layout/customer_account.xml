@@ -18,5 +18,40 @@
     <body>
         <referenceBlock name="catalog.compare.sidebar" remove="true"/>
         <referenceBlock name="wishlist_sidebar" remove="true"/>
+
+        <!--
+            SIGN OUT, at the foot of the account navigation (CL036-DEV01.08).
+            Core puts the only logout control in the header; from inside My
+            Account the customer had to go back up to the utility bar to leave.
+
+            A PLAIN Html\Link\Current, deliberately NOT a SortLinkInterface
+            block. Customer\Block\Account\Navigation::getLinks() pulls every
+            SortLinkInterface child out, sorts those by sortOrder descending and
+            puts them FIRST, then appends everything else in layout order. So
+            sortOrder is not the lever for "last" here — being unsortable is,
+            and `after="-"` puts it at the end of that trailing group, below
+            GDPR, which is the gap the ticket points at.
+
+            "Sign Out" rather than the ticket's word "Logout": the utility bar
+            and the header's account menu both already say Sign Out, it is
+            already translated in this theme's ar_SA.csv, and one action should
+            not carry two names on the same page.
+
+            Logout accepts GET in 2.4.8 (Controller\Account\Logout implements
+            HttpGetActionInterface), so a link needs no form key.
+        -->
+        <referenceBlock name="customer_account_navigation">
+            <block class="Magento\Framework\View\Element\Html\Link\Current"
+                   name="customer-account-navigation-logout-link"
+                   after="-">
+                <arguments>
+                    <argument name="path" xsi:type="string">customer/account/logout</argument>
+                    <argument name="label" xsi:type="string" translate="true">Sign Out</argument>
+                    <argument name="attributes" xsi:type="array">
+                        <item name="class" xsi:type="string">hm-nav-link hm-nav-link--logout</item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceBlock>
     </body>
 </page>

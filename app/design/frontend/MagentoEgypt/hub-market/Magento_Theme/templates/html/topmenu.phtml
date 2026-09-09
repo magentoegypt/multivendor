@@ -269,24 +269,18 @@ foreach ($hmByKey as $hmKey => $hmChild) {
         ?>
         <?php
         /*
-         * A FLEX LINE BREAK, so Bundle Deals starts a second row.
+         * THE FLEX LINE BREAK IS GONE, and with it the row Bundle Deals used to
+         * own. CL036-DEV01.09 moves this link to the header's utility bar and
+         * asks for the empty band it left behind to be reclaimed, so the promo
+         * is now simply the last item on the category row.
          *
-         * Measured on the reference: the nav band is 81px tall, the category row
-         * sits at y=101 and "🎁 Bundle Deals" at y=143, hard against the
-         * container's trailing edge. It is a row of its own, not a trailing item.
-         *
-         * Ours used to land on the SAME row and only because this catalogue is two
-         * categories short — with the reference's nine, the row would have wrapped
-         * on its own. Making the break explicit means the band looks right at seven
-         * categories and still looks right at nine, instead of silently changing
-         * shape when Pharmacy and FMCG are created.
-         *
-         * A zero-height 100%-basis flex item is the only way to force a line break
-         * in a flex row; `flex-basis: 100%` on the promo itself would stretch the
-         * anchor across the full width and make the whole strip clickable.
+         * The anchor stays in the markup because NARROW SCREENS still need
+         * it: the utility bar is `display: none` below 992px, so under that
+         * width this band is the only place Bundle Deals can live. _hm-nav.less
+         * hides this copy from 992px up, where the utility bar carries it
+         * instead — exactly one is ever visible.
          */
         ?>
-        <span class="hm-nav__break" aria-hidden="true"></span>
 
         <a class="hm-nav__promo" href="<?= $escaper->escapeUrl($bundlesUrl) ?>">
             <span class="hm-nav__promo-icon" aria-hidden="true"><?= $escaper->escapeHtml("\u{1F381}") ?></span>

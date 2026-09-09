@@ -75,16 +75,37 @@
         <referenceBlock name="wishlist_sidebar" remove="true"/>
 
         <!--
-            Mobile filter drawer (CL036-DEV01.02 item 2). Renders no markup; it
-            attaches js/hm-mobile-filters to the sidebar, which adds the
-            "Filters" pill to the toolbar and takes the rail off-canvas under
-            768px. Desktop is untouched, and with JS off the rail renders in
-            place exactly as before.
+            MOBILE FILTER DRAWER (CL036-DEV01.02 item 2, rebuilt for CL036-QA01
+            item 2).
+
+            It used to be one block that rendered nothing and attached
+            js/hm-mobile-filters to the sidebar; the script then built the
+            "Filters" pill and the close button in the DOM and set a class on
+            <html> that the CSS keyed off. Two of QA's three reports against
+            this ticket came straight out of that arrangement — a re-render
+            threw the pill away, and until the script ran the rail showed
+            un-drawered. Both are explained in the toolbar template's own note.
+
+            Now the drawer is markup and CSS only. Three pieces:
+              - the checkbox and its "Filters" label, rendered by this theme's
+                Magento_Catalog::product/list/toolbar.phtml, inside the toolbar;
+              - this head block — title and close — as the FIRST child of
+                .sidebar-main, so nothing overlaps the first filter card;
+              - the scrim, as a SIBLING of .sidebar-main inside .columns.
+            _hm-mobile.less does the rest with :has().
         -->
-        <referenceContainer name="content">
+        <referenceContainer name="sidebar.main">
             <block class="Magento\Framework\View\Element\Template"
-                   name="hm.plp.mobile.filters"
+                   name="hm.plp.filters.head"
+                   before="-"
                    template="Magento_LayeredNavigation::mobile-filters.phtml"/>
+        </referenceContainer>
+
+        <referenceContainer name="columns">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.plp.filters.scrim"
+                   after="-"
+                   template="Magento_LayeredNavigation::mobile-filters-scrim.phtml"/>
         </referenceContainer>
     </body>
 </page>

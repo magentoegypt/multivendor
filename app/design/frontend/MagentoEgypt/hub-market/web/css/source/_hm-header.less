@@ -840,6 +840,33 @@
     gap: 0;   // the per-link padding above supplies the rhythm
 }
 
+//  Bundle Deals, moved into this rail from the category band (CL036-DEV01.09).
+//
+//  The one accented item in an otherwise muted-white row, which is how it read
+//  in the band and is the reason the client wanted it kept rather than folded
+//  away. --hm-nav-promo, not --hm-accent: this bar is @hm-navy-deep, DARKER
+//  than the band the token was measured against, so the same value can only
+//  score better here — 4.72:1 on the band, more on this one. Bold at 12px is
+//  large-text under WCAG only from 14px, so the AA floor that applies is 4.5:1
+//  and this clears it.
+//
+//  The glyph carries its own trailing margin instead of using the link's
+//  `gap: .4rem`, because emoji sit on a wider advance than the 12px icons the
+//  gap was set for and 4px on top of that read as a loose space.
+.hm-utility__link--deals {
+    color: var(--hm-nav-promo);
+    font-weight: 700;
+
+    &:hover,
+    &:focus-visible { color: var(--hm-on-inverse); }
+}
+
+.hm-utility__deals-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    margin-inline-end: .2rem;
+}
+
 //  "Sell on Hub Market" is styled like every other utility link — muted white,
 //  brightening to white on hover — and carries NO accent. It used to be bold
 //  orange, and QA cycle 2 item 1-A ("the color used in the 'sell' sentence

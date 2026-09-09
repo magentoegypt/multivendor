@@ -14,14 +14,18 @@
 //
 
 //
-//  The filter pill is injected into the toolbar by JS on every viewport (the
-//  script has no width test of its own, so one DOM serves both). It belongs to
-//  the phone layout only: above the breakpoint the rail is always visible and a
-//  button that opens nothing would be a dead control. Declared OUTSIDE the media
-//  query because that is where "not on desktop" has to live.
+//  The filter drawer's controls are rendered on EVERY viewport — the toolbar and
+//  sidebar templates have no width test of their own, so one DOM serves both.
+//  They belong to the phone layout only: above the breakpoint the rail is always
+//  visible, so a pill that opens nothing, a "Filters ×" bar above the facets and
+//  a scrim would all be dead chrome. Declared OUTSIDE the media query because
+//  that is where "not on desktop" has to live; the block further down turns each
+//  of them back on under 768px.
 //
 .hm-filters-toggle,
-.hm-filters-close { display: none; }
+.hm-filters-close,
+.hm-filters-scrim,
+.hm-filters__head { display: none; }
 
 //
 //  All three tickets, item 1 — the white band under the header
@@ -219,30 +223,48 @@
     //  Blank drops the whole filter rail above the grid, so on a phone the
     //  client met five open accordions and had to scroll ~530px before seeing a
     //  product. The reference puts filters behind a single pill beside the
-    //  result count. `js/hm-mobile-filters` moves the rail into a drawer and
-    //  toggles `hm-filters-open` on <html>; everything below is that drawer's
-    //  appearance, and with JS off the rail simply renders where it always did.
+    //  result count.
     //
-    .hm-filters-toggle,
-    .hm-filters-close { display: inline-flex; }
-
+    //  NO JAVASCRIPT IS INVOLVED ANY MORE (CL036-QA01 item 2). The drawer used
+    //  to be built and toggled by js/hm-mobile-filters.js, which cost QA two
+    //  separate bug reports: a facet click re-renders the toolbar and threw the
+    //  injected pill away, and until the script had run — 2.5s to 17.4s after
+    //  DOMContentLoaded across four measured loads on this host — the rail
+    //  rendered in the old un-drawered way. Everything is now server-rendered
+    //  markup plus `:has()`: a hidden checkbox in the toolbar, three <label>s
+    //  pointing at it (the pill, the drawer's close control, the scrim), and
+    //  the rules below.
+    //
+    //  THE GUARD, on every rule in this section:
+    //      .columns:has(> .hm-filters-scrim):has(.filter-options-item)
+    //  — "this page was wired for the drawer AND actually has facets". The
+    //  toolbar template is shared by every product list on the storefront,
+    //  including ones with no sidebar at all; without the guard those would
+    //  show a Filters pill that opens nothing. With it they keep exactly the
+    //  behaviour they have today.
+    //
     .hm-filters-toggle {
         align-items: center;
         background: var(--hm-surface);
         border: 1px solid var(--hm-border-subtle);
         border-radius: var(--hm-radius-full);
         color: var(--hm-foreground);
-        display: inline-flex;
         font-size: 1.3rem;
         font-weight: 600;
         gap: var(--hm-space-2);
         padding: .8rem 1.6rem;
     }
 
-    .hm-filters-toggle[aria-expanded='true'] {
-        background: var(--hm-accent);
-        border-color: var(--hm-accent);
-        color: var(--hm-on-accent, #fff);
+    .columns:has(> .hm-filters-scrim):has(.filter-options-item) {
+        .hm-filters-toggle { display: inline-flex; }
+
+        //  Pressed state, previously keyed off aria-expanded — the checkbox is
+        //  the source of truth now, and it sits in the same toolbar.
+        &:has(.hm-filters-cb:checked) .hm-filters-toggle {
+            background: var(--hm-accent);
+            border-color: var(--hm-accent);
+            color: var(--hm-on-accent, #fff);
+        }
     }
 
     //  Toolbar as one row: pill, count, sort — the order the reference uses.
@@ -261,21 +283,30 @@
         .modes { display: none; }
     }
 
-    //  The rail itself: off-canvas until opened. Scoped to `.hm-filters-ready`,
-    //  which js/hm-mobile-filters sets once the pill exists — without the
-    //  script there is nothing to reopen the rail with, so it must stay in flow.
+    //  The pill belongs to the top toolbar only. The bottom one renders the
+    //  pager and nothing else, and toolbar.phtml already guards on
+    //  getIsBottom() — this is belt and braces for any other caller.
+    .products.wrapper + .toolbar-products .hm-filters-toggle { display: none; }
+
+    //
+    //  The rail itself: off-canvas, opened by the checkbox
+    //  ---------------------------------------------
     //  `.sidebar-main`'s desktop width (the 224px facet rail) wins over a
     //  single-class declaration, so the drawer opened at 248px. Same weight,
     //  narrow-screen value.
-    .hm-filters-ready .hm-plp .columns .sidebar-main,
-    .hm-filters-ready .hm-plp .sidebar-main {
+    //
+    //  The head block supplies its own top spacing, so this element takes a
+    //  plain `padding` shorthand without having to reserve room for an
+    //  absolutely positioned close button — which is what used to overlap the
+    //  first filter card.
+    .columns:has(> .hm-filters-scrim):has(.filter-options-item) .sidebar-main {
         background: var(--hm-surface);
         block-size: 100dvh;
         inset-block-start: 0;
         inset-inline-start: 0;
         max-inline-size: 92vw;
         overflow-y: auto;
-        padding: var(--hm-space-4);
+        padding: 0 var(--hm-space-4) var(--hm-space-4);
         position: fixed;
         transform: translateX(-100%);
         transition: transform var(--hm-duration) var(--hm-ease);
@@ -291,38 +322,98 @@
     //  viewport, 320 drawer) and `translateX(-100%)` then parks it at x=-250,
     //  leaving 70px of open drawer down the left of every Arabic category page.
     //  Measured, not guessed: computed transform was matrix(1,0,0,1,-320,0).
-    //  NO SPACE before .hm-filters-ready: js/hm-mobile-filters sets that class
-    //  on <html> itself, so `html:lang(ar) .hm-filters-ready` asks for a
-    //  DESCENDANT that carries it and matches nothing. Cost an entire deploy to
-    //  spot — the rule compiled, shipped, and quietly did not apply.
-    //  `:not(.hm-filters-open)` because this rule is (0,5,1) and the open-state
-    //  rule below is (0,4,0): without it the Arabic drawer wins in BOTH states
-    //  and can never be opened at all.
-    html:lang(ar).hm-filters-ready:not(.hm-filters-open) .hm-plp .sidebar-main,
-    [dir='rtl'].hm-filters-ready:not(.hm-filters-open) .hm-plp .sidebar-main { transform: translateX(100%); }
+    //
+    //  `:not(:has(.hm-filters-cb:checked))` for the same reason the old rule
+    //  carried `:not(.hm-filters-open)`: this selector outweighs the open-state
+    //  rule below, so without the exclusion the Arabic drawer would win in BOTH
+    //  states and could never be opened at all.
+    html:lang(ar) .columns:has(> .hm-filters-scrim):has(.filter-options-item):not(:has(.hm-filters-cb:checked)) .sidebar-main,
+    [dir='rtl'] .columns:has(> .hm-filters-scrim):has(.filter-options-item):not(:has(.hm-filters-cb:checked)) .sidebar-main {
+        transform: translateX(100%);
+    }
 
-    .hm-filters-ready.hm-filters-open .hm-plp .sidebar-main { transform: none; }
+    .columns:has(> .hm-filters-scrim):has(.filter-options-item):has(.hm-filters-cb:checked) .sidebar-main {
+        transform: none;
+    }
 
-    .hm-filters-scrim {
+    //
+    //  Drawer head — CL036-QA01 item 2, "the exit sign overlaps with the
+    //  category, we need it above them"
+    //  ---------------------------------------------
+    //  A sticky row at the top of the scrolling drawer carrying the title the
+    //  tester asked for and the close control, so the ✕ has a place of its own
+    //  instead of floating over the first card. Sticky rather than static: the
+    //  drawer scrolls, and a close control that scrolls away on a phone is a
+    //  trap.
+    .hm-filters__head {
+        align-items: center;
+        background: var(--hm-surface);
+        display: flex;
+        inset-block-start: 0;
+        justify-content: space-between;
+        margin-inline: calc(-1 * var(--hm-space-4));
+        padding: var(--hm-space-3) var(--hm-space-4);
+        position: sticky;
+        z-index: 2;
+    }
+
+    .hm-filters__title {
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .hm-filters-close {
+        align-items: center;
+        background: none;
+        border: 0;
+        color: var(--hm-foreground);
+        cursor: pointer;
+        display: inline-flex;
+        font-size: 2.4rem;
+        justify-content: center;
+        line-height: 1;
+        min-block-size: 4.4rem;
+        min-inline-size: 4.4rem;
+    }
+
+    //  The scrim. Inert and invisible until the checkbox is checked — it is
+    //  rendered on every wired product list, open or not.
+    .hm-filters-scrim { display: none; }
+
+    .columns:has(.hm-filters-cb:checked) > .hm-filters-scrim {
         background: rgba(15, 33, 68, .45);
+        display: block;
         inset: 0;
         position: fixed;
         z-index: 999;
     }
 
-    //  Body must not scroll behind the open drawer.
-    .hm-filters-open,
-    .hm-filters-open body { overflow: hidden; }
+    //  Body must not scroll behind the open drawer. `:has()` on the root
+    //  element is what replaces the class js/hm-mobile-filters.js used to set.
+    html:has(.hm-filters-cb:checked),
+    html:has(.hm-filters-cb:checked) body { overflow: hidden; }
 
-    .hm-filters-close {
-        background: none;
-        border: 0;
-        font-size: 2rem;
-        inset-block-start: var(--hm-space-2);
-        inset-inline-end: var(--hm-space-2);
-        line-height: 1;
-        padding: var(--hm-space-2);
-        position: absolute;
+    //
+    //  CATEGORY QA item 5 — "remove the blank space at the bottom of the page"
+    //  ---------------------------------------------
+    //  Measured at 390px on /clothes.html, between the last product card and
+    //  the footer: 36px (.products.wrapper margin-bottom) + 32px (the pager's
+    //  own margin-top) above the pager, then 16px (the bottom toolbar's
+    //  margin-bottom) + 48px (blank's `.column.main { padding-bottom: 48px }`,
+    //  a desktop figure that ships in the media-all sheet) below it. 132px of
+    //  nothing wrapped around a 38px control, and the tester boxed the lower
+    //  half of it.
+    //
+    //  Evened out to 24px on each side. Not zero: the pager still has to read
+    //  as separated from the grid it belongs to and from the footer below it.
+    //  Phone only — the desktop rail is unchanged.
+    .hm-plp .column.main { padding-block-end: var(--hm-space-6); }
+    .hm-plp .products.wrapper { margin-block-end: 0; }
+
+    .hm-plp .products.wrapper + .toolbar-products {
+        margin-block-end: 0;
+
+        .pages { margin-block-start: var(--hm-space-6); }
     }
 
     //
@@ -805,11 +896,11 @@
         min-block-size: 3.4rem;
         padding: 0 1.2rem;
 
-        //  The prototype leads the pill with a sliders glyph. The button is
-        //  built in js/hm-mobile-filters.js as text only, so the glyph is a
-        //  mask on a pseudo-element rather than another element in the DOM —
-        //  a mask, not a background-image, so it inherits the button's colour
-        //  through the pressed state.
+        //  The prototype leads the pill with a sliders glyph. The control is
+        //  a <label> carrying text only, so the glyph is a mask on a
+        //  pseudo-element rather than another element in the DOM — a mask, not
+        //  a background-image, so it inherits the label's colour through the
+        //  pressed state.
         &::before {
             background-color: currentColor;
             block-size: 1.6rem;

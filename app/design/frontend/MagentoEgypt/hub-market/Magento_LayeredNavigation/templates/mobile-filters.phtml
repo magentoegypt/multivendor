@@ -1,19 +1,36 @@
 <?php
 /**
- * Hub Market — bootstraps the mobile filter drawer.
+ * Hub Market — head of the mobile filter drawer.
  *
- * Renders no markup. It exists only to attach js/hm-mobile-filters to the
- * sidebar, because the sidebar container itself is core markup this theme does
- * not override — adding a template here is cheaper, and clearer to revert, than
- * copying Magento's container just to hang one data-mage-init on it.
+ * Renders as the FIRST child of `.sidebar-main`, above the filter cards.
  *
- * See CL036-DEV01.02 item 2.
+ * CL036-QA01 item 2, third report: "the exit sign overlaps with the category,
+ * we need it above them". The close control used to be a <button> that
+ * js/hm-mobile-filters.js prepended to the sidebar and CSS then took out of
+ * flow — `position: absolute` at the top-right corner, over whatever card
+ * happened to be first. _hm-mobile-parity.less did reserve 5.6rem of top
+ * padding for it, but _hm-mobile.less sets `padding` (the SHORTHAND) on the
+ * same element at (0,4,0) against that rule's (0,3,0), so the reservation was
+ * silently reset to 16px on every page and the ✕ sat on the first card's title.
+ *
+ * A real header row instead: a title, the close control, and the cards below
+ * them. Nothing is positioned, so nothing can overlap.
+ *
+ * The close control is a <label for> pointing at the checkbox the toolbar
+ * renders (Magento_Catalog::product/list/toolbar.phtml), which is what makes
+ * the drawer open and close with no JavaScript at all. The scrim behind it is
+ * another label on the same checkbox and lives in mobile-filters-scrim.phtml —
+ * it has to be a sibling of this sidebar, not a child; that file says why.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
  */
 ?>
-<script type="text/x-magento-init">
-{
-    ".sidebar.sidebar-main": {
-        "js/hm-mobile-filters": {}
-    }
-}
-</script>
+<div class="hm-filters__head">
+    <span class="hm-filters__title"><?= $escaper->escapeHtml(__('Filters')) ?></span>
+    <label class="hm-filters-close" for="hm-plp-filters-toggle"
+           role="button" tabindex="0"
+           aria-label="<?= $escaper->escapeHtmlAttr(__('Close filters')) ?>">
+        <span aria-hidden="true">&times;</span>
+    </label>
+</div>

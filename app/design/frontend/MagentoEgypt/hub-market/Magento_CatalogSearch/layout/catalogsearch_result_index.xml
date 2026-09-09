@@ -82,5 +82,31 @@
                 </arguments>
             </block>
         </referenceContainer>
+
+        <!--
+            The mobile filter drawer, same three pieces as the category page —
+            see the long note in Magento_Catalog/layout/catalog_category_view.xml.
+
+            Search DID NOT have the drawer before: the old JS-driven version was
+            wired on the category handle only, so on a phone this page dropped
+            the whole layered-navigation rail above the results. It has one to
+            drop — the search results carry the same facets — and now that the
+            "Filters" control is rendered by the shared toolbar template it
+            would appear here regardless. A control that opens nothing is worse
+            than either state, so the page gets the drawer that goes with it.
+        -->
+        <referenceContainer name="sidebar.main">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.plp.filters.head"
+                   before="-"
+                   template="Magento_LayeredNavigation::mobile-filters.phtml"/>
+        </referenceContainer>
+
+        <referenceContainer name="columns">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.plp.filters.scrim"
+                   after="-"
+                   template="Magento_LayeredNavigation::mobile-filters-scrim.phtml"/>
+        </referenceContainer>
     </body>
 </page>

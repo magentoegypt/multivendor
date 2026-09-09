@@ -1,0 +1,66 @@
+<?php
+/**
+ * Hub Market — product list toolbar.
+ *
+ * Core's template, with ONE addition: the mobile "Filters" control and the
+ * checkbox that drives the drawer are rendered here, server-side, instead of
+ * being injected by js/hm-mobile-filters.js after page load.
+ *
+ * WHY THE MOVE (CL036-QA01 item 2, two separate reports that share one cause).
+ *
+ *  "The filter disappears after we take any action." Applying a facet on this
+ *  store re-renders the toolbar block and swaps it into the page — the URL
+ *  changes without a full document load. The injected <button> lived only in
+ *  the DOM, so the replacement arrived without it, while `hm-filters-ready`
+ *  stayed on <html> keeping the rail off-canvas: no pill, no filters, no way
+ *  back. Reproduced. Rendered here, the control is part of what the server
+ *  sends, so it comes back with every re-render.
+ *
+ *  "Sometimes it shows up in the old way." The rail was hidden only once the
+ *  script had run and set `hm-filters-ready`. Measured on this host: the pill
+ *  appeared 2.5s, 2.8s, 4.1s and 17.4s after DOMContentLoaded across four
+ *  loads. Until then the visitor got the full un-drawered layered navigation —
+ *  ~530px of open accordions above the grid, which is exactly the screenshot
+ *  filed against this. There is now nothing to wait for.
+ *
+ * The open state is a checkbox and CSS `:has()`, not a class on <html>, so
+ * opening and closing the drawer needs no JavaScript at all. The label in the
+ * sidebar's own head and the scrim behind it point at this same checkbox by id.
+ * Only the TOP toolbar renders it — `getIsBottom()` guards that — so the id
+ * stays unique even though this template runs twice per page.
+ *
+ * @var $block \Magento\Catalog\Block\Product\ProductList\Toolbar
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+<?php if ($block->getCollection()->getSize()) :?>
+    <?php $widget = $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonDecode($block->getWidgetOptionsJson());
+        $widgetOptions = $this->helper(\Magento\Framework\Json\Helper\Data::class)->jsonEncode($widget['productListToolbarForm']);
+    ?>
+    <div class="toolbar toolbar-products" data-mage-init='{"productListToolbarForm":<?= /* @noEscape */ $widgetOptions ?>}'>
+        <?php if ($block->getIsBottom()): ?>
+            <?= $block->getPagerHtml() ?>
+            <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/limiter.phtml')) ?>
+        <?php else: ?>
+            <?php
+            /*
+             * Hidden from everything: `hidden` keeps it out of the flex row and
+             * off the tab order, and the <label> beside it is what receives
+             * focus and the click. Both stylesheets that care about it only ask
+             * whether it is checked.
+             */
+            ?>
+            <input class="hm-filters-cb" id="hm-plp-filters-toggle" type="checkbox" hidden>
+            <label class="hm-filters-toggle" for="hm-plp-filters-toggle">
+                <?= $escaper->escapeHtml(__('Filters')) ?>
+            </label>
+            <?php if ($block->isExpanded()): ?>
+                <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/viewmode.phtml')) ?>
+            <?php endif ?>
+            <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/amount.phtml')) ?>
+            <?php if ($block->isExpanded()): ?>
+                <?= $block->fetchView($block->getTemplateFile('Magento_Catalog::product/list/toolbar/sorter.phtml')) ?>
+            <?php endif ?>
+        <?php endif ?>
+    </div>
+<?php endif ?>

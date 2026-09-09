@@ -136,17 +136,22 @@
 
 .hm-nav__chevron { transition: transform var(--hm-duration) var(--hm-ease); }
 
-//  Bundle Deals — folded into this row instead of occupying a band of its own.
+//  Bundle Deals.
+//
+//  CL036-DEV01.09 moved this link to the header's utility bar and asked for the
+//  band it used to occupy on its own to be reclaimed. `.hm-nav__break` — the
+//  zero-height `flex: 1 0 100%` item that forced it onto a second row — is gone
+//  from topmenu.phtml along with it.
+//
+//  This copy survives only for NARROW SCREENS. The utility bar is
+//  `display: none` below 992px (_hm-header.less), so under that width the band
+//  is the only header chrome Bundle Deals can live in; from 992px up the rule at
+//  the foot of this block hides it and the utility bar carries the link instead.
+//  Exactly one of the two is ever visible.
+//
 //  --hm-accent-on-nav, not --hm-accent: the nav band is @hm-navy-nav, a step
 //  lighter than the header, and the fill orange measures 4.28:1 against it.
 //  See the token's own note.
-//  The break that puts Bundle Deals on row two. Zero height so it costs the band
-//  nothing beyond the row it creates; `flex-basis: 100%` is what forces the wrap.
-.hm-nav__break {
-    block-size: 0;
-    flex: 1 0 100%;
-}
-
 .hm-nav__promo {
     align-items: center;
     //  #ff6b00. The REFERENCE uses #f26522 here — measured, not assumed — but on
@@ -176,6 +181,13 @@
     //  than a deeper orange because --hm-accent-on-nav was picked for contrast
     //  against the navy and every accent below it reads worse there, not better.
     &:hover { color: var(--hm-on-inverse); }
+}
+
+//  From 992px the utility bar is on screen and carries Bundle Deals, so the
+//  band's copy stands down. Below it the utility bar is hidden and this is the
+//  only one there is.
+@media (min-width: 992px) {
+    .hm-nav__promo { display: none; }
 }
 
 //

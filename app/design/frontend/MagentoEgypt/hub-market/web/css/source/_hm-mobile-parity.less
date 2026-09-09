@@ -164,7 +164,6 @@
     .hm-nav__inline { display: contents; }
     .hm-nav__inline-item { display: block; margin: 0; }
     .hm-nav__inline-icon { margin: 0; }
-    .hm-nav__break { display: none; }
 
     .hm-nav__promo {
         font-size: 1.2rem;
@@ -462,26 +461,22 @@
     //  The drawer. `.page-products .columns` is `position: relative; z-index: 1`
     //  (blank), a stacking context: the sidebar's z-index 1000 ranked only
     //  inside it, under the sticky header (root context, 90) and under the
-    //  body-level scrim (999). The scrim now lives beside the sidebar (see
-    //  js/hm-mobile-filters.js) and the columns rise above the header while
-    //  the drawer is open, so drawer > scrim > everything else.
-    .hm-filters-open .page-products .columns { z-index: 1001; }
+    //  scrim (999). The scrim is a sibling of the sidebar inside that same
+    //  context (mobile-filters-scrim.phtml says why), and the columns rise
+    //  above the header while the drawer is open, so drawer > scrim > page.
+    .page-products .columns:has(.hm-filters-cb:checked) { z-index: 1001; }
 
-    .hm-filters-ready .hm-plp .sidebar-main {
-        padding-block-start: 5.6rem;
-
+    //  The rail's own chrome inside the drawer. The 5.6rem of top padding this
+    //  rule used to add is gone: it existed to clear an absolutely positioned
+    //  close button, and it never worked — _hm-mobile.less sets the `padding`
+    //  SHORTHAND on the same element at (0,4,0) against this rule's (0,3,0), so
+    //  it was reset to 16px on every page and the ✕ sat on the first card's
+    //  title (CL036-QA01 item 2). The close control now lives in a real header
+    //  row, .hm-filters__head, which takes its own space.
+    .hm-plp .columns:has(> .hm-filters-scrim) .sidebar-main {
         .block.filter { margin: 0; }
         .block.filter .filter-title { display: none; }
         .block.filter .filter-content { display: block; }
-    }
-
-    .hm-filters-close {
-        font-size: 2.4rem;
-        inset-block-start: .6rem;
-        inset-inline-end: .6rem;
-        min-block-size: 4.4rem;
-        min-inline-size: 4.4rem;
-        z-index: 1;
     }
 
     //  -----------------------------------------------------------------------
@@ -695,3 +690,87 @@
 }
 
 .minicart-wrapper .action.showcart .hm-minicart__label--short { display: none; }
+
+//
+//  CL036-DEV01.10 — the category band as ONE horizontal scroller
+//  ---------------------------------------------
+//  Under 992px the band wrapped its ten links over four rows and closed with a
+//  fifth for Bundle Deals: 189px of navy above the fold, measured on the home
+//  page at 390px, before a single product was visible. The client asked for one
+//  scrollable row instead.
+//
+//  This block sits at the END of the last-imported mobile file on purpose. Both
+//  _hm-mobile.less (≤991) and the parity block above (≤767) already declare
+//  `.hm-nav__inner { flex-wrap: wrap }` for two different breakpoints; rather
+//  than edit the same property in two places and hope the import order holds,
+//  everything the scroller needs is stated once here at (0,2,0) — `.hm-page` is
+//  on <body> — which outranks both.
+//
+@media (max-width: 991px) {
+    .hm-page .hm-nav__inner {
+        align-items: center;
+        flex-wrap: nowrap;
+        //  Only the inline axis is asked for, but setting one axis to a
+        //  non-visible value forces the other to `auto`. Nothing here is taller
+        //  than the row, so there is no vertical scroll to suppress — and the
+        //  category panel is `position: fixed` when open (_hm-mobile.less), so
+        //  it is not a descendant this scroller can clip.
+        overflow-x: auto;
+        //  A horizontal swipe that reaches the end of the strip must not turn
+        //  into a back-navigation gesture.
+        overscroll-behavior-x: contain;
+        padding-block: var(--hm-space-2);
+        //  No visible scrollbar: this is a chip strip, not a pane, and on a
+        //  phone the bar would sit on top of the labels.
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar { display: none; }
+
+        //  Flex items ignore a scroll container's trailing padding at the end
+        //  of the scroll range in several engines, so the last chip would sit
+        //  flush against the edge. A zero-content spacer as the final flex item
+        //  is honoured everywhere.
+        &::after {
+            content: '';
+            flex: 0 0 var(--hm-space-4);
+        }
+    }
+
+    //  Every link is its own flex item and none of them may shrink — a squeezed
+    //  chip is what wrapping was avoiding in the first place.
+    .hm-page .hm-nav__inline { display: contents; }
+
+    .hm-page .hm-nav__inline-item,
+    .hm-page .hm-nav__all,
+    .hm-page .hm-nav__inline-link,
+    .hm-page .hm-nav__promo {
+        flex: 0 0 auto;
+        white-space: nowrap;
+    }
+
+    //  Bundle Deals is the last chip in the strip now, not a right-aligned item
+    //  on a row of its own. The auto margin would push it past the end of the
+    //  scrollable content.
+    .hm-page .hm-nav__promo { margin-inline-start: 0; }
+
+    //
+    //  CL036-QA01 item 1 — "remove all the white space that's there"
+    //  ---------------------------------------------
+    //  The <details> that hosts the category panel was declared
+    //  `flex: 0 0 100%; order: 99` so it would fall to "an empty last flex row
+    //  in the nav band" — and that is precisely what the tester boxed in red: a
+    //  full-width empty navy strip between the last category and the breadcrumb.
+    //  It only ever needed to be out of the way, not to occupy a row.
+    //
+    //  Zero inline size rather than `display: none` or `display: contents`: the
+    //  element must keep generating a box for <details>'s own open/closed
+    //  machinery, and both its children are `position: fixed` (the summary in
+    //  the header, the panel over the page), so neither notices.
+    .hm-page .hm-nav__menu {
+        flex: 0 0 auto;
+        inline-size: 0;
+        min-block-size: 0;
+        order: 0;
+        padding: 0;
+    }
+}

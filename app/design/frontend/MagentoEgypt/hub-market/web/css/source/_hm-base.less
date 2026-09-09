@@ -145,8 +145,26 @@ img {
 //
 //  Container
 //  ---------------------------------------------
+//  `margin-inline: auto` BELONGS HERE, next to the cap, and not only in blank's
+//  desktop sheet. This file compiles into styles-m.css, which ships as
+//  `media="all"`; blank's own `.page-main { margin-left: auto; margin-right:
+//  auto; max-width: 1280px }` lives in styles-l.css, linked as `media="screen
+//  and (min-width: 768px)"`. So the WIDTH CAP arrived in the always-applied
+//  sheet and the CENTRING arrived in a second file.
+//
+//  Whenever styles-l.css was slow, timed out or 504'd — this host does that
+//  under load — the browser painted a page capped at the container width and
+//  pinned hard against the left edge, with the whole remainder of a 1920
+//  viewport empty on the right. That is CL036-DEV01.06, reported as "the page
+//  layout shifts to one side, intermittently, while navigating". Reproduced by
+//  blocking styles-l.css: .page-main computes left=0, width=1280,
+//  margin=0px/0px. With this line it computes left=320 on the same test.
+//
+//  Below 768 it costs nothing: the element is narrower than the cap, so auto
+//  resolves to zero on both sides.
 .page-main,
 .hm-container {
+    margin-inline: auto;
     max-width: var(--hm-container);
 }
 

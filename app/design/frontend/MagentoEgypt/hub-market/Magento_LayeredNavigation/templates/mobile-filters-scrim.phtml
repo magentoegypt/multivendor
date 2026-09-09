@@ -1,0 +1,28 @@
+<?php
+/**
+ * Hub Market — the scrim behind the mobile filter drawer.
+ *
+ * A <label> for the same checkbox the toolbar renders, so tapping outside the
+ * drawer closes it with no click handler.
+ *
+ * IT MUST BE A SIBLING OF `.sidebar-main`, NOT A CHILD, for two independent
+ * reasons:
+ *
+ *  - The drawer is parked off-canvas with `transform: translateX(-100%)`, and a
+ *    transformed element becomes the containing block for `position: fixed`
+ *    descendants. Nested inside, the scrim would slide with the drawer instead
+ *    of covering the viewport.
+ *  - `.page-products .columns` is `position: relative; z-index: 1` in blank — a
+ *    stacking context. A scrim appended at body level painted OVER the drawer
+ *    and swallowed every tap. Sharing the drawer's context gives
+ *    drawer (1000) > scrim (999) > page.
+ *
+ * Hence the `columns` container: a direct child of `.columns`, beside the
+ * sidebar. It renders on every product list; it is invisible and inert until
+ * the checkbox is checked.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<label class="hm-filters-scrim" for="hm-plp-filters-toggle" aria-hidden="true"></label>
