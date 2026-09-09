@@ -386,11 +386,12 @@ foreach ($hmByKey as $hmKey => $hmChild) {
          * asks for the empty band it left behind to be reclaimed, so the promo
          * is now simply the last item on the category row.
          *
-         * The anchor stays in the markup because NARROW SCREENS still need
-         * it: the utility bar is `display: none` below 992px, so under that
-         * width this band is the only place Bundle Deals can live. _hm-nav.less
-         * hides this copy from 992px up, where the utility bar carries it
-         * instead — exactly one is ever visible.
+         * IT LIVES HERE, ON EVERY WIDTH. CL036-DEV01.09 first asked for this
+         * link to move to the header's utility bar and it did; the client then
+         * clarified that they want it in the MAIN MENU, as the last item after
+         * Home Appliances — not in the top bar. So the utility-bar copy is gone
+         * and this is the only one, at every width, sitting at the end of the
+         * category row rather than pushed to the far edge of it.
          */
         ?>
 

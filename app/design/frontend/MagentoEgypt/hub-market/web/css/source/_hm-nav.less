@@ -164,7 +164,7 @@
     display: flex;
     font-size: 1.2rem;
     font-weight: 700;
-    margin-inline-start: auto;   // hard right on whichever row it lands on
+    margin-inline-start: 0;      // beside the last category, not across from it
     min-block-size: 3.8rem;
     padding-inline: 1.4rem;
     text-decoration: none;
@@ -183,12 +183,13 @@
     &:hover { color: var(--hm-on-inverse); }
 }
 
-//  From 992px the utility bar is on screen and carries Bundle Deals, so the
-//  band's copy stands down. Below it the utility bar is hidden and this is the
-//  only one there is.
-@media (min-width: 992px) {
-    .hm-nav__promo { display: none; }
-}
+//  NOT HIDDEN ON DESKTOP ANY MORE. It stood down from 992px up while the
+//  utility bar carried the link; the client has since asked for Bundle Deals in
+//  the MAIN MENU, last, directly after Home Appliances — so this is the only
+//  copy and it shows at every width.
+//
+//  The auto margin that pushed it to the far edge of the row goes with that:
+//  "after Home Appliances" means beside it, not across the band from it.
 
 //
 //  Panel
