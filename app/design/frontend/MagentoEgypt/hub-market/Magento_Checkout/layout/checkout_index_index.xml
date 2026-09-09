@@ -195,5 +195,24 @@
             </arguments>
         </referenceBlock>
 
+        <!--
+            NO BOTTOM NAVIGATION DURING CHECKOUT (CL036-DEV01.13, on request).
+
+            The bar is added on the `default` handle and shows on every other
+            page under 768px. Checkout is the one place five ways out of the
+            flow are a liability rather than a convenience, so the block is
+            removed here — removed, not hidden, so the markup is not shipped
+            either.
+
+            The room reserved for it at the foot of the page is keyed on the
+            bar actually being in the document (`:has(> .hm-bottomnav)` in
+            _hm-qa03.less), so it disappears with it and checkout does not end
+            in 58px of dead space.
+
+            The CART keeps its bar: a shopper reviewing a basket is still
+            browsing. So does the order-success page, where "back to the shop"
+            is exactly what is wanted.
+        -->
+        <referenceBlock name="hm.bottom.nav" remove="true"/>
     </body>
 </page>

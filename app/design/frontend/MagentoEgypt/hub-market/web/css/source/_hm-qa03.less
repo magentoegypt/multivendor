@@ -671,5 +671,70 @@
     //  Room for the bar at the foot of every page, or it covers the last row of
     //  the footer on every screen. Same variable as the bar's own height, so the
     //  two cannot drift apart again.
-    .hm-page .page-wrapper { padding-block-end: var(--hm-bottomnav-block-size); }
+    //
+    //  `:has(> .hm-bottomnav)` — only where the bar is actually in the document.
+    //  Checkout removes the block outright, and without this test that page
+    //  would still end in 58px of reserved nothing.
+    //
+    //  A CHILD combinator, measured rather than assumed: `before.body.end`
+    //  reads like a body-level container and the first attempt here used
+    //  `~`, on the assumption the bar was a sibling of .page-wrapper. It is
+    //  not — this page layout renders that container INSIDE the wrapper, so
+    //  the real path is `body > .page-wrapper > .hm-bottomnav` and the
+    //  sibling form matched nothing at all, leaving no reserve on any page.
+    .hm-page .page-wrapper:has(> .hm-bottomnav) {
+        padding-block-end: var(--hm-bottomnav-block-size);
+    }
 }
+
+
+//  3-A, second pass: the strip is STRETCHED to the stage rather than pinned to
+//  a pixel width.
+//
+//  The first pass sized it in view.xml — 3 x 192 + 2 x 8 = 592 — which was
+//  exact for the media column as it measured then. The column has since become
+//  656 (a PDP layout change from the parallel session's work), and a strip cut
+//  to 592 was suddenly 64px short of the image it is meant to line up with:
+//  the same defect the tester filed, back again from the other side.
+//
+//  Flex removes the coupling. The thumbs divide whatever the stage measures, so
+//  the strip cannot drift out of alignment when the column moves again. The
+//  `!important` answers fotorama, which writes its width and margin as inline
+//  style on every frame.
+//
+//  Guarded to galleries of five or fewer. Beyond that the strip is meant to
+//  scroll, and stretching would shrink each thumb toward nothing.
+.hm-pdp .fotorama__nav__shaft {
+    display: flex;
+    gap: .8rem;
+    inline-size: 100%;
+}
+
+.hm-pdp .fotorama__nav__frame--thumb:first-child:nth-last-child(-n+5),
+.hm-pdp .fotorama__nav__frame--thumb:first-child:nth-last-child(-n+5) ~ .fotorama__nav__frame--thumb {
+    //  block-size too, not just inline-size: fotorama writes BOTH as inline
+    //  style from the view.xml thumb size, and an inline height beats
+    //  `aspect-ratio` — which is why the frames came back 216 wide by 272 tall
+    //  once the widths were freed. Letting the height compute is what makes the
+    //  square the tester asked for ("just in a square shape").
+    block-size: auto !important;
+    flex: 1 1 0;
+    inline-size: auto !important;
+    margin: 0 !important;
+
+    //  `aspect-ratio: 1` alone did not hold the square: with `height: auto` the
+    //  frame's `min-height: auto` lets it grow to its content, and the content
+    //  is a 256px thumbnail source, so the box came back 216 wide by 272 tall.
+    //  A zero minimum lets the ratio decide instead.
+    min-block-size: 0 !important;
+
+    //  The shaft supplies the gap now, so the frame's own padding would double
+    //  it — and it is asymmetric (8px on three sides), which is what made the
+    //  first and last thumbs different widths from the middle one.
+    padding: 0 !important;
+}
+
+//  The strip's own boxes are sized from the same inline style and would keep
+//  the taller frame's height as dead space underneath.
+.hm-pdp .fotorama__nav,
+.hm-pdp .fotorama__nav-wrap { block-size: auto !important; }
