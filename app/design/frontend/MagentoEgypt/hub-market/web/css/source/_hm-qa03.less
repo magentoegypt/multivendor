@@ -421,3 +421,69 @@
         overflow-y: auto;
     }
 }
+
+//
+//  SIZE PASS — the part of 1-F, 1-K and 4 the first round left open
+//  ---------------------------------------------------------------------------
+//  The tester's wording on all three was about SIZE ("the size and appearance
+//  of the card are different", "the size and shape of the container isn't the
+//  theme's style", "the card sizes are bigger than the theme"). The first pass
+//  fixed arrangement and the obvious gaps; measuring against the prototype
+//  afterwards showed each card still running tall:
+//
+//                        prototype    was
+//    1-F bundle card        300x421   303x437
+//    1-K new-store card     303x79    303x92
+//    4   cart line          819x151   819x168
+//
+//  1-F: the whole 16px is vertical rhythm below the thumbnails — the rating row
+//  is 20px against the prototype's 15, the gap above it 20 against 16, and the
+//  gap above the price row 17 against 12.
+.hm-bundle__body {
+    .hm-rating {
+        line-height: 1;
+        margin-block: 1.6rem .2rem;
+    }
+
+    .hm-bundle__foot { padding-block-start: 1.2rem; }
+}
+
+//  1-K: 62px of body against the prototype's 51. Three rows of 18 with 4px
+//  between them, where the prototype sets three of ~15 with 2.
+.hm-stores--hm-home-newstores {
+    .hm-stores__body { gap: .2rem; }
+
+    .hm-stores__name,
+    .hm-stores__count,
+    .hm-stores__verified { line-height: 1.25; }
+}
+
+//  4: the cart line's height is its ASIDE — 128px against the prototype's 103 —
+//  and the padding went the wrong way in the first pass. The prototype keeps
+//  24px of padding and spends less on the controls, so the padding goes back
+//  and the two stepper/bin targets come to 3.2rem. Still comfortably above the
+//  24px WCAG 2.5.8 AA floor, and the phone layout below 768 is untouched: it
+//  keeps the full 44px, which is where the touch floor actually earns its
+//  place.
+@media (min-width: 768px) {
+    .checkout-cart-index {
+        .hm-cart-line { padding: var(--hm-space-6); }
+
+        .hm-cart-line__aside .action-delete,
+        .hm-qty__btn {
+            min-block-size: 3.2rem;
+            min-inline-size: 3.2rem;
+        }
+
+        //  block-size, not just min-. The stepper shell is `align-items:
+        //  stretch`, so the two buttons take their height from the tallest
+        //  child — the INPUT, which its own padding and line-height carried to
+        //  44px however low its minimum was set. Constraining the input is what
+        //  actually moves the row.
+        .hm-qty input.qty {
+            block-size: 3.2rem;
+            min-block-size: 3.2rem;
+            padding-block: 0;
+        }
+    }
+}
