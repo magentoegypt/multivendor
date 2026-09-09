@@ -395,7 +395,7 @@
 //
 //  Narrow screens
 //  ---------------------------------------------
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .account .box,
     .block-addresses-list .items.addresses > .item { padding: var(--hm-space-4); }
 
@@ -776,7 +776,7 @@
     }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-order-card__head,
     .hm-order-card__actions { padding-inline: var(--hm-space-4); }
 
@@ -967,7 +967,7 @@
     }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-identity {
         gap: var(--hm-space-4);
         padding: var(--hm-space-4);
@@ -1567,7 +1567,7 @@
 //  any table that does label its cells keeps the stacked treatment and only the
 //  ones that cannot be stacked legibly fall back to scrolling with their header
 //  intact.
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-page.account .column.main .table-wrapper:has(table:not(:has(td[data-th]))) {
         overflow-x: auto;
     }

@@ -239,7 +239,7 @@
     font-weight: 700;
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     //  There is no emblem any more (the reference header is text-only, see
     //  logo.phtml), so the wordmark IS the brand and must stay visible on a
     //  phone.
@@ -546,7 +546,7 @@
     }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .block-search .hm-search__label { .hm-sr-only-mixin(); }
 }
 
@@ -670,7 +670,7 @@
     }
 
     //  Touch rows and 16px-safe text on phones, same floors as the field itself.
-    @media (max-width: 767px) {
+    @media screen and (max-width: 767px) {
         ul li,
         ul li:not(:empty) { font-size: 1.5rem; min-block-size: 4.4rem; }
     }
@@ -750,7 +750,7 @@
 //
 //  Responsive
 //  ---------------------------------------------
-@media (max-width: 991px) {
+@media screen and (max-width: 991px) {
     .hm-header__utility { display: none; }   // promise + links move to the footer
 
     .hm-header__inner {
@@ -875,7 +875,7 @@
 //  Order. The class survives for the phone rule below, which keeps this one
 //  link visible when the rest of the rail is hidden.
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     //  The promise line and five links will not co-exist on a phone. Keep the
     //  two that convert; the rest live in the account menu and footer anyway.
     .hm-utility__link { display: none; }
@@ -1087,7 +1087,7 @@
 
 //  On a phone the selector would eat the field. Drop it — the plain search still
 //  works, and the category filter is available from the results page facets.
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-page .block-search .hm-search__cat { display: none; }
 }
 

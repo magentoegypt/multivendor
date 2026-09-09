@@ -364,7 +364,7 @@
     padding: 0;
 }
 
-@media (max-width: 1023px) {
+@media screen and (max-width: 1023px) {
     .hm-bundles__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -602,7 +602,7 @@
     .hm-bundle:hover & { background: var(--hm-accent-hover); }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-bundles__list { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -1164,11 +1164,11 @@
     grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
-@media (max-width: 1199px) {
+@media screen and (max-width: 1199px) {
     .block.widget.hm-rail--hm-home-bestsellers .product-items { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .products-grid .product-items,
     .block.widget .product-items,
     .hm-rail--hm-home-bestsellers .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1362,7 +1362,7 @@
     line-height: 1.2;
 }
 
-@media (max-width: 991px) {
+@media screen and (max-width: 991px) {
     .hm-chips__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
@@ -1678,7 +1678,7 @@
     color: var(--hm-accent-on-dark);   // 4.28:1 on the 6% card → 6.0:1
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-stores__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -1810,7 +1810,7 @@
     justify-content: flex-end;
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-promos { grid-template-columns: minmax(0, 1fr); }
 }
 
@@ -2010,7 +2010,7 @@
 //  nine at this width, so the ninth wrapped alone onto a second row.
 .hm-brands__list { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 
-@media (max-width: 991px) {
+@media screen and (max-width: 991px) {
     .hm-brands__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
@@ -2071,7 +2071,7 @@
     min-inline-size: 0;
 }
 
-@media (max-width: 991px) {
+@media screen and (max-width: 991px) {
     .hm-hero-band {
         grid-template-columns: minmax(0, 1fr);
         min-block-size: 0;
@@ -2421,7 +2421,7 @@
     img { block-size: 100%; inline-size: 100%; object-fit: cover; }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-cat-hero__thumb { display: none; }
     .hm-cat-hero__title { font-size: 2.4rem; }
 }
@@ -3294,7 +3294,7 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
 //
 //  The row wraps at this width because three 44px buttons plus a price do not fit
 //  a ~183px card at 390px; without it the actions overflowed the card edge.
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .product-item .action.tocart,
     .product-item .actions-secondary > a.action {
         block-size: 4.4rem;
@@ -3892,7 +3892,7 @@ html:lang(ar) .hm-hero-carousel { --hm-scrim-dir: left; }
     > .product-item { inline-size: auto; margin: 0; }
 }
 
-@media (max-width: 1023px) {
+@media screen and (max-width: 1023px) {
     .hm-pdp .block.related .product-items,
     .hm-pdp .block.upsell .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

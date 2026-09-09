@@ -72,32 +72,6 @@ $isLoggedIn = $authState !== false && $authState->isLoggedIn();
 
             <?php
             /*
-             * BUNDLE DEALS, moved up here from the category nav band
-             * (CL036-DEV01.09).
-             *
-             * It used to occupy a row of its own under the nine category
-             * links — a whole ~40px band carrying one right-aligned link,
-             * which is what the Figma reference does but which the client
-             * asked to reclaim. The reference is not the authority when the
-             * client contradicts it; same call as the cart's discount field.
-             *
-             * Placed immediately before the auth links because the ticket
-             * asks for it "next to Login/Register, My Account, Sign Out".
-             *
-             * The nav band keeps its own copy of this link for NARROW
-             * SCREENS: this whole bar is `display: none` below 992px
-             * (_hm-header.less), so under that width the band is the only
-             * place Bundle Deals can live. _hm-nav.less hides the band's copy
-             * from 992px up, so exactly one is ever visible.
-             */
-            ?>
-            <a class="hm-utility__link hm-utility__link--deals" href="<?= $escaper->escapeUrl($block->getUrl('bundles')) ?>">
-                <span class="hm-utility__deals-icon" aria-hidden="true"><?= $escaper->escapeHtml("\u{1F381}") ?></span>
-                <?= $escaper->escapeHtml(__('Bundle Deals')) ?>
-            </a>
-
-            <?php
-            /*
              * Auth-dependent links.
              *
              * THE BOOLEAN COMES FROM THE CACHE CONTEXT, NOT THE SESSION. This
@@ -174,6 +148,35 @@ $isLoggedIn = $authState !== false && $authState->isLoggedIn();
                 <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-phone"/></svg>
                 <?= $escaper->escapeHtml(__('Help')) ?>
             </a>
+
+            <?php
+            /*
+             * BUNDLE DEALS, moved up here from the category nav band
+             * (CL036-DEV01.09).
+             *
+             * It used to occupy a row of its own under the nine category
+             * links — a whole ~40px band carrying one right-aligned link,
+             * which is what the Figma reference does but which the client
+             * asked to reclaim. The reference is not the authority when the
+             * client contradicts it; same call as the cart's discount field.
+             *
+             * LAST IN THE RAIL. CL036-DEV01.09 asked for it "next to
+             * Login/Register, My Account, Sign Out" and it sat immediately
+             * before them; the follow-up asks for it at the END of this bar
+             * instead — still the top bar, not the category nav below it.
+             *
+             * The nav band keeps its own copy of this link for NARROW
+             * SCREENS: this whole bar is `display: none` below 992px
+             * (_hm-header.less), so under that width the band is the only
+             * place Bundle Deals can live. _hm-nav.less hides the band's copy
+             * from 992px up, so exactly one is ever visible.
+             */
+            ?>
+            <a class="hm-utility__link hm-utility__link--deals" href="<?= $escaper->escapeUrl($block->getUrl('bundles')) ?>">
+                <span class="hm-utility__deals-icon" aria-hidden="true"><?= $escaper->escapeHtml("\u{1F381}") ?></span>
+                <?= $escaper->escapeHtml(__('Bundle Deals')) ?>
+            </a>
+
         </div>
     </div>
 </div>

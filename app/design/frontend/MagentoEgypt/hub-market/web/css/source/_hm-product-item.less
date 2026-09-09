@@ -488,7 +488,7 @@ body:has(.product-item .swatch-option:hover) .swatch-option-tooltip { display: n
 
 //  One column below the rail breakpoint: an 18rem image beside text does not
 //  fit a phone.
-@media (max-width: 47.99em) {
+@media screen and (max-width: 47.99em) {
     .hm-page .products.wrapper.products-list {
         .product-item-info { grid-template-columns: minmax(0, 1fr); row-gap: var(--hm-space-4); }
         .product-item-media { grid-column: 1; inline-size: 100%; }

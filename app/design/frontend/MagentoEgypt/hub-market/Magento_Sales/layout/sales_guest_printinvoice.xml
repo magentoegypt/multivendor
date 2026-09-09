@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — the printable order (CL036-DEV01.17).
+ *
+ * The bottom navigation is added on the `default` handle and therefore reaches
+ * this page too, where it printed as a row of Home / Categories / Cart /
+ * Wishlist / Account icons across the foot of every sheet. Removed rather than
+ * hidden, exactly as on checkout, so it is not in the document at all.
+ *
+ * The other half of that ticket — the receipt coming out in the PHONE layout,
+ * with the item table stacked one label per line and the address panels one per
+ * row — was not this page's doing. Every one of this theme's mobile blocks was
+ * written as `@media (max-width: 767px)`, which is true when PRINTING as well
+ * as on a phone: paper is about 660px wide at A4 with default margins. Magento
+ * blank's own mobile rules say `@media only screen and (max-width: 767px)` and
+ * so never applied. Those 61 at-rules are now scoped to `screen` too, which is
+ * the actual fix and applies to every printable page, not just this one.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="hm.bottom.nav" remove="true"/>
+    </body>
+</page>

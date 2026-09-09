@@ -925,7 +925,7 @@
 
 //  Blank narrows the panel to 290px below 640px, after the theme, so this needs
 //  the weight — and both properties, since it sets the physical one.
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .hm-header__action .minicart-wrapper .block-minicart {
         //  ESCAPED — Less owns min() and evaluates it at compile time; unable
         //  to compare these units it silently emitted a flat 32rem, so the
@@ -1489,7 +1489,7 @@ a.sms-login-field-ctrl {
 //  The whole table-collapse apparatus that used to live here is GONE, along with
 //  the table. The line is a flex row of divs now, so the small-screen job is
 //  just to let the trailing column drop under the text instead of squeezing it.
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .checkout-cart-index {
         .hm-cart-line {
             align-items: start;
@@ -1782,7 +1782,12 @@ a.sms-login-field-ctrl {
     //  the same 2:1 the cart ships. Guarded at 900px because that is where
     //  Amasty's own 50% rule starts; unguarded, these percentages would apply to
     //  the stacked mobile column too and render every panel at a third width.
-    .page-main { max-inline-size: 115.2rem; }
+    //
+    //  The 1152 cap that stood here is gone with the 1280 one below, for the
+    //  same reason: every page is full width now. The 2:1 COLUMN SPLIT stays —
+    //  that is about the relationship between the form and the summary, not
+    //  about the page's width, and it holds at any width.
+    .page-main { max-inline-size: var(--hm-container); }
 
     .checkout-block { margin-inline: 0; }
 
@@ -2063,7 +2068,8 @@ a.sms-login-field-ctrl {
     .page-wrapper { background: var(--hm-surface-muted); }
 
     .page-main {
-        max-inline-size: 115.2rem;
+        //  Full width like every other page (CL036-DEV01.12 follow-up).
+        max-inline-size: var(--hm-container);
         padding-block-start: var(--hm-space-8);   // was 0 — the h1 began on the
                                                   // exact pixel the nav ended
         padding-inline: var(--hm-space-4);
@@ -2151,7 +2157,7 @@ a.sms-login-field-ctrl {
     }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     .account .page-title-wrapper .page-title,
     .checkout-onepage-success .page-title-wrapper .page-title { font-size: 2.8rem; }
 
@@ -2329,7 +2335,7 @@ a.sms-login-field-ctrl {
     }
 }
 
-@media (max-width: 767px) {
+@media screen and (max-width: 767px) {
     //  Magento stacks the two halves at this width; the divider between them
     //  becomes a horizontal rule, so the gap does the separating instead.
     .popup-authentication .block-authentication { gap: var(--hm-space-6); }
@@ -2449,13 +2455,19 @@ a.sms-login-field-ctrl {
 //  storefront caps at 1280 — measured 1120 of content against 1248 elsewhere, so
 //  checkout sat visibly narrower than the cart it follows.
 //
-//  Worth noting the reference does the same (its checkout is 1120 inside a 1248
-//  site), so this is a deliberate departure FROM the reference toward internal
-//  consistency: the header, footer and cart around it are all 1248, and a step
-//  that narrows mid-flow reads as a different page rather than the next screen.
+//  THE CAP IS GONE (CL036-DEV01.12 follow-up: "all inner pages need to be
+//  full"). It was 1280 — the old site width — kept so checkout matched the cart
+//  and header around it. Once the shell went full width that reasoning inverted:
+//  every other page now runs to the viewport and checkout was the only one that
+//  did not, which is the narrowing mid-flow this rule existed to prevent.
+//
+//  The argument for a narrow checkout is a real one — a payment form is easier
+//  to complete in a column than across a 1920 screen — and it was put to the
+//  client, who asked for full width everywhere. Their call. `--hm-container`
+//  rather than `none` so checkout still centres past 1920 like everything else.
 .hm-page.checkout-index-index {
     .page-main {
-        max-inline-size: 128rem;
+        max-inline-size: var(--hm-container);
     }
 }
 
