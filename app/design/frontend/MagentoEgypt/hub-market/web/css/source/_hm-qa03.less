@@ -2073,8 +2073,15 @@
     //  round these elements from different files: `_hm-pdp.less` rounds the
     //  stage, `_hm-figma.less` rounds `.fotorama__thumb`, and the 3-A pass in
     //  this file rounded the thumb images.
+    //  `.product.media` on the THUMB too, not just the stage. `_hm-figma.less`
+    //  rounds `.hm-pdp .product.media .fotorama__thumb` at (0,4,0) — the thumb
+    //  is the box that actually holds each image — and my square rule was a
+    //  bare `.hm-pdp .fotorama__thumb` at (0,2,0), so it lost and the strip
+    //  kept its corners while everything else went square. Same weight now.
     .product.media .fotorama__stage,
     .product.media .gallery-placeholder,
+    .product.media .fotorama__thumb,
+    .product.media .fotorama__thumb-border,
     .fotorama__stage__frame,
     .fotorama__stage .fotorama__img,
     .fotorama__thumb {
