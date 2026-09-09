@@ -2038,3 +2038,46 @@
     .hm-logo__word,
     .hm-logo__word-rest { color: var(--hm-foreground); }
 }
+
+//
+//  PDP GALLERY — rounded corners, and an active marker that stays put
+//  ---------------------------------------------------------------------------
+//  The active thumbnail's outline sat 10px below its thumbnail: the frame was
+//  at y=902 and fotorama's `.fotorama__thumb-border` at y=912. That element is
+//  positioned by fotorama's own JS from measurements it took of the ORIGINAL
+//  strip — the one with its inline widths and asymmetric padding — and the
+//  strip is now a flex row with that padding removed, so its arithmetic no
+//  longer describes the frames it is pointing at.
+//
+//  Rather than correct someone else's offset, the marker moves onto the frame
+//  itself as an `outline` with a negative offset: drawn inside the box, on the
+//  element it marks, so it cannot drift and cannot affect layout.
+//
+//  Rounding is the theme's, not the prototype's — measured, the reference
+//  gallery is square (radius 0 on both the stage image and the thumb buttons).
+//  This is the client's preference and it matches the cards elsewhere on the
+//  page rather than the reference.
+.hm-pdp {
+    .fotorama__thumb-border { display: none !important; }
+
+    .fotorama__stage,
+    .fotorama__stage__frame,
+    .fotorama__stage .fotorama__img {
+        border-radius: var(--hm-radius);
+        overflow: hidden;
+    }
+
+    .fotorama__nav__frame--thumb {
+        border-radius: var(--hm-radius-sm);
+        overflow: hidden;
+
+        .fotorama__img { border-radius: var(--hm-radius-sm); }
+
+        &.fotorama__active {
+            outline: 2px solid var(--hm-accent);
+            //  Inside the box, so the ring hugs the image instead of adding to
+            //  the frame's footprint and nudging the row.
+            outline-offset: -2px;
+        }
+    }
+}
