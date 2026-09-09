@@ -52,4 +52,30 @@
     <type name="MagentoEgypt\VendorExtend\Block\VendorsPage\Home\ProductList\Toolbar">
         <plugin name="customCountProductItems" disabled="true" />
     </type>
+    <!--
+        QA03 item 2-A: the prototype's category filter panel is Price Range,
+        Minimum Rating, Availability and Vendors. Only the first is a Magento
+        filter; the other three are appended by this plugin.
+
+        A PLUGIN, not an entry in `categoryFilterList`'s `filters` array. That
+        array is a MAP from backend type to class — FilterList::getFilters()
+        instantiates the category filter and then one filter per FILTERABLE
+        ATTRIBUTE, and never iterates the map — so items added to it are simply
+        never built. Worse, declaring the argument in an area di.xml REPLACES
+        the global one rather than merging, which silently dropped Mageplaza's
+        Category/Attribute/Price back to Magento's defaults. Both verified by
+        resolving the virtual type with the frontend config loaded.
+    -->
+    <type name="Magento\Catalog\Model\Layer\FilterList">
+        <plugin name="hm_qa03_extra_filters"
+                type="MagentoEgypt\VendorExtend\Plugin\Model\Layer\FilterListPlugin"
+                sortOrder="100"/>
+    </type>
+
+    <!-- QA03 item 2-A: the prototype heads this block "Price Range". -->
+    <type name="Mageplaza\LayeredNavigation\Model\Layer\Filter\Price">
+        <plugin name="hm_qa03_price_range_name"
+                type="MagentoEgypt\VendorExtend\Plugin\Model\Layer\PriceFilterNamePlugin"
+                sortOrder="100"/>
+    </type>
 </config>

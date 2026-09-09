@@ -362,3 +362,62 @@
         inline-size: 4.4rem;
     }
 }
+
+//
+//  2-A — CATEGORY FILTERS: "we need to change the filter that matches the theme"
+//  ---------------------------------------------------------------------------
+//  The prototype's panel is Price Range / Minimum Rating / Availability /
+//  Vendors. Three of those four did not exist on this storefront and are new
+//  layered-nav filters (see MagentoEgypt\VendorExtend\Model\Layer\Filter\*).
+//  This block does the two remaining jobs: drop the two blocks the prototype
+//  does not have, and dress the options the way it draws them.
+//
+//  Mageplaza's layer template already writes each filter's request var onto the
+//  block as `attribute="..."`, which is the hook used throughout here — the
+//  theme does not need its own template.
+.hm-plp {
+    //  Not on the prototype's panel. Category is also redundant on a category
+    //  page, and colour is one attribute of dozens that happens to be
+    //  filterable on this catalogue.
+    .filter-options-item[attribute='cat'],
+    .filter-options-item[attribute='color'] { display: none; }
+
+    //  Mageplaza prints a decorative `<input type="checkbox" aria-hidden>` ahead
+    //  of every option link — the link is the control, the input is paint. That
+    //  is exactly what the prototype draws, so it is styled rather than hidden.
+    .filter-options-content .items .item > input[type='checkbox'] {
+        accent-color: var(--hm-accent);
+        block-size: 1.4rem;
+        inline-size: 1.4rem;
+        margin-inline-end: var(--hm-space-2);
+        pointer-events: none;
+        vertical-align: middle;
+    }
+
+    //  Minimum Rating is single-choice in the prototype and reads as radios.
+    //  The markup is the same checkbox; only its shape changes.
+    .filter-options-item[attribute='rating'] .items .item > input[type='checkbox'] {
+        border-radius: var(--hm-radius-full);
+    }
+
+    //  The prototype's slider is the brand orange on a light track, and shows
+    //  "$0" against "Up to $2000" rather than a two-ended range.
+    .filter-options-item[attribute='price'] {
+        .ui-slider-range,
+        .ui-slider-handle {
+            background: var(--hm-accent);
+            border-color: var(--hm-accent);
+        }
+
+        .ui-slider {
+            background: var(--hm-border-subtle);
+        }
+    }
+
+    //  Vendors can run long on a marketplace; the prototype shows five. Keep the
+    //  block from taking over the column without hiding anything.
+    .filter-options-item[attribute='vendor'] .filter-options-content {
+        max-block-size: 28rem;
+        overflow-y: auto;
+    }
+}
