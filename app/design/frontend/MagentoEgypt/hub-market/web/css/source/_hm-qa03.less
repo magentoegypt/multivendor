@@ -448,6 +448,9 @@
     //
     //  Mageplaza does mark the active option `checked` (verified on a filtered
     //  URL), so the selected state is real and not decoration.
+    //  16px, the prototype's option text.
+    .filter-options-content .items .item > a { font-size: 1.6rem; }
+
     .filter-options-content .items .item > input[type='checkbox'] {
         appearance: none;
         -webkit-appearance: none;
@@ -456,11 +459,15 @@
         //  prototype's screenshot, where the control sampled as a grey outline
         //  on white (#767676 edges) at the size it was captured.
         background: var(--hm-foreground);
-        block-size: 1.6rem;
+        //  1.3rem, measured off the prototype: its control is 13x13 against a
+        //  16px label. Ours was 16x16 against a 14px label — bigger control,
+        //  smaller text — which is what made it read oversized rather than
+        //  merely different.
+        block-size: 1.3rem;
         border: 1.5px solid var(--hm-foreground);
         border-radius: .3rem;
         flex: 0 0 auto;
-        inline-size: 1.6rem;
+        inline-size: 1.3rem;
         margin: 0 var(--hm-space-2) 0 0;
         //  The link is the control; this is paint in front of it.
         pointer-events: none;
@@ -497,7 +504,9 @@
         &:checked {
             background: var(--hm-foreground);
             border-color: var(--hm-accent);
-            border-width: 3px;
+            //  2.5px on a 13px circle keeps the ring-to-centre ratio the 3px
+            //  ring had at 16.
+            border-width: 2.5px;
         }
 
         //  No tick on a radio.
@@ -1583,7 +1592,9 @@
 
 //  Amber on, grey off — the prototype's 12px stars at this row's size.
 .hm-fstars {
-    font-size: 1.3rem;
+    //  1.4rem: a ★ glyph paints a little smaller than its font-size, so this
+    //  lands on the prototype's 12px star icons beside a 16px label.
+    font-size: 1.4rem;
     letter-spacing: .05em;
     line-height: 1;
     white-space: nowrap;

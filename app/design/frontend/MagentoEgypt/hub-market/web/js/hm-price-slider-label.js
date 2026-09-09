@@ -12,10 +12,17 @@
  * numbers arrive already formatted in the store's currency and locale, which is
  * work this module has no business repeating (and would get wrong for ar_SA).
  *
- * The floor shown on the left is the collection's real minimum, not a hard
- * zero. It is what the hidden handle is actually sitting on, so it is the
- * honest label — quoting "EGP 0" for a rail whose cheapest item is EGP 11 would
- * be decoration.
+ * The floor is shown as ZERO, matching the control the client supplied. An
+ * earlier version quoted the collection's real minimum on the grounds that it
+ * is where the hidden handle sits — but the lower handle is hidden precisely
+ * because this is a MAXIMUM control, and "up to X" means everything below X.
+ * Zero is the honest floor for that reading, and it is what the design asks
+ * for.
+ *
+ * The zero is built by swapping the digits out of Mageplaza's own formatted
+ * string rather than composing one, so the currency symbol, its side and the
+ * locale's digits all survive — "EGP 11" becomes "EGP 0", "١١ ج.م" becomes
+ * "٠ ج.م".
  */
 define([], function () {
     'use strict';
@@ -84,7 +91,8 @@ define([], function () {
             }
 
             source.classList.add('hm-price-range__raw');
-            low.textContent = parts[0];
+            //  Latin and Arabic-Indic digits, plus the separators between them.
+            low.textContent = parts[0].replace(/[\d\u0660-\u0669][\d\u0660-\u0669.,\u066B\u066C]*/, '0');
             high.textContent = (config && config.capLabel ? config.capLabel : 'Up to %1')
                 .replace('%1', parts[1]);
         }
