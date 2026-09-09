@@ -285,6 +285,28 @@ foreach ($hmByKey as $hmKey => $hmChild) {
             </div>
         </details>
 
+        <?php
+        /*
+         * The promotional panel the mockup puts beside the columns
+         * (CL036-DEV01.15). A CMS block so marketing owns the copy, the offer
+         * and the destination, not a template: ONE block for the whole menu
+         * (`hm_mega_promo`), because ten per-category blocks is ten things to
+         * keep current and the ticket asks for "a promotional banner/highlight
+         * section", singular.
+         *
+         * Rendered once, here, and reused by every panel below — building it
+         * inside the loop meant loading the same CMS block six times per page.
+         *
+         * It reaches the markup only when the block EXISTS and has content: an
+         * unconfigured store gets columns that fill the panel rather than a
+         * hole where a banner should be.
+         */
+        $hmPromo = trim((string) $block->getLayout()
+            ->createBlock(\Magento\Cms\Block\Block::class)
+            ->setBlockId('hm_mega_promo')
+            ->toHtml());
+        ?>
+
         <?php if ($inline): ?>
             <ul class="hm-nav__inline">
                 <?php foreach ($inline as $item): ?>
@@ -339,26 +361,6 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                                         <?php endforeach; ?>
                                     </div>
 
-                                    <?php
-                                    /*
-                                     * The promotional panel the mockup puts beside
-                                     * the columns. A CMS block so marketing owns the
-                                     * copy and the link, not a template: one block
-                                     * for the whole menu (`hm_mega_promo`), because
-                                     * ten per-category blocks is ten things to keep
-                                     * current and the ticket asks for "a promotional
-                                     * banner/highlight section", singular.
-                                     *
-                                     * Rendered only when the block EXISTS and has
-                                     * content — an unconfigured store gets columns
-                                     * that fill the panel rather than a hole where a
-                                     * banner should be.
-                                     */
-                                    $hmPromo = trim((string) $block->getLayout()
-                                        ->createBlock(\Magento\Cms\Block\Block::class)
-                                        ->setBlockId('hm_mega_promo')
-                                        ->toHtml());
-                                    ?>
                                     <?php if ($hmPromo !== ''): ?>
                                         <div class="hm-nav__mega-promo"><?= /* @noEscape */ $hmPromo ?></div>
                                     <?php endif; ?>

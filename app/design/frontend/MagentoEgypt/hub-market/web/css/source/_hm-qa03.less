@@ -648,16 +648,18 @@
     .hm-page .block-collapsible-nav > .title { display: none; }
     .hm-page .block-collapsible-nav > .content { display: block; }
 
-    //  Above the account content. `.columns` is blank's default block box at
-    //  this width — the theme's two-column grid is declared inside
-    //  `@media (min-width: 768px)` and correctly does not apply here — so it
-    //  becomes a column flexbox purely to get `order` on the sidebar.
+    //  `.columns` is blank's default block box at this width — the theme's
+    //  two-column grid is declared inside `@media (min-width: 768px)` and
+    //  correctly does not apply here — so it becomes a column flexbox purely to
+    //  get `order` on its children.
+    //
+    //  The rail was ordered ABOVE the account content here while it carried the
+    //  navigation. It no longer does; the ordering now lives at the foot of
+    //  this file, with the rule that hides the navigation on a phone.
     .hm-page.account .columns {
         display: flex;
         flex-direction: column;
     }
-
-    .hm-page.account .columns > .sidebar-main { order: -1; }
 }
 
 //
@@ -1637,15 +1639,41 @@
 }
 
 //
-//  ACCOUNT — the left navigation is hidden on every account page
+//  ACCOUNT — the left navigation is hidden ON A PHONE
 //  ---------------------------------------------------------------------------
-//  Client's request. Only the NAV goes: `.sidebar-main` on these pages also
-//  holds the theme's own `.hm-stats` card (orders and wishlist counts), which
-//  is not navigation and stays. The column keeps its place in the grid for it.
+//  Client's request, narrowed on the follow-up: it was hidden at every width
+//  for one pass, and the ask is now "hide for mobile only" — so the rail's
+//  navigation card is back on desktop, where there is a column to put it in,
+//  and gone below 768px, where it was pushing the page's own content down.
 //
-//  Nothing becomes unreachable — the header's account menu and, on a phone, the
+//  Only the NAV goes: `.sidebar-main` on these pages also holds the theme's own
+//  `.hm-stats` card (orders and wishlist counts), which is not navigation and
+//  stays at every width.
+//
+//  Nothing becomes unreachable on a phone — the header's account menu and the
 //  bottom bar's Account tab both still reach every page this listed.
-.hm-page.account .block-collapsible-nav { display: none; }
+@media screen and (max-width: 767px) {
+    .hm-page.account .block-collapsible-nav { display: none; }
+}
+
+//
+//  ACCOUNT — Shopping Stats goes UNDER the page content on a phone
+//  ---------------------------------------------------------------------------
+//  Client's request. The rail was ordered above the account content on the
+//  mobile pass because it then carried the navigation and the reference put
+//  that first. With the navigation gone at this width the rail is Shopping
+//  Stats alone — a summary, which belongs after the thing it summarises, not
+//  ahead of it.
+//
+//  Explicit orders rather than deleting the `-1`: blank gives `.column.main`
+//  and `.sidebar-main` the SAME order (1), so with the override removed the two
+//  would be separated only by source order, and this file would be silently
+//  depending on the DOM order a layout XML happens to produce.
+@media screen and (max-width: 767px) {
+    .hm-page.account .columns > .column.main        { order: 1; }
+    .hm-page.account .columns > .sidebar-main       { order: 2; }
+    .hm-page.account .columns > .sidebar-additional { order: 3; }
+}
 
 //  ===========================================================================
 //  TICKET 25 — Product display (mobile), test run 86d4a6ph1 items 4, 6 and 7
@@ -1787,4 +1815,71 @@
     //  The star row is 18px against 21px of text; centred is the only sane
     //  vertical relationship, and it is what the row already does.
     .hm-stars { align-self: center; }
+}
+
+//
+//  CL036-DEV01.15, second half — the promotional highlight
+//  ---------------------------------------------------------------------------
+//  The ticket asks for subcategory columns "along with a promotional
+//  banner/highlight section", and the mockup puts that section to the RIGHT of
+//  the columns: a filled card carrying an eyebrow, a headline and a link.
+//
+//  The panel and its 28rem promo track were already built; what was missing was
+//  the `hm_mega_promo` CMS block that fills the track, so the menu shipped as
+//  columns only. The block now exists (English and Arabic), and this styles the
+//  card it renders.
+//
+//  The markup lives in a CMS block so marketing owns the copy, the offer and
+//  the destination — which is the whole reason it is a block and not a
+//  template. These rules therefore describe a SHAPE, not one campaign: an
+//  eyebrow, a headline, a call to action. Swap the words in the admin and the
+//  card still reads correctly. Delete the block and the columns take the panel
+//  back, because `.hm-nav__mega-inner:has(.hm-nav__mega-promo)` is what adds
+//  the second track.
+.hm-nav__mega-promo .hm-megapromo {
+    background: var(--hm-surface-inverse);
+    border-radius: var(--hm-radius);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: var(--hm-space-2);
+    inline-size: 100%;
+    //  Tall enough to read as a banner beside two rows of links, short enough
+    //  not to stretch the panel when a category has four columns of one.
+    min-block-size: 14rem;
+    padding: var(--hm-space-6);
+    text-decoration: none;
+
+    &:hover .hm-megapromo__cta { text-decoration: underline; }
+}
+
+.hm-megapromo__eyebrow {
+    color: var(--hm-accent-on-dark);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.hm-megapromo__title {
+    color: var(--hm-on-inverse);
+    font-family: var(--hm-font-display, var(--hm-font-sans));
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hm-megapromo__text {
+    color: var(--hm-on-inverse-muted);
+    font-size: 1.4rem;
+    line-height: 1.5;
+}
+
+//  Pushed to the foot of the card so the call to action sits on the card's
+//  bottom edge whatever length the copy above it runs to.
+.hm-megapromo__cta {
+    color: var(--hm-accent-on-dark);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin-block-start: auto;
 }
