@@ -385,11 +385,28 @@
 //  block as `attribute="..."`, which is the hook used throughout here — the
 //  theme does not need its own template.
 .hm-plp {
-    //  Not on the prototype's panel. Category is also redundant on a category
-    //  page, and colour is one attribute of dozens that happens to be
-    //  filterable on this catalogue.
-    .filter-options-item[attribute='cat'],
-    .filter-options-item[attribute='color'] { display: none; }
+    //  ALLOW-LIST, not a block-list. Naming `cat` and `color` only worked on the
+    //  one category they were measured against: /clothes.html also offers
+    //  Matrial, Sleeve_Length and Size, and they render BEFORE Price Range, so
+    //  the panel opened with three blocks the prototype does not have. Any
+    //  category can add more at any time — which attributes are filterable is
+    //  catalogue data, not something a stylesheet can keep up with.
+    //
+    //  So everything is closed and the prototype's four are opened by name. DOM
+    //  order does the rest: attribute filters are emitted ahead of price, so
+    //  what survives is Price Range / Minimum Rating / Availability / Vendors,
+    //  in that order, on every category.
+    //
+    //  Worth stating plainly: this DOES remove working facets. A shopper on a
+    //  fashion category can no longer filter by size or material. That is what
+    //  matching the prototype's panel costs, and it is a content decision
+    //  rather than a technical one.
+    .filter-options-item { display: none; }
+
+    .filter-options-item[attribute='price'],
+    .filter-options-item[attribute='rating'],
+    .filter-options-item[attribute='availability'],
+    .filter-options-item[attribute='vendor'] { display: block; }
 
     //  Mageplaza prints a decorative `<input type="checkbox" aria-hidden>` ahead
     //  of every option link — the link is the control, the input is paint. That
@@ -1405,4 +1422,36 @@
         position: absolute;
         white-space: nowrap;
     }
+}
+
+//
+//  CL036-QA01 item 7, second pass — the white space is BELOW the stars now
+//  _____________________________________________
+//
+//  The first pass removed the two-line title reservation, which was the empty
+//  line between the name and the stars. What is left, and what the follow-up
+//  points at, sits between the STARS and the PRICE: measured on the Grocery
+//  rail at 390px, stars end at 75 and the price row starts at 102 — 27px of
+//  nothing in the middle of the card.
+//
+//  It is `margin-block-start: auto` on the price row. The grid gives every card
+//  in a row the height of the tallest, and the auto margin spends that slack in
+//  the middle so the prices line up across the row. On a rail where one name
+//  runs to two lines and its neighbour to one, that is a visible hole.
+//
+//  Packed to the top instead, for the same reason the title reservation went:
+//  the reference stacks name, stars and price tight and lets the rows stagger.
+//  The slack does not disappear — it moves to the foot of the card, where it
+//  reads as padding rather than as a gap.
+//
+//  PHONE ONLY. On desktop the cards are wider, names rarely wrap, and there is
+//  almost no slack to move — so the aligned price rows there are worth keeping.
+//
+@media screen and (max-width: 767px) {
+    .hm-page .product-item .hm-card__foot { margin-block-start: 0; }
+
+    //  With the foot no longer pinned to the bottom, the details box should not
+    //  stretch to fill the card either — otherwise the same slack simply
+    //  reappears as a gap above the foot.
+    .hm-page .block.widget .product-item .product-item-details { justify-content: flex-start; }
 }
