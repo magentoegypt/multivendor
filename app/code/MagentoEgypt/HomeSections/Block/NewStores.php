@@ -127,7 +127,17 @@ class NewStores extends Template
             $id = (int) $r['entity_id'];
             $logo = $logos[$id] ?? null;
             $out[] = [
-                'name'     => (string) ($names[$id] ?? $r['company'] ?? $r['vendor_id']),
+                //  `??` only falls through on NULL, and `company` is an empty
+                //  STRING on four of the twenty-five vendor rows — so a seller
+                //  with no store_name and a blank company stopped at the empty
+                //  string and the card rendered with no name at all, just
+                //  "7 products / VERIFIED". Each step is now tested for content,
+                //  and the vendor code carries the card if nothing else does.
+                'name'     => $this->firstNonEmpty(
+                    $names[$id] ?? null,
+                    $r['company'] ?? null,
+                    $r['vendor_id'] ?? null
+                ),
                 'url'      => $this->getUrl('shop/' . $r['vendor_id']),
                 'logo'     => $logo ? $mediaUrl . 'ves_vendors/logo/' . ltrim((string) $logo, '/') : null,
                 'products' => (int) ($counts[$id] ?? 0),
@@ -402,4 +412,20 @@ class NewStores extends Template
     {
         return 1800;
     }
+    /**
+     * First argument that actually holds text, trimmed.
+     */
+    private function firstNonEmpty(mixed ...$candidates): string
+    {
+        foreach ($candidates as $candidate) {
+            $value = trim((string) ($candidate ?? ''));
+
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return '';
+    }
+
 }

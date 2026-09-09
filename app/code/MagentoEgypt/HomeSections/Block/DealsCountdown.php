@@ -89,8 +89,30 @@ class DealsCountdown extends Template
             return $this->resolved = null;
         }
 
-        return $this->resolved = (new \DateTime((string) $ends))
-            ->format(\DateTimeInterface::ATOM);
+        //  END of that day, not its midnight.
+        //
+        //  `special_to_date` is stored as a date — 2026-09-09 00:00:00 — and
+        //  Magento treats it INCLUSIVELY: the special price is still charged all
+        //  through the 9th. The query above already says as much
+        //  (`DATE(td.value) >= today`, "a deal ending today should stay live all
+        //  day"), but the value handed to the browser was the raw midnight, so
+        //  the timer read a deadline that had passed hours earlier and hid
+        //  itself for the rest of the day. The pill stayed on the page saying
+        //  "remaining" with nothing in front of it, because .hm-countdown's own
+        //  `display: inline-flex` outranks the UA's `[hidden]` rule — that half
+        //  is answered in CSS.
+        //
+        //  Built in the STORE timezone (Asia/Riyadh here), so the countdown
+        //  reaches zero when the offer actually stops, not at UTC midnight.
+        $tz  = new \DateTimeZone($this->_localeDate->getConfigTimezone());
+        $day = (new \DateTime((string) $ends))->format('Y-m-d');
+        $end = \DateTime::createFromFormat('Y-m-d H:i:s', $day . ' 23:59:59', $tz);
+
+        if (!$end) {
+            return $this->resolved = null;
+        }
+
+        return $this->resolved = $end->format(\DateTimeInterface::ATOM);
     }
 
     public function getCacheKeyInfo(): array

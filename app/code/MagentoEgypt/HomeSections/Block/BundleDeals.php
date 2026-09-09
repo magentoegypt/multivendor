@@ -249,7 +249,8 @@ class BundleDeals extends Template
                 'url'         => $product->getProductUrl(),
                 'image'       => $this->bannerUrl($product),
                 'vendor'      => $this->vendorNames->getName($product->getData('vendor_id')),
-                'description' => $this->excerpt((string) $product->getData('description')),
+                'description' => $this->excerpt((string) $product->getData('description'))
+                    ?? $this->describeContents($counted, $childData),
                 'is_kit'      => $isKit,
                 'item_count'  => $isKit ? count($counted) : $choiceSize,
                 'thumbs'      => $this->thumbsFor($counted, $childData),
@@ -394,7 +395,7 @@ class BundleDeals extends Template
         }
 
         $children = $this->collectionFactory->create();
-        $children->addAttributeToSelect(['small_image', 'thumbnail', 'image', 'price'])
+        $children->addAttributeToSelect(['name', 'small_image', 'thumbnail', 'image', 'price'])
             ->addIdFilter(array_keys($childIds))
             ->addStoreFilter($this->storeManager->getStore());
 
@@ -411,6 +412,9 @@ class BundleDeals extends Template
                  * turns a child going on special into a real bundle saving.
                  */
                 'price' => (float) $child->getData('price'),
+                //  For the description fallback below, when a bundle carries no
+                //  copy of its own.
+                'name'  => trim((string) $child->getName()),
             ];
         }
 
@@ -540,6 +544,48 @@ class BundleDeals extends Template
     /**
      * First sentence-ish of the description, plain text.
      */
+    /**
+     * What the bundle contains, in words, for a bundle with no description.
+     *
+     * Two of the bundles on this catalogue carry neither `description` nor
+     * `short_description`, and the card reserved the same slot for them as for
+     * the ones that do — so they rendered with a hole between the rating and the
+     * price. This fills it from the bundle's OWN CONTENTS rather than inventing
+     * marketing copy: every word of it is the names of the products actually in
+     * the bundle, so it cannot say anything the basket does not.
+     *
+     * @param  array<int, array<string, mixed>> $options
+     * @param  array<int, array<string, mixed>> $children
+     */
+    private function describeContents(array $options, array $children): ?string
+    {
+        $names = [];
+
+        foreach ($this->thumbIds($options) as $childId) {
+            $name = trim((string) ($children[$childId]['name'] ?? ''));
+
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        $names = array_values(array_unique($names));
+
+        if (!$names) {
+            return null;
+        }
+
+        $shown = array_slice($names, 0, 3);
+        $more  = count($names) - count($shown);
+        $list  = implode(', ', $shown);
+
+        $text = $more > 0
+            ? (string) __('Includes %1 and %2 more.', $list, $more)
+            : (string) __('Includes %1.', $list);
+
+        return $this->excerpt($text);
+    }
+
     private function excerpt(string $html): ?string
     {
         $text = trim(preg_replace('/\s+/', ' ', strip_tags($html)) ?? '');
