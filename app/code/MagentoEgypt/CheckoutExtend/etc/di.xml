@@ -30,4 +30,15 @@
     -->
     <preference for="Magento\Sales\Model\RtlTextHandler"
                 type="MagentoEgypt\CheckoutExtend\Model\Pdf\NoRtlReversal"/>
+
+    <!--
+        One address entered once must not become two rows in the address book.
+        Magento copies the quote's shipping and billing addresses across in two
+        independent branches at order placement; see the plugin.
+    -->
+    <type name="Magento\Customer\Api\AddressRepositoryInterface">
+        <plugin name="me_deduplicate_customer_address"
+                type="MagentoEgypt\CheckoutExtend\Plugin\Customer\DeduplicateAddress"
+                sortOrder="100"/>
+    </type>
 </config>
