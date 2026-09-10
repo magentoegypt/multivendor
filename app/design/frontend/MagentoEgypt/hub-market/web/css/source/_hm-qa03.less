@@ -2637,3 +2637,24 @@ html:lang(ar) .page-print .page-main > .hm-logo {
     margin-right: 0;
     margin-inline-end: 30px;
 }
+
+//
+//  "ITEMS ORDERED" TWICE, ONE ABOVE THE OTHER
+//  ---------------------------------------------------------------------------
+//  The upper one is not a heading. `sales_order_view.xml` adds a link named
+//  "Items Ordered" to `sales.order.info`, and the invoice, shipment and credit
+//  memo layouts each add their own — so `.order-links` is the tab strip across
+//  the top of an order: Items Ordered / Invoices / Shipments. On an order that
+//  has none of those, which is most of them here, the strip renders with a
+//  single item, and a one-tab tab strip is just the section heading printed
+//  twice: measured on order 3000000022, "Items Ordered" at y578 in the strip
+//  and again at y629 in `.order-title` directly below it.
+//
+//  Hidden only when it holds one item, so the moment an order has an invoice or
+//  a shipment the strip comes back and does its job. Checked both ways in the
+//  page: with a second link injected it returns to `display: block`.
+//
+//  The heading itself stays — it is the one that belongs to the table.
+.order-links:not(:has(> li:nth-child(2))) {
+    display: none;
+}
