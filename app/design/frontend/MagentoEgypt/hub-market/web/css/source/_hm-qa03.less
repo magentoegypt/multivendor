@@ -2482,3 +2482,106 @@ html:lang(ar) input[type="checkbox"] {
         margin-inline: 0;
     }
 }
+
+//
+//  THE PRINTED ORDER SAT IN THE CONTENT COLUMN OF A NAV IT DOES NOT HAVE
+//  ---------------------------------------------------------------------
+//  `sales_order_print` puts `account` on the body — that is core, and it is what
+//  gives the receipt the account typography — but the page layout is `1column`,
+//  so `.columns` has exactly one child, `.column.main`.
+//
+//  _hm-account.less turns `.hm-page.account .columns` into
+//
+//      grid-template-columns: 28.8rem minmax(0, 1fr);
+//      > .column.main { grid-column: 2 }
+//
+//  for the account rail. With no rail in the DOM the first track is still
+//  reserved and the content is still placed in the second one, so the receipt
+//  rendered 1136.8px wide inside a 1456.8px row, indented 320px from the start
+//  edge while the logo and the order title — which live in `.page-title-wrapper`,
+//  outside `.columns` — ran the full width. Left in English, right in Arabic:
+//  the same fault, mirrored, which is what a logical-property grid does.
+//
+//  Keyed on the absence of the rail rather than on `page-layout-1column`, so it
+//  also covers the guest receipts and anything else that lands on `account`
+//  without a sidebar. (0,5,0) with the `:not()`, so it beats the grid at (0,4,0)
+//  wherever the two files end up relative to each other.
+//
+//  Gated at the same 768px as the grid it corrects: on paper the media query is
+//  false (a sheet is about 718px), the grid never applies, and `.columns` is
+//  already a plain block.
+@media (min-width: 768px) {
+    .hm-page.account .columns:not(:has(> .sidebar-main)) {
+        display: block;
+    }
+}
+
+//
+//  THE PAGE IS AS WIDE AS ITS WIDEST CHILD ON A PHONE
+//  ---------------------------------------------------------------------------
+//  Measured on /bundles at 390px: `.page-main` came out 442.9px wide, and in
+//  Arabic 481.6px starting at -91.6. Everything inside it was therefore off its
+//  own grid — the navy hero band, which bleeds with
+//  `margin-inline: calc(50% - 50vw)`, computed a POSITIVE 11.45px margin
+//  (50% of a 412.9px parent is already more than 50vw) and sat inset on the left
+//  and cut off on the right, mirrored in Arabic. That is the shifted page.
+//
+//  It is not the hero's fault and not the chip row's. `.page-main` is a flex
+//  item of the column-flex `.page-wrapper`, and this theme gives it
+//  `margin-inline: auto` for the desktop centring. Auto margins in a flex item's
+//  CROSS axis suppress `stretch`, so its width falls back to fit-content —
+//  `max(min-content, available)` — and any child with a min-content wider than
+//  the screen drags the whole page out with it.
+//
+//  Above 768px this never happened, because blank's own
+//
+//      .page-main { box-sizing: border-box; width: auto }  +  .page-main { width: 100% }
+//
+//  pins it — and both of those live in styles-l.css, which is
+//  `min-width: 768px`. Below that breakpoint `.page-main` has never had a stated
+//  width or box-sizing at all; pages only looked right when nothing inside them
+//  happened to be wider than the phone.
+//
+//  So: state on a phone what the desktop sheet already states. A definite width
+//  makes `align-self: stretch` moot and pins the column to the viewport; wide
+//  children then overflow inside `.page-wrapper`'s `overflow-x: clip`, or scroll
+//  in their own scroller, instead of moving the page.
+//
+//  Checked at 390px before and after on /bundles (en + ar), the home page, a
+//  category page and the cart: the two bundles pages go 442.9/481.6 → 390 with
+//  the hero landing at 0×390, and the other three measured 390 both ways.
+@media screen and (max-width: 767px) {
+    .page-main {
+        box-sizing: border-box;
+        width: 100%;
+    }
+}
+
+//
+//  THE ORDER TOTALS DID NOT LINE UP WITH THE COLUMN THEY BELONG TO
+//  ---------------------------------------------------------------------------
+//  In the items table the Subtotal column is right-aligned: measured on order
+//  3000000022 the item's price ends at 1473, 16px inside the table edge. The
+//  totals underneath sit in the same column — core gives them
+//  `class="amount"` against a `colspan="4"` label — but nothing ever set their
+//  alignment, so they inherited `start` and ended at 1387: 86px short, which is
+//  the ragged edge under Grand Total.
+//
+//  `right`, not `end`, and that is deliberate. `.col.subtotal` is right-aligned
+//  PHYSICALLY, in both languages — measured in Arabic, the column's price and
+//  the totals both land at 220, so Arabic is already correct and `end` would
+//  push the totals to the far side of the cell and break it. Matching the
+//  column's own physical alignment keeps the two lined up in both directions.
+//
+//  Not scoped to the printable page: the same table with the same fault is on
+//  the order view, the invoice and the credit memo.
+//
+//  Three classes, and that is the whole trick. The first attempt was
+//  `.order-details-items table tfoot .amount` — later in the sheet and it still
+//  lost, because `.account .data.table td` is (0,3,1) and `.data.table` is TWO
+//  classes on one element, not one. Anything at two classes is outranked no
+//  matter where it sits. This is (0,3,2) and measured: the amount moves from
+//  1387 to 1473, which is where the item column's price ends.
+.order-details-items .table-order-items tfoot td.amount {
+    text-align: right;
+}
