@@ -61,14 +61,21 @@ class SearchCategories implements ArgumentInterface
                 ->setStore($store)
                 ->addAttributeToSort('position', 'ASC');
 
-            $out = [];
+            $categories = [];
             foreach ($collection as $category) {
+                $categories[(int) $category->getId()] = $category;
+            }
+
+            $counts = $this->visibleProductCounts($collection, array_keys($categories), (int) $store->getId());
+
+            $out = [];
+            foreach ($categories as $id => $category) {
                 // Never offer a filter that leads nowhere.
-                if ((int) $category->getProductCount() < 1) {
+                if (($counts[$id] ?? 0) < 1) {
                     continue;
                 }
                 $out[] = [
-                    'id'   => (int) $category->getId(),
+                    'id'   => $id,
                     'name' => (string) $category->getName(),
                 ];
             }
@@ -79,6 +86,62 @@ class SearchCategories implements ArgumentInterface
             // page — down. Degrade to no selector at all.
             $this->logger->warning('Hub Market search categories: ' . $e->getMessage());
             return $this->cache = [];
+        }
+    }
+
+    /**
+     * How many products each of these categories actually SHOWS, per the
+     * category index for this store.
+     *
+     * NOT `$category->getProductCount()`, which counts the rows in
+     * catalog_category_product — the products assigned to that category
+     * DIRECTLY. A parent whose products all live in its subcategories counts
+     * zero there and was dropped from the selector, even though its page lists
+     * them: "Fresh Food" was created with its seven products under
+     * "Dairy & Eggs", and it never appeared ([CL036-TC13]). The admin tree
+     * disagreed with the storefront for the same reason — it rolls the subtree
+     * up, and the selector did not.
+     *
+     * The index is the right source twice over: it rolls anchors up the way the
+     * category page does, and it already excludes what the storefront will not
+     * show, so a category whose only products are disabled still counts zero.
+     *
+     * Read through the collection's own connection rather than through an
+     * injected ResourceConnection: adding a constructor argument to a class
+     * this old means `setup:di:compile`, and that wipes `generated/` — several
+     * minutes of 500s on a live storefront, for a dropdown.
+     *
+     * FAILS OPEN. If the per-store index table is not there (a partial install,
+     * a mid-reindex switch), every category is let through rather than none:
+     * a selector with an extra entry beats a header with no selector.
+     *
+     * @param int[] $ids
+     * @return array<int, int>
+     */
+    private function visibleProductCounts($collection, array $ids, int $storeId): array
+    {
+        if (!$ids) {
+            return [];
+        }
+
+        try {
+            $connection = $collection->getConnection();
+            $table = $collection->getResource()->getTable('catalog_category_product_index_store' . $storeId);
+
+            if (!$connection->isTableExists($table)) {
+                return array_fill_keys($ids, 1);
+            }
+
+            $select = $connection->select()
+                ->from($table, ['category_id', 'products' => new \Zend_Db_Expr('COUNT(*)')])
+                ->where('category_id IN (?)', $ids)
+                ->group('category_id');
+
+            return array_map('intval', $connection->fetchPairs($select));
+        } catch (\Throwable $e) {
+            $this->logger->warning('Hub Market search categories, product counts: ' . $e->getMessage());
+
+            return array_fill_keys($ids, 1);
         }
     }
 }
