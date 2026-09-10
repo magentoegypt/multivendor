@@ -21,4 +21,15 @@
         <plugin name="magentoegypt_toolbar_sort_options"
                 type="MagentoEgypt\HomeSections\Plugin\Catalog\ToolbarSortOptions"/>
     </type>
+
+    <!--
+        CL036-DEV01.21 — "N results" reported the page size, not the total.
+        sortOrder 200: after the sort plugin above, so the search runs once the
+        collection is fully configured. See the plugin for the whole story.
+    -->
+    <type name="Magento\Catalog\Block\Product\ProductList\Toolbar">
+        <plugin name="magentoegypt_resolve_search_total"
+                type="MagentoEgypt\HomeSections\Plugin\Catalog\ResolveSearchTotal"
+                sortOrder="200"/>
+    </type>
 </config>
