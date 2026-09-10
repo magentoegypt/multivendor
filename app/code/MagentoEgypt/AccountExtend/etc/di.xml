@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * One click must cost one download (CL036-TC11). See GuardDoubleCount.
+ *
+ * On the RESOURCE model rather than the controller: the counter is written by
+ * `$linkPurchasedItem->save()` from inside Download\Link::execute(), which
+ * exits immediately afterwards, so there is nothing for a controller plugin to
+ * wrap. The save is the moment the entitlement changes, and it is the moment
+ * worth guarding.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Downloadable\Model\ResourceModel\Link\Purchased\Item">
+        <plugin name="magentoegypt_guard_double_download_count"
+                type="MagentoEgypt\AccountExtend\Plugin\Downloadable\GuardDoubleCount"
+                sortOrder="10"/>
+    </type>
+</config>
