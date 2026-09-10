@@ -31,14 +31,71 @@
     padding-inline: calc(50vw - 50%);
 }
 
-//  THE EYEBROW HUGS ITS WORDS.
-//  `.hm-hero__eyebrow` is a <p> with a pill background, written for the homepage
-//  hero, which is a flex column that shrink-wraps it. This section is not a flex
-//  container, so the paragraph did what a block does — took the full width — and
-//  the pill rendered as a grey bar running the length of the band with the words
-//  stranded at one end. That bar is what the client photographed.
-.cms-bundles .hm-hero__eyebrow {
-    inline-size: fit-content;
+//  THE BREADCRUMB, INSIDE THE BAND.
+//  Moved here by the page's layout handle (see the XML). It arrives carrying the
+//  chrome it wears everywhere else — a rule under it, the page container's own
+//  inset, and link colours for a white ground — and none of that applies on a
+//  navy band it is now a part of.
+//
+//  Measured against the reference: 12px, and 12px of air between it and the
+//  title. The colour is this theme's on-navy muted grey rather than the
+//  reference's white-at-50%, which measures 4.3:1 at 12px — under AA. The two
+//  read the same on the band; only one of them is legible to everybody.
+.cms-bundles .hm-bundle-hero .breadcrumbs {
+    border: 0;
+    //  2px, not 8: the link's 24px target box already carries ~6px under the
+    //  words, and the reference's air between crumb and title is 12.
+    margin: 0 0 .2rem;
+    max-inline-size: none;
+    padding: 0;
+
+    //  `align-items: center` and a leading of its own: the row inherits the CMS
+    //  page's 1.7 prose leading, and its links carry a 24px minimum height (the
+    //  theme's WCAG 2.5.8 target size). Baseline-aligned, those two stacked into
+    //  a 36px row against the reference's 16px. Centred, the row is exactly the
+    //  24px target — the extra 8px over the reference is the target size, which
+    //  is not something to give back for eight pixels.
+    .items {
+        align-items: center;
+        font-size: 1.2rem;
+        line-height: 1.4;
+        margin: 0;
+        padding: 0;
+    }
+
+    //  The CMS page's prose styles put 8px under every <li>, breadcrumbs
+    //  included — the same leak the cards below hit — and it was padding the
+    //  row out to 36px however the flex line was aligned.
+    .item { margin-block-end: 0; }
+
+    .item,
+    .item a,
+    .item strong {
+        color: var(--hm-on-inverse-muted);
+        font-weight: 400;
+    }
+
+    .item a:hover,
+    .item a:focus-visible { color: var(--hm-on-inverse); }
+}
+
+//  THE TITLE, at the reference's metrics: 36px is already right, the tracking
+//  and the leading were not (-0.36px and 40px against our normal and 43px).
+.cms-bundles .hm-bundle-hero__title {
+    letter-spacing: -.01em;
+    line-height: 1.11;
+    //  The air above the title is the reference's 12px measured from the WORDS
+    //  of the breadcrumb. Its own margin was 12px on top of the ~6px the crumb's
+    //  24px target box leaves under them, which read as 18.
+    margin-block-start: .6rem;
+}
+
+//  THE SENTENCE. 14px on a 20px leading, held to the reference's 512px measure —
+//  ours was 16px running 657px wide, which is a paragraph rather than a standfirst.
+.cms-bundles .hm-bundle-hero__text {
+    font-size: 1.4rem;
+    line-height: 1.43;
+    max-inline-size: 51.2rem;
 }
 
 //  THE FIGURES.
@@ -46,37 +103,53 @@
 //  BundleDeals::getPageStats() — so the row is however many of them are true
 //  today. `flex-wrap` because Arabic sets these wider and three of them do not
 //  fit a phone in one line.
+//
+//  Laid out as the reference lays them out: equal columns with the number
+//  centred over its label, 16px apart, 32px below the sentence. Ours were
+//  left-aligned, shrink-wrapped to their own text and 32px apart, so the three
+//  read as a sentence fragment rather than as a row of figures.
 .cms-bundles .hm-bundle-hero__stats {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--hm-space-8);
+    gap: var(--hm-space-4);
     list-style: none;
-    margin: var(--hm-space-6) 0 0;
+    margin: var(--hm-space-8) 0 0;
     padding: 0;
 }
 
 .cms-bundles .hm-bundle-hero__stat {
     display: flex;
     flex-direction: column;
-    gap: .2rem;
+    //  No gap: the reference runs the label straight under the figure, and the
+    //  two line boxes already carry the air between them.
+    gap: 0;
     margin: 0;
+    //  The reference's fixed 117px column, as a FLOOR rather than a width: the
+    //  Arabic labels are longer, and a hard width would clip them.
+    min-inline-size: 11.7rem;
+    text-align: center;
 }
 
-//  The accent that reads on navy across the whole gradient — the same token the
-//  band's links use, for the same measured reason.
+//  #f26522, the reference's own accent, not the lighter on-dark one. That
+//  substitution was made for TEXT on the navy panels, where 4.03:1 is under AA;
+//  these are 24px bold, which is large text, and 4.14:1 on this flat band clears
+//  the 3:1 it needs.
 .cms-bundles .hm-bundle-hero__stat-value {
-    color: var(--hm-accent-on-dark);
+    color: var(--hm-accent);
     font-family: var(--hm-font-heading);
-    font-size: 2.8rem;
+    font-size: 2.4rem;
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.33;
 }
 
 .cms-bundles .hm-bundle-hero__stat-label {
     color: var(--hm-on-inverse-muted);
-    font-size: 1.1rem;
-    font-weight: 600;
-    letter-spacing: .08em;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: .1em;
+    //  1.5, not the page's inherited 1.7: the reference sets these on a 15px
+    //  line and the prose leading made the figures block 4px taller.
+    line-height: 1.5;
     text-transform: uppercase;
 }
 
@@ -150,4 +223,13 @@
 //  and the avatar simply stops carrying margins of its own.
 .hm-stores--hm-home-topvendors .hm-stores__link .hm-stores__avatar {
     margin-block: 0;
+}
+
+//  On a phone the reference's 117px columns do not fit three across a 326px
+//  measure, and the row broke 2 + 1 — which reads as a fault rather than as a
+//  wrap. Below 768px the columns size to their own words instead; measured at
+//  390px the three come to 279px inside a 326px line.
+@media screen and (max-width: 767px) {
+    .cms-bundles .hm-bundle-hero__stats { gap: var(--hm-space-3); }
+    .cms-bundles .hm-bundle-hero__stat { min-inline-size: 0; }
 }

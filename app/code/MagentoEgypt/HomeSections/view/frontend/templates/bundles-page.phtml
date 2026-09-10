@@ -38,14 +38,30 @@
 $hmStats = $block->getPageStats();
 ?>
 <section class="hm-bundle-hero hm-surface-inverse">
-    <p class="hm-hero__eyebrow"><?= $escaper->escapeHtml(__('Buy more, save more')) ?></p>
+    <?php
+    /*
+     * THE BREADCRUMB SITS INSIDE THE BAND, as the reference draws it — a quiet
+     * line above the title rather than a white strip above the whole hero. The
+     * block is Magento's own, moved here by the page's layout handle rather than
+     * duplicated, so it still carries the real trail and still exists for anyone
+     * reading the page with assistive tech.
+     */
+    ?>
+    <?= $block->getChildHtml('breadcrumbs') ?>
 
     <?php /* The page's only h1 — the core title block is suppressed for this page. */ ?>
     <h1 class="hm-bundle-hero__title"><?= $escaper->escapeHtml(__('Bundle Deals')) ?></h1>
 
+    <?php
+    /*
+     * The reference's own two sentences. The pill above them ("BUY MORE, SAVE
+     * MORE") went with them: it was carried over from the homepage hero and the
+     * reference's bundles page has no such pill — the sentence says it instead.
+     */
+    ?>
     <p class="hm-bundle-hero__text hm-muted">
         <?= $escaper->escapeHtml(
-            __('Hand-curated bundles from verified vendors. Everything you need in one order, at a better price than buying separately.')
+            __('Hand-curated product bundles from verified vendors — buy more, save more. Each bundle is assembled to deliver maximum value.')
         ) ?>
     </p>
 

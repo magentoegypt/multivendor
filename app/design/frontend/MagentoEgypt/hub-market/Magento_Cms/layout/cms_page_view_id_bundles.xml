@@ -18,6 +18,15 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!--
+            The breadcrumb belongs INSIDE the navy band on this page, which is
+            where the reference puts it. Moved rather than re-rendered, so it is
+            still Magento's own trail — one breadcrumb on the page, still first
+            in the reading order, and still correct if the page is ever renamed.
+            bundles-page.phtml prints it with getChildHtml('breadcrumbs').
+        -->
+        <move element="breadcrumbs" destination="hm.bundles.page" before="-"/>
+
         <referenceContainer name="content">
             <block class="MagentoEgypt\HomeSections\Block\BundleDeals"
                    name="hm.bundles.page"
