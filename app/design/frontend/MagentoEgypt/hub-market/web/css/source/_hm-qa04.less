@@ -370,3 +370,18 @@
     border-color: var(--hm-surface-inverse);
     color: var(--hm-on-inverse);
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.24 — the seller registration form's leftovers
+//  ---------------------------------------------------------------------------
+//  "Select a Theme" offers exactly one option, "Default Theme", because
+//  ves_vendor_theme is empty — no vendor themes are installed. What renders is a
+//  heading over an empty tile, and a seller is asked to choose from a list of
+//  one.
+//
+//  Hidden on the condition that describes the fault — the list contains nothing
+//  but the no-theme placeholder — so it is self-healing: add a vendor theme and
+//  the chooser comes back on its own, with something to choose.
+.marketplace-seller-register .vendor-theme-list:not(:has(.vendor-theme-container > li:not(.no-theme))) {
+    display: none;
+}
