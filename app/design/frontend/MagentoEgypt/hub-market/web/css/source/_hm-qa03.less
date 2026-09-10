@@ -2585,3 +2585,55 @@ html:lang(ar) input[type="checkbox"] {
 .order-details-items .table-order-items tfoot td.amount {
     text-align: right;
 }
+
+//
+//  THE ARABIC RECEIPT'S MASTHEAD READ LEFT TO RIGHT
+//  ---------------------------------------------------------------------------
+//  Two separate physical-direction leaks, both only visible once the receipt
+//  started using the full width.
+//
+//  1. THE LOGO. `print.xml` moves it out of the header and drops it straight
+//     into `main.content`, where it is a block-level flex container with no
+//     width of its own — so it spanned the whole 1452px row. The lockup carries
+//     `direction: ltr` on purpose, because "Hub Market" is a Latin wordmark and
+//     must not be reordered; but on a full-width flex box that same declaration
+//     also puts the MAIN-START at the left, so the mark parked at the far left
+//     of an Arabic page while everything under it started from the right.
+//
+//     Sizing the box to its contents fixes the placement without touching the
+//     wordmark's own direction: a block box with a definite inline size sits at
+//     its containing block's start edge, which in Arabic is the right. Measured
+//     1369→1484 instead of 32→1484, and unchanged in English (the box shrinks
+//     from 1484 to 147; the mark stays at 32).
+//
+//     The trailing 8px padding and 4px margin are the lockup's own breathing
+//     room after the words. Under `direction: ltr` they are always on the right,
+//     which in Arabic is the page edge — the mark sat 13px in while the table
+//     under it was flush. Zeroed for Arabic only; in English they are the gap
+//     they were drawn to be.
+.page-print .page-main > .hm-logo {
+    inline-size: fit-content;
+}
+
+html:lang(ar) .page-print .page-main > .hm-logo {
+    margin-right: 0;
+    padding-right: 0;
+}
+
+//  2. THE HEADING. Blank hangs `margin-right: 30px` on the account page title —
+//     the gap before the status chip and the Print Order link. Physical, so in
+//     Arabic it is not the gap before the chip but a 30px hole between the
+//     heading and the page edge: the title ended at 1458 while the table under
+//     it ended at 1488.
+//
+//     Same 30px, stated logically. `margin-right: 0` first and the logical one
+//     second, so in English `margin-inline-end` maps straight back onto
+//     margin-right and nothing moves — measured, the chip stays at 384→457 —
+//     while Arabic gets it on the left where the chip actually is. (0,4,0),
+//     over blank's `.account .page-title-wrapper .page-title` at (0,3,0).
+//
+//     Not scoped to the receipt: every Arabic account page carried this.
+.hm-page.account .page-title-wrapper .page-title {
+    margin-right: 0;
+    margin-inline-end: 30px;
+}
