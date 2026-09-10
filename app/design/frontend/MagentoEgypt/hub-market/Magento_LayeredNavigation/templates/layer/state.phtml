@@ -1,0 +1,64 @@
+<?php
+/**
+ * Hub Market — "Now Shopping by", the active-filter list.
+ *
+ * QA cycle 2 on the mobile category page (test run 86d4af8mq) asked for one
+ * change: "Change from 'remove this item' to just the trash icon and place it
+ * on the right". In the drawer the control was a text link sitting inline after
+ * the filter's value, which read as part of the value rather than as an action.
+ *
+ * AN ICON, NOT A LABEL — but the label stays in the accessibility tree. The
+ * text is not deleted, it is visually hidden (_hm-qa03.less), because a bare
+ * icon link has no accessible name and this list can hold several of them.
+ *
+ * NAMED PER FILTER. Core gives every row the identical text "Remove This Item",
+ * so a screen reader's link list read "Remove This Item" three times with
+ * nothing to tell them apart. The filter and its value go into the name, the
+ * same call already made for the cart's delete button.
+ *
+ * AN ANCHOR, unlike the cart's remove control. This one navigates to a URL that
+ * re-renders the listing without the filter; the cart's posts a form. Core has
+ * it right here and it is left alone.
+ *
+ * @var $block \Magento\LayeredNavigation\Block\Navigation\State
+ */
+?>
+<?php $_filters = $block->getActiveFilters() ?>
+<?php if (!empty($_filters)) : ?>
+<div class="filter-current">
+    <strong class="block-subtitle filter-current-subtitle"
+            role="heading"
+            aria-level="2"
+            data-count="<?= /* @noEscape */ count($_filters) ?>"><?= $block->escapeHtml(__('Now Shopping by')) ?></strong>
+    <ol class="items">
+        <?php foreach ($_filters as $_filter) : ?>
+            <?php
+            $hmName  = $block->escapeHtmlAttr(__($_filter->getName()) . ' ' . $block->stripTags($_filter->getLabel()));
+            $hmClear = $_filter->getClearLinkUrl();
+            ?>
+            <li class="item">
+                <span class="filter-label"><?= $block->escapeHtml(__($_filter->getName())) ?></span>
+                <span class="filter-value"><?= $block->escapeHtml($block->stripTags($_filter->getLabel())) ?></span>
+                <?php if ($hmClear) : ?>
+                    <a class="action previous" href="<?= $block->escapeUrl($_filter->getRemoveUrl()) ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Previous')) ?>">
+                        <span><?= $block->escapeHtml(__('Previous')) ?></span>
+                    </a>
+                    <a class="action remove"
+                       title="<?= $block->escapeHtmlAttr($_filter->getFilter()->getClearLinkText()) ?>"
+                       href="<?= $block->escapeUrl($hmClear) ?>">
+                        <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-trash"/></svg>
+                        <span><?= $block->escapeHtml($_filter->getFilter()->getClearLinkText()) ?></span>
+                    </a>
+                <?php else : ?>
+                    <a class="action remove" href="<?= $block->escapeUrl($_filter->getRemoveUrl()) ?>"
+                       title="<?= /* @noEscape */ $block->escapeHtmlAttr(__('Remove')) . ' ' . $hmName ?>">
+                        <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-trash"/></svg>
+                        <span><?= /* @noEscape */ $block->escapeHtml(__('Remove')) . ' ' . $hmName ?></span>
+                    </a>
+                <?php endif; ?>
+            </li>
+        <?php endforeach; ?>
+    </ol>
+</div>
+<?php endif; ?>

@@ -2187,3 +2187,57 @@
 .hm-page .block.block-reorder:not(:has(> .block-content:not(.no-display))) {
     display: none;
 }
+
+//
+//  CATEGORY (mobile) — the active filter's remove control
+//  ---------------------------------------------------------------------------
+//  QA cycle 2, test run 86d4af8mq: "Change from 'remove this item' to just the
+//  trash icon and place it on the right". The icon comes from the template
+//  override beside this; these rules put it where it was asked for and take the
+//  words out of the layout without taking them out of the accessibility tree.
+//
+//  The row becomes a wrapping flex line so the label can keep its own line —
+//  which is how it already read — while the value and the control share the one
+//  below it. `margin-inline-start: auto` is what pushes the control to the end,
+//  and being logical it lands on the LEFT in Arabic, which is the same "end of
+//  the row" the request means.
+.hm-page .filter-current .items .item {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--hm-space-2);
+}
+
+//  The label keeps a line to itself.
+.hm-page .filter-current .items .item .filter-label { flex: 1 0 100%; }
+
+.hm-page .filter-current .items .item .action.remove {
+    align-items: center;
+    color: var(--hm-foreground-muted);
+    display: inline-flex;
+    justify-content: center;
+    margin-inline-start: auto;
+    //  A 44px target. The control is now an icon, and an icon is a smaller
+    //  thing to hit than the words it replaced — the box has to make that back.
+    min-block-size: 4.4rem;
+    min-inline-size: 4.4rem;
+}
+
+.hm-page .filter-current .items .item .action.remove:hover,
+.hm-page .filter-current .items .item .action.remove:focus-visible {
+    color: var(--hm-danger);
+}
+
+//  VISUALLY hidden, not `display: none`. The name is the only thing telling one
+//  of these controls from another once the text is off the screen.
+.hm-page .filter-current .items .item .action.remove > span {
+    block-size: 1px;
+    border: 0;
+    clip: rect(0, 0, 0, 0);
+    inline-size: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+}
