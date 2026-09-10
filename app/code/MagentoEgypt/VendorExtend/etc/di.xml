@@ -75,4 +75,18 @@
                 type="MagentoEgypt\VendorExtend\Plugin\Indexer\ExcludeUnapprovedProducts"
                 sortOrder="100"/>
     </type>
+
+    <!--
+        No vendor themes are installed, so neither the seller registration form
+        nor the seller panel's settings should offer a theme to choose. GLOBAL:
+        one renders in `frontend`, the other in `vendors` and `adminhtml`.
+    -->
+    <type name="Vnecoms\VendorsCustomTheme\Block\Account\Create\ThemeList">
+        <plugin name="hm_hide_empty_theme_chooser"
+                type="MagentoEgypt\VendorExtend\Plugin\CustomTheme\HideEmptyThemeChooser"/>
+    </type>
+    <type name="Vnecoms\VendorsCustomTheme\Block\Adminhtml\System\Config\Form\Field\Theme">
+        <plugin name="hm_hide_empty_theme_field"
+                type="MagentoEgypt\VendorExtend\Plugin\CustomTheme\HideEmptyThemeChooser"/>
+    </type>
 </config>
