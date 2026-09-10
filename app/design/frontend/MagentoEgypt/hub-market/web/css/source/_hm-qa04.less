@@ -124,3 +124,30 @@
 //  row 3px taller than the rail's. Restored on the card section only — the hero
 //  above it is running text and 1.7 is right for it.
 .cms-bundles .column.main .hm-bundles { line-height: 1.5; }
+
+//  ---------------------------------------------------------------------------
+//  1-J — TOP VENDORS: the avatar hangs BELOW the cover, not inside it
+//  ---------------------------------------------------------------------------
+//  QA cycle 4 retest: "We need the vendor image to move down a bit". Measured
+//  against the reference at 1440px, the difference was large rather than subtle:
+//
+//      reference   48px avatar, top 5px ABOVE the cover's bottom edge — 90% of
+//                  it sits on the white body, and the name is beside it
+//      ours        54px avatar, top 32px above that edge — 41% below it
+//
+//  It got there by being pulled up TWICE. QA cycle 2 put -3.2rem on the WRAPPER
+//  for exactly this — and that value is right — but the Figma pass had already
+//  put another -2.4rem on the avatar itself, and the two stacked.
+//
+//  The second pull also dragged the avatar out of its own wrapper. The verified
+//  badge is positioned against the WRAPPER, so the check drifted off the logo's
+//  corner; the avatar's 8px bottom margin (inherited from the stacked-card rail,
+//  where it separates the logo from the name below it) padded the wrapper out
+//  further still. Neither belongs on this card: the wrapper is the badge's
+//  frame and has to be the logo's box exactly.
+//
+//  So nothing is added to the wrapper — the cycle-2 rule keeps doing its job —
+//  and the avatar simply stops carrying margins of its own.
+.hm-stores--hm-home-topvendors .hm-stores__link .hm-stores__avatar {
+    margin-block: 0;
+}

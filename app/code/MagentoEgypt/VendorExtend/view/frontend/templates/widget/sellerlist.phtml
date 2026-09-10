@@ -153,7 +153,24 @@ $allStoresUrl = $block->getUrl('sellerlist');
                         <?php if ($hmStars !== null && $hmReviews > 0): ?>
                             <span class="hm-stores__rating"
                                   aria-label="<?= $block->escapeHtmlAttr(__('Rated %1 out of 5 from %2 reviews', $hmStars, $hmReviews)) ?>">
-                                <svg class="hm-icon hm-icon--sm hm-stores__star" aria-hidden="true" focusable="false"><use href="#hm-star"/></svg>
+                                <?php /*
+                                     THE SOLID STAR, not the outline one.
+                                     QA cycle 4 failed item 1-J again: "the star
+                                     pattern to change according to the theme".
+                                     `#hm-star` is Lucide's OUTLINE star — the
+                                     symbol itself carries `fill="none"
+                                     stroke="currentColor" stroke-width="2"`, and a
+                                     presentation attribute ON the symbol wins
+                                     inside a <use> shadow tree over anything the
+                                     host is styled with. Two earlier passes set
+                                     `fill: currentColor; stroke: none` on
+                                     `.hm-stores__star` and the computed styles duly
+                                     said amber-filled, unstroked — while the page
+                                     still painted a hollow star. The fix is a
+                                     second symbol, matching the filled star every
+                                     product card draws (see the Lucide path in
+                                     Magento_Review::helper/summary_short.phtml). */ ?>
+                                <svg class="hm-icon hm-icon--sm hm-stores__star" aria-hidden="true" focusable="false"><use href="#hm-star-solid"/></svg>
                                 <span class="hm-stores__score"><?= $block->escapeHtml(number_format((float) $hmStars, 1)) ?></span>
                             </span>
                         <?php endif; ?>
