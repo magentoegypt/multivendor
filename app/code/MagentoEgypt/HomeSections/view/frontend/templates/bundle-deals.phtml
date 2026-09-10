@@ -24,8 +24,23 @@ if (!$bundles) {
 /* One rating query for the rail — see BundleDeals::getRatingFigures(). */
 $hmRatings = $block->getRatingFigures(array_column($bundles, 'id'));
 $headingId = 'hm-bundles-title';
+/*
+ * The section head is the RAIL's head — the "Bundle Deals" title, its strapline
+ * and the "All Bundles" link out. The bundles landing page renders these same
+ * cards under its own hero, which already carries the h1 and the copy, and
+ * whose "All Bundles" link would point at the page you are standing on. There
+ * the head is switched off from layout (`show_head` 0), and the section takes
+ * an aria-label so it is still announced as a region with a name.
+ */
+$showHead = $block->getData('show_head') === null || (bool) $block->getData('show_head');
 ?>
-<section class="hm-bundles" aria-labelledby="<?= $escaper->escapeHtmlAttr($headingId) ?>">
+<section class="hm-bundles"
+    <?php if ($showHead): ?>
+        aria-labelledby="<?= $escaper->escapeHtmlAttr($headingId) ?>"
+    <?php else: ?>
+        aria-label="<?= $escaper->escapeHtmlAttr(__('Bundle Deals')) ?>"
+    <?php endif; ?>>
+    <?php if ($showHead): ?>
     <div class="hm-section__head">
         <div class="hm-section__heading">
             <h2 class="hm-section__title hm-section__title--bundles" id="<?= $escaper->escapeHtmlAttr($headingId) ?>">
@@ -40,6 +55,7 @@ $headingId = 'hm-bundles-title';
             <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-arrow-right"/></svg>
         </a>
     </div>
+    <?php endif; ?>
 
     <ul class="hm-bundles__list">
         <?php foreach ($bundles as $b): ?>

@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--
+    Hub Market — the Bundle Deals landing page.
+
+    The page itself stays a CMS page: it is what owns the /bundles URL, the
+    `cms-bundles` body class the stylesheets hang off, and the page title. Only
+    its BODY moves here, for the reason set out at the top of bundles-page.phtml
+    — the cards have to be the theme's bundle cards, and those come from a block,
+    not from a widget call in a content field.
+
+    This is the same route the homepage sections took: rendered from layout,
+    with the CMS row left in place and its previous content recoverable.
+
+    Handle name: Magento\Cms\Helper\Page passes the page identifier to
+    addPageLayoutHandles(), which produces `cms_page_view_id_<identifier>`. Both
+    store views' rows share the identifier `bundles`, so both get this.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="MagentoEgypt\HomeSections\Block\BundleDeals"
+                   name="hm.bundles.page"
+                   before="-"
+                   template="MagentoEgypt_HomeSections::bundles-page.phtml">
+                <arguments>
+                    <!-- The star renderer, as a view model — see ReviewStars. -->
+                    <argument name="review_stars" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\ReviewStars</argument>
+                    <!--
+                        A landing page, not a rail: everything the catalog has.
+                        There are four live bundles today; the ceiling is here so
+                        the page cannot grow unbounded if someone adds fifty.
+                    -->
+                    <argument name="limit" xsi:type="number">24</argument>
+                    <!-- The hero above the cards already carries the heading. -->
+                    <argument name="show_head" xsi:type="number">0</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

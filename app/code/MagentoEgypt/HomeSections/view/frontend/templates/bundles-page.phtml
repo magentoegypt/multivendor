@@ -1,0 +1,72 @@
+<?php
+/**
+ * Hub Market — the Bundle Deals landing page (/bundles).
+ *
+ * WHAT WAS THERE BEFORE ([CL036-DEV01.20], "the Bundle Deals page isn't
+ * displaying properly")
+ * ---------------------------------------------------------------------------
+ * The page was a CMS page: a hero written in HTML, followed by a CatalogWidget
+ * pinned to a hand-typed list of bundle SKUs. It rendered STOCK Magento product
+ * cards — underlined blue product names, two prices side by side, two empty
+ * white boxes where the buttons belong — and nothing the theme draws elsewhere.
+ *
+ * The cause is one word in the widget call. It asked for
+ * `template="product/widget/content/grid.phtml"` with no module prefix, and an
+ * unprefixed template resolves against the BLOCK's module. Vnecoms replaces
+ * Magento\CatalogWidget\Block\Product\ProductsList with its own subclass, so the
+ * block's module is Vnecoms_VendorsProduct, and the theme's override — which is
+ * registered under Magento_CatalogWidget — was never in the running. The
+ * homepage rails pass the prefix and have always looked right.
+ *
+ * WHY THIS IS A TEMPLATE AND NOT A FIXED WIDGET
+ * ---------------------------------------------
+ * Prefixing the template would have bought stock PLP cards. The reference draws
+ * something else on this page: a bundle card with the vendor, a description, the
+ * strip of what is inside, "You save X" and the CTA — which is exactly the card
+ * the homepage rail already renders from MagentoEgypt\HomeSections\Block\
+ * BundleDeals. So the page renders the same block, with its head switched off
+ * because the hero below already says all three things the head would.
+ *
+ * The SKU list goes with it. It had been typed by hand, listing seven SKUs of
+ * which four were disabled test bundles and missing the one real bundle added
+ * since; the block asks the catalog instead, so a new bundle appears here the
+ * moment it is enabled and a retired one leaves.
+ *
+ * @var \MagentoEgypt\HomeSections\Block\BundleDeals $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$hmStats = $block->getPageStats();
+?>
+<section class="hm-bundle-hero hm-surface-inverse">
+    <p class="hm-hero__eyebrow"><?= $escaper->escapeHtml(__('Buy more, save more')) ?></p>
+
+    <?php /* The page's only h1 — the core title block is suppressed for this page. */ ?>
+    <h1 class="hm-bundle-hero__title"><?= $escaper->escapeHtml(__('Bundle Deals')) ?></h1>
+
+    <p class="hm-bundle-hero__text hm-muted">
+        <?= $escaper->escapeHtml(
+            __('Hand-curated bundles from verified vendors. Everything you need in one order, at a better price than buying separately.')
+        ) ?>
+    </p>
+
+    <?php /* Measured off the cards below — see BundleDeals::getPageStats(). */ ?>
+    <?php if ($hmStats): ?>
+        <ul class="hm-bundle-hero__stats">
+            <?php foreach ($hmStats as $hmStat): ?>
+                <li class="hm-bundle-hero__stat">
+                    <span class="hm-bundle-hero__stat-value"><?= $escaper->escapeHtml($hmStat['value']) ?></span>
+                    <span class="hm-bundle-hero__stat-label"><?= $escaper->escapeHtml($hmStat['label']) ?></span>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
+</section>
+
+<?php
+/*
+ * The cards, from the rail's own template so there is one bundle card in this
+ * codebase rather than two that drift. Same block instance, so getBundles() has
+ * already run and this costs nothing but the render.
+ */
+?>
+<?= $block->fetchView($block->getTemplateFile('MagentoEgypt_HomeSections::bundle-deals.phtml')) ?>

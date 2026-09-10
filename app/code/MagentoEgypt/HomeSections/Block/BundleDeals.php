@@ -601,8 +601,64 @@ class BundleDeals extends Template
     }
 
     /**
+     * The three figures the bundles landing page heads itself with.
+     *
+     * The reference prints "8 ACTIVE BUNDLES / Up to 30% MAX SAVINGS /
+     * 8 CATEGORIES". Two of those are read straight off the cards; the third is
+     * not. The bundles in this catalog sit in five categories, and three of them
+     * are Luma leftovers ("Gear", "Fitness Equipment") or per-vendor buckets
+     * named after a person — a "5 CATEGORIES" claim would be true of the
+     * database and meaningless to a shopper. VENDORS is the figure that means
+     * something on a marketplace, is already on every card, and cannot go stale.
+     *
+     * Each figure is dropped rather than printed as zero or one: "1 VENDOR" and
+     * "Up to 0%" both read as faults. The row is what is true today, not a fixed
+     * three columns.
+     *
+     * @return array<int, array{value: string, label: string}>
+     */
+    public function getPageStats(): array
+    {
+        $bundles = $this->getBundles();
+        if (!$bundles) {
+            return [];
+        }
+
+        $stats = [[
+            'value' => (string) count($bundles),
+            'label' => (string) __('Active bundles'),
+        ]];
+
+        $discount = max(array_map(static fn (array $b): int => (int) $b['discount'], $bundles));
+        if ($discount > 0) {
+            $stats[] = [
+                'value' => (string) __('Up to %1', $discount . '%'),
+                'label' => (string) __('Max savings'),
+            ];
+        }
+
+        $vendors = array_filter(array_unique(array_map(
+            static fn (array $b): string => trim((string) $b['vendor']),
+            $bundles
+        )));
+        if (count($vendors) > 1) {
+            $stats[] = [
+                'value' => (string) count($vendors),
+                'label' => (string) __('Vendors'),
+            ];
+        }
+
+        return $stats;
+    }
+
+    /**
      * Cached per store. Bundle composition and price change on reindex, not on
      * request, and this sits on the busiest page on the site.
+     *
+     * The template and the head flag are part of the key because the same block
+     * class renders in two arrangements — the homepage rail and the bundles
+     * landing page — and a cache keyed on store and limit alone would let one
+     * serve the other's HTML the day their limits happen to match.
      *
      * @return array<int, mixed>
      */
@@ -612,6 +668,8 @@ class BundleDeals extends Template
             'HM_HOME_BUNDLE_DEALS',
             $this->storeManager->getStore()->getId(),
             (int) ($this->getData('limit') ?: 4),
+            (string) $this->getTemplate(),
+            (int) ($this->getData('show_head') === null ? 1 : (bool) $this->getData('show_head')),
         ];
     }
 

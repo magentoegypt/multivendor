@@ -1,0 +1,126 @@
+//
+//  QA CYCLE 4 (CL036-QA04) — the tickets filed against this round
+//  ===========================================================================
+//  One file per cycle, imported last, so a cycle's delta is one file to read and
+//  one line to revert. _hm-qa03.less is open in another workstream; nothing here
+//  touches it.
+//
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.20 — the Bundle Deals landing page
+//  ---------------------------------------------------------------------------
+//  The page's body now comes from the theme rather than from a widget call in a
+//  CMS field (see bundles-page.phtml). What is left to CSS is the arrangement
+//  the reference draws: a navy band across the full width carrying the heading
+//  and three figures, and the bundle cards below it on the page's own light
+//  ground — not on a second navy band, which is what the homepage rail wears and
+//  what this page would otherwise inherit.
+
+//  THE HERO IS A BAND, NOT A CARD.
+//  Everywhere else in this theme a navy panel is a rounded card inset from the
+//  page edges. This one is the page's header, and the reference runs it edge to
+//  edge with the content lined up on the normal grid. Same full-bleed technique
+//  the homepage bands use — negative inline margin, padding put back — so the
+//  text stays on the container's rhythm.
+.cms-bundles .hm-bundle-hero {
+    border-radius: 0;
+    box-sizing: border-box;
+    margin-block: 0 var(--hm-space-8);
+    margin-inline: calc(50% - 50vw);
+    padding-block: var(--hm-space-10);
+    padding-inline: calc(50vw - 50%);
+}
+
+//  THE EYEBROW HUGS ITS WORDS.
+//  `.hm-hero__eyebrow` is a <p> with a pill background, written for the homepage
+//  hero, which is a flex column that shrink-wraps it. This section is not a flex
+//  container, so the paragraph did what a block does — took the full width — and
+//  the pill rendered as a grey bar running the length of the band with the words
+//  stranded at one end. That bar is what the client photographed.
+.cms-bundles .hm-hero__eyebrow {
+    inline-size: fit-content;
+}
+
+//  THE FIGURES.
+//  Rendered from the cards below rather than typed — see
+//  BundleDeals::getPageStats() — so the row is however many of them are true
+//  today. `flex-wrap` because Arabic sets these wider and three of them do not
+//  fit a phone in one line.
+.cms-bundles .hm-bundle-hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-8);
+    list-style: none;
+    margin: var(--hm-space-6) 0 0;
+    padding: 0;
+}
+
+.cms-bundles .hm-bundle-hero__stat {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    margin: 0;
+}
+
+//  The accent that reads on navy across the whole gradient — the same token the
+//  band's links use, for the same measured reason.
+.cms-bundles .hm-bundle-hero__stat-value {
+    color: var(--hm-accent-on-dark);
+    font-family: var(--hm-font-heading);
+    font-size: 2.8rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.cms-bundles .hm-bundle-hero__stat-label {
+    color: var(--hm-on-inverse-muted);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+//  THE CARDS SIT ON THE PAGE, NOT ON A SECOND BAND.
+//  `.hm-bundles` is the homepage rail's section and carries the navy gradient
+//  and the full-bleed mixin. On the homepage that band is the point; here it
+//  would put a second navy slab directly under the first, and the reference
+//  shows white cards on the light page. Both halves of the mixin have to be
+//  undone — the negative margin AND the padding that compensates for it — or the
+//  cards keep a 50vw indent.
+.cms-bundles .hm-bundles {
+    background: none;
+    margin-inline: 0;
+    padding-block: 0 var(--hm-space-10);
+    padding-inline: 0;
+}
+
+//  THE CMS PROSE STYLES ARE FOR PROSE.
+//  /bundles is a CMS page, so everything inside `.column.main` picks up the
+//  long-form treatment written for Privacy and Terms — 24px of list indent,
+//  16px under every list, 8px under every item, and an underline on every link.
+//  Applied to a grid of cards that is: the grid sat 24px right of the heading
+//  above it, and every word inside the card — seller, title, description, "You
+//  save" — came out underlined, because the underline is drawn by the card's
+//  own <a> and no descendant can take it back.
+//
+//  Measured against the homepage rail, which renders the same card outside any
+//  CMS page: list padding 0, list margin 0, item margin 0, decoration none.
+//  These four restore exactly those and change nothing else — the anchor's
+//  colour, for instance, is already identical on both pages.
+.cms-bundles .column.main {
+    .hm-bundle-hero__stats,
+    .hm-bundles__list { margin-block-end: 0; padding-inline-start: 0; }
+
+    .hm-bundle-hero__stat,
+    .hm-bundles__item { margin-block-end: 0; }
+
+    .hm-bundle-hero a,
+    .hm-bundles a { text-decoration: none; }
+}
+
+//  ...and the prose LEADING is for prose too. `.column.main` sets 1.7, which the
+//  cards inherit; the same card on the homepage inherits the document's 1.5.
+//  Measured: 27.2px against 24px, which took the card 4px taller and its price
+//  row 3px taller than the rail's. Restored on the card section only — the hero
+//  above it is running text and 1.7 is right for it.
+.cms-bundles .column.main .hm-bundles { line-height: 1.5; }
