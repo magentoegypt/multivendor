@@ -2241,3 +2241,65 @@
     position: absolute;
     white-space: nowrap;
 }
+
+//
+//  CL036-DEV01.16 — centre the order success message
+//  ---------------------------------------------------------------------------
+//  "The 'Thank you for your purchase!' success message box (with order number
+//  and 'Continue Shopping' button) currently appears aligned to the left with
+//  empty space on the right side. This section should be centered on the page
+//  instead."
+//
+//  The page went full width with CL036-DEV01.12, and this block never had a
+//  width of its own — so a three-line message and one button were left hanging
+//  against the left edge of a 1920px page.
+//
+//  THE THANK-YOU BLOCK ONLY. `.column.main` on this page also carries the order
+//  details — Shipping/Billing address, Shipping/Payment method, and Items
+//  Ordered — laid out as a two-column grid in _hm-checkout.less. Centring the
+//  whole column would squeeze that grid to the message's width, which is not
+//  what was asked and would look like a second bug. So the cap goes on
+//  `.checkout-success` and the title, and everything below them is untouched.
+//
+//  64rem because that is roughly 60 characters at this font size: wide enough
+//  that "We'll email you an order confirmation with details and tracking info."
+//  does not break oddly, narrow enough to read as a centred block rather than
+//  as centred text on a full-width page.
+.checkout-onepage-success {
+    .page-title-wrapper { text-align: center; }
+
+    .checkout-success {
+        margin-inline: auto;
+        max-inline-size: 64rem;
+        text-align: center;
+    }
+
+    //  blank floats the toolbar's `.primary`, and a float ignores the
+    //  `text-align` above it — the button would have stayed left inside a
+    //  centred block, which is the half-fix that looks worse than none.
+    .checkout-success .actions-toolbar,
+    .checkout-success .actions-toolbar > .primary,
+    .checkout-success .actions-toolbar > .secondary {
+        display: flex;
+        float: none;
+        gap: var(--hm-space-3);
+        justify-content: center;
+        margin-inline: 0;
+        text-align: center;
+        width: auto;
+    }
+
+    //  blank hangs a 5px right margin on every action in a toolbar's primary
+    //  group, to space buttons that sit in a row. Inside a centred flex row
+    //  that margin is only on one side, so the button came to rest 3px left of
+    //  the block's true centre — measured, not guessed. The `gap` above does
+    //  the spacing job properly, and this takes the lopsided margin away.
+    .checkout-success .actions-toolbar > .primary .action,
+    .checkout-success .actions-toolbar > .secondary .action {
+        margin-inline: 0;
+    }
+
+    //  The order number is the one thing on this page a customer copies out, so
+    //  it keeps its weight rather than inheriting the block's centred body copy.
+    .checkout-success .order-number { font-weight: 700; }
+}
