@@ -9,4 +9,13 @@
         <plugin name="me_search_attribute_guard"
                 type="MagentoEgypt\SearchAttributeGuard\Plugin\AttributeSaveGuard"/>
     </type>
+
+    <!--
+        An empty category has no `position_category_<id>` in the index, and
+        sorting on a field with no mapping fails the whole query. See the plugin.
+    -->
+    <type name="Magento\Elasticsearch\SearchAdapter\Query\Builder\Sort\Position">
+        <plugin name="me_position_sort_unmapped"
+                type="MagentoEgypt\SearchAttributeGuard\Plugin\PositionSortUnmapped"/>
+    </type>
 </config>
