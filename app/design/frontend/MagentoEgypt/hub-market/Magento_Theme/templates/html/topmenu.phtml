@@ -78,17 +78,20 @@ $hmNavIcons = [
 ];
 
 /*
- * THE ORDER OF THE FIRST NINE — not the whole bar.
+ * THE BAR IS AN EXPLICIT LIST, IN THE REFERENCE'S ORDER — not the first N
+ * children by catalogue position.
  *
- * These are the reference's categories in the reference's order, and QA cycle 1
- * named that order explicitly. Everything else the menu holds follows them (see
- * $inline below), so this list decides SEQUENCE, never membership: what appears
- * in the bar is now whatever the catalogue says, which is what
- * [CL036-TC13] asked for — "top menu need to follow Include in Menu yes/no for
- * all menu & sub menu".
+ * QA cycle 1 named the order and asked for Bags and Shoes to come out. They
+ * were never chosen: the bar took the first nine menu children, and Bags and
+ * Shoes sit at positions 8 and 9 while Figma's own categories sit at 17-29
+ * and never reached the cap. Ordering by hand here rather than by editing
+ * catalogue positions keeps the change on this bar — positions also drive
+ * the category tree, the sitemap and the chip row.
  *
- * A key with no matching category is simply skipped, so one appears in its
- * reference slot the day it is created.
+ * `pharmacy` and `fmcg` DO NOT EXIST in this catalogue. They are listed
+ * because the reference has them and because a key with no matching category
+ * is simply skipped, so they appear in the right slot the day they are
+ * created. Seven of the reference's nine render today.
  */
 $hmNavOrder = [
     'super-market', 'pharmacy', 'furniture', 'clothes', 'fmcg',
@@ -163,47 +166,19 @@ $hmMega = static function ($node) use ($hmMegaCols, $hmMegaLinks): array {
     return $cols;
 };
 
-/*
- * THE BAR IS THE MENU, ORDERED.
- *
- * $hmByKey came from $block->getMenu(), which Magento builds from the category
- * tree with `is_active` AND `include_in_menu` already applied, at every level.
- * So the admin toggle is the switch: turn Include in Menu off and a category
- * leaves the bar, the panel and the mega columns together; turn it on and it
- * arrives in all three.
- *
- * It used to be the nine keys above and nothing else, which is why a category
- * created afterwards never appeared however it was configured — the defect
- * behind [CL036-TC13]. The nine still come first, in the order QA cycle 1
- * named; everything else follows in catalogue position order, which is the
- * order the admin's own tree shows and is reordered by dragging it.
- *
- * A category with no emoji in the map above simply renders without one.
- */
-$hmInlineItem = static function (string $key, $child) use ($hmNavIcons, $hmMega): array {
-    return [
+$inline = [];
+foreach ($hmNavOrder as $key) {
+    if (!isset($hmByKey[$key])) {
+        continue;   // not in this catalogue — see the note on $hmNavOrder
+    }
+    $child = $hmByKey[$key];
+    $inline[] = [
         'key'  => $key,
         'name' => (string) $child->getName(),
         'url'  => (string) $child->getUrl(),
         'icon' => $hmNavIcons[$key] ?? '',
         'mega' => $hmMega($child),
     ];
-};
-
-$inline = [];
-$hmPinned = [];
-foreach ($hmNavOrder as $key) {
-    if (!isset($hmByKey[$key])) {
-        continue;   // not in this catalogue — see the note on $hmNavOrder
-    }
-    $hmPinned[$key] = true;
-    $inline[] = $hmInlineItem($key, $hmByKey[$key]);
-}
-foreach ($hmByKey as $key => $child) {
-    if (isset($hmPinned[$key])) {
-        continue;
-    }
-    $inline[] = $hmInlineItem((string) $key, $child);
 }
 
 
