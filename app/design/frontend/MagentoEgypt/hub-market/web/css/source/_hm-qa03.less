@@ -2338,13 +2338,30 @@
 //  under it was centred — on the right in English, mirrored to the left in
 //  Arabic, wrong in both.
 //
-//  Dropping the float is the whole fix: the wrapper is already centred, so an
-//  inline-block lands in the middle. Nothing here is directional, so RTL needs
-//  no separate rule and cannot drift from LTR.
-.checkout-onepage-success .page-title-wrapper .action.print {
-    display: inline-block;
+//  TWO THINGS HAD TO BE BEATEN, and the first attempt only beat one of them.
+//
+//  The float comes from blank's `.page-main > .page-title-wrapper .page-title +
+//  .action`, which is (0,4,0) — EXACTLY the weight of
+//  `.checkout-onepage-success .page-title-wrapper .action.print`. Equal
+//  specificity is decided by source order, and blank's comes later, so the
+//  first version of this rule lost the float while appearing to work (its
+//  margin matched blank's 24px by coincidence, which is what made it look
+//  applied). Matching blank's own selector and adding `.print` takes it to
+//  (0,6,0) and settles it on weight rather than on which file the CSS merge
+//  happens to emit last.
+//
+//  BLOCK, NOT INLINE-BLOCK. Un-floated and inline, the link simply joined the
+//  end of the <h1>'s line — centred as a pair with the title, 206px off centre
+//  on its own. A block with `inline-size: fit-content` and auto inline margins
+//  puts it on its own line, in the middle.
+//
+//  Nothing here is directional, so RTL needs no second rule and cannot drift.
+.checkout-onepage-success .page-main > .page-title-wrapper .page-title + .action.print {
+    display: block;
     float: none;
+    inline-size: fit-content;
     margin-block-start: var(--hm-space-3);
+    margin-inline: auto;
 }
 
 //
@@ -2400,4 +2417,40 @@
     //  else on the page.
     .block-order-details-view .box-content,
     .block-order-details-view address { line-height: 1.35; }
+}
+
+//
+//  ARABIC — mirror the two margins blank only wrote for LTR
+//  ---------------------------------------------------------------------------
+//  Client's request. Both of these are blank's own physical margins flipped:
+//
+//    input[type="checkbox"]              margin: 2px 6px 0 0   ->  2px 0 0 6px
+//    .actions-toolbar .primary .action   margin: 0 6px 0 0     ->  0 0 0 6px
+//
+//  Physical values kept rather than translated to logical ones. Inside a rule
+//  that already says "only in Arabic", `margin-left` states plainly which edge
+//  is meant; a logical property would have to be read together with the
+//  direction to know, and this file is edited by people mid-ticket.
+//
+//  `html:lang(ar)` rather than `[lang="ar"]`: it is the selector the rest of
+//  this theme uses, and it also matches ar-SA and any other subtag, so it
+//  cannot quietly stop applying if the store's locale code is ever changed.
+html:lang(ar) input[type="checkbox"] {
+    margin: 2px 0 0 6px;
+}
+
+@media (min-width: 768px), print {
+    html:lang(ar) .actions-toolbar .primary .action {
+        margin: 0 0 0 6px;
+    }
+
+    //  THE ORDER SUCCESS BUTTON KEEPS ITS CENTRE. The rule above is (0,4,1) and
+    //  beats the margin zeroing that CL036-DEV01.16 put on `.checkout-success`,
+    //  which would have re-introduced the exact fault that ticket fixed — a
+    //  one-sided margin inside a centred flex row, leaving "Continue Shopping"
+    //  3px off centre in Arabic only. Restated here at (0,5,1) so the centring
+    //  survives.
+    html:lang(ar) .checkout-onepage-success .checkout-success .actions-toolbar > .primary .action {
+        margin-inline: 0;
+    }
 }
