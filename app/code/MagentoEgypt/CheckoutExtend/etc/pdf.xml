@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Arabic product names on the invoice PDF (CL036-DEV01.23).
+ *
+ * Only the invoice's default renderer is replaced. The shipment and credit memo
+ * documents carry the same product names and have the same fault, but they are
+ * separate renderers with their own forked draw(); they follow once this one is
+ * signed off rather than forking three copies of core on one unverified pass.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/pdf_file.xsd">
+    <renderers>
+        <page type="invoice">
+            <renderer product_type="default">MagentoEgypt\CheckoutExtend\Model\Pdf\Items\Invoice\Arabic</renderer>
+        </page>
+    </renderers>
+</config>
