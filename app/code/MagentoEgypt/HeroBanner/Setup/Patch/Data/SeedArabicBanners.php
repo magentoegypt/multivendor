@@ -122,7 +122,9 @@ class SeedArabicBanners implements DataPatchInterface
                 'kicker' => null, 'cta_label' => null,
                 'title' => 'الأطفال والألعاب',
                 'subtitle' => 'آمنة وتعليمية',
-                'url' => 'toys.html',
+                'url' => 'games.html',   // NOT toys.html: this catalog's Kids & Toys
+                                        // category (102) has the url key `games`,
+                                        // and /toys.html 404s.
                 'image' => 'hero/tile-kids.jpg',
             ],
         ];

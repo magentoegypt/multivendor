@@ -121,7 +121,9 @@ class SeedFigmaBanners implements DataPatchInterface
                 'kicker' => null, 'cta_label' => null,
                 'title' => 'Kids and Toys',
                 'subtitle' => 'Safe and educational',
-                'url' => 'toys.html',
+                'url' => 'games.html',   // NOT toys.html: this catalog's Kids & Toys
+                                        // category (102) has the url key `games`,
+                                        // and /toys.html 404s.
                 'image' => 'hero/tile-kids.jpg',
             ],
         ];
