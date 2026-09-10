@@ -17,4 +17,12 @@
                 type="MagentoEgypt\AccountExtend\Plugin\Downloadable\GuardDoubleCount"
                 sortOrder="10"/>
     </type>
+
+    <!--
+        City names on this store contain digits — 6th of October, 10th of
+        Ramadan, 15 May City — and core's validator rejects every one of them
+        while telling the customer digits are allowed. See the class.
+    -->
+    <preference for="Magento\Customer\Model\Validator\City"
+                type="MagentoEgypt\AccountExtend\Model\Validator\City"/>
 </config>
