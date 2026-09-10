@@ -78,4 +78,15 @@
                 type="MagentoEgypt\VendorExtend\Plugin\Model\Layer\PriceFilterNamePlugin"
                 sortOrder="100"/>
     </type>
+
+    <!--
+        CL036-DEV01.22 — a rail must not link to a product that 404s.
+        sortOrder 10: after ConfigurableProduct's parent injection (2), before
+        HomeSections' EnforceProductsCount (100).
+    -->
+    <type name="Magento\CatalogWidget\Block\Product\ProductsList">
+        <plugin name="hm_drop_unservable_widget_products"
+                type="MagentoEgypt\VendorExtend\Plugin\CatalogWidget\DropUnservableProducts"
+                sortOrder="10"/>
+    </type>
 </config>

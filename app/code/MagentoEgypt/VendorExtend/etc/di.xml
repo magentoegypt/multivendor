@@ -63,4 +63,16 @@
     -->
     <preference for="Vnecoms\VendorsPage\Block\Home\ListProduct"
                 type="MagentoEgypt\VendorExtend\Block\VendorsPage\Home\ListProduct"/>
+
+    <!--
+        CL036-DEV01.21 — the search index must hold only what the storefront
+        will serve, or category pages render short. See the plugin for the whole
+        story; the registration is GLOBAL because the indexer runs from cron and
+        from the CLI, not in the frontend area.
+    -->
+    <type name="Magento\Elasticsearch\Model\Indexer\IndexerHandler">
+        <plugin name="hm_exclude_unapproved_from_search_index"
+                type="MagentoEgypt\VendorExtend\Plugin\Indexer\ExcludeUnapprovedProducts"
+                sortOrder="100"/>
+    </type>
 </config>
