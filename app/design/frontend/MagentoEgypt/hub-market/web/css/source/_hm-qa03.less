@@ -2303,3 +2303,28 @@
     //  it keeps its weight rather than inheriting the block's centred body copy.
     .checkout-success .order-number { font-weight: 700; }
 }
+
+//
+//  ACCOUNT (mobile) — the spacing between the identity card, the stats and the
+//  page content
+//  ---------------------------------------------------------------------------
+//  Client's request. With the navigation hidden at this width and Shopping
+//  Stats ordered above the content, the column reads: identity card, stats,
+//  then the page. Those first two are one group and were sitting 32px apart —
+//  `.hm-identity` carries `margin-block-end: var(--hm-space-8)` for the desktop
+//  layout, where the stats are beside it rather than under it.
+//
+//  Closing that to nothing pairs them, and the 16px below the stats is what
+//  then separates the pair from the products. The gap moves rather than
+//  disappearing.
+//
+//  Mobile only: on desktop the two sit in the rail with the grid's own gutter
+//  between them, and the 32px is doing a different job there.
+@media screen and (max-width: 767px) {
+    //  (0,3,0) — `.account` and `.hm-page` are both on the body, and the rule
+    //  this overrides is (0,1,0) in a file whose position relative to this one
+    //  the CSS merge has changed before now. Weight rather than source order.
+    .hm-page.account .hm-identity { margin-block-end: 0; }
+
+    .hm-page .hm-stats { margin-block-end: var(--hm-space-4); }
+}
