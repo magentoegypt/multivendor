@@ -1,12 +1,18 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Arabic product names on the invoice PDF (CL036-DEV01.23).
+ * Arabic product names on the sales PDFs (CL036-DEV01.23).
  *
- * Only the invoice's default renderer is replaced. The shipment and credit memo
- * documents carry the same product names and have the same fault, but they are
- * separate renderers with their own forked draw(); they follow once this one is
- * signed off rather than forking three copies of core on one unverified pass.
+ * All three documents, because they all carry product names and all three drew
+ * them wrong. The invoice was merely unshaped — 2.4.8 reverses it via
+ * Sales\Model\RtlTextHandler but never joins the letters. The packing slip and
+ * the credit memo had no RTL handling at all, so their Arabic was neither
+ * shaped nor reversed.
+ *
+ * `default` only. The bundle, grouped and downloadable renderers subclass their
+ * own parents and are left on core: they are not in use on this catalogue's
+ * Arabic products, and forking three more copies of draw() to cover a case
+ * nobody has hit is how a fork stops being maintainable.
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -14,6 +20,12 @@
     <renderers>
         <page type="invoice">
             <renderer product_type="default">MagentoEgypt\CheckoutExtend\Model\Pdf\Items\Invoice\Arabic</renderer>
+        </page>
+        <page type="shipment">
+            <renderer product_type="default">MagentoEgypt\CheckoutExtend\Model\Pdf\Items\Shipment\Arabic</renderer>
+        </page>
+        <page type="creditmemo">
+            <renderer product_type="default">MagentoEgypt\CheckoutExtend\Model\Pdf\Items\Creditmemo\Arabic</renderer>
         </page>
     </renderers>
 </config>
