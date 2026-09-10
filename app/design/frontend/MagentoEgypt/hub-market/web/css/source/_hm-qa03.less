@@ -2417,6 +2417,34 @@
     //  else on the page.
     .block-order-details-view .box-content,
     .block-order-details-view address { line-height: 1.35; }
+
+    //  TWO-UP ON PAPER, which nothing else was giving it.
+    //
+    //  This is what actually pushed Order Information onto a second sheet, and
+    //  it is a gap between two width-based assumptions rather than a spacing
+    //  problem. A printed page is about 718px wide, so `@media (min-width:
+    //  768px)` — where blank floats these boxes side by side — is FALSE on
+    //  paper. And the theme's own mobile rules cannot fill in for it either:
+    //  they were re-scoped to `screen` when the printed receipt was fixed
+    //  (DEV01.17), precisely so paper would stop getting the phone layout.
+    //
+    //  Between the two, the boxes fell through to being plain stacked blocks:
+    //  the block ran 562px tall with half the sheet's width unused, too big for
+    //  the space left under the totals, so the whole of it moved to page two
+    //  and left the blank the client is pointing at.
+    //
+    //  `inline-block` rather than a float, because this sheet is printed in
+    //  Arabic too: inline-blocks lay themselves out along the writing
+    //  direction, so RTL mirrors on its own and needs no second rule, and a
+    //  page break can still fall between the two rows if an order ever carries
+    //  enough items to need one — which a float would not allow.
+    .block-order-details-view .box {
+        box-sizing: border-box;
+        display: inline-block;
+        float: none;
+        inline-size: 48%;
+        vertical-align: top;
+    }
 }
 
 //
