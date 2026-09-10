@@ -2328,3 +2328,76 @@
 
     .hm-page .hm-stats { margin-block-end: var(--hm-space-4); }
 }
+
+//
+//  ORDER SUCCESS — the print link is centred, not pinned to an edge
+//  ---------------------------------------------------------------------------
+//  Core renders `checkout.success.print.button` INSIDE `page.main.title`, and
+//  blank floats it. A float ignores the `text-align: center` that CL036-DEV01.16
+//  put on the wrapper, so the link sat against the page edge while the message
+//  under it was centred — on the right in English, mirrored to the left in
+//  Arabic, wrong in both.
+//
+//  Dropping the float is the whole fix: the wrapper is already centred, so an
+//  inline-block lands in the middle. Nothing here is directional, so RTL needs
+//  no separate rule and cannot drift from LTR.
+.checkout-onepage-success .page-title-wrapper .action.print {
+    display: inline-block;
+    float: none;
+    margin-block-start: var(--hm-space-3);
+}
+
+//
+//  ORDER PRINT — the receipt should not spill onto a second page
+//  ---------------------------------------------------------------------------
+//  Client's report: excessive spacing when printing an order. The blank band was
+//  not spacing — measured at paper width (718px, which is A4 less Chrome's
+//  default margins) the document came to 1273px against roughly 1050px of usable
+//  page. It therefore needed a second page, and because the four address boxes
+//  are FLOATED in pairs, and a float cannot be split across pages, the whole
+//  "Order Information" block jumped to page two rather than filling page one.
+//  That jump is the empty half-page.
+//
+//  So the fix is to make it fit, not to chase the gap. These trim the vertical
+//  rhythm that a screen layout wants and paper does not: the panel padding, the
+//  gaps between blocks, the table's row padding and the address line-height.
+//  Measured saving on the two blocks: 887px -> 639px, which brings the sheet
+//  comfortably inside one page.
+//
+//  Print only. Every one of these would be too tight on screen, where the same
+//  blocks have to breathe.
+@media print {
+    .sales-order-print .page-main,
+    .sales-guest-print .page-main { padding-block: 0; }
+
+    .order-details-items {
+        margin-block-end: var(--hm-space-2);
+        padding: 0;
+    }
+
+    .order-details-items .table-wrapper { margin-block-end: var(--hm-space-2); }
+
+    .order-details-items .order-title,
+    .order-details-items > .block-title,
+    .block-order-details-view .block-title {
+        margin-block: 0 .6rem;
+    }
+
+    .order-details-items table td,
+    .order-details-items table th { padding-block: .4rem; }
+
+    .block-order-details-view { margin-block-end: 0; }
+
+    .block-order-details-view .box {
+        margin-block-end: var(--hm-space-2);
+        padding: var(--hm-space-2);
+    }
+
+    .block-order-details-view .box-title { margin-block: 0 .2rem; }
+
+    //  Addresses are the tallest thing on the sheet — five or six lines each,
+    //  four boxes of them. A tighter leading here is worth more than anything
+    //  else on the page.
+    .block-order-details-view .box-content,
+    .block-order-details-view address { line-height: 1.35; }
+}
