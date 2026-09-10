@@ -89,4 +89,20 @@
                 type="MagentoEgypt\VendorExtend\Plugin\CatalogWidget\DropUnservableProducts"
                 sortOrder="10"/>
     </type>
+
+    <!--
+        CL036-DEV01.24 — every vendor page sent a signed-out visitor to the
+        CUSTOMER login, because Vnecoms' controllers extend Magento's
+        AbstractAccount and Magento's plugin authenticates first. See the class.
+    -->
+    <type name="Magento\Customer\Model\Url">
+        <plugin name="hm_seller_login_url"
+                type="MagentoEgypt\VendorExtend\Plugin\Customer\SellerLoginUrl"
+                sortOrder="100"/>
+    </type>
+    <type name="Magento\Customer\Model\Session">
+        <plugin name="hm_seller_login_redirect"
+                type="MagentoEgypt\VendorExtend\Plugin\Customer\SellerLoginUrl"
+                sortOrder="100"/>
+    </type>
 </config>

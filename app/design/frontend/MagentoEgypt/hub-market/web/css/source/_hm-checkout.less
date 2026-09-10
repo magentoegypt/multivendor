@@ -1043,6 +1043,8 @@
 //  prefix is needed to out-specify a rule emitted after _extend.less.
 .customer-account-login .login-container,
 .customer-account-create .login-container,
+.marketplace-seller-login .login-container,
+.marketplace-seller-register .login-container,
 .login-container {
     display: grid;
     gap: var(--hm-space-8);
@@ -1144,7 +1146,12 @@
 //  Same trick, same reason, as the .login-container fix above.
 .customer-account-login,
 .customer-account-create,
-.customer-account-forgotpassword {
+.customer-account-forgotpassword,
+//  Seller login and registration are the same form on the same layout — see the
+//  note in _hm-account.less. Without these two the labels stayed floated in
+//  blank's 25.8% column and sat ON TOP of their own inputs.
+.marketplace-seller-login,
+.marketplace-seller-register {
     .fieldset > .field:not(.choice) > .control,
     .fieldset > .field > .control {
         float: none;
@@ -1242,7 +1249,9 @@ a.sms-login-field-ctrl {
 //  spacer standing in for the floated label column this theme no longer uses.
 .customer-account-create,
 .customer-account-login,
-.customer-account-forgotpassword {
+.customer-account-forgotpassword,
+.marketplace-seller-login,
+.marketplace-seller-register {
     .fieldset > .field.choice::before,
     .fieldset > .field.no-label::before { content: none; display: none; }
 

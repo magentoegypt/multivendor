@@ -460,6 +460,13 @@
 .customer-account-login .page-title-wrapper .page-title,
 .customer-account-create .page-title-wrapper .page-title,
 .customer-account-forgotpassword .page-title-wrapper .page-title,
+//  The SELLER's two public routes are the same kind of page and were missed:
+//  they carry `marketplace-seller-login` and `-register`, no `.account`, so
+//  every rule written for the customer's three walked past them and the seller
+//  login rendered blank's 48px h1 hard against the viewport edge
+//  ([CL036-DEV01.24]).
+.marketplace-seller-login .page-title-wrapper .page-title,
+.marketplace-seller-register .page-title-wrapper .page-title,
 .vstorecredit-index-index .page-title-wrapper .page-title,
 .vrma-customer-index .page-title-wrapper .page-title {
     font-family: var(--hm-font-heading);
@@ -473,7 +480,9 @@
 //  panels added to these pages are white cards on a white page.
 .customer-account-login,
 .customer-account-create,
-.customer-account-forgotpassword {
+.customer-account-forgotpassword,
+.marketplace-seller-login,
+.marketplace-seller-register {
     .page-wrapper { background: var(--hm-surface-muted); }
     .page-main { padding-block-start: var(--hm-space-8); }
 }
