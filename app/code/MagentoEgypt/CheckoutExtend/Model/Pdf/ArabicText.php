@@ -116,6 +116,14 @@ class ArabicText
             return $text;
         }
 
+        //  IDEMPOTENT. Presentation forms in the input mean this string has
+        //  already been through here, and shaping it twice would reorder it
+        //  back to front. The transform is applied both at the page and (for
+        //  the item rows) by the renderers, so it has to be safe to meet twice.
+        if (preg_match('/[\x{FE70}-\x{FEFF}]/u', $text)) {
+            return $text;
+        }
+
         $chars = preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY) ?: [];
         $cps = array_map(static fn ($c) => self::ord($c), $chars);
 
@@ -238,7 +246,7 @@ class ArabicText
             }
         }
 
-        return implode('', array_map(static fn ($cp) => self::chr($cp), $glyphs));
+        return implode('', array_map(static fn ($cp) => self::chr(self::mirror($cp)), $glyphs));
     }
 
     /** Latin letters and digits carry their own direction. */
@@ -264,6 +272,27 @@ class ArabicText
             return false;
         }
         return isset($glyphs[$i + 1]) && $this->isLtr($glyphs[$i + 1]);
+    }
+
+    /**
+     * Paired punctuation has to be mirrored, not just moved.
+     *
+     * Reversing "(إجمالي رسوم الشحن ١٠,٠٠ ج.م.)" puts the closing bracket on
+     * the left, but it is still a CLOSING bracket, so the line came out
+     * ")…(" — brackets pointing the wrong way round. Unicode calls these
+     * mirrored pairs and a bidi implementation swaps them on reversal.
+     */
+    private const MIRROR = [
+        0x0028 => 0x0029, 0x0029 => 0x0028,   // ( )
+        0x005B => 0x005D, 0x005D => 0x005B,   // [ ]
+        0x007B => 0x007D, 0x007D => 0x007B,   // { }
+        0x003C => 0x003E, 0x003E => 0x003C,   // < >
+        0x00AB => 0x00BB, 0x00BB => 0x00AB,   // « »
+    ];
+
+    private static function mirror(int $cp): int
+    {
+        return self::MIRROR[$cp] ?? $cp;
     }
 
     private static function ord(string $char): int

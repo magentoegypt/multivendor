@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Arabic on the whole sales document, not just its item rows (CL036-DEV01.23).
+ *
+ * The item renderers in pdf.xml cover the product names. Everything else on the
+ * page — column headers, "Ship to:" captions, addresses, totals — is drawn by
+ * AbstractPdf's protected methods, which no plugin can reach. These three
+ * subclasses change one line each: the page they draw on shapes Arabic.
+ *
+ * GLOBAL. The documents are produced from the admin grid, but the same classes
+ * are reachable from the frontend and the CLI, and a receipt that is correct in
+ * one place and not another is the bug this fixes, not a variant of it.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Sales\Model\Order\Pdf\Invoice"
+                type="MagentoEgypt\CheckoutExtend\Model\Pdf\Doc\Invoice"/>
+    <preference for="Magento\Sales\Model\Order\Pdf\Shipment"
+                type="MagentoEgypt\CheckoutExtend\Model\Pdf\Doc\Shipment"/>
+    <preference for="Magento\Sales\Model\Order\Pdf\Creditmemo"
+                type="MagentoEgypt\CheckoutExtend\Model\Pdf\Doc\Creditmemo"/>
+
+    <!--
+        Direction is owned in one place. Core reverses address lines before the
+        page ever sees them, which left the country reading back-to-front while
+        the rest of the document was right. ArabicPage shapes and orders
+        everything, so core's reverser stands down. See NoRtlReversal.
+    -->
+    <preference for="Magento\Sales\Model\RtlTextHandler"
+                type="MagentoEgypt\CheckoutExtend\Model\Pdf\NoRtlReversal"/>
+</config>
