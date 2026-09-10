@@ -65,6 +65,9 @@ class BundleDeals extends Template
     /** @var array<int, array<string, mixed>>|null */
     private ?array $bundles = null;
 
+    /** @var array<int, string> id => name for the categories the bundles are in. */
+    private array $categoryNames = [];
+
     /**
      * Star rating for a bundle card.
      *
@@ -206,8 +209,9 @@ class BundleDeals extends Template
             return [];
         }
 
-        $ids       = array_map('intval', $collection->getAllIds());
-        $options   = $this->loadOptions($ids);
+        $ids        = array_map('intval', $collection->getAllIds());
+        $categories = $this->loadTopCategories($ids);
+        $options    = $this->loadOptions($ids);
         $indexed   = $this->loadIndexPrices($ids);
         $childData = $this->loadChildren($options);
 
@@ -260,6 +264,12 @@ class BundleDeals extends Template
                 'regular'     => $regular > 0 ? $this->priceCurrency->format($regular, false) : null,
                 'saving'      => $saving > 0 ? $this->priceCurrency->format($saving, false) : null,
                 'discount'    => $saving > 0 && $regular > 0 ? (int) round($saving / $regular * 100) : 0,
+                /*
+                 * The top-level categories this bundle sits under, for the chip
+                 * filter on the landing page. Ids only; the names are resolved
+                 * once for the whole row set in getCategoryChips().
+                 */
+                'cats'        => $categories[$id] ?? [],
                 /*
                  * The product itself, for the rating block. Carried rather than
                  * pre-rendered because the renderer needs a template and this
@@ -598,6 +608,148 @@ class BundleDeals extends Template
         }
 
         return $text;
+    }
+
+    /**
+     * The TOP-LEVEL category of every category each bundle is assigned to.
+     *
+     * Top level, not the leaf: the reference's chip row is the marketplace's
+     * departments, and a bundle filed under "Fitness Equipment" belongs to the
+     * "Gear" chip, not to one of its own. Inactive categories are left out — a
+     * chip that filters to a category nobody can browse is a dead end — and the
+     * two roots are skipped.
+     *
+     * @param int[] $productIds
+     * @return array<int, int[]>
+     */
+    private function loadTopCategories(array $productIds): array
+    {
+        if (!$productIds) {
+            return [];
+        }
+
+        try {
+            $conn = $this->resource->getConnection();
+            $rows = $conn->fetchAll(
+                $conn->select()
+                    ->from(['ccp' => $this->resource->getTableName('catalog_category_product')], ['product_id'])
+                    ->join(
+                        ['ce' => $this->resource->getTableName('catalog_category_entity')],
+                        'ce.entity_id = ccp.category_id',
+                        ['path']
+                    )
+                    ->where('ccp.product_id IN (?)', $productIds)
+                    ->where('ccp.category_id NOT IN (?)', [1, 2])
+            );
+        } catch (\Throwable $e) {
+            $this->logger->warning('HomeSections: bundle categories unavailable: ' . $e->getMessage());
+
+            return [];
+        }
+
+        $out = [];
+        foreach ($rows as $row) {
+            $parts = explode('/', (string) $row['path']);
+            if (count($parts) < 3) {
+                continue;
+            }
+            $top = (int) $parts[2];
+            $productId = (int) $row['product_id'];
+            $out[$productId][$top] = $top;
+        }
+
+        $active = $this->activeCategoryNames(array_unique(array_merge(...array_values(array_map('array_values', $out)) ?: [[]])));
+
+        foreach ($out as $productId => $tops) {
+            $out[$productId] = array_values(array_filter($tops, static fn (int $id): bool => isset($active[$id])));
+        }
+
+        $this->categoryNames = $active;
+
+        return $out;
+    }
+
+    /**
+     * @param int[] $ids
+     * @return array<int, string> id => name, in catalogue order
+     */
+    private function activeCategoryNames(array $ids): array
+    {
+        if (!$ids) {
+            return [];
+        }
+
+        $conn = $this->resource->getConnection();
+        $storeId = (int) $this->storeManager->getStore()->getId();
+        $eav = $this->resource->getTableName('eav_attribute');
+        $varchar = $this->resource->getTableName('catalog_category_entity_varchar');
+        $int = $this->resource->getTableName('catalog_category_entity_int');
+
+        $nameAttr = (int) $conn->fetchOne(
+            "SELECT attribute_id FROM {$eav} WHERE attribute_code = 'name' AND entity_type_id = 3"
+        );
+        $activeAttr = (int) $conn->fetchOne(
+            "SELECT attribute_id FROM {$eav} WHERE attribute_code = 'is_active' AND entity_type_id = 3"
+        );
+        if (!$nameAttr || !$activeAttr) {
+            return [];
+        }
+
+        $select = $conn->select()
+            ->from(['e' => $this->resource->getTableName('catalog_category_entity')], ['entity_id'])
+            ->joinLeft(['nd' => $varchar], "nd.entity_id = e.entity_id AND nd.attribute_id = {$nameAttr} AND nd.store_id = 0", [])
+            ->joinLeft(['ns' => $varchar], "ns.entity_id = e.entity_id AND ns.attribute_id = {$nameAttr} AND ns.store_id = {$storeId}", [])
+            ->joinLeft(['ad' => $int], "ad.entity_id = e.entity_id AND ad.attribute_id = {$activeAttr} AND ad.store_id = 0", [])
+            ->joinLeft(['as_' => $int], "as_.entity_id = e.entity_id AND as_.attribute_id = {$activeAttr} AND as_.store_id = {$storeId}", [])
+            ->columns(['name' => new \Zend_Db_Expr('COALESCE(ns.value, nd.value)')])
+            ->where('e.entity_id IN (?)', $ids)
+            ->where('COALESCE(as_.value, ad.value) = 1')
+            ->order('e.position ASC')
+            ->order('e.entity_id ASC');
+
+        return array_map('strval', $conn->fetchPairs($select));
+    }
+
+    /**
+     * The chip row above the grid: "All Bundles", then one chip per department
+     * that actually has a bundle in it, in catalogue order.
+     *
+     * Data, not decoration — a chip that filters to nothing would be worse than
+     * no chip. Returned empty when there is only one department to offer, since
+     * a filter with a single option filters nothing.
+     *
+     * @return array<int, array{id: int|string, name: string, count: int}>
+     */
+    public function getCategoryChips(): array
+    {
+        $bundles = $this->getBundles();
+        if (!$bundles) {
+            return [];
+        }
+
+        $counts = [];
+        foreach ($bundles as $bundle) {
+            foreach ($bundle['cats'] as $catId) {
+                $counts[(int) $catId] = ($counts[(int) $catId] ?? 0) + 1;
+            }
+        }
+        if (count($counts) < 2) {
+            return [];
+        }
+
+        $chips = [[
+            'id'    => 'all',
+            'name'  => (string) __('All Bundles'),
+            'count' => count($bundles),
+        ]];
+        foreach ($this->categoryNames as $id => $name) {
+            if (!isset($counts[$id])) {
+                continue;
+            }
+            $chips[] = ['id' => (int) $id, 'name' => $name, 'count' => $counts[$id]];
+        }
+
+        return $chips;
     }
 
     /**

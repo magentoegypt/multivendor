@@ -297,3 +297,76 @@
 //  the edge, and the row's `::after` still holds the air at the end of the
 //  scroll.
 .hm-page .hm-nav__inner { padding-inline-end: 0; }
+
+//  ---------------------------------------------------------------------------
+//  CL036-TR01 retest — "the images look cut off, short, and squished"
+//  ---------------------------------------------------------------------------
+//  The card's media is a 16:9 band, which is the shape the reference uses
+//  because its bundle art is landscape photography. This catalogue's bundle
+//  images are product shots in PORTRAIT — 363x450 on the four live bundles — so
+//  a 16:9 cover crop threw away half of every one of them: a tote bag with no
+//  base, a room with the top of someone's head.
+//
+//  Square, which is the shape every other card on this storefront uses (measured
+//  on the homepage rails and the category grid: 1/1 on --hm-surface-muted), and
+//  a 0.81 image loses almost nothing to it.
+//
+//  The landing page only. The homepage rail passed QA at 16:9 in an earlier
+//  cycle and four square cards there would add ~150px to the homepage; if that
+//  rail should match this page, it is one selector.
+.cms-bundles .hm-bundle__media {
+    aspect-ratio: 1;
+    background: var(--hm-surface-muted);
+}
+
+//  The count above the grid, as the reference prints it.
+.cms-bundles .hm-bundles__count {
+    color: var(--hm-foreground-muted);
+    font-size: 1.3rem;
+    margin: 0 0 var(--hm-space-4);
+}
+
+//  THE DEPARTMENT CHIPS.
+//  The reference's row between the band and the grid: pills on the page ground,
+//  the active one filled. Scrolls rather than wraps for the same reason the
+//  category bar does — one line is the shape being copied.
+.cms-bundles .hm-bundle-chips {
+    display: flex;
+    gap: var(--hm-space-2);
+    margin-block-end: var(--hm-space-4);
+    overflow-x: auto;
+    padding-block-end: .4rem;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar { display: none; }
+}
+
+.cms-bundles .hm-bundle-chip {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-full);
+    color: var(--hm-foreground);
+    cursor: pointer;
+    flex: 0 0 auto;
+    font-size: 1.3rem;
+    font-weight: 600;
+    //  A 40px target on a 32px-tall pill — WCAG 2.5.8 with room to spare.
+    min-block-size: 4rem;
+    padding: 0 var(--hm-space-4);
+    transition: background var(--hm-duration) var(--hm-ease),
+                border-color var(--hm-duration) var(--hm-ease),
+                color var(--hm-duration) var(--hm-ease);
+    white-space: nowrap;
+}
+
+.cms-bundles .hm-bundle-chip:hover {
+    border-color: var(--hm-accent);
+    color: var(--hm-accent-strong);
+}
+
+.cms-bundles .hm-bundle-chip--on,
+.cms-bundles .hm-bundle-chip--on:hover {
+    background: var(--hm-surface-inverse);
+    border-color: var(--hm-surface-inverse);
+    color: var(--hm-on-inverse);
+}

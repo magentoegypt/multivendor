@@ -80,6 +80,48 @@ $hmStats = $block->getPageStats();
 
 <?php
 /*
+ * THE DEPARTMENT CHIPS, as the reference draws them between the band and the
+ * grid. Built from the categories the live bundles are actually in — see
+ * BundleDeals::getCategoryChips() — so every chip filters to something, and the
+ * row does not render at all when there is only one department to offer.
+ *
+ * `hidden` until the script that drives them says otherwise: a filter that
+ * cannot filter is worse than no filter, and this way a page whose JavaScript
+ * never arrives shows the grid rather than a row of dead buttons.
+ */
+$hmChips = $block->getCategoryChips();
+?>
+<?php if ($hmChips): ?>
+    <div class="hm-bundle-chips" data-mage-init='{"js/hm-bundle-filter":{}}' hidden
+         role="group" aria-label="<?= $escaper->escapeHtmlAttr(__('Filter bundles by category')) ?>">
+        <?php foreach ($hmChips as $hmIndex => $hmChip): ?>
+            <button class="hm-bundle-chip<?= $hmIndex === 0 ? ' hm-bundle-chip--on' : '' ?>"
+                    type="button"
+                    data-hm-cat="<?= $escaper->escapeHtmlAttr((string) $hmChip['id']) ?>"
+                    aria-pressed="<?= $hmIndex === 0 ? 'true' : 'false' ?>">
+                <?= $escaper->escapeHtml($hmChip['name']) ?>
+            </button>
+        <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<?php
+/*
+ * The count, as the reference prints it above the grid. Read from the same rows
+ * the cards come from, so it cannot disagree with what is on the page.
+ */
+$hmBundles = $block->getBundles();
+?>
+<?php if ($hmBundles): ?>
+    <p class="hm-bundles__count">
+        <?= $escaper->escapeHtml(
+            count($hmBundles) === 1 ? __('1 bundle available') : __('%1 bundles available', count($hmBundles))
+        ) ?>
+    </p>
+<?php endif; ?>
+
+<?php
+/*
  * The cards, from the rail's own template so there is one bundle card in this
  * codebase rather than two that drift. Same block instance, so getBundles() has
  * already run and this costs nothing but the render.

@@ -59,7 +59,9 @@ $showHead = $block->getData('show_head') === null || (bool) $block->getData('sho
 
     <ul class="hm-bundles__list">
         <?php foreach ($bundles as $b): ?>
-            <li class="hm-bundles__item">
+            <?php /* The departments this bundle is in, for the landing page's chip
+                     filter. Harmless on the homepage rail, which has no chips. */ ?>
+            <li class="hm-bundles__item" data-hm-cats="<?= $escaper->escapeHtmlAttr(implode(' ', $b['cats'] ?? [])) ?>">
                 <a class="hm-bundle" href="<?= $escaper->escapeUrl($b['url']) ?>">
 
                     <span class="hm-bundle__media">
