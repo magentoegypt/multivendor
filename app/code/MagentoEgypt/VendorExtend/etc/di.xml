@@ -89,4 +89,30 @@
         <plugin name="hm_hide_empty_theme_field"
                 type="MagentoEgypt\VendorExtend\Plugin\CustomTheme\HideEmptyThemeChooser"/>
     </type>
+
+    <!--
+        CL036-TC09: a vendor's notification mail must never fail the order it
+        announces. Vnecoms mails the vendor from inside placeOrder() (and from
+        invoice, shipment and credit memo creation); a vendor with no linked
+        account has no address, the mail throws a TypeError that Vnecoms' own
+        catch (\Exception) misses, and checkout reports an error for an order
+        that was placed. See the plugin. GLOBAL: checkout places orders in
+        `webapi_rest`; invoices and shipments come from `adminhtml` and `vendors`.
+    -->
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\InvoiceSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\ShipmentSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\CreditmemoSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
 </config>
