@@ -385,10 +385,34 @@
 //  .4rem }` is (0,2,0), so it lost on every desktop and every label sat flush on
 //  its own input. The body-class prefix settles it at (0,5,0). `:not(.choice)`
 //  keeps it off the checkbox rows, whose label belongs beside the box.
+//
+//  AND THEY LOOK ALIKE. Email Address and Mobile Number sit inside
+//  `.control.sms-login-field`, out of reach of blank's direct-child label rules,
+//  and _hm-checkout.less sets them in the body colour at 500. Password is a
+//  direct child of its field, so it kept the muted `.form-login .label` grey,
+//  blank's 700 weight and blank's #e02b27 asterisk on a physical 6px left
+//  margin — and from 768px up, blank's 6px top padding, left over from its
+//  side-by-side label layout. Two label styles in one form. Password now takes
+//  the sms labels' values, asterisk included.
 .customer-account-login,
 .marketplace-seller-login {
     .fieldset > .field:not(.choice) > .label {
+        color: var(--hm-foreground);
+        font-size: 1.4rem;
+        font-weight: 500;
         margin-block-end: var(--hm-space-2);
+        padding: 0;
+    }
+
+    //  blank's marker is `.fieldset > .field.required > .label:after`, (0,4,1);
+    //  this is (0,5,1). Its physical margin is zeroed so that in Arabic the 4px
+    //  falls between the word and the asterisk, not on the asterisk's far side.
+    .fieldset > .field.required > .label:after,
+    .fieldset > .field._required > .label:after {
+        color: var(--hm-danger);
+        font-size: 1.4rem;
+        margin: 0;
+        margin-inline-start: var(--hm-space-1);
     }
 }
 
