@@ -464,4 +464,15 @@
             float: inline-start;
         }
     }
+
+    //  The forgot-password card, where both login pages send you. blank's other
+    //  pairing: the primary floats left and `.secondary` RIGHT, so in Arabic
+    //  "إعادة تعيين كلمة المرور" sat 0px from the left of the card's content
+    //  and "رجوع" 0px from its right — the English layout, unmirrored. The
+    //  25.8% offset blank also put here is already gone (_hm-checkout.less);
+    //  these are the floats it left behind.
+    .customer-account-forgotpassword .column.main .actions-toolbar {
+        > .primary { float: inline-start; }
+        > .secondary { float: inline-end; }
+    }
 }
