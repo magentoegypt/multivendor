@@ -370,3 +370,57 @@
     border-color: var(--hm-surface-inverse);
     color: var(--hm-on-inverse);
 }
+
+//  ---------------------------------------------------------------------------
+//  Login forms — labels and fields were touching (customer AND seller login)
+//  ---------------------------------------------------------------------------
+//  Measured at 1440, before:
+//
+//                          pills -> field    "Password" -> field    phone field
+//      seller login           0px                  0px              248px (email 622)
+//      customer login        41px                  0px              248px (email 622)
+//
+//  THE LABELS. blank ships `.fieldset > .field > .label { margin: 0 }` from
+//  768px up, at (0,3,0). This theme's `.form-login .label { margin-block-end:
+//  .4rem }` is (0,2,0), so it lost on every desktop and every label sat flush on
+//  its own input. The body-class prefix settles it at (0,5,0). `:not(.choice)`
+//  keeps it off the checkbox rows, whose label belongs beside the box.
+.customer-account-login,
+.marketplace-seller-login {
+    .fieldset > .field:not(.choice) > .label {
+        margin-block-end: var(--hm-space-2);
+    }
+}
+
+//  THE SELLER'S EMAIL/MOBILE SWITCH. The customer login's template override
+//  moved these pills into a `.sms-login-switch` row of their own, spaced from
+//  the field below; the seller login still renders Vnecoms' original markup, in
+//  which the two pills live INSIDE the email field's <label>. So the label is the
+//  pill row, and with blank's zero margin the dark "Email" pill stood directly on
+//  top of the input. A flex row with the customer form's spacing: 8px between
+//  the pills, 12px to the field.
+.marketplace-seller-login .fieldset > .field.email > .label {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--hm-space-2);
+    margin-block-end: var(--hm-space-3);
+}
+
+//  THE PHONE FIELD SPANS, as the email field it swaps with does. intl-tel-input
+//  wraps the control in `.intl-tel-input`, which is inline-block and shrink-wraps,
+//  so a 100%-wide input inside it rendered at 248px — the field visibly changed
+//  width when a shopper switched tabs. Same trap, same fix, as the address and
+//  registration forms.
+.customer-account-login,
+.marketplace-seller-login {
+    .form-login .intl-tel-input {
+        display: block;
+        inline-size: 100%;
+
+        input {
+            box-sizing: border-box;
+            inline-size: 100%;
+        }
+    }
+}
