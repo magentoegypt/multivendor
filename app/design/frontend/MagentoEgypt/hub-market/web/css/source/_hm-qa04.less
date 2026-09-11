@@ -392,21 +392,6 @@
     }
 }
 
-//  THE SELLER'S EMAIL/MOBILE SWITCH. The customer login's template override
-//  moved these pills into a `.sms-login-switch` row of their own, spaced from
-//  the field below; the seller login still renders Vnecoms' original markup, in
-//  which the two pills live INSIDE the email field's <label>. So the label is the
-//  pill row, and with blank's zero margin the dark "Email" pill stood directly on
-//  top of the input. A flex row with the customer form's spacing: 8px between
-//  the pills, 12px to the field.
-.marketplace-seller-login .fieldset > .field.email > .label {
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--hm-space-2);
-    margin-block-end: var(--hm-space-3);
-}
-
 //  THE PHONE FIELD SPANS, as the email field it swaps with does. intl-tel-input
 //  wraps the control in `.intl-tel-input`, which is inline-block and shrink-wraps,
 //  so a 100%-wide input inside it rendered at 248px — the field visibly changed

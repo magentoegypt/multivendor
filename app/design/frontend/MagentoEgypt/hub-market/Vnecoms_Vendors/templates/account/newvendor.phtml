@@ -1,0 +1,36 @@
+<?php
+/**
+ * Hub Market override of Vnecoms_Vendors::account/newvendor.phtml — the "New
+ * Seller Account" card beside the seller login.
+ *
+ * The seller twin of this theme's Magento_Customer::newcustomer.phtml, for the
+ * same one reason: the heading id. `block-new-customer-heading` also exists
+ * inside the authentication popup, which renders on every page, so the seller
+ * login page carried it twice and this card's `aria-labelledby` could resolve
+ * into the dialog. It takes the customer card's id — the two pages never share
+ * a document — and see the note at the head of the theme's Vnecoms_Sms
+ * customer/login.phtml for why the visible page is the side that gets renamed.
+ *
+ * Otherwise Vnecoms' markup, with its output now escaped.
+ *
+ * @var \Vnecoms\Vendors\Block\Account\Login\Info $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+?>
+<?php if ($this->helper(\Vnecoms\Vendors\Helper\Data::class)->isEnableVendorRegister()): ?>
+<div class="block block-new-customer">
+    <div class="block-title">
+        <strong id="hm-new-customer-heading" role="heading" aria-level="2"><?= $escaper->escapeHtml(__('New Seller Account')) ?></strong>
+    </div>
+    <div class="block-content" aria-labelledby="hm-new-customer-heading">
+        <p><?= $escaper->escapeHtml(__('Creating a seller account now to start selling your goods.')) ?></p>
+        <div class="actions-toolbar">
+            <div class="primary">
+                <a href="<?= $escaper->escapeUrl($block->getCreateAccountUrl()) ?>" class="action create primary"><span><?= $escaper->escapeHtml(__('Create an Account')) ?></span></a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
