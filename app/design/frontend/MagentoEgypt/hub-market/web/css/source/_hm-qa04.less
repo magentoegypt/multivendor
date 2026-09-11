@@ -498,3 +498,476 @@
 .shop-by-brand ul.brand-list::after {
     content: none;
 }
+
+//  ---------------------------------------------------------------------------
+//  My Account › Order view — refined for desktop and phone
+//  ---------------------------------------------------------------------------
+//  Measured on /en/sales/order/view/order_id/119/ at 1536 and 390, before:
+//
+//  - THE HEADER was four stacked rows, 180px: the title, the status chip on a
+//    line of its own, the date, then "Reorder" / "Print Order" as bare text
+//    links of two different heights (21 and 44px).
+//  - THE ITEM ROW had its hierarchy upside down: the product name was the
+//    quietest text in it (14px/400, muted) while price and subtotal were
+//    18px/700, louder than the grand total. On a phone every cell stacked under
+//    a bold "Label:" of its own width, so the values started at five offsets.
+//  - THE TOTALS had 12px labels and a 2px rule across the whole table.
+//  - ORDER INFORMATION never got the card treatment the success page has (that
+//    is scoped to `.checkout-onepage-success` in _hm-checkout.less): boxes 177
+//    and 93px tall side by side, and the phone number the only accent-coloured
+//    text on the page.
+//  - "BACK TO MY ORDERS" was rendered, inside the items block, and hidden by
+//    blank's `.actions-toolbar > .secondary .action.back { display: none }`.
+//
+//  Elsewhere: "Store Credit EGP 0" is skipped when no credit was used
+//  (Magento_Sales/templates/order/totals.phtml), and the sidebar's "Recently
+//  Ordered", which repeats the Reorder button, is removed from these pages
+//  (Magento_Sales/layout/sales_order_info_links.xml).
+//
+//  The invoice, shipment and credit memo tabs of the same order share the
+//  header, the back link and Order Information, so they take the same rules.
+@hm-order-pages: ~".hm-page:is(.sales-order-view, .sales-order-invoice, .sales-order-shipment, .sales-order-creditmemo)";
+
+//  Room at the top of the column for the back link pinned there below.
+@{hm-order-pages} .column.main {
+    padding-block-start: 4rem;
+    position: relative;
+}
+
+//  1. THE BACK LINK, at the top, where a detail page keeps it. It is rendered
+//  inside the items block, so it is lifted out of flow to the column's top.
+@{hm-order-pages} .order-details-items > .actions-toolbar {
+    border: 0;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+
+    .secondary {
+        float: none;
+        margin: 0;
+    }
+
+    .action.back {
+        align-items: center;
+        color: var(--hm-foreground-muted);
+        display: inline-flex;
+        font-size: 1.4rem;
+        font-weight: 600;
+        gap: .6rem;
+        min-block-size: 3.2rem;
+        text-decoration: none;
+
+        &::before {
+            content: '\2190';
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        &:hover { color: var(--hm-accent-strong); }
+    }
+}
+
+//  "Back" points to the start edge, which in Arabic is the right.
+html:lang(ar) @{hm-order-pages} .order-details-items > .actions-toolbar .action.back::before {
+    content: '\2192';
+}
+
+//  2. THE HEADER: title and status on one line, the date under them, the
+//  actions at the end as buttons. On a phone the actions take a row of their
+//  own (below).
+@{hm-order-pages} .page-title-wrapper {
+    align-items: center;
+    column-gap: var(--hm-space-3);
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    margin-block-end: var(--hm-space-6);
+    row-gap: var(--hm-space-1);
+
+    .page-title {
+        grid-column: 1;
+        grid-row: 1;
+        margin: 0;
+    }
+
+    .order-status {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: start;
+        margin: 0;
+    }
+
+    .order-date {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        grid-column: 1 / 4;
+        grid-row: 2;
+        margin: 0;
+
+        date {
+            color: var(--hm-foreground);
+            font-weight: 500;
+        }
+    }
+
+    .order-actions-toolbar {
+        grid-column: 4;
+        grid-row: 1 / 3;
+        margin: 0;
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--hm-space-2);
+            margin: 0;
+        }
+
+        .action {
+            align-items: center;
+            border: 1px solid var(--hm-border-strong);
+            border-radius: var(--hm-radius);
+            box-sizing: border-box;
+            color: var(--hm-foreground);
+            display: inline-flex;
+            font-size: 1.4rem;
+            font-weight: 600;
+            justify-content: center;
+            margin: 0;
+            min-block-size: 4.4rem;
+            padding: 0 var(--hm-space-4);
+            text-decoration: none;
+
+            &:hover {
+                border-color: var(--hm-accent);
+                color: var(--hm-accent-strong);
+            }
+        }
+
+        //  Reorder is the one a shopper comes back for; it takes the accent.
+        .action.order {
+            border-color: var(--hm-accent);
+            color: var(--hm-accent-strong);
+        }
+    }
+}
+
+//  3. ITEMS ORDERED as a card, with the row's weight moved onto the product.
+@{hm-order-pages} .order-details-items {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-lg);
+    margin-block-end: var(--hm-space-6);
+    padding: var(--hm-space-5) var(--hm-space-6) var(--hm-space-3);
+
+    .order-title {
+        border: 0;
+        margin: 0 0 var(--hm-space-2);
+        padding: 0;
+
+        strong {
+            font-family: var(--hm-font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    }
+
+    .table-wrapper { margin-block-end: 0; }
+}
+
+@{hm-order-pages} .order-details-items .table-order-items {
+    thead th {
+        background: transparent;
+        color: var(--hm-foreground-muted);
+        font-size: 1.2rem;
+        font-weight: 600;
+        letter-spacing: .04em;
+        padding-block: var(--hm-space-2);
+        text-transform: uppercase;
+    }
+
+    tbody td {
+        padding-block: var(--hm-space-4);
+        vertical-align: middle;
+    }
+
+    .product-item-name {
+        color: var(--hm-foreground);
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .col.sku {
+        color: var(--hm-foreground-muted);
+        font-size: 1.3rem;
+    }
+
+    .col.price .price,
+    .col.subtotal .price {
+        color: var(--hm-foreground);
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .col.subtotal .price { font-weight: 700; }
+
+    .items-qty {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        .item { margin: 0; }
+
+        .title {
+            color: var(--hm-foreground-muted);
+            font-size: 1.3rem;
+        }
+
+        .content {
+            color: var(--hm-foreground);
+            font-weight: 600;
+        }
+
+        //  "Ordered: 1" in a column already headed Qty. The label earns its place
+        //  only when there is more than one figure — Shipped, Refunded, Canceled.
+        .item:only-child .title { .hm-visually-hidden(); }
+    }
+
+    tfoot {
+        th,
+        td {
+            border: 0;
+            padding-block: .6rem;
+        }
+
+        tr:first-child th,
+        tr:first-child td { padding-block-start: var(--hm-space-4); }
+
+        .mark {
+            color: var(--hm-foreground-muted);
+            font-size: 1.4rem;
+            font-weight: 400;
+        }
+
+        .amount,
+        .amount .price {
+            color: var(--hm-foreground);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .grand_total th,
+        .grand_total td {
+            border-block-start: 1px solid var(--hm-border-subtle);
+            padding-block-start: var(--hm-space-3);
+        }
+
+        .grand_total .mark,
+        .grand_total .mark strong,
+        .grand_total .amount,
+        .grand_total .amount .price {
+            color: var(--hm-foreground);
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+    }
+}
+
+//  4. ORDER INFORMATION the way the success page draws it: cards, one height per
+//  row, the phone number in the text colour.
+@{hm-order-pages} .block-order-details-view {
+    margin-block-end: var(--hm-space-6);
+
+    .block-title {
+        border: 0;
+        margin: 0 0 var(--hm-space-3);
+        padding: 0;
+
+        strong {
+            font-family: var(--hm-font-heading);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+    }
+
+    .block-content {
+        align-items: stretch;
+        display: grid;
+        gap: var(--hm-space-4);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .box-title {
+        display: block;
+        margin: 0 0 var(--hm-space-2);
+
+        span {
+            color: var(--hm-foreground);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+    }
+
+    .box-content,
+    address {
+        color: var(--hm-foreground-muted);
+        font-size: 1.4rem;
+        font-style: normal;
+        line-height: 1.6;
+    }
+
+    .box-content a[href^='tel:'] {
+        color: var(--hm-foreground);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+}
+
+//  blank floats these at 48.8% from (0,6,0); a grid item needs neither.
+@{hm-order-pages} .column.main .block.block-order-details-view .block-content .box {
+    background: var(--hm-surface);
+    border: 1px solid var(--hm-border-subtle);
+    border-radius: var(--hm-radius-lg);
+    box-sizing: border-box;
+    float: none;
+    inline-size: auto;
+    margin: 0;
+    padding: var(--hm-space-5);
+    width: auto;
+}
+
+//  The account area's own rules for every `.block` and its `.block-content`
+//  outrank the lines above, so these two sit at the box rule's weight too. They
+//  draw a hairline and 24px of padding under each block — here a stray rule
+//  across the end of the page — and a clearfix `::before`, which took the grid's
+//  first cell and put Shipping Address in the second column (measured; the
+//  brand grid's trap again).
+@{hm-order-pages} .column.main .block.block-order-details-view {
+    border-block-end: 0;
+    padding-block-end: 0;
+
+    .block-content::before,
+    .block-content::after { content: none; }
+}
+
+//  5. PHONE.
+@media screen and (max-width: 767px) {
+    @{hm-order-pages} .column.main { padding-block-start: 3.6rem; }
+
+    @{hm-order-pages} .page-title-wrapper {
+        grid-template-columns: auto minmax(0, 1fr);
+        row-gap: var(--hm-space-2);
+
+        .page-title { grid-column: 1 / -1; }
+
+        .order-status {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        .order-date {
+            grid-column: 2;
+            grid-row: 2;
+        }
+
+        //  Two equal buttons across the width.
+        .order-actions-toolbar {
+            grid-column: 1 / -1;
+            grid-row: 3;
+            margin-block-start: var(--hm-space-2);
+
+            //  The toolbar is a flex row, so the grid must be told to fill it; as
+            //  a plain flex item it shrank to its two buttons (225 of 345px).
+            .actions {
+                display: grid;
+                flex: 1 1 auto;
+                grid-auto-columns: minmax(0, 1fr);
+                grid-auto-flow: column;
+            }
+        }
+    }
+
+    @{hm-order-pages} .order-details-items { padding: var(--hm-space-4); }
+
+    @{hm-order-pages} .block-order-details-view .block-content {
+        gap: var(--hm-space-3);
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    @{hm-order-pages} .column.main .block.block-order-details-view .block-content .box {
+        padding: var(--hm-space-4);
+    }
+}
+
+//  The stacked table (blank switches below 640px): the name on its own line with
+//  no "Product Name:" label, the SKU under it, then Price / Qty / Subtotal side
+//  by side with their labels above them, so the three figures line up.
+@media screen and (max-width: 639px) {
+    @{hm-order-pages} .order-details-items .table-wrapper .table-order-items.data.table {
+        > tbody > tr {
+            border-block-end: 1px solid var(--hm-border-subtle);
+            column-gap: var(--hm-space-3);
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            padding-block: var(--hm-space-4);
+            row-gap: var(--hm-space-2);
+        }
+
+        //  Blank clearfixes these rows for its floats. As grid and flex items the
+        //  pseudo-elements take a cell (tbody) or a share of the free space
+        //  (tfoot, where they pushed each label and amount in towards the middle).
+        > tbody > tr::before,
+        > tbody > tr::after,
+        > tfoot > tr::before,
+        > tfoot > tr::after { content: none; }
+
+        > tbody > tr > td {
+            border: 0;
+            padding: 0;
+
+            &::before {
+                color: var(--hm-foreground-muted);
+                content: attr(data-th);
+                display: block;
+                font-size: 1.2rem;
+                font-weight: 500;
+                margin-block-end: .2rem;
+                padding: 0;
+            }
+        }
+
+        > tbody > tr > td.col.name {
+            grid-column: 1 / -1;
+
+            &::before { display: none; }
+        }
+
+        > tbody > tr > td.col.sku {
+            grid-column: 1 / -1;
+
+            &::before {
+                content: attr(data-th) ': ';
+                display: inline;
+            }
+        }
+
+        > tbody > tr > td.col.subtotal { text-align: end; }
+
+        //  Blank floats the totals 70/30 with a physical `left`; a flex row
+        //  mirrors by itself.
+        > tfoot > tr {
+            align-items: baseline;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        > tfoot > tr > th,
+        > tfoot > tr > td {
+            float: none;
+            inline-size: auto;
+            width: auto;
+
+            &::before { display: none; }
+        }
+    }
+}

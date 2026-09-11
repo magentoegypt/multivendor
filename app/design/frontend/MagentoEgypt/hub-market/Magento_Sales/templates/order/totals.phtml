@@ -1,0 +1,40 @@
+<?php
+/**
+ * Hub Market override of Magento_Sales::order/totals.phtml.
+ *
+ * One change: a "Store Credit" row is skipped when no credit was used.
+ * Vnecoms\Credit\Block\Sales\Order\Credit::_initCredit() adds the row unless
+ * getCreditAmount() is falsy, but a stored 0.0000 comes back as a non-empty
+ * string, which PHP treats as true. So orders that used no credit showed
+ * "Store Credit EGP 0" between the shipping and the grand total. A credit that
+ * was actually used still shows.
+ *
+ * @var $block \Magento\Sales\Block\Order\Totals
+ * @see \Magento\Sales\Block\Order\Totals
+ */
+?>
+<?php foreach ($block->getTotals() as $_code => $_total) : ?>
+    <?php if ($_code === 'credit' && (float) $_total->getValue() === 0.0) {
+        continue;
+    } ?>
+    <?php if ($_total->getBlockName()) : ?>
+        <?= $block->getChildHtml($_total->getBlockName(), false) ?>
+    <?php else :?>
+    <tr class="<?= $block->escapeHtmlAttr($_code) ?>">
+        <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row">
+            <?php if ($_total->getStrong()) : ?>
+                <strong><?= $block->escapeHtml($_total->getLabel()) ?></strong>
+            <?php else : ?>
+                <?= $block->escapeHtml($_total->getLabel()) ?>
+            <?php endif ?>
+        </th>
+        <td <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtmlAttr($_total->getLabel()) ?>">
+            <?php if ($_total->getStrong()) : ?>
+                <strong><?= /* @noEscape */ $block->formatValue($_total) ?></strong>
+            <?php else : ?>
+                <?= /* @noEscape */ $block->formatValue($_total) ?>
+            <?php endif?>
+        </td>
+    </tr>
+    <?php endif; ?>
+<?php endforeach?>

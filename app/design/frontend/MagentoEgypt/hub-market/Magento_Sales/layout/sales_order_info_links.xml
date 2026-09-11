@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+    Hub Market: the account sidebar's "Recently Ordered" block
+    (sale.reorder.sidebar, declared in Magento_Sales default.xml) is dropped from
+    an order's own pages. It repeats the Reorder button this page already carries
+    at its top, and in the two-column account layout it hung below the end of the
+    order on desktop and followed it on a phone. It stays on every other account
+    page.
+
+    sales_order_info_links is the handle the order view and its Invoices,
+    Shipments and Refunds tabs all pull in, so one file covers the four.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sale.reorder.sidebar" remove="true"/>
+    </body>
+</page>
