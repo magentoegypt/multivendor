@@ -433,3 +433,35 @@
         }
     }
 }
+
+//  THE BUTTON ROWS MIRROR IN ARABIC. blank lays the desktop toolbar out with
+//  physical floats — `.actions-toolbar .primary { float: left }`, and on the
+//  login card `.secondary { float: left }` with a `margin-right: 36px` on the
+//  primary between them — so in Arabic both cards kept the English order.
+//  Measured at 1440: "إنشاء حساب" 0px from the card's LEFT edge and 482px from
+//  the right, where its heading and text start; Sign In at the left with
+//  Forgot Your Password to its right. _hm-qa03.less already mirrors the
+//  button's own 6px margin for Arabic; these are the floats and the gap.
+//
+//  Logical values, not an Arabic-only flip: `inline-start` IS left in English,
+//  so the English rows stay exactly where they were, and the Arabic ones
+//  mirror. blank's own media query, so this applies exactly where its floats
+//  do; below 768px the buttons are full-width and there is nothing to mirror.
+@media (min-width: 768px), print {
+    .customer-account-login,
+    .marketplace-seller-login {
+        //  Every row in both cards: Sign In, Send OTP, Create an Account.
+        .login-container .actions-toolbar > .primary {
+            float: inline-start;
+        }
+
+        .login-container .block .login .actions-toolbar > .primary {
+            margin-right: 0;
+            margin-inline-end: 3.6rem;
+        }
+
+        .login-container .block .login .actions-toolbar > .secondary {
+            float: inline-start;
+        }
+    }
+}
