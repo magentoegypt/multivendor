@@ -2658,3 +2658,248 @@ html:lang(ar) .page-print .page-main > .hm-logo {
 .order-links:not(:has(> li:nth-child(2))) {
     display: none;
 }
+
+//
+//  CL036-DEV01.25 — VIEW ARABIC
+//  ===========================================================================
+//  Items 1 and 4 are template changes (header/utility.phtml, and the product
+//  page's own title.phtml). Item 6 is further down with the brand page.
+
+//  2. THE SEARCH FIELD READ LEFT TO RIGHT.
+//  form.mini.phtml puts `dir="auto"` on #search, which is right for what a
+//  shopper TYPES — an English query stays left-to-right — but `auto` resolves
+//  from the field's value, and an empty field has none, so it came out
+//  `direction: ltr` and parked the Arabic placeholder on the far left of a
+//  917px box. Author CSS outranks the attribute, so this pins the Arabic store
+//  to RTL: placeholder and typing both start at the right, which is what QA
+//  asked for. The ID gives (1,1,1); nothing class-based competes.
+html:lang(ar) #search {
+    direction: rtl;
+    text-align: right;
+}
+
+//  3. THE FOOTER WORDMARK SAT ON THE WRONG SIDE OF ITS COLUMN.
+//  Same fault as the printed receipt's logo: the lockup carries `dir="ltr"` so
+//  "Hub Market" is never reordered, and as a block-level flex box it spanned the
+//  whole 486px brand column — so its main-start was the column's LEFT edge and
+//  the mark sat at 1019 while the column, its tagline and its chips all start at
+//  1505. Sized to its contents it sits at the column's start edge: the right in
+//  Arabic, and exactly where it already was in English.
+.hm-footer__brand > .hm-footer__logo {
+    inline-size: fit-content;
+}
+
+//  5. THE REVIEW FORM'S LABELS WERE ON THE LEFT OF ITS FIELDS.
+//  Blank's horizontal form floats every label and control LEFT — physically —
+//  with the label text right-aligned against the field, and floats the legend
+//  and the star block left too. In Arabic that put the label column on the
+//  wrong side and "أنت تقيم" on the far left. Mirrored for the review form only:
+//  the same float and padding rules also drive forms this theme has already
+//  un-floated (the checkout, the PDP options), and a site-wide mirror would
+//  out-rank those reverts and re-float them.
+html:lang(ar) .review-form .fieldset > .legend,
+html:lang(ar) .review-form .review-ratings {
+    float: right;
+}
+
+@media (min-width: 768px) {
+    html:lang(ar) .review-form .fieldset > .field:not(.choice) > .label {
+        float: right;
+        padding: 6px 0 0 15px;
+        text-align: right;
+    }
+
+    html:lang(ar) .review-form .fieldset > .field:not(.choice) > .control {
+        float: right;
+    }
+}
+
+//  7. THE ORDER SUMMARY'S FIGURES MET IN THE MIDDLE.
+//  Blank aligns the totals PHYSICALLY: labels (`.mark`) left, amounts
+//  (`.amount`) right. In English that spreads them to the two edges. In Arabic
+//  the columns swap sides but the alignment doesn't, so each one hugged the
+//  seam between them — measured at 1362 and 1366 in a 435px table — and the
+//  whole block read as one crowded cluster in the middle of the sidebar.
+//  Mirrored, paddings included, for the checkout sidebar and the cart's own
+//  totals. `tr` in the selector is for weight: blank's `.grand .amount`
+//  variants sit at (0,4,0) and (0,3,0).
+html:lang(ar) .opc-block-summary .table-totals tr .mark,
+html:lang(ar) .cart-totals tr .mark {
+    padding-left: 12px;
+    padding-right: 4px;
+    text-align: right;
+}
+
+html:lang(ar) .opc-block-summary .table-totals tr .amount,
+html:lang(ar) .cart-totals tr .amount {
+    padding-left: 4px;
+    padding-right: 12px;
+    text-align: left;
+}
+
+//  6. THE BRANDS PAGE HAD NO GRID AT ALL.
+//  MGS_Brand's templates are written for a Bootstrap theme — `row`,
+//  `col-md-custom-5 col-sm-4 col-6` — and this theme is built on blank, which
+//  defines none of that. What survived was a list with its bullets on, each
+//  brand floated in a 482px cell whose height was whatever its logo's natural
+//  size made it (472, 96, 525, 375, 326px measured), so the floats snagged on
+//  each other and rows broke unevenly — the "disorganized" in the ticket. The
+//  A–Z filter was a 1104px vertical bullet list, and the featured carousel sat
+//  at zero height under its own heading because owl-carousel hides the list
+//  until its script initialises.
+//
+//  A real grid, square logo tiles that `contain` the artwork whatever its
+//  proportions, and the letter filter as one wrapping row of chips. Weighted
+//  over mgs_brand.css, which loads after the theme sheet and styles
+//  `.widget.mgs-brand .item .image .img-responsive` at (0,5,0).
+.shop-by-brand {
+    .brand-search {
+        display: flex;
+        flex-direction: column;
+        gap: var(--hm-space-4);
+        margin-block: var(--hm-space-6);
+    }
+
+    #search_brand_form {
+        display: flex;
+        gap: var(--hm-space-2);
+        max-inline-size: 56rem;
+
+        .fields { flex: 1 1 auto; }
+        .actions { flex: none; }
+    }
+
+    .characters {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-3);
+
+        .clearfix { display: none; }
+    }
+
+    .characters-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .6rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        > li { margin: 0; }
+
+        a {
+            align-items: center;
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: var(--hm-radius);
+            box-sizing: border-box;
+            display: inline-flex;
+            justify-content: center;
+            min-block-size: 3.6rem;
+            min-inline-size: 3.6rem;
+            padding-inline: .8rem;
+            text-decoration: none;
+        }
+
+        > li.active a {
+            background: var(--hm-foreground);
+            border-color: var(--hm-foreground);
+            color: var(--hm-on-inverse);
+        }
+    }
+
+    .mgs-brand .content,
+    .mgs-brand .content.row { margin: 0; }
+
+    ul.brand-list,
+    ul.featured-brand-list:not(.owl-loaded) {
+        display: grid;
+        gap: var(--hm-space-4);
+        grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        > li.clear { display: none; }
+    }
+
+    .brand-list > li.item,
+    .featured-brand-list > li.item {
+        background: var(--hm-surface);
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius-lg);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        float: none;
+        inline-size: auto;
+        list-style: none;
+        margin: 0;
+        max-inline-size: none;
+        overflow: hidden;
+        padding: 0;
+        width: auto;
+    }
+
+    .mgs-brand .item .image {
+        align-items: center;
+        aspect-ratio: 1;
+        background: #fff;
+        border: 0;
+        border-radius: 0;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        padding: var(--hm-space-4);
+
+        > a {
+            align-items: center;
+            block-size: 100%;
+            display: flex;
+            inline-size: 100%;
+            justify-content: center;
+        }
+    }
+
+    body & .mgs-brand .item .image .img-responsive {
+        block-size: auto;
+        inline-size: auto;
+        margin: 0;
+        max-block-size: 100%;
+        max-inline-size: 100%;
+        object-fit: contain;
+    }
+
+    .hm-brand__initial {
+        align-items: center;
+        background: var(--hm-surface-muted, #f1f3f7);
+        border-radius: 50%;
+        color: var(--hm-foreground-muted);
+        display: flex;
+        font-family: var(--hm-font-heading);
+        font-size: 3.2rem;
+        font-weight: 700;
+        inline-size: 50%;
+        aspect-ratio: 1;
+        justify-content: center;
+    }
+
+    .brand-name {
+        border-block-start: 1px solid var(--hm-border-subtle);
+        margin-block-start: auto;
+        padding: var(--hm-space-3);
+        text-align: center;
+    }
+
+    .brand-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 1.3;
+        margin: 0;
+
+        span {
+            color: var(--hm-foreground-muted);
+            font-weight: 400;
+        }
+    }
+}

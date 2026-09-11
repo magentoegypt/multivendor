@@ -1,0 +1,42 @@
+<?php
+/**
+ * Hub Market — the product page heading, as the product is named.
+ *
+ * CL036-DEV01.25 item 4. Core's Html\Title::getPageHeading() passes the heading
+ * through __() whenever design/header/translate_title is on, and on a product
+ * page that heading is the product's NAME (Catalog\Helper\Product\View sets it
+ * with setPageTitle()). So any product whose name happens to be a dictionary
+ * key is renamed on its own page: "test" matches `"test","اختبار"` in the
+ * VendorExtend ar_SA pack, and product 5566 read "اختبار" in its H1 while the
+ * breadcrumb, the cart and the review form all said "test".
+ *
+ * A product's name is data, not interface copy. getPageTitle() returns the value
+ * setPageTitle() stored, untranslated; everything else here is core's template
+ * unchanged. Only catalog_product_view points at this file, so every other
+ * page's heading still translates.
+ *
+ * @var \Magento\Theme\Block\Html\Title $block
+ */
+$cssClass = $block->getCssClass() ? ' ' . $block->getCssClass() : '';
+$heading  = (string) $block->getPageTitle();
+$titleHtml = '';
+if (trim($heading)) {
+    $titleHtml = '<span class="base" data-ui-id="page-title-wrapper" '
+        . $block->getAddBaseAttribute()
+        . '>'
+        . $block->escapeHtml($heading)
+        . '</span>';
+}
+?>
+<?php if ($titleHtml) : ?>
+<div class="page-title-wrapper<?= $block->escapeHtmlAttr($cssClass) ?>">
+    <h1 class="page-title"
+        <?php if ($block->getId()) : ?> id="<?= $block->escapeHtmlAttr($block->getId()) ?>" <?php endif; ?>
+        <?php if ($block->getAddBaseAttributeAria()) : ?>
+            aria-labelledby="<?= $block->escapeHtmlAttr($block->getAddBaseAttributeAria()) ?>"
+        <?php endif; ?>>
+        <?= /* @noEscape */ $titleHtml ?>
+    </h1>
+    <?= $block->getChildHtml() ?>
+</div>
+<?php endif; ?>

@@ -24,6 +24,9 @@
             attached to it.
         -->
         <move element="page.main.title" destination="product.info.main" before="-"/>
+        <!-- CL036-DEV01.25 item 4: the heading is the product's name, untranslated.
+             See Magento_Catalog/templates/product/view/title.phtml. -->
+        <referenceBlock name="page.main.title" template="Magento_Catalog::product/view/title.phtml"/>
 
         <!--
             Savings chip, immediately after the price. Renders nothing when the

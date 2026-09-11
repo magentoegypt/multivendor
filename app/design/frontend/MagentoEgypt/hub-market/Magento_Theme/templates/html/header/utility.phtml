@@ -103,7 +103,14 @@ $isLoggedIn = $authState !== false && $authState->isLoggedIn();
             <span class="hm-utility__auth" data-bind="scope: 'customer'">
                 <?php if ($isLoggedIn): ?>
                     <a class="hm-utility__link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
-                        <span data-bind="text: customer().firstname || '<?= $escaper->escapeJs(__('My Account')) ?>'"><?= $escaper->escapeHtml(__('My Account')) ?></span>
+                        <?php /* CL036-DEV01.25 item 1: always the label, never the
+                                 customer's first name. QA read "test" here as a
+                                 hard-coded placeholder — it was the test customer's
+                                 first name, bound from customer-data — and asked for
+                                 "حسابي", which is what the English strip already
+                                 shows whenever that section is stale. A name also
+                                 isn't a destination: the link goes to My Account. */ ?>
+                        <?= $escaper->escapeHtml(__('My Account')) ?>
                     </a>
                     <?php /* Logout accepts GET in 2.4.8 (Controller\Account\Logout
                              implements HttpGetActionInterface AND HttpPostActionInterface),
