@@ -476,3 +476,25 @@
         > .secondary { float: inline-end; }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  Brand page — the grid's first cell was empty, and in Arabic that is the
+//  right-hand one
+//  ---------------------------------------------------------------------------
+//  _hm-qa03.less makes `ul.brand-list` a CSS grid, but the list also carries
+//  Bootstrap's `.row`, whose clearfix gives it `::before` and `::after` with
+//  `content: " "; display: table`. Inside a grid container a generated box with
+//  content is a grid item, so `::before` quietly took the first cell and every
+//  brand moved one place along. Measured at 1440 in both languages: a first
+//  row of 6 brands behind an empty 199px slot (one column plus the gap), then
+//  full rows of 7. In English the slot is on the left and reads as a stray
+//  indent; in Arabic the grid starts on the right, so the row read as
+//  left-aligned. `::after` does the same at the far end, where a full last row
+//  would have gained an empty row and its gap.
+//
+//  A grid has no floats to clear. The two pseudo-elements go; nothing else
+//  about the grid changes.
+.shop-by-brand ul.brand-list::before,
+.shop-by-brand ul.brand-list::after {
+    content: none;
+}
