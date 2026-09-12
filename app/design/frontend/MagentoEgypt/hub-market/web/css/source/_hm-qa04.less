@@ -1299,3 +1299,24 @@ html:lang(ar) .hm-page .review-item {
         text-align: right;
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  The RMA editor's status bar goes (ClickUp 86d4azdjx item 2)
+//
+//  The WYSIWYG on the returns pages is HugeRTE, and it draws a 48px status bar
+//  INSIDE the field: on the left the element path - a bare "p" - and on the
+//  right "Powered by HugeRTE". The client boxed it as a broken toolbar, which is
+//  a fair reading: to a shopper it is stray English inside their own message box.
+//
+//  Measured live on /ar/vrma/customer/new/: `.tox-statusbar`, 48px tall,
+//  containing `.tox-statusbar__text-container` ("p" + the branding) and
+//  `.tox-statusbar__resize-handle`. Hiding the bar takes the drag-to-resize
+//  handle with it, which is the accepted trade - the field is already ten rows
+//  tall and the client asked for the bar to go.
+//
+//  Scoped to the RMA screens by body class (`vrma-customer-new`,
+//  `vrma-customer-index`, `vrma-customer-view`) so no other editor on the
+//  storefront is touched.
+body[class*="vrma-customer"] .tox-statusbar {
+    display: none;
+}
