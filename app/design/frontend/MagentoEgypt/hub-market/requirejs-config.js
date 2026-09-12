@@ -69,14 +69,6 @@ var config = {
             'Magento_Search/js/form-mini': {
                 'js/hm-search-live': true
             },
-            /*
-             * RMA attachment upload posted `form_key=undefined` and was rejected
-             * by the CSRF validator, queueing "invalid form key" beside the
-             * success message. See the file for the full trace.
-             */
-            'Vnecoms_RMA/js/form/upload/uploader': {
-                'js/hm-rma-upload-form-key': true
-            },
             'Amasty_Gdpr/js/model/consents-assigner': {
                 'Amasty_CheckoutCore/js/model/consents-assigner-mixin': false
             },
