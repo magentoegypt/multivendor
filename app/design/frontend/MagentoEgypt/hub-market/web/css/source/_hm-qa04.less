@@ -971,3 +971,92 @@ html:lang(ar) @{hm-order-pages} .order-details-items > .actions-toolbar .action.
         }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.25 item 5, QA retest — the reviews LIST never mirrored
+//  ---------------------------------------------------------------------------
+//  _hm-qa03.less right-aligned the review FORM. The list is a different layout:
+//  Lof_ProductReviews renders each review as `.review-title`, `.lof-helpful`,
+//  then three boxes that blank floats LEFT — `.review-ratings`,
+//  `.review-content` and `.review-details`. Physical floats do not mirror, so an
+//  Arabic page read left to right: measured on /ar/josie-yoga-jacket.html, the
+//  stars column at x32 with the text beside it at x202 and the author stranded
+//  under the stars, on the far side from the review it belongs to.
+//
+//  A grid mirrors by itself, and it holds the three boxes in one row rather than
+//  letting them wrap around each other. English is unchanged: ratings first, the
+//  text beside them, the author underneath.
+//
+//  The English reviews on an Arabic page also needed isolating. Without it the
+//  bidi algorithm moved their punctuation to the wrong end ("!Can I please wear
+//  this every day?!") and closed up the space in "استعراض عن طريق Elvina".
+.hm-page .review-item {
+    column-gap: var(--hm-space-6);
+    display: grid;
+    grid-template-columns: 17rem minmax(0, 1fr);
+    row-gap: var(--hm-space-2);
+
+    .review-title,
+    .lof-helpful { grid-column: 1 / -1; }
+
+    .review-ratings,
+    .review-details {
+        float: none;
+        grid-column: 1;
+        max-inline-size: none;
+        max-width: none;
+    }
+
+    .review-content {
+        float: none;
+        grid-column: 2;
+        padding-inline: 0;
+    }
+
+    //  The module writes `margin-bottom: 30px` inline on this one, which is the
+    //  only reason for !important here.
+    .lof-helpful { margin-block-end: 0 !important; }
+
+    //  Any of these can hold either language.
+    .review-title,
+    .review-content,
+    .review-author,
+    .review-date { unicode-bidi: plaintext; }
+
+    .review-details-value { unicode-bidi: isolate; }
+
+    //  The word "التقييم" sat against the stars with no gap.
+    .rating-summary .rating-label { margin-inline-end: var(--hm-space-2); }
+
+    //  "Was this helpful? Yes / No" and "Report abuse" were loose boxes adrift in
+    //  the text column.
+    .review-form-actions {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2) var(--hm-space-4);
+
+        p { margin: 0; }
+
+        .actions-primary {
+            align-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--hm-space-2);
+            margin: 0;
+        }
+    }
+}
+
+//  Phone: one column, the stars above the review.
+@media screen and (max-width: 767px) {
+    .hm-page .review-item {
+        grid-template-columns: minmax(0, 1fr);
+
+        .review-title,
+        .lof-helpful,
+        .review-ratings,
+        .review-content,
+        .review-details { grid-column: 1; }
+    }
+}
