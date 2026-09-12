@@ -40,11 +40,27 @@ use Magento\Downloadable\Model\ResourceModel\Link\Purchased\Item as ItemResource
 class GuardDoubleCount
 {
     /**
-     * Ten seconds. The observed duplicate lands one second after the first;
-     * this leaves room for a slow connection or a retry without being long
-     * enough to be worth gaming.
+     * Two seconds. This was ten, and ten proved too generous once the CAUSE of
+     * the duplicate was removed: `catalog/downloadable/content_disposition` was
+     * sitting at Magento's default `inline`, so Chrome opened the .mpeg link in
+     * its media player and the player re-fetched the file - that re-fetch was
+     * the second request this guard exists to absorb. With the setting on
+     * `attachment` the browser downloads the file instead and one click now
+     * makes exactly one request (measured: 17:59:57, one request, one file, one
+     * decrement).
+     *
+     * What the wide window then cost: a shopper who deliberately downloaded the
+     * same file twice SEVEN seconds apart got the second one free - measured at
+     * 18:05:04 and 18:05:11, two full deliveries, one decrement. That is the
+     * failure this class's own header warns about, a 3-download product turning
+     * into an unlimited one.
+     *
+     * Two seconds still covers the duplicate this was built for, which landed
+     * one second after the first, while letting any deliberate re-download
+     * count. Kept rather than deleted because `attachment` fixes Chrome, not
+     * every browser or download manager that might retry.
      */
-    private const WINDOW_SECONDS = 10;
+    private const WINDOW_SECONDS = 2;
 
     private const KEY_PREFIX = 'hm_downloadable_count_guard_';
 
