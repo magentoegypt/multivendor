@@ -311,6 +311,35 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                         <?= /* @noEscape */ $hmPanelHtml ?>
                         <?= $block->getChildHtml() ?>
                     </ul>
+                    <?php
+                    /*
+                     * CL036-DEV01.29 - language toggle, last row of the phone menu.
+                     *
+                     * The header's utility bar carries this control, but that bar is
+                     * desktop-only (_hm-mobile-parity.less hides it under 768px), so
+                     * on a phone there was no way to change language at all.
+                     *
+                     * It renders the SAME block as the header, `hm.store.switcher`,
+                     * rather than rebuilding the link: that block is wired with its
+                     * mandatory SwitcherUrlProvider view model in
+                     * Magento_Theme/layout/default.xml, which is what makes the link
+                     * land on the CURRENT page in the other language instead of the
+                     * other home page. Rebuilding it here would duplicate that wiring
+                     * and the fatal it guards against.
+                     *
+                     * switch/languages.phtml returns early when only one store view is
+                     * active, so the trim() guard keeps an empty sheet row from
+                     * appearing. Ordered last and hidden from 768px up in _hm-qa04.less.
+                     */
+                    $hmLangSwitcher = $block->getLayout()->getBlock('hm.store.switcher');
+                    $hmLangHtml = $hmLangSwitcher ? trim((string) $hmLangSwitcher->toHtml()) : '';
+                    ?>
+                    <?php if ($hmLangHtml !== ''): ?>
+                        <div class="hm-nav__lang">
+                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-globe"/></svg>
+                            <?= /* @noEscape */ $hmLangHtml ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </details>

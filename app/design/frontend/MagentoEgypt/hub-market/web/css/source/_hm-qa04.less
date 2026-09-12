@@ -1139,3 +1139,53 @@ html:lang(ar) .sales-guest-form .form.form-orders-search {
         }
     }
 }
+
+//  Language toggle in the phone menu (ClickUp 86d4az9uj)
+//
+//  topmenu.phtml renders the header's own `hm.store.switcher` block as the last
+//  row of the menu sheet, so the markup arrives wearing the utility bar's
+//  classes. Two of those have to be undone here: `.hm-utility__link` is
+//  `display: none` below 768px (_hm-header.less line 854, the phone rule that
+//  strips the rail down to "Sell"), and it draws a leading hairline meant for a
+//  horizontal rail. Everything else dresses the row like `.hm-nav__quick-link`
+//  beside it - the same 4rem target, 1.4rem type, white/65 on the navy sheet.
+//
+//  `order: 3` is what actually puts it last: the sheet is a column flex whose
+//  children are explicitly ordered (categories 1, account links 2 in
+//  _hm-mobile.less), so source order alone would not decide the position.
+.hm-nav__lang {
+    //  Desktop reaches the same switcher in the utility bar; showing it again
+    //  inside the "All Categories" panel would be a second copy of one control.
+    display: none;
+}
+
+@media screen and (max-width: 767px) {
+    .hm-page .hm-nav__panel .hm-nav__lang {
+        align-items: center;
+        border-block-start: 1px solid fade(#ffffff, 10%);
+        display: flex;
+        gap: var(--hm-space-2);
+        margin: var(--hm-space-2) 0 0;
+        order: 3;
+        padding: var(--hm-space-2) var(--hm-space-4) 0;
+
+        .hm-icon {
+            color: fade(#ffffff, 65%);
+            flex: none;
+        }
+    }
+
+    .hm-page .hm-nav__panel .hm-nav__lang .hm-utility__link {
+        border: 0;
+        color: fade(#ffffff, 65%);
+        display: inline-flex;
+        font-size: 1.4rem;
+        min-block-size: 4rem;
+        padding: 0;
+
+        &:focus,
+        &:hover {
+            color: var(--hm-on-inverse);
+        }
+    }
+}
