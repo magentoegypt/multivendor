@@ -1,0 +1,66 @@
+<?php
+/**
+ * Hub Market override of Vnecoms_RMA::customer/new_request.phtml.
+ *
+ * ONE change: the <form> no longer carries name="FORM_KEY".
+ *
+ * A named form is published as a property of `window`, so `name="FORM_KEY"`
+ * made `window.FORM_KEY` the FORM ELEMENT itself on this page. Magento's
+ * file-uploader picks the key for an attachment upload with
+ *
+ *     formKey = window.FORM_KEY !== undefined ? window.FORM_KEY : $.cookie('form_key');
+ *
+ * and an HTMLFormElement is emphatically not `undefined`, so the uploader
+ * posted a DOM element as `form_key`. The CSRF validator rejected it, queued
+ * "مفتاح النموذج غير صالح", and that error then rendered beside the save's
+ * success message - the contradiction the client reported (CL036-DEV01.30
+ * item 3). Reproduced here twice: `POST /ar/vrma/customer/upload/ -> 302` at
+ * 09:49:37 for the tester and again at 12:22:42 for me. The browser's network
+ * panel shows 200 because the XHR follows the redirect; the Apache log shows
+ * the 302.
+ *
+ * The form_key COOKIE is correct - checked live, it matches the key rendered
+ * into this form's hidden input - so with the name attribute gone,
+ * `window.FORM_KEY` is undefined again and the uploader falls back to that
+ * cookie, which is what the reply form (not named FORM_KEY) already does
+ * successfully.
+ *
+ * The attribute is legacy and unused: nothing submits or looks up this form by
+ * name; it is addressed as `#request-new-form` by the validation init below.
+ *
+ * The same `name="FORM_KEY"` appears in three sibling templates that are NOT
+ * overridden here - guest/new_request.phtml (guest RMA is disabled, those
+ * routes 404) and the two escalate templates. They carry the same defect.
+ *
+ * @var $block \Vnecoms\RMA\Block\Customer\NewRequest
+ */
+?>
+<form action="<?php echo $block->getSubmitUrl() ?>" method="post" id="request-new-form" class="request-new-form" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+    <div class="request-information fieldset">
+        <?php echo $block->getChildHtml("info") ?>
+    </div>
+    <?php if ($block->getConfig()->enablePolicy()):?>
+    <div class="request_policy fieldset">
+        <?php echo $block->getChildHtml("policy") ?>
+    </div>
+    <?php endif;?>
+    <div class="recaptchar">
+        <?php if($block->getConfig()->enableRecaptcha() == 1):?>
+            <?php $siteKey = $block->getConfig()->siteKey();?>
+            <?php $lang = $block->getConfig()->languageRecaptcha();?>
+            <script type='text/javascript' src='https://www.google.com/recaptcha/api.js?hl=<?php echo $lang ?>' async defer></script>
+            <div class='g-recaptcha' data-sitekey='<?php echo  $siteKey ?>'></div>
+            <p class="check_recaptcha" style="display: none"><?php echo __("this is a required field.")?></p>
+        <?php endif ?>
+    </div>
+    <div class="buttons-set">
+        <button  id="request-submit-btn" title="Submit ticket" type="submit" class="action primary add" ><span><?php echo __('Submit RMA') ?></span></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "#request-new-form": {
+            "validation": {}
+        }
+    }
+</script>
