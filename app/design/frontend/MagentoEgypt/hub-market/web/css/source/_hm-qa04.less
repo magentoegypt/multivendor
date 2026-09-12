@@ -1189,3 +1189,82 @@ html:lang(ar) .sales-guest-form .form.form-orders-search {
         }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  Primary buttons take white text (ClickUp 86d4az9qv)
+//
+//  The client marked "متابعة", "إنشاء حساب" and "تسجيل الدخول" - all three the
+//  accent-orange primary - and asked for the text, which reads as black, to be
+//  white.
+//
+//  NOTE, because this reverses a deliberate decision rather than fixing an
+//  oversight: _hm-tokens.less picked `@hm-on-accent: #0f2144` precisely FOR its
+//  contrast, and says so ("navy on #f26522 5.04:1"), with the same figure
+//  repeated at a dozen call sites. White on #f26522 is 3.15:1 and on the
+//  #e85d18 hover 3.50:1. These buttons are 14px/600, which is not WCAG "large
+//  text" (that starts at 18.66px bold), so 4.5:1 applies and this fails AA where
+//  navy passed. It is the client's call; it is recorded here so nobody later
+//  reads it as an accident and "fixes" it back.
+//
+//  A literal, NOT a change to `--hm-on-accent`: that token also paints badges
+//  and CTA chips that were not part of the request, and flipping it would drag
+//  all of them along. The PDP's buy-bar Add to Cart is unaffected either way -
+//  it is navy-on-white by its own higher-specificity rule in _hm-pdp.less.
+.action.primary,
+.action-primary {
+    color: #ffffff;
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: #ffffff;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  Arabic login: "نسيت كلمة المرور؟" moves to the far edge (ClickUp 86d4az9qv)
+//
+//  The ticket's arrow runs from the link all the way to the opposite side of the
+//  card, so the two controls end up pushed apart rather than sitting together:
+//  the button on the right (RTL start) and the link hard against the left.
+//
+//  The row is blank's float pairing, already mirrored above, so this only has to
+//  send the secondary the other way - `inline-end` is LEFT in Arabic - and drop
+//  the 36px gap that existed to separate two adjacent controls. English is left
+//  alone: the ticket is about the Arabic view, and there the link still sits
+//  beside the button.
+//
+//  Both login cards, customer and seller, because they are twins by design and
+//  drift between them is how this page has broken before.
+@media (min-width: 768px), print {
+    html:lang(ar) .customer-account-login,
+    html:lang(ar) .marketplace-seller-login {
+        .login-container .block .login .actions-toolbar > .secondary {
+            float: inline-end;
+        }
+
+        .login-container .block .login .actions-toolbar > .primary {
+            margin-inline-end: 0;
+        }
+    }
+}
+
+//  The same again, one step up the specificity ladder.
+//
+//  `.action.primary` alone is (0,2,0) and several buttons are painted by
+//  three-class rules that outrank it - `.action.login.primary` and
+//  `.action.primary.send-otp-btn` in _hm-checkout.less, `.actions-toolbar
+//  .action.primary` there too - so Sign In and Send OTP kept their navy while
+//  every other primary went white. `.hm-page` is on <body> on every page of this
+//  theme, which takes these to (0,3,0): level with those rules, and this file is
+//  imported last, so it lands. The state rules go to (0,4,0) for the same reason.
+.hm-page .action.primary,
+.hm-page .action-primary {
+    color: #ffffff;
+
+    &:active,
+    &:focus,
+    &:hover {
+        color: #ffffff;
+    }
+}
