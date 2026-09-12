@@ -1238,23 +1238,39 @@ html:lang(ar) .sales-guest-form .form.form-orders-search {
 }
 
 //  ---------------------------------------------------------------------------
-//  Arabic login: "نسيت كلمة المرور؟" moves to the far edge (ClickUp 86d4az9qv)
+//  Login: the forgot-password link sits at the row's far edge, in BOTH languages
+//  (ClickUp 86d4az9qv, then the retest 86d4b03hx)
 //
-//  The ticket's arrow runs from the link all the way to the opposite side of the
-//  card, so the two controls end up pushed apart rather than sitting together:
-//  the button on the right (RTL start) and the link hard against the left.
+//  The arrow in the original ticket ran from the link all the way to the
+//  opposite side of the card, so the two controls end up pushed apart rather
+//  than sitting together: the button at the row's start and the link hard
+//  against its end.
 //
-//  The row is blank's float pairing, already mirrored above, so this only has to
-//  send the secondary the other way - `inline-end` is LEFT in Arabic - and drop
-//  the 36px gap that existed to separate two adjacent controls. English is left
-//  alone: the ticket is about the Arabic view, and there the link still sits
-//  beside the button.
+//  That was first shipped scoped to `html:lang(ar)`, on the reading that an
+//  Arabic-view ticket should not move the English page. The retest rejected
+//  that: with Arabic fixed, the tester compared the two and asked for the same
+//  in English - "move the 'forget password' to the right side in the English
+//  view", arrow pointing right. So the scope comes off and the rule becomes
+//  what it should have been from the start: one logical pairing that mirrors.
+//
+//  Measured at 1521 before this change, toolbar spanning 57..720 in English and
+//  802..1464 in Arabic:
+//
+//    English  Sign In 57..161, then a 36px gap, link at 197..365 - adrift in
+//             the middle of a 663px row. Now the link ends at 720, the row's
+//             right edge, and Sign In stays at 57.
+//    Arabic   already correct and unchanged: button 1301..1464 (the RTL start,
+//             i.e. right) and link 802..913 (the RTL end, i.e. left).
+//
+//  `inline-end` is the right in English and the left in Arabic, so this is one
+//  declaration rather than two opposite ones, and the 36px gap that existed to
+//  separate two ADJACENT controls goes with it - they are no longer adjacent.
 //
 //  Both login cards, customer and seller, because they are twins by design and
 //  drift between them is how this page has broken before.
 @media (min-width: 768px), print {
-    html:lang(ar) .customer-account-login,
-    html:lang(ar) .marketplace-seller-login {
+    .customer-account-login,
+    .marketplace-seller-login {
         .login-container .block .login .actions-toolbar > .secondary {
             float: inline-end;
         }
@@ -1388,5 +1404,85 @@ html:lang(ar) {
     //  that is `text-align: center`, leaving it stranded mid-row at 555..646.
     .vrma-customer-view .reply-message {
         text-align: left;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  Orders and Returns, Arabic: the form's own blocks reach the start edge, and
+//  the button stops sitting at the wrong end (ClickUp 86d4b00aj, retest of
+//  86d4az9km)
+//
+//  The first pass mirrored this form and the mirror is sound - measured at
+//  1901, 1740, 1600, 1440, 1280, 1024 and 900px, the Arabic legend, labels and
+//  controls are the exact reflection of the English ones. The retest still
+//  failed, with every arrow pointing right, so two things are being asked for
+//  that a straight reflection does not give.
+//
+//  1. THE BUTTON WAS GENUINELY UNMIRRORED - the one real defect here. It is
+//     `.actions-toolbar .primary .action`, floated `left` PHYSICALLY by blank.
+//     _hm-qa03 already mirrors that button's 6px margin for Arabic but not its
+//     float, so:
+//
+//       English  toolbar 269..951,  button 269..381  - the row's START
+//       Arabic   toolbar 951..1632, button 957..1048 - the row's END
+//
+//     i.e. in Arabic it sat at the far left, as far from the fields as the row
+//     allows. Scoped to this form rather than fixing
+//     `html:lang(ar) .actions-toolbar .primary .action` globally: that selector
+//     is on every page of the site and a blanket float flip is exactly the kind
+//     of change that moves twenty things to fix one.
+//
+//  2. THE 25.8% INDENTS COME OFF. blank pushes `.legend` and `.actions-toolbar`
+//     clear of the label column (`margin-left: 25.8%`), and the first pass
+//     mirrored that to `margin-right`, which is why the legend sat at
+//     1498..1632 with 237px of empty page to its right while the H1 above it
+//     reached 1869. A reflection of English, but not what was asked: the arrow
+//     runs from the legend towards the page's starting edge. Dropping both
+//     indents puts the legend and the button row where an Arabic reader starts
+//     reading, flush with the heading above them.
+//
+//  3. THE LABEL TEXT IS RIGHT-ALIGNED TOO. The label boxes already span
+//     1632..1869, hard against the start edge, but their TEXT was
+//     `text-align: left` - the mirror of English's `right`, which puts each
+//     label next to its own input. I flagged that right-aligning it moves the
+//     text up to 237px away from the field it names; the call came back to
+//     right-align it, so it is right-aligned: in Arabic the text now begins
+//     where the reader begins, level with the legend and the heading.
+//
+//  English is untouched throughout - every rule is `html:lang(ar)`.
+//
+//  NOTE THE MIXIN. These have to go through `.media-width('min', @screen__m)`
+//  and not a hand-written `@media (min-width: 768px)`, because the rules being
+//  overridden came through that mixin. Magento collects every `.media-width`
+//  definition in the build and emits them all where styles-l calls the mixin -
+//  at the very END of the stylesheet. A plain `@media` block lands wherever its
+//  file sits in the import order, which for this file is ~44KB EARLIER, so at
+//  equal specificity the 25.8% indents kept winning. Measured that way first:
+//  the button moved but the indents did not budge, `margin-right` still
+//  computing 236.969px. Same file, same selector, and still overridden - by
+//  source position alone.
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    html:lang(ar) .sales-guest-form .form.form-orders-search {
+        //  Reach the start edge instead of clearing a column that is beside
+        //  them, not above them.
+        .legend,
+        .actions-toolbar {
+            margin-right: 0;
+        }
+
+        //  Text begins at the start edge, not beside the input.
+        .fieldset > .field:not(.choice) > .label {
+            text-align: right;
+        }
+
+        //  The submit button belongs at the row's start, as it does in English.
+        //  The floated box is the `.primary` WRAPPER, not the button: the
+        //  button is only 91px inside a 97px wrapper, so floating the button
+        //  moved it 6px and nothing else. Measured `> .primary` at 951..1048 in
+        //  Arabic against 269..387 in English - both at their toolbar's LEFT,
+        //  which is the start in English and the end in Arabic.
+        > .actions-toolbar > .primary {
+            float: right;
+        }
     }
 }
