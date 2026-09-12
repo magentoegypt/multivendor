@@ -1320,3 +1320,57 @@ html:lang(ar) .hm-page .review-item {
 body[class*="vrma-customer"] .tox-statusbar {
     display: none;
 }
+
+//  ---------------------------------------------------------------------------
+//  Arabic returns pages: the controls move to the reading order's far edge
+//  (ClickUp 86d4azdjx items 4, 6, 7, 9, 10)
+//
+//  Every arrow in the client's screenshots points left, which in an RTL page is
+//  the END of the line - where a trailing control belongs. All five were sitting
+//  where an English layout puts them. Measured at 1521px with the content column
+//  spanning 32..1169 (list) and 32..1169 (view); the "before" figures below come
+//  from that page, not from reading the markup.
+//
+//  Scoped to `html:lang(ar)`: the ticket is about the Arabic view, and the
+//  English pages are left exactly as they are.
+html:lang(ar) {
+    //  Item 4. `.buttons-set` is already `justify-content: flex-end` - which IS
+    //  the left edge in RTL - but it was a hard-coded 720px box, so it sat
+    //  right-aligned at 449..1169 inside the 1137px column and took the button
+    //  with it. Full width lets flex-end reach the column edge. Before: 449.
+    .vrma-customer-index .page-title .buttons-set {
+        width: 100%;
+    }
+
+    //  Item 6. `.pager` is `justify-content: center`, so the 189px limiter sat
+    //  at 479..668 - both the one above the table and the one below it. An auto
+    //  margin on the INLINE-START side (the right, in Arabic) absorbs the free
+    //  space and pushes the control to the far end. Done on the limiter rather
+    //  than by changing the pager's justify-content, so that page links - which
+    //  appear once there is more than one page - keep their own placement.
+    .vrma-customer-index .pager .limiter {
+        margin-inline-start: auto;
+    }
+
+    //  Item 7. The Cancel and Escalate actions are physically `float: right`, so
+    //  they stayed on the right in Arabic: 1069..1164 and 862..1059. The logical
+    //  value is the same declaration in English and the mirror in Arabic.
+    .vrma-customer-view .page-title .action-request {
+        float: inline-end;
+    }
+
+    //  Item 9. Inside each cell of the summary table the `<span class="label">`
+    //  is `float: left`, so every pair read label-then-value from the LEFT while
+    //  the page reads from the right - the reversal the client marked. Measured
+    //  before: the "نوع الطلب :" label at 612..747 inside a cell spanning
+    //  600..1159, i.e. hard against the cell's far edge.
+    .vrma-customer-view .group-select .label {
+        float: inline-start;
+    }
+
+    //  Item 10. The reply button sits in a full-width `.reply-message` block
+    //  that is `text-align: center`, leaving it stranded mid-row at 555..646.
+    .vrma-customer-view .reply-message {
+        text-align: left;
+    }
+}
