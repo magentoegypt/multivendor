@@ -1025,8 +1025,24 @@ html:lang(ar) @{hm-order-pages} .order-details-items > .actions-toolbar .action.
 
     .review-details-value { unicode-bidi: isolate; }
 
-    //  The word "التقييم" sat against the stars with no gap.
-    .rating-summary .rating-label { margin-inline-end: var(--hm-space-2); }
+    //  The word "التقييم" sat against the stars with no gap - and 30px clear of
+    //  the row's own right edge, which read as a stray indent.
+    //
+    //  blank spaces this label from the stars with `padding-right: 30px`
+    //  (_reviews.less). That is physical, so in Arabic - where the label is the
+    //  RIGHTMOST thing in the row - the 30px landed on the outer edge instead of
+    //  between the label and the stars. Measured before: label box 1333..1403
+    //  against a row ending at 1403, so the text sat 30px in from the edge, while
+    //  the gap to the stars was 0 (label.left 1333 = stars.right 1333).
+    //
+    //  The first attempt at this was `margin-inline-end`, which did nothing:
+    //  `.rating-label` is `display: table-cell`, and margins do not apply to
+    //  table cells. Padding is the only lever here.
+    //
+    //  `padding-inline: 0 3rem` is the same 30px expressed logically - identical
+    //  to blank in English (start 0, end right), mirrored in Arabic (end left).
+    //  One declaration, no `:lang()` scope needed, and English is untouched.
+    .rating-summary .rating-label { padding-inline: 0 3rem; }
 
     //  "Was this helpful? Yes / No" and "Report abuse" were loose boxes adrift in
     //  the text column.
