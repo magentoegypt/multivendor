@@ -90,14 +90,56 @@ class LoginPost extends \Vnecoms\Sms\Controller\Login\LoginPost
                 ->setJsonData((new DataObject(['success' => false]))->toJson());
         }
 
-        $type = $this->getRequest()->getPost('type');
-        if ($this->helperData->isEnabledOtpLogin() && $type == 'mobile') {
+        if ($this->helperData->isEnabledOtpLogin() && $this->isMobileLogin()) {
             $response = $this->loginByMobile();
         } else {
             $response = $this->loginByPassword();
         }
 
         return $this->resultJsonFactory->create()->setJsonData($response->toJson());
+    }
+
+    /**
+     * Is this submission the storefront's "Mobile" tab?
+     *
+     * THIS IS THE FIX FOR ClickUp 86d4azyt1 / CL036-TC20. The branch used to ask
+     * only for a POST field named `type` with the value `mobile`, and NOTHING
+     * posts that. Vnecoms' own login form - both the customer and the seller
+     * template, and the theme's overrides of them - posts
+     *
+     *     <input type="hidden" name="login_type" value="by_email|by_mobile">
+     *
+     * driven by login.js through its `loginTypeField` option, using the constants
+     * Vnecoms\Sms\Helper\Data::LOGIN_TYPE_EMAIL / LOGIN_TYPE_MOBILE. So `type`
+     * was always null, the condition was always false, and every mobile login
+     * fell through to loginByPassword() - which requires login[username] and
+     * login[password], the two fields the mobile tab HIDES. Hence the reported
+     * "email and password are required" on a form where neither was asked for.
+     *
+     * loginByMobile() below was already correct; it was simply unreachable, which
+     * is why this was recorded as fixed and still failed on retest.
+     *
+     * Reproduced headlessly before the change on BOTH login pages - the customer
+     * one at /customer/account/login and the seller one at
+     * /marketplace/seller/login, which share this endpoint: switching to Mobile
+     * set login_type=by_mobile and hid the e-mail and password inputs, the form
+     * POSTed to /vsms/login/loginPost, and the page came back with "A login and a
+     * password are required." The seller page is the one QA filed; the customer
+     * page had the same defect.
+     *
+     * `type == 'mobile'` is still honoured so that any other caller of this
+     * endpoint - the mobile app's own login, for one - keeps working.
+     *
+     * @return bool
+     */
+    private function isMobileLogin()
+    {
+        if ((string)$this->getRequest()->getPost('type') === 'mobile') {
+            return true;
+        }
+
+        return (string)$this->getRequest()->getPost('login_type')
+            === \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_MOBILE;
     }
 
     /**
