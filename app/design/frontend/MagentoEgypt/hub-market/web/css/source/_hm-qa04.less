@@ -1094,3 +1094,48 @@ html:lang(ar) @{hm-order-pages} .order-details-items > .actions-toolbar .action.
         }
     }
 }
+
+//  Orders and Returns, Arabic: the side-label form mirrors (ClickUp 86d4az9km)
+//
+//  blank lays this form out with physical floats: `.label` and `.control` both
+//  `float: left` (label 25.8% wide, its 15px gutter on the right), and `.legend`
+//  and `.actions-toolbar` pushed clear of the label column with
+//  `margin-left: 25.8%`. None of that flips for Arabic, so the labels sat to the
+//  LEFT of their own inputs and the form read as floating in the middle of the
+//  page instead of starting at the right edge - which is what the client
+//  reported. Everything here is scoped to `html:lang(ar)`, so the English page
+//  keeps the exact geometry it has today.
+//
+//  The legend flips at every width; the label column only exists from 768px up,
+//  so its float and the two indents are confined to that range - below it the
+//  labels stack above their inputs and an indent would be wrong.
+html:lang(ar) .sales-guest-form .form.form-orders-search {
+    .legend {
+        float: right;
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    html:lang(ar) .sales-guest-form .form.form-orders-search {
+        .fieldset > .field:not(.choice) > .label {
+            float: right;
+            padding-left: 15px;
+            padding-right: 0;
+            text-align: left;
+        }
+
+        .fieldset > .field:not(.choice) > .control {
+            float: right;
+        }
+
+        .legend {
+            margin-left: 0;
+            margin-right: 25.8%;
+        }
+
+        .actions-toolbar {
+            margin-left: 0;
+            margin-right: 25.8%;
+        }
+    }
+}
