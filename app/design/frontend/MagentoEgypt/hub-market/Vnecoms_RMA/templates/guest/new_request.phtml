@@ -1,0 +1,55 @@
+<?php
+/**
+ * Hub Market override of Vnecoms_RMA::guest/new_request.phtml.
+ *
+ * ONE change: the <form> no longer carries name="FORM_KEY".
+ *
+ * The guest twin of customer/new_request.phtml, which carries the full trace of
+ * this defect. In short: a named form is published as a property of `window`,
+ * so `name="FORM_KEY"` made `window.FORM_KEY` the FORM ELEMENT, and Magento's
+ * file-uploader - which picks its key with
+ *
+ *     formKey = window.FORM_KEY !== undefined ? window.FORM_KEY : $.cookie('form_key');
+ *
+ * - then posted a DOM element as `form_key`, which the CSRF validator rejected
+ * with a 302.
+ *
+ * This page is NOT reachable today: guest RMA is switched off and
+ * /vrma/guest/new/ 404s, so unlike the other three this one is fixed unmeasured.
+ * It is fixed anyway because it is the last copy of the attribute - leaving it
+ * would hand the bug straight back the day guest RMA is enabled, and by then
+ * nobody will connect the two.
+ *
+ * The attribute is legacy and unused: the form is addressed as
+ * `#request-new-form`, never by name.
+ */
+?>
+<form action="<?php echo $block->getSubmitUrl() ?>" method="post" id="request-new-form" class="request-new-form" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+    <div class="request-information fieldset">
+        <?php echo $block->getChildHtml("info") ?>
+    </div>
+    <?php if ($block->getConfig()->enablePolicy()):?>
+    <div class="request_policy fieldset">
+        <?php echo $block->getChildHtml("policy") ?>
+    </div>
+    <?php endif;?>
+    <div class="recaptchar">
+        <?php if($block->getConfig()->enableRecaptcha() == 1):?>
+            <?php $siteKey = $block->getConfig()->siteKey();?>
+            <?php $lang = $block->getConfig()->languageRecaptcha();?>
+            <script type='text/javascript' src='https://www.google.com/recaptcha/api.js?hl=<?php echo $lang ?>' async defer></script>
+            <div class='g-recaptcha' data-sitekey='<?php echo  $siteKey ?>'></div>
+        <?php endif ?>
+    </div>
+    <div class="buttons-set">
+        <button  id="request-new-submit" title="Submit ticket" type="submit" class="action primary add"><span><?php echo __('Submit RMA') ?></span></button>
+    </div>
+    <div class="buttons-back"><a href="<?php echo $block->getUrl("rma/guest/list")?>"><span><span><< <?php echo __("Back List RMA") ?></span></span></a></div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "#request-new-form": {
+            "validation": {}
+        }
+    }
+</script>
