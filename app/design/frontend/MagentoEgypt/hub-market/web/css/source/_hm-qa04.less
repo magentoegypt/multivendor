@@ -1268,3 +1268,34 @@ html:lang(ar) .sales-guest-form .form.form-orders-search {
         color: #ffffff;
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.25 item 5, second QA retest — the English review TEXT still
+//  sat on the left of an Arabic page
+//  ---------------------------------------------------------------------------
+//  The grid above mirrors the three boxes correctly: measured on
+//  /ar/josie-yoga-jacket.html the stars land at 1318-1488 and the text column at
+//  32-1294, the exact mirror of English's 32-208 / 226-1488. What did NOT mirror
+//  was the writing inside them.
+//
+//  `unicode-bidi: plaintext` (added with that grid, to stop the bidi algorithm
+//  dragging English punctuation to the wrong end) makes each paragraph take its
+//  direction from its own first strong character. Every review on this store is
+//  written in English, so each title and body computed `direction: ltr`, and
+//  `text-align: start` then resolved to the physical LEFT — on an RTL page that
+//  threw the text to the far edge, leaving a wide gap between a review and the
+//  stars it belongs to, while every Arabic label around it sat on the right.
+//
+//  So: keep the per-paragraph direction (the punctuation fix still holds) and
+//  align the BLOCK to the page's start edge. Measured after: the title runs
+//  1332-1488, mirroring English's 32-188.
+//
+//  `text-align: match-parent` would express this without naming a side, and was
+//  tried first — Chrome dropped it, computed style stayed `start`. Hence the
+//  physical value, scoped to Arabic so English is untouched.
+html:lang(ar) .hm-page .review-item {
+    .review-title,
+    .review-content {
+        text-align: right;
+    }
+}
