@@ -8,9 +8,23 @@
  * (Magento\CatalogSearch\Model\Layer\Filter\Category) reads to scope the results.
  * So choosing "Grocery" and searching genuinely narrows the result set.
  *
- * Only categories that are active, included in the menu AND have products are
- * offered — sending a shopper into an empty result set is worse than offering one
- * fewer option, the same rule the homepage category chips already follow.
+ * The gate is ENABLED, and nothing else. A category the merchant has switched on
+ * belongs in this list whether or not it is in the menu: the menu is a curated
+ * navigation band with room for ten items, while this is a search scope, and the
+ * two answer different questions. Requested 2026-09-12 — "not depends on include
+ * in menu but enabled need to show there" — which took the list from 10 to 27.
+ *
+ * Top level only, deliberately: the admin tree runs four levels and 135 enabled
+ * categories, which is a scroll, not a selector.
+ *
+ * Nor is there a has-products test any more. There used to be one, on the
+ * principle that a filter should never lead to an empty page; it is gone because
+ * "show every enabled category" cannot be honoured while also dropping some of
+ * them. If it is ever wanted back, count through
+ * `catalog_category_product_index_store<N>` and NOT `getProductCount()` — the
+ * latter counts only DIRECTLY assigned rows, so a parent whose products all live
+ * in its children counts zero ("Fresh Food" disappeared exactly that way, see
+ * CL036-TC13), while the index rolls anchors up the way the category page does.
  */
 declare(strict_types=1);
 
@@ -54,28 +68,16 @@ class SearchCategories implements ArgumentInterface
             $rootId = (int) $store->getRootCategoryId();
 
             $collection = $this->collectionFactory->create();
-            $collection->addAttributeToSelect(['name', 'is_active', 'include_in_menu'])
+            $collection->addAttributeToSelect(['name', 'is_active'])
                 ->addFieldToFilter('parent_id', $rootId)
                 ->addFieldToFilter('is_active', 1)
-                ->addFieldToFilter('include_in_menu', 1)
                 ->setStore($store)
                 ->addAttributeToSort('position', 'ASC');
 
-            $categories = [];
-            foreach ($collection as $category) {
-                $categories[(int) $category->getId()] = $category;
-            }
-
-            $counts = $this->visibleProductCounts($collection, array_keys($categories), (int) $store->getId());
-
             $out = [];
-            foreach ($categories as $id => $category) {
-                // Never offer a filter that leads nowhere.
-                if (($counts[$id] ?? 0) < 1) {
-                    continue;
-                }
+            foreach ($collection as $category) {
                 $out[] = [
-                    'id'   => $id,
+                    'id'   => (int) $category->getId(),
                     'name' => (string) $category->getName(),
                 ];
             }
@@ -86,62 +88,6 @@ class SearchCategories implements ArgumentInterface
             // page — down. Degrade to no selector at all.
             $this->logger->warning('Hub Market search categories: ' . $e->getMessage());
             return $this->cache = [];
-        }
-    }
-
-    /**
-     * How many products each of these categories actually SHOWS, per the
-     * category index for this store.
-     *
-     * NOT `$category->getProductCount()`, which counts the rows in
-     * catalog_category_product — the products assigned to that category
-     * DIRECTLY. A parent whose products all live in its subcategories counts
-     * zero there and was dropped from the selector, even though its page lists
-     * them: "Fresh Food" was created with its seven products under
-     * "Dairy & Eggs", and it never appeared ([CL036-TC13]). The admin tree
-     * disagreed with the storefront for the same reason — it rolls the subtree
-     * up, and the selector did not.
-     *
-     * The index is the right source twice over: it rolls anchors up the way the
-     * category page does, and it already excludes what the storefront will not
-     * show, so a category whose only products are disabled still counts zero.
-     *
-     * Read through the collection's own connection rather than through an
-     * injected ResourceConnection: adding a constructor argument to a class
-     * this old means `setup:di:compile`, and that wipes `generated/` — several
-     * minutes of 500s on a live storefront, for a dropdown.
-     *
-     * FAILS OPEN. If the per-store index table is not there (a partial install,
-     * a mid-reindex switch), every category is let through rather than none:
-     * a selector with an extra entry beats a header with no selector.
-     *
-     * @param int[] $ids
-     * @return array<int, int>
-     */
-    private function visibleProductCounts($collection, array $ids, int $storeId): array
-    {
-        if (!$ids) {
-            return [];
-        }
-
-        try {
-            $connection = $collection->getConnection();
-            $table = $collection->getResource()->getTable('catalog_category_product_index_store' . $storeId);
-
-            if (!$connection->isTableExists($table)) {
-                return array_fill_keys($ids, 1);
-            }
-
-            $select = $connection->select()
-                ->from($table, ['category_id', 'products' => new \Zend_Db_Expr('COUNT(*)')])
-                ->where('category_id IN (?)', $ids)
-                ->group('category_id');
-
-            return array_map('intval', $connection->fetchPairs($select));
-        } catch (\Throwable $e) {
-            $this->logger->warning('Hub Market search categories, product counts: ' . $e->getMessage());
-
-            return array_fill_keys($ids, 1);
         }
     }
 }
