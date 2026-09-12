@@ -1486,3 +1486,45 @@ html:lang(ar) {
         }
     }
 }
+
+//  ...and the same for English, so the two views are each other's mirror
+//  (ClickUp 86d4b00aj, second round: "LTR view .. need to set all to left
+//  align as mirror of RTL")
+//
+//  The block above is what was asked for on the Arabic page; this is the
+//  identical treatment on the English one, so `en` starts every row at the LEFT
+//  content edge exactly as `ar` starts it at the right. The same three pieces of
+//  blank's desktop form geometry:
+//
+//    .legend           `margin-left: 25.8%` via `.fieldset .legend`, clearing
+//                      the label column - 269 instead of 32.
+//    .actions-toolbar  the same 25.8%, via
+//                      `.column:not(.sidebar-main) form .actions-toolbar`,
+//                      which carried the Continue button along with it.
+//    .label            `text-align: right` via
+//                      `.fieldset > .field:not(.choice) > .label`, putting each
+//                      label's text against its input instead of at the edge.
+//
+//  The `.primary` wrapper needs nothing here: blank already floats it `left`,
+//  which IS the start in English, so removing the toolbar's indent is enough to
+//  bring the button to 32.
+//
+//  SPECIFICITY, because these have to lose to Arabic and beat blank. They are
+//  unscoped on purpose and are simply outranked on the Arabic page by the
+//  `html:lang(ar)` rules above - (0,5,1) and (0,8,1) against the (0,4,0) and
+//  (0,7,0) here - so Arabic keeps its right-hand values whatever the source
+//  order. Against blank they win on class count: (0,4,0) over `.fieldset
+//  .legend` (0,2,0) and over `.column:not(.sidebar-main) form .actions-toolbar`
+//  (0,3,1), and (0,7,0) over the label rule's (0,4,0).
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .sales-guest-form .form.form-orders-search {
+        .legend,
+        .actions-toolbar {
+            margin-left: 0;
+        }
+
+        .fieldset > .field:not(.choice) > .label {
+            text-align: left;
+        }
+    }
+}
