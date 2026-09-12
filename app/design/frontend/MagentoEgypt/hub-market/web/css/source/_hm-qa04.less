@@ -1060,3 +1060,37 @@ html:lang(ar) @{hm-order-pages} .order-details-items > .actions-toolbar .action.
         .review-details { grid-column: 1; }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.25 item 8, QA retest — the tax figure was the odd one out
+//  ---------------------------------------------------------------------------
+//  "We need to change the tax color from red to black."
+//
+//  _hm-checkout.less styles the summary's rows as `tr.totals:not(.grand)` and
+//  `.grand`. Magento's tax line is neither — Magento_Tax renders it as
+//  `tr.totals-tax` — so it missed both rules and its amount fell back to the
+//  theme's price colour, --hm-price (#c2410c). Measured on /ar/checkout/ with a
+//  tax row in the summary: subtotal, shipping and grand total rgb(26,26,46),
+//  the tax rgb(194,65,12).
+//
+//  Same treatment as every other row that is not the grand total: a muted label
+//  and the amount in the text colour. `.totals-tax-details` is the per-rate
+//  breakdown Magento adds when the full tax summary is switched on, and the cart
+//  page carries the same pair of rules, so it is covered here too.
+.checkout-index-index .opc-block-summary .table-totals,
+.checkout-index-index .amcheckout-summary-container .table-totals,
+.checkout-cart-index .cart-summary .cart-totals {
+    tr.totals-tax,
+    tr.totals-tax-details {
+        .mark {
+            color: var(--hm-foreground-muted);
+            font-weight: 400;
+        }
+
+        .amount,
+        .amount .price {
+            color: var(--hm-foreground);
+            font-weight: 500;
+        }
+    }
+}
