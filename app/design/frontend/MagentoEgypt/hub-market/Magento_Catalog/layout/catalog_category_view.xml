@@ -116,5 +116,23 @@
                    after="-"
                    template="Magento_LayeredNavigation::mobile-filters-scrim.phtml"/>
         </referenceContainer>
+
+        <!--
+            CL036-DEV01.26: the swatch strip comes off the listing cards.
+
+            Magento_Swatches adds `category.product.type.details.renderers.configurable`
+            to every listing, which renders `.swatch-opt-<id>` into the card between
+            the rating and the price. On this catalogue that reads badly twice over:
+            configurable products drew a row of colour boxes that overlapped the
+            price in list mode, and every SIMPLE product - the overwhelming
+            majority here - still reserved the strip and drew an empty band. The
+            client marked both and asked for it to match the theme.
+
+            Removed in layout rather than hidden in CSS: `display: none` would still
+            build the block, still run its option queries per card, and still ship
+            the swatch renderer JS to every listing. Nothing is lost - a
+            configurable still opens on the PDP with its full option picker.
+        -->
+        <referenceBlock name="category.product.type.details.renderers.configurable" remove="true"/>
     </body>
 </page>
