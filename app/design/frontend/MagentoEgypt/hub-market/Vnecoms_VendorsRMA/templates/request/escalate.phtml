@@ -2,7 +2,10 @@
 /**
  * Hub Market override of Vnecoms_VendorsRMA::request/escalate.phtml.
  *
- * ONE change: the <form> no longer carries name="FORM_KEY".
+ * TWO changes: the <form> no longer carries name="FORM_KEY", and the WYSIWYG
+ * init at the bottom speaks Arabic on the Arabic store (and drops a plugin list
+ * that only ever produced 404s). The editor part is documented at that init and
+ * in web/js/hm-editor-locale.js; the form-key part is below.
  *
  * Same defect, same page-level consequence as the new-request form - see
  * Vnecoms_RMA/templates/customer/new_request.phtml in this theme for the full
@@ -96,22 +99,18 @@
         "jquery",
         'mage/validation',
         "mage/adminhtml/wysiwyg/tiny_mce/setup",
-        "mage/adminhtml/wysiwyg/widget"
-    ], function($) {
+        "mage/adminhtml/wysiwyg/widget",
+        "js/hm-editor-locale"
+    ], function($, validation, wysiwyg, widget, hmEditorLocale) {
         'use strict';
 
         $(function() {
-            tinymce.init({
+            tinymce.init(hmEditorLocale.apply({
                 selector: '#content_message_reply',
                 height: 200,
                 menubar: false,
-                plugins: [
-                    'advlist autolink lists link image charmap print preview anchor textcolor',
-                    'searchreplace visualblocks code fullscreen',
-                    'insertdatetime media table paste code help wordcount'
-                ],
-                toolbar: 'undo redo | formatselect | bold italic forecolor | alignleft aligncenter alignright alignjustify | removeformat',
-            });
+                toolbar: 'undo redo | formatselect | bold italic forecolor | alignleft aligncenter alignright alignjustify | removeformat'
+            }));
 
             $("#msg-send-btn").click(function() {
                 var content = tinyMCE.get('content_message_reply').getContent();
