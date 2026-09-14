@@ -98,8 +98,15 @@ require([
     /**
      * Validate phone number
      */
+    function syncMobileNumber(){
+        var number = $('#mobile-number-input').intlTelInput('getNumber');
+        $('#mobile-number').val(number);
+        $('#mobilenumber').val(number);
+        return number;
+    }
+
     function validatePhoneNum(){
-        var number = $("#mobile-number-input").intlTelInput("getNumber");
+        var number = syncMobileNumber();
         var currentCustomerNumber = '<?php echo $this->getCustomer()->getMobilenumber()?>';
         if(currentCustomerNumber.length && (number == currentCustomerNumber)){
         	$('#mobile-number-input').addClass('otp-validated');
@@ -107,13 +114,14 @@ require([
         	$('#mobile-number-input').removeClass('otp-validated');
         }
 
-        $('#mobile-number').val(number);
-        if ($('#mobilenumber')) {
-            $('#mobilenumber').val(number);
-        }
         // $('.sms-otp-mobile').html($("#mobile-number-input").intlTelInput("getNumber", intlTelInputUtils.numberFormat.INTERNATIONAL)); /*intlTelInputUtils.numberFormat.NATIONAL*/
         $('.sms-otp-mobile').html($("#mobile-number").val());
     }
+
+    $('#form-validate').on('input change', '#mobile-number-input', syncMobileNumber);
+    $('#form-validate').on('submit', function(){
+        syncMobileNumber();
+    });
 
     /**
      * Send otp

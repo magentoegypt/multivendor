@@ -1,25 +1,75 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <type name="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\TabsLeft">
+    <type name="Vnecoms\VendorsLayerNavigation\Model\Layer\VendorHomePage\ItemCollectionProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\CollectionFactory</argument>
+        </arguments>
+    </type>
+    <type name="MGS\Lookbook\Model\Lookbook">
+        <plugin name="phpfixlookbook" type="MagentoEgypt\VendorExtend\Plugin\Lookbook"/>
+    </type>
+    <preference for="Vnecoms\BannerManager\Block\Banner" type="MagentoEgypt\VendorExtend\Block\BannerManager\Banner"/>
+    <type name="Vnecoms\VendorsPriceComparison\Helper\Data">
+        <arguments>
+            <argument name="allowedAttributes" xsi:type="array">
+                <item name="ves_category_ids" xsi:type="string">ves_category_ids</item>
+                <item name="category_ids" xsi:type="string">category_ids</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Vnecoms\VendorsApi\Api\ProductRepositoryInterface" type="MagentoEgypt\VendorExtend\Model\ProductRepository" />
+    <preference for="MagentoEgypt\VendorExtend\Api\VendorRepositoryInterface" type="MagentoEgypt\VendorExtend\Model\VendorRepository" />
+    <preference for="MagentoEgypt\VendorExtend\Api\OrderRepositoryInterface" type="MagentoEgypt\VendorExtend\Model\OrderRepository" />
+    <preference for="MagentoEgypt\VendorExtend\Api\Data\Sale\OrderInterface" type="MagentoEgypt\VendorExtend\Model\Data\Sale\Order" />
+    <preference for="Vnecoms\Quotation\Model\Sequence" type="MagentoEgypt\VendorExtend\Model\QuoteSequence" />
+    <type name="Vnecoms\RMA\Model\Pdf\Request">
         <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
     </type>
-    <type name="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\Renderer\Message">
+    <type name="Vnecoms\RMA\Model\Request">
         <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
     </type>
-    <type name="Vnecoms\VendorsRMA\Block\Adminhtml\Request\Edit\Renderer\Status">
-        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    <type name="Vnecoms\Credit\Model\Processor">
+        <arguments>
+            <argument name="creditProcessors" xsi:type="array">
+                <item name="order_payment" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\OrderPayment</item>
+                <item name="item_commission" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\ItemCommission</item>
+                <item name="withdraw_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\Withdraw</item>
+                <item name="cancel_withdrawal" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\CancelWithdrawal</item>
+                <item name="order_payment_refund" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\RefundOrderPayment</item>
+                <item name="item_commission_refund" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\RefundItemCommission</item>
+                <item name="vendor_refund_spent_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\CreditProcessor\RefundSpentCredit</item>
+                <item name="buy_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\Processor\BuyCredit</item>
+                <item name="refund_spent_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\Processor\RefundSpentCredit</item>
+                <item name="refund_by_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\Processor\RefundByCredit</item>
+                <item name="spend_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\Processor\SpendCredit</item>
+                <item name="admin_add_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\Processor\AdminAddCredit</item>
+                <item name="admin_subtract_credit" xsi:type="object">MagentoEgypt\VendorExtend\Model\Processor\AdminSubtractCredit</item>
+            </argument>
+        </arguments>
     </type>
-    <type name="Vnecoms\RMA\Block\Adminhtml\Request\Edit\AjaxMessage">
-        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    <preference for="Vnecoms\VendorsPage\Block\Home\ListProduct" type="MagentoEgypt\VendorExtend\Block\VendorsPage\Home\ListProduct"/>
+    <type name="Magento\Elasticsearch\Model\Indexer\IndexerHandler">
+        <plugin name="hm_exclude_unapproved_from_search_index" type="MagentoEgypt\VendorExtend\Plugin\Indexer\ExcludeUnapprovedProducts" sortOrder="100"/>
     </type>
-    <type name="Vnecoms\VendorsRMA\Block\Frontend\PrintRma">
-        <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
+    <type name="Vnecoms\VendorsCustomTheme\Block\Account\Create\ThemeList">
+        <plugin name="hm_hide_empty_theme_chooser" type="MagentoEgypt\VendorExtend\Plugin\CustomTheme\HideEmptyThemeChooser"/>
     </type>
-
-    <preference for="Vnecoms\Quotation\Block\Adminhtml\Quote\Edit\Header" type="MagentoEgypt\VendorExtend\Block\Adminhtml\Quote\Edit\Header"/>
-
-    <type name="Vnecoms\Vendors\Block\Adminhtml\Vendor\Edit\Tabs">
-        <plugin name="magentoegypt_vendorextend_add_custom_theme_tab"
-                type="MagentoEgypt\VendorExtend\Plugin\Block\Adminhtml\Vendor\Edit\TabsPlugin"/>
+    <type name="Vnecoms\VendorsCustomTheme\Block\Adminhtml\System\Config\Form\Field\Theme">
+        <plugin name="hm_hide_empty_theme_field" type="MagentoEgypt\VendorExtend\Plugin\CustomTheme\HideEmptyThemeChooser"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order" type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\InvoiceSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order" type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\ShipmentSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order" type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\CreditmemoSender">
+        <plugin name="hm_vendor_email_cannot_fail_the_order" type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
+    </type>
+    <type name="Vnecoms\VendorsSales\Block\Adminhtml\Vorder\View\Items">
+        <plugin name="magentoegypt_vendor_order_items_collection" type="MagentoEgypt\VendorExtend\Plugin\VendorOrderItems"/>
     </type>
 </config>

@@ -1,4 +1,4 @@
-<form name="FORM_KEY" action="<?php echo $block->getSubmitUrl() ?>" method="post" id="request-new-form" class="request-new-form" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
+<form action="<?php echo $block->getSubmitUrl() ?>" method="post" id="request-new-form" class="request-new-form" enctype="multipart/form-data" data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>">
     <div class="request-information fieldset">
         <?php echo $block->getChildHtml("info") ?>
     </div>

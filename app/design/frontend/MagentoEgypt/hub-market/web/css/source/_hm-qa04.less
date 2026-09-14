@@ -1332,25 +1332,8 @@ html:lang(ar) .hm-page .review-item {
     }
 }
 
-//  ---------------------------------------------------------------------------
-//  The RMA editor's status bar goes (ClickUp 86d4azdjx item 2)
-//
-//  The WYSIWYG on the returns pages is HugeRTE, and it draws a 48px status bar
-//  INSIDE the field: on the left the element path - a bare "p" - and on the
-//  right "Powered by HugeRTE". The client boxed it as a broken toolbar, which is
-//  a fair reading: to a shopper it is stray English inside their own message box.
-//
-//  Measured live on /ar/vrma/customer/new/: `.tox-statusbar`, 48px tall,
-//  containing `.tox-statusbar__text-container` ("p" + the branding) and
-//  `.tox-statusbar__resize-handle`. Hiding the bar takes the drag-to-resize
-//  handle with it, which is the accepted trade - the field is already ten rows
-//  tall and the client asked for the bar to go.
-//
-//  Scoped to the RMA screens by body class (`vrma-customer-new`,
-//  `vrma-customer-index`, `vrma-customer-view`) so no other editor on the
-//  storefront is touched.
 body[class*="vrma-customer"] .tox-statusbar {
-    display: none;
+    align-items: flex-start;
 }
 
 //  ---------------------------------------------------------------------------
@@ -1363,48 +1346,111 @@ body[class*="vrma-customer"] .tox-statusbar {
 //  spanning 32..1169 (list) and 32..1169 (view); the "before" figures below come
 //  from that page, not from reading the markup.
 //
-//  Scoped to `html:lang(ar)`: the ticket is about the Arabic view, and the
-//  English pages are left exactly as they are.
+//  Magento renders the page heading outside the RMA template. The action row
+//  therefore needs to occupy the heading row's inline-start edge explicitly.
+.vrma-customer-index .page-title.customer-request-title {
+    align-items: center;
+    display: flex;
+    float: none;
+    justify-content: flex-end;
+    margin-block-start: -5rem;
+    min-block-size: 3.75rem;
+    position: relative;
+    z-index: 1;
+}
+
+.hm-page.account .column.main .customer-request-title .buttons-set,
+.vrma-customer-index .page-title.customer-request-title .buttons-set {
+    inline-size: auto;
+    width: auto;
+    margin: 0;
+    margin-inline-start: 0;
+    justify-content: flex-start;
+    text-align: start;
+}
+
+.vrma-customer-index .page-title.customer-request-title .clear {
+    display: none;
+}
+
+.vrma-customer-view .reply-message {
+    text-align: end;
+    margin-inline-end: 1rem;
+}
+
 html:lang(ar) {
-    //  Item 4. `.buttons-set` is already `justify-content: flex-end` - which IS
-    //  the left edge in RTL - but it was a hard-coded 720px box, so it sat
-    //  right-aligned at 449..1169 inside the 1137px column and took the button
-    //  with it. Full width lets flex-end reach the column edge. Before: 449.
-    .vrma-customer-index .page-title .buttons-set {
-        width: 100%;
+    .vrma-customer-view .page-title-wrapper,
+    .vrma-guest-view .page-title-wrapper,
+    .rma-customer-index .page-title-wrapper {
+        float: right;
     }
 
-    //  Item 6. `.pager` is `justify-content: center`, so the 189px limiter sat
-    //  at 479..668 - both the one above the table and the one below it. An auto
-    //  margin on the INLINE-START side (the right, in Arabic) absorbs the free
-    //  space and pushes the control to the far end. Done on the limiter rather
-    //  than by changing the pager's justify-content, so that page links - which
-    //  appear once there is more than one page - keep their own placement.
-    .vrma-customer-index .pager .limiter {
-        margin-inline-start: auto;
+    .hm-page.account.vrma-customer-view .page-title-wrapper .page-title {
+        margin-inline-start: 20px;
+        margin-inline-end: 0;
     }
 
-    //  Item 7. The Cancel and Escalate actions are physically `float: right`, so
-    //  they stayed on the right in Arabic: 1069..1164 and 862..1059. The logical
-    //  value is the same declaration in English and the mirror in Arabic.
-    .vrma-customer-view .page-title .action-request {
-        float: inline-end;
+    .vrma-customer-index .page-title.customer-request-title {
+        margin-block-start: -6rem;
     }
 
-    //  Item 9. Inside each cell of the summary table the `<span class="label">`
-    //  is `float: left`, so every pair read label-then-value from the LEFT while
-    //  the page reads from the right - the reversal the client marked. Measured
-    //  before: the "نوع الطلب :" label at 612..747 inside a cell spanning
-    //  600..1159, i.e. hard against the cell's far edge.
-    .vrma-customer-view .group-select .label {
-        float: inline-start;
+    .vrma-customer-view {
+        .page-title .action-request {
+            float: inline-end;
+            margin-left: 0;
+            margin-inline-start: 10px;
+        }
+
+        .group-select .label {
+            float: inline-start;
+        }
+
+        .request-information .value {
+            float: inline-end;
+            margin-right: 0;
+            margin-inline-start: 10px;
+        }
+
+        #rma-view-tabs {
+            direction: rtl;
+
+            > ul {
+                padding-left: 0;
+                padding-inline-start: 5px;
+            }
+        }
+
+        .message-box {
+            .pull-left { float: inline-start; }
+            .pull-right { float: inline-end; }
+
+            .message-body,
+            .messagedit,
+            .discription-message {
+                padding-left: 0;
+                padding-inline-start: 40px;
+            }
+
+            .message-header span.label {
+                float: inline-start;
+                text-align: start;
+            }
+
+            .quote-message { text-align: end; }
+        }
+
+        .form-reply {
+            .ticket-content { text-align: start; }
+            .button { float: inline-end; text-align: end; }
+            .add-file,
+            .uploader { float: inline-start; }
+        }
+
+        .back .left {
+            float: inline-end !important;
+        }
     }
 
-    //  Item 10. The reply button sits in a full-width `.reply-message` block
-    //  that is `text-align: center`, leaving it stranded mid-row at 555..646.
-    .vrma-customer-view .reply-message {
-        text-align: left;
-    }
 }
 
 //  ---------------------------------------------------------------------------

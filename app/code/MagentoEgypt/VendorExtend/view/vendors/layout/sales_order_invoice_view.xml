@@ -1,6 +1,17 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework/View/Layout/etc/page_configuration.xsd">
     <body>
+        <referenceBlock name="invoice_items.default">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">MagentoEgypt_VendorExtend::order/invoice/view/items/renderer/default.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="invoice_totals">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">MagentoEgypt_VendorExtend::order/invoice/totals.phtml</argument>
+            </action>
+        </referenceBlock>
         <referenceBlock name="order_info" template="MagentoEgypt_VendorExtend::order/view/info.phtml" />
     </body>
 </page>

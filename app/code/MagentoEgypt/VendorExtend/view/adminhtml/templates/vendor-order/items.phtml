@@ -1,0 +1,61 @@
+<?php
+/** @var \Magento\Sales\Block\Adminhtml\Order\View\Items $block */
+$_order = $block->getOrder();
+$om = \Magento\Framework\App\ObjectManager::getInstance();
+$vendorOrderCollection = $om->create('Vnecoms\VendorsSales\Model\ResourceModel\Order\Collection');
+$vendorOrderCollection->addFieldToFilter('order_id', $_order->getId());
+$vendorOrderItemIds = [];
+$message = __('This will create an offline refund. To create an online refund, open an invoice and create credit memo for it. Do you want to continue?');
+?>
+<div class="order-items">
+    <?php foreach ($vendorOrderCollection as $vendorOrder): ?>
+        <?php $_vendor = $vendorOrder->getVendor(); ?>
+        <div class="admin__table-header">
+            <h3><?= /* @noEscape */ __('Seller: %1 (%2)', sprintf('<a href="%s" target="_blank">%s</a>', $block->getUrl('vendors/index/edit', ['id' => $_vendor->getId()]), $vendorOrder->getVendor()->getVendorId()), $vendorOrder->getStatus()) ?></h3>
+            <?php if ($vendorOrder->canShip()): ?>
+                <button onclick="setLocation('<?= $block->escapeUrl($block->getUrl('vendors/sales_shipment/start', ['order_id' => $vendorOrder->getId()])) ?>')" class="action-default scalable action-primary"><?= $block->escapeHtml(__('Ship')) ?></button>
+            <?php endif; ?>
+            <?php if ($vendorOrder->canCreditmemo()): ?>
+                <?php $creditmemoUrl = $block->getUrl('vendors/sales_creditmemo/start', ['vorder_id' => $vendorOrder->getId()]); ?>
+                <button onclick="<?= $_order->getPayment()->getMethodInstance()->isGateway() ? 'confirmSetLocation(' . $block->escapeJs($message) . ',' . $block->escapeJs($creditmemoUrl) . ')' : 'setLocation(' . $block->escapeJs($creditmemoUrl) . ')' ?>" class="action-default scalable action-primary"><?= $block->escapeHtml(__('Credit Memo')) ?></button>
+            <?php endif; ?>
+        </div>
+        <div class="admin__table-wrapper">
+            <table class="data-table admin__table-primary edit-order-table">
+                <thead><tr class="headings">
+                    <?php $columns = $block->getColumns(); $lastItemNumber = count($columns); $i = 0; ?>
+                    <?php foreach ($columns as $columnName => $columnTitle): $i++; ?>
+                        <th class="col-<?= $block->escapeHtmlAttr($columnName) ?><?= $i === $lastItemNumber ? ' last' : '' ?>"><span><?= $block->escapeHtml($columnTitle) ?></span></th>
+                    <?php endforeach; ?>
+                </tr></thead>
+                <?php $_items = $vendorOrder->getAllItems(); $i = 0; foreach ($_items as $_item): ?>
+                    <?php $vendorOrderItemIds[] = $_item->getId(); if ($_item->getParentItem()) continue; $i++; ?>
+                    <tbody class="<?= $i % 2 ? 'even' : 'odd' ?>">
+                        <?= $block->getItemHtml($_item) ?>
+                        <?= $block->getItemExtraInfoHtml($_item) ?>
+                    </tbody>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    <?php endforeach; ?>
+    <?php $_allItems = $block->getItemsCollection(); ?>
+    <?php if (count($_allItems) > count($vendorOrderItemIds)): ?>
+        <div class="admin__table-wrapper">
+            <table class="data-table admin__table-primary edit-order-table">
+                <thead><tr class="headings">
+                    <?php $columns = $block->getColumns(); $lastItemNumber = count($columns); $i = 0; ?>
+                    <?php foreach ($columns as $columnName => $columnTitle): $i++; ?>
+                        <th class="col-<?= $block->escapeHtmlAttr($columnName) ?><?= $i === $lastItemNumber ? ' last' : '' ?>"><span><?= $block->escapeHtml($columnTitle) ?></span></th>
+                    <?php endforeach; ?>
+                </tr></thead>
+                <?php $i = 0; foreach ($_allItems as $_item): ?>
+                    <?php if (in_array($_item->getId(), $vendorOrderItemIds, true) || $_item->getParentItem()) continue; $i++; ?>
+                    <tbody class="<?= $i % 2 ? 'even' : 'odd' ?>">
+                        <?= $block->getItemHtml($_item) ?>
+                        <?= $block->getItemExtraInfoHtml($_item) ?>
+                    </tbody>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>

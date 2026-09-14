@@ -1,0 +1,162 @@
+<?php
+/** @var \Magento\Sales\Block\Adminhtml\Totals $block */
+$invoice = method_exists($block, 'getVendorInvoice') ? $block->getVendorInvoice() : null;
+if (!$invoice && method_exists($block, 'getInvoice')) {
+    $invoice = $block->getInvoice();
+}
+$vendorOrder = method_exists($block, 'getVendorOrder') ? $block->getVendorOrder() : null;
+$source = method_exists($block, 'getSource') ? $block->getSource() : null;
+if ($invoice) {
+    $items = $invoice->getAllItems();
+    $displayOrder = $invoice->getOrder();
+} elseif ($vendorOrder) {
+    $items = $vendorOrder->getAllItems();
+    $displayOrder = $vendorOrder->getOrder();
+} elseif ($source instanceof \Vnecoms\VendorsSales\Model\Order) {
+    $items = $source->getAllItems();
+    $displayOrder = $source->getOrder();
+} else {
+    $displayOrder = $block->getOrder();
+    $items = $displayOrder->getAllItems();
+}
+
+$catalogDiscount = 0.0;
+$displaySubtotal = 0.0;
+foreach ($items as $item) {
+    if ($item->getParentItem()) {
+        continue;
+    }
+    $qty = $invoice ? (float) $item->getQty() : (float) $item->getQtyOrdered();
+    $orderItem = $invoice ? $item->getOrderItem() : $item;
+    $originalPrice = (float) $orderItem->getOriginalPrice();
+    $currentPrice = (float) $orderItem->getPrice();
+    $displaySubtotal += $originalPrice * $qty;
+    $catalogDiscount += max(0.0, ($originalPrice - $currentPrice) * $qty);
+}
+
+$footerTotals = $block->getTotals('footer');
+$bodyTotals = $block->getTotals('');
+$hasDiscountTotal = isset($footerTotals['discount']) || isset($bodyTotals['discount']);
+$isSubtotal = static function ($code, $total): bool {
+    return $code === 'subtotal' || strtolower((string) $total->getLabel()) === 'subtotal';
+};
+$discountRendered = false;
+$renderFallbackDiscount = static function () use ($block, $displayOrder, $catalogDiscount, &$discountRendered): void {
+    if ($catalogDiscount <= 0.0001) {
+        return;
+    }
+    $discountRendered = true;
+    ?>
+    <tr class="col-discount">
+        <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+            <?= $block->escapeHtml(__('Discount')) ?>
+        </td>
+        <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+            <span>-<?= /* @noEscape */ $displayOrder->formatPrice($catalogDiscount) ?></span>
+        </td>
+    </tr>
+    <?php
+};
+?>
+<table class="data table admin__table-secondary order-subtotal-table">
+    <?php if ($footerTotals) : ?>
+        <tfoot>
+            <?php foreach ($footerTotals as $_code => $_total) : ?>
+                <?php if ($_total->getBlockName()) : ?>
+                    <?php if ($isSubtotal($_code, $_total) && $catalogDiscount > 0.0001) : ?>
+                        <tr class="col-<?php /* @escapeNotVerified */ echo $_code?>">
+                            <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+                                <?= $block->escapeHtml($_total->getLabel()) ?>
+                            </td>
+                            <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+                                <?= /* @noEscape */ $displayOrder->formatPrice($displaySubtotal) ?>
+                            </td>
+                        </tr>
+                    <?php elseif ($_code === 'discount' && $catalogDiscount > 0.0001) : ?>
+                        <tr class="col-discount">
+                            <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+                                <?= $block->escapeHtml($_total->getLabel()) ?>
+                            </td>
+                            <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+                                <?= /* @noEscape */ $displayOrder->formatPrice(-abs((float) $_total->getValue()) - $catalogDiscount) ?>
+                            </td>
+                        </tr>
+                    <?php else : ?>
+                        <?= $block->getChildHtml($_total->getBlockName(), false) ?>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <tr class="col-<?= $block->escapeHtmlAttr($_code) ?>">
+                        <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+                            <strong><?= $block->escapeHtml($_total->getLabel()) ?></strong>
+                        </td>
+                        <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+                            <strong>
+                                <?php if ($isSubtotal($_code, $_total) && $catalogDiscount > 0.0001) : ?>
+                                    <?= /* @noEscape */ $displayOrder->formatPrice($displaySubtotal) ?>
+                                <?php elseif ($_code === 'discount' && $catalogDiscount > 0.0001) : ?>
+                                    <?= /* @noEscape */ $displayOrder->formatPrice(-abs((float) $_total->getValue()) - $catalogDiscount) ?>
+                                <?php else : ?>
+                                    <?= /* @noEscape */ $block->formatValue($_total) ?>
+                                <?php endif; ?>
+                            </strong>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                <?php if ($isSubtotal($_code, $_total) && !$hasDiscountTotal) : ?><?php $renderFallbackDiscount(); ?><?php endif; ?>
+            <?php endforeach; ?>
+        </tfoot>
+    <?php endif; ?>
+
+    <?php if ($bodyTotals) : ?>
+        <tbody>
+            <?php foreach ($bodyTotals as $_code => $_total) : ?>
+                <?php if ($_total->getBlockName()) : ?>
+                    <?php if ($isSubtotal($_code, $_total) && $catalogDiscount > 0.0001) : ?>
+                        <tr class="col-subtotal">
+                            <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+                                <?= $block->escapeHtml($_total->getLabel()) ?>
+                            </td>
+                            <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+                                <?= /* @noEscape */ $displayOrder->formatPrice($displaySubtotal) ?>
+                            </td>
+                        </tr>
+                    <?php elseif ($_code === 'discount' && $catalogDiscount > 0.0001) : ?>
+                        <tr class="col-discount">
+                            <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+                                <?= $block->escapeHtml($_total->getLabel()) ?>
+                            </td>
+                            <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+                                <?= /* @noEscape */ $displayOrder->formatPrice(-abs((float) $_total->getValue()) - $catalogDiscount) ?>
+                            </td>
+                        </tr>
+                    <?php else : ?>
+                        <?= $block->getChildHtml($_total->getBlockName(), false) ?>
+                    <?php endif; ?>
+                <?php else : ?>
+                    <tr class="col-<?= $block->escapeHtmlAttr($_code) ?>">
+                        <td <?= /* @noEscape */ $block->getLabelProperties() ?>>
+                            <?php if ($_total->getStrong()) : ?><strong><?php endif; ?>
+                            <?= $block->escapeHtml($_total->getLabel()) ?>
+                            <?php if ($_total->getStrong()) : ?></strong><?php endif; ?>
+                        </td>
+                        <td <?= /* @noEscape */ $block->getValueProperties() ?>>
+                            <?php if ($_total->getStrong()) : ?><strong><?php endif; ?>
+                            <?php if ($isSubtotal($_code, $_total) && $catalogDiscount > 0.0001) : ?>
+                                <?= /* @noEscape */ $displayOrder->formatPrice($displaySubtotal) ?>
+                            <?php elseif ($_code === 'discount' && $catalogDiscount > 0.0001) : ?>
+                                <?= /* @noEscape */ $displayOrder->formatPrice(-abs((float) $_total->getValue()) - $catalogDiscount) ?>
+                            <?php else : ?>
+                                <?= /* @noEscape */ $block->formatValue($_total) ?>
+                            <?php endif; ?>
+                            <?php if ($_total->getStrong()) : ?></strong><?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endif; ?>
+                <?php if ($isSubtotal($_code, $_total) && !$hasDiscountTotal) : ?><?php $renderFallbackDiscount(); ?><?php endif; ?>
+            <?php endforeach; ?>
+        </tbody>
+    <?php endif; ?>
+    <?php if (!$hasDiscountTotal && !$discountRendered) : ?>
+        <tbody><?php $renderFallbackDiscount(); ?></tbody>
+    <?php endif; ?>
+</table>

@@ -1,0 +1,30 @@
+<?php
+/** @var \Magento\Sales\Block\Adminhtml\Order\View\Items\Renderer\DefaultRenderer $block */
+$_item = $block->getItem();
+$block->setPriceDataObject($_item);
+$displayOrder = $_item->getOrder();
+if (!$displayOrder) {
+    $displayOrder = $block->getOrder();
+}
+if ($displayOrder instanceof \Vnecoms\VendorsSales\Model\Order) {
+    $displayOrder = $displayOrder->getOrder();
+}
+$catalogDiscount = max(
+    0.0,
+    ((float) $_item->getOriginalPrice() - (float) $_item->getPrice()) * (float) $_item->getQtyOrdered()
+);
+$discountAmount = (float) $_item->getDiscountAmount() + $catalogDiscount;
+?>
+<tr>
+    <?php $i = 0; $columns = $block->getColumns(); $lastItemNumber = count($columns); ?>
+    <?php foreach ($columns as $columnName => $columnClass): ?>
+        <?php $i++; ?>
+        <td class="<?= /* @noEscape */ $columnClass ?><?= $i === $lastItemNumber ? ' last' : '' ?>">
+            <?php if ($columnName === 'discont'): ?>
+                <?= /* @noEscape */ $displayOrder->formatPrice($discountAmount) ?>
+            <?php else: ?>
+                <?= /* @noEscape */ $block->getColumnHtml($_item, $columnName) ?>
+            <?php endif; ?>
+        </td>
+    <?php endforeach; ?>
+</tr>

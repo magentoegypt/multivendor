@@ -157,12 +157,21 @@
         border-radius: var(--hm-radius-sm);
         box-sizing: border-box;
         font-size: 1.6rem;
+        height: auto;
         inline-size: 100%;
-        min-block-size: 4.8rem;
-        padding-inline: var(--hm-space-4);
+        min-block-size: 0;
+        padding-inline: 0;
     }
 
-    textarea { min-block-size: 12rem; padding-block: var(--hm-space-3); }
+    textarea { padding-block: var(--hm-space-3); }
+
+    html:lang(ar) & {
+        input.input-text,
+        select,
+        textarea {
+            padding: 0;
+        }
+    }
 
     //  The required marker is an em on this markup, not the usual .required span.
     .required em,

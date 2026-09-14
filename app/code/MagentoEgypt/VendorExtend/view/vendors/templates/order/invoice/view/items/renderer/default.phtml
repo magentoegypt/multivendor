@@ -1,0 +1,22 @@
+<?php
+/** @var \Magento\Sales\Block\Adminhtml\Items\Renderer\DefaultRenderer $block */
+$_item = $block->getItem();
+$_item->setStoreId($_item->getInvoice()->getStoreId());
+$block->setPriceDataObject($_item);
+$orderItem = $_item->getOrderItem();
+$catalogDiscount = max(
+    0.0,
+    ((float) $orderItem->getOriginalPrice() - (float) $orderItem->getPrice()) * (float) $_item->getQty()
+);
+$discountAmount = (float) $_item->getDiscountAmount() + $catalogDiscount;
+$displayOrder = $orderItem->getOrder();
+?>
+<tr>
+    <td class="col-product"><?= /* @noEscape */ $block->getColumnHtml($_item, 'name') ?></td>
+    <td class="col-price"><?= /* @noEscape */ $block->getColumnHtml($_item, 'price') ?></td>
+    <td class="col-qty"><?= (float) $_item->getQty() ?></td>
+    <td class="col-subtotal"><?= /* @noEscape */ $block->getColumnHtml($_item, 'subtotal') ?></td>
+    <td class="col-tax"><?= /* @noEscape */ $block->displayPriceAttribute('tax_amount') ?></td>
+    <td class="col-discount"><?= /* @noEscape */ $displayOrder->formatPrice($discountAmount) ?></td>
+    <td class="col-total last"><?= /* @noEscape */ $block->getColumnHtml($_item, 'total') ?></td>
+</tr>
