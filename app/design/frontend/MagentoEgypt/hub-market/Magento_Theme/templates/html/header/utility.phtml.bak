@@ -1,0 +1,33 @@
+<?php
+/**
+ * Hub Market — header utility bar (band 1 of 3).
+ *
+ * Carries the delivery promise, the store/language switcher and the account
+ * links. Magento's own header.panel.wrapper is removed in favour of this.
+ *
+ * The delivery promise is deliberately a CMS block (`hm_delivery_promise`) and
+ * not hard-coded copy: the Figma build hard-coded "Free delivery on orders over
+ * AED 150" in one place and three different thresholds in two currencies
+ * elsewhere. One editable source avoids repeating that.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+declare(strict_types=1);
+?>
+<div class="hm-header__utility">
+    <div class="hm-header__utility-inner">
+        <p class="hm-header__promise">
+            <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-delivery"/></svg>
+            <?= /* @noEscape */ $block->getLayout()
+                ->createBlock(\Magento\Cms\Block\Block::class)
+                ->setBlockId('hm_delivery_promise')
+                ->toHtml() ?>
+        </p>
+
+        <div class="hm-header__utility-right">
+            <?= $block->getChildHtml('store_switcher') ?>
+            <?= $block->getChildHtml('topLinks') ?>
+        </div>
+    </div>
+</div>
