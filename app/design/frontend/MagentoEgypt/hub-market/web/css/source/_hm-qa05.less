@@ -709,3 +709,38 @@ input.mobile-number {
         margin-block-start: var(--hm-space-5);
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-TC34 — the Review Order button was a silent dead end
+//  ---------------------------------------------------------------------------
+//  "Clicking Continue does not proceed — the page remains stuck on the same
+//  screen with no error message or progress."
+//
+//  The button bound `enable: isReady()`, and `isReady` is just
+//  `!!quote.paymentMethod()`. With no method chosen Knockout set `disabled`,
+//  and blank ships:
+//
+//      .action.primary[disabled] { opacity: .5; cursor: default;
+//                                  pointer-events: none }
+//
+//  so the button became CLICK-TRANSPARENT. The press never reached the
+//  handler, which is why nothing moved and nothing was said — and why the
+//  component's own `if (!quote.paymentMethod()) return false` was unreachable.
+//  The same pointer-events trap is already on record here from the header
+//  search; a `[disabled] .action` cannot report anything to anyone.
+//
+//  The button is now always pressable and carries this class instead while it
+//  has nothing to do. Same dimmed reading as blank's disabled state — the
+//  customer is still told it is not ready — but the click lands, so the
+//  handler can name the missing step and scroll the payment list into view.
+.hm-continue-review__button--waiting {
+    //  Matches blank's `[disabled]` treatment, minus `pointer-events: none`.
+    opacity: .5;
+
+    //  NOT `cursor: default`. It IS pressable now, and pressing it is how the
+    //  customer finds out what is missing.
+    &:hover,
+    &:focus {
+        opacity: .65;
+    }
+}

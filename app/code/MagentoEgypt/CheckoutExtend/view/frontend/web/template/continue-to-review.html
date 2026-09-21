@@ -16,9 +16,17 @@
             <span data-bind="i18n: 'Back'"></span>
         </button>
 
+        <!--
+            NOT `enable: isReady()`. A disabled .action.primary is given
+            `pointer-events: none` by blank, so the click never reached the
+            handler and pressing this did nothing at all with nothing said —
+            which is CL036-TC34. The class keeps the unavailable LOOK; the
+            handler explains what is missing.
+        -->
         <button type="button"
                 class="action primary checkout hm-continue-review__button"
-                data-bind="click: continueToReview, enable: isReady()">
+                data-bind="click: continueToReview,
+                           css: {'hm-continue-review__button--waiting': !isReady()}">
             <span data-bind="i18n: 'Review Order'"></span>
         </button>
     </div>
