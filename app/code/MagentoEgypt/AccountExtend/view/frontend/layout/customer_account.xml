@@ -28,6 +28,22 @@
             </block>
         </referenceContainer>
 
+        <!--
+            CL036-DEV01.32 item 5 — the mobile account grid.
+
+            The rail's wrapper gets a theme copy of Magento_Theme's
+            collapsible.phtml, which adds a second, mobile-only title. On a
+            phone that bar is the grid's "Settings" card and opens the less-used
+            links; on desktop it stays the rail's "My Account" heading. One
+            string cannot read both ways, and a CSS `content:` string would not
+            be translatable — see the template.
+
+            Re-pointed here rather than by overriding collapsible.phtml in the
+            theme, because other blocks render with that template too.
+        -->
+        <referenceBlock name="sidebar.main.account_nav"
+                        template="MagentoEgypt_AccountExtend::html/account-collapsible.phtml"/>
+
         <referenceContainer name="sidebar.main">
             <block class="Magento\Framework\View\Element\Template"
                    name="hm.account.stats"

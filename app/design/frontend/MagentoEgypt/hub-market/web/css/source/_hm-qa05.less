@@ -1,0 +1,711 @@
+//
+//  QA CYCLE 5 (CL036-QA05 / DEV01.31–32) — the tickets filed against this round
+//  ===========================================================================
+//  One file per cycle, imported last, so a cycle's delta is one file to read and
+//  one line to revert. Same arrangement as _hm-qa04.less.
+//
+
+//  ---------------------------------------------------------------------------
+//  CL036-TC35 — the phone number reverses in the Arabic checkout
+//  ---------------------------------------------------------------------------
+//  Typing `01020104267` into the Arabic shipping form showed `4267 010 0102`.
+//
+//  Nothing reverses the string; the field is simply rendered in an RTL context.
+//  The input inherits `direction: rtl` from `html:lang(ar)`, and the bidi
+//  algorithm then lays the field's runs out right-to-left. Digits are neutral
+//  enough that each run stays internally LTR, which is why the digits inside a
+//  group still read correctly while the GROUPS come out in the wrong order —
+//  exactly the `4267 010 0102` the tester filmed.
+//
+//  A phone number is an LTR-locked value, which this theme already says out
+//  loud: the `.hm-ltr` helper in _hm-base.less names "prices, SKUs, order IDs,
+//  phone numbers" as the things that must not reorder inside Arabic copy. The
+//  phone fields just never got it.
+//
+//  `text-align: left` is QA's wording in the test case, and it is also what you
+//  want here: under `direction: ltr` it resolves to the start edge, so the
+//  caret sits where the first digit goes. The two intl-tel-input forms park a
+//  flag dropdown in that same left gutter via `padding-left: 5.6rem`
+//  (_hm-account.less); leaving the padding alone keeps the text clear of it.
+//
+//  Cast wider than the one ticket on purpose. The tester hit it in the guest
+//  checkout, but the same inherited direction applies to every phone field in
+//  the Arabic storefront — address book, registration, forgot-password, the
+//  vendor forms — and they are all the same defect. `telephone` is the checkout
+//  and address-form name (Magento renders it `type="text"`, so a `type='tel'`
+//  selector alone would miss it); `type='tel'` covers the intl-tel-input
+//  widgets; `mobilenumber` / `.mobile-number` are the Vnecoms SMS fields.
+input[type='tel'],
+input[name='telephone'],
+input[name='mobilenumber'],
+input.mobile-number {
+    direction: ltr;
+    text-align: left;
+}
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.31 item 1 — the logout page's message sits in the corner
+//  ---------------------------------------------------------------------------
+//  "Logout confirmation page, we need to move the text that's in the middle of
+//  the page." The tester's two screenshots draw the same arrow on both stores:
+//  from the message block out to the empty middle. In English the block is
+//  pinned top-LEFT, in Arabic top-RIGHT — it is the start edge in both, so
+//  nothing is mirrored wrongly; the text simply never moved off the corner.
+//
+//  Why it looks stranded: `.page-main` on this page computes to
+//  `max-width: 1920px` with `margin-inline: 0` (measured at a 1440 viewport:
+//  page-main x=0 w=1440, .column.main x=32 w=1376), so the container is the
+//  whole window and its two short lines of text sit at one end of it above
+//  roughly 450px of nothing before the footer.
+//
+//  Centring the text is the fix the ticket asks for, and it is the right one
+//  for the content — this page is a confirmation with no form and no actions,
+//  and it redirects itself after 5 seconds. The heading lives in
+//  `.page-title-wrapper`, which is a SIBLING of `.columns`, not inside it, so
+//  both have to be addressed or only the paragraph would move.
+//
+//  The block padding is what puts it in the middle of that empty band rather
+//  than at the top of it; it is deliberately padding and not a flex/min-height
+//  centring, because `.columns` is Magento's grid container and giving it a
+//  display of its own here would change how the page lays out at every width.
+.customer-account-logoutsuccess {
+    .page-title-wrapper {
+        padding-block-start: var(--hm-space-12);
+        text-align: center;
+    }
+
+    .column.main {
+        padding-block-end: var(--hm-space-12);
+        text-align: center;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.31 item 2 — the checkout fields do not fill the panel
+//  ---------------------------------------------------------------------------
+//  "The checkout page fields are not showing up properly and they are not
+//  taking the full width of the page." Filed with both an English and an
+//  Arabic screenshot, and it is one cause for both.
+//
+//  Measured on the live shipping step at a 1440 viewport, guest, one physical
+//  product in the cart:
+//
+//      .opc-wrapper            x=32  w=917
+//      .form-shipping-address  x=57  w=600   max-width: 600px
+//      #co-shipping-form       x=57  w=600   max-width: 600px
+//      street[0]                     w=600
+//      firstname                     w=285   (half of 600, paired with lastname)
+//
+//  So the column is 917px and the form inside it is capped at 600 — a 317px
+//  dead gutter down the whole step, which is exactly the empty right-hand half
+//  in the English shot and the empty left-hand half in the Arabic one.
+//
+//  The 600px is Magento's own `.opc-wrapper .form-login,
+//  .opc-wrapper .form-shipping-address { max-width: 600px }`. It is a sensible
+//  default for a checkout whose column is the full page; it is wrong here
+//  because this theme already gives the step a 736/1088 column and a separate
+//  order-summary rail beside it, so the form has its own measured width and
+//  does not need a second one.
+//
+//  Scoped to `.checkout-index-index .opc-wrapper` rather than unsetting the
+//  rule globally: the same 600px also applies inside `.modal-popup
+//  .form-shipping-address` (the address-edit dialog), where it IS the right
+//  width and must keep it.
+.checkout-index-index .opc-wrapper {
+    .form-login,
+    .form-shipping-address {
+        max-width: none;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.31 item 3 — the set-password form reads inside out in Arabic
+//  ---------------------------------------------------------------------------
+//  "We need the field description to be on the far right side with the fields
+//  next to it", filed against /ar/customer/account/createpassword/.
+//
+//  blank lays this form out with a horizontal label column, in PHYSICAL values:
+//
+//      .fieldset > .field:not(.choice) > .label   { float: left; width: 25.8%;
+//                                                   padding: 6px 15px 0 0;
+//                                                   text-align: right }
+//      .fieldset > .field:not(.choice) > .control { float: left; width: 74.2% }
+//
+//  `float: left` is still left in an RTL document, so Arabic keeps the English
+//  order: label on the LEFT with the input running off to the right, which is
+//  the back-to-front reading the tester screenshotted. Same family of bug as
+//  the login and forgot-password toolbars in _hm-qa04 — that note ends "other
+//  forms unchecked", and this is one of them.
+//
+//  Answered in LOGICAL values rather than with an `html:lang(ar)` flip, which
+//  is what _hm-qa04 settled on: `inline-start` IS left in English, so the
+//  English form does not move a pixel, and Arabic mirrors on its own. The
+//  padding and text-align go logical for the same reason — `end` keeps the
+//  label tucked against its input on both stores, which is how the English one
+//  already reads.
+//
+//  Left deliberately scoped to this page. The physical floats above are global
+//  and every form using that layout has the same defect in Arabic; sweeping
+//  them all is a bigger change than this ticket, and two forms
+//  (`.review-form`, `.sales-guest-form`) already carry their own `float: right`
+//  overrides that a global rule would have to be reconciled with.
+.customer-account-createpassword {
+    .fieldset > .field:not(.choice) > .label {
+        float: inline-start;
+        padding-inline: 0 1.5rem;
+        text-align: end;
+    }
+
+    .fieldset > .field:not(.choice) > .control {
+        float: inline-start;
+    }
+}
+
+//  ===========================================================================
+//  CL036-DEV01.32 — mobile UI pass
+//  ===========================================================================
+//  The theme's narrow-viewport work lives in _hm-mobile.less and uses
+//  `@media screen and (max-width: 767px)`; these match that breakpoint so the
+//  cycle's delta stays in one file rather than being threaded back into it.
+
+//  ---------------------------------------------------------------------------
+//  item 1 — the OTP dialog takes the whole screen
+//  ---------------------------------------------------------------------------
+//  "The OTP send confirmation appears fully on the page, we don't need it to
+//  take up the whole page." The screenshot shows the 2-Step Verification panel
+//  running the full height of the phone with one short paragraph, a Get OTP
+//  button, and roughly 500px of empty white under it.
+//
+//  `#sms-otp-dialog` (Vnecoms_Sms customer/login.phtml) is opened as a Magento
+//  modal, and Magento's mobile modal is a full-height slide-in by default — the
+//  inner wrap is given the viewport height whether or not the content needs it.
+//  The content here is three short elements, so it should size to them.
+//
+//  Matched with `:has()` on the wrapper rather than by adding a class, because
+//  the dialog is moved into Magento's own modal markup at runtime and the theme
+//  never sees the wrapper to name it. `:has()` is already load-bearing in this
+//  theme (the filter drawer and the PLP toolbar both drive state with it).
+@media screen and (max-width: 767px) {
+    .modal-popup:has(.sms-otp-dialog),
+    .modal-slide:has(.sms-otp-dialog) {
+        .modal-inner-wrap {
+            block-size: auto;
+            margin-block: auto;
+            max-block-size: 90vh;
+            min-block-size: 0;
+        }
+
+        .modal-content {
+            padding-block-end: var(--hm-space-6);
+        }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 6 — drop "Recently Ordered" on mobile
+//  ---------------------------------------------------------------------------
+//  The tester crosses the whole card out. It is Magento's reorder sidebar
+//  (`.block.block-reorder`), which on a phone lands below the order cards as a
+//  checkbox list plus an Add to Cart — a second, competing buy path directly
+//  under the order it belongs to.
+//
+//  Mobile only, deliberately: this is the mobile-UI ticket and the block is
+//  still wanted on the desktop account sidebar, where it has a column of its
+//  own to sit in.
+//
+//  _hm-qa03.less already hides this card when it renders EMPTY. That rule is a
+//  different case (it fires on `:not(:has(> .block-content...))`) and still
+//  applies on desktop; this one removes the populated card on phones.
+@media screen and (max-width: 767px) {
+    .hm-page .block.block-reorder {
+        display: none;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 8 — the menu button should become a close button
+//  ---------------------------------------------------------------------------
+//  "We need the icon to change to an exit (X) when we open the menu."
+//
+//  The nav is a native `<details class="hm-nav__menu">` with the hamburger as
+//  its `<summary class="hm-nav__trigger">`, so the open state is already in the
+//  DOM as `[open]` and this needs no JS at all.
+//
+//  The bars cannot be swapped by CSS: the icon is `<svg><use href="#hm-menu"/>`
+//  and a sprite reference is not a property. So the sprite is hidden while open
+//  and the cross is drawn on the summary itself — two pseudo-element bars, 2px,
+//  rotated. `currentColor` so it keeps whatever colour the trigger already has
+//  against the navy row.
+//
+//  `list-style: none` on the summary matters: with the icon hidden, Safari and
+//  Firefox would otherwise show their default disclosure triangle in its place.
+@media screen and (max-width: 767px) {
+    //  NO `position` HERE. _hm-mobile.less pins this trigger with
+    //  `position: fixed` at this same breakpoint so the button stays in the
+    //  pinned top row while the category band scrolls away. Setting
+    //  `position: relative` to anchor the pseudo-elements overrides that, drops
+    //  the button back into the band at (106,127), and the open panel then
+    //  renders on top of it — measured with elementFromPoint, which returned
+    //  `A.level-top` (a panel link) at the button's own centre, with the cross
+    //  drawn but buried. `fixed` is itself a containing block for the absolute
+    //  bars below, so nothing needs to be declared here at all.
+    .hm-page .hm-nav__menu[open] > .hm-nav__trigger {
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        //  The hamburger and the chevron both go; the cross replaces both.
+        > .hm-icon {
+            visibility: hidden;
+        }
+
+        &::before,
+        &::after {
+            background: currentColor;
+            block-size: 2px;
+            content: '';
+            inline-size: 1.8rem;
+            inset-block-start: 50%;
+            inset-inline-start: 50%;
+            position: absolute;
+            transform-origin: center;
+        }
+
+        &::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        &::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+        }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 9 — the mobile checkout reads as messy
+//  ---------------------------------------------------------------------------
+//  "The fields on the checkout page aren't showing correctly and are messy."
+//  Two separate things in the tester's shot, both on a 360-wide phone.
+//
+//  THE STEP BAR IS CLIPPED. "1 Shipping Info  2 Payment  3" — the third step
+//  runs off the right edge and its label never appears. The row is laid out for
+//  three labelled steps side by side, which does not fit a phone. Allowed to
+//  scroll rather than shrunk: dropping the type or hiding a label would leave
+//  the customer without the one thing the bar is for, which is knowing how many
+//  steps are left. `scroll-snap` so it lands on a step rather than mid-label,
+//  and the scrollbar hidden because it is chrome on a 3-item strip.
+//
+//  THE NAME PAIR IS CRAMPED. First Name and Last Name sit two-up at roughly
+//  140px each with the labels above them. blank pairs them at every width; on a
+//  phone they should stack, like every other field in the form already does.
+@media screen and (max-width: 767px) {
+    .checkout-index-index {
+        .hm-steps,
+        .opc-progress-bar {
+            -ms-overflow-style: none;
+            overflow-x: auto;
+            scroll-snap-type: x proximity;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            > * {
+                scroll-snap-align: start;
+            }
+        }
+
+        //  The pair blank builds with `.fields.group .field { width: 48% }`.
+        .opc-wrapper .fieldset .fields.group > .field,
+        .opc-wrapper .fieldset > .field.fullname > .fields > .field {
+            float: none;
+            inline-size: 100%;
+            width: 100%;
+        }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 7 — Sign Out in the phone menu sheet
+//  ---------------------------------------------------------------------------
+//  The tester boxes the empty strip under "عربي". The sheet reached Account and
+//  Wishlist but offered no way out, and on a phone this sheet IS the account
+//  menu — the header's account rail is desktop-only.
+//
+//  The row is rendered by topmenu.phtml behind an auth-context check, so it is
+//  only ever in the DOM for a signed-in customer. Everything here mirrors the
+//  language row directly above it (_hm-qa04.less): same hairline, same muted
+//  white, same 40px target. `order: 4` puts it after that row, which is 3.
+//
+//  THE ROW IS IN THE MARKUP FOR EVERYONE — the sheet is a shared, hour-cached
+//  ESI fragment (`Cache-Control: max-age=3600, public`, `Vary: User-Agent,
+//  Accept-Encoding` — measured), so it cannot branch on who is asking without
+//  serving one visitor's state to the next. `html.hm-signed-in` is published by
+//  the header's action rail, which is NOT an ESI fragment and reads the auth
+//  context the page cache varies on. Hidden by default at EVERY width, so a
+//  guest never sees it even if the sheet is opened above the breakpoint.
+.hm-nav__signout {
+    display: none;
+}
+
+@media screen and (max-width: 767px) {
+    //  `hm-signed-in` is on <html> and `hm-page` on <body>, so this is one
+    //  descendant chain, not a compound — they are never the same element.
+    html.hm-signed-in .hm-page .hm-nav__panel .hm-nav__signout {
+        border-block-start: 1px solid fade(#ffffff, 10%);
+        display: block;
+        margin: var(--hm-space-2) 0 0;
+        order: 4;
+        padding: var(--hm-space-2) var(--hm-space-4) 0;
+    }
+
+    .hm-page .hm-nav__panel .hm-nav__signout-link {
+        align-items: center;
+        color: fade(#ffffff, 65%);
+        display: flex;
+        font-size: 1.4rem;
+        gap: var(--hm-space-2);
+        min-block-size: 4rem;
+
+        .hm-icon {
+            color: fade(#ffffff, 65%);
+            flex: none;
+        }
+
+        &:focus,
+        &:hover {
+            color: var(--hm-on-inverse);
+
+            .hm-icon { color: inherit; }
+        }
+    }
+}
+
+//  THE MOBILE-ONLY LABEL IS HIDDEN EVERYWHERE BY DEFAULT.
+//  account-collapsible.phtml renders TWO headings in the rail's title bar so
+//  one bar can read "My Account" on desktop and "Settings" on a phone. Without
+//  this the desktop rail showed BOTH — measured at 1440: two visible <strong>s,
+//  heading read "My Account Settings". The mobile block below is what swaps
+//  them; everything above 767px keeps the heading it always had.
+.hm-acct-more__label {
+    display: none;
+}
+
+//  ---------------------------------------------------------------------------
+//  item 5 — the mobile My Account screen becomes an icon grid
+//  ---------------------------------------------------------------------------
+//  "Replace the current empty space (previously a full vertical sidebar list)
+//  ... with a 2-column grid of icon cards ... Sign Out should remain as a
+//  separate, clearly visible action outside the grid."
+//
+//  THIS REVERSES A RULE THAT HAS NOW BEEN SET FOUR WAYS. _hm-qa03.less ends
+//  with `.hm-page.account .block-collapsible-nav { display: none }` below 768px
+//  and documents the history: hidden everywhere (client), shown everywhere (QA
+//  cycle 1), hidden on phones only (client). This ticket is the fourth answer
+//  and it is not a straight revert — the rail does not come back as a list, it
+//  comes back as the grid the client has now specified. The `display: none`
+//  above is what leaves the empty strip the tester screenshotted, so it has to
+//  go for anything to occupy that space.
+//
+//  BUILT FROM THE REAL NAV, NOT A NEW MENU. Every cell is one of the account
+//  links Magento already renders, with the icon it already carries — the
+//  `--hm-nav-icon` mask set in _hm-account.less. Rebuilding these as a fresh
+//  list of hardcoded URLs would mean a second place for them to drift, and
+//  would silently lose any link a module adds or removes.
+//
+//  HOW THE CELLS ARE MADE. `.block-collapsible-nav` becomes the grid; its
+//  `.content` and the `ul.nav.items` inside it are set to `display: contents`
+//  so each `li` is promoted to a direct grid item. That is what allows the
+//  wrapper's own `.title` bar — a SIBLING of the list, not a member of it — to
+//  sit in the grid as the sixth card.
+//
+//  THE SIXTH CARD IS THE EXISTING DISCLOSURE. That `.title` already carries
+//  Magento's `toggleAdvanced`, which toggles `active` on the content and does
+//  nothing else (no inline styles — checked in lib/web/mage/toggle.js), so the
+//  Settings card opens the rest of the links with no JS of our own. _hm-qa03
+//  hides that bar on phones because it had nothing to do once the list was
+//  forced open; here it has a job again.
+//
+//  NOTHING IS STRANDED. The seven "less frequently used" links the ticket lists
+//  are not removed, they are folded behind Settings. That matters on this store
+//  specifically: the account layout's own comment records that product reviews,
+//  the newsletter, downloadables, GDPR, credit, RMA and quotations are all live
+//  features, and that hiding a link does not remove its route.
+@media screen and (max-width: 767px) {
+    .hm-page.account .block-collapsible-nav {
+        background: transparent;
+        border: 0;
+        display: grid;
+        gap: var(--hm-space-3);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-block-end: var(--hm-space-5);
+        padding: 0;
+    }
+
+    //  The two wrappers stop being boxes so the links become grid cells.
+    .hm-page.account .block-collapsible-nav > .content,
+    .hm-page.account .block-collapsible-nav .nav.items {
+        display: contents;
+    }
+
+    //  Opt IN, not out: a link this theme does not place stays hidden rather
+    //  than landing in the grid in an arbitrary spot.
+    .hm-page.account .block-collapsible-nav .nav.item {
+        display: none;
+        margin: 0;
+    }
+
+    //  Every cell, including the Settings bar, wears the same card.
+    .hm-page.account .block-collapsible-nav .nav.item > a,
+    .hm-page.account .block-collapsible-nav .nav.item > strong,
+    .hm-page.account .block-collapsible-nav > .title {
+        align-items: center;
+        background: var(--hm-surface);
+        block-size: 100%;
+        border: 1px solid var(--hm-border-subtle);
+        border-radius: var(--hm-radius);
+        box-sizing: border-box;
+        color: var(--hm-foreground);
+        display: flex;
+        flex-direction: column;
+        font-size: 1.3rem;
+        font-weight: 600;
+        gap: var(--hm-space-2);
+        justify-content: center;
+        line-height: 1.3;
+        //  A FIXED height, not a minimum. "Stored Payment Methods" is three
+        //  words and wraps where the others do not, which stretched its whole
+        //  grid row to 138px against the 88px of the two above it — measured —
+        //  and a grid of cards that are not the same size reads as a mistake.
+        //  Put on the card rather than on `grid-auto-rows`, because the rows
+        //  that are NOT cards (the opened Settings list, Sign Out) share these
+        //  declarations and set their own height back below.
+        block-size: 8.8rem;
+        overflow: hidden;
+        padding: var(--hm-space-4) var(--hm-space-2);
+        text-align: center;
+    }
+
+    //  The icon stacks above its label instead of sitting beside it, and grows
+    //  to the size the reference draws. The inline margin was the row gap.
+    .hm-page.account .block-collapsible-nav .nav.item > [class*='hm-nav-link--']::before {
+        block-size: 2.4rem;
+        color: var(--hm-accent);
+        inline-size: 2.4rem;
+        margin-inline-end: 0;
+    }
+
+    //  The six the ticket names, in its order. `:has()` because the class that
+    //  identifies a row is on the LINK, not on the item that becomes the cell.
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--orders)   { display: block; order: 1; }
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--wishlist) { display: block; order: 2; }
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--address)  { display: block; order: 3; }
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--returns)  { display: block; order: 4; }
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--cards)    { display: block; order: 5; }
+
+    //  Card six: the disclosure. Its desktop heading is swapped for the
+    //  mobile-only label the template adds beside it.
+    .hm-page.account .block-collapsible-nav > .title {
+        //  The gear this card needs is not one of the per-link icons — those
+        //  are set by `hm-nav-link--*` classes and this bar is not a link. Same
+        //  encoding and the same Lucide set as the rest of _hm-account.less;
+        //  the stroke colour in the payload is irrelevant because it is used as
+        //  a mask and takes its colour from `background-color` below.
+        --hm-nav-icon-settings: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M20 7h-9%22 /%3E %3Cpath d=%22M14 17H5%22 /%3E %3Ccircle cx=%2217%22 cy=%2217%22 r=%223%22 /%3E %3Ccircle cx=%227%22 cy=%227%22 r=%223%22 /%3E%3C/svg%3E");
+
+        cursor: pointer;
+        display: flex;
+        order: 6;
+
+        > strong { font-weight: inherit; }
+        > strong:not(.hm-acct-more__label) { display: none; }
+        > strong.hm-acct-more__label { display: block; }
+
+        //  The gear, drawn the same way the link icons are.
+        &::before {
+            background-color: var(--hm-accent);
+            block-size: 2.4rem;
+            content: '';
+            flex: 0 0 auto;
+            inline-size: 2.4rem;
+            mask: var(--hm-nav-icon-settings) no-repeat center / contain;
+            -webkit-mask: var(--hm-nav-icon-settings) no-repeat center / contain;
+        }
+    }
+
+    //  Open state: the folded links become full-width rows under the grid.
+    //  They are ordinary list rows again, not cards — they are a menu, and six
+    //  more cards would bury the six that matter.
+    //  ONLY the folded links. The first cut of this said
+    //  `:not(:has(> .hm-nav-link--logout))`, which also caught the five cards
+    //  and the delimiters — opening Settings flattened the whole grid into a
+    //  list (measured: every card came back 360x48) and the two hairlines
+    //  reappeared between them. Excluding each card explicitly keeps the grid
+    //  intact behind the opened group, and anything a module adds later still
+    //  lands in the group rather than being stranded.
+    .hm-page.account .block-collapsible-nav > .content.active .nav.item:not(:has(> .hm-nav-link--orders)):not(:has(> .hm-nav-link--wishlist)):not(:has(> .hm-nav-link--address)):not(:has(> .hm-nav-link--returns)):not(:has(> .hm-nav-link--cards)):not(:has(> .hm-nav-link--logout)):not(:has(> .delimiter)) {
+        display: block;
+        grid-column: 1 / -1;
+        order: 7;
+    }
+
+    .hm-page.account .block-collapsible-nav > .content.active .nav.item:not(:has(> .hm-nav-link--orders)):not(:has(> .hm-nav-link--wishlist)):not(:has(> .hm-nav-link--address)):not(:has(> .hm-nav-link--returns)):not(:has(> .hm-nav-link--cards)):not(:has(> .hm-nav-link--logout)):not(:has(> .delimiter)) > a,
+    .hm-page.account .block-collapsible-nav > .content.active .nav.item:not(:has(> .hm-nav-link--orders)):not(:has(> .hm-nav-link--wishlist)):not(:has(> .hm-nav-link--address)):not(:has(> .hm-nav-link--returns)):not(:has(> .hm-nav-link--cards)):not(:has(> .hm-nav-link--logout)):not(:has(> .delimiter)) > strong {
+        block-size: auto;
+        flex-direction: row;
+        justify-content: flex-start;
+        min-block-size: 4.8rem;
+        padding: var(--hm-space-3) var(--hm-space-4);
+        text-align: start;
+    }
+
+    .hm-page.account .block-collapsible-nav > .content.active .nav.item:not(:has(> .hm-nav-link--orders)):not(:has(> .hm-nav-link--wishlist)):not(:has(> .hm-nav-link--address)):not(:has(> .hm-nav-link--returns)):not(:has(> .hm-nav-link--cards)):not(:has(> .hm-nav-link--logout)):not(:has(> .delimiter)) > [class*='hm-nav-link--']::before {
+        block-size: 1.8rem;
+        inline-size: 1.8rem;
+        margin-inline-end: var(--hm-space-3);
+    }
+
+    //  The delimiters are the list's furniture and have no place in a grid.
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .delimiter) {
+        display: none;
+    }
+
+    //  SIGN OUT, outside the grid, as the ticket asks. Always shown — it is not
+    //  one of the folded links — full width, last, and in the accent so it
+    //  reads as the one destructive action on the screen.
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--logout) {
+        display: block;
+        grid-column: 1 / -1;
+        order: 99;
+    }
+
+    .hm-page.account .block-collapsible-nav .nav.item:has(> .hm-nav-link--logout) > a {
+        block-size: auto;
+        color: var(--hm-accent);
+        flex-direction: row;
+        gap: var(--hm-space-2);
+        min-block-size: 5.2rem;
+
+        &::before {
+            block-size: 1.8rem;
+            inline-size: 1.8rem;
+            margin-inline-end: 0;
+        }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 2 — search suggestions are buried behind the open menu
+//  ---------------------------------------------------------------------------
+//  "Search suggestions don't show up when we open the menu." They do render —
+//  they are painted underneath the menu sheet.
+//
+//  Measured on a 390 viewport, typing into the header search:
+//
+//      menu CLOSED  #search_autocomplete  y 98-220, 2 items, hit-test on each
+//                   row returns `li` — the suggestion is on top and clickable
+//      menu OPEN    identical box, identical items, but the hit-test on each
+//                   row returns `a.level-top` — a category link from the panel
+//
+//  So the dropdown is complete and correctly positioned; the sheet is simply
+//  above it. `.hm-nav__panel` is `position: fixed; z-index: 100` and covers
+//  everything from y=110 down, which is all but the top 12px of the dropdown.
+//
+//  RAISING THE DROPDOWN ITSELF DOES NOTHING. `#search_autocomplete` sits inside
+//  `div.hm-header__main`, which is `position: fixed; z-index: 90` and therefore
+//  CREATES A STACKING CONTEXT — walked the ancestor chain to confirm it is the
+//  only one between the dropdown and <body>. A child cannot escape its parent's
+//  context, so the whole header is behind the panel no matter what z-index the
+//  dropdown is given. The header is what has to move.
+//
+//  Raised only while there are suggestions on screen. Magento's quickSearch
+//  EMPTIES `#search_autocomplete` when it closes — verified: 0 `li` and
+//  `display: none` before typing, 2 `li` and `display: block` after — so
+//  `:has(… li)` is an accurate "the dropdown is open" test and the header drops
+//  back to 90 the moment it closes.
+//
+//  90 was chosen in _hm-mobile.less to sit above page content and below the
+//  filter drawer at 999; 101 keeps both of those relationships and only clears
+//  the panel's 100.
+@media screen and (max-width: 767px) {
+    .hm-page:has(#search_autocomplete li) .hm-header__main {
+        z-index: 101;
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 4 — the seller dashboard does not respond below 768px
+//  ---------------------------------------------------------------------------
+//  "The vendor dashboard isn't showing properly", filed with four screenshots,
+//  English and Arabic. The four stat tiles stay four-across at roughly 70px
+//  each with the figures spilling out of their boxes ("EGP 20,900" printed
+//  clean over the edge of the red tile), and the two-column body below keeps
+//  its desktop split, so the orders table and the Recently Added Products rail
+//  are squeezed into about 250px and 110px.
+//
+//  This is not a theme bug. Vnecoms' dashboard.phtml lays the page out with
+//  `col-xs-3` for the tiles and `col-xs-8` / `col-xs-4` for the body, and `xs`
+//  is Bootstrap's EXPLICITLY NON-STACKING tier — it is the one breakpoint that
+//  is meant to hold at every width. There is no smaller tier for it to fall
+//  back to, so the desktop grid is pinned all the way down to 320px.
+//
+//  Answered on the two container classes the template gives those rows
+//  (`.dashboard-state`, `.row-grap`) rather than on `col-xs-*` globally, which
+//  other Bootstrap-laid pages in the vendor area also use.
+//
+//  DELIBERATELY NOT `display: grid` on these. They are Bootstrap `.row`s, and
+//  `.row` carries a clearfix — making one a grid container promotes its
+//  `::before`/`::after` into empty cells and opens a blank hole at the start of
+//  the row, which in Arabic lands on the right. Floats already wrap; only the
+//  widths need changing.
+@media screen and (max-width: 767px) {
+    //  Four tiles across become two up. The padding keeps Bootstrap's gutter.
+    .dashboard-state > [class*='col-xs-'] {
+        padding-inline: var(--hm-space-2);
+        width: 50%;
+    }
+
+    //  These are FLOATS of unequal height, so they stagger: the credit tile
+    //  wraps its figure onto a second line, and the tile after it tucks under
+    //  the SHORT one beside it rather than starting a new row — measured as
+    //  red(tall)+yellow on row 1, green alone on the right of row 2, purple
+    //  alone on the left of row 3. Clearing every odd tile forces clean 2-up
+    //  rows however tall any one of them gets. (The alternative, equal heights
+    //  via a min-height, only hides it until a longer figure appears.)
+    .dashboard-state > [class*='col-xs-']:nth-child(odd) {
+        clear: both;
+    }
+
+    //  The figure is the thing that overflowed. It is a heading sized for a
+    //  quarter of a desktop row; on half a phone row it needs to be smaller and
+    //  allowed to break — `anywhere` rather than `break-word` because
+    //  "EGP 20,900" has no space to break at once the currency is attached.
+    .dashboard-state .small-box .inner h3 {
+        font-size: 2.2rem;
+        line-height: 1.2;
+        margin-block-end: var(--hm-space-1);
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .dashboard-state .small-box .inner p {
+        font-size: 1.3rem;
+        line-height: 1.3;
+    }
+
+    //  The body stops being two columns. `float: none` as well as the width,
+    //  because a 100%-wide float still establishes a float context and the
+    //  row's clearfix is what would otherwise have to close it.
+    .row-grap > [class*='col-xs-'] {
+        float: none;
+        width: 100%;
+    }
+
+    //  The rail that was 4/12 sat under the chart with no air once stacked.
+    .row-grap > [class*='col-xs-'] + [class*='col-xs-'] {
+        margin-block-start: var(--hm-space-5);
+    }
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CL036-TC33 — Withdraw Funds: the "Withdrawal Request" header did nothing.
+ *
+ * Vnecoms' credit_withdraw_index.xml points `withdrawal_methods` at its own
+ * withdraw/method-list.phtml, which dresses the panel as a collapsible and never
+ * binds the toggle. Re-point it at the VendorExtend copy, which keeps the same
+ * markup and adds the behaviour. Same override style as sales_order_view.xml.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="withdrawal_methods" template="MagentoEgypt_VendorExtend::withdraw/method-list.phtml"/>
+    </body>
+</page>

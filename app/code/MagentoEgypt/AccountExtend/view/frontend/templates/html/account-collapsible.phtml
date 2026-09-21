@@ -1,0 +1,47 @@
+<?php
+/**
+ * Hub Market — the account rail's collapsible wrapper.
+ *
+ * A copy of Magento_Theme::html/collapsible.phtml with ONE addition: a second,
+ * mobile-only title. Everything else, including the `toggleAdvanced` wiring, is
+ * core's and must stay as it is — that widget is what opens and closes the
+ * group below, and CL036-DEV01.32 item 5 reuses it rather than adding a second
+ * disclosure of our own.
+ *
+ * WHY A SECOND TITLE RATHER THAN RENAMING THE FIRST
+ * -------------------------------------------------
+ * On a phone this bar becomes the "Settings" card — the sixth cell of the icon
+ * grid, which opens the less-used account links. On desktop it stays the rail's
+ * "My Account" heading, which is what the approved desktop screen shows.
+ *
+ * The label therefore cannot simply be changed: one string has to read two ways
+ * at two widths. It also cannot be done in CSS — `content: 'Settings'` is not
+ * translatable, and this store's second locale is Arabic, so a CSS string would
+ * ship English into the Arabic account page.
+ *
+ * So both labels are rendered and the stylesheet shows one at a time
+ * (_hm-qa05.less). Both go through __(), so both are translatable. "Settings"
+ * was NOT in this theme's ar_SA.csv and has been added there ("الإعدادات");
+ * "My Account" and "Sign Out" were already present.
+ *
+ * Re-pointed at `sidebar.main.account_nav` ONLY (see customer_account.xml), not
+ * by overriding Magento_Theme::html/collapsible.phtml, which other blocks share.
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+?>
+<div class="block <?= $block->escapeHtmlAttr($block->getBlockCss()) ?>">
+    <div class="title <?= $block->escapeHtmlAttr($block->getBlockCss()) ?>-title"
+         data-mage-init='{"toggleAdvanced": {"toggleContainers": "#<?= $block->escapeHtmlAttr($block->getBlockCss()) ?>", "selectorsToggleClass": "active"}}'>
+        <strong>
+            <?= $block->escapeHtml(__($block->getBlockTitle())) ?>
+        </strong>
+        <strong class="hm-acct-more__label">
+            <?= $block->escapeHtml(__('Settings')) ?>
+        </strong>
+    </div>
+    <div class="content <?= $block->escapeHtmlAttr($block->getBlockCss()) ?>-content"
+         id="<?= $block->escapeHtmlAttr($block->getBlockCss()) ?>">
+        <?= $block->getChildHtml() ?>
+    </div>
+</div>

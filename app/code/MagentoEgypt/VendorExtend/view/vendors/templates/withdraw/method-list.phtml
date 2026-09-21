@@ -1,0 +1,98 @@
+<?php
+/**
+ * Hub Market — Withdraw Funds, the method list.
+ *
+ * CL036-TC33: "Clicking the 'Withdrawal Request' tab does not trigger any
+ * action, and the withdrawal request form/details fail to expand or appear."
+ *
+ * The stock Vnecoms template (module-vendors-credit withdraw/method-list.phtml)
+ * draws this panel as a collapsible — `admin__collapsible-block` on both the
+ * header and the fieldset, a `box-title open` link, and the AdminLTE chevron in
+ * the corner — but nothing ever bound a handler to it. The link's href is
+ * `#withdrawal-request`, and the element with that id is an EMPTY <span> sitting
+ * in the header itself, so a click scrolls nowhere and changes nothing. The
+ * affordance is real; only the behaviour was missing.
+ *
+ * Note the methods table was never hidden — the tester could already reach the
+ * form through the "Withdraw Funds" link in the Payment Method column. What was
+ * broken was the control they clicked first, which looked like the way in.
+ *
+ * So: keep Vnecoms' markup and class names (AdminLTE styles the panel off them,
+ * and the vendor area has no other stylesheet for it) and give the header the
+ * behaviour it was already dressed for. Starts OPEN, which is exactly what the
+ * page does today — this only adds the ability to close it again, so a vendor
+ * who never touches the header sees no change.
+ *
+ * Vanilla JS on purpose. The vendor area is AdminLTE rather than Magento UI, and
+ * this panel has no other reason to pull in a RequireJS module.
+ *
+ * @var $block \Vnecoms\VendorsCredit\Block\Vendors\Withdraw\MethodList
+ */
+$panelId = 'hm-withdrawal-request-panel';
+?>
+<div class="box">
+    <div class="box-body">
+        <div class="section-config active">
+            <div class="entry-edit-head admin__collapsible-block box-header with-border">
+                <span id="withdrawal-request" class="entry-edit-head-link"></span>
+                <i class="fa fa-bars"></i>
+                <a class="box-title open"
+                   href="#withdrawal-request"
+                   role="button"
+                   aria-expanded="true"
+                   aria-controls="<?= $block->escapeHtmlAttr($panelId) ?>"
+                   data-hm-withdrawal-toggle="<?= $block->escapeHtmlAttr($panelId) ?>"><?= $block->escapeHtml(__('Withdrawal Request')) ?></a>
+            </div>
+            <fieldset class="config admin__collapsible-block"
+                      id="<?= $block->escapeHtmlAttr($panelId) ?>">
+                <legend><?= $block->escapeHtml(__('Store Information')) ?></legend>
+                <div class="form-horizontal">
+                    <table class="table table-striped"><tbody>
+                        <tr>
+                            <th><?= $block->escapeHtml(__('Payment Method')) ?></th>
+                            <th><?= $block->escapeHtml(__('Description')) ?></th>
+                            <th><?= $block->escapeHtml(__('Fee')) ?></th>
+                        </tr>
+                        <?php foreach ($block->getWithdrawalMethods() as $method): ?>
+                        <tr>
+                            <td><strong><a href="<?= $block->escapeUrl($block->getWithdrawalUrl($method)) ?>"><?= $block->escapeHtml($method->getTitle()) ?></a></strong></td>
+                            <td><?= $block->escapeHtml($method->getDescription()) ?></td>
+                            <td><span class="badge bg-yellow"><?= $block->escapeHtml($method->getFee()) ?></span></td>
+                        </tr>
+                        <?php endforeach; ?>
+                  </tbody></table>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<script>
+    (function () {
+        'use strict';
+
+        var link = document.querySelector('[data-hm-withdrawal-toggle]');
+
+        if (!link) {
+            return;
+        }
+
+        var panel = document.getElementById(link.getAttribute('data-hm-withdrawal-toggle'));
+
+        if (!panel) {
+            return;
+        }
+
+        link.addEventListener('click', function (event) {
+            // The href is an in-page anchor; without this the browser jumps to
+            // the empty marker span and the header scrolls out from under the
+            // pointer mid-click.
+            event.preventDefault();
+
+            var open = link.getAttribute('aria-expanded') !== 'false';
+
+            link.setAttribute('aria-expanded', open ? 'false' : 'true');
+            link.classList.toggle('open', !open);
+            panel.style.display = open ? 'none' : '';
+        });
+    }());
+</script>

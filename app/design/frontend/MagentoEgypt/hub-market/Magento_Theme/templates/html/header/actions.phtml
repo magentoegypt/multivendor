@@ -38,6 +38,27 @@ $logoutUrl   = $block->getUrl('customer/account/logout');
 $authState  = $block->getChildBlock('authState');
 $isLoggedIn = $authState !== false && $authState->isLoggedIn();
 ?>
+<?php
+/*
+ * CL036-DEV01.32 item 7 — the one auth signal the phone menu sheet can use.
+ *
+ * That sheet is an ESI fragment with a ttl, served `public` and varying only on
+ * User-Agent and Accept-Encoding, so it is SHARED between visitors and cannot
+ * carry a Sign Out row of its own (see the note in topmenu.phtml). This rail is
+ * not an ESI fragment and branches on the auth CONTEXT, which the page cache
+ * varies on — so it is the right place to publish the state, and the sheet just
+ * reveals its always-present row from it.
+ *
+ * Set on <html> rather than <body> so the class is in place before the sheet
+ * below is painted. Deliberately NOT customer-data: the note further down
+ * records that this store's `customer` section can still hold the guest copy
+ * after a real login, which is exactly the bug this would reintroduce.
+ */
+?>
+<?php if ($isLoggedIn): ?>
+    <script>document.documentElement.classList.add('hm-signed-in');</script>
+<?php endif; ?>
+
 <div class="hm-header__actions">
 
     <?php

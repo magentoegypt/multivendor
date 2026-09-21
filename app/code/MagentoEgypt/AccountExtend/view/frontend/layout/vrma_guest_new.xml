@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * CL036-TC36 — the RMA item list never loads.
+ *
+ * Vnecoms' new-request page posts through Prototype's Ajax.Request, which reads
+ * a global `FORM_KEY`. That global only exists in the admin and vendor areas,
+ * so on the storefront the call throws a ReferenceError and no request is ever
+ * sent. This declares it for the RMA pages; see the template for the trace.
+ *
+ * Both the customer and the guest new-request handles get it — same inline
+ * js.phtml, same Ajax.Request, same defect.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.rma.form.key.js.vrma_guest_new"
+                   template="MagentoEgypt_AccountExtend::html/rma-form-key.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

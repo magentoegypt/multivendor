@@ -1,0 +1,87 @@
+<?php
+/**
+ * Hub Market — the `FORM_KEY` global, for the RMA pages.
+ *
+ * CL036-TC36: "When selecting an order to create an RMA request, the products
+ * list does not appear ... preventing form submission due to the error
+ * 'You must select item RMA'."
+ *
+ * WHAT ACTUALLY HAPPENS
+ * ---------------------
+ * Choosing an order runs `requestOption.findOrder()` (inline in Vnecoms'
+ * new_request/js.phtml), which posts to vrma/customer/ajaxproduct through
+ * Prototype's `new Ajax.Request(...)`. Reproduced on a seeded complete order,
+ * the select fires and then:
+ *
+ *   ReferenceError: FORM_KEY is not defined
+ *     at initialize (legacy-build.min.js)        <- Prototype Ajax.Request
+ *     at findOrder  (/en/vrma/customer/new/)
+ *
+ * and NO request is sent at all. Magento's bundled Prototype reads a global
+ * `FORM_KEY` when it builds a POST body. That global is declared only in the
+ * admin and vendor areas — Vnecoms' own vendors panel ships it in
+ * module-vendors/view/vendors/templates/page/js/require_js.phtml — and nothing
+ * declares it on the storefront.
+ *
+ * So `findOrder()` throws before the request leaves the browser. The list stays
+ * empty, and because the select is disabled on the way in and only re-enabled
+ * in the AJAX `onSuccess`, it is also left permanently disabled — measured
+ * after selecting: `{disabled: true, listHtmlLen: 5}`. With no items rendered
+ * there is nothing to tick, which is where "You must select item RMA" comes
+ * from on submit. The server side is fine; the request never reaches it.
+ *
+ * WHY THE VALUE IS READ FROM THE DOM AND NOT FROM PHP
+ * --------------------------------------------------
+ * The obvious version of this hands the block `Magento\Framework\Data\Form\
+ * FormKey` as a layout argument. Magento rejects that — an `xsi:type="object"`
+ * argument must implement `View\Element\Block\ArgumentInterface`, and it does
+ * not, which fails silently in production with only a log line:
+ *
+ *   CRITICAL: Instance of ...Block\ArgumentInterface is expected,
+ *             got Magento\Framework\Data\Form\FormKey instead.
+ *
+ * `View\Element\FormKey` cannot be reused either: it hardcodes `_toHtml()` to
+ * emit a hidden input and takes no template. Writing a ViewModel of our own
+ * would mean a new class, and production runs compiled DI, so it would not be
+ * picked up without a di:compile.
+ *
+ * The page already renders `<input name="form_key">` (verified on the live
+ * page), so the key is there to be read. The cookie is the same fallback
+ * Magento's own file-uploader.js uses. Deferred to DOMContentLoaded because
+ * this block renders before the form; the customer cannot select an order
+ * until long after that, so the value is always in place before Prototype
+ * asks for it.
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+?>
+<script>
+    (function () {
+        'use strict';
+
+        function readFormKey() {
+            var input = document.querySelector('input[name="form_key"]'),
+                match;
+
+            if (input && input.value) {
+                return input.value;
+            }
+
+            match = document.cookie.match(/(?:^|;\s*)form_key=([^;]+)/);
+
+            return match ? decodeURIComponent(match[1]) : '';
+        }
+
+        function apply() {
+            if (!window.FORM_KEY) {
+                window.FORM_KEY = readFormKey();
+            }
+        }
+
+        apply();
+
+        if (!window.FORM_KEY) {
+            document.addEventListener('DOMContentLoaded', apply);
+        }
+    }());
+</script>

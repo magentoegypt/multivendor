@@ -340,6 +340,46 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                             <?= /* @noEscape */ $hmLangHtml ?>
                         </div>
                     <?php endif; ?>
+
+                    <?php
+                    /*
+                     * CL036-DEV01.32 item 7 — Sign Out, below the language row.
+                     *
+                     * The tester's screenshot boxes the empty strip under
+                     * "عربي": the sheet reaches Account and Wishlist but there
+                     * was no way to sign out of it, and on a phone this sheet
+                     * IS the account menu — the header's own account rail is
+                     * hidden below 768px (_hm-mobile-parity.less).
+                     *
+                     * RENDERED FOR EVERYONE, REVEALED BY CSS. This block
+                     * carries `ttl="3600"`, so Magento serves it as an ESI
+                     * fragment with `Cache-Control: max-age=3600, public` and
+                     * `Vary: User-Agent, Accept-Encoding` — measured. That
+                     * fragment is SHARED: it does not vary on X-Magento-Vary,
+                     * so it cannot hold anything that differs per visitor. A
+                     * server-side `isLoggedIn()` branch here renders nothing at
+                     * all (the ESI request has no auth context), and if it did
+                     * it would cache one visitor's state for everyone else.
+                     *
+                     * So the row is always in the markup and `.hm-signed-in` on
+                     * <html> decides whether it is shown. That class is set by
+                     * the header's action rail, which is NOT an ESI fragment
+                     * and branches on the auth context the page cache varies
+                     * on — the one auth signal this theme already trusts.
+                     *
+                     * "Sign Out" rather than "Logout" to match the account rail
+                     * and the header menu; it is already in this theme's
+                     * ar_SA.csv. Logout accepts GET in 2.4.8, so a plain link
+                     * needs no form key baked into cached HTML.
+                     */
+                    ?>
+                    <div class="hm-nav__signout">
+                        <a class="hm-nav__signout-link"
+                           href="<?= $escaper->escapeUrl($block->getUrl('customer/account/logout')) ?>">
+                            <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-logout"/></svg>
+                            <?= $escaper->escapeHtml(__('Sign Out')) ?>
+                        </a>
+                    </div>
                 </div>
             </div>
         </details>
