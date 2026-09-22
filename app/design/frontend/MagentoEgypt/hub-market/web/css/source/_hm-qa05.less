@@ -757,38 +757,57 @@ input.mobile-number {
 //  item 2 — search suggestions are buried behind the open menu
 //  ---------------------------------------------------------------------------
 //  "Search suggestions don't show up when we open the menu." They do render —
-//  they are painted underneath the menu sheet.
+//  they are painted underneath the menu sheet. `.hm-nav__panel` is
+//  `position: fixed; z-index: 100` and covers everything from y=110 down.
 //
-//  Measured on a 390 viewport, typing into the header search:
+//  RAISING THE DROPDOWN ITSELF DOES NOTHING. It sits inside `.hm-header__main`,
+//  which is `position: fixed; z-index: 90` and therefore CREATES A STACKING
+//  CONTEXT — walked the ancestor chain to confirm it is the only one between
+//  the dropdown and <body>. A child cannot escape its parent's context, so the
+//  whole header is behind the sheet whatever z-index the dropdown is given.
+//  The header is what has to move.
 //
-//      menu CLOSED  #search_autocomplete  y 98-220, 2 items, hit-test on each
-//                   row returns `li` — the suggestion is on top and clickable
-//      menu OPEN    identical box, identical items, but the hit-test on each
-//                   row returns `a.level-top` — a category link from the panel
+//  THE FIRST VERSION OF THIS RULE WAS DEAD ON ARRIVAL, and QA re-reported the
+//  item. It matched `.hm-page:has(#search_autocomplete li)` — Magento's own
+//  quickSearch dropdown. Algolia now owns the header search
+//  (`catalog/search/engine = algolia`, `is_popup_enabled = 1`): the block is
+//  `div#algoliaAutocomplete` and `#search_autocomplete` IS NOT IN THE DOM AT
+//  ALL, so the selector could never match and the sheet went on burying the
+//  suggestions. Re-measured at 390px with the menu open and "sh" typed: 10
+//  `.aa-Item` rows present and painted, `elementFromPoint` on every one of them
+//  returning `a.level-top` — a category link from the sheet.
 //
-//  So the dropdown is complete and correctly positioned; the sheet is simply
-//  above it. `.hm-nav__panel` is `position: fixed; z-index: 100` and covers
-//  everything from y=110 down, which is all but the top 12px of the dropdown.
+//  TWO ELEMENTS HAVE TO CLEAR THE SHEET, NOT ONE. Raising only the header hides
+//  the close button: `_hm-mobile.less` pins `.hm-nav__trigger` at `z-index: 91`
+//  OUTSIDE `.hm-header__main`, so a header at 101 paints over it and the X from
+//  item 8 disappears — measured, the button vanished from the top right and the
+//  only way out of the menu with it. The trigger goes to 102 alongside.
 //
-//  RAISING THE DROPDOWN ITSELF DOES NOTHING. `#search_autocomplete` sits inside
-//  `div.hm-header__main`, which is `position: fixed; z-index: 90` and therefore
-//  CREATES A STACKING CONTEXT — walked the ancestor chain to confirm it is the
-//  only one between the dropdown and <body>. A child cannot escape its parent's
-//  context, so the whole header is behind the panel no matter what z-index the
-//  dropdown is given. The header is what has to move.
+//  `:has(.aa-Panel)` AND NOT `:has(.aa-Panel .aa-Item)`. Measured through a
+//  full cycle: no `.aa-Panel` at idle or on focus, one with 10 `.aa-Item` after
+//  typing, one with ZERO `.aa-Item` when the query matches nothing (it reads
+//  "No results" for products, categories and pages), and none again after
+//  Escape. Keying on the items would therefore have left the "No results"
+//  message buried — the same bug wearing a different coat. Keying on the panel
+//  covers both and still releases, because Algolia removes the element when the
+//  dropdown closes.
 //
-//  Raised only while there are suggestions on screen. Magento's quickSearch
-//  EMPTIES `#search_autocomplete` when it closes — verified: 0 `li` and
-//  `display: none` before typing, 2 `li` and `display: block` after — so
-//  `:has(… li)` is an accurate "the dropdown is open" test and the header drops
-//  back to 90 the moment it closes.
+//  KNOWN AND OUT OF SCOPE: backspacing the query to empty leaves that panel up
+//  showing "No results" rather than closing it. That is Algolia's own
+//  behaviour, it happens on every screen, and it is only invisible here today
+//  because the sheet happens to cover it.
 //
 //  90 was chosen in _hm-mobile.less to sit above page content and below the
-//  filter drawer at 999; 101 keeps both of those relationships and only clears
-//  the panel's 100.
+//  filter drawer at 999; 101/102 keep both of those relationships and only
+//  clear the sheet's 100.
 @media screen and (max-width: 767px) {
-    .hm-page:has(#search_autocomplete li) .hm-header__main {
+    .hm-page:has(.aa-Panel) .hm-header__main {
         z-index: 101;
+    }
+
+    //  (0,3,0) against the 91 in _hm-mobile.less, which is (0,2,0).
+    .hm-page:has(.aa-Panel) .hm-nav__trigger {
+        z-index: 102;
     }
 }
 
