@@ -2,6 +2,40 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^customer/address_file/upload - [F,L]
+
+    # -----------------------------------------------------------------------
+    # 2026-09-22: PHP source in a query string, and the client that used it.
+    #
+    # The live payload, from this server's own access log on 19 Sep:
+    #
+    #   POST /rest/V1/guest-carts?<?=$x=gzuncompress(hex2bin('78da...'));
+    #        @file_put_contents('ss9s.php',$x); @file_put_contents('static.php',$x);
+    #        ... print('WROK')?>=1
+    #
+    # It ran. It wrote six web shells into this directory — including over
+    # pub/static.php, a real Magento entry point — and the same client then
+    # drove /ss9s.php as a command shell across five vhosts for three days.
+    # A query string never legitimately contains "<?", raw or encoded.
+    #
+    # WHY REWRITE AND NOT Require. /etc/apache2/conf-enabled/block-bots.conf
+    # wraps every request in <Location "/">, and <Location> is merged AFTER
+    # .htaccess — so a Require here is silently overridden and does nothing.
+    # (That is also why the "Require not ip" list further down this file has
+    # never taken effect; the addresses in it are not actually blocked.)
+    # mod_rewrite's [F] runs at fixup, after authorization has already
+    # granted, so it is not subject to that override.
+    #
+    # STOP-GAP, NOT THE FIX: this blocks the vector that was used, not the
+    # vulnerability. The same code can arrive in a request body where no
+    # rewrite rule can see it. The fix is Adobe's patch for the guest-cart
+    # RCE; until it is applied, treat this install as reachable.
+    # -----------------------------------------------------------------------
+    RewriteCond %{QUERY_STRING} (<|%3c)\s*(\?|%3f) [NC]
+    RewriteRule ^ - [F,L]
+
+    # Operated /ss9s.php across five vhosts, 19-22 Sep 2026.
+    RewriteCond %{REMOTE_ADDR} ^209\.99\.188\.105$
+    RewriteRule ^ - [F,L]
 </IfModule>
 
 <RequireAll>
