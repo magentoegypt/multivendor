@@ -26,6 +26,17 @@
         <p class="hm-billing-step__note"
            data-bind="i18n: 'This order has nothing to ship, so we only need a billing address.'"></p>
 
+        <!-- Guest e-mail. Not a region of this component: the node still lives
+             under the payment step so that its registry name stays intact, and
+             billing-step.js hands the instance over. `with:` puts it in scope so
+             getTemplate() resolves against the component, exactly as the region
+             idiom below does. -->
+        <!-- ko if: emailComponent() -->
+            <!-- ko with: emailComponent() -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+
         <!-- ko foreach: getRegion('billing-address-form-shared') -->
             <!-- ko template: getTemplate() --><!-- /ko -->
         <!-- /ko -->

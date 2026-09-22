@@ -132,6 +132,60 @@
                                                                 </item>
                                                             </item>
                                                         </item>
+                                                        <!--
+                                                            EXPRESS CHECKOUT, REMOVED.
+
+                                                            Two modules put an express
+                                                            payment group at the very top
+                                                            of the checkout: core
+                                                            Magento_PaymentServicesPaypal
+                                                            and PayPal_Braintree. Both are
+                                                            enabled, neither is configured
+                                                            with credentials, so each drew
+                                                            its heading and its "Or proceed
+                                                            with the standard checkout"
+                                                            divider around an empty space
+                                                            where the PayPal, Pay Later,
+                                                            Google Pay and Apple Pay
+                                                            buttons would go.
+
+                                                            The container renders that
+                                                            heading and divider itself, so
+                                                            it does not disappear when the
+                                                            buttons cannot draw — the first
+                                                            thing a customer met on the
+                                                            checkout was two lines of
+                                                            instructions for a control that
+                                                            was not there.
+
+                                                            Disabled, not hidden, for the
+                                                            same reason as the discount
+                                                            block below: these are jsLayout
+                                                            component nodes, not layout
+                                                            blocks, so there is no block
+                                                            name to reference and
+                                                            componentDisabled stops them
+                                                            being instantiated at all.
+
+                                                            NEITHER PAYMENT METHOD IS
+                                                            SWITCHED OFF. This removes the
+                                                            express shortcut at the top of
+                                                            the page only; if either is
+                                                            ever configured it still
+                                                            appears in the payment method
+                                                            list, and deleting these four
+                                                            items brings the shortcut back.
+                                                        -->
+                                                        <item name="payment-services-express-payments" xsi:type="array">
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                            </item>
+                                                        </item>
+                                                        <item name="braintree-express-payments" xsi:type="array">
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                            </item>
+                                                        </item>
                                                     </item>
                                                 </item>
                                             </item>
@@ -165,6 +219,22 @@
                                                 -->
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
+                                                        <!--
+                                                            The same express group again.
+                                                            PaymentServicesPaypal declares
+                                                            it twice, once under the
+                                                            shipping step and once here, so
+                                                            that a VIRTUAL cart — which has
+                                                            no shipping step — still gets
+                                                            one. Disabling only the first
+                                                            leaves the stray heading on
+                                                            every virtual checkout.
+                                                        -->
+                                                        <item name="payment-services-express-payments" xsi:type="array">
+                                                            <item name="config" xsi:type="array">
+                                                                <item name="componentDisabled" xsi:type="boolean">true</item>
+                                                            </item>
+                                                        </item>
                                                         <item name="afterMethods" xsi:type="array">
                                                             <item name="children" xsi:type="array">
                                                                 <item name="discount" xsi:type="array">

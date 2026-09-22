@@ -67,6 +67,15 @@ use Magento\Checkout\Block\Checkout\LayoutProcessor;
 class RemoveBillingAddress
 {
     /**
+     * displayArea given to the payment step's customer-email node so that
+     * payment.html's `getRegion('customer-email')` no longer finds it.
+     *
+     * Any string no template renders would do; it is named for where the field
+     * ends up so that a grep for it lands on billing-step.js, which renders it.
+     */
+    public const RELOCATED_EMAIL_AREA = 'hm-billing-email';
+
+    /**
      * @param  LayoutProcessor $subject
      * @param  array           $jsLayout
      * @return array
@@ -123,29 +132,43 @@ class RemoveBillingAddress
             $form['children']['form-fields']['children']['company']['visible'] = false;
         }
 
-        //  THE E-MAIL FIELD IS DELIBERATELY LEFT WHERE MAGENTO PUT IT.
+        //  THE E-MAIL FIELD IS RENDERED IN THIS STEP WITHOUT BEING MOVED INTO IT.
         //
-        //  It was moved in here once, so that a guest would be asked for their
-        //  e-mail before their address, the order a physical cart uses. It did
-        //  not render. Measured after the move: the component was present and
-        //  correct — registry name checkout.steps.hm-billing-step.customer-email,
-        //  displayArea customer-email, the step's own customer-email region
-        //  populated with exactly 1 element, getTemplate() resolving, and
-        //  isCustomerLoggedIn() false — yet #customer-email,
-        //  #customer-email-fieldset and .form-login were all absent from the DOM.
-        //  Its sibling billing-address-form, rendered from the same region
-        //  pattern in the same template, came out fine.
+        //  Moving the node was tried first and does not work. After reparenting,
+        //  the component measured perfect — registry name
+        //  checkout.steps.hm-billing-step.customer-email, displayArea
+        //  customer-email, the new parent's own region holding exactly 1 element,
+        //  getTemplate() resolving to a template that is deployed for this theme,
+        //  and isCustomerLoggedIn() false — and yet #customer-email,
+        //  #customer-email-fieldset and .form-login were all absent from the DOM,
+        //  while its sibling billing-address-form rendered fine from the same
+        //  region pattern in the same template.
         //
-        //  Reparenting it also quietly breaks Magento_PaymentServicesPaypal:
-        //  email-mixin.js decides whether to run the Fastlane account lookup by
+        //  Reparenting also quietly breaks Magento_PaymentServicesPaypal, whose
+        //  email-mixin.js decides whether to run its Fastlane account lookup by
         //  comparing this.name against the literal string
-        //  'checkout.steps.billing-step.payment.customer-email', so the node
-        //  stops being recognised the moment it is given a new parent.
+        //  'checkout.steps.billing-step.payment.customer-email'.
         //
-        //  A guest who cannot type an e-mail address cannot place an order. That
-        //  is a far worse defect than asking for the address first, which is in
-        //  any case exactly what stock Magento does on a virtual cart — and
-        //  which works. The field stays in the payment step.
+        //  So the node STAYS a child of payment and keeps that exact name. Only
+        //  its displayArea changes — the thing that decides WHICH REGION of its
+        //  parent it is drawn in. payment.html draws it from exactly one place:
+        //
+        //      <!-- ko if: (quoteIsVirtual) -->
+        //          <!-- ko foreach: getRegion('customer-email') -->
+        //
+        //  Renaming the area empties that region, so the payment step stops
+        //  drawing the field, and billing-step.js fetches the component from the
+        //  registry by its unchanged name and renders it at the top of this step.
+        //
+        //  Harmless on a physical cart: that `quoteIsVirtual` guard means the
+        //  payment step never drew this node for them in the first place — they
+        //  render the SHIPPING step's separate customer-email node, which is a
+        //  different component and is not touched here.
+        if (isset($steps['billing-step']['children']['payment']['children']['customer-email'])) {
+            $steps['billing-step']['children']['payment']['children']['customer-email']['displayArea']
+                = self::RELOCATED_EMAIL_AREA;
+        }
+
         $children = ['billing-address-form' => $form];
 
         $steps['hm-billing-step'] = [

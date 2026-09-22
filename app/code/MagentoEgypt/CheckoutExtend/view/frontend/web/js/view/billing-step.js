@@ -48,15 +48,23 @@ define([
 ], function (ko, Component, _, registry, stepNavigator, quote, $t) {
     'use strict';
 
+    //  Kept in step with RemoveBillingAddress::RELOCATED_EMAIL_AREA's neighbour:
+    //  this is the node's name in the registry, which the plugin deliberately
+    //  does NOT change.
+    var EMAIL_COMPONENT = 'checkout.steps.billing-step.payment.customer-email';
+
     return Component.extend({
         defaults: {
             template: 'MagentoEgypt_CheckoutExtend/billing-step'
         },
 
         initialize: function () {
+            var self = this;
+
             this._super();
 
             this.hmIsVisible = ko.observable(false);
+            this.emailComponent = ko.observable(null);
 
             //  Physical carts already have Shipping Info in this slot, and their
             //  billing address is derived from it. Registering here would give
@@ -64,6 +72,24 @@ define([
             if (!quote.isVirtual()) {
                 return this;
             }
+
+            //  The e-mail field, borrowed rather than moved.
+            //
+            //  RemoveBillingAddress renames the displayArea of the payment
+            //  step's customer-email node so payment.html stops drawing it, but
+            //  leaves the node itself exactly where Magento declared it. That
+            //  keeps its registry name, which Magento_PaymentServicesPaypal's
+            //  email-mixin.js compares against a hard-coded string, and it
+            //  avoids reparenting, which produced a component that measured
+            //  correct in every way and rendered nothing at all.
+            //
+            //  Asynchronous on purpose: the payment step is a sibling and there
+            //  is no ordering guarantee that it has been built by the time this
+            //  one initialises. The observable starts null and the template
+            //  draws nothing until it is filled.
+            registry.get(EMAIL_COMPONENT, function (component) {
+                self.emailComponent(component);
+            });
 
             //  sortOrder 10 is the slot shipping would have taken. Safe to reuse:
             //  on a virtual quote shipping never registers at all, so the two can
