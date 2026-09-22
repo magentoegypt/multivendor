@@ -37,6 +37,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'algolia/algoliasearch-adapter-magento-2' => array(
+            'pretty_version' => '0.9.1',
+            'version' => '0.9.1.0',
+            'reference' => 'c350887072a0b5b1af49c816f1d9b0dd5bffb721',
+            'type' => 'magento2-module',
+            'install_path' => __DIR__ . '/../algolia/algoliasearch-adapter-magento-2',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'algolia/algoliasearch-client-php' => array(
             'pretty_version' => '4.18.3',
             'version' => '4.18.3.0',

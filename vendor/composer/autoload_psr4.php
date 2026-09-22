@@ -677,6 +677,7 @@ return array(
     'Amasty\\CheckoutDeliveryDate\\' => array($vendorDir . '/amasty/module-checkout-delivery-date'),
     'Amasty\\CheckoutCore\\' => array($vendorDir . '/amasty/module-one-step-checkout-core'),
     'Amasty\\Base\\' => array($vendorDir . '/amasty/base'),
+    'Algolia\\SearchAdapter\\' => array($vendorDir . '/algolia/algoliasearch-adapter-magento-2'),
     'Algolia\\AlgoliaSearch\\' => array($vendorDir . '/algolia/algoliasearch-magento-2', $vendorDir . '/algolia/algoliasearch-client-php/lib'),
     'AdobeStock\\Api\\' => array($vendorDir . '/astock/stock-api-libphp/src'),
     'AESKW\\' => array($vendorDir . '/spomky-labs/aes-key-wrap/src'),

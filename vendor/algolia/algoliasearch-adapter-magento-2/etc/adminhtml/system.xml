@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="catalog">
+            <group id="search">
+                <field id="engine" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Engine</label>
+                    <frontend_model>Algolia\SearchAdapter\Block\Adminhtml\System\Config\Engine</frontend_model>
+                    <source_model>Magento\Search\Model\Adminhtml\System\Config\Source\Engine</source_model>
+                    <backend_model>Algolia\SearchAdapter\Model\Config\Backend\Engine</backend_model>
+                </field>
+                <field id="algolia_app_id" translate="label" type="text" sortOrder="61"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Algolia Application ID</label>
+                    <frontend_model>Algolia\SearchAdapter\Block\Adminhtml\System\Config\ApplicationId</frontend_model>
+                    <comment>
+                        <model>Algolia\SearchAdapter\Model\Config\Comment\ApplicationIdComment</model>
+                    </comment>
+                    <depends>
+                        <field id="engine">algolia</field>
+                    </depends>
+                </field>
+                <field id="algolia_connect_timeout" translate="label" type="text" sortOrder="64"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Algolia Connection Timeout (in seconds)</label>
+                    <comment>
+                        <![CDATA[
+                            Number of seconds to allow Algolia to respond to connection requests.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="engine">algolia</field>
+                    </depends>
+                </field>
+                <field id="algolia_read_timeout" translate="label" type="text" sortOrder="65"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Algolia Read Timeout (in seconds)</label>
+                    <comment>
+                        <![CDATA[
+                            Number of seconds to allow Algolia to perform read operations.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="engine">algolia</field>
+                    </depends>
+                </field>
+                <field id="algolia_seo_filters" translate="label" type="select" sortOrder="66"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable SEO Friendly Filters</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Highly recommended when using InstantSearch alongside backend render.
+                            When enabled, Magento’s backend renderer uses the same query-parameter format as InstantSearch,
+                            ensuring a consistent experience and improving SEO by generating meaningful, indexable URLs.
+
+                            <br></br>
+                            Example: <code>?color=49</code> → <code>?color=blue</code>
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="engine">algolia</field>
+                    </depends>
+                </field>
+                <field id="algolia_test_connect" translate="button_label" sortOrder="68" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label/>
+                    <button_label>Test Connection</button_label>
+                    <frontend_model>Algolia\SearchAdapter\Block\Adminhtml\System\Config\TestConnection</frontend_model>
+                    <depends>
+                        <field id="engine">algolia</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_instant">
+            <group id="backend" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Backend Search Compatibility</label>
+                <attribute type="expanded">1</attribute>
+                <comment>
+                    <![CDATA[
+                    InstantSearch renders search results and product listings dynamically in the end user’s browser using JavaScript.
+                    <br><br>
+                    When <strong>backend rendering</strong> is enabled, search results can also be generated on the server side <em>before</em> the page is delivered.
+                    This can be beneficial for SEO, ensuring that product listings are discoverable by search engine crawlers, and may also improve content visibility for LLM-based discovery.
+                    ]]>
+                </comment>
+                <field id="backend_render_mode" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable backend rendering?</label>
+                    <source_model>Algolia\SearchAdapter\Model\Config\Source\BackendRenderMode</source_model>
+                    <backend_model>Algolia\SearchAdapter\Model\Config\Backend\BackendRenderMode</backend_model>
+                    <comment>
+                        <model>Algolia\SearchAdapter\Model\Config\Comment\BackendRenderMode</model>
+                    </comment>
+                </field>
+                <field id="backend_render_allowed_user_agents" translate="label comment" type="Algolia\AlgoliaSearch\Model\Textarea" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow backend rendering for specific User Agents</label>
+                    <comment>
+                        <![CDATA[
+                            To specify multiple, please put one <code>User-Agent</code> string per line.
+                            Partial matches are supported.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="backend_render_mode">2</field>
+                    </depends>
+                </field>
+                <field id="query_string_param_mode" translate="label comment" type="select" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Query string parameters</label>
+                    <source_model>Algolia\SearchAdapter\Model\Config\Source\QueryStringParamMode</source_model>
+                    <comment>
+                        <model>Algolia\SearchAdapter\Model\Config\Comment\QueryStringParamMode</model>
+                    </comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

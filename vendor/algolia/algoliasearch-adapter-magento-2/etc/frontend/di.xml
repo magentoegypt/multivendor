@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Block\Product\ProductList\Toolbar">
+        <plugin name="algolia_toolbar" type="Algolia\SearchAdapter\Plugin\View\ToolbarPlugin" />
+    </type>
+
+    <!-- URL generators for filters -->
+    <type name="Magento\Catalog\Model\Layer\Filter\Item">
+        <plugin name="algolia_filter" type="Algolia\SearchAdapter\Plugin\Model\Layer\Filter\ItemPlugin" />
+    </type>
+    <type name="Magento\Swatches\Block\LayeredNavigation\RenderLayered">
+        <plugin name="algolia_swatch_filter"
+                type="Algolia\SearchAdapter\Plugin\Block\LayeredNavigation\RenderedLayeredPlugin" />
+    </type>
+
+    <!-- URL handlers for filters -->
+    <type name="Magento\CatalogSearch\Model\Layer\Filter\Attribute">
+        <plugin name="algolia_filter_request_normalizer"
+                type="Algolia\SearchAdapter\Plugin\Model\Layer\Filter\AttributePlugin" />
+    </type>
+    <type name="Magento\CatalogSearch\Model\Layer\Filter\Category">
+        <plugin name="algolia_category_filter"
+                type="Algolia\SearchAdapter\Plugin\Model\Layer\Filter\CategoryPlugin" />
+    </type>
+
+    <!-- Cannot call on Magento\Catalog\Model\ResourceModel\Product\Collection due to inheritance -->
+    <type name="Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection">
+        <plugin name="algolia_collection_filter"
+                type="Algolia\SearchAdapter\Plugin\Model\ResourceModel\Product\CollectionPlugin" />
+    </type>
+
+    <!-- Backend render -->
+    <type name="Algolia\AlgoliaSearch\Service\RenderingManager">
+        <plugin name="algolia_adapter_rendering_manager"
+                type="Algolia\SearchAdapter\Plugin\Service\RenderingManagerPlugin" />
+    </type>
+
+    <type name="Magento\Framework\App\Http\Context">
+        <plugin name="algolia_rendering_cache_context_plugin"
+                type="Algolia\SearchAdapter\Plugin\RenderingCacheContextPlugin" />
+    </type>
+</config>

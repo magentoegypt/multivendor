@@ -255,6 +255,7 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         '883f83d7010463b7d9154dd30454fdd7' => __DIR__ . '/..' . '/vnecoms/module-vendors-commission-preview/registration.php',
         '5f7aeb557ea616fd8347d593eff80281' => __DIR__ . '/..' . '/vnecoms/module-vendors-config-approval/registration.php',
         '66531a64a949dc18a405f9514832947e' => __DIR__ . '/..' . '/vnecoms/module-vendors-product/registration.php',
+        '568b22267a02ed7e8633652e03d8d755' => __DIR__ . '/..' . '/algolia/algoliasearch-client-php/lib/Http/Psr7/functions.php',
         'd186ca7cd5359ad94a55c6ecf1cf0bdd' => __DIR__ . '/..' . '/amasty/module-single-step-checkout/registration.php',
         '3341aec7bc6ef4825cef596bd4dbbc07' => __DIR__ . '/..' . '/magento/module-aws-s3-page-builder/registration.php',
         '349afecbd3cb361d96461e67f4585179' => __DIR__ . '/..' . '/magento/module-backup/registration.php',
@@ -332,7 +333,7 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         '87bb82aba4e6954227316088ec049d42' => __DIR__ . '/..' . '/magento/module-translation/registration.php',
         '69872b0952a8e272b697dffbf090d4be' => __DIR__ . '/..' . '/vnecoms/module-vendors-notification/registration.php',
         '2f2ee04400c559bbfdaf895f244d70b2' => __DIR__ . '/..' . '/vnecoms/module-vendors-withdrawal/registration.php',
-        '568b22267a02ed7e8633652e03d8d755' => __DIR__ . '/..' . '/algolia/algoliasearch-client-php/lib/Http/Psr7/functions.php',
+        '9237a3af6016ba790703d0a225e0b86b' => __DIR__ . '/..' . '/algolia/algoliasearch-magento-2/registration.php',
         '13284be146fd6f6b7a932bb9cccfebda' => __DIR__ . '/..' . '/amasty/module-one-step-checkout-pro-package/registration.php',
         'f0776c07a20eb1116d39cc93bd82496c' => __DIR__ . '/..' . '/landofcoder/module-all/registration.php',
         '4444551b69a588f0c3ae204e139ba1a0' => __DIR__ . '/..' . '/magento/language-de_de/registration.php',
@@ -477,7 +478,7 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         'afe657b1e19ecdc154ca80275b4d9476' => __DIR__ . '/..' . '/vnecoms/module-vendors-translate-inline/registration.php',
         'b1b2574c14577f375ac6893d0907d47e' => __DIR__ . '/..' . '/vnecoms/module-vendors-ui/registration.php',
         '3d05c57cf3345ac0da3bedbb7341b5c5' => __DIR__ . '/..' . '/vnecoms/theme-vendors-default/registration.php',
-        '9237a3af6016ba790703d0a225e0b86b' => __DIR__ . '/..' . '/algolia/algoliasearch-magento-2/registration.php',
+        '8f25418936123e153d1ec4817f546960' => __DIR__ . '/..' . '/algolia/algoliasearch-adapter-magento-2/registration.php',
         '5d52b38bbbec65920da3ae1a7e51ee9a' => __DIR__ . '/..' . '/amasty/module-one-step-checkout-pro-subscription-package/registration.php',
         'e8889adfcdbfb86e3fb527979ec7e556' => __DIR__ . '/..' . '/landofcoder/module-product-reviews/registration.php',
         'efb1c0737b9e14915954f7954ea42462' => __DIR__ . '/..' . '/magento/module-bundle-sample-data/registration.php',
@@ -1299,6 +1300,7 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
             'Amasty\\CheckoutDeliveryDate\\' => 28,
             'Amasty\\CheckoutCore\\' => 20,
             'Amasty\\Base\\' => 12,
+            'Algolia\\SearchAdapter\\' => 22,
             'Algolia\\AlgoliaSearch\\' => 22,
             'AdobeStock\\Api\\' => 15,
             'AESKW\\' => 6,
@@ -3993,6 +3995,10 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         'Amasty\\Base\\' =>
         array (
             0 => __DIR__ . '/..' . '/amasty/base',
+        ),
+        'Algolia\\SearchAdapter\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/algolia/algoliasearch-adapter-magento-2',
         ),
         'Algolia\\AlgoliaSearch\\' =>
         array (

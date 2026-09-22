@@ -1,0 +1,18 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <catalog>
+            <search>
+                <algolia_connect_timeout>2</algolia_connect_timeout>
+                <algolia_read_timeout>5</algolia_read_timeout>
+                <algolia_seo_filters>1</algolia_seo_filters>
+            </search>
+        </catalog>
+        <algoliasearch_instant>
+            <backend>
+                <backend_render_mode>0</backend_render_mode>
+                <backend_render_allowed_user_agents>Googlebot&#xA;Bingbot</backend_render_allowed_user_agents>
+                <query_string_param_mode>magento</query_string_param_mode>
+            </backend>
+        </algoliasearch_instant>
+    </default>
+</config>
