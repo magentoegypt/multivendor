@@ -17,6 +17,20 @@
  * form through the "Withdraw Funds" link in the Payment Method column. What was
  * broken was the control they clicked first, which looked like the way in.
  *
+ * QA CYCLE 3 (CL036-TC33-QA03): "we need update customization from latpiece to
+ * here". The reference screenshots show an explicit "Request Withdrawal" button
+ * at the end of each row; stock Vnecoms makes the method TITLE the only link,
+ * which is the same affordance problem this ticket opened with — the thing that
+ * looks clickable and the thing that is clickable were not the same element.
+ * The button points at the same URL the title does, so the title keeps working
+ * for anyone used to it.
+ *
+ * The rest of that comment — Wire Transfer, its real description and fee, and
+ * the "Your Bank Info" block on the next screen — needed no code at all. That
+ * method is stock Vnecoms and was already configured here with exactly the
+ * values in the screenshots; it was simply switched off
+ * (`withdrawal_methods/wire_transfer/active`, now 1).
+ *
  * So: keep Vnecoms' markup and class names (AdminLTE styles the panel off them,
  * and the vendor area has no other stylesheet for it) and give the header the
  * behaviour it was already dressed for. Starts OPEN, which is exactly what the
@@ -52,12 +66,17 @@ $panelId = 'hm-withdrawal-request-panel';
                             <th><?= $block->escapeHtml(__('Payment Method')) ?></th>
                             <th><?= $block->escapeHtml(__('Description')) ?></th>
                             <th><?= $block->escapeHtml(__('Fee')) ?></th>
+                            <th class="hm-withdrawal-action-col"><span class="sr-only"><?= $block->escapeHtml(__('Action')) ?></span></th>
                         </tr>
                         <?php foreach ($block->getWithdrawalMethods() as $method): ?>
                         <tr>
                             <td><strong><a href="<?= $block->escapeUrl($block->getWithdrawalUrl($method)) ?>"><?= $block->escapeHtml($method->getTitle()) ?></a></strong></td>
                             <td><?= $block->escapeHtml($method->getDescription()) ?></td>
                             <td><span class="badge bg-yellow"><?= $block->escapeHtml($method->getFee()) ?></span></td>
+                            <td class="hm-withdrawal-action-col">
+                                <a href="<?= $block->escapeUrl($block->getWithdrawalUrl($method)) ?>"
+                                   class="btn btn-default primary btn-success"><?= $block->escapeHtml(__('Request Withdrawal')) ?></a>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                   </tbody></table>
