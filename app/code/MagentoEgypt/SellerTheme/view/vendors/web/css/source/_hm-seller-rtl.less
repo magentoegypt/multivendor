@@ -168,6 +168,24 @@ html:lang(ar),
     .small-box h3 {
         unicode-bidi: isolate;
     }
+
+    //
+    //  Collapsible box header — the chevron
+    //  ---------------------------------------------
+    //  custom.css pins it with `right: 0` on `a.box-title:after`. Same shape as
+    //  the login field icon at the foot of this file, and the same reason this
+    //  file is physical: a logical `inset-inline-end` declared after it would
+    //  resolve to LEFT under RTL while the original `right: 0` survived,
+    //  anchoring the pseudo-element to both edges at once and stretching it.
+    //
+    //  Nothing else needs mirroring here. The anchor reserves the arrow's room
+    //  with `width: calc(100% - 25px)`, and a box that starts at the
+    //  inline-start edge leaves that 25px on the left under RTL — which is
+    //  exactly where the arrow now sits.
+    .section-config > .admin__collapsible-block > a.box-title:after {
+        left: 0;
+        right: auto;
+    }
 }
 
 //
@@ -216,6 +234,7 @@ html:lang(ar),
         position: static;
         right: auto;
     }
+
 }
 
 //
