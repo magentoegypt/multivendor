@@ -1036,3 +1036,87 @@ input.mobile-number {
         inset-block-start: 0;
     }
 }
+
+//  ===========================================================================
+//  RTL SWEEP — the remaining forms still on blank's PHYSICAL label column
+//  ===========================================================================
+//  Not a ticket. Four fixes in a row (DEV01.32 item 3, QA01 items 2 and 3) all
+//  turned out to be the same thing — a physical direction value inherited from
+//  blank that is right in English and backwards in Arabic — so the rest of the
+//  storefront was swept for it rather than waiting for QA to find them one at
+//  a time.
+//
+//  Method: every reachable form page was loaded at 1440px in the Arabic store
+//  and each `.fieldset > .field:not(.choice)` measured. A label sitting to the
+//  LEFT of its own control, on the same line, is the defect — in an RTL form
+//  the label column belongs on the right.
+//
+//  CLEAN (no change needed): account login / create / forgot-password /
+//  createpassword / edit / change-password, address new, wishlist share,
+//  seller login + register, checkout, cart, newsletter (checkbox only), the
+//  RMA new-request page (legacy `ul.form-list`, already stacked and
+//  start-aligned) and the review form (carries its own `html:lang(ar)`
+//  override from an earlier cycle). `sendfriend` and `giftregistry` are 404 on
+//  this install.
+//
+//  BROKEN — the three below, 19 fields between them:
+//      .contact-index-index             4 fields
+//      .catalogsearch-advanced-index   14 fields
+//      .customer-account-confirmation   1 field
+//  all measured with the label at x=720 and its control at x=898: label on the
+//  left, control to its right, i.e. the English order in an Arabic document.
+//
+//  Mirrored rather than stacked. Stacking is what the theme does to the forms
+//  it has actively designed, and it is what QA asked for on createpassword —
+//  but that was a change of mind about that page's design, not a statement
+//  about every form. These three have never been through design review, and
+//  the defect here is only that Arabic reads inside out. Logical values fix
+//  exactly that and leave English byte-identical: `inline-start` IS left in
+//  English, and `end` IS blank's own `right`.
+.hm-logical-label-column() {
+    .fieldset > .field:not(.choice) > .label {
+        float: inline-start;
+        padding: 6px 0 0;
+        padding-inline: 0 15px;
+        text-align: end;
+    }
+
+    .fieldset > .field:not(.choice) > .control {
+        float: inline-start;
+    }
+
+    //  The spacer and the description hang off the same column; leaving them
+    //  physical would mirror the label and strand everything else.
+    .fieldset > .field.choice:before,
+    .fieldset > .field.no-label:before {
+        float: inline-start;
+        padding: 6px 0 0;
+        padding-inline: 0 15px;
+    }
+
+    .fieldset > .field .description {
+        float: inline-start;
+        padding: 6px 0 0;
+        padding-inline: 0 15px;
+        text-align: end;
+    }
+
+    //  blank indents the toolbar by the column width with `margin-left`, which
+    //  in Arabic indents from the side the column is not on.
+    .column:not(.sidebar-main) form .actions-toolbar,
+    .column:not(.sidebar-additional) form .actions-toolbar {
+        margin-left: 0;
+        margin-inline-start: 25.8%;
+    }
+}
+
+//  Scoped per page rather than applied to `.fieldset` globally: blank's column
+//  is site-wide, and a blanket mirror would also hit the forms that have
+//  already been answered a different way — `.review-form` and
+//  `.sales-guest-form` both carry their own `float: right` overrides that a
+//  global rule would have to be reconciled with first.
+@media all and (min-width: 768px), print {
+    .contact-index-index { .hm-logical-label-column(); }
+    .catalogsearch-advanced-index { .hm-logical-label-column(); }
+    .customer-account-confirmation { .hm-logical-label-column(); }
+}
