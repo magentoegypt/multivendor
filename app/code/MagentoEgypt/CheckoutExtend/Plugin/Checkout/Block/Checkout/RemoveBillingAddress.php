@@ -114,15 +114,47 @@ class RemoveBillingAddress
                 ['afterMethods']['children']['billing-address-form']
         );
 
+        //  Company is hidden on the shipping form by this theme's layout XML
+        //  (checkout_index_index.xml, shipping-address-fieldset). The billing
+        //  form is built in PHP from the same attribute list but never saw that
+        //  override, so a virtual cart asked for a Company the physical flow
+        //  does not. Matched here.
+        if (isset($form['children']['form-fields']['children']['company'])) {
+            $form['children']['form-fields']['children']['company']['visible'] = false;
+        }
+
+        //  THE E-MAIL FIELD IS DELIBERATELY LEFT WHERE MAGENTO PUT IT.
+        //
+        //  It was moved in here once, so that a guest would be asked for their
+        //  e-mail before their address, the order a physical cart uses. It did
+        //  not render. Measured after the move: the component was present and
+        //  correct — registry name checkout.steps.hm-billing-step.customer-email,
+        //  displayArea customer-email, the step's own customer-email region
+        //  populated with exactly 1 element, getTemplate() resolving, and
+        //  isCustomerLoggedIn() false — yet #customer-email,
+        //  #customer-email-fieldset and .form-login were all absent from the DOM.
+        //  Its sibling billing-address-form, rendered from the same region
+        //  pattern in the same template, came out fine.
+        //
+        //  Reparenting it also quietly breaks Magento_PaymentServicesPaypal:
+        //  email-mixin.js decides whether to run the Fastlane account lookup by
+        //  comparing this.name against the literal string
+        //  'checkout.steps.billing-step.payment.customer-email', so the node
+        //  stops being recognised the moment it is given a new parent.
+        //
+        //  A guest who cannot type an e-mail address cannot place an order. That
+        //  is a far worse defect than asking for the address first, which is in
+        //  any case exactly what stock Magento does on a virtual cart — and
+        //  which works. The field stays in the payment step.
+        $children = ['billing-address-form' => $form];
+
         $steps['hm-billing-step'] = [
             'component' => 'MagentoEgypt_CheckoutExtend/js/view/billing-step',
             'sortOrder' => '1',
             'config' => [
                 'template' => 'MagentoEgypt_CheckoutExtend/billing-step',
             ],
-            'children' => [
-                'billing-address-form' => $form,
-            ],
+            'children' => $children,
         ];
 
         unset($steps);

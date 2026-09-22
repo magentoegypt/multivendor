@@ -76,14 +76,60 @@ define([
             this.hmIsVisible(true);
         },
 
-        /** Shipping address, for the review summary. */
+        /** True when the cart has nothing to ship. */
+        isVirtualOrder: function () {
+            return !!quote.isVirtual();
+        },
+
+        /**
+         * The address this order is actually identified by.
+         *
+         * A virtual or downloadable order has no shipping address — Magento
+         * never collects one. Reading quote.shippingAddress() there returns an
+         * EMPTY address object, which is truthy, so the review rendered a
+         * "Shipping Address" heading with nothing underneath it and the customer
+         * never saw the billing address they had just typed, immediately before
+         * being asked to pay.
+         *
+         * @return {Object|null}
+         */
+        getAddress: function () {
+            return this.isVirtualOrder() ? quote.billingAddress() : quote.shippingAddress();
+        },
+
+        /** Heading for that block — the two order types name it differently. */
+        getAddressHeading: function () {
+            return this.isVirtualOrder() ? $t('Billing Address') : $t('Shipping Address');
+        },
+
+        /**
+         * Whether the block is worth drawing at all.
+         *
+         * Guards on CONTENT, not on the object existing, because both
+         * quote.shippingAddress() and quote.billingAddress() return an empty
+         * object rather than null before they are filled in — which is exactly
+         * how the empty heading got on screen.
+         *
+         * @return {Boolean}
+         */
+        hasAddress: function () {
+            var a = this.getAddress();
+
+            if (!a) {
+                return false;
+            }
+
+            return !!(a.city || a.postcode || (a.street && a.street.join('')));
+        },
+
+        /** Kept for compatibility with anything still calling the old name. */
         getShippingAddress: function () {
-            return quote.shippingAddress();
+            return this.getAddress();
         },
 
         /** Recipient name, from the shipping address. */
         getRecipient: function () {
-            var a = quote.shippingAddress();
+            var a = this.getAddress();
 
             if (!a) {
                 return '';
@@ -94,7 +140,7 @@ define([
 
         /** Street, which Magento models as an array of lines. */
         getStreet: function () {
-            var a = quote.shippingAddress();
+            var a = this.getAddress();
 
             if (!a || !a.street) {
                 return '';
@@ -107,7 +153,7 @@ define([
 
         /** "City, Region Postcode" on one line, skipping whatever is missing. */
         getCityLine: function () {
-            var a = quote.shippingAddress(),
+            var a = this.getAddress(),
                 tail;
 
             if (!a) {
@@ -124,7 +170,7 @@ define([
          * through the places Magento actually puts an email.
          */
         getEmail: function () {
-            var a = quote.shippingAddress(),
+            var a = this.getAddress(),
                 config = window.checkoutConfig || {};
 
             return quote.guestEmail

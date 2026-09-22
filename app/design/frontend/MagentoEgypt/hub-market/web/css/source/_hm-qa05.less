@@ -1230,3 +1230,42 @@ input.mobile-number {
     .catalogsearch-advanced-index { .hm-logical-label-column(); }
     .customer-account-confirmation { .hm-logical-label-column(); }
 }
+
+//  ---------------------------------------------------------------------------
+//  Virtual checkout — the Billing step
+//  ---------------------------------------------------------------------------
+//  Magento's billing-address/list.html draws a saved-address picker:
+//
+//      <div class="field field-select-billing">
+//          <label class="label"><span>Billing Address</span></label>
+//          <div class="control" data-bind="if: (addressOptions.length > 1)">…
+//
+//  The <select> only renders with more than one saved address, so a GUEST gets
+//  the label and nothing else — an orphaned "Billing Address" sitting directly
+//  under the step heading that already says exactly that. Measured on the
+//  virtual flow: two visible elements whose own text is "Billing Address", one
+//  in `.step-title`, one in `.label`.
+//
+//  The label goes either way. With a picker present the step title directly
+//  above it already names the section, which is how blank treats this same
+//  markup inside `.checkout-billing-address`. Plain descendant selectors, so
+//  this holds without `:has()`.
+#checkout-step-hm-billing .field-select-billing > .label {
+    display: none;
+}
+
+//  The container itself is only collapsed when the picker really is empty, so a
+//  logged-in customer with several saved addresses keeps the control that lets
+//  them choose — without a stray empty row's margins when they have one or none.
+#checkout-step-hm-billing .field-select-billing:not(:has(select)) {
+    display: none;
+}
+
+.hm-billing-step__note {
+    color: var(--hm-foreground-muted);
+    margin-block-end: var(--hm-space-4);
+}
+
+.hm-billing-step__actions {
+    margin-block-start: var(--hm-space-5);
+}

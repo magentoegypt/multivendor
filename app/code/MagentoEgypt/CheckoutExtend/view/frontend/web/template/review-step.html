@@ -13,9 +13,18 @@
 
     <div id="checkout-step-review-content" class="step-content" data-role="content">
         <div class="hm-review">
-            <!-- ko if: getShippingAddress() -->
+            <!--
+                Guarded on hasAddress(), not on the address object existing:
+                quote.shippingAddress() and quote.billingAddress() both return an
+                EMPTY object before they are filled, which is truthy. That is how
+                a virtual order came to show a "Shipping Address" heading with
+                nothing under it — the order has no shipping address at all, and
+                the customer never saw the billing address they had just entered.
+                The heading follows the order type for the same reason.
+            -->
+            <!-- ko if: hasAddress() -->
             <div class="hm-review__block">
-                <h3 class="hm-review__heading" data-bind="i18n: 'Shipping Address'"></h3>
+                <h3 class="hm-review__heading" data-bind="text: getAddressHeading()"></h3>
                 <div class="hm-review__value" data-bind="text: getRecipient()"></div>
                 <div class="hm-review__value" data-bind="text: getStreet()"></div>
                 <div class="hm-review__value" data-bind="text: getCityLine()"></div>
