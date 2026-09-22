@@ -1,0 +1,191 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Test\Integration\Indexing\Category;
+
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\Exceptions\ExceededRetriesException;
+use Algolia\AlgoliaSearch\Service\Category\BatchQueueProcessor as CategoryBatchQueueProcessor;
+use Algolia\AlgoliaSearch\Test\Integration\Indexing\MultiStoreTestCase;
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\Data\CategoryInterface;
+use Magento\Catalog\Model\ResourceModel\Category\CollectionFactory;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Store\Api\Data\StoreInterface;
+
+/**
+ * @magentoDataFixture Algolia_AlgoliaSearch::Test/Integration/_files/second_website_with_two_stores_and_products.php
+ * @magentoDbIsolation disabled
+ * @magentoAppIsolation enabled
+ */
+class MultiStoreCategoriesTest extends MultiStoreTestCase
+{
+    /** @var CategoryRepositoryInterface */
+    protected $categoryRepository;
+
+    /**  @var CollectionFactory */
+    private $categoryCollectionFactory;
+
+    /** @var CategoryBatchQueueProcessor  */
+    protected $categoryBatchQueueProcessor;
+
+    const BAGS_CATEGORY_ID = 4;
+    const BAGS_CATEGORY_NAME = "Bags";
+    const BAGS_CATEGORY_NAME_ALT = "Bags Alt";
+
+    protected function setUp():void
+    {
+        parent::setUp();
+
+        $this->categoryRepository = $this->objectManager->get(CategoryRepositoryInterface::class);
+        $this->categoryCollectionFactory = $this->objectManager->get(CollectionFactory::class);
+
+        $this->categoryBatchQueueProcessor = $this->objectManager->get(CategoryBatchQueueProcessor::class);
+        $this->reindexToAllStores($this->categoryBatchQueueProcessor);
+    }
+
+    /**
+     * @throws CouldNotSaveException
+     * @throws ExceededRetriesException
+     * @throws AlgoliaException
+     * @throws NoSuchEntityException
+     */
+    public function testMultiStoreCategoryIndices()
+    {
+        // Check that every store has the right number of categories
+        foreach ($this->storeManager->getStores() as $store) {
+            $this->assertNbOfRecordsPerStore(
+                $store->getCode(),
+                'categories',
+                $this->assertValues->expectedCategory,
+                $store->getId()
+            );
+        }
+
+        $defaultStore = $this->storeRepository->get('default');
+        $fixtureSecondStore = $this->storeRepository->get('fixture_second_store');
+
+        // Check the base url of the categories
+        $this->validateEntityUrl(
+            'categories',
+            self::BAGS_CATEGORY_ID,
+            $defaultStore,
+            "http://default.test/"
+        );
+        $this->validateEntityUrl(
+            'categories',
+            self::BAGS_CATEGORY_ID,
+            $fixtureSecondStore,
+            "http://fixture_second_store.test/"
+        );
+
+        $bagsCategory = $this->loadCategory(self::BAGS_CATEGORY_ID, $defaultStore->getId());
+
+        $this->assertEquals(self::BAGS_CATEGORY_NAME, $bagsCategory->getName());
+
+        // Change a category name at store level
+        $bagsCategoryAlt = $this->updateCategory(
+            self::BAGS_CATEGORY_ID,
+            $fixtureSecondStore->getId(),
+            ['name' => self::BAGS_CATEGORY_NAME_ALT]
+        );
+
+        $this->assertEquals(self::BAGS_CATEGORY_NAME, $bagsCategory->getName());
+        $this->assertEquals(self::BAGS_CATEGORY_NAME_ALT, $bagsCategoryAlt->getName());
+
+        $this->reindexToAllStores($this->categoryBatchQueueProcessor, [self::BAGS_CATEGORY_ID]);
+
+        $this->assertAlgoliaRecordValues(
+            'categories',
+            (string) self::BAGS_CATEGORY_ID,
+            ['name' => self::BAGS_CATEGORY_NAME],
+            $defaultStore->getId()
+        );
+
+        $this->assertAlgoliaRecordValues(
+            'categories',
+            (string) self::BAGS_CATEGORY_ID,
+            ['name' => self::BAGS_CATEGORY_NAME_ALT],
+            $fixtureSecondStore->getId()
+        );
+
+        // Disable this category at store level
+        $bagsCategoryAlt = $this->updateCategory(
+            self::BAGS_CATEGORY_ID,
+            $fixtureSecondStore->getId(),
+            ['is_active' => 0]
+        );
+
+        $this->reindexToAllStores($this->categoryBatchQueueProcessor, [self::BAGS_CATEGORY_ID]);
+
+        $this->assertNbOfRecordsPerStore(
+            $defaultStore->getCode(),
+            'categories',
+            $this->assertValues->expectedCategory,
+            $defaultStore->getId()
+        );
+
+        $this->assertNbOfRecordsPerStore(
+            $fixtureSecondStore->getCode(),
+            'categories',
+            $this->assertValues->expectedCategory - 1,
+            $fixtureSecondStore->getId()
+        );
+    }
+
+    /**
+     * Loads category by name.
+     *
+     * @param int $categoryId
+     * @param int $storeId
+     *
+     * @return CategoryInterface
+     * @throws NoSuchEntityException
+     */
+    private function loadCategory(int $categoryId, int $storeId): CategoryInterface
+    {
+        return $this->categoryRepository->get($categoryId, $storeId);
+    }
+
+    /**
+     * @param int $categoryId
+     * @param int $storeId
+     * @param array $values
+     *
+     * @return CategoryInterface
+     * @throws CouldNotSaveException
+     * @throws NoSuchEntityException
+     *
+     * @see Magento\Catalog\Block\Product\ListProduct\SortingTest
+     */
+    private function updateCategory(int $categoryId, int $storeId, array $values): CategoryInterface
+    {
+        $oldStoreId = $this->storeManager->getStore()->getId();
+        $this->storeManager->setCurrentStore($storeId);
+        $category = $this->loadCategory($categoryId, $storeId);
+        foreach ($values as $attribute => $value) {
+            $category->setData($attribute, $value);
+        }
+        $categoryAlt = $this->categoryRepository->save($category);
+        $this->storeManager->setCurrentStore($oldStoreId);
+
+        return $categoryAlt;
+    }
+
+    protected function tearDown(): void
+    {
+        $defaultStore = $this->storeRepository->get('default');
+
+        // Restore category name in case DB is not cleaned up
+        $this->updateCategory(
+            self::BAGS_CATEGORY_ID,
+            $defaultStore->getId(),
+            [
+                'name' => self::BAGS_CATEGORY_NAME,
+                'is_active' => 1
+            ]
+        );
+
+        parent::tearDown();
+    }
+}

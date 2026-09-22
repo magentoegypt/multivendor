@@ -1,0 +1,267 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Test\Integration\Indexing\Product;
+
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\Service\Product\BatchQueueProcessor as ProductBatchQueueProcessor;
+use Algolia\AlgoliaSearch\Test\Integration\Indexing\MultiStoreTestCase;
+use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Indexer\IndexerRegistry;
+use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Api\WebsiteRepositoryInterface;
+
+/**
+ * @magentoDataFixture Algolia_AlgoliaSearch::Test/Integration/_files/second_website_with_two_stores_and_products.php
+ * @magentoDbIsolation disabled
+ * @magentoAppIsolation enabled
+ */
+class MultiStoreProductsTest extends MultiStoreTestCase
+{
+    /** @var ProductBatchQueueProcessor */
+    protected $productBatchQueueProcessor;
+
+    /** @var ProductRepositoryInterface */
+    protected $productRepository;
+
+    /**  @var CollectionFactory */
+    private $productCollectionFactory;
+
+    /** @var WebsiteRepositoryInterface */
+    protected $websiteRepository;
+
+    /*** @var IndexerRegistry */
+    protected $indexerRegistry;
+
+    protected $productPriceIndexer;
+
+    const VOYAGE_YOGA_BAG_ID = 8;
+    const VOYAGE_YOGA_BAG_NAME = "Voyage Yoga Bag";
+    const VOYAGE_YOGA_BAG_NAME_ALT = "Voyage Yoga Bag Alt";
+
+    public const SKUS = [
+        '24-MB01',
+        '24-MB04',
+        '24-MB03',
+        '24-MB05',
+        '24-MB06',
+        '24-WB01'
+    ];
+
+    protected function setUp():void
+    {
+        parent::setUp();
+
+        $this->productBatchQueueProcessor = $this->objectManager->get(ProductBatchQueueProcessor::class);
+        $this->productRepository = $this->objectManager->get(ProductRepositoryInterface::class);
+        $this->productCollectionFactory = $this->objectManager->get(CollectionFactory::class);
+        $this->websiteRepository = $this->objectManager->get(WebsiteRepositoryInterface::class);
+
+        $this->indexerRegistry = $this->objectManager->get(IndexerRegistry::class);
+        $this->productPriceIndexer = $this->indexerRegistry->get('catalog_product_price');
+        $this->productPriceIndexer->reindexAll();
+
+        $this->reindexToAllStores($this->productBatchQueueProcessor);
+    }
+
+    public function testMultiStoreProductIndices()
+    {
+        // Check that every store has the right number of products
+        foreach ($this->storeManager->getStores() as $store) {
+            $this->assertNbOfRecordsPerStore(
+                $store->getCode(),
+                'products',
+                $store->getCode() === 'default' ?
+                    $this->assertValues->productsCountWithoutGiftcards :
+                    count(self::SKUS),
+                $store->getId()
+            );
+        }
+
+        $defaultStore = $this->storeRepository->get('default');
+        $fixtureSecondStore = $this->storeRepository->get('fixture_second_store');
+        $fixtureThirdStore = $this->storeRepository->get('fixture_third_store');
+
+        try {
+            $voyageYogaBag = $this->loadProduct(self::VOYAGE_YOGA_BAG_ID, $defaultStore->getId());
+        } catch (\Exception) {
+            $this->markTestIncomplete('Product could not be found.');
+        }
+
+        $this->assertEquals(self::VOYAGE_YOGA_BAG_NAME, $voyageYogaBag->getName());
+
+        // Change a product name at store level
+        $voyageYogaBagAlt = $this->updateProduct(
+            self::VOYAGE_YOGA_BAG_ID,
+            $fixtureSecondStore->getId(),
+            ['name' => self::VOYAGE_YOGA_BAG_NAME_ALT]
+        );
+
+        $this->assertEquals(self::VOYAGE_YOGA_BAG_NAME, $voyageYogaBag->getName());
+        $this->assertEquals(self::VOYAGE_YOGA_BAG_NAME_ALT, $voyageYogaBagAlt->getName());
+
+        $this->reindexToAllStores($this->productBatchQueueProcessor, [self::VOYAGE_YOGA_BAG_ID]);
+
+        $this->assertAlgoliaRecordValues(
+            'products',
+            (string) self::VOYAGE_YOGA_BAG_ID,
+            ['name' => self::VOYAGE_YOGA_BAG_NAME],
+            $defaultStore->getId()
+        );
+
+        $this->assertAlgoliaRecordValues(
+            'products',
+            (string) self::VOYAGE_YOGA_BAG_ID,
+            ['name' => self::VOYAGE_YOGA_BAG_NAME_ALT],
+            $fixtureSecondStore->getId()
+        );
+
+        // Check the base url of the products
+        $this->validateEntityUrl(
+            'products',
+            self::VOYAGE_YOGA_BAG_ID,
+            $defaultStore,
+            "http://default.test/"
+        );
+
+        $this->validateEntityUrl(
+            'products',
+            self::VOYAGE_YOGA_BAG_ID,
+            $fixtureSecondStore,
+            "http://fixture_second_store.test/"
+        );
+
+        $this->validateEntityUrl(
+            'products',
+            self::VOYAGE_YOGA_BAG_ID,
+            $fixtureThirdStore,
+            "http://fixture_third_store.test/"
+        );
+
+        // Unassign product from a single website (removed from test website (second and third store))
+        $baseWebsite = $this->websiteRepository->get('base');
+
+        $voyageYogaBag = $this->loadProduct(self::VOYAGE_YOGA_BAG_ID);
+
+        $voyageYogaBag->setWebsiteIds([$baseWebsite->getId()]);
+        $this->productRepository->save($voyageYogaBag);
+        $this->productPriceIndexer->reindexRow(self::VOYAGE_YOGA_BAG_ID);
+
+        $this->reindexToAllStores($this->productBatchQueueProcessor, [self::VOYAGE_YOGA_BAG_ID]);
+
+        // default store should have the same number of products
+        $this->assertNbOfRecordsPerStore(
+            $defaultStore->getCode(),
+            'products',
+            $this->assertValues->productsCountWithoutGiftcards,
+            $defaultStore->getId()
+        );
+
+        // Stores from test website must have one less product
+        $this->assertNbOfRecordsPerStore(
+            $fixtureThirdStore->getCode(),
+            'products',
+            count(self::SKUS) - 1,
+            $fixtureThirdStore->getId()
+        );
+
+        $this->assertNbOfRecordsPerStore(
+            $fixtureSecondStore->getCode(),
+            'products',
+            count(self::SKUS) - 1,
+            $fixtureSecondStore->getId()
+        );
+    }
+
+    /**
+     * We set the area to adminhtml to check the url model (see MAGE-1515)
+     * We need a separate test for this because urls will start with http://localhost no matter the config we set in
+     * the data fixture (which breaks the tests asserted by the validateEntityUrl() method in the previous test)
+     *
+     * @magentoDbIsolation disabled
+     * @magentoAppIsolation enabled
+     * @magentoAppArea adminhtml
+     */
+    public function testUrlModel()
+    {
+        $defaultStore = $this->storeRepository->get('default');
+        $fixtureSecondStore = $this->storeRepository->get('fixture_second_store');
+        $fixtureThirdStore = $this->storeRepository->get('fixture_third_store');
+
+        $resource = $this->objectManager->get(ResourceConnection::class);
+
+        $this->validateModelUrl(self::VOYAGE_YOGA_BAG_ID, $defaultStore);
+        $this->validateModelUrl(self::VOYAGE_YOGA_BAG_ID, $fixtureSecondStore);
+        $this->validateModelUrl(self::VOYAGE_YOGA_BAG_ID, $fixtureThirdStore);
+
+        // Check again without url rewrite (see MAGE-1515)
+        $resource->getConnection()->query(
+            'DELETE FROM url_rewrite WHERE entity_id = ? AND entity_type = "product" ',
+            [self::VOYAGE_YOGA_BAG_ID]
+        );
+
+        $this->reindexToAllStores($this->productBatchQueueProcessor, [self::VOYAGE_YOGA_BAG_ID]);
+
+        $this->validateModelUrl(self::VOYAGE_YOGA_BAG_ID, $defaultStore);
+        $this->validateModelUrl(self::VOYAGE_YOGA_BAG_ID, $fixtureSecondStore);
+        $this->validateModelUrl(self::VOYAGE_YOGA_BAG_ID, $fixtureThirdStore);
+    }
+
+    /**
+     * Loads product by id.
+     *
+     * @param int $productId
+     * @param int|null $storeId
+     *
+     * @return ProductInterface
+     * @throws NoSuchEntityException
+     */
+    private function loadProduct(int $productId, ?int $storeId = null): ProductInterface
+    {
+        return $this->productRepository->getById($productId, true, $storeId);
+    }
+
+    /**
+     * @param int $productId
+     * @param int $storeId
+     * @param array $values
+     *
+     * @return ProductInterface
+     * @throws CouldNotSaveException
+     * @throws NoSuchEntityException
+     *
+     */
+    private function updateProduct(int $productId, int $storeId, array $values): ProductInterface
+    {
+        $oldStoreId = $this->storeManager->getStore()->getId();
+        $this->storeManager->setCurrentStore($storeId);
+        $product = $this->loadProduct($productId, $storeId);
+        foreach ($values as $attribute => $value) {
+            $product->setData($attribute, $value);
+        }
+        $productAlt = $this->productRepository->save($product);
+        $this->storeManager->setCurrentStore($oldStoreId);
+
+        return $productAlt;
+    }
+
+    protected function tearDown(): void
+    {
+        $defaultStore = $this->storeRepository->get('default');
+
+        // Restore product name in case DB is not cleaned up
+        $this->updateProduct(
+            self::VOYAGE_YOGA_BAG_ID,
+            $defaultStore->getId(),
+            [
+                'name' => self::VOYAGE_YOGA_BAG_NAME,
+            ]
+        );
+
+        parent::tearDown();
+    }
+}

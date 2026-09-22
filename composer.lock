@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "352252eca8ee6e75fd751d90ffdc05b9",
+    "content-hash": "74b106456a1537467a270db7679f6087",
     "packages": [
         {
             "name": "2tvenom/cborencode",
@@ -85,6 +85,123 @@
             },
             "type": "metapackage",
             "description": "Metapackage contains references to extensions bundled with Magento OS"
+        },
+        {
+            "name": "algolia/algoliasearch-client-php",
+            "version": "4.18.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/algolia/algoliasearch-client-php.git",
+                "reference": "251490d025a7d1216405eda59a097e53d49adad4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/algolia/algoliasearch-client-php/zipball/251490d025a7d1216405eda59a097e53d49adad4",
+                "reference": "251490d025a7d1216405eda59a097e53d49adad4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/psr7": "^2.0",
+                "php": ">=8.1 !=8.3.0",
+                "psr/http-message": "^1.1 || ^2.0",
+                "psr/log": "^1.0 || ^2.0 || ^3.0",
+                "psr/simple-cache": "^1.0 || ^2.0 || ^3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.0 || ^3.5.0",
+                "phpstan/phpstan": "^1.12",
+                "phpunit/phpunit": "^11.0",
+                "vlucas/phpdotenv": "^5.4"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "If you prefer to use Guzzle HTTP client instead of the Http Client implementation provided by the package"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/Http/Psr7/functions.php"
+                ],
+                "psr-4": {
+                    "Algolia\\AlgoliaSearch\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Algolia Team",
+                    "homepage": "https://alg.li/support"
+                }
+            ],
+            "description": "API powering the features of Algolia.",
+            "homepage": "https://github.com/algolia/algoliasearch-client-php",
+            "keywords": [
+                "algolia",
+                "api",
+                "client",
+                "php",
+                "search"
+            ],
+            "support": {
+                "issues": "https://github.com/algolia/algoliasearch-client-php/issues",
+                "source": "https://github.com/algolia/algoliasearch-client-php/tree/4.18.3"
+            },
+            "time": "2025-04-07T14:04:10+00:00"
+        },
+        {
+            "name": "algolia/algoliasearch-magento-2",
+            "version": "3.18.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/algolia/algoliasearch-magento-2.git",
+                "reference": "f48382476e7c4b316760dce3e8d557a5d5f1fc35"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/algolia/algoliasearch-magento-2/zipball/f48382476e7c4b316760dce3e8d557a5d5f1fc35",
+                "reference": "f48382476e7c4b316760dce3e8d557a5d5f1fc35",
+                "shasum": ""
+            },
+            "require": {
+                "algolia/algoliasearch-client-php": "4.18.3",
+                "ext-dom": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "ext-pdo": "*",
+                "guzzlehttp/guzzle": "^6.3.3|^7.3.0",
+                "magento/framework": "~103.0",
+                "php": "~8.2|~8.3|~8.4|~8.5"
+            },
+            "require-dev": {
+                "phpcompatibility/php-compatibility": "^9.2",
+                "phpunit/phpunit": "^9.5|^10.5|^12.0"
+            },
+            "suggest": {
+                "algolia/algoliasearch-inventory-magento-2": "Algolia Search Inventory module for Magento 2.3.x,2.4.x and Algolia Search 1.12+ extension"
+            },
+            "type": "magento2-module",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Algolia\\AlgoliaSearch\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Algolia Search & Discovery extension for Magento 2",
+            "support": {
+                "source": "https://github.com/algolia/algoliasearch-magento-2/tree/3.18.1"
+            },
+            "time": "2026-06-15T12:48:00+00:00"
         },
         {
             "name": "amasty/base",
@@ -22688,6 +22805,57 @@
                 "source": "https://github.com/php-fig/log/tree/3.0.2"
             },
             "time": "2024-09-11T13:17:53+00:00"
+        },
+        {
+            "name": "psr/simple-cache",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/simple-cache.git",
+                "reference": "764e0b3939f5ca87cb904f570ef9be2d78a07865"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/764e0b3939f5ca87cb904f570ef9be2d78a07865",
+                "reference": "764e0b3939f5ca87cb904f570ef9be2d78a07865",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\SimpleCache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interfaces for simple caching",
+            "keywords": [
+                "cache",
+                "caching",
+                "psr",
+                "psr-16",
+                "simple-cache"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/simple-cache/tree/3.0.0"
+            },
+            "time": "2021-10-29T13:26:27+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

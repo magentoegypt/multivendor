@@ -1,0 +1,109 @@
+<?php
+
+/** @var \Algolia\AlgoliaSearch\Block\Instant\Hit $block */
+/** @var \Magento\Framework\Escaper $escaper */
+$priceKey     = $block->getPriceKey();
+$currencyCode = $block->getCurrencyCode();
+
+$baseVar         = $escaper->escapeHtml('price' . $priceKey);
+$maxVar          = $escaper->escapeHtml('price' . $priceKey . '_max');
+$baseFormatedVar = $escaper->escapeHtml('price' . $priceKey . '_formated');
+$origFormatedVar = $escaper->escapeHtml('price' . $priceKey . '_original_formated');
+
+?>
+
+<script type="text/template" id="instant-hit-template">
+    <div class="col-md-4 col-sm-6" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+        <meta itemprop="position" content="{{__position}}" />
+        <div class="result-wrapper" itemprop="item" itemscope itemtype="http://schema.org/Product">
+            <meta itemprop="url"
+                {{^__queryID}} content="{{url}}" {{/__queryID}}
+                {{#__queryID}} content="{{urlForInsights}}" {{/__queryID}}
+                />
+            <a class="result"
+                {{^__queryID}} href="{{url}}" {{/__queryID}}
+                {{#__queryID}} href="{{urlForInsights}}" {{/__queryID}}
+                data-objectid="{{objectID}}"
+                data-indexname="{{__indexName}}"
+                data-position="{{__position}}"
+                data-queryid="{{__queryID}}">
+                <div class="result-content">
+                    <div class="result-thumbnail">
+                        {{#image_url}}<img itemprop="image" src="{{{image_url}}}" alt="{{{name}}}" />{{/image_url}}
+                        {{^image_url}}<span class="no-image"></span>{{/image_url}}
+                    </div>
+                    <div class="result-sub-content">
+                        <h3 itemprop="name" class="result-title text-ellipsis">
+                            {{{ _highlightResult.name.value }}}
+                        </h3>
+                        <div class="ratings">
+                            <div class="result-sub-content">
+                                <div class="product-reviews-summary short">
+                                    <div class="rating-summary">
+                                        <span class="label"><span><?= $escaper->escapeHtml(__('Rating')) ?>:</span></span>
+                                        <div class="rating-result" title="{{rating_summary}}%">
+                                            <span style="width:{{rating_summary}}%">
+                                                <span>{{rating_summary}}%</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                {{^<?= $escaper->escapeHtml($maxVar) ?>}}
+                                <div itemprop="offers" itemscope itemtype="http://schema.org/Offer" class="price">
+                                    <meta itemprop="price" content="{{<?= $escaper->escapeHtmlAttr($baseVar); ?>}}" />
+                                {{/<?= $escaper->escapeHtml($maxVar); ?>}}
+                                {{#<?= $escaper->escapeHtml($maxVar); ?>}}
+                                <div itemprop="offers" itemscope itemtype="http://schema.org/AggregateOffer" class="price">
+                                    <meta itemprop="lowPrice" content="{{<?= $escaper->escapeHtmlAttr($baseVar); ?>}}" />
+                                    <meta itemprop="highPrice" content="{{<?= $escaper->escapeHtmlAttr($maxVar); ?>}}" />
+                                {{/<?= $escaper->escapeHtml($maxVar); ?>}}
+                                    <meta itemprop="priceCurrency" content="<?= $escaper->escapeHtmlAttr($currencyCode); ?>" />
+                                    <div class="price-wrapper">
+                                        <div>
+
+                                            <span class="after_special
+                                                    {{#<?= $escaper->escapeHtml($origFormatedVar); ?>}}
+                                                        promotion
+                                                    {{/<?= $escaper->escapeHtml($origFormatedVar); ?>}}">
+                                                {{<?= $escaper->escapeHtml($baseFormatedVar); ?>}}
+                                            </span>
+                                            {{#<?= $escaper->escapeHtml($origFormatedVar); ?>}}
+                                                <span class="before_special">
+                                                    {{<?= $escaper->escapeHtml($origFormatedVar); ?>}}
+                                                </span>
+                                            {{/<?= $escaper->escapeHtml($origFormatedVar); ?>}}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="result-description text-ellipsis">{{{ _highlightResult.description.value }}}</div>
+
+                        {{#isAddToCartEnabled}}
+                        <form data-role="tocart-form" action="{{ addToCart.action }}" method="post">
+                            <input type="hidden" name="queryID" value="{{__queryID}}">
+                            <input type="hidden" name="product" value="{{objectID}}">
+                            <input type="hidden" name="indexName" value="{{__indexName}}">
+                            <input type="hidden" name="referer" value="instantsearch">
+                            {{#_highlightResult.default_bundle_options}}<input type="hidden" name="bundle_option[{{ optionId }}]" value="{{selectionId}}">{{/_highlightResult.default_bundle_options}}
+                            <input type="hidden" name="{{ addToCart.redirectUrlParam }}" value="{{ addToCart.uenc }}">
+                            <input name="form_key" type="hidden" value="{{ addToCart.formKey }}">
+                            <button type="submit" title="<?= $escaper->escapeHtml(__('Add to Cart')) ?>" class="action tocart primary"
+                            data-objectid="{{objectID}}"
+                            data-indexname="{{__indexName}}"
+                            data-position="{{__position}}"
+                            data-queryid="{{__queryID}}"
+                            >
+                                <span><?= $escaper->escapeHtml(__('Add to Cart')) ?></span>
+                            </button>
+                        </form>
+                        {{/isAddToCartEnabled}}
+                    </div>
+                </div>
+                <div class="algolia-clearfix"></div>
+            </a>
+        </div>
+    </div>
+</script>

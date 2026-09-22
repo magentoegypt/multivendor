@@ -1,0 +1,141 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Test\Unit\Helper;
+
+use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Algolia\AlgoliaSearch\Helper\Configuration\AutocompleteHelper;
+use Algolia\AlgoliaSearch\Helper\Configuration\InstantSearchHelper;
+use Algolia\AlgoliaSearch\Helper\Configuration\QueueHelper;
+use Algolia\AlgoliaSearch\Service\Serializer;
+use Algolia\AlgoliaSearch\Test\TestCase;
+use Magento\Cookie\Helper\Cookie as CookieHelper;
+use Magento\Customer\Api\GroupExcludedWebsiteRepositoryInterface;
+use Magento\Customer\Model\ResourceModel\Group\Collection as GroupCollection;
+use Magento\Directory\Model\Currency as DirCurrency;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\Storage\WriterInterface;
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Locale\Currency;
+use Magento\Framework\Module\ResourceInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Weee\Helper\Data as WeeeHelper;
+
+class ConfigHelperTest extends TestCase
+{
+    protected ?ConfigHelper $configHelper;
+    protected ?ScopeConfigInterface $configInterface;
+    protected ?WriterInterface $configWriter;
+    protected ?StoreManagerInterface $storeManager;
+    protected ?Currency $currency;
+    protected ?DirCurrency $dirCurrency;
+    protected ?DirectoryList $directoryList;
+    protected ?ResourceInterface $moduleResource;
+    protected ?ProductMetadataInterface $productMetadata;
+    protected ?ManagerInterface $eventManager;
+    protected ?Serializer $serializer;
+    protected ?GroupCollection $groupCollection;
+    protected ?GroupExcludedWebsiteRepositoryInterface $groupExcludedWebsiteRepository;
+    protected ?CookieHelper $cookieHelper;
+    protected ?AutocompleteHelper $autocompleteHelper;
+    protected ?InstantSearchHelper $instantSearchHelper;
+    protected ?QueueHelper $queueHelper;
+
+    protected ?WeeeHelper $weeeHelper;
+
+    protected function setUp(): void
+    {
+        $this->configInterface = $this->createMock(ScopeConfigInterface::class);
+        $this->configWriter = $this->createMock(WriterInterface::class);
+        $this->storeManager = $this->createMock(StoreManagerInterface::class);
+        $this->currency = $this->createMock(Currency::class);
+        $this->dirCurrency = $this->createMock(DirCurrency::class);
+        $this->directoryList = $this->createMock(DirectoryList::class);
+        $this->moduleResource = $this->createMock(ResourceInterface::class);
+        $this->productMetadata = $this->createMock(ProductMetadataInterface::class);
+        $this->eventManager = $this->createMock(ManagerInterface::class);
+        $this->serializer = $this->createMock(Serializer::class);
+        $this->groupCollection = $this->createMock(GroupCollection::class);
+        $this->groupExcludedWebsiteRepository = $this->createMock(GroupExcludedWebsiteRepositoryInterface::class);
+        $this->cookieHelper = $this->createMock(CookieHelper::class);
+        $this->autocompleteHelper = $this->createMock(AutocompleteHelper::class);
+        $this->instantSearchHelper = $this->createMock(InstantSearchHelper::class);
+        $this->queueHelper = $this->createMock(QueueHelper::class);
+        $this->weeeHelper = $this->createMock(WeeeHelper::class);
+
+        $this->configHelper = new ConfigHelper(
+            $this->configInterface,
+            $this->configWriter,
+            $this->storeManager,
+            $this->currency,
+            $this->dirCurrency,
+            $this->directoryList,
+            $this->moduleResource,
+            $this->productMetadata,
+            $this->eventManager,
+            $this->serializer,
+            $this->groupCollection,
+            $this->groupExcludedWebsiteRepository,
+            $this->cookieHelper,
+            $this->autocompleteHelper,
+            $this->instantSearchHelper,
+            $this->queueHelper,
+            $this->weeeHelper
+        );
+    }
+
+    public function testGetIndexPrefix()
+    {
+        $testPrefix = 'foo_bar_';
+        $this->configInterface->method('getValue')->willReturn($testPrefix);
+        $this->assertEquals($testPrefix, $this->configHelper->getIndexPrefix());
+    }
+
+    public function testGetIndexPrefixWhenNull() {
+        $this->configInterface->method('getValue')->willReturn(null);
+        $this->assertEquals('', $this->configHelper->getIndexPrefix());
+    }
+
+    /**
+     * @dataProvider isEnabledFrontEndProvider
+     */
+    public function testIsEnabledFrontEnd(
+        bool $isAutocompleteEnabled,
+        bool $isInstantSearchEnabled,
+        bool $expectedResult
+    ): void {
+        $storeId = 1;
+
+        $this->autocompleteHelper->method('isEnabled')->with($storeId)->willReturn($isAutocompleteEnabled);
+        $this->instantSearchHelper->method('isEnabled')->with($storeId)->willReturn($isInstantSearchEnabled);
+
+        $this->assertSame($expectedResult, $this->configHelper->isEnabledFrontEnd($storeId));
+    }
+
+    public static function isEnabledFrontEndProvider(): array
+    {
+        return [
+            'Both enabled' => [
+                'isAutocompleteEnabled' => true,
+                'isInstantSearchEnabled' => true,
+                'expectedResult' => true,
+            ],
+            'Only autocomplete enabled' => [
+                'isAutocompleteEnabled' => true,
+                'isInstantSearchEnabled' => false,
+                'expectedResult' => true,
+            ],
+            'Only instant search enabled' => [
+                'isAutocompleteEnabled' => false,
+                'isInstantSearchEnabled' => true,
+                'expectedResult' => true,
+            ],
+            'Neither enabled' => [
+                'isAutocompleteEnabled' => false,
+                'isInstantSearchEnabled' => false,
+                'expectedResult' => false,
+            ],
+        ];
+    }
+}

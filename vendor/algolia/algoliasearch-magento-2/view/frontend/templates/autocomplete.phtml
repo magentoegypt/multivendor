@@ -1,0 +1,18 @@
+<?php
+/*** @var \Algolia\AlgoliaSearch\Block\Algolia $blockInstance */
+
+$blockInstance= $block->getLayout()->createBlock('Algolia\AlgoliaSearch\Block\Algolia');
+$config = $blockInstance->getConfigHelper();
+$catalogSearchHelper = $blockInstance->getCatalogSearchHelper();
+
+// Render form with autocomplete input
+if ($config->isAutoCompleteEnabled()): ?>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "algoliaAutocomplete": {}
+            }
+        }
+    </script>
+    <div id="algoliaAutocomplete" class="block block-search algolia-search-block algolia-search-input"></div>
+<?php endif;?>

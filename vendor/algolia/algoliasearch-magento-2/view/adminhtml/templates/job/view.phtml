@@ -1,0 +1,105 @@
+<?php
+
+/* @var \Algolia\AlgoliaSearch\Block\Adminhtml\Job\View $block */
+/* @var \Algolia\AlgoliaSearch\Model\Job $job */
+$job = $block->getCurrentJob();
+?>
+<div class="admin__fieldset-wrapper opened algolia-setup-fieldset">
+    <div class="admin__fieldset-wrapper-title">
+        <strong class="title">
+            <span><?= $escaper->escapeHtml(__('Job Informations')); ?></span>
+        </strong>
+    </div>
+    <div class="admin__fieldset-wrapper-content">
+        <fieldset class="admin__fieldset">
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Job Id')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getId()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('PID')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getPid()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Created')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getCreated()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Status')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getStatus()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Class')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getClass()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Method')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getMethod()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Data')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getData('data')); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Max retries')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getMaxRetries()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Retries')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getRetries()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Data Size')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getDataSize()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Error Log')); ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($job->getErrorLog()); ?>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

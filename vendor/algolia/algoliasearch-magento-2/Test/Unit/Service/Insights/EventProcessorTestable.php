@@ -1,0 +1,23 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Test\Unit\Service\Insights;
+
+use Algolia\AlgoliaSearch\Service\Insights\EventProcessor;
+
+class EventProcessorTestable extends EventProcessor
+{
+    public function getObjectDataForPurchase(...$params): array
+    {
+        return parent::getObjectDataForPurchase(...$params);
+    }
+
+    public function getTotalRevenueForEvent(...$params): float
+    {
+        return parent::getTotalRevenueForEvent(...$params);
+    }
+
+    public function initDecimalPrecision(): void
+    {
+        parent::initDecimalPrecision();
+    }
+}

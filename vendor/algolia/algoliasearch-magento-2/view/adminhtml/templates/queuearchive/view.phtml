@@ -1,0 +1,122 @@
+<?php
+
+/* @var \Algolia\AlgoliaSearch\Block\Adminhtml\QueueArchive\View $block */
+/* @var \Algolia\AlgoliaSearch\Model\Queue $queue */
+$queue = $block->getCurrentJob();
+?>
+
+<div class="admin__fieldset-wrapper opened algolia-setup-fieldset">
+    <div class="admin__fieldset-wrapper-title">
+        <strong class="title">
+            <span><?= $escaper->escapeHtml(__('Queue Archive Informations')) ?></span>
+        </strong>
+    </div>
+    <div class="admin__fieldset-wrapper-content">
+        <fieldset class="admin__fieldset">
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Archive Id')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getArchiveId()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('PID')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getPid()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Class')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getClass()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Method')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getMethod()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Data')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getData('data')) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Error Log')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getErrorLog()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Data Size')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getDataSize()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Created At')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getCreatedAt()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Retries')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getRetries()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Is Full Reindex')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getIsFullReindex()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Processed At')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getProcssedAt()) ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Success')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getSuccess()); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="admin__field">
+                <label class="admin__field-label"><span><?= $escaper->escapeHtml(__('Debug')) ?></span></label>
+                <div class="admin__field-control">
+                    <div class="admin__field admin__field-option">
+                        <?= $escaper->escapeHtml($queue->getDebug()) ?>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+</div>

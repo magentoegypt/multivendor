@@ -1,0 +1,1686 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="algolia" translate="label" sortOrder="100001">
+            <label>
+                <![CDATA[
+                    Algolia Search
+                ]]>
+            </label>
+        </tab>
+        <section id="algoliasearch_credentials" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <label>Credentials and Basic Setup</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="credentials" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Credentials and Setup</label>
+                <attribute type="expanded">1</attribute>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                     ]]>
+                </comment>
+                <field id="application_id" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Application ID</label>
+                    <comment>
+                        <![CDATA[
+                            You can find your Application ID and API keys in the <a href="https://www.algolia.com/account/api-keys" target="_blank">Algolia dashboard</a>.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="search_only_api_key" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search-only (public) API key</label>
+                    <comment>
+                        <![CDATA[
+                            You can find your Application ID and API keys in the <a href="https://www.algolia.com/account/api-keys" target="_blank">Algolia dashboard</a>.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="api_key" translate="label comment" type="password" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Admin API key</label>
+                    <comment>
+                        <![CDATA[
+                            You can find your Application ID and API keys in the <a href="https://www.algolia.com/account/api-keys" target="_blank">Algolia dashboard</a>.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="index_prefix" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Index Name Prefix</label>
+                    <comment>
+                        <![CDATA[
+                            Specify different index prefixes for each environment (eg. local, staging, production). It will prevent your data from being overridden.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="debug" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Logging</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                           Logging generates a significant amount of data and can affect performance of the extension. Use it only for debugging.
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="algolia_cookie_configuration" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Algolia Cookie Configuration</label>
+                <attribute type="expanded">1</attribute>
+                <comment>
+                    <![CDATA[
+                         If your Magento cookie settings, specifically <b>General > Web > Default Cookie Settings > Cookie Restriction Mode</b> is set to "No," we will consider it as Implicit Cookie Consent. In this case, <code>useCookie</code> will be set to True by default for all insight events. Conversely, if <b>Cookie Restriction Mode is set to 'Yes,'</b> Insight events will not be allowed without explicit cookie consent.
+                        ]]>
+                </comment>
+                <field id="default_consent_cookie_name" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Consent Cookie Name</label>
+                    <comment>
+                        <![CDATA[
+                            Enter the name for your website's consent cookie.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="allow_cookie_button_selector" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow Cookie Button Selector</label>
+                    <comment>
+                        <![CDATA[
+                            Enter Allow Cookie Button Selector.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="cookie_duration" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Algolia Cookie Duration</label>
+                    <comment>
+                        <![CDATA[
+                            Add Cookie Duration in milliseconds. Default is 15552000000 (6 Months).
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_autocomplete" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Autocomplete Menu</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="autocomplete" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Autocomplete Menu</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                        ]]>
+                </comment>
+                <field id="is_popup_enabled" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Autocomplete Menu</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to display a search-as-you-type drop-down menu?<br>
+                            It requires your theme to expose a <code>top.search</code> and <code>content</code> block.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="autocomplete_selector" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Input Container Selector</label>
+                    <comment>
+                        <![CDATA[
+                            If you don't have the <code>top.search</code> block, you can specify a DOM selector of your dom container here to make the search work.
+                            Default value is <code>.algolia-search-input</code>.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="nb_of_products_suggestions" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of products</label>
+                    <comment>
+                        <![CDATA[
+                            How many products do you want to display in the autocomplete menu? Default value is 6.<br>
+                            Set 0 to disable the products section.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="nb_of_categories_suggestions" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of categories</label>
+                    <comment>
+                        <![CDATA[
+                            How many categories do you want to display in the autocomplete menu? Default value is 2.<br>
+                            Set 0 to disable the categories section.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="suggestions_mode" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Suggestions</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\Suggestions</source_model>
+                    <comment>
+                        <![CDATA[
+                            Choose if you want to use Magento Suggestions (populated by the <code>search_query</code> table) or the Algolia Suggestions from your Algolia dashboard.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="nb_of_queries_suggestions" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of queries</label>
+                    <comment>
+                        <![CDATA[
+                            How many query suggestions do you want to display in the autocomplete menu? By default it's disabled.<br>
+                            Set 0 to disable the query suggestion section.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                        <field id="suggestions_mode">1</field>
+                    </depends>
+                </field>
+                <field id="min_popularity" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Minimal query popularity</label>
+                    <comment>
+                        <![CDATA[
+                            The minimal number of times a query has been performed in order to be suggested in the autocomplete menu. Default value is 1000.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                        <field id="suggestions_mode">1</field>
+                    </depends>
+                </field>
+                <field id="min_number_of_results" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Minimal number of results per query</label>
+                    <comment>
+                        <![CDATA[
+                            The minimal number of results a query needs in order to be suggested. Default value is 2.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                        <field id="suggestions_mode">1</field>
+                    </depends>
+                </field>
+                <field id="suggestions_index_name" translate="label comment" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search suggestions index name</label>
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\SuggestionsIndexName</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify the index name you have configured in Algolia to use for search suggestions.<br/>
+                            By default, it is <code>%PRODUCT_INDEX_NAME%_query_suggestions</code><br/>
+                            For more information, check the <a target="_blank" href="https://www.algolia.com/doc/guides/building-search-ui/ui-and-ux-patterns/query-suggestions">Algolia official documentation</a><br/>
+                            If you just created it in the Algolia dashboard, this may takes some time for it to be available.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                        <field id="suggestions_mode">2</field>
+                    </depends>
+                </field>
+                <field id="nb_of_algolia_suggestions" translate="label comment" type="text" sortOrder="47" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of Algolia Suggestions</label>
+                    <comment>
+                        <![CDATA[
+                            How many query Algolia Suggestions do you want to display ? (Must be higher than 0)
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                        <field id="suggestions_mode">2</field>
+                    </depends>
+                </field>
+                <field id="sections" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Additional Sections</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\Sections</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify additional sections you want to include in the autocomplete menu (eg. pages, colors, manufacturers).
+                            <br><span class="algolia-config-warning">&#9888;</span> All attributes used here have to be configured as facets in the <strong>InstantSearch Results Page Configuration</strong> panel.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="excluded_pages" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Excluded Pages</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\CustomPages</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify pages you don't want to search in.<br>
+                            Pages' indexing documentation: <a target="_blank" href="https://www.algolia.com/doc/integration/magento-2/how-it-works/indexing/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link#pages-indexing">https://www.algolia.com/doc/integration/magento-2/how-it-works/indexing/#pages-indexing</a>
+                            <br><span class="algolia-config-warning">&#9888;</span> Do not forget to reindex the Algolia Search Pages indexer after you've modified this panel.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="render_template_directives" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Render template directives</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to have CMS pages' templates' content (e.g. <code>{{block type="core/template" ...}}</code>) indexed?
+                            <br><span class="algolia-config-warning">&#9888;</span> Do not forget to reindex the Algolia Search Pages indexer after you've modified this setting.
+                            ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="debug" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable autocomplete menu's debug mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            When set to "Yes", the autocomplete menu won't disappear when clicked outside of the menu.
+                            It's useful when you debug or style a look and feel of the autocomplete menu.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="navigator" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable keyboard navigation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="debounce_millisec" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Debounce requests</label>
+                    <comment>
+                        <![CDATA[
+                            The minimal time (in milliseconds) that should elapse as users type their search query before a request is sent to the Algolia Search API. Default value is 300.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+                <field id="minimum_char_length" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Minimum query length</label>
+                    <comment>
+                        <![CDATA[
+                            The minimal number of characters required for a search term before a request is sent to the Algolia Search API. If set to 0 then results will be fetched on first keystroke. Default value is 0.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="is_popup_enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="redirects" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Redirects</label>
+                <comment>
+                    <![CDATA[
+                      <p>
+                        Algolia allows you to <a href="https://www.algolia.com/doc/guides/managing-results/rules/merchandising-and-promoting/how-to/redirects" target="_blank">redirect users</a>
+                        to a specific page of your website or mobile app based on a query or a set of conditions.
+                      </p>
+                    ]]>
+                </comment>
+                <attribute type="expanded">1</attribute>
+                <field id="enable" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable redirects</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            When enabled, Autocomplete can redirect searches to a different URL based on rules configured in either the Dashboard or Merchandising Studio.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="mode" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Redirect display mode</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\AutocompleteRedirectMode</source_model>
+                    <comment>
+                        <![CDATA[
+                            Use this setting to configure how redirects behave within Autocomplete.
+                        ]]>
+                    </comment>
+                    <depends><field id="enable">1</field></depends>
+                </field>
+                <field id="target" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Open redirect URL in a new window</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Applies to clickable links only.
+                        ]]>
+                    </comment>
+                    <depends><field id="mode" separator=",">1,2</field></depends>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_instant" translate="label" type="text" sortOrder="20" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <label>InstantSearch Results Page</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="instant" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>InstantSearch Results Page</label>
+                <attribute type="expanded">1</attribute>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                        ]]>
+                </comment>
+                <field id="is_instant_enabled" translate="label comment" type="select" sortOrder="0" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enable InstantSearch Results Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want the products inside a search results page to be searchable and updated with as-you-type experience?<br>
+                            It requires your theme to expose a <code>top.search</code> and <code>content</code> block.
+                            <br><span class="algolia-config-warning">&#9888;</span> Enabling the InstantSearch results page can potentially break your design and some work will be required to have a good integration with your theme.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="instant_selector" translate="label comment" type="text" sortOrder="3" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>DOM Selector</label>
+                    <comment>
+                        <![CDATA[
+                            DOM selector of block in which the search results page will be displayed using JavaScript.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="pagination_mode" translate="label comment" type="select" sortOrder="4" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\PaginationMode</source_model>
+                    <label>Pagination</label>
+                    <comment>
+                        <model>Algolia\AlgoliaSearch\Model\Config\PaginationMode</model>
+                    </comment>
+                </field>
+                <field id="number_product_results" translate="label comment" type="text" sortOrder="5" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of products per page (custom)</label>
+                    <comment>
+                        <![CDATA[
+                            Default custom value is 9.
+                        ]]>
+                    </comment>
+                    <depends><field id="pagination_mode">2</field></depends>
+                </field>
+                <field id="replace_categories" translate="label comment" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Replace categories page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to replace default Magento category pages (PLPs) with the InstantSearch results page?
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="instant_facets" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Faceting</label>
+
+                <field id="facets" translate="label comment" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Facets</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\Facets</frontend_model>
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\Facets</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify the <a href="https://www.algolia.com/doc/guides/managing-results/refine-results/faceting/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link#conjunctive-and-disjunctive-faceting" target="_blank">filtering options</a> you want to offer on a search results page.<br>
+                                &nbsp; - Disjunctive facets filter your results on <em>any</em> match (e.g. hotels with 4 OR 5 stars).<br>
+                                &nbsp; - Conjunctive facets filter your results on <em>all</em> matches (e.g. shirts that come in "Size M" AND "Size L").
+
+                            <br><br>
+                            Set facet as searchable if you want your customers to be able to <a target="_blank" href="https://www.algolia.com/doc/api-reference/api-methods/search-for-facet-values/">search for facet values</a>. It's handy when a facet has a lot of values.
+                            <br><br>
+                            <div class="algolia_block blue icon-documentation">
+                                <b>Create a Query rule</b> for a facet when you want Algolia to automatically filter on a facet
+                                when a user searches for its value in a query. For example, when you create a Query rule
+                                for a "color" facet and a user is searching "red shorts", Algolia will internally filter
+                                results for the color "red" and search only "shorts". It leads to more relevant results.
+                                This query rule is applied for both Autocomplete and InstantSearch results.
+                                <br><br>
+                                Find out more about Facets in
+                                <a href="https://www.algolia.com/doc/integration/magento-2/how-it-works/indexing/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link#facets" target="_blank">documentation</a>.
+                            </div>
+                        ]]>
+                    </comment>
+                </field>
+                <field id="max_values_per_facet" translate="label comment" type="text" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of values per facet</label>
+                    <comment>
+                        <![CDATA[
+                            The number of values each facet can display. Default value is 10.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="enable_dynamic_facets" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enable dynamic facets</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            While the rendering of facets is configured based on your Magento admin settings, it is possible to override
+                            these settings via merchandising rules in Algolia. Enable "dynamic facets" to allow InstantSearch
+                            to render facets based on the rule conditions you define in either the Algolia Dashboard or Merchandising Studio.
+                            <br><br>
+                            This feature utilizes the "Facet display" configuration in the Algolia Dashboard (a.k.a. <code>renderingContent</code>).
+                            If you have customized this setting in the Dashboard for your products index, please note that enabling this option will allow Magento to overwrite your configuration.
+                            <br><br>
+                            <span class="algolia-config-warning">&#9888;</span>
+                            <strong>IMPORTANT!</strong> Do not enable dynamic facets unless you have the "renderingContent" feature enabled on your Algolia application. Otherwise this configuration
+                            can cause your indexing to fail.
+
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="instant_sorts" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Sorting</label>
+                <field id="sorts" translate="label comment" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Sorts</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\Sorts</frontend_model>
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\Sorts</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify different sorting options you want to offer on a search results page and (if enabled) category pages.<br>
+                            By default, each sort is created as a full replica of your primary index which can significantly increase the number of records you store in Algolia.<br>
+                            Premium plans can utilize virtual replicas but there are differences in how these kinds of sorts behave and certain limitations apply.<br>
+                            For further details see <a target="_blank" href="https://www.algolia.com/doc/guides/managing-results/refine-results/sorting/">our documentation</a>
+                            <!--
+                            TODO: Update this documentation and provide links
+                            <a target="_blank" href="https://www.algolia.com/doc/integration/magento-2/how-it-works/indexing/?client=php#switching-to-virtual-replica">documentation</a>
+                            <a target="_blank" href="https://www.algolia.com/doc/integration/magento-2/how-it-works/indexing/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link#sorting-strategies">documentation</a>.
+                            -->
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="instant_options" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Display Options</label>
+                <field id="instantsearch_searchbox" translate="label comment" type="select" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable searchBox Widget in InstantSearch Page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            The searchBox widget is used to let the user perform a text-based query. <a target="_blank" href="https://www.algolia.com/doc/api-reference/widgets/search-box/js/#about"> Know More </a>
+                        ]]>
+                    </comment>
+                </field>
+                <field id="show_suggestions_on_no_result_page" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show query suggestions when no results</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to display the most popular query suggestions on InstantSearch results page when there are no results?
+                        ]]>
+                    </comment>
+                </field>
+                <field id="add_to_cart_enable" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Add to Cart</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to display an "Add To Cart" button in a product on an InstantSearch results page?
+                        ]]>
+                    </comment>
+                </field>
+                <field id="infinite_scroll_enable" translate="label comment" type="select" sortOrder="60"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Infinite Scrolling?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to display a "Show More" button to load more results instead of using traditional pagination?
+                        ]]>
+                    </comment>
+                </field>
+                <field id="hide_pagination" translate="label comment" type="select" sortOrder="70" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Hide Pagination for Single Page Results</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Hide Pagination if there is only one page in the results
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="instant_redirects" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <comment>
+                    <![CDATA[
+                      <p>
+                        Algolia allows you to <a href="https://www.algolia.com/doc/guides/managing-results/rules/merchandising-and-promoting/how-to/redirects" target="_blank">redirect users</a>
+                        to a specific page of your website or mobile app based on a query or a set of conditions.
+                      </p>
+                    ]]>
+                </comment>
+                <label>Redirects</label>
+                <attribute type="expanded">1</attribute>
+                <field id="enable" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable redirects</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            When enabled, InstantSearch powered pages can be redirected to a different URL based on rules configured in either the Dashboard or Merchandising Studio.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="options" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Redirect options</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Block\Adminhtml\System\Config\Form\Field\Checkboxes</frontend_model>
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\Checkboxes</backend_model>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\InstantSearchRedirectOptions</source_model>
+                    <depends><field id="enable">1</field></depends>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_products" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Products</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="products" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Products</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                        ]]>
+                </comment>
+                <field id="product_additional_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attributes</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\SortOrderProduct</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <model>Algolia\AlgoliaSearch\Model\Config\AttributesComment</model>
+                    </comment>
+                </field>
+                <field id="custom_ranking_product_attributes" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ranking</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\CustomRankingProduct</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Configure attributes for <a target="_blank" href="https://www.algolia.com/doc/guides/managing-results/must-do/custom-ranking/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link">Custom Ranking</a> - for example, an attribute that reflects popularity of a product (eg. stock status, number of sales).
+                            <br><span class="algolia-config-warning">&#9888;</span> Do not forget to reindex the Algolia Search Products indexer after you've modified this panel.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="use_adaptive_image" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Replace default image by matching variation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            When a customer searches for a "blue dress", Algolia will display the image associated with the blue variation instead of the default picture.
+                            The same happens when a customer refines products by any color.
+                            <br><br>If a customer searches for "blue dress" and refines by "red" color, Algolia will display images for the red (refined) color.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="enable_visual_merchandising" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable visual merchandising support</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            If enabled, products will be indexed into Algolia with a compatible category data format that supports advanced merchandising features
+                            such as visual rules and the new Merchandising Studio.
+                            <br><br>
+                            <strong>NOTE:</strong> After enabling, you must run a full product reindex to ensure that the attribute data is properly applied to your storefront catalog.
+                            Merchandising Studio is only available on Premium plans.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="category_page_id_attribute_name" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category page ID attribute</label>
+                    <comment>
+                        <![CDATA[
+                            Specify the name of the attribute that will contain your <a href="https://www.algolia.com/doc/guides/managing-results/rules/merchandising-and-promoting/how-to/merchandising-category-pages/#configure-the-visual-editor-for-category-merchandising" target="_blank">category page ID</a>. Default is <code>categoryPageId</code>.
+                        ]]>
+                    </comment>
+                    <validate>required-entry validate-data</validate>
+                    <depends>
+                        <field id="enable_visual_merchandising">1</field>
+                    </depends>
+                </field>
+                <field id="include_non_visible_products_in_index" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Include non visible products in index</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Include non visible products in index. Default value is <strong>No</strong>
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_categories" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Categories</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="categories" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Categories</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                        ]]>
+                </comment>
+                <field id="category_additional_attributes" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Attributes</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\SortOrderCategory</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Specify a category's attributes your users can search on (searchable).
+                            The order of the searchable attributes matters: a query matching the first searchable attribute of a category will put this category before the others in the results.<br><br>
+                            Searchable attributes' documentation: <a target="_blank" href="https://www.algolia.com/doc/integration/magento-2/how-it-works/indexing/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link#searchable-attributes-1">Categories's searchable attributes</a>
+                            <br><span class="algolia-config-warning">&#9888;</span> Do not forget to reindex the Algolia Search Categories indexer after you've modified this panel.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="custom_ranking_category_attributes" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Ranking</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\CustomRankingCategory</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Configure attributes for <a target="_blank" href="https://www.algolia.com/doc/guides/managing-results/must-do/custom-ranking/?utm_source=magento&utm_medium=extension&utm_campaign=magento_2&utm_term=shop-owner&utm_content=doc-link">Custom Ranking</a> - for example, an attribute that reflects popularity of a category (eg. products count, total number of sales of the category).
+                            <br><span class="algolia-config-warning">&#9888;</span> Do not forget to reindex the Algolia Search Categories indexer after you've modified this panel.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="show_cats_not_included_in_navigation" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show categories not included in navigation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to display all categories in both the autocomplete menu and InstantSearch results page ignoring the "Include in navigation menu" setting?
+                        ]]>
+                    </comment>
+                </field>
+                <field id="index_empty_categories" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Index empty categories?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to display all categories in both the autocomplete menu and InstantSearch results page ignoring if they contain products or not?
+                        ]]>
+                    </comment>
+                </field>
+                <field id="category_separator" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Category separator</label>
+                    <validate>required-entry</validate>
+                    <comment>
+                        <![CDATA[
+                            The separator is used when serializing category data to your Algolia index and is used to build hierarchical facets and for visual merchandising rules.
+                            You should use a separator that is unlikely to occur within your category data. <strong>Spaces matter!</strong> Default is " /// ".
+
+                            <br><span class="algolia-config-warning">&#9888;</span> Do not forget to reindex the Algolia Search Products indexer after you've modified this value.
+
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_recommend" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Recommend Products Settings</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="recommend" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Algolia Recommend Products Settings</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                        ]]>
+                </comment>
+                <group id="frequently_bought_together" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Frequently Bought Together</label>
+                    <field id="is_frequently_bought_together_enabled" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable On PDP</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want the Frequently Bought Together products to display inside a product detail page after main product info?
+                                <br><span class="algolia-config-warning">&#9888;</span> Enabling Frequently Bought Together products can potentially break your design on PDP page and some work will be required to have a good integration with your theme.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_frequently_bought_together_enabled_in_cart_page" translate="label comment" type="select" sortOrder="1.5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable On Cart Page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want the Frequently Bought Together products to display inside a shopping cart page?
+                                <br><span class="algolia-config-warning">&#9888;</span> Enabling Frequently Bought Together products can potentially break your design on shopping cart page and some work will be required to have a good integration with your theme.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="title" translate="label comment" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <validate>required-entry</validate>
+                        <label>Title</label>
+                    </field>
+                    <field id="num_of_frequently_bought_together_products" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                        <label>Number of Products</label>
+                        <comment>
+                            <![CDATA[
+                            How many products do you want to display in the Frequently Bought Together? Default value is 6.
+                        ]]>
+                        </comment>
+                    </field>
+                    <field id="is_addtocart_enabled" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Add To Cart Button</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                            Do you want to display an "Add To Cart" button in Frequently Bought Together products?
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_remove_core_upsell_products_block" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Remove The Magento Upsell Products Block</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                            Do you want to remove the magento default upsell products inside a product detail page?
+                        ]]>
+                        </comment>
+                        <depends>
+                            <field id="is_frequently_bought_together_enabled">1</field>
+                        </depends>
+                    </field>
+                </group>
+                <group id="related_product" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Related Products</label>
+                    <field id="is_related_products_enabled" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable On PDP</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want the Related Products to display inside a product detail page after main product info?
+                                <br><span class="algolia-config-warning">&#9888;</span> Enabling Related Products can potentially break your design on PDP page and some work will be required to have a good integration with your theme.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_related_products_enabled_in_cart_page" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable on Cart Page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want the Related Products to display inside a shopping cart page?
+                                <br><span class="algolia-config-warning">&#9888;</span> Enabling Related Products can potentially break your design on shopping cart page and some work will be required to have a good integration with your theme.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="title" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <validate>required-entry</validate>
+                        <label>Title</label>
+                    </field>
+                    <field id="num_of_related_products" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                        <label>Number of Related Products</label>
+                        <comment>
+                            <![CDATA[
+                                How many products do you want to display in the Related Products? Default value is 6.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_addtocart_enabled" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Add To Cart Button</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                            Do you want to display an "Add To Cart" button in Related Products?
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_remove_core_related_products_block" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Remove The Magento Related Products Block</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want to remove the magento default Related Products inside a product detail page?
+                            ]]>
+                        </comment>
+                        <depends>
+                            <field id="is_related_products_enabled">1</field>
+                        </depends>
+                    </field>
+                </group>
+                <group id="trends_item" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Trending Items</label>
+                    <field id="is_trending_items_enabled_on_pdp" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable on PDP</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want the Trending Items to display inside a product detail page after main product info?
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_trending_items_enabled_on_cart_page" translate="label comment" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable on Cart Page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want the Trending Items to display inside a cart page after cart item info?
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_trending_items_enabled" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Trending Items Widgets</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <validate>required-entry</validate>
+                        <label>Title</label>
+                    </field>
+                    <field id="facet_name" translate="label comment" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Facet Name</label>
+                        <comment>
+                            <![CDATA[
+                                Please Input Valid facet attribute name EX:- color,size etc.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="facet_value" translate="label comment" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Facet Value</label>
+                        <comment>
+                            <![CDATA[
+                                Please Enter Valid Facet Value.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="num_of_trending_items" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Number of Trending Items</label>
+                        <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                        <comment>
+                            <![CDATA[
+                                How many products do you want to display in the Trending Items? Default value is 6.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_addtocart_enabled" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Add To Cart Button</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                            Do you want to display an "Add To Cart" button in Trending Items?
+                            ]]>
+                        </comment>
+                    </field>
+                </group>
+                <group id="looking_similar" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Looking Similar</label>
+                    <field id="is_looking_similar_enabled_on_pdp" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable on PDP</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want Looking Similar Items to display inside a product detail page after main product info?
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_looking_similar_enabled_on_cart_page" translate="label comment" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable on Cart Page</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                                Do you want Looking Similar Items to display inside a cart page after cart item info?
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_looking_similar_enabled" translate="label comment" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Looking Similar Widgets</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="title" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <validate>required-entry</validate>
+                        <label>Title</label>
+                    </field>
+                    <field id="num_of_products" translate="label comment" type="text" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Number of products to display</label>
+                        <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                        <comment>
+                            <![CDATA[
+                                How many Looking Similar Products do you want to display? Default value is 6.
+                            ]]>
+                        </comment>
+                    </field>
+                    <field id="is_addtocart_enabled" translate="label comment" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Add To Cart Button</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[
+                            Do you want to display an "Add To Cart" button in Looking Similar Items?
+                            ]]>
+                        </comment>
+                    </field>
+                </group>
+            </group>
+        </section>
+        <section id="algoliasearch_images" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Images</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="image" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Images</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                     ]]>
+                </comment>
+                <field id="width" translate="label comment" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Width</label>
+                </field>
+                <field id="height" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Height</label>
+                    <comment>
+                        <![CDATA[
+                            You can specify the size of the images used on the InstantSearch results page.<br>
+                            If your images are already present in some size, eg. 265x265, Algolia's index job may not have to resize those, potentially saving time and resources.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="type" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Type</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\ImageType</source_model>
+                    <comment>
+                        <![CDATA[
+                            What type of image do you want to display on the InstantSearch results page.
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_queue" translate="label" type="text" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Indexing Queue / Cron</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="queue" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Indexing Queue / Cron</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                        ]]>
+                </comment>
+                <field id="active" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Indexing Queue</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <model>Algolia\AlgoliaSearch\Model\Config\EnableQueueComment</model>
+                    </comment>
+                </field>
+                <field id="use_built_in_cron" translate="label comment" type="select" sortOrder="15" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Use Magento built-in cron</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            This configuration will add <code>algolia_queue_process</code> jobs to the Magento <code>cron_schedule</code> table according to the specified cron expression.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="cron_expr" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\QueueCron</backend_model>
+                    <label>Cron expression</label>
+                    <comment>
+                        <![CDATA[
+                            Enter a valid cron expression such as <code>*/5 * * * *</code> to process the queue every 5 minutes. You can also use aliases like <code>@hourly</code>.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="active">1</field>
+                        <field id="use_built_in_cron">1</field>
+                    </depends>
+                </field>
+                <field id="number_of_job_to_run" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of jobs to run each time the cron is run</label>
+                    <comment>
+                        <![CDATA[
+                            Number of queued jobs to run each time the cron is launched. Default value is 5.
+                            <br><span class="algolia-config-warning">&#9888;</span> Each time the cron runs it will process ("Max number of element per indexing job" * "Number of jobs to run each time the cron is run")
+                            products.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="number_of_retries" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Number of times to retry processing of queued jobs</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\RetryValues</source_model>
+                    <comment>
+                        <![CDATA[
+                           Defines the number of times that the queue tries to process a job.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+                <field id="use_tmp_index" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Use a temporary index for full products reindex</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            This configuration defines if a temporary index suffixed by <code>_tmp</code> will be used for products full reindex. If you set it to "No", product updates will be sent directly to your production index.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_indexing_manager" translate="label" type="text" sortOrder="66" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Indexing Manager</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="algolia_indexing" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Enable Algolia indexing</label>
+                <attribute type="expanded">1</attribute>
+                <field id="enable_indexing" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Indexing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want the Algolia extension to push your data to Algolia?<br>
+                            The benefit here is that Algolia will manage to keep your data up to date.
+                            If you choose "No", you will need to push and manage your data in a different way.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="enable_query_suggestions_index" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Query Suggestions Index</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want the Algolia extension to push your search terms/suggestions to Algolia?<br>
+                            If you choose "No", _suggestion indexes will not be created.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable_indexing">1</field>
+                    </depends>
+                </field>
+                <field id="enable_pages_index" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Pages Index</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want the Algolia extension to push your CMS Pages to Algolia?<br>
+                            If you choose "No", _pages indexes will not be created.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable_indexing">1</field>
+                    </depends>
+                </field>
+            </group>
+            <group id="full_indexing" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Full indexing via Magento indexers</label>
+                <depends>
+                    <field id="algoliasearch_indexing_manager/algolia_indexing/enable_indexing">1</field>
+                </depends>
+                <attribute type="expanded">1</attribute>
+                <comment>
+                    <![CDATA[
+                         <p><span class="algolia-config-warning">&#9888;</span> Since version 3.18.0, the following Magento indexers are disabled for <strong>full indexing</strong>.
+                         The extension will continue to rely on them for reindexing specific entities with Magento materialized views or entity save events if you do so.</p>
+                         <p>If you want to perform full reindexing, we highly suggest to keep this configuration <strong>disabled</strong> and run the newly created CLI commands instead.</p>
+                    ]]>
+                </comment>
+                <field id="products" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Products Indexer (algolia_products)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:products</code> instead
+                        ]]>
+                    </comment>
+                </field>
+                <field id="categories" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Categories Indexer (algolia_categories)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:categories</code> instead
+                        ]]>
+                    </comment>
+                </field>
+                <field id="pages" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Pages Indexer (algolia_pages)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:pages</code> instead
+                        ]]>
+                    </comment>
+                </field>
+                <field id="suggestions" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Suggestions Indexer (algolia_suggestions)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:suggestions</code> instead
+                        ]]>
+                    </comment>
+                </field>
+                <field id="additional_sections" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Additional Sections Indexer (algolia_additional_sections)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:additional_sections</code> instead
+                        ]]>
+                    </comment>
+                </field>
+                <field id="delete_products" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Delete Products Indexer (algolia_delete_products)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:delete_products</code> instead
+                        ]]>
+                    </comment>
+                </field>
+                <field id="queue" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Enable Algolia Queue Runner (algolia_queue_runner)</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            We highly recommend to run <code>bin/magento algolia:reindex:process_queue</code> instead
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_cc_analytics" translate="label" type="text" sortOrder="67" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label><![CDATA[Click & Conversion Analytics]]></label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="cc_analytics_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label><![CDATA[Click & Conversion Analytics]]></label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                    ]]>
+                </comment>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Click Analytics</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <model>Algolia\AlgoliaSearch\Model\Config\EnableClickAnalyticsComment</model>
+                    </comment>
+                </field>
+                <field id="is_selector" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DOM selector of a result container on the InstantSearch page</label>
+                    <comment>
+                        <![CDATA[
+                            The element must contain attributes <code>data-objectid</code>, <code>data-indexname</code>, <code>data-position</code>, and <code>data-queryid</code>.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="conversion_analytics_mode" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Conversion Analytics</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\ConversionAnalyticsMode</source_model>
+                    <comment>
+                        <![CDATA[
+                            Conversion is tracked when a product was found and clicked in search results and then added to cart / ordered. </br></br>
+
+                            If conversion is tracked, URL parameters will be appended to your searched product links. The <code>queryID</code> parameter is required for insights to tie a conversion event to a search. For best SEO practice, we recommend you to use canonical links for your product pages. You can enable this setting by going to <strong>Stores > Configuration > Catalog > Catalog > Search Engine Optimization > Use Canonical Link Meta Tag For Products</strong>.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="add_to_cart_selector" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>DOM selector of "Add to Cart" buttons</label>
+                    <comment>
+                        <![CDATA[
+                            The element has to contain attribute <code>data-objectid</code> or a <code>productId</code> variable needs to be specified
+                            in a "frontend" <code>algoliaConfig</code> variable.
+                            <br><br>
+                            More selectors separated by comma (<code>,</code>).
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="conversion_analytics_mode" separator=",">add_to_cart,all</field>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+
+        <section id="algoliasearch_personalization" translate="label" type="text" sortOrder="68" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Personalization</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="personalization_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Tracked data</label>
+                <comment>
+                    <![CDATA[
+                            <p>Please select what events we should track. Don't forget to save your preferences afterwards.</p>
+                            <p>The Algolia extension for Magento will implement it automatically for you, no extra coding required.</p>
+                        ]]>
+                </comment>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Personalization</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <group id="personalization_view_events_group" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>View events</label>
+                    <attribute type="expanded">1</attribute>
+                    <comment>
+                        <![CDATA[
+                            View event tracking is based on default Magento behaviors.
+                        ]]>
+                    </comment>
+                    <field id="view_product" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>View a product page</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[]]></comment>
+                    </field>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </group>
+
+                <group id="personalization_click_events_group" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Click events</label>
+                    <attribute type="expanded">1</attribute>
+                    <comment>
+                        <![CDATA[
+                            Event tracking is based on default Magento behaviors and components. If you are using a specific component that
+                            is not Magento native, please specify its DOM selector, so Algolia should know where what to target for this event.
+                        ]]>
+                    </comment>
+
+                    <field id="product_clicked" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Product clicked</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                    </field>
+                    <field id="product_clicked_selector" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
+                        <depends>
+                            <field id="product_clicked">1</field>
+                        </depends>
+                    </field>
+
+                    <field id="product_recommended_clicked" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Product recommendation clicked</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                    </field>
+                    <field id="product_recommended_clicked_selector" translate="label comment" type="text" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>DOM selector</label>
+                        <frontend_model>Algolia\AlgoliaSearch\Block\System\Form\Field\PersonalizationSelector</frontend_model>
+                        <depends>
+                            <field id="product_recommended_clicked">1</field>
+                        </depends>
+                    </field>
+
+                    <field id="filter_clicked" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Facet clicked</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This event will track when a filter has been selected from instantsearch.]]></comment>
+                    </field>
+
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </group>
+
+                <group id="personalization_conversion_events_group" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Conversion events</label>
+                    <attribute type="expanded">1</attribute>
+                    <comment>
+                        <![CDATA[
+                            Conversion event tracking is based on default Magento behavior and will fire after dispatched events mentioned.
+                        ]]>
+                    </comment>
+                    <field id="conversion_wishist_add" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Product added to wishlist</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This conversion event fires on the dispatched event `wishlist_product_add_after`.]]></comment>
+                    </field>
+                    <field id="conversion_cart_add" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Product added to cart</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This conversion event fires on the dispatched event `checkout_cart_product_add_after`.]]></comment>
+                    </field>
+                    <field id="conversion_order_placed" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Place order</label>
+                        <source_model>Algolia\AlgoliaSearch\Model\Source\PersonalizationTracking</source_model>
+                        <comment><![CDATA[This conversion event fires on the dispatched event `checkout_onepage_controller_success_action`.]]></comment>
+                    </field>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </group>
+            </group>
+        </section>
+
+        <section id="algoliasearch_analytics" translate="label" type="text" sortOrder="69" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Google Analytics</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="analytics_group" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Google Analytics</label>
+                <comment>
+                    <![CDATA[
+                        <div class="algolia-admin-content"></div>
+                    ]]>
+                </comment>
+                <field id="enable" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Google Analytics</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="delay" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Delay (in milliseconds)</label>
+                    <comment>
+                        <![CDATA[
+                            When the search bar is used, each keystroke triggers a search in Algolia. It’s really good for an instantsearch and as-you-type search experience, but it’s not good for analytics as it brings a lot of noise to the analytics. The delay defines how long the extension should wait before pushing data to GA.
+                            <br>
+                            Default value is 3000.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="trigger_on_ui_interaction" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Trigger the push function before the delay on UI interaction</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                        If a user selects a search result even before the push was triggered (because of the delay), the push to GA might never be called.
+                        With this parameter you can trigger a data push to GA when the user interacts with a search result during the delay.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="push_initial_search" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Trigger the push function after the initial search</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Sometimes your customers come directly to a search page from a link, so a search is triggered automatically without any action from the user.
+                            At the same time, the load of the page triggers standard GA code to track the page view.
+                            By this parameter you can specify if you want to trigger a data push on this kind of search scenario.
+                        ]]>
+                    </comment>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+
+        <section id="algoliasearch_advanced" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Advanced</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="advanced" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Advanced</label>
+                <attribute type="expanded">1</attribute>
+                <field id="remove_words_if_no_result" translate="label comment" type="select" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Remove Words If No Result</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\RemoveWords</source_model>
+                    <comment>
+                        <![CDATA[
+                            By default, Algolia performs "AND" queries between words, which can lead to no results pages when queries are too long or too detailed. To avoid this, you can select among the following options:<br>
+                            <b>LastWords</b>: when a query does not return any result, the last word will be considered as optional and the query will be automatically performed again (the process is repeated with the n-1 word, n-2 word, ... until there is results).<br>
+                            <b>FirstWords</b>: when a query does not return any result, the first word will be considered as optional and the query will be automatically performed again (the process is repeated with the second word, third word, ... until there is results).<br>
+                            <b>allOptional</b>: when a query does not return any result, all words will be optional.
+                            None: No specific processing is done when a query does not return any result. <br>
+                        ]]>
+                    </comment>
+                </field>
+                <field id="partial_update" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Partial Updates</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to use <code>partialUpdateObjects</code> instead of <code>addObjects</code>?<br>
+                            You should enable this option if you want to update only some attributes of your records from an external source without overriding Magento data.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="customer_groups_enable" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Customer Groups</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\EnableCustomerGroups</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to take into account customer groups and display the price of the logged-in group instead of the default price?
+                            <br><span class="algolia-config-warning">&#9888;</span> If you want to sort by the  <code>price</code> attribute on the InstantSearch results page, this option will create a replica index for each customer group, thereby multiplying the amount of records in Algolia.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="fpt_enable" translate="label comment" type="select" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable FPT</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to take into account Fixed Product Tax (FPT) configured on your products?
+                            <br><span class="algolia-config-warning">&#9888;</span> The extension will only take into account global FPT per country (state scoped FPT are not supported).
+                        ]]>
+                    </comment>
+                </field>
+                <field id="remove_pub_dir_in_url" translate="label comment" type="select" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Remove pub/ from image URLs</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want to replace an image URL like <code>example.com/<b>pub/</b>media/image.jpg</code> by <code>example.com/media/image.jpg</code>?<br>
+                            Activate this if your server is set to use the <code>pub/</code> directory as a root directory.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="remove_branding" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Remove branding logo</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="index_product_on_category_products_update" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Update products in changed category?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Do you want the extension to automatically update the product index when a category is changed?
+                        ]]>
+                    </comment>
+                </field>
+                <field id="non_castable_attributes" translate="label comment" type="text" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Product numeric textfield attributes</label>
+                    <frontend_model>Algolia\AlgoliaSearch\Model\Source\ProductAttributes</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>
+                        <![CDATA[
+                            Choose here the textfield/non-castable attributes that you don't want to be turned into numeric values (i.e. : if you don't want "00123" turned into "123" or "34567834545672" turned into "345678E+2")
+                        ]]>
+                    </comment>
+                </field>
+                <field id="number_of_element_by_page" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>validate-digits</validate>
+                    <label>Maximum number of records sent per indexing request</label>
+                    <comment>
+                        <![CDATA[
+                            Default value is 1000.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="max_record_size_limit" translate="label comment" type="text" sortOrder="96" showInDefault="1">
+                    <label>Max record size limit per record</label>
+                    <comment>
+                        <![CDATA[
+                            By default, the Algolia extension has a record size limit of 10 kB per record.
+                            If your Algolia plan allows a higher record size limit, you can customize the record size limit.]]>
+                    </comment>
+                </field>
+                <field id="max_replicas_limit" translate="label comment" type="text" sortOrder="97" showInDefault="1">
+                    <label>Maximum number of replicas per index</label>
+                    <comment>
+                        <![CDATA[
+                            By default, the Algolia extension allows the creation of 20 replicas per index.
+                            If your Algolia plan allows a higher number of replicas, you can increase it.]]>
+                    </comment>
+                </field>
+                <field id="analytics_region" translate="label comment" type="select" sortOrder="99" showInDefault="1">
+                    <label>Analytics Region</label>
+                    <source_model>Algolia\AlgoliaSearch\Model\Source\AnalyticsRegion</source_model>
+                </field>
+                <field id="connection_timeout" translate="label comment" type="text" sortOrder="100" showInDefault="1">
+                    <label>Connection Timeout (In Seconds)</label>
+                </field>
+                <field id="read_timeout" translate="label comment" type="text" sortOrder="105" showInDefault="1">
+                    <label>Read Timeout (In Seconds)</label>
+                </field>
+                <field id="write_timeout" translate="label comment" type="text" sortOrder="110" showInDefault="1">
+                    <label>Write Timeout (In Seconds)</label>
+                </field>
+                <field id="forward_to_replicas" translate="label comment" type="select" sortOrder="115" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Forward index settings to replicas</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            When this configuration is enabled, settings that are changed in Algolia on the primary index will also be forwarded to its replica indices. It is enabled by default.
+                            <br><br>
+                            The ability to disable this behavior is retained for legacy implementations, but it is highly recommended that you leave this setting enabled especially if you are using dynamic facets.
+                        ]]>
+                    </comment>
+                </field>
+                <field id="auto_price_indexing" translate="label comment" type="select" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable automatic price indexing</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <model>Algolia\AlgoliaSearch\Model\Config\AutomaticPriceIndexingComment</model>
+                    </comment>
+                </field>
+                <field id="enable_profiler" translate="label comment" type="select" sortOrder="130" showInDefault="1">
+                    <label>Enable Profiler</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                           You can use the Magento Profiler with Algolia but you must first enable it here.
+                           It is intended to help diagnose where bottlenecks may be occurring within your indexing process.
+                           Do not leave profiling enabled as it can slow down indexing operations significantly.
+                        ]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="queue" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Indexing Queue</label>
+                <attribute type="expanded">1</attribute>
+                <comment>
+                    <![CDATA[
+                            These advanced settings will only apply if the Indexing Queue is enabled.
+                            Indexing Queue is enabled under the "Indexing Queue / Cron" tab.
+                      ]]>
+                </comment>
+                <field id="archive_clear_limit" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Archive log clean limit</label>
+                    <comment>
+                        <![CDATA[
+                            (In days - default value is 30) Sets the limit when the oldest records should be cleared from the archive logs (algoliasearch_queue_archive).
+                        ]]>
+                    </comment>
+                </field>
+                <field id="enhanced_archive" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable enhanced archive</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[
+                            Useful for debugging. Algolia archives failed jobs by default. Enable this setting to archive all jobs that are processed by the indexing queue and to obtain and preserve the stack trace for jobs created.
+                        ]]>
+                        <model>Algolia\AlgoliaSearch\Model\Config\QueueArchiveComment</model>
+                    </comment>
+                    <depends>
+                        <field id="active">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+        <section id="algoliasearch_extra_settings" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Advanced Algolia indices settings</label>
+            <tab>algolia</tab>
+            <resource>Algolia_AlgoliaSearch::algolia_algoliasearch</resource>
+            <group id="extra_settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Advanced Algolia indices settings</label>
+                <comment>
+                    <![CDATA[
+                    <p>Here, you can specify additional Algolia indices settings which can be applied only programatically via one of Algolia API clients.</p>
+
+                    <p>
+                    To set settings, please fill the right textarea with JSON where you specify the settings.<br>
+                    Example: <code>{"exactOnSingleWordQuery":"word"}</code>
+                    </p>
+                    <p><span class="algolia-config-warning">&#9888;</span> These settings will overwrite existing parameters, not add to them. Proceed to edit these settings only when you're sure what you're doing. Bad settings can effect your search functionality and have a bad impact on your relevance.</p>
+                    <br/>
+                    <div class="algolia-admin-content"></div>
+                ]]>
+                </comment>
+
+                <field id="products_extra_settings" translate="label comment" type="\Algolia\AlgoliaSearch\Model\Textarea" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\ExtraSettings</backend_model>
+                    <label>Products' indices settings</label>
+                    <attribute type="abrala" value="80">
+                        <value>90</value>
+                    </attribute>
+                </field>
+                <field id="categories_extra_settings" translate="label comment" type="\Algolia\AlgoliaSearch\Model\Textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\ExtraSettings</backend_model>
+                    <label>Categories' indices settings</label>
+                </field>
+                <field id="pages_extra_settings" translate="label comment" type="\Algolia\AlgoliaSearch\Model\Textarea" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\ExtraSettings</backend_model>
+                    <label>Pages' indices settings</label>
+                </field>
+                <field id="suggestions_extra_settings" translate="label comment" type="\Algolia\AlgoliaSearch\Model\Textarea" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\ExtraSettings</backend_model>
+                    <label>Suggestions' indices settings</label>
+                </field>
+                <field id="additional_sections_extra_settings" translate="label comment" type="\Algolia\AlgoliaSearch\Model\Textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <backend_model>Algolia\AlgoliaSearch\Model\Backend\ExtraSettings</backend_model>
+                    <label>Additional sections' indices settings</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

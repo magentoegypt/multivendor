@@ -1,0 +1,27 @@
+<?php
+/** @var \Algolia\AlgoliaSearch\Block\Widget\LookingSimilar $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$isEnabled = $block->isLookingSimilarEnabled();
+if ($isEnabled):
+    $lsContainer =  'lsItems' . $block->generateUniqueToken(); ?>
+    <div id="<?= $escaper->escapeHtmlAttr($lsContainer) ?>" class="lsItem recommend-component"></div>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Algolia_AlgoliaSearch/js/recommend" : {
+                    "recommendLSContainer" : "<?= $escaper->escapeJs($lsContainer) ?>",
+                    "numOfLookingSimilarItem" : "<?= $escaper->escapeJs($block->getData('numOfLookingSimilarItem')) ?>",
+                    "objectIDs" : JSON.parse('<?= $escaper->escapeJs($block->getProductIds()) ?>')
+                }
+            }
+        }
+    </script>
+    <script type="text/x-magento-init">
+        {
+            "[data-role=tocart-form]": {
+                "catalogAddToCart": {}
+            }
+        }
+    </script>
+<?php endif; ?>

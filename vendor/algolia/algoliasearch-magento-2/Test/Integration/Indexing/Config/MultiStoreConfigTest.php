@@ -1,0 +1,136 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Test\Integration\Indexing\Config;
+
+use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Algolia\AlgoliaSearch\Helper\Configuration\InstantSearchHelper;
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
+use Algolia\AlgoliaSearch\Test\Integration\Indexing\Config\Traits\ConfigAssertionsTrait;
+use Algolia\AlgoliaSearch\Test\Integration\Indexing\MultiStoreTestCase;
+
+/**
+ * @magentoDataFixture Magento/Store/_files/second_website_with_two_stores.php
+ */
+class MultiStoreConfigTest extends MultiStoreTestCase
+{
+    use ConfigAssertionsTrait;
+
+    const ADDITIONAL_ATTRIBUTE = 'additional_attribute';
+
+    public function testMultiStoreIndicesCreation()
+    {
+        $websites = $this->storeManager->getWebsites();
+        $stores = $this->storeManager->getStores();
+
+        // Check that stores and websites are properly created
+        $this->assertEquals(2, count($websites));
+        $this->assertEquals(3, count($stores));
+
+        foreach ($stores as $store) {
+            $this->setupStore($store, true);
+        }
+
+        $defaultStore = $this->storeRepository->get('default');
+        $fixtureSecondStore = $this->storeRepository->get('fixture_second_store');
+        $fixtureThirdStore = $this->storeRepository->get('fixture_third_store');
+
+        $indicesCreatedByTest = 0;
+
+        $indicesCreatedByTest += $this->countStoreIndices($defaultStore);
+        $indicesCreatedByTest += $this->countStoreIndices($fixtureSecondStore);
+        $indicesCreatedByTest += $this->countStoreIndices($fixtureThirdStore);
+
+        // Check that the configuration created the appropriate number of indices (7 (4 mains + 3 replicas per store => 3*7=21)
+        $this->assertEquals(21, $indicesCreatedByTest);
+
+        // Change category configuration at store level (attributes and ranking)
+        $attributesFromConfig = $this->configHelper->getCategoryAdditionalAttributes($defaultStore->getId());
+        $attributesFromConfigAlt = $attributesFromConfig;
+        $attributesFromConfigAlt[] = [
+            "attribute" => self::ADDITIONAL_ATTRIBUTE,
+            "searchable" => "1",
+            "order" => "unordered",
+            "retrievable" => "1",
+        ];
+
+        $this->setConfig(
+            path: ConfigHelper::CATEGORY_ATTRIBUTES,
+            value: json_encode($attributesFromConfigAlt),
+            scopeCode: $fixtureSecondStore->getCode())
+        ;
+
+        $rankingsFromConfig = $this->configHelper->getCategoryCustomRanking($defaultStore->getId());
+        $rankingsFromConfigAlt = $rankingsFromConfig;
+        $rankingsFromConfigAlt[] = [
+            "attribute" => self::ADDITIONAL_ATTRIBUTE,
+            "order" => "desc",
+        ];
+
+        $this->setConfig(
+            path: ConfigHelper::CATEGORY_CUSTOM_RANKING,
+            value: json_encode($rankingsFromConfigAlt),
+            scopeCode: $fixtureSecondStore->getCode())
+        ;
+
+        // Query rules check (activate one QR on the fixture store)
+        $facetsFromConfig = $this->configHelper->getFacets($defaultStore->getId());
+        $facetsFromConfigAlt = $facetsFromConfig;
+        foreach ($facetsFromConfigAlt as $key => $facet) {
+            if ($facet['attribute'] === "color") {
+                $facetsFromConfigAlt[$key]['create_rule'] = "1";
+                break;
+            }
+        }
+
+        $this->setConfig(
+            path:InstantSearchHelper::FACETS,
+            value: json_encode($facetsFromConfigAlt),
+            scopeCode: $fixtureSecondStore->getCode()
+        );
+
+        $this->indicesConfigurator->saveConfigurationToAlgolia(
+            $fixtureSecondStore->getId(),
+            false,
+            ['products', 'categories']
+        );
+
+        $defaultIndexOptions = $this->getIndexOptions('products', $defaultStore->getId());
+        $fixtureIndexOptions = $this->getIndexOptions('products', $fixtureSecondStore->getId());
+
+        $productHelper = $this->objectManager->get(ProductHelper::class);
+        $this->invokeMethod($productHelper, 'setFacetsQueryRules', [$defaultIndexOptions]);
+        $this->algoliaConnector->waitForAllCollectedTaskIds($defaultIndexOptions->getStoreId());
+
+        $this->invokeMethod($productHelper, 'setFacetsQueryRules', [$fixtureIndexOptions]);
+        $this->algoliaConnector->collectTaskIdToWaitFor($fixtureIndexOptions);
+        $this->algoliaConnector->waitForAllCollectedTaskIds($fixtureIndexOptions->getStoreId());
+
+        $defaultCategoryIndexOptions = $this->getIndexOptions('categories', $defaultStore->getId());
+        $defaultCategoryIndexSettings = $this->algoliaConnector->getSettings($defaultCategoryIndexOptions);
+
+        $fixtureCategoryIndexOptions = $this->getIndexOptions('categories', $fixtureSecondStore->getId());
+        $fixtureCategoryIndexSettings = $this->algoliaConnector->getSettings($fixtureCategoryIndexOptions);
+
+        $attributeFromConfig = 'unordered(' . self::ADDITIONAL_ATTRIBUTE . ')';
+        $this->assertNotContains($attributeFromConfig, $defaultCategoryIndexSettings['searchableAttributes']);
+        $this->assertContains($attributeFromConfig, $fixtureCategoryIndexSettings['searchableAttributes']);
+
+        $rankingFromConfig = 'desc(' . self::ADDITIONAL_ATTRIBUTE . ')';
+        $this->assertNotContains($rankingFromConfig, $defaultCategoryIndexSettings['customRanking']);
+        $this->assertContains($rankingFromConfig, $fixtureCategoryIndexSettings['customRanking']);
+
+        $defaultProductIndexRules = $this->algoliaConnector->searchRules($defaultIndexOptions);
+        $fixtureProductIndexRules = $this->algoliaConnector->searchRules($fixtureIndexOptions);
+
+        // Check that the Rule has only been created for the fixture store
+        $this->assertEquals(0, $defaultProductIndexRules['nbHits']);
+        $this->assertEquals(1, $fixtureProductIndexRules['nbHits']);
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->setConfig(InstantSearchHelper::IS_ENABLED, 0);
+    }
+}

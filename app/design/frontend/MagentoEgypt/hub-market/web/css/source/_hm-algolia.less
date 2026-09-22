@@ -1,0 +1,218 @@
+//
+//  Algolia InstantSearch — Arabic mirroring and theme chrome
+//  _____________________________________________
+//
+//  Algolia ships its own Bootstrap-era float grid (view/frontend/web/css/grid.css:
+//  #algolia-left-container is .col-md-3, #algolia-right-container is .col-md-9, both
+//  `float: left`) plus algolia-reset.css. None of it knows this theme exists, and its
+//  stylesheets are added by the extension's own layout handle — so they can land AFTER
+//  styles-m/styles-l in the head.
+//
+//  Every rule below is therefore anchored on #algolia_instant_selector, an ID. That
+//  out-specifies Algolia's class-level rules no matter which file the browser reads
+//  last, which is the only ordering guarantee available here.
+//
+
+#algolia_instant_selector {
+
+    //  Facet column and results column, in the theme's own surface treatment rather
+    //  than the extension's unstyled default.
+    #algolia-left-container {
+        .ais-Panel {
+            border: 1px solid var(--hm-border-subtle);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            background: var(--hm-background);
+        }
+
+        .ais-Panel-header {
+            font-weight: 700;
+            color: var(--hm-text-strong, #1a1a2e);
+            text-transform: none;
+            border-bottom: 1px solid var(--hm-border-subtle);
+        }
+    }
+
+    //  Orange, not navy. The accent is the brand's action colour across this theme and
+    //  a previous pass had a neutral primary rejected twice — see the PDP button note.
+    .ais-Pagination-item--selected .ais-Pagination-link,
+    .ais-ClearRefinements-button:not(.ais-ClearRefinements-button--disabled) {
+        background: var(--hm-accent);
+        border-color: var(--hm-accent);
+        color: #fff;
+    }
+
+    .ais-RefinementList-labelText,
+    .ais-HierarchicalMenu-label {
+        color: var(--hm-text, #3d4759);
+    }
+}
+
+//
+//  Arabic
+//  _____________________________________________
+//
+//  `html:lang(ar)` and NOT [dir='rtl']. This storefront renders <html lang="ar"> with
+//  no dir attribute at all, so every [dir='rtl'] rule in the codebase matches nothing.
+//  Verified against the live Arabic category page before writing this.
+//
+html:lang(ar) {
+
+    #algolia_instant_selector {
+
+        //  The two columns are physically floated by Algolia's grid. Left-floating them
+        //  in Arabic puts the facet rail on the wrong edge and pushes the results grid
+        //  away from the content column — the same failure mode as the blank theme's
+        //  .actions-toolbar floats on the login form.
+        .row > [class*='col-'] {
+            float: right;
+        }
+
+        //  Algolia's reset leaves these physically aligned.
+        #algolia-left-container,
+        #algolia-right-container,
+        .ais-Panel-header,
+        .ais-Stats,
+        .ais-Hits-item,
+        .ais-InfiniteHits-item {
+            text-align: right;
+        }
+
+        //  Counts and checkboxes sit to the logical *start* of their label. Algolia
+        //  spaces them with physical margins, which collapse to the wrong side here.
+        .ais-RefinementList-count,
+        .ais-HierarchicalMenu-count {
+            margin-left: 0;
+            margin-right: 0.4em;
+        }
+
+        .ais-RefinementList-checkbox {
+            margin-left: 0.5em;
+            margin-right: 0;
+        }
+
+        //  Pagination reads right-to-left; the list itself is a flex row in Algolia's
+        //  CSS, so the items need reversing rather than re-floating.
+        .ais-Pagination-list {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+        }
+
+        //  The price slider stays LTR: a numeric range is not mirrored in Arabic
+        //  typography, and flipping it would put the low handle on the high end.
+        .ais-RangeSlider,
+        .ais-RangeInput {
+            direction: ltr;
+        }
+    }
+}
+
+//
+//  InstantSearch results grid → the theme's product-item grid
+//  _____________________________________________
+//
+//  hit.phtml (overridden in this theme) now emits `.product-item /
+//  .product-item-info / .product-item-photo / .price-box`, so the card itself is
+//  already styled by _hm-product-item.less. What is left is the LIST: that <ol>
+//  belongs to InstantSearch and carries Algolia's own float-grid classes, not
+//  `.products-grid .product-items`. These rules restate the grid container so the
+//  cards lay out exactly as they do on the homepage rails and the old PLP.
+//
+#algolia_instant_selector {
+
+    .ais-Hits-list,
+    .ais-InfiniteHits-list {
+        //  Same track sizing as `.products-grid .product-items` in
+        //  _hm-product-item.less. Kept as literal values rather than an :extend
+        //  because that rule set is emitted under a different parent and LESS
+        //  cannot extend across it without dragging the parent selector along.
+        display: grid;
+        gap: var(--hm-space-4);
+        grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        //  Algolia clears its float grid with `content: ' '` on ::after. The
+        //  moment this list becomes a grid container that pseudo-element is a
+        //  GRID ITEM, and it renders as an empty cell at the end of every page
+        //  of results — the same failure as the `.row`/`.clearfix` case.
+        &::after {
+            content: none;
+        }
+    }
+
+    .ais-Hits-item,
+    .ais-InfiniteHits-item {
+        //  The <li> is the grid track; the card inside it does the styling.
+        float: none;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        width: auto;
+
+        //  `.product-item-info` is `block-size: 100%`, so every ancestor between
+        //  it and the track has to pass the height through or cards in a row
+        //  stop matching heights.
+        > .product-item {
+            block-size: 100%;
+        }
+
+        //  Algolia greys EVERY link inside a hit on hover (#666). The card's own
+        //  treatment — border + shadow on .product-item-info — should be the only
+        //  hover affordance, and the title must keep the theme's link colour.
+        a:hover {
+            color: inherit;
+        }
+    }
+
+    //  Upstream's leftovers. Nothing emits these any more, but Algolia's
+    //  stylesheet still ships rules for them (centred prices, grey tocart), and
+    //  they would win if a future extension upgrade reintroduces the markup.
+    .result-wrapper {
+        padding: 0;
+    }
+}
+
+//
+//  Image box for JS-rendered hits
+//  _____________________________________________
+//
+//  Magento's PHP listing emits a per-product inline <style> next to every card:
+//
+//      .product-image-container-2368 { width:240px; aspect-ratio:240/300 }
+//      .product-image-container-2368 span.product-image-wrapper { height:100%; width:100% }
+//
+//  That inline rule is what gives `.product-image-wrapper` its height, and
+//  `_hm-product-item.less` then sizes the <img> at `block-size: 100%` OF it.
+//  A hit rendered by InstantSearch has no such inline block — there is no PHP
+//  pass to write one — so the container, the wrapper and the image all resolved
+//  to height 0 and every card showed a blank box above the title, even though
+//  the <img> itself had loaded (265x265 natural).
+//
+//  `.product-item-photo` already carries `aspect-ratio: 1/1` from the theme, so
+//  the box has a height; these two rules just pass it down the chain.
+//
+#algolia_instant_selector {
+
+    .ais-Hits-item,
+    .ais-InfiniteHits-item {
+
+        .product-image-container,
+        .product-image-wrapper {
+            block-size: 100%;
+            display: block;
+            inline-size: 100%;
+        }
+
+        //  Matches _hm-product-item.less: cover, not contain, so the card grid
+        //  stays flush regardless of the source image's aspect.
+        img.product-image-photo {
+            block-size: 100%;
+            inline-size: 100%;
+            object-fit: cover;
+            position: static;
+        }
+    }
+}

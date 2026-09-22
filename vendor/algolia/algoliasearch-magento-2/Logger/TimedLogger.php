@@ -1,0 +1,60 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Logger;
+
+use Algolia\AlgoliaSearch\Api\LoggerInterface;
+use Algolia\AlgoliaSearch\Exception\DiagnosticsException;
+use Monolog\Logger;
+
+class TimedLogger
+{
+    /** @var string[]  */
+    protected array $timers = [];
+
+    public function __construct(
+        protected LoggerInterface $logger
+    )
+    {}
+
+    public function start(string $action, bool $separator): void
+    {
+        if ($separator) {
+            $this->log('');
+            $this->log('');
+        }
+
+        $this->log('>>>>> BEGIN ' . $action);
+        $this->timers[$action] = microtime(true);
+    }
+
+    /**
+     * @throws DiagnosticsException
+     */
+    public function stop(string $action, bool $separator): void
+    {
+        if (false === isset($this->timers[$action])) {
+            throw new DiagnosticsException(__('Algolia Logger => non existing action'));
+        }
+
+        $this->log('<<<<< END ' . $action . ' (' . $this->formatTime($this->timers[$action], microtime(true)) . ')');
+
+        if ($separator) {
+            $this->log('');
+            $this->log('');
+        }
+    }
+
+    /**
+     * NOTE: Switch to Monolog\Level once MAGE 2.4.7 is no longer supported.
+     */
+    public function log(string $message, int $logLevel = Logger::INFO, array $context = []): void
+    {
+        $this->logger->log($logLevel, $message, $context);
+    }
+
+    private function formatTime($begin, $end): string
+    {
+        return ($end - $begin) . 'sec';
+    }
+
+}

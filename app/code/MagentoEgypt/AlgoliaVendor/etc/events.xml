@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Every hook is one of Algolia's own documented events, so nothing here is a
+ * plugin on, or a preference for, an Algolia class. An extension upgrade can
+ * therefore not silently strip the seller out of the index without also
+ * removing its own public API.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="algolia_before_products_collection_load">
+        <observer name="magentoegypt_algolia_exclude_inactive_sellers"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\ExcludeInactiveSellerProducts"/>
+    </event>
+    <event name="algolia_after_create_product_object">
+        <observer name="magentoegypt_algolia_add_seller_data"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerData"/>
+    </event>
+    <event name="algolia_products_index_before_set_settings">
+        <observer name="magentoegypt_algolia_add_seller_facet"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerFacet"/>
+    </event>
+</config>

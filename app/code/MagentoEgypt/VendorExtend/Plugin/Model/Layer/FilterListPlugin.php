@@ -6,13 +6,14 @@ namespace MagentoEgypt\VendorExtend\Plugin\Model\Layer;
 use Magento\Catalog\Model\Layer;
 use Magento\Catalog\Model\Layer\Category as CategoryLayer;
 use Magento\Catalog\Model\Layer\FilterList;
+use Magento\Catalog\Model\Layer\Search as SearchLayer;
 use Magento\Framework\ObjectManagerInterface;
 use MagentoEgypt\VendorExtend\Model\Layer\Filter\Availability;
 use MagentoEgypt\VendorExtend\Model\Layer\Filter\Rating;
 use MagentoEgypt\VendorExtend\Model\Layer\Filter\Vendor;
 
 /**
- * Appends the three QA03 item 2-A filters to the category panel.
+ * Appends the three QA03 item 2-A filters to the category AND search panels.
  *
  * `FilterList::getFilters()` builds the category filter and then one filter per
  * filterable ATTRIBUTE; there is no hook for a filter that is not an attribute,
@@ -36,9 +37,25 @@ class FilterListPlugin
      */
     public function afterGetFilters(FilterList $subject, array $result, Layer $layer): array
     {
-        //  Category pages only. The search results page has its own panel and
-        //  was not part of this ticket.
-        if (!$layer instanceof CategoryLayer) {
+        /*
+         * Category AND search. Originally category-only, on the grounds that the
+         * search results page "has its own panel" — but that panel is built from
+         * the same FilterList, so it simply rendered without these three while the
+         * category page had them. The two pages disagreed, which is what this
+         * reverses.
+         *
+         * Safe on the search layer specifically because none of the three touch
+         * the layer's type, and AbstractIdFilter::apply() writes its id list onto
+         * the collection's own SELECT rather than through addFieldToFilter() —
+         * the search layer's collection is a fulltext collection, and
+         * addFieldToFilter() on one of those pushes `entity_id` into the
+         * OpenSearch criteria, where it is accepted and then silently dropped.
+         * That is the same reason the category collection needed the SELECT
+         * route, so the mechanism already handles this case.
+         *
+         * Other layers (a widget's, a vendor microsite's) still return early.
+         */
+        if (!$layer instanceof CategoryLayer && !$layer instanceof SearchLayer) {
             return $result;
         }
 

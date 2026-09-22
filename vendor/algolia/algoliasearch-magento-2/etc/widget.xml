@@ -1,0 +1,37 @@
+<?xml version="1.0" ?>
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:helloworld:Magento_Widget:etc/widget.xsd">
+    <widget class="Algolia\AlgoliaSearch\Block\Widget\TrendsItem" id="algoliasearch_recommend_trends_item">
+        <label>Algolia Recommend Trending Items</label>
+        <description>You can allow Algolia Recommend Trending items to appear anywhere you want</description>
+        <parameters>
+            <parameter name="numOfTrendsItem" sort_order="10" visible="true" xsi:type="text">
+                <label>Number Of Trends Items</label>
+                <description>How many products do you want to display in the Trending Items?.</description>
+                <value>6</value>
+            </parameter>
+            <parameter name="facetName" sort_order="20" visible="true" xsi:type="text">
+                <label>Facet Name</label>
+                <description>Please Input Valid facet attribute name EX:- color,size etc.</description>
+            </parameter>
+            <parameter name="facetValue" sort_order="30" visible="true" xsi:type="text">
+                <label>Facet Value</label>
+                <description>Please Enter Valid Facet Value.</description>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget class="Algolia\AlgoliaSearch\Block\Widget\LookingSimilar" id="algoliasearch_looking_similar_item">
+        <label>Algolia Looking Similar Items</label>
+        <description>You can allow Algolia Looking Similar items to appear anywhere you want</description>
+        <parameters>
+            <parameter name="numOfLookingSimilarItem" sort_order="10" visible="true" xsi:type="text">
+                <label>Number Of Looking Similar Items</label>
+                <description>How many products do you want to display in the Looking Similar Items?.</description>
+                <value>6</value>
+            </parameter>
+            <parameter name="productIds" sort_order="20" visible="true" xsi:type="text">
+                <label>Product Ids (separated by commas)</label>
+                <description>Which product(s) should be taken as reference ? (mandatory if you don't plan to use this widget on a product page or on the cart page) </description>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>

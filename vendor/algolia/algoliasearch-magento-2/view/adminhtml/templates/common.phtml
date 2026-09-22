@@ -1,0 +1,95 @@
+<?php
+/** @var \Magento\Backend\Block\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \Algolia\AlgoliaSearch\ViewModel\Adminhtml\Common $viewModel */
+
+$viewModel = $block->getViewModel();
+
+$ajaxCheckUrl = $block->getUrl('algolia_algoliasearch/landingpage/checkUrl');
+$ajaxCheckQuery = $block->getUrl('algolia_algoliasearch/query/checkQuery');
+
+$applicationId = $viewModel->getApplicationId();
+?>
+<script>
+var applicationId = "<?= $escaper->escapeJs($applicationId) ?>";
+var ajaxCheckUrl = "<?= $escaper->escapeJs($ajaxCheckUrl) ?>";
+var ajaxCheckQuery = "<?= $escaper->escapeJs($ajaxCheckQuery) ?>";
+document.addEventListener("DOMContentLoaded", function(event) {
+  requirejs([
+    'jquery',
+    'Magento_Ui/js/lib/validation/validator',
+    'mage/translate'
+  ], function ($, validator, mage) {
+    'use strict';
+
+      $(".close-box").click(function() {
+        $(this).parent().hide();
+      });
+
+      validator.addRule(
+        'validate-query-usage',
+        function (value) {
+          var isValid = true;
+          var storeId = $('select[name="store_id"]').val();
+          var queryId = $('input[name="query_id"]').val();
+
+          var checkUrl = ajaxCheckQuery;
+
+          // Only check if the focus is not on the search
+          if ($(':focus').attr('name') != 'query_text') {
+            $.ajax({
+              url: checkUrl,
+              method: 'POST',
+              data: {'store_id': storeId, 'query_text': value, 'query_id': queryId},
+              async: false,
+              complete: function (transport) {
+                var response = JSON.parse(transport.responseText);
+                isValid = response.isValid;
+              }
+            });
+          }
+
+          return isValid;
+        },
+        $.mage.__('This query is already connected to another query rule. Please enter a different query or edit the existing one.')
+      );
+
+      validator.addRule(
+        'validate-algolia-index',
+        function (value) {
+
+          if (typeof window.algoliaSearchConfig.indexDataByStoreIds[value]== "undefined") {
+            return false;
+          }
+
+          return true;
+        },
+        $.mage.__('The index corresponding to the store you selected doesn\'t exist.')
+      );
+
+        validator.addRule(
+            'validate-url-unicity',
+            function (value) {
+                var isValid = false;
+                var storeId = $('select[name="store_id"]').val();
+                var landingPageId = $('input[name="landing_page_id"]').val();
+                var checkUrl = ajaxCheckUrl;
+
+                $.ajax({
+                  url: checkUrl,
+                  method: 'POST',
+                  data: {'store_id': storeId, 'url_key': value, 'landing_page_id': landingPageId},
+                  async: false,
+                  complete: function (transport) {
+                    var response = JSON.parse(transport.responseText);
+                    isValid = response.isValid;
+                  }
+                });
+
+                return isValid;
+            },
+            $.mage.__('This URL key is already in use. Please find another one.')
+        );
+  });
+});
+</script>

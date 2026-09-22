@@ -162,6 +162,7 @@ return array(
     'ReCaptcha\\' => array($vendorDir . '/google/recaptcha/src/ReCaptcha', $vendorDir . '/phpfui/recaptcha/src/ReCaptcha'),
     'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),
     'Ramsey\\Collection\\' => array($vendorDir . '/ramsey/collection/src'),
+    'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
     'Psr\\Http\\Client\\' => array($vendorDir . '/psr/http-client/src'),
@@ -676,6 +677,7 @@ return array(
     'Amasty\\CheckoutDeliveryDate\\' => array($vendorDir . '/amasty/module-checkout-delivery-date'),
     'Amasty\\CheckoutCore\\' => array($vendorDir . '/amasty/module-one-step-checkout-core'),
     'Amasty\\Base\\' => array($vendorDir . '/amasty/base'),
+    'Algolia\\AlgoliaSearch\\' => array($vendorDir . '/algolia/algoliasearch-magento-2', $vendorDir . '/algolia/algoliasearch-client-php/lib'),
     'AdobeStock\\Api\\' => array($vendorDir . '/astock/stock-api-libphp/src'),
     'AESKW\\' => array($vendorDir . '/spomky-labs/aes-key-wrap/src'),
 );

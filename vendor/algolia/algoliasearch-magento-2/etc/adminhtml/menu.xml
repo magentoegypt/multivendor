@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add
+            id="Algolia_AlgoliaSearch::manage"
+            title="Algolia Search"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="999"
+            parent="Magento_Backend::stores"
+            resource="Magento_Backend::stores"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::credentials"
+            title="Credentials and Basic Setup"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="10"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="adminhtml/system_config/edit/section/algoliasearch_credentials"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::autocomplete"
+            title="Autocomplete Menu"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="20"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="adminhtml/system_config/edit/section/algoliasearch_autocomplete"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::instant"
+            title="InstantSearch Results Page"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="30"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="adminhtml/system_config/edit/section/algoliasearch_instant"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::queue"
+            title="Indexing Queue"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="50"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/queue/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::reindex"
+            title="Reindex SKU(s)"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="90"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/reindex/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::manager"
+            title="Indexing Manager"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="93"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/indexingmanager/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::merchandising"
+            title="Merchandising"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="95"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/merchandising/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::analytics"
+            title="Analytics Overview"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="110"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/analytics/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+        <add
+            id="Algolia_AlgoliaSearch::support"
+            title="Help &amp; Support"
+            translate="title"
+            module="Algolia_AlgoliaSearch"
+            sortOrder="120"
+            parent="Algolia_AlgoliaSearch::manage"
+            action="algolia_algoliasearch/support/index"
+            resource="Algolia_AlgoliaSearch::manage"
+        />
+    </menu>
+</config>

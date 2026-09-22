@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Teaches the official Algolia extension about Vnecoms sellers.
+ *
+ * Stock Algolia has no concept of a marketplace: every product in the catalogue
+ * is indexed and nothing in the record says who sells it. This module closes
+ * both gaps through Algolia's own event API, so no Algolia class is overridden
+ * and an extension upgrade cannot silently drop the behaviour.
+ *
+ * No setup_version. This module has no schema and no data patches, and
+ * declaring a version it never installs makes DbStatusValidator 500 the whole
+ * storefront until setup:upgrade is run.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_AlgoliaVendor">
+        <sequence>
+            <module name="Algolia_AlgoliaSearch"/>
+            <module name="Vnecoms_Vendors"/>
+        </sequence>
+    </module>
+</config>

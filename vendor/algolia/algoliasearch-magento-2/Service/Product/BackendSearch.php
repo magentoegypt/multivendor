@@ -1,0 +1,88 @@
+<?php
+
+namespace Algolia\AlgoliaSearch\Service\Product;
+
+use Algolia\AlgoliaSearch\Api\Data\SearchQueryInterfaceFactory;
+use Algolia\AlgoliaSearch\Api\Product\ProductRecordFieldsInterface;
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\Helper\ConfigHelper;
+use Algolia\AlgoliaSearch\Helper\Entity\ProductHelper;
+use Algolia\AlgoliaSearch\Service\AlgoliaConnector;
+use Magento\Framework\Exception\NoSuchEntityException;
+
+class BackendSearch
+{
+    public function __construct(
+        protected ConfigHelper                $configHelper,
+        protected ProductHelper               $productHelper,
+        protected AlgoliaConnector            $algoliaConnector,
+        protected IndexOptionsBuilder         $indexOptionsBuilder,
+        protected SearchQueryInterfaceFactory $searchQueryFactory,
+    ){}
+
+    /**
+     * @param string $query
+     * @param int $storeId
+     * @param array|null $searchParams
+     * @param string|null $targetedIndex
+     * @return array
+     * @throws AlgoliaException|NoSuchEntityException
+     * @internal This method is intended primarily for integration testing and not for the search experience
+     */
+    public function getSearchResult(string $query, int $storeId, ?array $searchParams = null, ?string $targetedIndex = null): array
+    {
+        $indexOptions = $targetedIndex !== null ?
+            $this->indexOptionsBuilder->buildWithEnforcedIndex($targetedIndex, $storeId) :
+            $this->indexOptionsBuilder->buildEntityIndexOptions($storeId);
+
+        $numberOfResults = 1000;
+        if ($this->configHelper->isInstantEnabled()) {
+            $numberOfResults = min($this->configHelper->getNumberOfProductResults($storeId), 1000);
+        }
+
+        $facetsToRetrieve = [];
+        foreach ($this->configHelper->getFacets($storeId) as $facet) {
+            $facetsToRetrieve[] = $facet['attribute'];
+        }
+
+        $params = [
+            'hitsPerPage'            => $numberOfResults, // retrieve all the hits (hard limit is 1000)
+            'attributesToRetrieve'   => AlgoliaConnector::ALGOLIA_API_OBJECT_ID,
+            'attributesToHighlight'  => '',
+            'attributesToSnippet'    => '',
+            'numericFilters'         => [sprintf('%s=1', ProductRecordFieldsInterface::VISIBILITY_SEARCH)],
+            'removeWordsIfNoResults' => $this->configHelper->getRemoveWordsIfNoResult($storeId),
+            'analyticsTags'          => 'backend-search',
+            'facets'                 => $facetsToRetrieve,
+            'maxValuesPerFacet'      => 100,
+        ];
+
+        if (is_array($searchParams)) {
+            $params = array_merge($params, $searchParams);
+        }
+
+        $response = $this->algoliaConnector->query($this->searchQueryFactory->create([
+            'indexOptions' => $indexOptions,
+            'query' => $query,
+            'params' => $params,
+        ]));
+        $answer = reset($response['results']);
+
+        $data = [];
+
+        foreach ($answer['hits'] as $i => $hit) {
+            $productId = $hit[AlgoliaConnector::ALGOLIA_API_OBJECT_ID];
+
+            if ($productId) {
+                $data[$productId] = [
+                    'entity_id' => $productId,
+                    'score' => $numberOfResults - $i,
+                ];
+            }
+        }
+
+        $facetsFromAnswer = $answer['facets'] ?? [];
+
+        return [$data, $answer['nbHits'], $facetsFromAnswer];
+    }
+}

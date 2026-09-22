@@ -1,0 +1,102 @@
+{
+    "algoliasearch_queue": {
+        "column": {
+            "job_id": true,
+            "pid": true,
+            "class": true,
+            "method": true,
+            "data": true,
+            "max_retries": true,
+            "retries": true,
+            "error_log": true,
+            "data_size": true,
+            "created": true,
+            "is_full_reindex": true,
+            "locked_at": true,
+            "debug": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "algoliasearch_queue_log": {
+        "column": {
+            "id": true,
+            "started": true,
+            "duration": true,
+            "processed_jobs": true,
+            "with_empty_queue": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "algoliasearch_queue_archive": {
+        "column": {
+            "archive_id": true,
+            "pid": true,
+            "class": true,
+            "method": true,
+            "data": true,
+            "error_log": true,
+            "data_size": true,
+            "created_at": true,
+            "retries": true,
+            "is_full_reindex": true,
+            "success": true,
+            "debug": true,
+            "processed_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "algoliasearch_landing_page": {
+        "column": {
+            "landing_page_id": true,
+            "store_id": true,
+            "url_key": true,
+            "is_active": true,
+            "title": true,
+            "meta_title": true,
+            "meta_description": true,
+            "meta_keywords": true,
+            "content": true,
+            "query": true,
+            "configuration": true,
+            "custom_js": true,
+            "custom_css": true,
+            "date_from": true,
+            "date_to": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "algoliasearch_query": {
+        "column": {
+            "query_id": true,
+            "store_id": true,
+            "query_text": true,
+            "is_active": true,
+            "banner_image": true,
+            "banner_url": true,
+            "banner_alt": true,
+            "banner_content": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "quote_item": {
+        "column": {
+            "algoliasearch_query_param": true
+        }
+    },
+    "sales_order_item": {
+        "column": {
+            "algoliasearch_query_param": true
+        }
+    }
+}

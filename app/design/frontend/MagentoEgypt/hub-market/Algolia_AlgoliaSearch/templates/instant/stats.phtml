@@ -1,0 +1,37 @@
+<?php
+/**
+ * Algolia InstantSearch stats line — Arabic-safe.
+ *
+ * Overrides Algolia_AlgoliaSearch::instant/stats.phtml for ONE reason: upstream
+ * writes the single-result branch as `__('result') found`, leaving "found"
+ * outside the translation call. On the Arabic storefront that renders
+ * "١ نتيجة found". Folding it into one key `result found` makes the whole
+ * phrase translatable.
+ *
+ * Everything else is byte-identical to upstream deliberately, so a diff against
+ * the vendor file shows exactly one change.
+ *
+ * The `in` / `out of` / `seconds` keys are NOT changed here. They are fixed in
+ * the theme dictionary with `,module,Algolia_AlgoliaSearch` scoping, because a
+ * bare "in" is already claimed globally as "بوصة" (inch) by
+ * MagentoEgypt/VendorExtend/i18n/ar_SA.csv, alongside cm/lb/kg. Scoping the
+ * override to this module leaves that units block alone.
+ *
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+<script type="text/template" id="instant-stats-template">
+    {{#hasOneResult}}<strong>1</strong> <?= $escaper->escapeHtml(__('result found')); ?>{{/hasOneResult}}
+
+    {{#hasManyResults}}
+        {{^hasNoResults}}{{first}}-{{last}} <?= $escaper->escapeHtml(__('out of')); ?>{{/hasNoResults}}
+        <strong>
+            <span itemprop="numberOfItems">{{nbHits}}</span>
+            <?= $escaper->escapeHtml(__('results found')); ?>
+        </strong>
+    {{/hasManyResults}}
+
+    {{^hasNoResults}}
+    <?= $escaper->escapeHtml(__('in')); ?> {{seconds}} <?= $escaper->escapeHtml(__('seconds')); ?>
+    {{/hasNoResults}}
+</script>

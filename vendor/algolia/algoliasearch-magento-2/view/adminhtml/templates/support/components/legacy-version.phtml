@@ -1,0 +1,13 @@
+<?php
+/** @var \Magento\Backend\Block\Template $block */
+?>
+<script>
+    var algoliaSearchExtentionsVersion = "<?= $escaper->escapeJs($block->getData('extension_version')); ?>"
+</script>
+
+<div class="legacy_version">
+    You’re running version <span id="current_version" class="version"></span> Algolia for Magento 2 extension.
+    The latest version is <span class="version latest_version"></span>.
+    Please update to <span class="version latest_version"></span> for new features and bug fixes that could solve your current issues.
+    <a href="https://www.algolia.com/doc/integration/magento-2/getting-started/upgrading/" target="_blank">How to update?</a>
+</div>
