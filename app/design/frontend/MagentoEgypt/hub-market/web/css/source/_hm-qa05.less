@@ -139,10 +139,16 @@ input.mobile-number {
 //
 //  Answered in LOGICAL values rather than with an `html:lang(ar)` flip, which
 //  is what _hm-qa04 settled on: `inline-start` IS left in English, so the
-//  English form does not move a pixel, and Arabic mirrors on its own. The
-//  padding and text-align go logical for the same reason — `end` keeps the
-//  label tucked against its input on both stores, which is how the English one
-//  already reads.
+//  English form does not move a pixel, and Arabic mirrors on its own.
+//
+//  THE LABEL'S OWN ALIGNMENT IS THE ONE THING THAT IS NOT A STRAIGHT MIRROR.
+//  The first cut used `text-align: end` throughout, on the reasoning that it
+//  keeps the label tucked against its input the way the English form reads.
+//  That is not what was asked for: the ticket says the description should sit
+//  "on the far right side with the fields next to it", i.e. pushed out to the
+//  OUTER edge of its column, not pulled in against the input. In Arabic that
+//  edge is `start`. English keeps `end`, which is blank's own `right` and
+//  leaves that form exactly as it was.
 //
 //  Left deliberately scoped to this page. The physical floats above are global
 //  and every form using that layout has the same defect in Arabic; sweeping
@@ -159,6 +165,13 @@ input.mobile-number {
     .fieldset > .field:not(.choice) > .control {
         float: inline-start;
     }
+}
+
+//  Arabic only — the label goes to the far edge, per the ticket. `html:lang(ar)`
+//  rather than `[dir='rtl']`: this store sets the language and never the dir
+//  attribute, so the attribute selector matches nothing.
+html:lang(ar) .customer-account-createpassword .fieldset > .field:not(.choice) > .label {
+    text-align: start;
 }
 
 //  ===========================================================================
@@ -743,4 +756,83 @@ input.mobile-number {
     &:focus {
         opacity: .65;
     }
+}
+
+//  ---------------------------------------------------------------------------
+//  Phone field follow-up — full width everywhere, and a country list that stays
+//  on the screen in Arabic
+//  ---------------------------------------------------------------------------
+//  Raised on the Arabic checkout after the TC35 direction fix above. Two things,
+//  both measured at a 1440 viewport with a physical product in the cart.
+//
+//  1. FULL WIDTH IN BOTH DIRECTIONS. intl-tel-input wraps the control in its own
+//     `.intl-tel-input`, which ships `display: inline-block` and shrink-wraps,
+//     so the field is only as wide as its content unless something says
+//     otherwise. This theme already says otherwise in THREE separate places —
+//     the login card (_hm-qa04), the registration/checkout mobile field
+//     (_hm-checkout) and the vendor form (_hm-qa02-recheck) — each repeating the
+//     same two declarations for one more form. Stated once here instead, so a
+//     form nobody has patched yet is full width the first time it is used.
+//     Checkout measured 783px in both stores before and after, so this changes
+//     nothing where a rule already existed; it only covers the ones that had
+//     none.
+//
+//     `padding-left` is PHYSICAL on purpose, and only inside the widget. The
+//     flag is pinned `left: 0` by intl-tel-input in BOTH directions — the note
+//     in _hm-checkout.less records that being verified in the Arabic checkout —
+//     so a logical `padding-inline-start` opens the gap on the wrong side in
+//     Arabic and leaves the digits sitting under the flag. Scoped to
+//     `.intl-tel-input input` because that is exactly the set of inputs that
+//     have a flag over them; a bare `input[type=tel]` elsewhere has none and
+//     must not be indented.
+.intl-tel-input {
+    display: block;
+    inline-size: 100%;
+
+    input {
+        box-sizing: border-box;
+        inline-size: 100%;
+        padding-left: 5.6rem;   // 46px of flag (allow-dropdown) plus 10px
+    }
+}
+
+//     The global rule above is (0,1,0) and the checkout is not a fair fight:
+//     this page styles its controls at (0,6,1) — `.hm-page.checkout-index-index
+//     .fieldset > .field .control input[type=...]` — and that file compiles
+//     after this one, so a single-class rule loses there however it is ordered.
+//     The shipping form's mobile control is therefore named outright, at
+//     (0,3,0), so the width holds on the one page the ticket was raised on.
+.checkout-index-index .sms-address-mobile-container .intl-tel-input {
+    inline-size: 100%;
+}
+
+//  2. THE COUNTRY LIST OPENED OFF THE SIDE OF THE SCREEN IN ARABIC.
+//
+//     Measured with the dropdown open, 1440 viewport:
+//
+//         English   list x=57   w=487  left: 1px    right edge 544   on screen
+//         Arabic    list x=-318 w=470  right: 1px   right edge 152   318px off
+//
+//     Those `left`/`right` values are USED values, not authored ones — the
+//     widget declares neither, so the browser resolved each from the list's
+//     static position inside `.flag-container`, which is its positioned
+//     ancestor. Under `direction: rtl` that static position is the container's
+//     RIGHT edge, so the list grew leftwards out of a box that is already hard
+//     against the left of the form and all but the last 152px fell outside the
+//     viewport. That is the clipped white panel in the screenshot.
+//
+//     So the fix belongs on the container, not the list. intl-tel-input pins
+//     `.flag-container` to the left in both directions (see note 1 above); the
+//     only thing still RTL about it is the inherited direction. Setting that to
+//     ltr makes the list resolve to `left: 1px` — byte for byte what English
+//     already computes — and the flag, the arrow, the country names and the
+//     `+20` dial codes all lay out LTR with it, so no second rule is needed on
+//     the list itself.
+//
+//     NOT gated to Arabic. This subtree is LTR in English already, so the rule
+//     is a no-op there — the same reasoning as the logical-property fixes
+//     elsewhere in this file, and it keeps one rule instead of two.
+.intl-tel-input.allow-dropdown .flag-container,
+.intl-tel-input.separate-dial-code .flag-container {
+    direction: ltr;
 }
