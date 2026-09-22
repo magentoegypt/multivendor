@@ -312,6 +312,47 @@ body.hm-seller {
         }
     }
 
+    //
+    //  Collapsible box header — ONE chevron, and one that actually moves
+    //  ---------------------------------------------
+    //  Vnecoms' collapsible panels carry BOTH class vocabularies on the same
+    //  elements — Magento admin's `.section-config > .admin__collapsible-block`
+    //  and AdminLTE's `.box-header > a.box-title` — and each brings its own
+    //  indicator, on a different pseudo-element:
+    //
+    //      styles-l/m  .section-config.active > .admin__collapsible-block > a:before   \f077  up
+    //      custom.css  .active .box-header a.box-title:after                           \f107  down
+    //
+    //  Both fire, so the corner renders an up-chevron immediately followed by a
+    //  down-chevron — the zigzag QA reported on Withdraw Funds. It is stock, not
+    //  ours: the same artefact is visible in the reference panel they compared
+    //  us against.
+    //
+    //  The second defect is subtler. Both rules key off `.section-config.active`,
+    //  an ANCESTOR that nothing ever toggles — so even with a single arrow it
+    //  would never move: the panel collapses and the chevron keeps pointing the
+    //  same way. Re-pointed at `aria-expanded` on the anchor itself, which is
+    //  the state the panel's own toggle maintains.
+    //
+    //  `body.hm-seller` for the reason this whole file uses it (see
+    //  vendors/layout/default.xml): both stock rules are (0,3,1), and one of
+    //  them lives in custom.css, whose position relative to this file is not
+    //  something to rely on. The prefix adds a class and an element and takes
+    //  the tie outright, without !important.
+    //
+    //  Only `content` is restated — the positioning and 25px sizing already on
+    //  that `:after` in custom.css are uncontested and still apply.
+    .section-config > .admin__collapsible-block > a.box-title {
+        &:before { content: none; }
+
+        &:after {
+            content: '\f077';   //  expanded
+            font-family: 'FontAwesome';
+        }
+
+        &[aria-expanded='false']:after { content: '\f078'; }   //  collapsed
+    }
+
     .box-body,
     .panel-body { padding: @hm-space-5; }
 
