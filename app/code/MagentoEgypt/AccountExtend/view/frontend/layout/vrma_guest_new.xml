@@ -19,6 +19,15 @@
             <block class="Magento\Framework\View\Element\Template"
                    name="hm.rma.form.key.js.vrma_guest_new"
                    template="MagentoEgypt_AccountExtend::html/rma-form-key.phtml"/>
+            <!--
+                CL036-TC36 second half — one message per state. The form said
+                "You must select item RMA" whether the items were still loading,
+                the order had nothing returnable, the request had failed, or the
+                customer simply had not ticked anything. See the template.
+            -->
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.rma.item.status.vrma_guest_new"
+                   template="MagentoEgypt_AccountExtend::html/rma-item-status.phtml"/>
         </referenceContainer>
     </body>
 </page>

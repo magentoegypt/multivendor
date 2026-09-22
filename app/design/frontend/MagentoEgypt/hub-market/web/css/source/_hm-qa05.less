@@ -836,3 +836,57 @@ html:lang(ar) .customer-account-createpassword .fieldset > .field:not(.choice) >
 .intl-tel-input.separate-dial-code .flag-container {
     direction: ltr;
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-TC36 second half — the RMA item list tells you which state it is in
+//  ---------------------------------------------------------------------------
+//  Four situations used to end at the same sentence, "You must select item RMA":
+//  the items were loading, the order had nothing returnable, the request had
+//  failed, or nothing had been ticked yet. Only the last of those is what that
+//  message actually means.
+//
+//  The element is created by rma-item-status.phtml next to the item list — and
+//  OUTSIDE it, because the list's whole container is replaced on every AJAX
+//  call, which is why Vnecoms' own three placeholder rows can never be seen.
+//
+//  Three readings, and they are distinguished by more than colour: the text
+//  says which state it is, and `role="status"` announces it. Colour alone would
+//  leave the difference invisible to a screen reader and to anyone who cannot
+//  separate the two hues.
+.hm-rma-status {
+    border-inline-start: 3px solid var(--hm-border-strong);
+    border-radius: var(--hm-radius-sm);
+    background: var(--hm-surface-muted);
+    color: var(--hm-foreground);
+    display: block;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    margin-block: var(--hm-space-3);
+    padding: var(--hm-space-3) var(--hm-space-4);
+
+    //  `hidden` is set on the element between states; blank's reset gives
+    //  several elements `display: block`, which beats the attribute.
+    &[hidden] {
+        display: none;
+    }
+}
+
+//  Loading is deliberately quiet — it is the expected path, not news.
+.hm-rma-status--loading {
+    border-inline-start-color: var(--hm-border-strong);
+    color: var(--hm-foreground-muted);
+}
+
+//  Nothing to return is an ANSWER, not a failure. It gets the informational
+//  treatment rather than the error one, because the order is fine and so is the
+//  customer — there is simply nothing eligible.
+.hm-rma-status--empty {
+    border-inline-start-color: var(--hm-accent);
+}
+
+//  Only a real failure reads as one, and this is the state that asks the
+//  customer to do something (choose the order again).
+.hm-rma-status--error {
+    border-inline-start-color: var(--hm-error, #c2410c);
+    color: var(--hm-error, #c2410c);
+}

@@ -1,0 +1,245 @@
+<?php
+/**
+ * Hub Market — RMA item list: one message per state, not one message for four.
+ *
+ * CL036-TC36 follow-up. The technical cause of "the products list does not
+ * appear" was a FORM_KEY ReferenceError that stopped the request ever being
+ * sent (see rma-form-key.phtml). This is the other half of that ticket: the
+ * form said the same thing whatever had happened.
+ *
+ * Four different situations all ended at "You must select item RMA":
+ *
+ *   1. the items are still loading
+ *   2. the order genuinely has nothing to return — Ajaxproduct only renders
+ *      items for an order in `processing` or `complete`, and answers 200 with
+ *      an EMPTY body for anything else, so a pending order looks identical to
+ *      a returnable one that happens to be slow
+ *   3. the request failed
+ *   4. the customer has simply not ticked anything yet  <- the only one that
+ *                                                          message is true for
+ *
+ * Vnecoms does ship three placeholder rows for some of this
+ * (#ves-items-noorder / #ves-items-noitems / #ves-items-error), but they live
+ * INSIDE the fragment that the AJAX call replaces — so they do not exist before
+ * the first load, and they are wiped by the very failure they describe. They
+ * can never show. The element below is created outside that container, so it
+ * survives every replacement.
+ *
+ * WHY A RESPONDER AND NOT AN OVERRIDE OF js.phtml.
+ * `findOrder()` lives in Vnecoms' new_request/js.phtml and closes over a local
+ * `formControl` that nothing outside the module can reach, so the function
+ * cannot be wrapped or replaced from here — it could only be copied, and that
+ * template is 400+ lines of Prototype we would then own forever. Prototype
+ * publishes `Ajax.Responders`, which fires for every request regardless of who
+ * issued it, so the states can be observed without touching their code.
+ *
+ * WHICH RESPONDER CALLBACKS ACTUALLY EXIST. Only `onCreate`, `onException` and
+ * the five ready-state names are dispatched to responders (prototype.js
+ * `respondToReadyState`); `onSuccess`/`onFailure` are per-request options and
+ * are NOT broadcast, so success and failure both have to be told apart inside
+ * `onComplete`. That is also the callback we want: Vnecoms' own onSuccess runs
+ * a few lines earlier in the same function, so the new markup is already in the
+ * DOM by the time we are called and the list can just be counted.
+ *
+ * IT ALSO RE-ENABLES THE ORDER SELECT. findOrder() disables the select on the
+ * way in and re-enables it only in onSuccess, so any failure left it disabled
+ * for good — the customer could not even retry the thing the error told them to
+ * retry. There is no reachable code path in Vnecoms that undoes that.
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ */
+?>
+<script>
+    require(['prototype'], function () {
+        'use strict';
+
+        var LIST_ID   = 'ves-list-product-order',
+            SELECT_ID = 'order_incremental_id',
+            STATUS_ID = 'hm-rma-status',
+            TIMEOUT   = 30000,
+            timer     = null;
+
+        var TEXT = {
+            loading: <?= /* @noEscape */ json_encode(__('Loading the items on this order…')) ?>,
+            empty:   <?= /* @noEscape */ json_encode(__('This order has no items available to return. Items can be returned once they have shipped, and only while the return window is open.')) ?>,
+            error:   <?= /* @noEscape */ json_encode(__('We could not load the items on this order. Please choose the order again to retry.')) ?>
+        };
+
+        /**
+         * The status element, created next to the item list the first time it
+         * is needed. Matched to its parent — the list is an <li> in the vendor
+         * template and a <tbody> in the base one, and a <div> before a <tbody>
+         * is invalid markup the browser would hoist out of the table.
+         */
+        function statusEl() {
+            var el = document.getElementById(STATUS_ID),
+                list = document.getElementById(LIST_ID),
+                anchor, parent, tag;
+
+            if (el) {
+                return el;
+            }
+
+            if (!list) {
+                return null;
+            }
+
+            anchor = list.tagName === 'TBODY' ? (list.closest('table') || list) : list;
+            parent = anchor.parentNode;
+
+            if (!parent) {
+                return null;
+            }
+
+            tag = (parent.tagName === 'UL' || parent.tagName === 'OL') ? 'li' : 'div';
+            el = document.createElement(tag);
+            el.id = STATUS_ID;
+            el.className = 'hm-rma-status';
+            //  Announced, because the whole point is that the customer was
+            //  never told what had happened.
+            el.setAttribute('role', 'status');
+            el.setAttribute('aria-live', 'polite');
+            el.hidden = true;
+            parent.insertBefore(el, anchor);
+
+            return el;
+        }
+
+        function setState(state) {
+            var el = statusEl();
+
+            if (!el) {
+                return;
+            }
+
+            if (!state) {
+                el.hidden = true;
+                el.textContent = '';
+                el.className = 'hm-rma-status';
+
+                return;
+            }
+
+            el.className = 'hm-rma-status hm-rma-status--' + state;
+            el.textContent = TEXT[state];
+            el.hidden = false;
+        }
+
+        function enableSelect() {
+            var sel = document.getElementById(SELECT_ID);
+
+            if (sel) {
+                sel.disabled = false;
+            }
+        }
+
+        function fail() {
+            clearTimer();
+            setState('error');
+            enableSelect();
+        }
+
+        function clearTimer() {
+            if (timer) {
+                window.clearTimeout(timer);
+                timer = null;
+            }
+        }
+
+        /**
+         * Only this module's call, and only one that names an order.
+         *
+         * Vnecoms observes the select unconditionally, so picking
+         * "---Select an order---" back fires findOrder('') — a real request
+         * that answers 200 with an empty body. Without the second test that
+         * would read as "this order has nothing to return" when in fact no
+         * order is selected at all. `parameters` is populated before onCreate
+         * dispatches, so it can be read on the way in as well as on the way
+         * out. A request with no `order` key at all is left alone rather than
+         * skipped, so a differently-shaped call still gets its states.
+         */
+        function isItemRequest(request) {
+            if (!request || !request.url || request.url.indexOf('ajaxproduct') === -1) {
+                return false;
+            }
+
+            if (request.parameters && 'order' in request.parameters) {
+                return !!request.parameters.order;
+            }
+
+            return true;
+        }
+
+        /**
+         * Read the HTTP status off the response rather than asking
+         * `request.success()`, which answers true for status 0 (`!status`) and
+         * would report a dropped connection as an order with no items.
+         */
+        function httpStatus(response) {
+            try {
+                return response && typeof response.status === 'number' ? response.status : 0;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        Ajax.Responders.register({
+            onCreate: function (request) {
+                if (!isItemRequest(request)) {
+                    return;
+                }
+
+                setState('loading');
+                clearTimer();
+
+                //  onComplete covers a request that comes back wrong; nothing in
+                //  Prototype covers one that never comes back at all, and this
+                //  host is slow enough for that to be a real state.
+                timer = window.setTimeout(fail, TIMEOUT);
+            },
+
+            onComplete: function (request, response) {
+                if (!isItemRequest(request)) {
+                    return;
+                }
+
+                var status = httpStatus(response),
+                    loaded;
+
+                if (!((status >= 200 && status < 300) || status === 304)) {
+                    fail();
+
+                    return;
+                }
+
+                clearTimer();
+
+                //  Vnecoms' own onSuccess has already written the markup by the
+                //  time responders run, so the list can be counted directly.
+                //  `.ves-items-count` is the per-item qty input — the same hook
+                //  their validator counts.
+                loaded = document.querySelectorAll('#' + LIST_ID + ' .ves-items-count').length;
+
+                setState(loaded > 0 ? null : 'empty');
+            },
+
+            onException: function (request) {
+                if (!isItemRequest(request)) {
+                    return;
+                }
+
+                fail();
+            }
+        });
+
+        //  Clearing the order back to the placeholder should clear the message
+        //  with it, rather than leaving the last order's answer on screen.
+        document.addEventListener('change', function (event) {
+            if (event.target && event.target.id === SELECT_ID && !event.target.value) {
+                clearTimer();
+                setState(null);
+            }
+        });
+    });
+</script>
