@@ -664,21 +664,59 @@ input.mobile-number {
 
     //  Card six: the disclosure. Its desktop heading is swapped for the
     //  mobile-only label the template adds beside it.
+    //
+    //  THIS CARD CAME BACK FROM THE CLIENT AS "settings icon not properly
+    //  appeared". Three separate things made the sixth cell not match the five
+    //  beside it, all of them blank's styling for a disclosure bar still
+    //  reaching an element that is now a card:
+    //
+    //    1. THE WRONG GLYPH. The first version used Lucide `settings-2`, which
+    //       is two sliders. The client's reference for this screen draws a
+    //       COG, like every other settings affordance. Swapped for Lucide
+    //       `settings`.
+    //    2. THE LABEL WAS 24px WITH 24px MARGINS. This block carries `block` as
+    //       well as `block-collapsible-nav`, and it sits in `.column.main`, so
+    //       blank's `.column.main .block .title strong { font-size: 24px }` and
+    //       `.block .title strong { margin: 2.4rem 0 }` both reached it —
+    //       "Settings" printed nearly twice the size of "My Orders", and 48px
+    //       of vertical margin inside an 88px card with `overflow: hidden`
+    //       shoved the icon off centre. That is what the screenshot shows. The
+    //       old rule set `font-weight` only, which is why it looked handled.
+    //    3. A LEFTOVER DISCLOSURE CHEVRON. `.block-collapsible-nav .title:after`
+    //       paints `\e622` from `icons-blank-theme` at `position: absolute;
+    //       right: 12px; top: 0; font-size: 28px` — the stray chevron in the
+    //       top corner of the card. None of the other five cells has one and
+    //       the reference does not draw one.
     .hm-page.account .block-collapsible-nav > .title {
-        //  The gear this card needs is not one of the per-link icons — those
-        //  are set by `hm-nav-link--*` classes and this bar is not a link. Same
+        //  The cog this card needs is not one of the per-link icons — those are
+        //  set by `hm-nav-link--*` classes and this bar is not a link. Same
         //  encoding and the same Lucide set as the rest of _hm-account.less;
         //  the stroke colour in the payload is irrelevant because it is used as
         //  a mask and takes its colour from `background-color` below.
-        --hm-nav-icon-settings: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M20 7h-9%22 /%3E %3Cpath d=%22M14 17H5%22 /%3E %3Ccircle cx=%2217%22 cy=%2217%22 r=%223%22 /%3E %3Ccircle cx=%227%22 cy=%227%22 r=%223%22 /%3E%3C/svg%3E");
+        //  (`hm-nav-link--settings` is NOT reusable here: that one is a PENCIL,
+        //  because it labels Account Information, which is an edit link.)
+        --hm-nav-icon-settings: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23000%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22%3E%3Cpath d=%22M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z%22 /%3E %3Ccircle cx=%2212%22 cy=%2212%22 r=%223%22 /%3E%3C/svg%3E");
 
         cursor: pointer;
         display: flex;
         order: 6;
 
+        //  blank's disclosure chevron. `content: none` rather than
+        //  `display: none` so the pseudo-element is never generated at all.
+        &::after { content: none; }
+
         > strong { font-weight: inherit; }
         > strong:not(.hm-acct-more__label) { display: none; }
-        > strong.hm-acct-more__label { display: block; }
+
+        //  Everything the card already sets, taken back from blank's
+        //  `.column.main .block .title strong` (0,3,0) and `.block .title
+        //  strong` (0,3,0). This selector is (0,5,0), so it wins on weight.
+        > strong.hm-acct-more__label {
+            display: block;
+            font-size: inherit;
+            line-height: inherit;
+            margin: 0;
+        }
 
         //  The gear, drawn the same way the link icons are.
         &::before {
