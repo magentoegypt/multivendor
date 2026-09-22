@@ -356,6 +356,34 @@ input.mobile-number {
 //  THE NAME PAIR IS CRAMPED. First Name and Last Name sit two-up at roughly
 //  140px each with the labels above them. blank pairs them at every width; on a
 //  phone they should stack, like every other field in the form already does.
+//
+//  THE FIRST FIX FOR THAT MISSED THE FORM IT WAS WRITTEN FOR. `.fields.group >
+//  .field` is blank's markup and the shipping step does not use it: _hm-checkout
+//  lays that step out as an explicit grid of its own,
+//
+//      #shipping-new-address-form { display: grid;
+//                                   grid-template-columns: repeat(6, 1fr) }
+//        > [name$='.firstname'], > [name$='.lastname']  { grid-column: span 3 }
+//        > [name$='.region_id'], > [name$='.region'],
+//        > [name$='.city'],      > [name$='.postcode']  { grid-column: span 2 }
+//
+//  with NO media query around it, so the desktop shape holds all the way down to
+//  320px. Two things follow, and both had to be got right:
+//
+//    1. A WIDTH CANNOT UNDO A `grid-column`. `inline-size: 100%` on a grid item
+//       is 100% OF ITS GRID AREA, not of the row, so even where the selector had
+//       matched the fields would not have moved. The span is the thing to change.
+//    2. The tester's SECOND screenshot boxes a third group the first fix never
+//       looked at — State/Province, City and Zip, running three-up.
+//
+//  Measured on the live checkout at 390px before this change: firstname and
+//  lastname 154px each side by side, region/city/postcode 97px each three-up,
+//  with the Zip label wrapping to two lines and its input dropping out of line
+//  with its neighbours. After: all six full width, one per row.
+//
+//  `grid-column: 1 / -1` rather than `span 6`, and on every direct `.field`
+//  rather than on the six named ones, so a field the template adds later is full
+//  width too and the rule does not depend on the column count staying at 6.
 @media screen and (max-width: 767px) {
     .checkout-index-index {
         .hm-steps,
@@ -375,13 +403,85 @@ input.mobile-number {
         }
 
         //  The pair blank builds with `.fields.group .field { width: 48% }`.
+        //  KEPT: it is still the right fix for any step that does use blank's
+        //  markup -- the billing form does, and has no grid of its own.
         .opc-wrapper .fieldset .fields.group > .field,
         .opc-wrapper .fieldset > .field.fullname > .fields > .field {
             float: none;
             inline-size: 100%;
             width: 100%;
         }
+
+        //  The shipping step's grid. (1,2,0) against the ID rule's (1,1,0):
+        //  this file is imported last so source order would already settle it,
+        //  but the rules being overridden are ID-scoped and weight is what does
+        //  not move if an import is ever reordered.
+        #shipping-new-address-form > .field {
+            grid-column: 1 / -1;
+        }
     }
+}
+
+//  ---------------------------------------------------------------------------
+//  item 9, third screenshot — the success page's "create an account" panel is
+//  cut off at the right edge
+//  ---------------------------------------------------------------------------
+//  The last shot filed under item 9 is a different page: the order-success
+//  screen, with "You can track your order status by creating an acco" running
+//  off the side mid-word. Not a wrapping problem and not the theme's:
+//
+//      #registration { border-left: 3px solid #f58c12; margin: 20px 0 25px;
+//                      padding: 0 0 0 12px; position: relative;
+//                      width: 600px }
+//
+//  A HARD-CODED 600px, from Amasty's One Step Checkout core
+//  (`module-one-step-checkout-core/.../module/_classic.less:497`), inside that
+//  file's `@media-common` block — so it compiles into styles-m.css at `media:
+//  all` and holds at every width. On a 390px phone the block is 600px wide and
+//  the 210px that do not fit are simply clipped; the orange rule down the left
+//  of the tester's screenshot is that `border-left`.
+//
+//  NOTE THE MODULE IS SWITCHED OFF. `amasty_checkout/general/enabled` is 0, so
+//  Amasty's checkout never renders — but a disabled module's stylesheet still
+//  ships, and this one styles a block Magento renders on its own. Disabling the
+//  module again will not fix it; the rule has to be answered.
+//
+//  NOT in a media query. 600px is wrong at any width narrower than about 640,
+//  and `inline-size: auto` with a 60rem cap resolves to exactly the same 600px
+//  wherever the container is wider — so desktop is byte-for-byte what it was and
+//  the block simply stops overflowing when it cannot fit.
+//
+//  Logical border and padding so the bar and its indent move to the right in
+//  Arabic; `html:lang(ar)` sets `direction: rtl`, which is what logical
+//  properties resolve against. The physical pair is reset alongside, because
+//  that is what is being overridden.
+//
+//  The bar also comes onto the palette. #f58c12 is Amasty's own amber, and it
+//  sits 8px from a `--hm-accent` "Create an Account" button — two oranges that
+//  are nearly but not quite the same read as a mistake. Revert this one
+//  declaration if the old amber was deliberate.
+//
+//  (1,1,0) against Amasty's (1,0,0). Source order alone would settle it — that
+//  rule lands at byte 158k of styles-m.css and this file's at 807k — but the
+//  body class is true (this block exists on no other page) and weight does not
+//  depend on where an import sits.
+//  `border: 0` AND NOT `border-left: 0`, and it has to come first. The pair
+//  was written the other way round at first -- `border-inline-start` then
+//  `border-left: 0` -- which is this file's alphabetical order and is WRONG
+//  here: in English `border-inline-start` IS `border-left`, so the reset landed
+//  on top of it and the bar disappeared altogether (measured: 3px -> 0px in
+//  English, correct only in Arabic, where the two map to opposite sides). The
+//  shorthand clears whichever side Amasty put it on, sorts before the logical
+//  longhand, and leaves the longhand to paint the one that is wanted. `padding`
+//  below is the same shape and was right by accident.
+.checkout-onepage-success #registration {
+    border: 0;
+    border-inline-start: 3px solid var(--hm-accent);
+    inline-size: auto;
+    max-inline-size: 60rem;
+    padding: 0;
+    padding-inline-start: var(--hm-space-3);
+    width: auto;
 }
 
 //  ---------------------------------------------------------------------------
