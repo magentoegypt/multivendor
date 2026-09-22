@@ -239,6 +239,34 @@ input.mobile-number {
 //  `height`/`min-height` are restated alongside the logical properties because
 //  the rules being overridden are physical, and mixing the two only works when
 //  specificity is on your side, which is the mistake the first attempt made.
+//  FOLLOW-UP: THE PANEL WAS NOT CENTRED. Reported after the height fix landed —
+//  "uneven left right in popup". `margin-inline: auto` below does centre the
+//  wrap, but it centres it inside a CONTAINER that is itself off-centre:
+//  blank ships
+//
+//      .modal-slide { left: 44px; z-index: 900 }
+//
+//  a slide-in panel's offset, meant to leave a strip of the page showing down
+//  one side. Measured at 390px with the dialog open: the panel sat 61px from
+//  the left edge and 16px from the right — 45px out, which is that 44px plus
+//  rounding. After: 20px and 19px.
+//
+//  `left`/`right` and NOT the logical pair. The value is 0, which has no
+//  handedness, and the declaration being overridden is physical — in Arabic
+//  `inset-inline-start` maps to `right` and would leave blank's `left: 44px`
+//  untouched, which is the same mistake this file has already recorded once on
+//  the success page's border.
+//
+//  (0,2,0) against `.modal-slide`'s (0,1,0); both classes are on the same
+//  element — the wrapper is `modal-popup otp-verify-modal modal-slide
+//  _inner-scroll _show`.
+@media screen and (max-width: 767px) {
+    .otp-verify-modal.modal-slide {
+        left: 0;
+        right: 0;
+    }
+}
+
 @media screen and (max-width: 767px) {
     .modal-popup.modal-slide._inner-scroll.otp-verify-modal .modal-inner-wrap,
     .otp-verify-modal .modal-inner-wrap {
