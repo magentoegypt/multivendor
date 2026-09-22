@@ -59,7 +59,20 @@ $panelId = 'hm-withdrawal-request-panel';
             </div>
             <fieldset class="config admin__collapsible-block"
                       id="<?= $block->escapeHtmlAttr($panelId) ?>">
-                <legend><?= $block->escapeHtml(__('Store Information')) ?></legend>
+                <legend><?= $block->escapeHtml(__('Withdrawal methods')) ?></legend>
+                <?php /*
+                    The reference panel opens with this sentence, and Vnecoms'
+                    <legend> is where it would naturally live — but the vendor
+                    area's custom.css carries `fieldset.config legend {display:
+                    none}`, and this fieldset is `class="config ..."`, so
+                    anything put there is invisible. That is also why the stock
+                    legend read "Store Information" on a withdrawal page for so
+                    long without anyone noticing. The legend keeps a sensible
+                    label for when that rule is not in play; the sentence the
+                    vendor actually needs to read goes in a paragraph that
+                    nothing hides.
+                */ ?>
+                <p class="hm-withdrawal-intro"><?= $block->escapeHtml(__('Choose a payment method below to request a withdrawal.')) ?></p>
                 <div class="form-horizontal">
                     <table class="table table-striped"><tbody>
                         <tr>
