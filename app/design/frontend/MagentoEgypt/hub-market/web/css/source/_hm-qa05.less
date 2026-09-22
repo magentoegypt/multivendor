@@ -890,3 +890,77 @@ html:lang(ar) .customer-account-createpassword .fieldset > .field:not(.choice) >
     border-inline-start-color: var(--hm-error, #c2410c);
     color: var(--hm-error, #c2410c);
 }
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.32 item 3 — order details: the tab strip and the item columns
+//  ---------------------------------------------------------------------------
+//  The ticket reads "the 'Invoices' word to go to the far right of the screen
+//  and we also need the description to be from right to left", which on its own
+//  is not actionable: the tabs ALREADY run right-to-left and "المنتجات
+//  المطلوبة" is already hard against the right edge, so "الفواتير" cannot go
+//  there too. The screenshot settles it. There are two marks on it:
+//
+//    1. a box round "الفواتير" with a thick arrow pointing LEFT, into the empty
+//       half of the strip — i.e. spread the tabs to opposite ends, not reorder
+//       them. "Far right" is the far END, described from an RTL reading.
+//    2. a box round the item table's column labels with an arrow pointing RIGHT,
+//       into the gap between where those labels stop and the card edge their
+//       own values reach.
+//
+//  Both marks are the same class of defect: a PHYSICAL property inherited from
+//  blank that happens to be correct in English and backwards in Arabic.
+
+//  1. THE TAB STRIP BUNCHED AT ONE END.
+//  `.order-links .item` carries blank's `margin-right: 20px`. In Arabic that
+//  hangs the gap off the wrong side of each tab, which is why the strip stopped
+//  20px short of its container: measured, the strip spans 15→375 but the first
+//  tab ended at 355. Made logical, so English maps straight back onto
+//  margin-right and nothing moves there.
+.order-links .item {
+    margin-right: 0;
+    margin-inline-end: 20px;
+}
+
+@media screen and (max-width: 639px) {
+    //  Spread only when there is something to spread. `.order-links:not(:has(>
+    //  li:nth-child(2)))` in _hm-qa03 hides a one-tab strip outright (a single
+    //  tab is just the section heading printed twice); this is its exact
+    //  complement, so the two never fight over `display`.
+    .order-links:has(> li:nth-child(2)) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--hm-space-2) var(--hm-space-4);
+        justify-content: space-between;
+
+        //  The 20px above would otherwise add to the distributed space and push
+        //  the end tab back off the edge — the very thing being fixed.
+        > .item {
+            margin-inline-end: 0;
+        }
+    }
+}
+
+//  2. THE COLUMN LABELS STOPPED SHORT OF THE EDGE.
+//  Below 639px this theme (_hm-qa04) turns each item row into a 3-column grid
+//  and prints the column label from `td::before`. blank then aligns the cells
+//  with `text-align: left` — physically — under
+//  `.order-items.table-wrapper .col.price` and friends. In English left IS the
+//  start edge, so the label sits over its value; in Arabic the grid runs
+//  right-to-left, so every label and figure was pinned to the far side of its
+//  own column. Measured on order 3000000097: the price column occupies
+//  257→358, but its content hugged 257, leaving the ~100px gap the screenshot
+//  draws an arrow into.
+//
+//  `start` rather than `right`: in English it resolves to left, which is what
+//  blank already did, so this changes nothing there. Subtotal is deliberately
+//  left out — _hm-qa04 already gives it `end` so the running total hugs the
+//  outer edge, which is the intended design in both directions.
+@media screen and (max-width: 639px) {
+    .order-details-items .order-items.table-wrapper .table-order-items > tbody > tr > td.col {
+        &.price,
+        &.qty,
+        &.msrp {
+            text-align: start;
+        }
+    }
+}
