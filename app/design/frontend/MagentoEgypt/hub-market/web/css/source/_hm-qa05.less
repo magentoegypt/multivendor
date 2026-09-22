@@ -119,59 +119,92 @@ input.mobile-number {
 }
 
 //  ---------------------------------------------------------------------------
-//  CL036-DEV01.31 item 3 — the set-password form reads inside out in Arabic
+//  CL036-DEV01.31 item 3 — the set-password form stacks its fields
 //  ---------------------------------------------------------------------------
-//  "We need the field description to be on the far right side with the fields
-//  next to it", filed against /ar/customer/account/createpassword/.
+//  Filed against /ar/customer/account/createpassword/. THE ASK CHANGED BETWEEN
+//  THE TICKET AND THE RETEST, so the first implementation is gone rather than
+//  layered over:
 //
-//  blank lays this form out with a horizontal label column, in PHYSICAL values:
+//    ticket:  "the field description on the far right side with the fields
+//              next to it"      -> keep the horizontal label column, mirror it
+//    retest (CL036-QA01, Mahmoud Magdy, 22 Sep):
+//             "not Done. We need the fields to move under the description"
+//                               -> no label column at all; stack them
+//
+//  The first reading was implemented and was genuinely what the sentence said;
+//  the retest screenshot shows the mirrored horizontal form and rejects it. So
+//  the label column goes.
+//
+//  What produced the column is blank, at >= 768px, in PHYSICAL values:
 //
 //      .fieldset > .field:not(.choice) > .label   { float: left; width: 25.8%;
 //                                                   padding: 6px 15px 0 0;
 //                                                   text-align: right }
 //      .fieldset > .field:not(.choice) > .control { float: left; width: 74.2% }
 //
-//  `float: left` is still left in an RTL document, so Arabic keeps the English
-//  order: label on the LEFT with the input running off to the right, which is
-//  the back-to-front reading the tester screenshotted. Same family of bug as
-//  the login and forgot-password toolbars in _hm-qa04 — that note ends "other
-//  forms unchecked", and this is one of them.
+//  Three more rules hang off that same 25.8% column and have to come with it,
+//  or the label stacks while everything else stays indented:
 //
-//  Answered in LOGICAL values rather than with an `html:lang(ar)` flip, which
-//  is what _hm-qa04 settled on: `inline-start` IS left in English, so the
-//  English form does not move a pixel, and Arabic mirrors on its own.
+//      .fieldset > .field.choice:before   floats a 25.8% spacer  -> "Show
+//                                         Password" keeps a phantom indent
+//      .fieldset > .field .description    floats into the column
+//      form .actions-toolbar              margin-left: 25.8%     -> the submit
+//                                         button sits off to one side
 //
-//  THE LABEL'S OWN ALIGNMENT IS THE ONE THING THAT IS NOT A STRAIGHT MIRROR.
-//  The first cut used `text-align: end` throughout, on the reasoning that it
-//  keeps the label tucked against its input the way the English form reads.
-//  That is not what was asked for: the ticket says the description should sit
-//  "on the far right side with the fields next to it", i.e. pushed out to the
-//  OUTER edge of its column, not pulled in against the input. In Arabic that
-//  edge is `start`. English keeps `end`, which is blank's own `right` and
-//  leaves that form exactly as it was.
-//
-//  Left deliberately scoped to this page. The physical floats above are global
-//  and every form using that layout has the same defect in Arabic; sweeping
-//  them all is a bigger change than this ticket, and two forms
-//  (`.review-form`, `.sales-guest-form`) already carry their own `float: right`
-//  overrides that a global rule would have to be reconciled with.
+//  This is the treatment the theme ALREADY gives every other account form —
+//  .customer-account-login, -create and -forgotpassword are all un-floated the
+//  same way in _hm-account. createpassword was the odd one out; now it matches,
+//  which is also why this is not scoped to Arabic. Stacking is direction-
+//  neutral, and leaving English on the old horizontal layout would make the
+//  same form read two different ways in the two stores.
 .customer-account-createpassword {
     .fieldset > .field:not(.choice) > .label {
-        float: inline-start;
-        padding-inline: 0 1.5rem;
-        text-align: end;
+        float: none;
+        inline-size: auto;
+        width: auto;
+        padding-block: 0 var(--hm-space-2);
+        padding-inline: 0;
+        text-align: start;
     }
 
     .fieldset > .field:not(.choice) > .control {
+        float: none;
+        inline-size: auto;
+        width: auto;
+    }
+
+    //  The spacer that reserved the label column. `content: none` rather than
+    //  `display: none` — the same fix as the clearfix-in-a-grid case: the
+    //  pseudo-element should not exist at all, not merely be invisible.
+    .fieldset > .field.choice:before,
+    .fieldset > .field.no-label:before {
+        content: none;
+    }
+
+    .fieldset > .field .description {
+        float: none;
+        inline-size: auto;
+        width: auto;
+        padding-inline: 0;
+        text-align: start;
+    }
+
+    .column:not(.sidebar-main) form .actions-toolbar,
+    .column.main form .actions-toolbar {
+        margin-inline-start: 0;
+        margin-left: 0;
+    }
+
+    //  Un-indenting the toolbar exposed a second physical value underneath it:
+    //  blank floats the submit button `left`, which is still left in Arabic, so
+    //  with the 25.8% indent gone the button landed at the far END of the form
+    //  while every field above it started at the far right. Logical float, so
+    //  English keeps the button exactly where the screenshot above shows it.
+    //  This is the same correction _hm-account already applies to the
+    //  forgot-password toolbar.
+    .column.main .actions-toolbar > .primary {
         float: inline-start;
     }
-}
-
-//  Arabic only — the label goes to the far edge, per the ticket. `html:lang(ar)`
-//  rather than `[dir='rtl']`: this store sets the language and never the dir
-//  attribute, so the attribute selector matches nothing.
-html:lang(ar) .customer-account-createpassword .fieldset > .field:not(.choice) > .label {
-    text-align: start;
 }
 
 //  ===========================================================================
@@ -962,5 +995,44 @@ html:lang(ar) .customer-account-createpassword .fieldset > .field:not(.choice) >
         &.msrp {
             text-align: start;
         }
+    }
+}
+
+//  ---------------------------------------------------------------------------
+//  CL036-DEV01.31 item 2 (QA01 retest) — the checkout "?" fell below its field
+//  ---------------------------------------------------------------------------
+//  Retest, 22 Sep: "not Done. I need a '?' sign to appear next to the field and
+//  remove the space between the fields." The screenshot boxes the tooltip
+//  toggle sitting under the Email Address input, out on the right, level with
+//  the "You can create an account after checkout." note instead of with the
+//  field it belongs to.
+//
+//  _hm-checkout sets `.field-tooltip { inset-block-start: auto }` on the login
+//  and shipping forms, with the note "the tooltip's own gutter reserved 40px
+//  above the field it belongs to". That diagnosis was right — blank's
+//  `top: 1px` resolved against the wrong box — but `auto` is not the cure. For
+//  an absolutely positioned element `auto` means STATIC POSITION: wherever it
+//  would have sat in normal flow, which is immediately after the input.
+//  Measured on /en/checkout/, that computes to `top: 48px` — exactly one input
+//  height down — so the icon lands under the field and overhangs the bottom of
+//  its own control by 18px.
+//
+//  The gutter it was fighting is already reserved properly elsewhere in that
+//  same file: the input is sized `calc(100% - 4.8rem)` with a margin after it,
+//  which measured 48px of clear space at the inline end (input ends 840, the
+//  control ends 888). Nothing needs to move horizontally — the icon just has to
+//  stop being pushed down. `0` instead of `auto` puts it at the top of the
+//  control, and giving the box the input's own height lets the already-centred
+//  action sit on the field's centre line rather than 4px above it.
+//
+//  Same specificity as the rule it corrects, and this file is imported after
+//  _hm-checkout — the convention for this theme's QA-cycle files.
+.hm-page.checkout-index-index .opc-wrapper {
+    .form-shipping-address .field-tooltip,
+    .form-login .field-tooltip {
+        align-items: center;
+        block-size: 4.8rem;
+        display: flex;
+        inset-block-start: 0;
     }
 }
