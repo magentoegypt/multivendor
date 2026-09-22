@@ -1,0 +1,43 @@
+<!--
+/**
+ * Hub Market — the Billing step, shown on virtual carts only.
+ *
+ * `billing-address-form-shared` is the displayArea Magento's own LayoutProcessor
+ * gives the shared billing form (getBillingAddressComponent('shared', ...)).
+ * Rendering it through getRegion keeps this template agnostic about what the
+ * form actually contains, so an address-field change in layout XML lands here
+ * without touching this file.
+ *
+ * The per-method shape (display_billing_address_on = payment method) is rendered
+ * too, under `billing-address-form-<code>`; RemoveBillingAddress only relocates
+ * the shared one, so that branch normally renders nothing here.
+ */
+-->
+<li id="checkout-step-hm-billing"
+    class="checkout-billing-step hm-billing-step"
+    data-bind="visible: hmIsVisible">
+
+    <div class="step-title hm-step-title" data-role="title">
+        <span data-bind="i18n: 'Billing Address'"></span>
+    </div>
+
+    <div id="checkout-step-hm-billing-content" class="step-content" data-role="content">
+
+        <p class="hm-billing-step__note"
+           data-bind="i18n: 'This order has nothing to ship, so we only need a billing address.'"></p>
+
+        <!-- ko foreach: getRegion('billing-address-form-shared') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+
+        <div class="actions-toolbar hm-billing-step__actions">
+            <div class="primary">
+                <button class="button action continue primary hm-billing-step__continue"
+                        type="button"
+                        data-bind="click: continueToPayment">
+                    <span data-bind="i18n: 'Continue to Payment'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</li>
