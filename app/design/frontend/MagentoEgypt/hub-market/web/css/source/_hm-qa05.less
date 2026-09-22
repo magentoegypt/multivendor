@@ -783,30 +783,39 @@ input.mobile-number {
 //  item 8 disappears — measured, the button vanished from the top right and the
 //  only way out of the menu with it. The trigger goes to 102 alongside.
 //
-//  `:has(.aa-Panel)` AND NOT `:has(.aa-Panel .aa-Item)`. Measured through a
-//  full cycle: no `.aa-Panel` at idle or on focus, one with 10 `.aa-Item` after
-//  typing, one with ZERO `.aa-Item` when the query matches nothing (it reads
-//  "No results" for products, categories and pages), and none again after
-//  Escape. Keying on the items would therefore have left the "No results"
-//  message buried — the same bug wearing a different coat. Keying on the panel
-//  covers both and still releases, because Algolia removes the element when the
-//  dropdown closes.
+//  UNCONDITIONAL, AND NOT GATED ON `:has(.aa-Panel)`. Gating it was the first
+//  version of this repair and it is not reliable: on the Arabic home page, the
+//  same deployed CSS and the same script measured the header at 90 on one run
+//  and 101 on the next, with `document.querySelector('.hm-page:has(.aa-Panel)')`
+//  returning a match BOTH times. Forcing a style recalc afterwards flipped it to
+//  101. That is Blink failing to invalidate an ancestor's `:has()` match when
+//  the panel is inserted deep in its subtree — the computed value is simply
+//  stale until something else triggers a recalc. `:has()` elsewhere in this file
+//  keys on markup that is present at parse time; this one would have keyed on a
+//  node a third-party script inserts mid-session, which is the case that races.
+//  A QA item that has already come back twice does not get a selector that
+//  works most of the time.
 //
-//  KNOWN AND OUT OF SCOPE: backspacing the query to empty leaves that panel up
-//  showing "No results" rather than closing it. That is Algolia's own
-//  behaviour, it happens on every screen, and it is only invisible here today
-//  because the sheet happens to cover it.
+//  NOTHING IS LOST BY RAISING IT ALWAYS. Measured: `.hm-nav__panel` is
+//  x0 y110 w390 h735 and `.hm-header__main` is the fixed band ABOVE it, so the
+//  two never overlap and the sheet is not covered by a header at 101 — the gate
+//  was buying nothing. 90 was chosen in _hm-mobile.less to sit above page
+//  content and below the filter drawer at 999; 101/102 keep both of those
+//  relationships and only clear the sheet's 100.
 //
-//  90 was chosen in _hm-mobile.less to sit above page content and below the
-//  filter drawer at 999; 101/102 keep both of those relationships and only
-//  clear the sheet's 100.
+//  KNOWN AND OUT OF SCOPE: the panel stays up showing "No results" if the query
+//  is backspaced to empty, instead of closing. That is Algolia's own behaviour
+//  and it happens on every screen; it is only invisible here today because the
+//  sheet covers it.
 @media screen and (max-width: 767px) {
-    .hm-page:has(.aa-Panel) .hm-header__main {
+    .hm-page .hm-header__main {
         z-index: 101;
     }
 
-    //  (0,3,0) against the 91 in _hm-mobile.less, which is (0,2,0).
-    .hm-page:has(.aa-Panel) .hm-nav__trigger {
+    //  Has to move with it. _hm-mobile.less pins this at 91 OUTSIDE
+    //  `.hm-header__main`, so a header at 101 paints over the X. (0,2,0) here
+    //  equals that rule's weight, and this file is imported last.
+    .hm-page .hm-nav__trigger {
         z-index: 102;
     }
 }
@@ -1278,6 +1287,21 @@ input.mobile-number {
 //  them choose — without a stray empty row's margins when they have one or none.
 #checkout-step-hm-billing .field-select-billing:not(:has(select)) {
     display: none;
+}
+
+//  The e-mail field is drawn in this step by billing-step.js, borrowed from the
+//  payment step's component. It therefore arrives with the payment step's
+//  spacing, which was tuned for sitting above a method list, not above an
+//  address form.
+#checkout-step-hm-billing .form-login,
+#checkout-step-hm-billing #customer-email-fieldset {
+    margin-block-end: var(--hm-space-5);
+}
+
+//  Blank collapses the fieldset's own bottom margin only inside the payment
+//  step, so without this the note and the address form sit hard against it.
+#checkout-step-hm-billing #customer-email-fieldset > .field {
+    margin-block-end: 0;
 }
 
 .hm-billing-step__note {
