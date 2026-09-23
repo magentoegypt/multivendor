@@ -62,11 +62,12 @@
 //  stay in the same family instead of falling back mid-sentence. In a seller
 //  panel that matters more than on the storefront — nearly every screen mixes
 //  Arabic labels with latin identifiers.
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-400'; 400; @hm-range-arabic);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-500'; 500; @hm-range-arabic);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-600'; 600; @hm-range-arabic);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-700'; 700; @hm-range-arabic);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-400';  400; @hm-range-latin);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-500';  500; @hm-range-latin);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-600';  600; @hm-range-latin);
-.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-700';  700; @hm-range-latin);
+//
+//  TWO weights, not four (2026-09-23), matching the storefront's _hm-fonts.less.
+//  Each file claims a weight RANGE: 500 renders from the 400 master, 600 from
+//  the 700 master, with no faux bold. The 500/600 files stay in web/fonts/ so
+//  this is a two-line revert.
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-400'; ~"100 500"; @hm-range-arabic);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-700'; ~"600 900"; @hm-range-arabic);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-400';  ~"100 500"; @hm-range-latin);
+.hm-seller-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-700';  ~"600 900"; @hm-range-latin);
