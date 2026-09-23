@@ -1004,6 +1004,28 @@ input.mobile-number {
 //  label's side in both directions.
 //  The CURRENT item is a `<strong>`, not an `<a>` — so the first cut of this
 //  missed exactly the one item the client screenshotted (Dashboard).
+//  The avatar card at the top of the menu: Vnecoms gives `.user-panel`
+//  `padding: 0 15px 20px` — NO top padding, so the avatar sat on the card's
+//  top border (client: "user-panel touch to top"). Its `.info` also carries a
+//  physical `padding-left: 15px`, which is the gap on the wrong side in Arabic.
+//  (0,3,0): the rules being overridden are `.seller-menu-container .user-panel`
+//  (0,2,0) in Vnecoms' vendor-panel.css, a separate stylesheet linked AFTER the
+//  theme's, so equal weight loses on order. `.info` is also floated physically
+//  left there, which is why the name sat on the wrong side of the avatar in RTL.
+.block-seller-menu .seller-menu-container .user-panel {
+    padding-block-start: var(--hm-space-4);
+}
+
+.block-seller-menu .seller-menu-container .user-panel .info {
+    float: inline-start;
+    padding-left: 5px;
+    padding-inline-start: var(--hm-space-3);
+}
+
+.block-seller-menu .seller-menu-container .user-panel .image {
+    float: inline-start;
+}
+
 .seller-menu li > a > .fa,
 .seller-menu li > strong > .fa,
 .user-panel .info a > .fa {
