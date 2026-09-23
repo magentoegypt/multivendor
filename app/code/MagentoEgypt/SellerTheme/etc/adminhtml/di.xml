@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+    Hub Market — keep JS/CSS/HTML minification OFF in the adminhtml area.
+
+    dev/js/minify_files = 1 is set at websites/1 (hub-market storefront) only.
+    Minification::isEnabled() reads it at the CURRENT STORE's scope, and on the
+    hub-market host both the admin and the Vnecoms seller panel resolve to a
+    hub-market store view, so they inherited the storefront flag and requested
+    *.min.js that static deploy never builds for these areas (2026-09-23: admin
+    and seller panel lost ALL JavaScript — require.min.js 404).
+
+    Reading the flag at the 'default' scope here gives these areas the global
+    value (off) while the storefront keeps its website-level minification.
+    Mirrored for both areas: etc/adminhtml/di.xml and etc/vendors/di.xml.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\View\Asset\Minification">
+        <arguments>
+            <argument name="scope" xsi:type="string">default</argument>
+        </arguments>
+    </type>
+</config>
