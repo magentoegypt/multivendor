@@ -36,6 +36,35 @@ foreach ($items as $item) {
 
 $footerTotals = $block->getTotals('footer');
 $bodyTotals = $block->getTotals('');
+
+// Order view only (the one totals block that adds `paid`): Total Paid moves to the
+// end, followed by a display-only "Net Paid" once anything was refunded (TC30,
+// 86d4b5zg0). Stored total_paid is deliberately untouched — Total Due, sales
+// reports and gateway reconciliation all read it as money collected.
+// getTotals($area) returns a numerically indexed list, so match on each total's code.
+$paidKey = null;
+foreach ((array) $footerTotals as $key => $footerTotal) {
+    if ($footerTotal->getCode() === 'paid') {
+        $paidKey = $key;
+    }
+}
+if ($paidKey !== null) {
+    $paidTotal = $footerTotals[$paidKey];
+    unset($footerTotals[$paidKey]);
+    $footerTotals['paid'] = $paidTotal;
+    $refundSource = $block->getSource();
+    $refunded = $refundSource ? (float) $refundSource->getTotalRefunded() : 0.0;
+    if ($refunded > 0.0001) {
+        $footerTotals['net_paid'] = new \Magento\Framework\DataObject([
+            'code' => 'net_paid',
+            'strong' => true,
+            'value' => max(0.0, (float) $refundSource->getTotalPaid() - $refunded),
+            'base_value' => max(0.0, (float) $refundSource->getBaseTotalPaid() - (float) $refundSource->getBaseTotalRefunded()),
+            'label' => __('Net Paid'),
+            'area' => 'footer',
+        ]);
+    }
+}
 $hasDiscountTotal = isset($footerTotals['discount']) || isset($bodyTotals['discount']);
 $isSubtotal = static function ($code, $total): bool {
     return $code === 'subtotal' || strtolower((string) $total->getLabel()) === 'subtotal';
