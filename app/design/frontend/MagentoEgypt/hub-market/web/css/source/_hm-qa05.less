@@ -1075,6 +1075,30 @@ input.mobile-number {
     float: inline-start;
 }
 
+//  The submenu (Sales > Orders, Catalog > Manage Products) is a bare <ul>, so it
+//  kept the browser's defaults: `list-style: circle` — the stray "○" outside the
+//  highlight — and `padding-inline-start: 40px`, which pushed the current
+//  sub-item's highlight block 40px in from the parent's. The block now runs the
+//  full width like the parent's, and the label is indented instead, to 5rem:
+//  measured, that lands the sub-label under the parent's label (83px vs 83px),
+//  past a 24px inline padding, the icon and its gap. Logical, so it mirrors.
+.block-seller-menu .seller-menu .seller-submenu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.block-seller-menu .seller-menu .seller-submenu > li {
+    list-style: none;
+    margin: 0;
+}
+
+.block-seller-menu .seller-menu .seller-submenu > li > a,
+.block-seller-menu .seller-menu .seller-submenu > li > strong {
+    padding-left: 0;
+    padding-inline-start: 5rem;
+}
+
 //  The "Online" link: `.seller-menu-container .user-panel > .info > a
 //  { padding-right: 5px }` (0,3,1), physical.
 .block-seller-menu .seller-menu-container .user-panel > .info > a {
@@ -1082,8 +1106,14 @@ input.mobile-number {
     padding-inline-end: 5px;
 }
 
+//  A section that is OPEN and CURRENT (Sales, on the Orders page) nests one
+//  level deeper again: `a > strong > i.fa`, which the child-combinator rules
+//  above never reached — the client's "Sales" screenshot. Descendant form here,
+//  at (0,3,1) so it clears vendor-panel.css, which loads after the theme.
 .seller-menu li > a > .fa,
 .seller-menu li > strong > .fa,
+.block-seller-menu .seller-menu li > a .fa,
+.block-seller-menu .seller-menu li > strong .fa,
 .user-panel .info a > .fa {
     margin-inline-end: var(--hm-space-2);
 }
