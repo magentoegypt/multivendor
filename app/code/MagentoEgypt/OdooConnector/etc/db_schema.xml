@@ -86,10 +86,9 @@
         <index referenceId="ME_ODOO_SYNC_QUEUE_CORRELATION_ID" indexType="btree">
             <column name="correlation_id"/>
         </index>
-        <index referenceId="ME_ODOO_SYNC_QUEUE_ENTITY_TYPE_MAGENTO_ID" indexType="btree">
-            <column name="entity_type"/>
-            <column name="magento_id"/>
-        </index>
+        <!-- ME_ODOO_SYNC_QUEUE_ENTITY_TYPE_MAGENTO_ID (entity_type, magento_id) removed (TC46):
+             it is the leading prefix of ME_ODOO_SYNC_QUEUE_DEDUPE below, which serves the same
+             lookups. Still whitelisted, so setup:upgrade drops it rather than re-adding it. -->
         <index referenceId="ME_ODOO_SYNC_QUEUE_LOCKED_AT" indexType="btree">
             <column name="locked_at"/>
         </index>

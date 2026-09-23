@@ -4,8 +4,11 @@
         <job name="magentoegypt_odoo_sync_consumer" instance="MagentoEgypt\OdooConnector\Cron\RunConsumer" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+        <!-- Daily, not every 30 min (TC46 / 14zb93nupm1): reconcile is a FULL re-sync safety net
+             (656 queue rows per run, every order re-sent 29x/day). Real changes already sync
+             immediately through the queue. The run also prunes old queue/log rows. -->
         <job name="magentoegypt_odoo_reconcile" instance="MagentoEgypt\OdooConnector\Cron\RunReconcile" method="execute">
-            <schedule>*/30 * * * *</schedule>
+            <schedule>0 3 * * *</schedule>
         </job>
     </group>
 </config>
