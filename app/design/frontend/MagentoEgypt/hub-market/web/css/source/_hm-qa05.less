@@ -1784,3 +1784,46 @@ html:lang(ar) body[class*='marketplace-'] .column.main {
         }
     }
 }
+
+//  ---------------------------------------------------------------------------
+//  TC53 (14zb93nup6u) — add to cart on phones.
+//    1. Header shook when scrolling during the add. Its geometry never moves
+//       (measured frame by frame: fixed, top 0, 110px throughout); what the
+//       phone shows is the fixed bar being repainted late while the add's
+//       section reload keeps the main thread busy (50-170ms long tasks).
+//       Its own compositor layer lets the GPU scroll it without waiting for
+//       the main thread. Safe: nothing inside it is fixed-position, so the
+//       new containing block traps nothing.
+//    2. No visible loading state on the cards. catalog-add-to-cart swaps the
+//       LABEL to "Adding..." and adds `.disabled`, but the card button is a
+//       28px icon with the label visually hidden. Swap the icon for a spinner
+//       while `.disabled` is on.
+.hm-header__main {
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+.product-item .action.tocart {
+    &.disabled,
+    &[disabled] {
+        opacity: 1;
+        position: relative;
+
+        > svg { visibility: hidden; }
+
+        &::after {
+            animation: hm-spin 700ms linear infinite;
+            block-size: 1.4rem;
+            border: 2px solid currentColor;
+            border-block-start-color: transparent;
+            border-radius: 50%;
+            box-sizing: border-box;
+            content: '';
+            inline-size: 1.4rem;
+            inset: 0;
+            margin: auto;
+            position: absolute;
+        }
+    }
+}
