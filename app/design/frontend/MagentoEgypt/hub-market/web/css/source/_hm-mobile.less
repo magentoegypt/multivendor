@@ -333,6 +333,10 @@
     }
 
     .columns:has(> .hm-filters-scrim):has(.filter-options-item):has(.hm-filters-cb:checked) .sidebar-main {
+        //  Scrolling the drawer to its end must not carry on into the page
+        //  behind it — half of the scroll lock the html:has() rule below used
+        //  to provide.
+        overscroll-behavior: contain;
         transform: none;
     }
 
@@ -384,14 +388,25 @@
         background: rgba(15, 33, 68, .45);
         display: block;
         inset: 0;
+        //  The other half of the scroll lock: a finger dragging on the scrim
+        //  cannot pan the page underneath.
+        overscroll-behavior: contain;
         position: fixed;
+        touch-action: none;
         z-index: 999;
     }
 
-    //  Body must not scroll behind the open drawer. `:has()` on the root
-    //  element is what replaces the class js/hm-mobile-filters.js used to set.
-    html:has(.hm-filters-cb:checked),
-    html:has(.hm-filters-cb:checked) body { overflow: hidden; }
+    //  The page must not scroll behind the open drawer. That used to be
+    //      html:has(.hm-filters-cb:checked), html:has(...) body { overflow: hidden }
+    //  and it was the single most expensive rule on the site (2026-09-23): a
+    //  `:has()` on the ROOT whose argument holds a state pseudo-class (:checked)
+    //  cannot be narrowed by Chrome, so EVERY node inserted anywhere re-styled
+    //  the whole document — ~3,800 elements, hundreds of times while a page's
+    //  scripts render, and once a second forever under the deals countdown.
+    //  Measured with invalidation tracking: 1,375 whole-document invalidations
+    //  on <html> in one home-page load. Scroll-locking is now done where the
+    //  scrolling happens — the scrim swallows touch panning and the drawer
+    //  contains its own overscroll — so nothing needs to watch the root.
 
     //
     //  CATEGORY QA item 5 — "remove the blank space at the bottom of the page"

@@ -389,20 +389,48 @@
 
     &::before {
         background: #ffffff;
-        //  The halo is drawn on the dot itself rather than as a second node,
-        //  since the dot is already a pseudo-element.
-        box-shadow: 0 0 0 0 fade(#ffffff, 60%);
+    }
+
+    //  The halo is a SEPARATE layer over the dot, not a box-shadow on the dot.
+    //  It used to be `box-shadow` animated on ::before, and box-shadow cannot be
+    //  animated by the compositor: every frame needed a style recalc and a
+    //  repaint on the main thread, forever — measured 60 recalcs and ~100 paints
+    //  a second on the home page, never idle, whether or not the rail was on
+    //  screen. That is the single largest item in Lighthouse's "Style & Layout"
+    //  on mobile and it drains a phone's battery for a decorative dot.
+    //
+    //  This is Tailwind's actual `animate-ping` technique: a copy of the dot that
+    //  scales up and fades out. transform + opacity run on the GPU, so the main
+    //  thread does nothing per frame. Same look — white at 60% growing .5rem past
+    //  the 6px dot (6 + 2 x 5 = 16px, scale 16/6) and fading out.
+    position: relative;
+
+    &::after {
+        background: fade(#ffffff, 60%);
+        block-size: .6rem;
+        border-radius: 50%;
+        content: '';
+        inline-size: .6rem;
+        //  Over the dot: the badge's start padding, vertically centred. Out of
+        //  the flex flow because it is absolutely positioned, so the pill's
+        //  gap and width are untouched. Logical, so it follows the dot in RTL.
+        inset-block-start: calc(50% - .3rem);
+        inset-inline-start: var(--hm-space-3);
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
     }
 }
 
 //  The pulse. Paused for anyone who asked for less motion — it is decoration
 //  and it never stops on its own.
 @keyframes hm-pfy-ping {
-    75%, 100% { box-shadow: 0 0 0 .5rem fade(#ffffff, 0); }
+    0%       { opacity: 1; transform: scale(1); }
+    75%, 100% { opacity: 0; transform: scale(2.67); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    .hm-rail--hm-home-pickedforyou .hm-section__badge::before {
+    .hm-rail--hm-home-pickedforyou .hm-section__badge::after {
         animation: hm-pfy-ping 1.6s cubic-bezier(0, 0, .2, 1) infinite;
     }
 }

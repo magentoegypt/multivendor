@@ -9,6 +9,36 @@
  */
 var config = {
     map: {
+        /*
+         * MOBILE PAGE WEIGHT (2026-09-23). Each entry swaps a dependency for ONE
+         * module only; everything else keeps the original.
+         *
+         * Vnecoms_Sms/js/login asks for 'jquery/ui', which in Magento 2.4 is the
+         * legacy alias for 'jquery/compat' and loads ALL of jQuery UI —
+         * datepicker, timepicker and the rest, 27 modules / 40 KB on every page,
+         * for the sign-in popup. The module only calls `$.widget(...)`; nothing
+         * else from jQuery UI. The widget factory alone is what it needs.
+         *
+         * The target is the REAL module id, not Magento's 'jquery-ui-modules/widget'
+         * alias: that alias lives in the '*' map, and RequireJS applies map ONCE —
+         * a module-specific map that produces an alias is never resolved again. It
+         * requested the literal path jquery-ui-modules/widget.js (404), and with
+         * Magento's `waitSeconds: 0` the SMS login module then waited forever, with
+         * no error, and the checkout sign-in popup never initialised.
+         */
+        'Vnecoms_Sms/js/login': {
+            'jquery/ui': 'jquery/ui-modules/widget'
+        },
+
+        /*
+         * Algolia's common.js loads the whole InstantSearch library (84 KB
+         * compressed) just to build a router InstantSearch widgets would use, and
+         * InstantSearch is off. See the stub before ever enabling InstantSearch.
+         */
+        'Algolia_AlgoliaSearch/js/internals/common': {
+            'algoliaInstantSearchLib': 'Algolia_AlgoliaSearch/js/hm-instantsearch-stub'
+        },
+
         '*': {
             hmCartQty: 'js/hm-cart-qty',
             hmMinicartQty: 'js/hm-minicart-qty',

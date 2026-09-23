@@ -33,7 +33,16 @@ $id = 'hm-cd-' . uniqid();
         var h = Math.floor(ms / 3600000) % 24;
         var m = Math.floor(ms / 60000) % 60;
         var s = Math.floor(ms / 1000) % 60;
-        out.textContent = (d > 0 ? d + 'd ' : '') + pad(h) + ':' + pad(m) + ':' + pad(s);
+        //  Update the existing text node rather than assigning textContent:
+        //  textContent REPLACES the node (remove + insert) every second, and a
+        //  node insertion can make the browser re-check selectors across the
+        //  whole page. Changing a text node's value in place does not.
+        var text = (d > 0 ? d + 'd ' : '') + pad(h) + ':' + pad(m) + ':' + pad(s);
+        if (out.firstChild && out.firstChild.nodeType === 3) {
+            if (out.firstChild.nodeValue !== text) { out.firstChild.nodeValue = text; }
+        } else {
+            out.textContent = text;
+        }
         setTimeout(tick, 1000);
     }
     tick();

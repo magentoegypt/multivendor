@@ -346,7 +346,16 @@
 //
 //  `!important` is not decoration: the JS writes `display:block` inline on the
 //  node when it shows it, and nothing short of !important outranks that.
-body:has(.product-item .swatch-option:hover) .swatch-option-tooltip { display: none !important; }
+//
+//  MOUSE DEVICES ONLY. A `:has()` anchored on <body> with a state pseudo-class
+//  (:hover) in its argument cannot be narrowed by Chrome: every node inserted
+//  anywhere — and on a card page the swatch renderer inserts hundreds — made it
+//  re-style the WHOLE page (measured 2026-09-23). The rule is about hovering
+//  with a pointer, so it only needs to exist where one exists; rules in a media
+//  query that does not match are not tracked at all, so phones pay nothing.
+@media (hover: hover) and (pointer: fine) {
+    body:has(.product-item .swatch-option:hover) .swatch-option-tooltip { display: none !important; }
+}
 
 //
 //  LIST MODE
