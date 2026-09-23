@@ -191,4 +191,8 @@
     <type name="Magento\Theme\Block\Html\Breadcrumbs">
         <plugin name="hm_breadcrumbs_add_link" type="MagentoEgypt\VendorExtend\Plugin\Theme\BreadcrumbsAddLink"/>
     </type>
+    <!-- TC47: guest context carried customer_name " " so no first visit was ever cacheable. -->
+    <type name="Magento\Framework\App\Http\Context">
+        <plugin name="hm_http_context_blank_value" type="MagentoEgypt\VendorExtend\Plugin\Framework\HttpContextBlankValue"/>
+    </type>
 </config>
