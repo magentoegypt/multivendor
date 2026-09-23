@@ -73,11 +73,15 @@
 //  The latin faces are scoped by unicode-range and this family is only
 //  referenced from the :lang(ar) / [dir=rtl] block, so they never displace
 //  DM Sans in the English store view.
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-400'; 400; @hm-range-arabic);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-500'; 500; @hm-range-arabic);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-600'; 600; @hm-range-arabic);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-700'; 700; @hm-range-arabic);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-400';  400; @hm-range-latin);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-500';  500; @hm-range-latin);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-600';  600; @hm-range-latin);
-.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-700';  700; @hm-range-latin);
+//
+//  TWO weights, not four (2026-09-23). The Arabic home page fetched 11 font
+//  files (~336 KB) against English's 3, and PageSpeed's slow-4G model charged
+//  that as ~1 s of First Contentful Paint (AR 74 vs EN 86). Each file now
+//  claims a weight RANGE: 500 renders from the 400 master, 600 from the 700
+//  master. A range that includes the requested weight also stops the browser
+//  faux-bolding 600 — the face "is" 600 as far as matching is concerned.
+//  The 500/600 files stay in web/fonts/ so this is a two-line revert.
+.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-400'; ~"100 500"; @hm-range-arabic);
+.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/arabic-700'; ~"600 900"; @hm-range-arabic);
+.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-400';  ~"100 500"; @hm-range-latin);
+.hm-face('IBM Plex Sans Arabic'; 'ibm-plex-sans-arabic/latin-700';  ~"600 900"; @hm-range-latin);
