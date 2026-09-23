@@ -51,8 +51,12 @@ if ($hmBrandsUrl !== '' && !preg_match('~^https?://~i', $hmBrandsUrl)) {
             <li class="hm-brands__item">
                 <a class="hm-brands__link" href="<?= $escaper->escapeUrl($b['url']) ?>">
                     <?php if ($b['image']): ?>
+                        <?php /* alt="" — the brand name is printed right
+                                 beside the logo inside the same link, so a
+                                 named image made screen readers say it twice
+                                 (Lighthouse image-redundant-alt on /ar/). */ ?>
                         <img class="hm-brands__img" src="<?= $escaper->escapeUrl($b['image']) ?>"
-                             alt="<?= $escaper->escapeHtmlAttr($b['name']) ?>"
+                             alt=""
                              loading="lazy" width="64" height="64"/>
                     <?php endif; ?>
                     <?php /* Through __() since QA cycle 2 (item 1-I): MGS_Brand
