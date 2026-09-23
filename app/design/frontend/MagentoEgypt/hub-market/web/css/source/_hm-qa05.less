@@ -359,7 +359,16 @@ input.mobile-number {
             content: '';
             inline-size: 1.8rem;
             inset-block-start: 50%;
-            inset-inline-start: 50%;
+            //  PHYSICAL `left`, not `inset-inline-start`. The bars are centred
+            //  by `left: 50%` + `translate(-50%, …)`, and translate is always
+            //  physical. Under `direction: rtl` `inset-inline-start: 50%` became
+            //  `right: 50%` while the translate still pulled LEFT, so in Arabic
+            //  the cross sat on the button's left edge instead of its centre
+            //  (client screenshot). A centre has no handedness.
+            //  `right: auto` too: with BOTH offsets set, an RTL box takes `right`
+            //  and ignores `left` — which a first test of this fix hit.
+            left: 50%;
+            right: auto;
             position: absolute;
             transform-origin: center;
         }
