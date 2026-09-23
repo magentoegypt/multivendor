@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — the seller order view (/marketplace/sales_order/view/…) renders
+ * instead of a fatal error.
+ *
+ * Every order view died with
+ *   Error: Object of class Vnecoms\VendorsSales\Model\Order could not be
+ *   converted to string … at Magento\Sales\Block\Order\Items->createItemsCollection()
+ *
+ * Vnecoms' `order_items` block (Vnecoms\VendorsSales\Block\Order\Items) overrides
+ * getOrder() to return the VENDOR order, so its template lists only this
+ * seller's items. Magento 2.4.8's parent _prepareLayout() now always does
+ * `setOrderFilter($this->getOrder())`, which accepts a core Sales Order or an id;
+ * handed the Vnecoms model it falls through to addFieldToFilter('order_id',
+ * <object>) and fatals. Unconditional, so no seller could open any order.
+ *
+ * NO NEW PHP CLASS, deliberately: this box runs production mode with compiled
+ * DI, where a class added since the last compile is constructed with no
+ * arguments and the block is dropped silently, and a new di.xml plugin is
+ * ignored because plugin lists are compiled too. Instead:
+ *
+ *  - the block is swapped for Magento's core Sales\Block\Order\Items, which IS
+ *    compiled and whose getOrder() is the core order, so _prepareLayout() works;
+ *  - its template (this theme's Vnecoms_VendorsSales::order/items.phtml) reads
+ *    the VENDOR order from the registry itself, so the list is still this
+ *    seller's items only — swapping the class alone would have shown every
+ *    seller's items on a split order;
+ *  - the item renderers and totals are MOVED into it, not re-declared: the
+ *    shared `sales_order_item_renderers` handle attaches renderers to the block
+ *    NAMED sales.order.items.renderers;
+ *  - the replacement cannot take the alias `order_items` while the old block
+ *    still exists (Data\Structure throws on a duplicate alias; removes run after
+ *    moves), so this page's sales.order.view gets a template copy that prints
+ *    `hm_order_items`. referenceBlock is scoped to this handle, so the
+ *    customer's own order page is untouched.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="sales.order.view" template="Vnecoms_VendorsSales::order/view.phtml">
+            <block class="Magento\Sales\Block\Order\Items" name="hm_order_items" as="hm_order_items"
+                   template="Vnecoms_VendorsSales::order/items.phtml"/>
+        </referenceBlock>
+        <move element="sales.order.items.renderers" destination="hm_order_items" as="renderer.list"/>
+        <move element="order_totals" destination="hm_order_items" as="order_totals"/>
+        <referenceBlock name="order_items" remove="true"/>
+    </body>
+</page>
