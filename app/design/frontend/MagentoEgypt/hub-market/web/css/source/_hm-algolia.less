@@ -295,6 +295,15 @@ html:lang(ar) {
     .actions { display: flex; }
     .hm-search__submit { block-size: 100%; }
 
+    //  Same fix for the category segment. _hm-header.less pins the select to
+    //  `block-size: 4rem` above 768px (to match the theme's own 40px button),
+    //  so inside this 44px bar its lighter background stopped 4px short of the
+    //  bottom: wrapper 44px, select 40px, top-aligned — in both directions,
+    //  since it is a vertical offset. Stretching it to the row keeps all three
+    //  segments one height whatever that height becomes.
+    .hm-search__cat { display: flex; }
+    .hm-search__cat-select { align-self: stretch; block-size: auto; }
+
     .aa-SubmitButton,
     .aa-InputWrapperPrefix { display: none; }
     .aa-ClearButton { color: var(--hm-neutral-500, #6b7280); }
@@ -499,6 +508,14 @@ html:lang(ar) {
         left: auto;
         right: auto;
 
+        //  Upstream offsets the badge with `margin: 5px 0 5px 10px` — a PHYSICAL
+        //  left margin, so in Arabic the badge sat hard against the panel's
+        //  right edge. Logical start margin instead, sized to the section
+        //  headings' text edge (source padding 1rem + heading padding) so
+        //  "Search by" lines up under "CATEGORIES" / "PAGES" in both directions.
+        margin: .5rem 0;
+        margin-inline-start: calc(1rem + var(--hm-space-4));
+
         //  Upstream spaces "Search by" from the logo with a physical
         //  `margin-right: 5px`, which in Arabic lands on the outer side and
         //  runs "البحث بواسطة" straight into the logo.
@@ -630,7 +647,7 @@ html:lang(ar) {
         .aa-PanelLayout > section.aa-Source:first-child,
         .aa-PanelLayout > section.aa-Source:last-of-type { padding-block-end: 0; }
 
-        #algoliaFooter { padding: var(--hm-space-3) var(--hm-space-4); }
+        #algoliaFooter { margin: 0; padding: var(--hm-space-3) var(--hm-space-4); }
 
         //  The flex row itself is set at every width further up; phones only
         //  differ in that a long name should WRAP rather than be truncated —
