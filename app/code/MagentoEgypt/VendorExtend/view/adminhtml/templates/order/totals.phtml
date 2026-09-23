@@ -37,10 +37,10 @@ foreach ($items as $item) {
 $footerTotals = $block->getTotals('footer');
 $bodyTotals = $block->getTotals('');
 
-// Order view only (the one totals block that adds `paid`): Total Paid moves to the
-// end, followed by a display-only "Net Paid" once anything was refunded (TC30,
-// 86d4b5zg0). Stored total_paid is deliberately untouched — Total Due, sales
-// reports and gateway reconciliation all read it as money collected.
+// Order view only (the one totals block that adds `paid`), TC30 / 86d4b5zg0:
+// Total Paid is rendered LAST and shows paid minus refunded (560 - 100 = 460).
+// DISPLAY ONLY, agreed 2026-09-23: stored total_paid keeps the amount collected,
+// because Total Due, sales reports and gateway reconciliation all read it that way.
 // getTotals($area) returns a numerically indexed list, so match on each total's code.
 $paidKey = null;
 foreach ((array) $footerTotals as $key => $footerTotal) {
@@ -49,21 +49,14 @@ foreach ((array) $footerTotals as $key => $footerTotal) {
     }
 }
 if ($paidKey !== null) {
-    $paidTotal = $footerTotals[$paidKey];
+    $paidTotal = clone $footerTotals[$paidKey];
     unset($footerTotals[$paidKey]);
-    $footerTotals['paid'] = $paidTotal;
-    $refundSource = $block->getSource();
-    $refunded = $refundSource ? (float) $refundSource->getTotalRefunded() : 0.0;
-    if ($refunded > 0.0001) {
-        $footerTotals['net_paid'] = new \Magento\Framework\DataObject([
-            'code' => 'net_paid',
-            'strong' => true,
-            'value' => max(0.0, (float) $refundSource->getTotalPaid() - $refunded),
-            'base_value' => max(0.0, (float) $refundSource->getBaseTotalPaid() - (float) $refundSource->getBaseTotalRefunded()),
-            'label' => __('Net Paid'),
-            'area' => 'footer',
-        ]);
+    $paidSource = $block->getSource();
+    if ($paidSource) {
+        $paidTotal->setValue(max(0.0, (float) $paidSource->getTotalPaid() - (float) $paidSource->getTotalRefunded()));
+        $paidTotal->setBaseValue(max(0.0, (float) $paidSource->getBaseTotalPaid() - (float) $paidSource->getBaseTotalRefunded()));
     }
+    $footerTotals['paid'] = $paidTotal;
 }
 $hasDiscountTotal = isset($footerTotals['discount']) || isset($bodyTotals['discount']);
 $isSubtotal = static function ($code, $total): bool {
