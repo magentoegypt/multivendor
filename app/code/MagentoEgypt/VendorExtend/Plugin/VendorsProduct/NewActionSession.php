@@ -38,7 +38,13 @@ use Vnecoms\VendorsProduct\Controller\Catalog\Product\NewAction;
  */
 class NewActionSession
 {
-    public function beforeExecute(NewAction $subject): void
+    /**
+     * Runs Vnecoms' NewAction body with one change: `$this->getUrl()` (NewAction.php:100)
+     * exists only on the admin-area parent, so the storefront controller fatals when it
+     * builds breadcrumbs. The body below is Vnecoms' execute() verbatim, bound to the
+     * controller for its protected members, with getUrl() routed to the frontend URL builder.
+     */
+    public function aroundExecute(NewAction $subject, callable $proceed)
     {
         $objectManager = ObjectManager::getInstance();
         if (!isset($subject->_session)) {
@@ -47,5 +53,51 @@ class NewActionSession
         if (!isset($subject->_config)) {
             $subject->_config = $objectManager->get(ScopeConfigInterface::class);
         }
+        $url = $objectManager->get(\Magento\Framework\UrlInterface::class);
+
+        return \Closure::bind(function () use ($url) {
+            if (!$this->getRequest()->getParam('set')) {
+                return $this->resultForwardFactory->create()->forward('noroute');
+            }
+            $product = $this->productBuilder->build($this->getRequest());
+            $productData = $this->getRequest()->getPost('product');
+            if (!$productData) {
+                $sessionData = $this->_session->getProductData(true);
+                if (!empty($sessionData['product'])) {
+                    $productData = $sessionData['product'];
+                }
+            }
+            if ($productData) {
+                $stockData = $productData['stock_data'] ?? [];
+                $productData['stock_data'] = $this->stockFilter->filter($stockData);
+                $product->addData($productData);
+            }
+            $this->_eventManager->dispatch('vendor_catalog_product_new_action', ['product' => $product]);
+
+            $resultPage = $this->resultPageFactory->create();
+            if ($this->_config->getValue('vendors/catalog/product_edit_tabs_template')
+                == \Vnecoms\VendorsProduct\Model\Config\Source\Tab\Template::TEMPLATE_HORIZONTAL_TABS) {
+                $resultPage->addHandle('vendors_catalog_product_edit_tabs_horizontal');
+            }
+            if ($this->getRequest()->getParam('popup')) {
+                $resultPage->addHandle(['popup', 'catalog_product_' . $product->getTypeId()]);
+            } else {
+                $resultPage->addHandle(['catalog_product_' . $product->getTypeId()]);
+                $title = $resultPage->getConfig()->getTitle();
+                $title->prepend(__("Catalog"));
+                $title->prepend(__("Manage Products"));
+                $breadCrumbBlock = $resultPage->getLayout()->getBlock('breadcrumbs');
+                if ($breadCrumbBlock) {
+                    $breadCrumbBlock->addLink(__("Catalog"), __("Catalog"))
+                        ->addLink(__("Manage Products"), __("Manage Products"), $url->getUrl('marketplace/catalog_product'))
+                        ->addLink(__("New Product"), __("New Product"));
+                }
+            }
+            $block = $resultPage->getLayout()->getBlock('catalog.wysiwyg.js');
+            if ($block) {
+                $block->setStoreId($product->getStoreId());
+            }
+            return $resultPage;
+        }, $subject, NewAction::class)();
     }
 }
