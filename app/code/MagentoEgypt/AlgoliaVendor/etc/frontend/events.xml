@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Algolia's logged-in customer token cookie waits for cookie consent.
+ * See MagentoEgypt\AlgoliaVendor\Observer\SetCustomerTokenWithConsent.
+ *
+ * The two upstream observers are disabled by name, in the same area and on the
+ * same events they are declared on (Algolia_AlgoliaSearch etc/frontend/events.xml);
+ * this module is sequenced after Algolia_AlgoliaSearch, so its declaration is the
+ * one that wins the merge.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="customer_login">
+        <observer name="algoliasearch_personalization_set_user_token" disabled="true"/>
+        <observer name="magentoegypt_algolia_customer_token_with_consent"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\SetCustomerTokenWithConsent"/>
+    </event>
+    <event name="controller_action_predispatch">
+        <observer name="algoliasearch_cookie_refresher" disabled="true"/>
+        <observer name="magentoegypt_algolia_customer_token_with_consent"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\SetCustomerTokenWithConsent"/>
+    </event>
+</config>

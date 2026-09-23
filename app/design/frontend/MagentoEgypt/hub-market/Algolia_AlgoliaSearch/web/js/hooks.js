@@ -20,6 +20,9 @@
 define(['algoliaCommon'], function (algoliaCommon) {
     'use strict';
 
+    //  The Insights / Personalization rules (consent, Free-plan query guards)
+    //  live in insights-hm-mixin.js, which is applied before insights.js runs.
+
     algoliaCommon.registerHook('beforeAutocompleteOptions', function (options) {
         var mount = document.querySelector('.hm-search__field');
 

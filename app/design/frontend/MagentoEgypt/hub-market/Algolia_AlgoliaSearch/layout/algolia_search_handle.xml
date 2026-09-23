@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market: a consent gate that must run in the same parse pass as Algolia's
+ * inline `window.algoliaConfig`, and after it. See the template for why.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="head.additional">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.algolia.consent.gate"
+                   template="Algolia_AlgoliaSearch::internals/hm-consent-gate.phtml"
+                   after="algolia.internals.configuration"/>
+        </referenceBlock>
+    </body>
+</page>

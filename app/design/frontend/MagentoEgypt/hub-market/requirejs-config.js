@@ -178,6 +178,14 @@ var config = {
             },
             'PayPal_Braintree/js/view/payment/method-renderer/paypal': {
                 'Amasty_CheckoutCore/js/view/payment/method-renderer/braintree/paypal-mixin': false
+            },
+
+            /*
+             * Algolia Insights: consent on every event sender, and the
+             * Free-plan query guards. See the mixin for the measurements.
+             */
+            'Algolia_AlgoliaSearch/js/insights': {
+                'Algolia_AlgoliaSearch/js/insights-hm-mixin': true
             }
         }
     }

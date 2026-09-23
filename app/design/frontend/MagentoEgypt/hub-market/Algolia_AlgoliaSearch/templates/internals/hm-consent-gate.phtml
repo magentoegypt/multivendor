@@ -1,0 +1,40 @@
+<?php
+/**
+ * Hub Market — hold Algolia's page-load "Viewed Product" event until consent.
+ *
+ * insights-hm-mixin.js gates every Insights sender on cookie consent, and that
+ * covers clicks, facet clicks and conversions, which all happen on user action.
+ * The product-view event is different: insights.js fires it on DOM ready, and a
+ * RequireJS mixin is loaded ASYNCHRONOUSLY — measured, the unwrapped
+ * trackView() (insights.js:289 -> :339) sent "Viewed Product" before the mixin
+ * arrived, even though the wrapped method was in place moments later.
+ *
+ * This runs synchronously during parsing, straight after the inline
+ * `window.algoliaConfig`, so it is decided before any module can read the flag
+ * insights.js checks (`personalization.viewedEvents.viewProduct.enabled`). It has
+ * to be client-side: pages are served from Varnish, so the server cannot know a
+ * given visitor's consent.
+ *
+ * A visitor who accepts on a product page is tracked from the next page on.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+$script = <<<'JS'
+(function () {
+    var c = window.algoliaConfig;
+    if (!c || !c.cookieConfiguration || !c.cookieConfiguration.cookieRestrictionModeEnabled) {
+        return;
+    }
+    var name = c.cookieConfiguration.consentCookieName + '=';
+    var consented = document.cookie.split(';').some(function (part) {
+        return part.replace(/^\s+/, '').indexOf(name) === 0;
+    });
+    var view = c.personalization && c.personalization.viewedEvents && c.personalization.viewedEvents.viewProduct;
+    if (!consented && view) {
+        view.enabled = false;
+    }
+})();
+JS;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $script, false) ?>
