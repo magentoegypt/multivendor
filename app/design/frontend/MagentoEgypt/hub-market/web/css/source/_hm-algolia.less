@@ -327,6 +327,17 @@ html:lang(ar) {
         box-shadow: var(--hm-shadow);
         inline-size: 100% !important;
         inset-inline-start: 0 !important;
+        //  THE GAP BETWEEN THE FIELD AND THE DROPDOWN. autocomplete-js writes an
+        //  inline `top` equal to the form's distance from the top of the
+        //  VIEWPORT (measured `top: 92px` at 1440, `98px` on a phone) — correct
+        //  when the panel hangs off <body>, which is its default. hooks.js mounts
+        //  it inside `.hm-search__field` instead, and that element is the
+        //  panel's offsetParent, so the same offset was applied a second time
+        //  from the field's own top: the panel landed 48px (desktop) / 58px
+        //  (phone) below the field, on top of the category nav. `100%` of the
+        //  offsetParent is exactly the field's bottom edge at every width, and
+        //  `!important` is only here to beat the inline style it replaces.
+        inset-block-start: 100% !important;
         margin-block-start: 0;
         max-block-size: 60rem;
         overflow-y: auto;
