@@ -1712,3 +1712,75 @@ html:lang(ar) body[class*='marketplace-'] .column.main {
     .admin__action-multiselect::before { right: auto; left: 0; }
     .admin__action-multiselect::after { right: auto; left: 12px; }
 }
+
+//  ---------------------------------------------------------------------------
+//  QA01 retest (14zb93nup2h), item 9 — phone checkout.
+//    1. The step bar scrolled sideways and clipped step 3. Compact it the way
+//       the tester's reference does: 28px discs, label under the disc, three
+//       equal columns, the connector drawn between disc centres. Replaces the
+//       horizontal-scroll treatment above (overflow back to visible).
+//    2. "Estimated Total" sat on the left in Arabic: blank floats it with a
+//       physical `left`. Logical floats put it at the reading start in both.
+@media screen and (max-width: 767px) {
+    .checkout-index-index {
+        .hm-steps { padding: 1.6rem 1.2rem; }
+
+        .hm-steps .opc-progress-bar {
+            align-items: flex-start;
+            max-inline-size: none;
+            overflow: visible;
+        }
+
+        .opc-progress-bar .opc-progress-bar-item {
+            flex: 1 1 0;
+            justify-content: center;
+            min-inline-size: 0;
+            position: relative;
+
+            &:last-child { flex: 1 1 0; }
+
+            //  Connector: from this disc's edge to the next disc's edge.
+            &:before {
+                flex: none;
+                inline-size: calc(100% - 4.4rem);
+                inset-block-start: 1.4rem;
+                inset-inline-start: calc(50% + 2.2rem);
+                margin: 0;
+                position: absolute;
+            }
+
+            &:last-child:before { display: none; }
+
+            > span {
+                flex-direction: column;
+                font-size: 1.2rem;
+                inline-size: 100%;
+                justify-content: flex-start;
+                line-height: 1.3;
+                min-block-size: 0;
+                padding: 3.6rem 0 0;
+                text-align: center;
+                white-space: normal;
+            }
+
+            //  Disc and numeral centred with physical left + translate: a
+            //  centre is the same in both directions, a logical inset is not.
+            > span:before,
+            > span:after {
+                block-size: 2.8rem;
+                font-size: 1.3rem;
+                inline-size: 2.8rem;
+                inset-block-start: 0;
+                left: 50%;
+                line-height: 2.8rem;
+                right: auto;
+                transform: translateX(-50%);
+            }
+        }
+
+        .opc-estimated-wrapper {
+            .estimated-block { float: inline-start; text-align: start; }
+            .minicart-wrapper { float: inline-end; }
+        }
+    }
+}
