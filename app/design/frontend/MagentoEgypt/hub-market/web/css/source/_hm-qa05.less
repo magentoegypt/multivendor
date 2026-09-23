@@ -894,6 +894,123 @@ input.mobile-number {
 }
 
 //  ---------------------------------------------------------------------------
+//  item 4 follow-up — the seller dashboard mirrors in Arabic, keeps its tables
+//  on screen, and stops gluing icons to text
+//  ---------------------------------------------------------------------------
+//  Client, on /marketplace/dashboard/: "tables data cropped", "RTL tabs not
+//  mirror of LTR", "lots of elements not mirror", and on desktop "text touch
+//  to elements". Audited by laying the English and Arabic pages side by side
+//  at 375px and checking every element against its reflection
+//  (rtl.left == vw - ltr.right). Everything that failed traced to a PHYSICAL
+//  property from Vnecoms/Bootstrap that `direction: rtl` does not flip:
+//
+//    stat tiles, chart tabs, grid tabs   `float: left`
+//    the "Last 24 Hours" select holder   `float: right`
+//    tile background icon                `position: absolute; right: 10px`
+//    grid headers                        `text-align: left`
+//    new-products price badge            `.pull-right`, i.e. `float: right`
+//
+//  Each is restated with its logical equivalent, so English is unchanged —
+//  `inline-start` IS left there — and Arabic becomes the true mirror.
+
+//  Tiles and the chart/rail columns. The mobile block below sets the rail
+//  columns to `float: none`; it comes later in this file, so it still wins
+//  below 768px and the stacking is unaffected.
+.dashboard-state > [class*='col-xs-'],
+.row-grap > [class*='col-xs-'] {
+    float: inline-start;
+}
+
+//  The watermark icon in each tile. `left: auto` as well, because Bootstrap
+//  resolves a used `left` from the `right` it is given.
+.small-box .credit-icon {
+    left: auto;
+    right: auto;
+    inset-inline-end: 1rem;
+}
+
+//  Both tab strips (Orders/Amounts/Credits and Last Orders/…/Most Viewed).
+//  The period <select> shares the Orders strip as an untitled <li> floated to
+//  the far side; it flips with them.
+.ves-tabs-title > li.ves-tab-title {
+    float: inline-start;
+    margin-right: 0;
+    margin-inline-end: .5rem;
+}
+
+.ves-tabs-title > li:not(.ves-tab-title) {
+    float: inline-end;
+    margin-right: 0;
+    margin-inline-start: .5rem;
+}
+
+//  THE CROPPED TABLE. Last Orders is five nowrap columns — 587px of table in
+//  English, 532px in Arabic — inside a 345px card whose container had
+//  `overflow-x: visible`, so Grand Total and Status were cut off the right
+//  edge in English and off the LEFT edge in Arabic. It scrolls inside its
+//  card now instead; the page itself never scrolls sideways.
+.dashboard-item-content {
+    max-inline-size: 100%;
+    overflow-x: auto;
+}
+
+.ves__table-primary.dashboard-data th,
+.ves__table-primary.dashboard-data td {
+    text-align: start;
+}
+
+.ves__table-primary.dashboard-data .a-right {
+    text-align: end;
+}
+
+//  "Recently Added Products": the thumbnail touched its title and the price
+//  badge was floated physically right, landing against the title's last word.
+//  Laid out as a row with a real gap; the badge sits under the title at the
+//  start edge, in both directions.
+.block-new-products .products-list > .item {
+    align-items: flex-start;
+    display: flex;
+    gap: var(--hm-space-3);
+
+    .product-img {
+        flex: 0 0 auto;
+        float: none;
+    }
+
+    .product-info {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: column;
+        gap: var(--hm-space-1);
+        margin: 0;
+        min-inline-size: 0;
+    }
+
+    .product-title {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--hm-space-1);
+    }
+
+    .price-label.pull-right {
+        float: none;
+        margin: 0;
+    }
+}
+
+//  The seller side menu and its "Online" line: the Font Awesome glyph sat
+//  flush against its label ("🛒Sales"). A logical gap, so the space is on the
+//  label's side in both directions.
+//  The CURRENT item is a `<strong>`, not an `<a>` — so the first cut of this
+//  missed exactly the one item the client screenshotted (Dashboard).
+.seller-menu li > a > .fa,
+.seller-menu li > strong > .fa,
+.user-panel .info a > .fa {
+    margin-inline-end: var(--hm-space-2);
+}
+
+//  ---------------------------------------------------------------------------
 //  item 4 — the seller dashboard does not respond below 768px
 //  ---------------------------------------------------------------------------
 //  "The vendor dashboard isn't showing properly", filed with four screenshots,
