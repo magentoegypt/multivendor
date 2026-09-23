@@ -938,10 +938,41 @@ input.mobile-number {
     margin-inline-end: .5rem;
 }
 
+//  `!important` BECAUSE THE FLOAT IS INLINE. tabs.phtml writes
+//  `<li style="float: right;">` round the period <select>, and no selector
+//  outweighs a style attribute — the first cut of this rule (no !important)
+//  measured `float: right` in Arabic, i.e. it had never applied.
 .ves-tabs-title > li:not(.ves-tab-title) {
-    float: inline-end;
+    float: inline-end !important;
     margin-right: 0;
     margin-inline-start: .5rem;
+}
+
+//  RE-AUDIT, second pass (client: "some elements not mirrored of LTR"). The
+//  mirror diff after the first pass left three structural misses:
+//
+//  1. Both tab strips started 40px in from the right in Arabic. That is the
+//     browser's OWN list indent — `padding-inline-start: 40px` in the UA
+//     sheet — which Vnecoms resets as `padding-left: 0`. In English that is
+//     the same side; in Arabic the indent is on the right and survives.
+.row-grap ul.ves-tabs-title {
+    padding-left: 0;
+    padding-right: 0;
+    padding-inline-start: 0;
+}
+
+//  2. Every stat tile was 10px short of the start edge in Arabic:
+//     `.small-box { margin-right: 10px }` is physical.
+.dashboard-state .small-box {
+    margin-right: 0;
+    margin-inline-end: 10px;
+}
+
+//  3. The "Recently Added Products" rail sat 15px further in on the wrong
+//     side: `.block-new-products { padding-left: 15px }`, physical.
+.row-grap .block-new-products {
+    padding-left: 0;
+    padding-inline-start: 15px;
 }
 
 //  THE CROPPED TABLE. Last Orders is five nowrap columns — 587px of table in
