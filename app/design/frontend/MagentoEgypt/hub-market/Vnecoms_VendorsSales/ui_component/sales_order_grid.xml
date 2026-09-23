@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Hub Market — the seller Orders page (/marketplace/sales_order/) loads again.
+ *
+ * Vnecoms' STOREFRONT listing is named `sales_order_grid`, and its data provider
+ * looks its collection up under the name `sales_order_grid_data_source` — which
+ * Magento_Sales maps to its OWN admin order-grid collection. That collection
+ * reads `sales_order_grid`, which has no `vendor_id` column, and the grid's
+ * `filter_url_params` then adds `vendor_id = <seller>`:
+ *
+ *   SQLSTATE[42S22]: Unknown column 'vendor_id' in 'where clause', query was:
+ *   SELECT main_table.* FROM sales_order_grid AS main_table WHERE (vendor_id = '51')
+ *
+ * Every seller got that error in place of their orders.
+ *
+ * Vnecoms DOES ship the right collection — Vnecoms\VendorsSales\Model\
+ * ResourceModel\Order\Grid\Collection, registered globally as
+ * `vendors_sales_order_grid_data_source`. It reads ves_vendor_sales_order (which
+ * has vendor_id), joins sales_order_grid for the display fields, and returns the
+ * VENDOR-order id as entity_id — exactly what this grid's View link
+ * (marketplace/sales_order/view, param order_id) and the controller behind it
+ * (vendorOrderFactory->load($id)) expect. It was simply never wired to this
+ * storefront page.
+ *
+ * So the data provider's lookup NAME changes. No PHP and no DI change: this
+ * needs a config-cache clean, not di:compile.
+ *
+ * THE PROVIDER REFERENCES HAVE TO FOLLOW IT. The dataProvider `name` is ALSO the
+ * name the JS data-source component registers under, so after the rename it is
+ * `sales_order_grid.vendors_sales_order_grid_data_source`. The first cut of this
+ * override left the listing's js_config pointing at the old
+ * `sales_order_grid.sales_order_grid_data_source`, and the listing waited
+ * forever for a provider that never appeared: no error anywhere, just an empty
+ * page — measured two minutes in, with only the renamed source in uiRegistry.
+ * The only other reference in the module's copy is inside a commented-out
+ * filterSearch block.
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">sales_order_grid.vendors_sales_order_grid_data_source</item>
+            <item name="deps" xsi:type="string">sales_order_grid.vendors_sales_order_grid_data_source</item>
+        </item>
+    </argument>
+    <!-- Cells render with a reactive foreach; see the header of
+         Vnecoms_VendorsSales/web/template/grid/listing.html in this theme. -->
+    <columns name="sales_order_columns">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="template" xsi:type="string">Vnecoms_VendorsSales/grid/listing</item>
+            </item>
+        </argument>
+    </columns>
+    <dataSource name="sales_order_grid_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="name" xsi:type="string">vendors_sales_order_grid_data_source</argument>
+        </argument>
+    </dataSource>
+</listing>

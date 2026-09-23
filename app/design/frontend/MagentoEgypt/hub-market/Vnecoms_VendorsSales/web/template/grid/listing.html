@@ -1,0 +1,39 @@
+<!--
+/**
+ * Hub Market — Magento_Ui::grid/listing.html for the seller Orders grid only,
+ * with ONE change: the row cells use Knockout's reactive `foreach` instead of
+ * `outerfasteach`.
+ *
+ * `outerfasteach="data: getVisible()"` evaluates the visible-column list ONCE
+ * per row. Core grids get away with it because their rows arrive by AJAX after
+ * the columns have initialised. This grid's collection (Vnecoms'
+ * vendors_sales_order_grid_data_source) delivers its rows INLINE with the page,
+ * so the rows rendered while getVisible() was still empty and stayed empty:
+ * 20 <tr class="data-row"> with zero cells, reproduced on two clean loads at
+ * 65s and 114s, while the header — which uses the reactive `each` — showed all
+ * 8 columns. A data refresh re-rendered them correctly, which is what proved
+ * the cause.
+ *
+ * `foreach` re-evaluates when the columns become visible. At 20 rows x 8 cells
+ * the speed difference fastForEach exists for does not matter.
+ */
+-->
+<div class="admin__data-grid-wrap" data-role="grid-wrapper">
+    <table class="data-grid" data-role="grid">
+       <thead>
+            <tr each="data: getVisible(), as: '$col'" render="getHeader()"></tr>
+        </thead>
+        <tbody>
+            <tr if="rows" class="data-row" repeat="foreach: rows, item: '$row'" css="'_odd-row': $index % 2">
+                <!-- ko if: $row() -->
+                <!-- ko foreach: {data: getVisible(), as: '$col'} -->
+                <td css="getFieldClass($row())" click="getFieldHandler($row())" template="getBody()"></td>
+                <!-- /ko -->
+                <!-- /ko -->
+            </tr>
+            <tr ifnot="hasData()" class="data-grid-tr-no-data">
+                <td attr="colspan: countVisible()" translate="'We couldn\'t find any records.'"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
