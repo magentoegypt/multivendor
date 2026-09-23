@@ -1,0 +1,31 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+ -->
+<div if="isPaymentMethodsAvailable()"
+     class="items payment-methods">
+    <div repeat="foreach: paymentGroupsList, item: '$group'"
+         class="payment-group">
+        <div if="regionHasElements($group().displayArea)"
+             translate="getGroupTitle($group)"
+             class="step-title"
+             data-role="title">
+        </div>
+        <each args="data: getRegion($group().displayArea), as: 'method'" render=""></each>
+    </div>
+</div>
+<!-- Hub Market (TC54): methods returned but their renderers still loading — a
+     spinner, not "No Payment Methods". See Magento_Checkout/js/payment-list-mixin. -->
+<div if="!isPaymentMethodsAvailable() && hmIsRendering && hmIsRendering()"
+     class="hm-payment-loading"
+     role="status"
+     aria-live="polite">
+    <span class="hm-spinner" aria-hidden="true"></span>
+    <span translate="'Loading payment methods...'"></span>
+</div>
+<div if="!isPaymentMethodsAvailable() && !(hmIsRendering && hmIsRendering())"
+     class="no-payments-block"
+     translate="'No Payment Methods'">
+</div>

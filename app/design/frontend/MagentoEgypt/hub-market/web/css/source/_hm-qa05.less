@@ -1827,3 +1827,13 @@ html:lang(ar) body[class*='marketplace-'] .column.main {
         }
     }
 }
+
+//  TC54 (14zb93nupaj): shown while the payment renderers load, in place of
+//  "No Payment Methods". See Magento_Checkout/js/payment-list-mixin.js.
+.hm-payment-loading {
+    align-items: center;
+    color: var(--hm-foreground-muted);
+    display: flex;
+    gap: var(--hm-space-3);
+    padding-block: var(--hm-space-4);
+}

@@ -162,7 +162,9 @@ var config = {
                 'Amasty_CheckoutCore/js/view/payment/method-renderer/default-mixin': false
             },
             'Magento_Checkout/js/view/payment/list': {
-                'Amasty_CheckoutCore/js/view/payment/list': false
+                'Amasty_CheckoutCore/js/view/payment/list': false,
+                //  Preloads renderers; spinner instead of "No Payment Methods" (TC54).
+                'Magento_Checkout/js/payment-list-mixin': true
             },
             'Magento_Checkout/js/view/shipping': {
                 'Amasty_Checkout/js/view/shipping-mixin': false,
