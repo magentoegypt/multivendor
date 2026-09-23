@@ -23,6 +23,43 @@ define(['algoliaCommon'], function (algoliaCommon) {
     //  The Insights / Personalization rules (consent, Free-plan query guards)
     //  live in insights-hm-mixin.js, which is applied before insights.js runs.
 
+    /*
+     * Hand over from the server-rendered field (autocomplete.phtml,
+     * #hm-search-prefield) to Algolia's the moment Algolia's is mounted. Whatever
+     * the visitor typed while the scripts were loading, and their focus, move
+     * across, so the swap is invisible even mid-typing.
+     */
+    algoliaCommon.registerHook('afterAutocompleteStart', function (instance) {
+        var pre = document.getElementById('hm-search-prefield');
+
+        if (!pre) {
+            return instance;
+        }
+
+        var input = pre.querySelector('input');
+        var typed = input ? input.value : '';
+        var hadFocus = !!input && document.activeElement === input;
+
+        pre.parentNode.removeChild(pre);
+
+        var aaInput = document.querySelector('#algoliaAutocomplete .aa-Input');
+
+        if (typed && instance && typeof instance.setQuery === 'function') {
+            instance.setQuery(typed);
+
+            if (hadFocus) {
+                instance.setIsOpen(true);
+                instance.refresh();
+            }
+        }
+
+        if (hadFocus && aaInput) {
+            aaInput.focus();
+        }
+
+        return instance;
+    });
+
     algoliaCommon.registerHook('beforeAutocompleteOptions', function (options) {
         var mount = document.querySelector('.hm-search__field');
 

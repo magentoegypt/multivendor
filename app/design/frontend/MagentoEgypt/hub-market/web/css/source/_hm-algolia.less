@@ -267,6 +267,37 @@ html:lang(ar) {
 
     .aa-InputWrapper { flex: 1 1 auto; min-inline-size: 0; }
 
+    //  The server-rendered field shown until Algolia mounts (autocomplete.phtml).
+    //  Every value here mirrors `.aa-Form` / `.aa-Input` so the handover is not
+    //  visible — change them together.
+    .hm-search__prefield {
+        align-items: center;
+        background: #fff;
+        block-size: 4.4rem;
+        display: flex;
+        inline-size: 100%;
+        margin: 0;
+    }
+
+    .hm-search__prefield-input {
+        appearance: none;
+        background: transparent;
+        block-size: 4.4rem;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        color: #1a1a2e;
+        font-family: var(--hm-font-sans);
+        font-size: 1.4rem;
+        inline-size: 100%;
+        margin: 0;
+        padding-block: 0;
+        padding-inline: var(--hm-space-4);
+
+        &::placeholder { color: var(--hm-neutral-500, #6b7280); opacity: 1; }
+        &:focus { box-shadow: none; outline: 0; }
+    }
+
     .aa-Input {
         background: transparent;
         border: 0;
@@ -599,7 +630,9 @@ html:lang(ar) {
     .hm-search--algolia {
         .aa-Autocomplete,
         .aa-Form,
-        .aa-Input { block-size: 4rem; }
+        .aa-Input,
+        .hm-search__prefield,
+        .hm-search__prefield-input { block-size: 4rem; }
 
         //  The label is screen-reader-only at this width, so the magnifier is
         //  the button's only visible content and has to sit in the middle of it.

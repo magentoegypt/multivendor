@@ -45,7 +45,7 @@ if (!$config->isAutoCompleteEnabled()) {
                     <label class="label hm-sr-only" for="hm-search-cat">
                         <span><?= $escaper->escapeHtml(__('Search in category')) ?></span>
                     </label>
-                    <select id="hm-search-cat" name="cat" class="hm-search__cat-select">
+                    <select id="hm-search-cat" name="cat" class="hm-search__cat-select" form="hm-search-prefield">
                         <option value=""><?= $escaper->escapeHtml(__('All Categories')) ?></option>
                         <?php foreach ($hmCats as $hmCat): ?>
                             <option value="<?= $escaper->escapeHtmlAttr($hmCat['id']) ?>"
@@ -58,13 +58,34 @@ if (!$config->isAutoCompleteEnabled()) {
             <?php endif; ?>
 
             <?php /* autocomplete-js mounts here; the class is what algoliaConfig.autocomplete.selector targets */ ?>
-            <div id="algoliaAutocomplete" class="algolia-search-block algolia-search-input hm-search__field"></div>
+            <div id="algoliaAutocomplete" class="algolia-search-block algolia-search-input hm-search__field"><?php
+                /* THE FIELD BEFORE ALGOLIA ARRIVES.
+                   autocomplete-js draws the search box, and on a phone its scripts land
+                   a second or more after the page is on screen — until then this mount
+                   point was an empty strip between "All Categories" and the orange
+                   button. This is a real, server-rendered search form in its place:
+                   visible with the HTML, styled identically (_hm-algolia.less), and a
+                   plain GET to Magento's results page, so it works even if Algolia's
+                   scripts never load. The category select and the Search button join it
+                   through the HTML `form` attribute.
+                   hooks.js removes it on `afterAutocompleteStart`, carrying over what
+                   the visitor already typed and their focus. Once it is gone, the
+                   button's `form` points at nothing and the click handler below drives
+                   Algolia's form, exactly as before. */ ?>
+                <form id="hm-search-prefield" class="hm-search__prefield" role="search"
+                      action="<?= $escaper->escapeUrl($block->getUrl('catalogsearch/result')) ?>" method="get">
+                    <input class="hm-search__prefield-input" type="text" name="q"
+                           inputmode="search" enterkeyhint="search" autocomplete="off"
+                           placeholder="<?= $escaper->escapeHtmlAttr(__('Search for products, categories, ...')) ?>"
+                           aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"/>
+                </form>
+            </div>
 
             <?php /* Third segment of Figma's bar. autocomplete-js puts its own submit
                      on the LEFT as a magnifier, which is not this theme's shape, so that
                      one is hidden in CSS and this drives the same form. */ ?>
             <div class="actions">
-                <button type="button" class="action search hm-search__submit" aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+                <button type="submit" form="hm-search-prefield" class="action search hm-search__submit" aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
                     <?php /* The icon is NOT decoration here. Below 768px the theme takes the
                              label away (`.block-search .hm-search__label { .hm-sr-only-mixin() }`,
                              _hm-header.less), so a button carrying only the label renders as an
