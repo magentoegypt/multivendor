@@ -1171,6 +1171,33 @@ html:lang(ar) body[class*='marketplace-'] {
     .selectmenu {
         text-align: right;
     }
+
+    //  Seller ORDER VIEW. Mirror-diff of #3000000045 left two groups on English
+    //  sides:
+    //  1. The info boxes (shipping/billing address vs method). blank's generic
+    //     two-column rule `.account .column.main .block:not(.widget)
+    //     .block-content .box:nth-child(odd|even)` (0,8,0) floats odd boxes
+    //     left + clear left and even boxes right. A per-box selector lost to it;
+    //     restating the same pattern wins at (0,9,2) and also covers every
+    //     other two-column box block on seller pages.
+    //  2. The totals (Subtotal … Grand Total): every tfoot cell is
+    //     `text-align: right`.
+    //  After both, the diff reports only differences explained by Arabic word
+    //  widths.
+    .column.main .block:not(.widget) .block-content .box:nth-child(odd) {
+        clear: right;
+        float: right;
+    }
+
+    .column.main .block:not(.widget) .block-content .box:nth-child(even) {
+        float: left;
+    }
+
+    .table-order-items tfoot .mark,
+    .table-order-items tfoot .amount,
+    .table-order-items tfoot th {
+        text-align: left;
+    }
 }
 
 //  ---------------------------------------------------------------------------
