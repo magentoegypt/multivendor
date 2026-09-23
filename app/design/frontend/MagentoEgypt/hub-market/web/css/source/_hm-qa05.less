@@ -932,10 +932,19 @@ input.mobile-number {
 //  Both tab strips (Orders/Amounts/Credits and Last Orders/…/Most Viewed).
 //  The period <select> shares the Orders strip as an untitled <li> floated to
 //  the far side; it flips with them.
-.ves-tabs-title > li.ves-tab-title {
+//  Written against Vnecoms' own selectors in vendor-panel.css:
+//      .ves-tabs > .ves-tabs-title > li               { float: left; margin-right: 5px }
+//      .ves-tabs > .ves-tabs-title > li:first-of-type { margin-left: 0 }        (0,3,1)
+//  That second rule zeroes the first tab's START margin in English. In Arabic
+//  `margin-left` is the gap AFTER the first tab, so it glued tabs one and two
+//  together — measured 0px there against 5px between every other pair, and 5px
+//  everywhere in English. Both selectors are restated here, at (0,4,1).
+.ves-tabs > .ves-tabs-title > li.ves-tab-title,
+.ves-tabs > .ves-tabs-title > li.ves-tab-title:first-of-type {
     float: inline-start;
+    margin-left: 0;
     margin-right: 0;
-    margin-inline-end: .5rem;
+    margin-inline-end: 5px;
 }
 
 //  `!important` BECAUSE THE FLOAT IS INLINE. tabs.phtml writes
@@ -1055,6 +1064,13 @@ input.mobile-number {
 
 .block-seller-menu .seller-menu-container .user-panel .image {
     float: inline-start;
+}
+
+//  The "Online" link: `.seller-menu-container .user-panel > .info > a
+//  { padding-right: 5px }` (0,3,1), physical.
+.block-seller-menu .seller-menu-container .user-panel > .info > a {
+    padding-right: 0;
+    padding-inline-end: 5px;
 }
 
 .seller-menu li > a > .fa,
