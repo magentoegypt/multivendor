@@ -339,6 +339,27 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                             <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-globe"/></svg>
                             <?= /* @noEscape */ $hmLangHtml ?>
                         </div>
+                        <?php
+                        /*
+                         * TC55 (14zb93nupn7): this menu is block-cached and shared by
+                         * every page, so the link above carries the uenc of whichever
+                         * page first filled the cache — "عربي" on Grocery went to the
+                         * Arabic home page, "English" went to Checkout. The header's
+                         * utility-bar switcher is rendered per page and is always right
+                         * (present on phones too, only hidden), so on tap follow ITS href.
+                         */
+                        ?>
+                        <script>
+                            document.addEventListener('click', function (event) {
+                                var link = event.target.closest && event.target.closest('.hm-nav__lang a[lang]'),
+                                    live = link && document.querySelector('.hm-utility__lang a[lang="' + link.getAttribute('lang') + '"]');
+
+                                if (live && live.href && live.href !== link.href) {
+                                    event.preventDefault();
+                                    window.location.href = live.href;
+                                }
+                            }, true);
+                        </script>
                     <?php endif; ?>
 
                     <?php
