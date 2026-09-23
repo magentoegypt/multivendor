@@ -470,6 +470,45 @@ html:lang(ar) {
         .info { flex: 1 1 auto; margin: 0; min-inline-size: 0; padding: 0; }
     }
 
+    //
+    //  The two footers
+    //
+    //  Algolia positions BOTH footers `absolute; bottom: 0` over the content
+    //  instead of below it: `#autocomplete-products-footer` ("See products in
+    //  All departments (22) or in Bags", a 44px grey band) and `#algoliaFooter`
+    //  ("Search by algolia"). Nothing reserves room for them, so whenever the
+    //  product list reaches the bottom of its column the band sits on the last
+    //  row — measured over 31px of row 4 at a 790px-tall window — and on phones
+    //  "Search by algolia" was drawn across a product's price.
+    //
+    //  Desktop keeps Algolia's single bottom band and reserves its height: the
+    //  products source (always the first section) spans the full panel height,
+    //  so padding it by the band's height keeps the list above the band; the
+    //  last section in the other column is padded for "Search by". Phones
+    //  un-position both instead — see the phone block below.
+    //
+    //  `#algoliaFooter` is also pinned with a PHYSICAL `left: 0`, which in
+    //  Arabic put it under the product column; `inset-inline-start` follows the
+    //  page direction.
+    .aa-PanelLayout > section.aa-Source:first-child { padding-block-end: 4.4rem; }
+    .aa-PanelLayout > section.aa-Source:last-of-type { padding-block-end: 3.2rem; }
+
+    #algoliaFooter {
+        inset-inline-end: auto;
+        inset-inline-start: 0;
+        left: auto;
+        right: auto;
+
+        //  Upstream spaces "Search by" from the logo with a physical
+        //  `margin-right: 5px`, which in Arabic lands on the outer side and
+        //  runs "البحث بواسطة" straight into the logo.
+        .algolia-search-by-label {
+            margin-left: 0;
+            margin-right: 0;
+            margin-inline-end: .5rem;
+        }
+    }
+
     //  Headings share the rows' 16px inline padding so "CATEGORIES" and the
     //  category names start on the same edge — measured 15px vs 27px before.
     //  The extra `.aa-Panel .aa-Source` weight is needed because Algolia's own
@@ -583,6 +622,16 @@ html:lang(ar) {
         //  AFTER the theme's, so on equal specificity it won on source order and
         //  this rule measured as `nowrap` even though it was present in
         //  styles-m.css. The fourth class settles it without !important.
+        //  One column: both footers simply follow the content in order, so
+        //  neither can land on a product, and the desktop reservations go.
+        #autocomplete-products-footer,
+        #algoliaFooter { position: static; }
+
+        .aa-PanelLayout > section.aa-Source:first-child,
+        .aa-PanelLayout > section.aa-Source:last-of-type { padding-block-end: 0; }
+
+        #algoliaFooter { padding: var(--hm-space-3) var(--hm-space-4); }
+
         //  The flex row itself is set at every width further up; phones only
         //  differ in that a long name should WRAP rather than be truncated —
         //  there is no second line of real estate to truncate into here.
