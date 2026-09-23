@@ -1089,6 +1089,61 @@ input.mobile-number {
 }
 
 //  ---------------------------------------------------------------------------
+//  Seller panel grids (Manage Products, and every other Vnecoms listing that
+//  reuses Magento's admin data-grid on the storefront) — the Arabic mirror
+//  ---------------------------------------------------------------------------
+//  Client: "check RTL on other seller panel pages too". Magento's admin grid
+//  chrome was only ever built for LTR, and Vnecoms reuses it on /marketplace/*.
+//  Mirror-diffed English against Arabic on Manage Products; the misses were:
+//
+//    toolbar rows (Actions | records found | pager)   Bootstrap col-xs-*, float: left
+//    Filters wrapper                                   float: right
+//    pager wrapper                                     float: right; text-align: right
+//    pager, previous, next                             physical margin-left/-right
+//
+//  Arabic-only and scoped to seller pages — every one carries a `marketplace-*`
+//  body class — so English and the storefront are untouched. `html:lang(ar)`
+//  per [[rtl-selectors-never-match]]: there is no dir attribute on this site.
+//  The grid body itself needed nothing: its wrapper already scrolls
+//  (5,885px of columns in a 334px box), and in RTL the scroll starts at the
+//  right, which is correct.
+html:lang(ar) body[class*='marketplace-'] {
+    .column.main [class*='col-xs-'],
+    .column.main [class*='col-sm-'],
+    .column.main [class*='col-md-'] {
+        float: right;
+    }
+
+    .data-grid-filters-actions-wrap {
+        float: left;
+    }
+
+    .admin__data-grid-pager-wrap {
+        float: left;
+        text-align: left;
+    }
+
+    .admin__data-grid-pager {
+        margin-left: 0;
+        margin-right: 30px;
+    }
+
+    .admin__data-grid-pager .action-previous {
+        margin-left: 25px;
+        margin-right: 0;
+    }
+
+    .admin__data-grid-pager .action-next {
+        margin-left: 0;
+        margin-right: 15px;
+    }
+
+    .selectmenu {
+        text-align: right;
+    }
+}
+
+//  ---------------------------------------------------------------------------
 //  item 4 — the seller dashboard does not respond below 768px
 //  ---------------------------------------------------------------------------
 //  "The vendor dashboard isn't showing properly", filed with four screenshots,
