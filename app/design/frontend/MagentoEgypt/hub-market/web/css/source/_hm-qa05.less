@@ -257,11 +257,18 @@ input.mobile-number {
 //  untouched, which is the same mistake this file has already recorded once on
 //  the success page's border.
 //
-//  (0,2,0) against `.modal-slide`'s (0,1,0); both classes are on the same
-//  element — the wrapper is `modal-popup otp-verify-modal modal-slide
-//  _inner-scroll _show`.
+//  (0,3,0), NOT (0,2,0). The first cut of this was `.otp-verify-modal.modal-slide`
+//  and QA sent it straight back. blank declares the offset TWICE: once as
+//  `.modal-slide` (0,1,0), and again inside its mobile `.media-width` block as
+//  `.modal-popup.modal-slide { left: 44px }` — (0,2,0), the same weight as the
+//  first cut, and `.media-width` output EMITS AT THE END of the stylesheet
+//  (byte 856k in the merged file; this rule is at 815k). Equal weight, later
+//  wins, so the deployed page kept `left: 44px`. It passed in testing only
+//  because the test appended the rule to the page, i.e. after blank's.
+//  Three classes, all on the same element — the wrapper is `modal-popup
+//  otp-verify-modal modal-slide _inner-scroll _show` — settles it on weight.
 @media screen and (max-width: 767px) {
-    .otp-verify-modal.modal-slide {
+    .modal-popup.modal-slide.otp-verify-modal {
         left: 0;
         right: 0;
     }
