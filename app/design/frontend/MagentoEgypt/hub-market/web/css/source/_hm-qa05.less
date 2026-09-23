@@ -1798,10 +1798,17 @@ html:lang(ar) body[class*='marketplace-'] .column.main {
 //       LABEL to "Adding..." and adds `.disabled`, but the card button is a
 //       28px icon with the label visually hidden. Swap the icon for a spinner
 //       while `.disabled` is on.
-.hm-header__main {
-    backface-visibility: hidden;
-    transform: translateZ(0);
-    will-change: transform;
+//
+//       PHONES ONLY (DEV01.33 / 14zb93nupmz): on desktop the bar is not fixed,
+//       and the layer made it its own stacking context, so the mini-cart,
+//       account menu and search panel opening from it painted UNDER the
+//       categories bar that follows it (hit-testing still said "on top").
+@media screen and (max-width: 767px) {
+    .hm-header__main {
+        backface-visibility: hidden;
+        transform: translateZ(0);
+        will-change: transform;
+    }
 }
 
 .product-item .action.tocart {
