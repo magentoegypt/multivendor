@@ -1692,3 +1692,23 @@ html:lang(ar) body[class*='marketplace-'] {
 .hm-billing-step__actions {
     margin-block-start: var(--hm-space-5);
 }
+
+// Seller product edit form: add-on units stay inline, empty warning hidden,
+// and Arabic mirrors the switches, messages and multiselect arrow.
+body[class*='marketplace-'] .column.main {
+    .control-addon { display: flex; align-items: center; gap: .8rem; }
+    .control-addon > input { flex: 1 1 auto; min-width: 0; width: auto; }
+    .control-addon > .addon-suffix,
+    .control-addon > .addon-prefix { flex: 0 0 auto; white-space: nowrap; }
+    .message.warning:has(> span:empty) { display: none; }
+}
+html:lang(ar) body[class*='marketplace-'] .column.main {
+    .admin__actions-switch-label { transform: scaleX(-1); }
+    .message { padding-left: 24px; padding-right: 40px; }
+    .message > *:first-child::before { left: auto; right: 0; }
+    .admin__action-multiselect,
+    .admin__action-multiselect-text { text-align: right; }
+    .admin__action-multiselect { padding-left: 36px; padding-right: 10px; }
+    .admin__action-multiselect::before { right: auto; left: 0; }
+    .admin__action-multiselect::after { right: auto; left: 12px; }
+}

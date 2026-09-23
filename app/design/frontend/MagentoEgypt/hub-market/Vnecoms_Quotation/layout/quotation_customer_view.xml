@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+    Hub Market: drop Vnecoms' reference to jquery/fileUploader/css/jquery.fileupload-ui.css.
+    Magento 2.4.8 removed the jQuery fileUploader library (lib/web/jquery/fileUploader/css no
+    longer exists). With CSS merging on, a page whose merged bundle is rebuilt with this in its
+    asset list dies with "LESS file is empty: .../jquery.fileupload-ui.less" - that is what
+    broke the seller Add product page. Removing a link to a file that does not exist changes
+    no styling. Done for every Vnecoms handle that still carries it, not just the one that
+    failed today.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <remove src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+    </head>
+</page>

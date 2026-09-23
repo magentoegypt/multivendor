@@ -105,4 +105,90 @@
                 type="MagentoEgypt\VendorExtend\Plugin\Customer\SellerLoginUrl"
                 sortOrder="100"/>
     </type>
+
+    <!--
+        Hub Market: the seller product ADD and EDIT pages (/marketplace/catalog_product/new|edit)
+        fataled for every seller on Magento 2.4.8:
+
+          CompositeConfigProvider::__construct(): Argument #3 ($variablePluginConfigProvider)
+          must be of type array, null given
+
+        Vnecoms runs its seller product form in the FRONTEND area, and its controller's
+        dependency chain builds Magento\Cms\Model\Wysiwyg\Config for the description
+        editor. That needs CompositeConfigProvider's four provider maps, which Magento only
+        declares in Magento_Cms/etc/adminhtml/di.xml; in the compiled frontend map they are
+        empty, and 2.4.8's constructor requires arrays. It fails while the CONTROLLER is
+        constructed, so no layout/template/ui_component change can route around it.
+
+        These are the same four maps Magento declares for adminhtml, copied verbatim.
+    -->
+    <type name="Magento\Cms\Model\Wysiwyg\CompositeConfigProvider">
+        <arguments>
+            <argument name="variablePluginConfigProvider" xsi:type="array">
+                <item name="default" xsi:type="string">Magento\Variable\Model\Variable\ConfigProvider</item>
+            </argument>
+            <argument name="widgetPluginConfigProvider" xsi:type="array">
+                <item name="default" xsi:type="string">Magento\Widget\Model\Widget\Config</item>
+            </argument>
+            <argument name="wysiwygConfigPostProcessor" xsi:type="array">
+                <item name="default" xsi:type="string">Magento\Cms\Model\Wysiwyg\DefaultConfigProvider</item>
+            </argument>
+            <argument name="galleryConfigProvider" xsi:type="array">
+                <item name="default" xsi:type="string">Magento\Cms\Model\Wysiwyg\Gallery\DefaultConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        Same failure class, found by building the seller product_form component from the CLI
+        before a second compile rather than by crashing the page again. Each of these is
+        declared by Magento for adminhtml only; Vnecoms' storefront product form needs them.
+
+        - Eav\CompositeConfigProcessor: its eavWysiwygDataProcessors map (Catalog's default
+          only; PageBuilder's processor is left out on purpose, the seller editor is plain
+          WYSIWYG and PageBuilder would pull its whole admin editor into the storefront).
+        - UploadResizeConfigInterface: the product image gallery block.
+        - Initialization\Helper\HandlerInterface: product SAVE initialisation.
+        - AttributesListInterface: configurable products.
+        - SalesChannelNameResolverInterface: the inventory panel.
+    -->
+    <type name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Eav\CompositeConfigProcessor">
+        <arguments>
+            <argument name="eavWysiwygDataProcessors" xsi:type="array">
+                <item name="default" xsi:type="object">Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Eav\WysiwygConfigDataProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Backend\Model\Image\UploadResizeConfigInterface" type="Magento\Backend\Model\Image\UploadResizeConfig"/>
+    <preference for="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper\HandlerInterface" type="Magento\Catalog\Controller\Adminhtml\Product\Initialization\Helper\Plugin\Handler\Composite"/>
+    <preference for="Magento\ConfigurableProduct\Model\AttributesListInterface" type="Magento\ConfigurableProduct\Model\AttributesList"/>
+    <preference for="Magento\InventorySalesAdminUi\Model\SalesChannelNameResolverInterface" type="Magento\InventorySalesAdminUi\Model\WebsiteNameResolver"/>
+
+    <!--
+        Third and last of the set. The description/custom WYSIWYG fields are rendered by
+        PageBuilder's form element (it replaces the core wysiwyg element globally), whose
+        InlineEditingSupportedAdapterList only gets its adapter map in PageBuilder's adminhtml
+        di.xml. This is just that map (which editor adapters support inline editing), not
+        PageBuilder's editor. Found by preparing the WHOLE seller product_form component tree
+        from the CLI (229 components; 220 for configurable), which the first probe did not do.
+        With this and the entries above, new-simple, existing-configurable and
+        new-configurable forms all prepare with zero errors.
+    -->
+    <type name="Magento\PageBuilder\Model\Wysiwyg\InlineEditingSupportedAdapterList">
+        <arguments>
+            <argument name="wysiwygAdaptersSupportingInlineEditing" xsi:type="array">
+                <item name="mage/adminhtml/wysiwyg/tiny_mce/tinymceAdapter" xsi:type="boolean">true</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Seller "Add product": Vnecoms' storefront NewAction has no _session; see the plugin. -->
+    <type name="Vnecoms\VendorsProduct\Controller\Catalog\Product\NewAction">
+        <plugin name="hm_new_action_session" type="MagentoEgypt\VendorExtend\Plugin\VendorsProduct\NewActionSession"/>
+    </type>
+
+    <!-- Storefront breadcrumbs accept Vnecoms' admin-style addLink(); see the plugin. -->
+    <type name="Magento\Theme\Block\Html\Breadcrumbs">
+        <plugin name="hm_breadcrumbs_add_link" type="MagentoEgypt\VendorExtend\Plugin\Theme\BreadcrumbsAddLink"/>
+    </type>
 </config>

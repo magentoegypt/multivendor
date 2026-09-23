@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market — seller panel pages are never full-page cached.
+ *
+ * Every private seller page (dashboard, products list/new/edit, orders list/view,
+ * seller index) loads this handle. Vnecoms' copy declares nothing uncacheable, so
+ * Magento treated these layouts as full-page-cacheable:
+ *
+ *  1. The seller product edit page came back `x-magento-cache-debug: HIT` —
+ *     served from Varnish. Varnish varies on customer group / store / currency,
+ *     not on WHICH seller, and Vnecoms' ownership check lives in the controller,
+ *     which a cache hit never reaches.
+ *  2. A cacheable layout makes blocks with a ttl render through ESI. The header
+ *     nav (`hub.market.topnav`, ttl 3600) was fetched as an ESI sub-request
+ *     carrying this page's handles; `catalog_product_form` in that sub-request
+ *     (no product id) sent the router into its 100-iteration loop, and Magento's
+ *     error page was injected into the header of the product add/edit pages.
+ *
+ * One cacheable="false" block marks the whole layout uncacheable: no FPC for
+ * seller pages, and the nav renders inline with the rest of the page.
+ * Public seller pages (login, register) do not load this handle and stay cacheable.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="hm.seller.panel.nocache" cacheable="false"/>
+        </referenceContainer>
+    </body>
+</page>
