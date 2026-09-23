@@ -216,3 +216,368 @@ html:lang(ar) {
         }
     }
 }
+
+//
+//  Algolia autocomplete wearing the Hub Market search bar
+//  _____________________________________________
+//
+//  Algolia replaces the whole `top.search` block, so the theme's bar has to be
+//  rebuilt around its mount point (see the autocomplete.phtml override). The
+//  markup there reuses .block-search / .form.minisearch / .hm-search__cat, so
+//  _hm-header.less already supplies the category segment and the outer row.
+//  What is left is dressing autocomplete-js's own .aa-* DOM as the WHITE middle
+//  segment, and un-anchoring its panel from the ~360px box it defaults to.
+//
+//  Figma's bar is SQUARE and three-tone: dark category / white field / orange
+//  button. No radius anywhere — that was the single most visible header defect
+//  the last time this was measured, so nothing here introduces one.
+//
+.hm-search--algolia {
+
+    .hm-search__row {
+        align-items: stretch;
+        display: flex;
+        width: 100%;
+    }
+
+    //  The mount point is the flex middle. min-inline-size:0 is what actually lets
+    //  it shrink inside the row — without it the panel keeps its content width and
+    //  the bar overflows the header.
+    .hm-search__field {
+        flex: 1 1 auto;
+        min-inline-size: 0;
+        position: relative;
+    }
+
+    .aa-Autocomplete,
+    .aa-Form {
+        block-size: 4.4rem;
+        inline-size: 100%;
+    }
+
+    //  White field, square, no border — matched to the theme's own input.
+    .aa-Form {
+        align-items: center;
+        background: #fff;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        display: flex;
+    }
+
+    .aa-InputWrapper { flex: 1 1 auto; min-inline-size: 0; }
+
+    .aa-Input {
+        background: transparent;
+        border: 0;
+        block-size: 4.4rem;
+        color: #1a1a2e;
+        font-family: var(--hm-font-sans);
+        font-size: 1.4rem;
+        inline-size: 100%;
+        padding-inline: var(--hm-space-4);
+
+        &::placeholder { color: var(--hm-neutral-500, #6b7280); opacity: 1; }
+        &:focus { outline: 0; box-shadow: none; }
+    }
+
+    //  autocomplete-js ships a magnifier submit on the LEFT. This theme's affordance
+    //  is the orange button on the right, so the built-in one is removed rather than
+    //  restyled — two submit affordances in one bar reads as a bug.
+    //  The orange segment stood 4px short of the white field on desktop —
+    //  measured 40 against 44 — because _hm-header.less pins the button to
+    //  `min-block-size: 4rem` above 768px while the field and the category
+    //  select are 4.4rem. `.hm-search__row` is already `align-items: stretch`,
+    //  so `.actions` is the full bar height; only the button inside it was not
+    //  filling. Filling the parent tracks whatever height the bar happens to be
+    //  at any width, rather than introducing a third hardcoded value that would
+    //  then have to be kept in step with two others.
+    .actions { display: flex; }
+    .hm-search__submit { block-size: 100%; }
+
+    .aa-SubmitButton,
+    .aa-InputWrapperPrefix { display: none; }
+    .aa-ClearButton { color: var(--hm-neutral-500, #6b7280); }
+
+    //
+    //  The suggestions panel
+    //
+    //  autocomplete-js absolutely positions .aa-Panel against the MOUNT POINT and
+    //  sets an inline pixel width from it, which is why it rendered ~360px wide and
+    //  clipped its own rows. Widening it to the whole bar needs the inline width
+    //  overridden, hence !important on inline-size only.
+    //
+    .aa-Panel {
+        background: var(--hm-surface, #fff);
+        border: 1px solid var(--hm-border-subtle);
+        //  WHITE TEXT ON A WHITE PANEL. This markup is a child of `.hm-header`,
+        //  so `color` inherits var(--hm-on-inverse) — measured rgb(255,255,255)
+        //  on a rgb(255,255,255) background, a contrast ratio of 1:1. Most rows
+        //  escaped it only because they set a colour of their own; anything that
+        //  does not was invisible, which is what happened to the footer line
+        //  ("See products in … (317) or in …" — only the orange links showed).
+        //  This is the same defect, and the same fix, that `.search-autocomplete`
+        //  in _hm-header.less already carries for the non-Algolia dropdown.
+        color: var(--hm-foreground);
+        //  Without this the 1px borders are added OUTSIDE the forced 100%, so
+        //  the panel measured 1275 inside a 1273 field and the field itself
+        //  reported a horizontal overflow.
+        box-sizing: border-box;
+        border-radius: 0;
+        box-shadow: var(--hm-shadow);
+        inline-size: 100% !important;
+        inset-inline-start: 0 !important;
+        margin-block-start: 0;
+        max-block-size: 60rem;
+        overflow-y: auto;
+        z-index: 1000;      // above the sticky nav row beneath the header
+    }
+
+    //
+    //  Panel layout
+    //
+    //  `.aa-PanelLayout` is a GRID with two hardcoded tracks — measured
+    //  `grid-template-columns: 240px 560px`, so 800px of content sitting in a
+    //  1275px panel. `.aa-Panel` is `flex-direction: row-reverse`, which packs
+    //  that 800px against the right edge and leaves the remaining 474px as dead
+    //  white space down the LEFT of the dropdown. Letting the product track take
+    //  the slack fills the panel and, because the track stops being 560px,
+    //  simultaneously removes the reason the results scrolled sideways.
+    //
+    //  `inline-size` is the whole fix here. Upstream sizes the two tracks as
+    //  `30% / 70%`, which is already adaptive — it was the LAYOUT that was not
+    //  filling the panel. (An earlier attempt to restate the tracks as
+    //  `24rem 1fr` measured as 237.344px/553.812px, i.e. still 30/70, so it was
+    //  never winning that declaration and has been removed rather than left in
+    //  looking load-bearing.)
+    .aa-PanelLayout { inline-size: 100%; }
+
+    .aa-Item {
+        //  THE HORIZONTAL SCROLLBAR UNDER THE PRODUCTS WAS THIS ONE PROPERTY.
+        //  The results list is a two-track grid that already sizes itself to
+        //  the column (`1fr 1fr`), but the rows are content-box, so their
+        //  `padding: 12px 16px` is added OUTSIDE the track: measured tracks of
+        //  434.406px holding items 466px wide — 434.4 + 16 + 16 — which is
+        //  exactly the 32px by which scrollWidth beat clientWidth at both 1440
+        //  and 1920. Nothing about the track widths needed changing.
+        box-sizing: border-box;
+
+        //  ...and this is the other half of it. A grid item's `min-width` is
+        //  `auto`, i.e. it refuses to shrink below its own content, so at 1440
+        //  (tracks of 266px rather than 1920's 434px) the rows pushed the track
+        //  wide again and the scrollbar came back — the same 32px. This is the
+        //  identical floor that `.hm-search__field` above has to clear for the
+        //  bar itself. The row then truncates inside its track, which is what
+        //  `.info { overflow: hidden }` upstream is already there to do.
+        min-inline-size: 0;
+
+        //  THE GAP BETWEEN SUGGESTIONS IS THE THEME'S OWN, not Algolia's.
+        //  autocomplete-js renders each row as an <li>, and this theme carries a
+        //  blanket `ul > li, ol > li { margin-bottom: 1.2rem }` — written for
+        //  prose lists — which lands on every suggestion. Measured as a constant
+        //  12px between the first four rows at 390px AND 1440px; nothing in
+        //  Algolia's own stylesheet sets a margin here at all. Specificity is
+        //  not the issue (that rule is 0,0,2), it simply had no competition.
+        margin-block-end: 0;
+        //  8px, not 12px: the hit link inside used to add its own 5px on top
+        //  (reset below), and the two together made every row roughly twice
+        //  the height of its text — categories 65px for 34px of text, pages 95
+        //  for 64. That doubled padding is what read as a gap between
+        //  suggestions even after the stray list margin was gone.
+        padding: var(--hm-space-2) var(--hm-space-4);
+
+        &[aria-selected='true'],
+        &:hover {
+            background: var(--hm-surface-muted, #f5f7fa);
+        }
+    }
+
+    //  THE ROW ITSELF IS WHAT OVERFLOWED THE PRODUCT COLUMN.
+    //  Upstream renders each result as an `inline-block` whose width comes from
+    //  its content, with `white-space: nowrap` on the text — so it sized itself
+    //  to ~275px regardless of the track it was placed in. At 1920 the tracks
+    //  are 434px and it fits; at 1440 they are 266px and it did not, which is
+    //  the horizontal scrollbar under the results (measured scrollWidth 565 vs
+    //  clientWidth 533 — and why the bar appeared at one width but not another).
+    //  Making it a flex row that fills the track, with the text column allowed
+    //  to shrink, lets it truncate inside the cell the way `.info`'s own
+    //  `overflow: hidden` already intends.
+    //  UPSTREAM PADS THE HIT LINK AS WELL AS THE ROW (`5px 10px`), which both
+    //  doubled every row's height and pushed row text 10px further in than the
+    //  "CATEGORIES" / "PAGES" headings above it — together with the row's own
+    //  16px that was the visible left-hand indent in the left column (text at
+    //  x≈51, heading at x≈29). One layer of padding, on the row, lines the
+    //  text up with its heading and halves the row.
+    .aa-Panel .algoliasearch-autocomplete-hit { padding: 0; }
+
+    //  PRODUCT ROWS ONLY, selected by the list's own id
+    //  (`autocomplete-0-products-list`), not by `:has(.thumb)`. The three sources
+    //  share the `.algoliasearch-autocomplete-hit` class but not the markup:
+    //      products    <div class="thumb"><img></div><div class="info">…
+    //      categories  <mark>Bag</mark>s / Women's <mark>Bag</mark>s (14)
+    //      pages       <div class="info-without-thumb">…
+    //  A category row has no element wrappers, so flexing it turns every <mark>
+    //  and text node into a spaced flex item ("Bag  s /  Women's  Bag  s").
+    //  `:has()` did scope it correctly, but these rows are inserted by script
+    //  after load and Blink re-evaluates `:has()` on late-inserted nodes only
+    //  sometimes (see memory: has-selector-invalidation-race) — an attribute
+    //  on the list itself has no such race.
+    //
+    //  The rest fixes the jagged text column: thumbnails had no fixed width
+    //  (names started at 505 / 499 / 498px down one column), and upstream spaces
+    //  thumb and text with BOTH `margin-right: 10px` on the thumb and
+    //  `padding-left: 15px` on the text. A fixed 5rem thumb box and the flex gap
+    //  alone give one aligned text edge. `margin`/`padding` are reset whole, not
+    //  per side, because upstream's are physical and would land on the wrong
+    //  side in Arabic.
+    .aa-Panel .aa-List[id$='-products-list'] .algoliasearch-autocomplete-hit {
+        align-items: center;
+        display: flex;
+        gap: var(--hm-space-3);
+        inline-size: 100%;
+        min-inline-size: 0;
+
+        //  72px, up from upstream's 50px wide / ~35px tall: the product is the
+        //  thing being chosen here and at 50px it was barely identifiable. The
+        //  indexed thumbnails are 265x265 (algoliasearch_images/image), so this
+        //  stays sharp even at 2x density. `object-fit: contain` in a square
+        //  box keeps tall and wide photos the same visual size, so the text
+        //  column beside them stays on one edge.
+        .thumb {
+            flex: 0 0 7.2rem;
+            inline-size: 7.2rem;
+            margin: 0;
+            text-align: center;
+
+            img {
+                block-size: 7.2rem;
+                inline-size: 100%;
+                object-fit: contain;
+            }
+        }
+
+        .info { flex: 1 1 auto; margin: 0; min-inline-size: 0; padding: 0; }
+    }
+
+    //  Headings share the rows' 16px inline padding so "CATEGORIES" and the
+    //  category names start on the same edge — measured 15px vs 27px before.
+    //  The extra `.aa-Panel .aa-Source` weight is needed because Algolia's own
+    //  header rule (a margin on the header, no padding) merges after the theme
+    //  and was winning at equal specificity.
+    .aa-Panel .aa-Source .aa-SourceHeader {
+        margin: 0;
+        padding: var(--hm-space-2) var(--hm-space-4);
+
+        //  The products source renders an EMPTY header div; with the padding
+        //  above it became a 16px blank band over the first product.
+        &:empty { display: none; }
+    }
+
+    //  `start`, not `left`/`right`, so one rule serves both languages. Upstream
+    //  hard-codes `text-align: left` on the hit link and on
+    //  `.aa-Panel .aa-PanelLayout section .aa-SourceHeader`; in Arabic that left
+    //  every product name flush LEFT while its thumbnail moved right — a wide
+    //  hole between each image and its text — and put the section headings on
+    //  the opposite side from their rows. The html:lang(ar) `text-align: right`
+    //  rule further down tied upstream's specificity and lost on merge order.
+    //  The panel is already RTL in Arabic (the flex row places the thumbnail on
+    //  the right), so `start` resolves correctly without a language branch.
+    .aa-Panel .aa-PanelLayout .aa-Source .aa-SourceHeader,
+    .aa-Panel .aa-List .algoliasearch-autocomplete-hit { text-align: start; }
+
+    .aa-SourceHeader {
+        color: var(--hm-neutral-600, #535d70);
+        font-size: 1.2rem;
+        font-weight: 700;
+        padding: var(--hm-space-2) var(--hm-space-4);
+        text-transform: uppercase;
+    }
+}
+
+//  Arabic: the panel is pinned with a logical property above, but autocomplete-js
+//  also writes `left` inline. `html:lang(ar)` (never [dir=rtl] — no dir attribute
+//  exists on this storefront) re-pins it and mirrors the row.
+html:lang(ar) {
+    .hm-search--algolia {
+        .aa-Panel { inset-inline-start: 0 !important; inset-inline-end: auto !important; }
+        .aa-Item, .aa-SourceHeader { text-align: right; }
+    }
+}
+
+
+//
+//  Phones
+//  _____________________________________________
+//
+//  _hm-algolia.less had NO media rules at all: the bar above was written at the
+//  desktop width and simply inherited onto phones, where it does not fit the
+//  header the rest of the theme builds.
+//
+//  The 4rem is not a fresh choice. _hm-mobile.less budgets the pinned phone
+//  header on a 4rem search row — its own comment does the arithmetic,
+//  `12 + 36 + 8 + 40 + 12 = 108`, "which takes the pinned header to 297px
+//  (35% of the viewport) — below the prototype's own 315" — and normalises the
+//  theme's `.input-text` and `.action.search` to it:
+//
+//      .hm-page .hm-search .input-text,
+//      .hm-page .hm-search .action.search { block-size: 4rem; min-block-size: 0; }
+//
+//  Algolia's field is NEITHER of those selectors. It is `.aa-Input` inside
+//  `.aa-Form`, so it kept the 4.4rem set above and stood four pixels proud of
+//  the button beside it — measured 44 against 40 at 390px. Matching the budget
+//  here rather than pushing the button back up to 4.4rem keeps that header
+//  arithmetic true.
+//
+@media screen and (max-width: 767px) {
+    .hm-search--algolia {
+        .aa-Autocomplete,
+        .aa-Form,
+        .aa-Input { block-size: 4rem; }
+
+        //  The label is screen-reader-only at this width, so the magnifier is
+        //  the button's only visible content and has to sit in the middle of it.
+        //  Width is deliberately left to the theme's own padding so this button
+        //  measures the same as the one form.mini.phtml renders elsewhere.
+        .hm-search__submit { justify-content: center; }
+
+        //  The panel is anchored to the MOUNT POINT, which is only the white
+        //  field — 290px of a 390px screen. Everything inside it is then laid
+        //  out for a desktop panel, so the rows had ~148px of usable width.
+        //  Widening it to the search ROW (field + button) is the one change that
+        //  gives the rows room; `!important` only because autocomplete-js writes
+        //  an inline pixel width, same reason as the desktop rule above.
+        .aa-Panel {
+            inline-size: calc(100vw - 3.2rem) !important;
+            //  Leave the header and a little of the page visible behind it
+            //  rather than letting 10 hits run past the bottom of the screen.
+            max-block-size: calc(100vh - 16rem);
+        }
+
+        //  autocomplete-js renders the rows as real list-items, and the marker
+        //  box indents each one ~25px at this width — pure waste next to a 50px
+        //  thumbnail.
+        .aa-List { list-style: none; margin: 0; padding-inline-start: 0; }
+        .aa-Item { display: block; }
+
+        //  Upstream TRUNCATES rather than wraps: its own stylesheet puts
+        //  `white-space: nowrap; overflow: hidden` on `.info`, which at this
+        //  width cut product names mid-word ("Men's Portable Foldable…") and
+        //  clipped the category line under them. Wrapping is the only thing
+        //  that makes a long name readable on a phone.
+        //
+        //  `.aa-Panel` IS IN THIS SELECTOR ON PURPOSE. Algolia's rule is
+        //  `.aa-Panel .algoliasearch-autocomplete-hit .info` — three classes,
+        //  exactly the weight of `.hm-search--algolia .algoliasearch-autocomplete-hit
+        //  .info`. With merge_css_files on, Algolia's stylesheet is concatenated
+        //  AFTER the theme's, so on equal specificity it won on source order and
+        //  this rule measured as `nowrap` even though it was present in
+        //  styles-m.css. The fourth class settles it without !important.
+        //  The flex row itself is set at every width further up; phones only
+        //  differ in that a long name should WRAP rather than be truncated —
+        //  there is no second line of real estate to truncate into here.
+        .aa-Panel .algoliasearch-autocomplete-hit {
+            .info,
+            .algoliasearch-autocomplete-category { white-space: normal; }
+        }
+    }
+}

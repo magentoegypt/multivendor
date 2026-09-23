@@ -19,6 +19,12 @@
         <sequence>
             <module name="Algolia_AlgoliaSearch"/>
             <module name="Vnecoms_Vendors"/>
+            <!--
+                Both are required for etc/di.xml to win: it REDEFINES virtual types
+                those two modules declare, and the last definition loaded wins.
+            -->
+            <module name="Algolia_SearchAdapter"/>
+            <module name="Mageplaza_LayeredNavigation"/>
         </sequence>
     </module>
 </config>

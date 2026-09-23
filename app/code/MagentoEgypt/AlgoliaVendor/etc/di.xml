@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Lets Algolia's SearchAdapter and Mageplaza's layered navigation share one
+ * product collection.
+ *
+ * THE COLLISION
+ * Mageplaza redefines the virtual type
+ * Magento\CatalogSearch\Model\ResourceModel\Fulltext\CollectionFactory so it
+ * builds its OWN class, which adds getCollectionClone(), removeAttributeSearch()
+ * and setGetAllData(). Its Price, Category and Attribute filters all chain those.
+ * SearchAdapter builds algoliaFulltextSearchCollection / algoliaCategoryCollection
+ * from the STOCK fulltext collection, so with catalog/search/engine = algolia the
+ * methods vanish and every category page dies on the price slider:
+ *
+ *   Error: Call to undefined method ...Fulltext\Collection\Interceptor::getCollectionClone()
+ *   at Mageplaza/LayeredNavigation/Model/Layer/Filter/Price.php:179
+ *
+ * WHY POINTING THEM AT MAGEPLAZA'S CLASS IS SOUND
+ * Mageplaza's collection extends Magento\Catalog\...\Product\Collection rather
+ * than the fulltext one, so it is a reimplementation, not a subclass — but it
+ * reimplements the SAME search-API contract: its constructor takes
+ * searchRequestName, searchCriteriaResolverFactory, searchResultApplierFactory
+ * and totalRecordsResolverFactory, and _renderFiltersBefore() resolves through
+ * getSearchCriteriaResolver(). Algolia only needs those three arguments honoured,
+ * which they are. So Algolia's resolvers ride on Mageplaza's collection and both
+ * sets of behaviour survive.
+ *
+ * Arguments below are copied verbatim from the adapter's own di.xml; only the
+ * `type` changes. If the adapter is upgraded, re-diff those arguments.
+ *
+ * Inert while catalog/search/engine is not `algolia` — nothing resolves these
+ * virtual types otherwise.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <virtualType name="algoliaFulltextSearchCollection"
+                 type="Mageplaza\LayeredNavigation\Model\ResourceModel\Fulltext\Collection">
+        <arguments>
+            <argument name="searchRequestName" xsi:type="string">quick_search_container</argument>
+            <argument name="searchCriteriaResolverFactory" xsi:type="object">algoliaSearchCriteriaResolverFactory</argument>
+            <argument name="totalRecordsResolverFactory" xsi:type="object">algoliaTotalRecordsResolver\Factory</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="algoliaCategoryCollection"
+                 type="Mageplaza\LayeredNavigation\Model\ResourceModel\Fulltext\Collection">
+        <arguments>
+            <argument name="searchRequestName" xsi:type="string">catalog_view_container</argument>
+            <argument name="searchCriteriaResolverFactory" xsi:type="object">algoliaSearchCriteriaResolverFactory</argument>
+            <argument name="totalRecordsResolverFactory" xsi:type="object">algoliaTotalRecordsResolver\Factory</argument>
+        </arguments>
+    </virtualType>
+
+    <!--
+        Keeps the suggestions index from being emptied by Algolia's own reindex.
+        See MagentoEgypt\AlgoliaVendor\Plugin\PreserveSuggestionIndex for the
+        upstream defect this compensates for; the guard is self-disabling if the
+        defect is ever fixed.
+    -->
+    <type name="Algolia\AlgoliaSearch\Service\AlgoliaConnector">
+        <plugin name="magentoegypt_algolia_preserve_suggestion_index"
+                type="MagentoEgypt\AlgoliaVendor\Plugin\PreserveSuggestionIndex"
+                sortOrder="10"/>
+    </type>
+</config>

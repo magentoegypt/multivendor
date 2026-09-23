@@ -1,0 +1,103 @@
+<?php
+/**
+ * Algolia autocomplete, wearing the Hub Market search bar.
+ *
+ * Upstream renders ONLY `<div id="algoliaAutocomplete" class="... algolia-search-input">`
+ * and lets autocomplete-js fill it. Because Algolia replaces the whole `top.search`
+ * block, that wiped the theme's bar: the "All Categories" selector, the orange
+ * Search button and the full-width field all disappeared, and the suggestions panel
+ * anchored to a ~360px box at the far left of the header.
+ *
+ * This override rebuilds the theme's chrome AROUND Algolia's mount point, reusing the
+ * same `search_categories` view model form.mini.phtml uses — that argument is declared
+ * on the BLOCK in Magento_Theme/layout/default.xml, so it survives the template swap.
+ *
+ * NO <form> WRAPPER, deliberately. autocomplete-js renders its own <form class="aa-Form">
+ * inside the container, and nesting forms is invalid HTML — the browser closes the outer
+ * one early and the category select ends up outside it. The select therefore sits beside
+ * the mount point and is carried onto the results URL by the submit hook below.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$blockInstance = $block->getLayout()->createBlock(\Algolia\AlgoliaSearch\Block\Algolia::class);
+$config        = $blockInstance->getConfigHelper();
+
+$hmCatVm     = $block->getData('search_categories');
+$hmCats      = $hmCatVm ? $hmCatVm->getCategories() : [];
+$hmActiveCat = (int) $block->getRequest()->getParam('cat');
+
+if (!$config->isAutoCompleteEnabled()) {
+    return;
+}
+?>
+<script type="text/x-magento-init">
+    { "*": { "algoliaAutocomplete": {} } }
+</script>
+
+<div class="block block-search hm-search hm-search--algolia">
+    <div class="block block-title"><strong><?= $escaper->escapeHtml(__('Search')) ?></strong></div>
+    <div class="block block-content">
+        <div class="form minisearch hm-search__row" role="search">
+
+            <?php if ($hmCats): ?>
+                <div class="field hm-search__cat">
+                    <label class="label hm-sr-only" for="hm-search-cat">
+                        <span><?= $escaper->escapeHtml(__('Search in category')) ?></span>
+                    </label>
+                    <select id="hm-search-cat" name="cat" class="hm-search__cat-select">
+                        <option value=""><?= $escaper->escapeHtml(__('All Categories')) ?></option>
+                        <?php foreach ($hmCats as $hmCat): ?>
+                            <option value="<?= $escaper->escapeHtmlAttr($hmCat['id']) ?>"
+                                <?= $hmActiveCat === (int) $hmCat['id'] ? ' selected="selected"' : '' ?>>
+                                <?= $escaper->escapeHtml($hmCat['name']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+
+            <?php /* autocomplete-js mounts here; the class is what algoliaConfig.autocomplete.selector targets */ ?>
+            <div id="algoliaAutocomplete" class="algolia-search-block algolia-search-input hm-search__field"></div>
+
+            <?php /* Third segment of Figma's bar. autocomplete-js puts its own submit
+                     on the LEFT as a magnifier, which is not this theme's shape, so that
+                     one is hidden in CSS and this drives the same form. */ ?>
+            <div class="actions">
+                <button type="button" class="action search hm-search__submit" aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+                    <?php /* The icon is NOT decoration here. Below 768px the theme takes the
+                             label away (`.block-search .hm-search__label { .hm-sr-only-mixin() }`,
+                             _hm-header.less), so a button carrying only the label renders as an
+                             EMPTY orange square on every phone — which is exactly how this
+                             shipped. Same markup as the theme's own Magento_Search/templates/
+                             form.mini.phtml button, so the two stay in step. */ ?>
+                    <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-search"/></svg>
+                    <span class="hm-search__label"><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Carry the category scope onto the results URL. Algolia's own form submit
+    // navigates to resultPageUrl with ?q=, and knows nothing about `cat` — which is
+    // the parameter Magento's category layer filter reads.
+    require(['jquery'], function ($) {
+        'use strict';
+        //  The theme's button is outside Algolia's form, so it submits it explicitly.
+        $(document).on('click', '.hm-search__submit', function () {
+            var $f = $('#algoliaAutocomplete form.aa-Form');
+            if ($f.length) { $f.trigger('submit'); }
+        });
+
+        $(document).on('submit', '#algoliaAutocomplete form.aa-Form', function (e) {
+            var cat = $('#hm-search-cat').val();
+            if (!cat) { return; }
+            e.preventDefault();
+            var q = $(this).find('input.aa-Input').val() || '';
+            window.location.href = <?= /* @noEscape */ json_encode($block->getUrl('catalogsearch/result')) ?>
+                + '?q=' + encodeURIComponent(q) + '&cat=' + encodeURIComponent(cat);
+        });
+    });
+</script>

@@ -21,4 +21,12 @@
         <observer name="magentoegypt_algolia_add_seller_facet"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerFacet"/>
     </event>
+    <event name="algolia_after_suggestions_collection_build">
+        <observer name="magentoegypt_algolia_filter_suggestions"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\FilterSuggestions"/>
+    </event>
+    <event name="algolia_after_create_configuration">
+        <observer name="magentoegypt_algolia_storefront_translations"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\AddStorefrontTranslations"/>
+    </event>
 </config>

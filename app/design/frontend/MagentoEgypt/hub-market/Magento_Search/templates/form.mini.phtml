@@ -21,7 +21,26 @@ declare(strict_types=1);
 /** @var \Magento\Search\Helper\Data $helper */
 $helper = $this->helper(\Magento\Search\Helper\Data::class);
 $searchViewModel = $block->getData('configProvider');
-$isSuggestionsAllowed = $searchViewModel && $searchViewModel->isSuggestionsAllowed();
+/*
+ * Autocomplete is rendered unconditionally, NOT gated on
+ * catalog/search/search_suggestion_enabled, because that one flag drives two
+ * unrelated things and they pull in opposite directions here:
+ *
+ *   1. Magento\AdvancedSearch\Model\DataProvider\AutocompleteSuggestions::getItems()
+ *      uses it to choose the data source -- ON asks the SEARCH ENGINE for
+ *      suggestions, OFF falls back to the search_query log.
+ *   2. This template uses it to decide whether to emit the quickSearch JS at all.
+ *
+ * With catalog/search/engine = algolia the engine branch returns nothing (the
+ * adapter only aliases core's Suggestions provider and yields no items), so the
+ * flag has to be OFF for suggestions to exist -- which previously also removed
+ * the JS that displays them, leaving an input wired to nothing.
+ *
+ * Decoupling it here keeps the dropdown working off the query log, which is what
+ * Magento's native autocomplete has always been. Revert this line if a
+ * SuggestedQueriesInterface is ever implemented for Algolia.
+ */
+$isSuggestionsAllowed = true;
 ?>
 <div class="block block-search">
     <div class="block block-title"><strong><?= $escaper->escapeHtml(__('Search')) ?></strong></div>
