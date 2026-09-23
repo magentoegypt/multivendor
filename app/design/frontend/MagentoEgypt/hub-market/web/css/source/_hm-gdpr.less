@@ -1,0 +1,57 @@
+//
+//  Cookie consent banner (MGS_GDPR) — phones
+//  _____________________________________________
+//
+//  The banner is MGS_GDPR's html/notices.phtml, and it is positioned by INLINE
+//  styles built from admin config (gdpr/cookie_restriction/*):
+//      width: 400px; bottom: 50px; left: 30px   (right: 30px in Arabic)
+//  — desktop numbers. Measured at 390px: 460px wide from x=30, so it ran ~100px
+//  off the right edge and cut its own text ("…experience b", "Rea…"); and it sat
+//  at z-index 10 with its bottom 8px inside the fixed bottom tab bar (z 80), so
+//  the bar covered it.
+//
+//  `!important` only where the inline style has to be beaten. Desktop keeps the
+//  admin-configured card.
+//
+@media screen and (max-width: 767px) {
+    #notice-cookie-block.mgs-gdpr-cookie-notice {
+        //  Full width with the page's 16px gutters, in either direction —
+        //  physical left AND right, because the inline style sets both.
+        box-sizing: border-box;
+        inline-size: auto !important;
+        left: 1.6rem !important;
+        right: 1.6rem !important;
+        max-inline-size: none;
+
+        //  Above the tab bar, using the bar's own published height so the two
+        //  cannot drift apart; falls back to its 58px on pages without it.
+        bottom: calc(var(--hm-bottomnav-block-size, 5.8rem) + 1.2rem) !important;
+        z-index: 81;
+
+        //  Compact enough to leave most of the screen visible, and scrollable
+        //  rather than clipped if a long translation ever outgrows it.
+        max-block-size: calc(100vh - var(--hm-bottomnav-block-size, 5.8rem) - 4rem);
+        overflow-y: auto;
+        padding: 1.6rem;
+
+        .notice-cookie-title {
+            font-size: 1.8rem;
+            margin: 0 0 .8rem;
+        }
+
+        .notice-cookie-content,
+        .notice-cookie-content p {
+            font-size: 1.4rem;
+            line-height: 1.5;
+            margin: 0 0 1.2rem;
+        }
+
+        .actions { margin: 0; }
+
+        //  Full-width, thumb-sized button.
+        #btn-cookie-allow {
+            inline-size: 100%;
+            min-block-size: 4.4rem;
+        }
+    }
+}
