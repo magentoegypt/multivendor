@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--
+    Hub Market: drop Vnecoms' reference to jquery/fileUploader/css/jquery.fileupload-ui.css.
+    Magento 2.4.8 removed the jQuery fileUploader library (lib/web/jquery/fileUploader/css no
+    longer exists). With CSS merging on, building the merged bundle for a page that lists it
+    fails with "LESS file is empty: .../jquery.fileupload-ui.less" (main.CRITICAL), and the
+    page falls back to loading every stylesheet separately. Removing a link to a file that
+    does not exist changes no styling. One of the six handles the first pass missed
+    (2026-09-24; the new-return page vrma/customer/new logged it).
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <remove src="jquery/fileUploader/css/jquery.fileupload-ui.css"/>
+    </head>
+</page>
