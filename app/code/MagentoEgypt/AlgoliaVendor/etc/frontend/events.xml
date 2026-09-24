@@ -4,7 +4,7 @@
  * Algolia's logged-in customer token cookie waits for cookie consent.
  * See MagentoEgypt\AlgoliaVendor\Observer\SetCustomerTokenWithConsent.
  *
- * The two upstream observers are disabled by name, in the same area and on the
+ * The upstream observers are disabled by name, in the same area and on the
  * same events they are declared on (Algolia_AlgoliaSearch etc/frontend/events.xml);
  * this module is sequenced after Algolia_AlgoliaSearch, so its declaration is the
  * one that wins the merge.
@@ -21,5 +21,11 @@
         <observer name="algoliasearch_cookie_refresher" disabled="true"/>
         <observer name="magentoegypt_algolia_customer_token_with_consent"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\SetCustomerTokenWithConsent"/>
+    </event>
+    <!-- Purchase event only when there is a (consented) shopper token: see PlaceOrderEventWithToken. -->
+    <event name="checkout_onepage_controller_success_action">
+        <observer name="algoliasearch_insights_place_order_event" disabled="true"/>
+        <observer name="magentoegypt_algolia_place_order_event_with_token"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\PlaceOrderEventWithToken"/>
     </event>
 </config>
