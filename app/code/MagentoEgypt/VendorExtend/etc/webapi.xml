@@ -15,4 +15,50 @@
             <resource ref="Vnecoms_Vendors::vendors"/>
         </resources>
     </route>
-</routes>
+
+    <!-- Vendor app without the admin token: every route below resolves the seller from the
+         caller's own customer token (customerId is forced), never from a client-sent id. -->
+    <route url="/V1/vendors/me" method="PUT">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="updateMe"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/vendors/me" method="DELETE">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="deleteMe"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/vendors/me/stockItems/:sku" method="GET">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="getStockItem"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/vendors/me/categories" method="GET">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="getCategories"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <!-- Anonymous, but only with the single-use token otp/verify issues for VENDOR_REGISTER. -->
+    <route url="/V1/vendors/register" method="POST">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="register"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+</routes>

@@ -10,6 +10,10 @@ use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Cache\Frontend\Pool;
 use Psr\Log\LoggerInterface;
 use Magento\Integration\Model\Oauth\TokenFactory;
+use Magento\Integration\Api\UserTokenIssuerInterface;
+use Magento\Integration\Api\Data\UserTokenParametersInterfaceFactory;
+use Magento\Integration\Model\CustomUserContext;
+use Magento\Framework\Exception\AuthenticationException;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Vnecoms\Sms\Helper\Data as SmsHelper;
@@ -18,6 +22,16 @@ class Otp extends AbstractHelper
 {
     const CACHE_TAG = 'otp_cache_';
     const OTP_EXPIRATION = 900;
+
+    /* Wrong codes allowed per issued OTP; the next one burns it and a new code must be sent. */
+    const MAX_VERIFY_ATTEMPTS = 5;
+    const ATTEMPTS_TAG = 'otp_attempts_';
+    const SENT_TAG = 'otp_sent_';
+    const DEFAULT_RESEND_COOLDOWN = 30;
+
+    /* Single-use proof that a number passed VENDOR_REGISTER, for POST /V1/vendors/register. */
+    const REGISTRATION_TICKET_TAG = 'otp_regticket_';
+    const REGISTRATION_TICKET_LIFETIME = 1800;
 
     protected $dateTime;
     protected $cache;
@@ -28,6 +42,8 @@ class Otp extends AbstractHelper
     protected $tokenFactory;
     protected $filter;
     protected $helper;
+    private $tokenIssuer;
+    private $tokenParametersFactory;
 
     public function __construct(
         Context $context,
@@ -39,7 +55,9 @@ class Otp extends AbstractHelper
         TokenFactory $tokenFactory,
         TypeListInterface $cacheTypeList,
         \Magento\Email\Model\Template\Filter $filter,
-        SmsHelper $helper
+        SmsHelper $helper,
+        UserTokenIssuerInterface $tokenIssuer,
+        UserTokenParametersInterfaceFactory $tokenParametersFactory
     ) {
         parent::__construct($context);
         $this->logger = $logger;
@@ -51,6 +69,19 @@ class Otp extends AbstractHelper
         $this->cacheTypeList = $cacheTypeList;
         $this->filter = $filter;
         $this->helper = $helper;
+        $this->tokenIssuer = $tokenIssuer;
+        $this->tokenParametersFactory = $tokenParametersFactory;
+    }
+
+    /**
+     * One cache key per NUMBER, not per spelling of it: "01001234567", "+201001234567"
+     * and "201001234567" share the OTP, its attempt counter and its resend cooldown.
+     * (Keyed on the raw string, a new spelling was a fresh counter.)
+     */
+    private function cacheKey($prefix, $mobile)
+    {
+        $canonical = $this->canonicalizeMobileForDelivery($mobile);
+        return $prefix . preg_replace('/\D+/', '', (string)($canonical ?? $mobile));
     }
 
     public function getCustomerId($mobile)
@@ -188,21 +219,74 @@ class Otp extends AbstractHelper
         return array_values($customers);
     }
 
+    /**
+     * A customer token from the CURRENT issuer (JWT on 2.4.4+), the same kind
+     * POST /V1/integration/customer/token returns. It used to be minted by the legacy
+     * Oauth TokenFactory, which writes an opaque row to oauth_token outside the
+     * token-issuer path.
+     */
     public function generateToken($customerId)
     {
-        return $this->tokenFactory->create()->createCustomerToken($customerId)->getToken();
+        $context = new CustomUserContext((int)$customerId, CustomUserContext::USER_TYPE_CUSTOMER);
+        return $this->tokenIssuer->create($context, $this->tokenParametersFactory->create());
     }
 
     public function changePassword($mobile, $password)
     {
-        $customerCollection = $this->customerCollectionFactory->create();
-        $customerCollection->addAttributeToFilter('mobilenumber', $mobile);
-        $customer = $customerCollection->getFirstItem();
-        if($customer->getId() === null) {
+        $customers = $this->getCustomersByMobile($mobile);
+        if (count($customers) !== 1) {
+            throw new LocalizedException(__('Mobile number not found.'));
+        }
+        $this->changePasswordForCustomer($customers[0]->getId(), $password);
+    }
+
+    public function changePasswordForCustomer($customerId, $password)
+    {
+        $customer = $this->customerCollectionFactory->create()
+            ->addAttributeToFilter('entity_id', (int)$customerId)
+            ->getFirstItem();
+        if ($customer->getId() === null) {
             throw new LocalizedException(__('Mobile number not found.'));
         }
         $customer->changePassword($password);
         $customer->save();
+    }
+
+    /**
+     * @param string $mobile
+     * @return string single-use ticket for POST /V1/vendors/register
+     */
+    public function issueRegistrationTicket($mobile)
+    {
+        $ticket = bin2hex(random_bytes(24));
+        $canonical = $this->canonicalizeMobileForDelivery($mobile) ?? trim((string)$mobile);
+        $this->cache->save(
+            $canonical,
+            self::REGISTRATION_TICKET_TAG . $ticket,
+            [self::CACHE_TAG],
+            self::REGISTRATION_TICKET_LIFETIME
+        );
+        return $ticket;
+    }
+
+    /**
+     * @param string $ticket
+     * @return string|null the verified mobile number, or null when unknown/expired
+     */
+    public function peekRegistrationTicket($ticket)
+    {
+        if (!preg_match('/^[a-f0-9]{48}$/', (string)$ticket)) {
+            return null;
+        }
+        $mobile = $this->cache->load(self::REGISTRATION_TICKET_TAG . $ticket);
+        return $mobile ?: null;
+    }
+
+    public function consumeRegistrationTicket($ticket)
+    {
+        if (preg_match('/^[a-f0-9]{48}$/', (string)$ticket)) {
+            $this->cache->remove(self::REGISTRATION_TICKET_TAG . $ticket);
+        }
     }
 
     /**
@@ -214,13 +298,14 @@ class Otp extends AbstractHelper
      */
     public function getOtp($phoneNumber)
     {
-        $cacheKey = self::CACHE_TAG . $phoneNumber;
+        $cacheKey = $this->cacheKey(self::CACHE_TAG, $phoneNumber);
 
         $cachedOtp = $this->cache->load($cacheKey);
 
         if(!empty($cachedOtp)) return $cachedOtp;
 
-        $otp = rand(100000, 999999);
+        $otp = random_int(100000, 999999);
+        $this->cache->remove($this->cacheKey(self::ATTEMPTS_TAG, $phoneNumber));
 
         $this->cache->save(
             (string) $otp,
@@ -242,7 +327,8 @@ class Otp extends AbstractHelper
      */
     public function verifyOtp($phoneNumber, $otp)
     {
-        $cacheKey = self::CACHE_TAG . $phoneNumber;
+        $cacheKey = $this->cacheKey(self::CACHE_TAG, $phoneNumber);
+        $attemptsKey = $this->cacheKey(self::ATTEMPTS_TAG, $phoneNumber);
 
         // Retrieve OTP from cache
         $cachedOtp = $this->cache->load($cacheKey);
@@ -251,18 +337,44 @@ class Otp extends AbstractHelper
             throw new LocalizedException(__('OTP has expired or does not exist.'));
         }
 
-        if ($cachedOtp !== $otp) {
-            throw new LocalizedException(__('Invalid OTP.'));
+        /*
+         * A 6-digit code with unlimited guesses for 15 minutes could be brute-forced —
+         * and FORGOTPASS sets a new password on success. Each wrong code counts; the
+         * MAX_VERIFY_ATTEMPTS-th burns the code. AuthenticationException lets the caller
+         * also count it toward the customer's account lockout.
+         */
+        if (!hash_equals((string)$cachedOtp, trim((string)$otp))) {
+            $attempts = (int)$this->cache->load($attemptsKey) + 1;
+            if ($attempts >= self::MAX_VERIFY_ATTEMPTS) {
+                $this->cache->remove($cacheKey);
+                $this->cache->remove($attemptsKey);
+                throw new AuthenticationException(__('Too many incorrect codes. Please request a new code.'));
+            }
+            $this->cache->save((string)$attempts, $attemptsKey, [self::CACHE_TAG], self::OTP_EXPIRATION);
+            throw new AuthenticationException(__('Invalid OTP.'));
         }
 
         // Invalidate the OTP after successful verification
         $this->cache->remove($cacheKey);
+        $this->cache->remove($attemptsKey);
 
         return true;
     }
 
     public function sendOtp($mobileNum)
     {
+        /* Every send is a paid WhatsApp message: one per number per resend period. */
+        $cooldown = method_exists($this->helper, 'getOtpResendPeriodTime')
+            ? (int)$this->helper->getOtpResendPeriodTime() : 0;
+        $cooldown = $cooldown > 0 ? $cooldown : self::DEFAULT_RESEND_COOLDOWN;
+        $sentKey = $this->cacheKey(self::SENT_TAG, $mobileNum);
+        if ($this->cache->load($sentKey)) {
+            throw new LocalizedException(
+                __('Please wait %1 seconds before requesting another code.', $cooldown)
+            );
+        }
+        $this->cache->save('1', $sentKey, [self::CACHE_TAG], $cooldown);
+
         $otp = $this->getOtp($mobileNum);
         /* Send otp Message*/
         $message = $this->helper->getOtpMessage();

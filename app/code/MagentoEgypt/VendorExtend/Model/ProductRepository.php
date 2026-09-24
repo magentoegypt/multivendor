@@ -80,6 +80,90 @@ class ProductRepository extends BaseProductRepository
     }
 
     /**
+     * POST /V1/vendors/product/save — refuses a SKU (or product id) that belongs to someone else.
+     *
+     * Vnecoms' own "already exists" guard throws its LocalizedException INSIDE the
+     * try whose catch(\Exception) swallows it, so it never fired. Core's repository then
+     * treats a known SKU as an update: posting another seller's (or the admin's) SKU
+     * rewrote that product and moved it to the caller (vendor app ticket 86d4b10r8,
+     * which became reachable once vendors could type their own SKU).
+     *
+     * A SKU the caller already owns still goes through, as it always has.
+     *
+     * @inheritdoc
+     */
+    public function save(
+        $customerId,
+        \Magento\Catalog\Api\Data\ProductInterface $product,
+        $saveOptions = false,
+        $saveDraft = false,
+        $storeId = null
+    ) {
+        $vendorId = (int) $this->helper->getVendorByCustomerId($customerId)->getId();
+        $sku = trim((string) $product->getSku());
+        if ($sku === '') {
+            throw new \Magento\Framework\Exception\InputException(__('SKU is required.'));
+        }
+
+        /* Exact SKU lookup — NOT $this->get(), which reads a numeric SKU as an entity id. */
+        $productResource = $this->objectManager->get(\Magento\Catalog\Model\ResourceModel\Product::class);
+        $skuOwnerId = (int) $productResource->getIdBySku($sku);
+        if ($skuOwnerId && $this->getProductVendorId($skuOwnerId) !== $vendorId) {
+            throw new LocalizedException(
+                __('The SKU "%1" is already used by another product. Please choose a different SKU.', $sku)
+            );
+        }
+
+        $productId = (int) $product->getId();
+        if ($productId) {
+            if ($this->getProductVendorId($productId) !== $vendorId
+                || ($skuOwnerId && $skuOwnerId !== $productId)
+            ) {
+                throw new LocalizedException(__('You are not permitted to save product %1', $sku));
+            }
+        }
+
+        return parent::save($customerId, $product, $saveOptions, $saveDraft, $storeId);
+    }
+
+    /**
+     * DELETE /V1/vendors/product/:sku — only the owning seller (or an admin/integration).
+     *
+     * The route forces customerId, but the interface method takes only the SKU, so
+     * Vnecoms deleted whatever SKU it was given: any seller could delete any product.
+     * The caller is read from the Web API user context instead.
+     *
+     * @inheritdoc
+     */
+    public function deleteById($sku)
+    {
+        $userContext = $this->objectManager->get(\Magento\Authorization\Model\UserContextInterface::class);
+        $userType = (int) $userContext->getUserType();
+
+        if ($userType === \Magento\Authorization\Model\UserContextInterface::USER_TYPE_CUSTOMER) {
+            $vendorId = (int) $this->helper->getVendorByCustomerId($userContext->getUserId())->getId();
+            $product = $this->productRepository->get($sku);
+            if ((int) $product->getVendorId() !== $vendorId) {
+                throw new LocalizedException(__('You are not permitted to delete product %1', $sku));
+            }
+        } elseif ($userType !== \Magento\Authorization\Model\UserContextInterface::USER_TYPE_ADMIN
+            && $userType !== \Magento\Authorization\Model\UserContextInterface::USER_TYPE_INTEGRATION
+        ) {
+            throw new \Magento\Framework\Exception\AuthorizationException(__('You are not permitted to delete products.'));
+        }
+
+        return parent::deleteById($sku);
+    }
+
+    /**
+     * vendor_id of a product (0 = admin-owned), read from the catalog, not the request.
+     */
+    private function getProductVendorId(int $productId): int
+    {
+        return (int) $this->productRepository->getById($productId)->getVendorId();
+    }
+
+    /**
      * @param int $customerId
      * @param \Magento\Catalog\Api\Data\ProductInterface $product
      * @param string[] $attributes

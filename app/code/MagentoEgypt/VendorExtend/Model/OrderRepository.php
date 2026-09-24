@@ -2,6 +2,7 @@
 namespace MagentoEgypt\VendorExtend\Model;
 
 use Vnecoms\VendorsApi\Model\OrderRepository as BaseOrderRepository;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class OrderRepository extends BaseOrderRepository
 {
@@ -34,10 +35,10 @@ class OrderRepository extends BaseOrderRepository
             ]
         );
         
-        if(!$collection->count()) throw new LocalizedException(__('The order does not exist'));
+        if(!$collection->count()) throw new NoSuchEntityException(__('The order does not exist'));
         $vendorOrder = $collection->getFirstItem();
 
-        if($vendorOrder->getVendorId() != $vendor->getId()) throw new LocalizedException(__('The order does not exist'));
+        if($vendorOrder->getVendorId() != $vendor->getId()) throw new NoSuchEntityException(__('The order does not exist'));
         
         $om = \Magento\Framework\App\ObjectManager::getInstance();
         $result = $om->create('MagentoEgypt\VendorExtend\Api\Data\Sale\OrderInterface');
