@@ -1,13 +1,12 @@
 <?php $requestData =  $block->getRequestData(); ?>
-<h2 class="legend" style="float: none;margin-inline-start: 0;"><?php echo __('Request Information'); ?></h2>
+<h2 class="legend"><?php echo __('Request Information'); ?></h2>
 <ul class="form-list">
     <li class="wide">
         <label for="content_message" class="required"><em>*</em><?php echo __('Order') ?></label>
         <div class="input-box">
             <select  class="validate-select" name="order_incremental_id" id="order_incremental_id">
-                <option value=""><?php echo __('---Select an order---') ?></option>
                 <?php foreach($block->getOrderByCustomerId() as $order):?>
-                    <option <?php if (isset($requestData['order_incremental_id']) == $order->getIncrementId()) echo "selected "?> value="<?php echo $order->getIncrementId() ?>" ><?php echo '#'.$order->getIncrementId().' at '.$order->getCreatedAt().' ('.$order->formatPrice($order->getGrandTotal(),(bool)$block->getIncludeContainer()).' )' ?></option>
+                    <option <?php if (isset($requestData['order_incremental_id']) == $order->getIncrementId()) echo "selected "?> value="<?php echo $order->getIncrementId() ?>" ><?php echo '#'.$order->getIncrementId().' at '.$order->getCreatedAt().' ( '.$order->formatPrice($order->getGrandTotal()).' )' ?></option>
                 <?php endforeach;?>
             </select>
         </div>
@@ -20,7 +19,7 @@
             <div class="input-box">
                 <select name="package_opened" id="package_opened" class="validate-select">
                     <?php foreach($block->getPackOpened() as $key => $value):?>
-                        <option <?php if (isset($requestData['package_opened']) == $key) echo "selected"?> value="<?php echo $key ?>" ><?php echo __($value) ?></option>
+                        <option <?php if (isset($requestData['package_opened']) == $key) echo "selected"?> value="<?php echo $key ?>" ><?php echo $value ?></option>
                     <?php endforeach;?>
                 </select>
             </div>
@@ -31,21 +30,20 @@
                 <select name="type" id="type" class="validate-select" onchange="requestOption.changeType(this.value)">
                     <option value=""><?php echo __('--- Select an Type ---') ?></option>
                     <?php foreach($block->getType() as $key => $value):?>
-                        <option <?php if (isset($requestData['type']) == $key) echo "selected"?>  value="<?php echo $key ?>" ><?php echo __($value) ?></option>
+                        <option <?php if (isset($requestData['type']) == $key) echo "selected"?>  value="<?php echo $key ?>" ><?php echo $value ?></option>
                     <?php endforeach;?>
                 </select>
             </div>
         </div>
         <div class="clear"></div>
     </li>
-
     <li class="wide" style="display:none">
         <label for="reason" class="required"><em>*</em><?php echo __('Refund Amount') ?></label>
         <div class="input-box">
             <select name="refund_amount_type" id="refund_amount_type" class="validate-select" onchange="requestOption.changeRefundAmountType(this.value)">
                 <?php foreach($block->getRefundAmountType() as $key => $title):?>
                     <option <?php if (isset($requestData['refund_amount_type']) == $key)
-                        echo "selected"?>  value="<?php echo $key ?>" ><?php echo __($title) ?>
+                        echo "selected"?>  value="<?php echo $key ?>" ><?php echo $title ?>
                     </option>
                 <?php endforeach;?>
             </select>
@@ -67,7 +65,8 @@
             <select name="reason" id="reason" class="validate-select" onchange="requestOption.changeReason(this)">
                 <option value=""><?php echo __('--- Select an Reason ---') ?></option>
                 <?php
-                /* Store-view label, not the default title - see the note at the bottom. */
+                /* Store-view label, not the default (Arabic) title: ClickUp 14zb93nuunn item 2,
+                   same change as the customer form's override. Otherwise Vnecoms' template. */
                 $hmStoreId = (int) \Magento\Framework\App\ObjectManager::getInstance()
                     ->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore()->getId();
                 ?>
@@ -81,7 +80,6 @@
             <div id="rma-reason-note" style="display: none"></div>
         </div>
     </li>
-
     <?php if($block->getConfig()->allowOtherReasons()) :  ?>
         <li class="wide" style="display:none">
             <label for="reason_detail"><?php echo __('Other Reason') ?></label>
@@ -100,63 +98,14 @@
 
     <li class="wide">
         <div class="field message">
-            <label class="label required" for="message"><span><?php /* @escapeNotVerified */ echo __('Message') ?></span></label>
+            <label class="label" for="message"><span><?php /* @escapeNotVerified */ echo __('Message') ?></span></label>
             <div class="control">
                 <?php $message =isset($requestData['message']) ? $requestData['message']:''?>
-                <textarea id="content_message_reply" name="message"><?php echo $message?></textarea>
+                <?php echo $block->getHtmlEditor($message) ?>
             </div>
         </div>
     </li>
-<?php
-/**
- * Hub Market override of Vnecoms_VendorsRMA::new_request/info.phtml.
- *
- * TWO changes.
- *
- * A. The reason dropdown prints each reason's STORE-VIEW label
- *    (Reason::getLabelByStoreId), not its default title. The default titles
- *    were entered in Arabic, so /en listed Arabic reasons although English
- *    labels exist for store 3 in ves_rma_reason_store (ClickUp 14zb93nuunn
- *    item 2). Requests store the reason ID and the request pages already use
- *    getReasonTitle(), which is store-aware, so history is unaffected. The
- *    guest form (new_request/guest/info.phtml) carries the same change.
- *
- * B. At the bottom: the WYSIWYG init.
- *
- *   1. It speaks Arabic on the Arabic store. `js/hm-editor-locale` registers
- *      the language pack Magento does not ship and then apply() adds
- *      `language: 'ar'` + `directionality: 'rtl'` when <html lang> is Arabic.
- *      Every tooltip on this toolbar was English before, inside an otherwise
- *      Arabic form (ClickUp 86d4azdjx item 2, second half).
- *
- *   2. The `plugins` list is gone. It was three strings each holding several
- *      space-separated names, and HugeRTE treats one array entry as ONE plugin
- *      name - so it asked for "plugins/advlist autolink lists link image
- *      charmap print/plugin.min.js" and two more like it, got three 404s, and
- *      loaded NO plugins at all. Dropping the list is therefore behaviour for
- *      behaviour identical to what shoppers get today, minus three errors in
- *      their console. Writing the names out properly would instead ADD
- *      autolink and friends - a feature change, not this ticket's business.
- *      Several of those names (print, textcolor, paste) do not exist in
- *      HugeRTE 1.x anyway.
- *
- * Everything above this comment is Vnecoms' template apart from change A.
- */
-?>
-<script>
-require([
-    "mage/adminhtml/wysiwyg/tiny_mce/setup",
-    "mage/adminhtml/wysiwyg/widget",
-    "js/hm-editor-locale"
-], function (wysiwyg, widget, hmEditorLocale) {
-    tinymce.init(hmEditorLocale.apply({
-        selector: '#content_message_reply',
-        height: 200,
-        menubar: false,
-        toolbar: 'undo redo | formatselect | bold italic forecolor | alignleft aligncenter alignright alignjustify | removeformat'
-    }));
-});
-</script>
+
     <li class="wide">
         <div class="field uploader" id="knockout-message-attachment"  data-bind="scope: 'attachment'">
             <label class="label" for="message"><span><?php echo __('Allow Extension : ').$block->getConfig()->allowFileExtension() ?></span></label>
@@ -169,7 +118,7 @@ require([
                                 "attachment": {
                                     "component": "Vnecoms_RMA/js/form/upload/uploader",
                                     "uploaderConfig":{
-                                        "url": "<?php echo $block->getUrl("vrma/customer/upload");?>"
+                                        "url": "<?php echo $block->getUrl("vrma/guest/upload");?>"
                                     },
                                     "dataScope" : "data.attachment",
                                     "dataType" : "data.text",

@@ -1,0 +1,26 @@
+/*
+ * Hub Market: on phones the Algolia search suggestions no longer fill the screen
+ * (ClickUp 14zb93nuunn item 1).
+ *
+ * The panel ran from under the search bar down to the bottom navigation bar, 684px of
+ * an 844px screen, so there was no page left to tap to close it. It now stops at 60% of
+ * the visible height and scrolls inside; the band of page below it is where a tap closes
+ * it (js/hm-search-dismiss.js; Algolia's mobile debug mode never closed it on its own).
+ *
+ * dvh, with a vh fallback: the phone's address bar shows and hides, and vh measures the
+ * largest viewport, so a vh-sized panel overflows exactly while the bar is showing.
+ * !important because Algolia sizes the panel to the viewport itself.
+ *
+ * Its own file, added in the head: the theme's styles-*.css are served immutable from the
+ * CDN, and a new stylesheet changes the merged-CSS file name. That works once; later edits
+ * here ship with the next normal static deploy.
+ */
+@media (max-width: 767px) {
+    body .aa-Panel {
+        max-height: 60vh !important;
+        max-height: 60dvh !important;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+    }
+}
