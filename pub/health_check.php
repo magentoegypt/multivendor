@@ -67,7 +67,17 @@ if ($cacheConfigs) {
             $cacheFrontendFactory = $objectManager->get(Magento\Framework\App\Cache\Frontend\Factory::class);
             /** @var \Zend_Cache_Backend_Interface $backend */
             $backend = $cacheFrontendFactory->create($cacheConfig);
-            $backend->test('test_cache_id');
+            // Hub Market (TC44, 2026-09-24): test('test_cache_id') looks up a key that never
+            // exists, so every probe (Varnish, every 5 s) was a Redis cache MISS and pulled the
+            // hit ratio down to ~88%. Check the storage is reachable without touching the
+            // keyspace (Redis: CONFIG GET + INFO); fall back to the original check otherwise.
+            // NOTE: this file is deployed by magento/magento2-base — re-apply after composer updates.
+            $cacheBackend = $backend->getBackend();
+            if ($cacheBackend instanceof \Zend_Cache_Backend_ExtendedInterface) {
+                $cacheBackend->getFillingPercentage();
+            } else {
+                $backend->test('test_cache_id');
+            }
         } catch (\Exception $e) {
             http_response_code(500);
             $logger->error("Cache storage is not accessible");
