@@ -65,4 +65,26 @@
                 type="MagentoEgypt\AlgoliaVendor\Plugin\PreserveSuggestionIndex"
                 sortOrder="10"/>
     </type>
+
+    <!--
+        DEV04 "fall back to default Magento search if Algolia is down", and the
+        Luma storefront (no Algolia indices) back on OpenSearch. See each class.
+    -->
+    <type name="Magento\Search\Model\EngineResolver">
+        <plugin name="magentoegypt_engine_per_store" type="MagentoEgypt\AlgoliaVendor\Plugin\EngineResolverPlugin"/>
+    </type>
+    <type name="Algolia\SearchAdapter\Model\Adapter">
+        <plugin name="magentoegypt_algolia_search_fallback" type="MagentoEgypt\AlgoliaVendor\Plugin\SearchAdapterFallback"/>
+    </type>
+    <type name="Magento\CatalogSearch\Model\Indexer\IndexerHandlerFactory">
+        <plugin name="magentoegypt_fulltext_opensearch_mirror" type="MagentoEgypt\AlgoliaVendor\Plugin\FulltextIndexerMirror"/>
+    </type>
+    <type name="Magento\CatalogSearch\Model\Indexer\IndexSwitcherProxy">
+        <plugin name="magentoegypt_fulltext_opensearch_switch" type="MagentoEgypt\AlgoliaVendor\Plugin\FulltextIndexerMirror"/>
+    </type>
+
+    <!-- DEV06: server-side searches are not Analytics searches; the results page records them from the browser. -->
+    <type name="Algolia\SearchAdapter\Service\QueryParamBuilder">
+        <plugin name="magentoegypt_server_search_no_analytics" type="MagentoEgypt\AlgoliaVendor\Plugin\ServerSearchNoAnalytics"/>
+    </type>
 </config>

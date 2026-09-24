@@ -18,6 +18,8 @@
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerData"/>
         <observer name="magentoegypt_algolia_add_price_range"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddPriceRange"/>
+        <observer name="magentoegypt_algolia_fix_price_symbol"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\FixPriceSymbol"/>
     </event>
     <event name="algolia_products_index_before_set_settings">
         <observer name="magentoegypt_algolia_add_seller_facet"
