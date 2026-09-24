@@ -1,0 +1,31 @@
+//
+//  Hub Market — Algolia Recommend carousels (DEV07)
+//  _____________________________________________
+//
+//  The cards are the theme's own product-card markup (see
+//  Algolia_AlgoliaSearch/web/js/template/recommend/products.js) inside a
+//  `.block.widget` root, so _hm-product-item.less / _hm-figma.less style them.
+//  Only the ROW needs saying: recommend-js renders <ol class="product-items">
+//  with no grid of its own, and the rail grid rules that give home rows their
+//  display are not guaranteed on the product, cart and category pages. Same
+//  geometry as the PDP related row (_hm-figma.less, "four across … two below
+//  1024"). Logical properties only, so RTL needs nothing extra.
+//
+.block.widget.hm-rec {
+    margin-block: var(--hm-space-6);
+
+    .product-items {
+        display: grid;
+        gap: var(--hm-space-5);
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        > .product-item { inline-size: auto; margin: 0; }
+    }
+}
+
+@media screen and (max-width: 1023px) {
+    .block.widget.hm-rec .product-items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

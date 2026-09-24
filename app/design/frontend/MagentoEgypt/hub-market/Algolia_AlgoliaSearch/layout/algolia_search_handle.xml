@@ -6,6 +6,17 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <!--
+        DEV07: the extension's recommend.css styles ITS OWN card markup (flex
+        rows, 16.67%-wide items, 180px images, 80px gaps) through #algoliaRecommend
+        ID selectors. The theme replaces that markup with its product cards
+        (js/template/recommend/products.js + _hm-recommend.less), and the ID
+        selectors out-weigh every theme rule — the carousels rendered as a ragged
+        flex row. Nothing else uses the file.
+    -->
+    <head>
+        <remove src="Algolia_AlgoliaSearch::css/recommend.css"/>
+    </head>
     <body>
         <referenceBlock name="head.additional">
             <block class="Magento\Framework\View\Element\Template"

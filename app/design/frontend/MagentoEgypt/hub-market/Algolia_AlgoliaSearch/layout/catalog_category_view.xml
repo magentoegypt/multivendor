@@ -7,6 +7,17 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!-- DEV07: trending in THIS category (Algolia Recommend), under the listing. -->
+        <referenceContainer name="content">
+            <block class="Algolia\AlgoliaSearch\Block\Widget\TrendsItem"
+                   name="hm.algolia.category.trends"
+                   template="Algolia_AlgoliaSearch::recommend/widget/hm-category-trends.phtml"
+                   after="-">
+                <arguments>
+                    <argument name="numOfTrendsItem" xsi:type="string">4</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
         <referenceContainer name="before.body.end">
             <block class="Magento\Framework\View\Element\Template"
                    name="hm.algolia.personalized.order"

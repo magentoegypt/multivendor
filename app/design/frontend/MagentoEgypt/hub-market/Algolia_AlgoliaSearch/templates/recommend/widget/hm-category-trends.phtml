@@ -1,0 +1,37 @@
+<?php
+/**
+ * Hub Market (DEV07): "Category: Trending Items filtered by category".
+ *
+ * The extension's trending widget with the CURRENT category as its facet
+ * filter (categoryIds:<id>), so a category page shows what is trending in that
+ * category only. Renders nothing when the Trending model has no results (see
+ * js/recommend.js), which is the case until enough conversions exist.
+ *
+ * @var \Algolia\AlgoliaSearch\Block\Widget\TrendsItem $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+if (!$block->isTrendingItemEnabled()) {
+    return;
+}
+$categoryView = $block->getLayout()->getBlock('category.products');
+$category = $categoryView ? $categoryView->getCurrentCategory() : null;
+if (!$category || !$category->getId()) {
+    return;
+}
+$container = 'hmCategoryTrends' . $block->generateUniqueToken();
+?>
+<div class="hm-rec-slot hm-rec-slot--category">
+    <div id="<?= $escaper->escapeHtmlAttr($container) ?>" class="trendsItem recommend-component"></div>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Algolia_AlgoliaSearch/js/recommend": {
+                "recommendTrendContainer": "<?= $escaper->escapeJs($container) ?>",
+                "numOfTrendsItem": "<?= (int) ($block->getData('numOfTrendsItem') ?: 4) ?>",
+                "facetName": "categoryIds",
+                "facetValue": "<?= $escaper->escapeJs((string) $category->getId()) ?>"
+            }
+        }
+    }
+</script>
