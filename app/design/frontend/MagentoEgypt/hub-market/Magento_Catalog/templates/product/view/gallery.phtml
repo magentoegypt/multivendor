@@ -1,0 +1,112 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * Product media data template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Gallery
+ * @var $escaper \Magento\Framework\Escaper
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+?>
+
+<?php
+$images = $block->getGalleryImages()->getItems();
+$mainImage = current(array_filter($images, function ($img) use ($block) {
+    return $block->isMainImage($img);
+}));
+
+if (!empty($images) && empty($mainImage)) {
+    $mainImage = $block->getGalleryImages()->getFirstItem();
+}
+
+$helper = $block->getData('imageHelper');
+$mainImageData = $mainImage ?
+    $mainImage->getData('medium_image_url') :
+    $helper->getDefaultPlaceholderUrl('image');
+    $imageWidth = $block->getImageAttribute('product_page_image_medium', 'width');
+    $imageHeight = $block->getImageAttribute('product_page_image_medium', 'height');
+
+// Hub Market (ClickUp 14zb93nuuez / QA CL036-TC63, 2026-09-24): WebP for the product gallery.
+// Cached catalog images have a "<image>.webp" copy (bin/hm-webp-sync; Apache answers that URL with
+// the original until the copy exists). The placeholder shown before the gallery starts gets a
+// <picture> WebP source; the script after the gallery config switches the gallery's "img" and
+// "thumb" URLs to the same .webp copies, but only in browsers that picked (or can decode) WebP, so
+// the main image is downloaded once. "full" (zoom / fullscreen) keeps the original file.
+$webpPattern = '#/media/catalog/product/cache/[^?\#]+\.(?:jpe?g|png)$#i';
+$mainWebp = preg_match($webpPattern, (string)$mainImageData) ? $mainImageData . '.webp' : '';
+?>
+
+<div class="gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder">
+    <?php if ($mainWebp !== ''): ?><picture><source type="image/webp" srcset="<?= $escaper->escapeUrl($mainWebp) ?>"><?php endif; ?><img
+        alt="main product photo"
+        class="gallery-placeholder__image"
+        src="<?= /* @noEscape */ $mainImageData ?>"
+        <?= $imageWidth ? 'width="'. $escaper->escapeHtmlAttr($imageWidth) .'"' : '' ?>
+        <?= $imageHeight ? 'height="'. $escaper->escapeHtmlAttr($imageHeight) .'"' : '' ?>
+    /><?php if ($mainWebp !== ''): ?></picture><?php endif; ?>
+    <link itemprop="image" href="<?= /* @noEscape */ $mainImageData ?>">
+</div>
+<?php // phpcs:ignore Magento2.Legacy.PhtmlTemplate ?>
+<script type="text/x-magento-init" id="hm-gallery-init">
+    {
+        "[data-gallery-role=gallery-placeholder]": {
+            "mage/gallery/gallery": {
+                "mixins":["magnifier/magnify"],
+                "magnifierOpts": <?= /* @noEscape */ $block->getMagnifier() ?>,
+                "data": <?= /* @noEscape */ $block->getGalleryImagesJson() ?>,
+                "options": <?= /* @noEscape */ $block->getGalleryOptions()->getOptionsJson() ?>,
+                "fullscreen": <?= /* @noEscape */ $block->getGalleryOptions()->getFSOptionsJson() ?>,
+                 "breakpoints": <?= /* @noEscape */ $block->getBreakpoints() ?>
+            }
+        }
+    }
+</script>
+<?php
+// Runs while the page is parsed, before mage/apply reads the x-magento-init block above.
+$galleryWebpJs = <<<'JS'
+(function () {
+    'use strict';
+    var init = document.getElementById('hm-gallery-init'),
+        placeholder = document.querySelector('[data-gallery-role=gallery-placeholder] picture img'),
+        cached = /\/media\/catalog\/product\/cache\/[^?#]+\.(?:jpe?g|png)$/i,
+        webp = false,
+        config,
+        gallery;
+
+    if (!init || !placeholder) {
+        return;
+    }
+    if (/\.webp$/i.test(placeholder.currentSrc || '')) {
+        webp = true;
+    } else {
+        try {
+            webp = document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0;
+        } catch (e) {
+            webp = false;
+        }
+    }
+    if (!webp) {
+        return;
+    }
+    try {
+        config = JSON.parse(init.textContent);
+        gallery = config['[data-gallery-role=gallery-placeholder]']['mage/gallery/gallery'];
+        (gallery.data || []).forEach(function (item) {
+            ['img', 'thumb'].forEach(function (key) {
+                if (typeof item[key] === 'string' && cached.test(item[key])) {
+                    item[key] += '.webp';
+                }
+            });
+        });
+        init.textContent = JSON.stringify(config);
+    } catch (e) {
+        // Leave the gallery on the original images.
+    }
+}());
+JS;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $galleryWebpJs, false) ?>

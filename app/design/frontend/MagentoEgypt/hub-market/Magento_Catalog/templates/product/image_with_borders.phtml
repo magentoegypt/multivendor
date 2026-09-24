@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/** @var $block \Magento\Catalog\Block\Product\Image */
+/** @var $escaper \Magento\Framework\Escaper */
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+$width = (int)$block->getWidth();
+$height = (int)$block->getHeight();
+$paddingBottom = $block->getRatio() * 100;
+$imageUrl = (string)$block->getImageUrl();
+// Hub Market (ClickUp 14zb93nuuez / QA CL036-TC63, 2026-09-24): offer a WebP copy of cached
+// catalog images. bin/hm-webp-sync writes "<image>.webp" beside each cached JPEG/PNG; until it
+// has (or where WebP would be larger) Apache answers that URL with the original image, so the
+// <source> never breaks. Browsers without WebP ignore it and load the <img> exactly as before.
+// Layout and swatch handling for the <picture>: Magento_Catalog::hm-webp-picture.phtml.
+$webpUrl = preg_match('#/media/catalog/product/cache/[^?\#]+\.(?:jpe?g|png)$#i', $imageUrl)
+    ? $imageUrl . '.webp'
+    : '';
+?>
+<span class="product-image-container product-image-container-<?= /* @noEscape */ $block->getProductId() ?>">
+    <span class="product-image-wrapper">
+        <?php if ($webpUrl !== ''): ?><picture><source type="image/webp" srcset="<?= $escaper->escapeUrl($webpUrl) ?>"><?php endif; ?><img class="<?= $escaper->escapeHtmlAttr($block->getClass()) ?>"
+            <?php foreach ($block->getCustomAttributes() as $name => $value): ?>
+                <?= $escaper->escapeHtmlAttr($name) ?>="<?= $escaper->escapeHtml($value) ?>"
+            <?php endforeach; ?>
+            src="<?= $escaper->escapeUrl($imageUrl) ?>"
+            loading="lazy"
+            width="<?= $escaper->escapeHtmlAttr($block->getWidth()) ?>"
+            height="<?= $escaper->escapeHtmlAttr($block->getHeight()) ?>"
+            alt="<?= $escaper->escapeHtmlAttr($block->getLabel()) ?>"/><?php if ($webpUrl !== ''): ?></picture><?php endif; ?></span>
+</span>
+<?php
+$styles = <<<STYLE
+.product-image-container-{$block->getProductId()} {
+    width: {$width}px;
+    height: auto;
+    aspect-ratio: {$width} / {$height};
+}
+.product-image-container-{$block->getProductId()} span.product-image-wrapper {
+    height: 100%;
+    width: 100%;
+}
+@supports not (aspect-ratio: auto) {
+    .product-image-container-{$block->getProductId()} span.product-image-wrapper {
+        padding-bottom: {$paddingBottom}%;
+    }
+}
+STYLE;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], $styles, false) ?>

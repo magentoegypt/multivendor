@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market (ClickUp 14zb93nuuez / QA CL036-TC63, 2026-09-24): page-level support for the WebP
+ * <picture> sources on product-card images (see Magento_Catalog::hm-webp-picture.phtml).
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="hm.webp.picture" template="Magento_Catalog::hm-webp-picture.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

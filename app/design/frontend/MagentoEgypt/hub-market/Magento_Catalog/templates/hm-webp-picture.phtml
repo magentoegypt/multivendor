@@ -1,0 +1,57 @@
+<?php
+/**
+ * Hub Market (ClickUp 14zb93nuuez / QA CL036-TC63, 2026-09-24): page-level support for the
+ * <picture> WebP sources that Magento_Catalog::product/image_with_borders.phtml puts on
+ * product-card images. Rendered once per page from Magento_Catalog/layout/default.xml.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+
+// The <picture> must not change the layout: without a box of its own the <img> keeps laying out
+// as a direct child of .product-image-wrapper (cards) or .gallery-placeholder (product page).
+$css = '.product-image-wrapper > picture,.gallery-placeholder > picture{display:contents}';
+
+// Swatches (and any other script) switch a card image by setting <img src>. Inside a <picture>
+// the browser keeps showing the <source>, so point the WebP source at the new image, or drop
+// it when the new image has no WebP copy (anything outside the catalog image cache).
+$js = <<<'JS'
+(function () {
+    'use strict';
+    var cached = /\/media\/catalog\/product\/cache\/[^?#]+\.(?:jpe?g|png)$/i;
+
+    function follow(img) {
+        var picture = img.parentNode,
+            source,
+            src;
+
+        if (!picture || picture.nodeName !== 'PICTURE') {
+            return;
+        }
+        source = picture.querySelector('source[type="image/webp"]');
+        if (!source) {
+            return;
+        }
+        src = img.getAttribute('src') || '';
+        if (cached.test(src)) {
+            source.setAttribute('srcset', src + '.webp');
+        } else {
+            picture.removeChild(source);
+        }
+    }
+
+    if (!window.MutationObserver) {
+        return;
+    }
+    new MutationObserver(function (records) {
+        records.forEach(function (record) {
+            if (record.target.nodeName === 'IMG') {
+                follow(record.target);
+            }
+        });
+    }).observe(document.documentElement, {subtree: true, attributes: true, attributeFilter: ['src']});
+}());
+JS;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('style', [], $css, false) ?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $js, false) ?>

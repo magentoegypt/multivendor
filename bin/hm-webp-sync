@@ -1,0 +1,49 @@
+#!/bin/bash
+# Hub Market: WebP copies of cached catalog images (ClickUp 14zb93nuuez / QA CL036-TC63, 2026-09-24).
+#
+# Magento 2.4.8 has no built-in WebP conversion ("web/webp/enable" does not exist). Product cards
+# (hub-market theme, Magento_Catalog::product/image_with_borders.phtml) offer "<cached image>.webp"
+# through <picture>. This script writes those files next to each cached JPEG/PNG with cwebp. Where
+# WebP would not be smaller it writes an empty "<image>.nowebp" marker instead, and Apache
+# (hub-market-backend.conf) answers the .webp URL with the original image, as it does for images
+# this script has not reached yet.
+#
+# Usage: hm-webp-sync [recent|all]
+#   recent  images written in the last 20 minutes (crontab, every 10 minutes)
+#   all     every cached image without an up-to-date .webp (nightly, and the first run)
+set -euo pipefail
+
+CACHE=${HM_WEBP_CACHE:-/var/www/multi.magento2.click/pub/media/catalog/product/cache}
+QUALITY=80
+
+mode=${1:-recent}
+case "$mode" in
+    recent) age=(-mmin -20) ;;
+    all) age=() ;;
+    *) echo "usage: $0 [recent|all]" >&2; exit 2 ;;
+esac
+
+made=0; kept=0; failed=0
+while IFS= read -r -d '' src; do
+    out="$src.webp"
+    marker="$src.nowebp"
+    [[ -f "$out" && ! "$src" -nt "$out" ]] && continue
+    [[ -f "$marker" && ! "$src" -nt "$marker" ]] && continue
+    tmp="$out.tmp$$"
+    if cwebp -quiet -q "$QUALITY" -m 4 -metadata none "$src" -o "$tmp" 2>/dev/null; then
+        if (( $(stat -c %s "$tmp") < $(stat -c %s "$src") )); then
+            mv -f "$tmp" "$out"
+            rm -f "$marker"
+            made=$((made + 1))
+        else
+            rm -f "$tmp" "$out"
+            : > "$marker"
+            kept=$((kept + 1))
+        fi
+    else
+        rm -f "$tmp"
+        failed=$((failed + 1))
+    fi
+done < <(find "$CACHE" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) "${age[@]}" -print0)
+
+echo "$(date -u +%FT%TZ) hm-webp-sync $mode: $made written, $kept kept original (WebP not smaller), $failed failed"
