@@ -1,0 +1,18 @@
+<?php
+/**
+ * Hub Market (DEV06): "a proper no-results page with suggested products".
+ *
+ * Renders its child (the same Best Selling Items rail as the home page — real
+ * sales, same cards as the category rails) ONLY when this search found nothing,
+ * so a normal results page does not pay for a second product query.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+$result = $block->getLayout()->getBlock('search.result');
+if (!$result || (int) $result->getResultCount() > 0) {
+    return;
+}
+?>
+<section class="hm-no-results-suggestions" aria-label="<?= $block->escapeHtmlAttr(__('Popular right now')) ?>">
+    <?= $block->getChildHtml('hm.search.noresults.bestsellers') ?>
+</section>

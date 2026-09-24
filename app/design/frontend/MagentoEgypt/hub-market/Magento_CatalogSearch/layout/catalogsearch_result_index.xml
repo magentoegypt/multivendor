@@ -44,6 +44,30 @@
             <block class="Magento\Framework\View\Element\Template"
                    name="hm.search.recorder"
                    template="MagentoEgypt_SearchLanding::recorder.phtml"/>
+            <!--
+                DEV06: suggested products when a search finds nothing. The wrapper
+                renders its child only for a zero-result search; the child is the
+                home page's Best Selling Items rail (see cms_index_index.xml, 13).
+            -->
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.search.noresults"
+                   template="Magento_CatalogSearch::hm-no-results-suggestions.phtml"
+                   after="search.result">
+                <block class="MagentoEgypt\HomeSections\Block\BestSellers"
+                       name="hm.search.noresults.bestsellers">
+                    <arguments>
+                        <argument name="title" xsi:type="string" translate="true">Popular right now</argument>
+                        <argument name="subtitle" xsi:type="string" translate="true">Nothing matched your search — these are selling well</argument>
+                        <argument name="more_url" xsi:type="string">all.html</argument>
+                        <argument name="more_label" xsi:type="string" translate="true">View All</argument>
+                        <argument name="vendor_names" xsi:type="object">MagentoEgypt\HomeSections\ViewModel\VendorNames</argument>
+                        <argument name="products_count" xsi:type="number">8</argument>
+                        <argument name="show_pager" xsi:type="number">0</argument>
+                        <argument name="template" xsi:type="string">Magento_CatalogWidget::product/widget/content/grid.phtml</argument>
+                        <argument name="conditions_encoded" xsi:type="string">^[`1`:^[`type`:`Magento||CatalogWidget||Model||Rule||Condition||Combine`,`aggregator`:`all`,`value`:`1`,`new_child`:``^]^]</argument>
+                    </arguments>
+                </block>
+            </block>
         </referenceContainer>
 
         <!--
