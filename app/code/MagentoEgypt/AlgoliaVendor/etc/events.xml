@@ -16,6 +16,8 @@
     <event name="algolia_after_create_product_object">
         <observer name="magentoegypt_algolia_add_seller_data"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerData"/>
+        <observer name="magentoegypt_algolia_use_indexed_min_price"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\UseIndexedMinPrice"/>
         <observer name="magentoegypt_algolia_add_price_range"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddPriceRange"/>
         <observer name="magentoegypt_algolia_fix_price_symbol"
