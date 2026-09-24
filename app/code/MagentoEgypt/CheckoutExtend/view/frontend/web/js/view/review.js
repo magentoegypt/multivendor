@@ -217,9 +217,20 @@ define([
             return (m['carrier_title'] || '') + ' - ' + (m['method_title'] || '');
         },
 
-        /** Chosen payment method's display title. */
+        /**
+         * Chosen payment method's display title.
+         *
+         * Reads hmIsVisible() so the binding re-evaluates every time the step is
+         * shown. The renderer lookup goes through uiRegistry, which Knockout
+         * cannot track: evaluated only when quote.paymentMethod() changed, a
+         * lookup made before the renderer existed stuck, and the step printed the
+         * raw code ("cashondelivery") — the visible tell of TC65.
+         */
         getPaymentMethodTitle: function () {
-            var renderer = this.getSelectedPaymentRenderer();
+            var renderer;
+
+            this.hmIsVisible();
+            renderer = this.getSelectedPaymentRenderer();
 
             if (renderer && renderer.getTitle) {
                 return renderer.getTitle();
@@ -259,9 +270,21 @@ define([
             return found;
         },
 
-        /** True once a payment method is chosen — the step cannot act before that. */
+        /**
+         * Enables the Place Order button: the step is on screen and a method is chosen.
+         *
+         * Deliberately NOT "a renderer is found" any more (CL036-TC65). That
+         * lookup reads uiRegistry, which Knockout cannot track, so the `enable`
+         * binding only re-ran when quote.paymentMethod() changed. When the method
+         * was set before its renderer registered — a logged-in customer whose
+         * quote already carried it, while the payment list was still loading —
+         * the button stayed disabled for good. It still LOOKED green, and blank
+         * gives disabled buttons pointer-events: none, so clicks went nowhere:
+         * no request, no message. The lookup now happens at click time, below,
+         * which already knows what to do when it fails.
+         */
         canPlaceOrder: function () {
-            return !!this.getSelectedPaymentRenderer();
+            return this.hmIsVisible() && !!quote.paymentMethod();
         },
 
         /**
@@ -270,9 +293,18 @@ define([
          * If no renderer is found the customer is sent BACK to payment rather
          * than left on a dead button — that is the only state where this step
          * cannot do its job, and it is recoverable.
+         *
+         * Same when the renderer REFUSES. Its placeOrder() returns false without a
+         * word here when its own form fails validation or no billing address is
+         * set — and every message it shows about that renders inside the payment
+         * step, which is hidden on this one. Going back puts the customer where
+         * those messages are. The exception is an order already in flight (a
+         * double click): the renderer refuses that too, and must be left alone.
          */
         placeOrder: function () {
-            var renderer = this.getSelectedPaymentRenderer();
+            var renderer = this.getSelectedPaymentRenderer(),
+                started = false,
+                wasAllowed;
 
             if (!renderer) {
                 stepNavigator.navigateTo('payment');
@@ -280,10 +312,19 @@ define([
                 return false;
             }
 
+            wasAllowed = typeof renderer.isPlaceOrderActionAllowed === 'function'
+                ? renderer.isPlaceOrderActionAllowed()
+                : true;
+
+            if (!wasAllowed && quote.billingAddress()) {
+                /* Billing is set, so "not allowed" means an order is already being placed. */
+                return false;
+            }
+
             fullScreenLoader.startLoader();
 
             try {
-                renderer.placeOrder();
+                started = renderer.placeOrder();
             } finally {
                 /*
                  * The renderer owns the loader from here — it stops it on both
@@ -293,7 +334,11 @@ define([
                 fullScreenLoader.stopLoader();
             }
 
-            return true;
+            if (!started) {
+                stepNavigator.navigateTo('payment');
+            }
+
+            return started;
         },
 
         backToPayment: function () {

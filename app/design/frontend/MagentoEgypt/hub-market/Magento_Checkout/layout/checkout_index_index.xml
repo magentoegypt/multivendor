@@ -100,8 +100,16 @@
                             <item name="children" xsi:type="array">
                                 <item name="steps" xsi:type="array">
                                     <item name="children" xsi:type="array">
+                                        <!--
+                                            js/view/review, formerly js/view/review-step
+                                            (CL036-TC65). Static files are served
+                                            `immutable` for a year and Cloudflare had
+                                            the old one cached, so a fix under the
+                                            same name would never have reached a
+                                            browser. A new file name is a new URL.
+                                        -->
                                         <item name="review-step" xsi:type="array">
-                                            <item name="component" xsi:type="string">MagentoEgypt_CheckoutExtend/js/view/review-step</item>
+                                            <item name="component" xsi:type="string">MagentoEgypt_CheckoutExtend/js/view/review</item>
                                             <item name="sortOrder" xsi:type="string">3</item>
                                             <item name="config" xsi:type="array">
                                                 <item name="template" xsi:type="string">MagentoEgypt_CheckoutExtend/review-step</item>
