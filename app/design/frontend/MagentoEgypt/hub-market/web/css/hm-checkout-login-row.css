@@ -1,0 +1,49 @@
+/*
+ * Checkout "You already have an account with us" row: Login at the START, "Forgot Your
+ * Password?" at the END, in English and Arabic alike.
+ *
+ * Blank indents every `.column:not(.sidebar-main) form .actions-toolbar` by the 25.8% label
+ * column with a PHYSICAL margin-left, and floats `.primary` left / `.secondary` right. So on
+ * desktop Login sat ~200px in from the email field in English, and in Arabic it landed on
+ * the END side with the password link on the start side. A flex row follows the page
+ * direction, so one rule puts both in the right place for LTR and RTL.
+ *
+ * Plain CSS in its own file, added on the checkout handle only: the theme's styles-*.css
+ * are served `immutable` for a year and cached at the CDN, whereas a new stylesheet changes
+ * checkout's merged-CSS file name, i.e. a URL no cache has seen.
+ *
+ * That trick works ONCE. The merged name is a hash of the file LIST, not the content, so a
+ * later edit here keeps the old URL and the CDN keeps serving the old rules. Ship further
+ * edits with the next normal static deploy (new deployed_version), like any other CSS.
+ * (It was renamed from hm-checkout-login.css for exactly that reason.)
+ *
+ * #customer-email-fieldset also covers the email block on the virtual-cart billing step.
+ */
+.checkout-index-index #customer-email-fieldset .actions-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-inline: 0;
+}
+
+/* Blank's clearfix pseudo-elements would become flex items and push Login off the start. */
+.checkout-index-index #customer-email-fieldset .actions-toolbar::before,
+.checkout-index-index #customer-email-fieldset .actions-toolbar::after {
+    content: none;
+}
+
+.checkout-index-index #customer-email-fieldset .actions-toolbar > .primary,
+.checkout-index-index #customer-email-fieldset .actions-toolbar > .secondary {
+    float: none;
+    margin: 0;
+}
+
+/* The Arabic stylesheet gives the button a 6px physical margin-left, which pushed it 6px past
+   the field's start edge once the row was flush. The row's gap handles spacing. */
+.checkout-index-index #customer-email-fieldset .actions-toolbar > .primary .action {
+    margin: 0;
+}
