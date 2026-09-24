@@ -22,6 +22,11 @@
         <observer name="magentoegypt_algolia_customer_token_with_consent"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\SetCustomerTokenWithConsent"/>
     </event>
+    <!-- Search results page: apply sort + paging before result.phtml counts the results. -->
+    <event name="layout_generate_blocks_after">
+        <observer name="magentoegypt_algolia_apply_search_toolbar_early"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\ApplySearchToolbarEarly"/>
+    </event>
     <!-- Purchase event only when there is a (consented) shopper token: see PlaceOrderEventWithToken. -->
     <event name="checkout_onepage_controller_success_action">
         <observer name="algoliasearch_insights_place_order_event" disabled="true"/>
