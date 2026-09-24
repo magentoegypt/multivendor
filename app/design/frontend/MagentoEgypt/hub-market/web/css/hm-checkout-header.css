@@ -1,0 +1,15 @@
+/*
+ * Hub Market: the header cart icon shows on checkout too, and links to the cart.
+ *
+ * Magento_Checkout's own stylesheet hides it there:
+ * `.checkout-index-index .page-header .minicart-wrapper { display: none }` at (0,3,0).
+ * This restores it one class stronger. The click goes to the cart page instead of
+ * opening the mini-cart dropdown (js/hm-checkout-cart-link.js), because the dropdown's
+ * only action on checkout would be "Proceed to Checkout".
+ *
+ * Checkout-only file, like hm-checkout-login-row.css, for the same CDN reason: a new file
+ * changes checkout's merged-CSS name once; later edits ship with a normal static deploy.
+ */
+.checkout-index-index .page-header .hm-header__action .minicart-wrapper {
+    display: block;
+}
