@@ -71,6 +71,7 @@
                     ->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore()->getId();
                 ?>
                 <?php foreach($block->getReason() as $key =>$reason):?>
+                    <?php /* Admin's Enabled/Disabled switch: Vnecoms never filtered on it. */ if ((int) $reason->getStatus() !== 1) { continue; } ?>
                     <option <?php if (isset($requestData['reason']) == $key) echo "selected"?>  value="<?php echo $reason->getReasonId() ?>" rel="<?php echo $reason->getWhoPayShipping() ?>"><?php echo $block->escapeHtml($reason->getLabelByStoreId($hmStoreId)) ?></option>
                 <?php endforeach;?>
                 <?php if($block->getConfig()->allowOtherReasons()) :  ?>
