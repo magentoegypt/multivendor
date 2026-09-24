@@ -7,7 +7,7 @@
  * had to stop. A mixin is applied as the module is defined, before any of its
  * methods can run.
  */
-define(['algoliaCommon'], function (algoliaCommon) {
+define(['algoliaCommon', 'algoliaAnalyticsLib'], function (algoliaCommon, algoliaAnalyticsWrapper) {
     'use strict';
 
     /*
@@ -19,10 +19,15 @@ define(['algoliaCommon'], function (algoliaCommon) {
      * plan and are the history Personalization learns from, so the switch stays
      * on and only the query flag is removed.
      *
-     * AFTER A PLAN UPGRADE that includes Personalization, set this to true and
-     * personalized ranking starts working with no other change.
+     * 2026-09-24: the app is on Grow Plus, which includes Personalization; a
+     * search with enablePersonalization now returns 200 with _rankingInfo.
+     * personalization, so the flag is passed through. Set back to false if the
+     * plan is ever downgraded, or every search fails with 402 again.
      */
-    var PLAN_SUPPORTS_PERSONALIZED_QUERIES = false;
+    var PLAN_SUPPORTS_PERSONALIZED_QUERIES = true;
+
+    // The same insights-js instance insights.js uses (RequireJS modules are singletons).
+    var algoliaAnalytics = algoliaAnalyticsWrapper && algoliaAnalyticsWrapper.default;
 
     /*
      * The consent rule insights.js applies to its own cookie (useCookie()), made
@@ -67,6 +72,23 @@ define(['algoliaCommon'], function (algoliaCommon) {
             onlyWithConsent(insights, method);
         });
 
+        /*
+         * ONE PROFILE ACROSS LOGIN. Upstream searches with the logged-in token
+         * when there is one (authenticatedUserToken ?? userToken). Algolia's
+         * Personalization is keyed on userToken ONLY and needs "the same
+         * userToken for queries and events"; after login the events carry the
+         * SAME anonymous userToken plus the new authenticatedUserToken, which is
+         * how Algolia links the two histories (docs: sending-events/concepts/
+         * usertoken). Searching with the authenticated token instead would start
+         * every customer on an empty profile the moment they sign in. So search
+         * with the anonymous token whenever the visitor has one.
+         */
+        if (algoliaAnalytics && typeof algoliaAnalytics.getUserToken === 'function') {
+            insights.determineUserToken = function () {
+                return algoliaAnalytics.getUserToken() || algoliaAnalytics.getAuthenticatedUserToken();
+            };
+        }
+
         var applyInsights = insights.applyInsightsToSearchParams;
 
         if (typeof applyInsights === 'function') {
@@ -95,6 +117,12 @@ define(['algoliaCommon'], function (algoliaCommon) {
 
                 if (token === undefined || token === null || token === '' || token === 'undefined') {
                     delete params.userToken;
+                    // No consent yet = no profile to personalize from; without a
+                    // token Algolia would fall back to the visitor's IP address.
+                    // Explicit false, not delete: the product indices carry
+                    // enablePersonalization=true as their default (Advanced
+                    // Personalization), so omitting it would still switch it on.
+                    params.enablePersonalization = false;
                 }
 
                 return params;

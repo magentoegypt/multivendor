@@ -16,10 +16,14 @@
     <event name="algolia_after_create_product_object">
         <observer name="magentoegypt_algolia_add_seller_data"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerData"/>
+        <observer name="magentoegypt_algolia_add_price_range"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\AddPriceRange"/>
     </event>
     <event name="algolia_products_index_before_set_settings">
         <observer name="magentoegypt_algolia_add_seller_facet"
                   instance="MagentoEgypt\AlgoliaVendor\Observer\AddSellerFacet"/>
+        <observer name="magentoegypt_algolia_enable_personalization"
+                  instance="MagentoEgypt\AlgoliaVendor\Observer\EnablePersonalizationSetting"/>
     </event>
     <event name="algolia_after_suggestions_collection_build">
         <observer name="magentoegypt_algolia_filter_suggestions"

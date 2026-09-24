@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market (DEV05): personalized order of the products on this cached page.
+ * See Algolia_AlgoliaSearch::hm-personalized-order.phtml.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.algolia.personalized.order"
+                   template="Algolia_AlgoliaSearch::hm-personalized-order.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

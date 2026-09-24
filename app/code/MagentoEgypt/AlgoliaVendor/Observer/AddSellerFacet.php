@@ -28,6 +28,8 @@ class AddSellerFacet implements ObserverInterface
     private const WANTED = [
         'seller'    => 'searchable(seller)',
         'seller_id' => 'filterOnly(seller_id)',
+        // DEV05: price band for the Personalization strategy (see AddPriceRange).
+        'price_range' => 'price_range',
     ];
 
     public function execute(Observer $observer): void
