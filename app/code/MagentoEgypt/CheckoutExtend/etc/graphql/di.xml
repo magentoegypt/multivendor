@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- TC45: client-caused GraphQL errors are logged at INFO, not as "critical lines". -->
+    <type name="Magento\Framework\GraphQl\Query\ErrorHandler">
+        <plugin name="hm_graphql_client_error_log_level" type="MagentoEgypt\CheckoutExtend\Plugin\GraphQl\ClientErrorLogLevel"/>
+    </type>
+    <!-- TC45: Payflow Pro is disabled here; refuse its GraphQL callback cleanly. -->
+    <type name="Magento\PaypalGraphQl\Model\Resolver\PayflowProResponse">
+        <plugin name="hm_payflowpro_response_guard" type="MagentoEgypt\CheckoutExtend\Plugin\GraphQl\PayflowProResponseGuard"/>
+    </type>
+</config>
