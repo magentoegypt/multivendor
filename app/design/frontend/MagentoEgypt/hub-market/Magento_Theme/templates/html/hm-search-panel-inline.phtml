@@ -1,0 +1,19 @@
+<?php
+/**
+ * Hub Market: one search-panel rule, inline until the next static deploy.
+ *
+ * Algolia's autocomplete.css gives the desktop panel grid `min-height: 280px`,
+ * so a search with no results ("زقزقزق") showed its one-line "لا توجد نتائج"
+ * above a large empty white panel (QA01 2026-09-25, BUG-12). The panel does not
+ * need the floor: with products in it, their column is taller than 280px anyway.
+ *
+ * Inline rather than in web/css/hm-search-panel.css because that file is a
+ * static asset behind CloudFront's immutable cache: changing it means a
+ * deployed_version bump and a site-wide cache turnover. Move this rule into
+ * hm-search-panel.css at the next static deploy and delete this block
+ * (Magento_Theme/layout/default_head_blocks.xml, hm.search.panel.inline).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<style>@media (min-width:769px){.aa-Panel .aa-PanelLayout.with-grid{min-height:0}}</style>

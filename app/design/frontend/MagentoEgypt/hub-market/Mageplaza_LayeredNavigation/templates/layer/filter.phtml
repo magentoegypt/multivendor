@@ -68,7 +68,8 @@ $filterModel = $this->helper(\Mageplaza\LayeredNavigation\Helper\Data::class)->g
                            disabled="disabled"/>
                 <?php endif; ?>
                 <a href="<?= /** @noEscape */ $block->escapeUrl($filterModel->getItemUrl($filterItem)) ?>">
-                    <?= /** @noEscape */ $filterItem->getLabel() ?>
+                    <?php /* <bdi>: mixed Latin + number labels ("55 cm") keep their own order in the Arabic store (QA01 BUG-11). */ ?>
+                    <bdi><?= /** @noEscape */ $filterItem->getLabel() ?></bdi>
                     <?php if ($filterModel->isShowCounter($filter)): ?>
                         <span class="count"><?= /** @noEscape */ $filterItem->getCount() ?>
                             <span class="filter-count-label">

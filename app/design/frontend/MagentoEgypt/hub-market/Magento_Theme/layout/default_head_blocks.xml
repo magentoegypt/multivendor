@@ -48,5 +48,12 @@
 
         <!-- MGS ThemeSettings inline config block, same story -->
         <referenceBlock name="themesetting_config" remove="true"/>
+
+        <!-- Empty-result autocomplete collapses to its message (QA01 BUG-12); see the template -->
+        <referenceBlock name="head.additional">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.search.panel.inline"
+                   template="Magento_Theme::html/hm-search-panel-inline.phtml"/>
+        </referenceBlock>
     </body>
 </page>

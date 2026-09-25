@@ -48,11 +48,15 @@
                 DEV06: suggested products when a search finds nothing. The wrapper
                 renders its child only for a zero-result search; the child is the
                 home page's Best Selling Items rail (see cms_index_index.xml, 13).
+                after="-", not after="search.result": the "Your search returned no
+                results." notice renders inside Mageplaza's #layer-product-list
+                wrapper, which came AFTER this block, so shoppers read 8 products
+                before learning they were not results (QA01 2026-09-25, BUG-08).
             -->
             <block class="Magento\Framework\View\Element\Template"
                    name="hm.search.noresults"
                    template="Magento_CatalogSearch::hm-no-results-suggestions.phtml"
-                   after="search.result">
+                   after="-">
                 <block class="MagentoEgypt\HomeSections\Block\BestSellers"
                        name="hm.search.noresults.bestsellers">
                     <arguments>
