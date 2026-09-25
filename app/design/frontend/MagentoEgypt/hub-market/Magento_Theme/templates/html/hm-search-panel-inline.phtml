@@ -1,19 +1,102 @@
 <?php
 /**
- * Hub Market: one search-panel rule, inline until the next static deploy.
+ * Hub Market: the search panel with nothing to show says so once (QA01 BUG-12).
  *
- * Algolia's autocomplete.css gives the desktop panel grid `min-height: 280px`,
- * so a search with no results ("زقزقزق") showed its one-line "لا توجد نتائج"
- * above a large empty white panel (QA01 2026-09-25, BUG-12). The panel does not
- * need the floor: with products in it, their column is taller than 280px anyway.
+ * A query with no matches ("زقزقزق") showed "لا توجد نتائج" three times — under
+ * Products, Categories and Pages — in a two-column panel with a large empty
+ * area. Now, when no source has a single item and at least one reports "no
+ * results", the panel shows just the products source's message and the Algolia
+ * footer, in one column, sized to fit.
  *
- * Inline rather than in web/css/hm-search-panel.css because that file is a
- * static asset behind CloudFront's immutable cache: changing it means a
- * deployed_version bump and a site-wide cache turnover. Move this rule into
- * hm-search-panel.css at the next static deploy and delete this block
- * (Magento_Theme/layout/default_head_blocks.xml, hm.search.panel.inline).
+ * - Algolia's autocomplete.css also gives the desktop grid `min-height: 280px`;
+ *   lifted for every state, since a panel with products is taller than that
+ *   anyway.
+ * - The state is a `data-hm-empty` attribute on `.aa-Panel`: autocomplete
+ *   re-renders the panel's contents and rewrites its className on every
+ *   keystroke, but leaves unknown attributes alone. A MutationObserver on the
+ *   panel's own subtree keeps it current. The panel is found wherever it
+ *   mounts: inside the header's #algoliaAutocomplete (desktop) or on <body>.
+ * - No :has(): over script-inserted nodes Blink re-evaluates it only sometimes
+ *   (see memory: has-selector-invalidation-race), and a stale match here would
+ *   hide real categories and pages.
+ *
+ * Inline rather than in web/css/hm-search-panel.css and web/js: those are static
+ * assets behind CloudFront's immutable cache, so changing them needs a
+ * deployed_version bump. Move this into the static files at the next static
+ * deploy and delete the hm.search.panel.inline block
+ * (Magento_Theme/layout/default_head_blocks.xml).
  *
  * @var \Magento\Framework\View\Element\Template $block
  */
 ?>
-<style>@media (min-width:769px){.aa-Panel .aa-PanelLayout.with-grid{min-height:0}}</style>
+<style>
+@media (min-width:769px){.aa-Panel .aa-PanelLayout.with-grid{min-height:0}}
+.aa-Panel[data-hm-empty] .aa-PanelLayout.with-grid{display:block}
+.aa-Panel[data-hm-empty] section.aa-Source:not([data-autocomplete-source-id=products]){display:none}
+</style>
+<script>
+(function () {
+    'use strict';
+
+    if (!window.MutationObserver) {
+        return;
+    }
+
+    var watched = null,
+        panelObserver = new MutationObserver(function () {
+            update(watched);
+        });
+
+    function update(panel) {
+        if (!panel) {
+            return;
+        }
+
+        var empty = !panel.querySelector('.aa-Item') && !!panel.querySelector('.aa-SourceNoResults');
+
+        if (empty !== panel.hasAttribute('data-hm-empty')) {
+            if (empty) {
+                panel.setAttribute('data-hm-empty', '');
+            } else {
+                panel.removeAttribute('data-hm-empty');
+            }
+        }
+    }
+
+    function watch() {
+        var panel = document.querySelector('.aa-Panel');
+
+        if (panel !== watched) {
+            panelObserver.disconnect();
+            watched = panel;
+
+            if (panel) {
+                panelObserver.observe(panel, {childList: true, subtree: true});
+            }
+        }
+
+        update(panel);
+    }
+
+    function init() {
+        var mounts = new MutationObserver(watch),
+            container = document.getElementById('algoliaAutocomplete');
+
+        // The panel mounts inside the header's #algoliaAutocomplete on desktop;
+        // on <body> when autocomplete runs with a detached panel. Watch both.
+        mounts.observe(document.body, {childList: true});
+
+        if (container) {
+            mounts.observe(container, {childList: true, subtree: true});
+        }
+
+        watch();
+    }
+
+    if (document.body) {
+        init();
+    } else {
+        document.addEventListener('DOMContentLoaded', init);
+    }
+})();
+</script>
