@@ -10,4 +10,16 @@
         <observer name="magentoegypt_vendorextend_admin_clear_vendor_theme"
                   instance="MagentoEgypt\VendorExtend\Observer\AdminClearVendorTheme" />
     </event>
+    <!--
+        An RMA created in Admin (Returns > New Request) must belong to the vendor who sold the item, or it never
+        shows in that vendor's panel (ClickUp TC39 14zb93nu9dj). Admin's vrma route is served by
+        Vnecoms\VendorsRMA\Controller\Adminhtml\Request\Save, which dispatches `helpdesk_request_prepare_save`
+        (a leftover from Vnecoms' Helpdesk module) instead of `rma_request_prepare_save`, the event Vnecoms'
+        SaveVendorId observer listens to. Run that same observer here, so admin requests get vendor_id and
+        vendor_order_id from the returned order item exactly as customer and guest requests do.
+    -->
+    <event name="helpdesk_request_prepare_save">
+        <observer name="magentoegypt_vendorextend_admin_rma_vendor"
+                  instance="Vnecoms\VendorsRMA\Observer\SaveVendorId" />
+    </event>
 </config>
