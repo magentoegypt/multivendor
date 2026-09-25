@@ -55,5 +55,12 @@
                    name="hm.search.panel.inline"
                    template="Magento_Theme::html/hm-search-panel-inline.phtml"/>
         </referenceBlock>
+
+        <!-- Phone search suggestions: a visible × on the panel (14zb93nuunn); inline, see the template -->
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.search.close"
+                   template="Magento_Theme::html/hm-search-close.phtml"/>
+        </referenceContainer>
     </body>
 </page>

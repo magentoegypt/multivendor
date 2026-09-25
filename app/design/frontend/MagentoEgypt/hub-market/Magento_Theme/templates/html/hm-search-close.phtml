@@ -1,0 +1,88 @@
+<?php
+/**
+ * Hub Market: a visible × on the phone search suggestions (ClickUp 14zb93nuunn, DEV01.34).
+ *
+ * The panel already stops at 60% of the screen and a tap on the page below closes it
+ * (web/css/hm-search-panel.css, web/js/hm-search-dismiss.js). This adds the explicit
+ * control the ticket's plan asked for: a round × pinned to the panel's top corner (top-left
+ * in Arabic). The top corner stays on screen when the phone keyboard covers the bottom of
+ * the panel. Tapping it closes the panel the way Escape does, keeping the query.
+ *
+ * Phones only (up to 767px, the same breakpoint as the height cap). The button lives on
+ * <body>, not inside .aa-Panel, because autocomplete re-renders the panel's content; while
+ * the panel is open it follows the panel's box every frame, and it hides when the panel goes.
+ * On touch phones hm-search-dismiss.js sees the tap first (it is outside the panel) and closes
+ * the panel itself; the click handler here covers browsers where that script stays off.
+ *
+ * Inline rather than in web/js or web/css: those are static assets behind CloudFront's
+ * immutable cache, so a new or changed file there needs a deployed_version bump. Move this
+ * into the static files at the next static deploy and remove the hm.search.close block
+ * (Magento_Theme/layout/default_head_blocks.xml).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<style>
+.hm-search-close{display:none}
+@media (max-width:767px){
+.hm-search-close.is-open{display:flex;position:fixed;z-index:100000;box-sizing:border-box;width:44px;height:44px;min-width:0;min-height:0;margin:0;padding:0;align-items:center;justify-content:center;border:1px solid #d0d5dd;border-radius:50%;background:#fff;color:#101828;box-shadow:0 2px 8px rgba(16,24,40,.18);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hm-search-close svg{display:block;width:16px;height:16px}
+}
+</style>
+<script>
+(function () {
+    'use strict';
+
+    var button = document.createElement('button'),
+        arabic = /^ar/i.test(document.documentElement.lang || ''),
+        frame = null;
+
+    button.type = 'button';
+    button.className = 'hm-search-close';
+    button.setAttribute('aria-label', arabic ? 'إغلاق اقتراحات البحث' : 'Close search suggestions');
+    button.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">'
+        + '<path d="M3 3l10 10M13 3L3 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    document.body.appendChild(button);
+
+    function panel() {
+        return document.querySelector('.aa-Panel');
+    }
+
+    /* Escape on the input closes an open autocomplete panel and keeps the query. */
+    function close() {
+        var input = document.querySelector('.aa-Input');
+
+        if (input) {
+            input.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true}));
+            input.blur();
+        }
+    }
+
+    function follow() {
+        var p = panel(),
+            box;
+
+        if (!p || !p.offsetHeight) {
+            button.classList.remove('is-open');
+            frame = null;
+            return;
+        }
+        box = p.getBoundingClientRect();
+        button.style.top = (box.top + 8) + 'px';
+        button.style.left = (getComputedStyle(p).direction === 'rtl' ? box.left + 8 : box.right - 52) + 'px';
+        button.classList.add('is-open');
+        frame = requestAnimationFrame(follow);
+    }
+
+    new MutationObserver(function () {
+        if (!frame && panel()) {
+            frame = requestAnimationFrame(follow);
+        }
+    }).observe(document.body, {childList: true, subtree: true});
+
+    button.addEventListener('click', function (event) {
+        event.preventDefault();
+        close();
+    });
+}());
+</script>
