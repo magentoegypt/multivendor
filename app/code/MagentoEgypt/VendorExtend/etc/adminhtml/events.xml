@@ -18,6 +18,15 @@
         SaveVendorId observer listens to. Run that same observer here, so admin requests get vendor_id and
         vendor_order_id from the returned order item exactly as customer and guest requests do.
     -->
+    <!--
+        Approve / Mass Approve / Reject / Mass Unapprove of a vendor product dispatch this once per
+        product after saving `approval`. Bring the product online (or offline) right then: stock
+        status, index rows, Algolia and page cache. See the observer for why (ClickUp TC32 86d4bcryz).
+    -->
+    <event name="vnecoms_vendors_push_notification">
+        <observer name="magentoegypt_vendorextend_approval_go_live"
+                  instance="MagentoEgypt\VendorExtend\Observer\ProductApprovalGoLive" />
+    </event>
     <event name="helpdesk_request_prepare_save">
         <observer name="magentoegypt_vendorextend_admin_rma_vendor"
                   instance="Vnecoms\VendorsRMA\Observer\SaveVendorId" />
