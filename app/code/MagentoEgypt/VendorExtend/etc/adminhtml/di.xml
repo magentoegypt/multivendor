@@ -28,6 +28,10 @@
     <type name="Vnecoms\RMA\Model\Request">
         <plugin name="format_date_html" type="MagentoEgypt\VendorExtend\Plugin\FormatDateHtml"/>
     </type>
+    <!-- RMA reasons in the admin user's interface language, not the (Arabic) default title -->
+    <type name="Vnecoms\RMA\Model\Reason">
+        <plugin name="hm_rma_reason_admin_label" type="MagentoEgypt\VendorExtend\Plugin\Rma\ReasonAdminLabel"/>
+    </type>
     <type name="Vnecoms\Credit\Model\Processor">
         <arguments>
             <argument name="creditProcessors" xsi:type="array">
