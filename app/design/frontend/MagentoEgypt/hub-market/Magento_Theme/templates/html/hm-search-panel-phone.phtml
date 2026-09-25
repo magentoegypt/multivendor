@@ -1,0 +1,101 @@
+<?php
+/**
+ * Hub Market: phone search suggestions laid out like the client's prototype (ClickUp 14zb93nuunn).
+ *
+ * Up to 767px only; tablets and desktop keep Algolia's layout. Inside the panel (already capped at 60% of
+ * the screen by web/css/hm-search-panel.css), only the product list scrolls, with a small chevron while
+ * more results sit below. Pinned under it, in this order:
+ *   - Categories and Pages as one line each ("Pages · test, Home Bestselling"); a section with no
+ *     matches is hidden;
+ *   - "View all N results": Algolia's own "See products in All departments (N)" link, which the extension
+ *     hides on phones, shown as a button with its count;
+ *   - "Search by Algolia".
+ *
+ * Algolia's products section gets display:contents, so its list and its footer become items of the
+ * panel's flex column and can be ordered around the Categories and Pages sections. Nothing in the panel is
+ * moved or re-created: autocomplete re-renders it on every keystroke (and rewrites class names), so the
+ * observer below only sets data attributes: data-hm-none on an empty section, data-hm-more on the list while
+ * more results sit below, data-hm-count on the View-all link.
+ *
+ * Inline rather than in web/css: static files are behind CloudFront's immutable cache (see
+ * hm-search-panel-inline.phtml). Move this into web/css/hm-search-panel.css at the next static deploy and
+ * remove the hm.search.panel.phone block (Magento_Theme/layout/default_head_blocks.xml).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<style>
+@media (max-width:767px){
+body .aa-Panel{display:flex;flex-direction:column;overflow:hidden!important}
+body .aa-Panel .aa-PanelLayout{flex:1 1 auto;min-height:0;max-height:none;display:flex;flex-direction:column;overflow:hidden}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="products"]{display:contents}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="products"]>.aa-List{order:1;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="products"]>.aa-SourceNoResults{order:1}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="products"]>.aa-List[data-hm-more]::after{content:"";position:sticky;bottom:0;display:block;height:30px;margin-top:-30px;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 6l4.5 4.5L12.5 6' fill='none' stroke='%2398a2b3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center 12px/16px 16px no-repeat,linear-gradient(rgba(255,255,255,0),#fff 55%)}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"],body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"]{order:2;flex:0 0 auto;margin:0;padding:10px 16px;border-top:1px solid #eaecf0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px;line-height:20px;color:#1a1a2e}
+body .aa-Panel .aa-PanelLayout .aa-Source[data-hm-none]{display:none}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-SourceHeader,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-SourceHeader{display:inline;margin:0;padding:0;border:0;font-size:14px;line-height:20px;font-weight:600;letter-spacing:0;text-transform:none;color:#1a1a2e}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-SourceHeader::after,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-SourceHeader::after{content:" · ";font-weight:400;color:#98a2b3}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-List,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-List,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-Item,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-Item,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-Item a,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-Item a,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .info-without-thumb,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .info-without-thumb{display:inline;margin:0;padding:0;border:0;min-height:0;background:none;font-size:14px;line-height:20px}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-Item a,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-Item a{color:#0f2144;text-decoration:none}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-Item+.aa-Item::before,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-Item+.aa-Item::before{content:", "}
+html:lang(ar) body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .aa-Item+.aa-Item::before,html:lang(ar) body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .aa-Item+.aa-Item::before{content:"، "}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .details,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .details,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .algolia-clearfix,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="pages"] .algolia-clearfix,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] img,body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="categories"] .thumb{display:none}
+body .aa-Panel .aa-PanelLayout [data-autocomplete-source-id="products"]>.aa-SourceFooter{order:3;flex:0 0 auto;margin:0;padding:10px 12px 2px;border-top:1px solid #eaecf0}
+body .aa-Panel .aa-PanelLayout #autocomplete-products-footer{display:block!important;position:static;height:auto;min-height:0;margin:0;padding:0;border:0;background:none;font-size:0;line-height:normal;text-align:center}
+body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:not(:first-of-type){display:none}
+body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:first-of-type{display:block}
+body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:first-of-type>a{display:flex;align-items:center;justify-content:center;min-height:46px;padding:0 16px;border-radius:8px;background:#0f2144;color:#fff;font-size:0;line-height:0;text-decoration:none}
+body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:first-of-type>a::after{content:"View all results";font-size:15px;line-height:20px;font-weight:600}
+body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:first-of-type>a[data-hm-count]::after{content:"View all " attr(data-hm-count) " results"}
+html:lang(ar) body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:first-of-type>a::after{content:"عرض جميع النتائج"}
+html:lang(ar) body .aa-Panel .aa-PanelLayout #autocomplete-products-footer>span:first-of-type>a[data-hm-count]::after{content:"عرض جميع النتائج (" attr(data-hm-count) ")"}
+body .aa-Panel .aa-PanelLayout>#algoliaFooter{order:4;flex:0 0 auto;box-sizing:border-box;width:auto;justify-content:center;margin:0;padding:6px 16px 10px;border:0;font-size:12px;line-height:18px;color:#667085}
+}
+</style>
+<script>
+(function () {
+    'use strict';
+
+    var phone = window.matchMedia('(max-width: 767px)');
+
+    /* The chevron shows while more results sit below the visible part of the list. */
+    function more(list) {
+        list.toggleAttribute('data-hm-more', list.scrollHeight - list.scrollTop - list.clientHeight > 8);
+    }
+
+    function tag() {
+        var panel = phone.matches && document.querySelector('.aa-Panel'),
+            footer,
+            link,
+            count,
+            list;
+
+        if (!panel) {
+            return;
+        }
+        [].forEach.call(panel.querySelectorAll('.aa-Source:not([data-autocomplete-source-id="products"])'), function (source) {
+            source.toggleAttribute('data-hm-none', !source.querySelector('.aa-Item'));
+        });
+        footer = panel.querySelector('#autocomplete-products-footer');
+        link = footer && footer.querySelector('a');
+        count = footer && /\(([0-9٠-٩][0-9٠-٩.,٬]*)\)/.exec(footer.textContent);
+        if (link && count && link.getAttribute('data-hm-count') !== count[1]) {
+            link.setAttribute('data-hm-count', count[1]);
+        }
+        list = panel.querySelector('[data-autocomplete-source-id="products"] > .aa-List');
+        if (list) {
+            more(list);
+        }
+    }
+
+    new MutationObserver(tag).observe(document.documentElement, {childList: true, subtree: true});
+    document.addEventListener('scroll', function (event) {
+        var target = event.target;
+
+        if (target && target.classList && target.classList.contains('aa-List')) {
+            more(target);
+        }
+    }, true);
+}());
+</script>
