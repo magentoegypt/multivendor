@@ -21,7 +21,9 @@ class NumberFormatter extends \Magento\Framework\NumberFormatter
 	{
 		$this->setAttribute(\Magento\Framework\NumberFormatter::FRACTION_DIGITS, 0);
 		if($this->getLocale() == self::BAW_FIXED_LOCALE && $currency != 'USD') {
-            return str_replace([$currency,'.'],[$this->getSymbolExtend($currency),','],parent::formatCurrency($amount, $currency));
+            // de_DE groups with '.', which becomes ',' — BEFORE the Arabic symbol goes in:
+            // the other order turned the symbol's own dots into commas ("1,000 ج,م,").
+            return str_replace($currency, $this->getSymbolExtend($currency), str_replace('.', ',', parent::formatCurrency($amount, $currency)));
 		}
 		return parent::formatCurrency($amount, $currency);
 	}

@@ -10,21 +10,38 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Store\Model\ScopeInterface;
 
 /**
- * English product records showed prices as "ج.م.‏500.00" in the autocomplete
- * while the English storefront shows "EGP 500.00".
+ * Algolia's formatted prices look exactly like the storefront's.
  *
- * Upstream PriceManager formats with formatPrecision(..., ['locale' => en_US]),
- * which takes Magento's legacy (Zend) currency path; that data has no en_US
- * symbol for EGP and falls back to the currency's home region (ar_EG), so the
- * Arabic symbol is glued to Latin digits. Magento's own NumberFormatter path
- * (no locale option) gives "EGP 500.00" — reproduced 2026-09-24. This swaps the
- * symbol in every *_formated price of a non-Arabic store, ranges included.
+ * The storefront formats prices through MagentoEgypt\SetExtend's
+ * NumberFormatter preference (frontend area only): no decimals, Latin digits
+ * in Arabic too ("1,000 ج.م."), "EGP 1,000" in English. Algolia builds its
+ * `*_formated` strings from indexers that run outside the frontend area, with
+ * Magento's own formatting, so the autocomplete showed "١٬٠٠٠٫٠٠ ج.م." and
+ * "EGP 1,000.00" next to category pages showing "1,000 ج.م." and "EGP 1,000"
+ * (QA01 2026-09-25, BUG-06). Earlier the English records even carried the
+ * Arabic symbol ("ج.م.‏500.00"), which is where this observer's name comes from.
+ *
+ * Each number in every `*_formated` value — a single price, a "min - max"
+ * range, a "was" price — is read back (Latin or Arabic-Indic digits) and
+ * formatted again with the storefront formatter for the record's store locale.
+ * Numeric fields (`default`, `default_max`) are untouched: sorting, filters and
+ * the price band still use the exact amounts.
  *
  * No constructor dependencies on purpose (compiled DI, see AddPriceRange).
  */
 class FixPriceSymbol implements ObserverInterface
 {
-    private const ARABIC_SYMBOL = "/ج\\.م\\.\u{200F}?\\s*/u";
+    private const STOREFRONT_FORMATTER = \MagentoEgypt\SetExtend\Plugin\Price\NumberFormatter::class;
+
+    /** Arabic-Indic digits and separators => Latin/English equivalents. */
+    private const NORMALISE = [
+        '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+        '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+        '٬' => ',', '٫' => '.',
+    ];
+
+    /** @var array<string, object> locale => storefront formatter */
+    private static array $formatters = [];
 
     public function execute(Observer $observer): void
     {
@@ -35,16 +52,10 @@ class FixPriceSymbol implements ObserverInterface
             return;
         }
 
-        $locale = (string) ObjectManager::getInstance()->get(ScopeConfigInterface::class)
-            ->getValue('general/locale/code', ScopeInterface::SCOPE_STORE, (int) $product->getStoreId());
-
-        if ($locale === '' || str_starts_with($locale, 'ar')) {
-            return;
-        }
-
         $prices = $transport->getData('price');
+        $formatter = $this->formatterFor((int) $product->getStoreId());
 
-        if (!is_array($prices)) {
+        if (!is_array($prices) || $formatter === null) {
             return;
         }
 
@@ -55,11 +66,49 @@ class FixPriceSymbol implements ObserverInterface
 
             foreach ($values as $key => $value) {
                 if (is_string($value) && str_ends_with((string) $key, '_formated')) {
-                    $prices[$currency][$key] = preg_replace(self::ARABIC_SYMBOL, $currency . ' ', $value);
+                    $prices[$currency][$key] = $this->reformat($value, (string) $currency, $formatter);
                 }
             }
         }
 
         $transport->setData('price', $prices);
+    }
+
+    private function reformat(string $formatted, string $currency, object $formatter): string
+    {
+        $normalised = strtr($formatted, self::NORMALISE);
+
+        if (!preg_match_all('/\d[\d,]*(?:\.\d+)?/', $normalised, $matches)) {
+            return $formatted;
+        }
+
+        $parts = [];
+
+        foreach ($matches[0] as $token) {
+            $text = $formatter->formatCurrency((float) str_replace(',', '', $token), $currency);
+            if ($text === false) {
+                return $formatted;
+            }
+            $parts[] = $text;
+        }
+
+        return implode(' - ', $parts);
+    }
+
+    private function formatterFor(int $storeId): ?object
+    {
+        $locale = (string) ObjectManager::getInstance()->get(ScopeConfigInterface::class)
+            ->getValue('general/locale/code', ScopeInterface::SCOPE_STORE, $storeId);
+
+        if ($locale === '' || !class_exists(self::STOREFRONT_FORMATTER)) {
+            return null;
+        }
+
+        if (!isset(self::$formatters[$locale])) {
+            $class = self::STOREFRONT_FORMATTER;
+            self::$formatters[$locale] = new $class($locale, \Magento\Framework\NumberFormatter::CURRENCY);
+        }
+
+        return self::$formatters[$locale];
     }
 }
