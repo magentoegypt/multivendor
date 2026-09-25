@@ -39,12 +39,17 @@ use Magento\Search\Model\EngineResolver;
  */
 class ApplySearchToolbarEarly implements ObserverInterface
 {
-    private const SEARCH_ACTION = 'catalogsearch_result_index';
+    /**
+     * Search results page, and category pages since the category hero band
+     * shows the listing's total and so counts the results before the list
+     * renders too (QA01 2026-09-25, BUG-05).
+     */
+    private const ACTIONS = ['catalogsearch_result_index', 'catalog_category_view'];
     private const TOOLBAR_BLOCK = 'product_list_toolbar';
 
     public function execute(Observer $observer): void
     {
-        if ($observer->getData('full_action_name') !== self::SEARCH_ACTION) {
+        if (!in_array($observer->getData('full_action_name'), self::ACTIONS, true)) {
             return;
         }
 

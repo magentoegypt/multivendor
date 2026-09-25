@@ -99,6 +99,12 @@ abstract class AbstractIdFilter extends AbstractFilter
             ->getSelect()
             ->where('e.entity_id IN (?)', $ids ?: [0]);
 
+        // With Algolia as the engine the total and the paging come from Algolia,
+        // which never sees the SQL above; hand it the same ids (QA01 2026-09-25).
+        if (class_exists(\MagentoEgypt\AlgoliaVendor\Model\IdRestriction::class)) {
+            \MagentoEgypt\AlgoliaVendor\Model\IdRestriction::restrictTo($ids);
+        }
+
         $this->getLayer()->getState()->addFilter(
             $this->_createItem($this->hmOptions()[$value], $value)
         );

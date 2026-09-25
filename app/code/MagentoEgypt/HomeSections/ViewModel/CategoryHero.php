@@ -93,6 +93,29 @@ class CategoryHero implements ArgumentInterface
             return 0;
         }
 
+        /*
+         * The listing's own total, not the category's assignment count.
+         * Category::getProductCount() counts every product assigned to the
+         * category — disabled, pending-approval, other websites — so the band
+         * read "40 products" over a 12-product listing (QA01 2026-09-25, BUG-05).
+         * The layer's collection is the one the toolbar counts, so the two can
+         * no longer disagree. Its first getSize() runs the search, which is why
+         * Observer\ApplySearchToolbarEarly (AlgoliaVendor) applies the toolbar's
+         * sort and paging to category pages before any block renders.
+         */
+        try {
+            $layer = \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\Magento\Catalog\Model\Layer\Resolver::class)
+                ->get();
+            $current = $layer->getCurrentCategory();
+
+            if ($current && (int) $current->getId() === (int) $category->getId()) {
+                return (int) $layer->getProductCollection()->getSize();
+            }
+        } catch (\Throwable $e) {
+            // No listing layer on this request: fall back to the category's own count.
+        }
+
         try {
             return (int) $category->getProductCount();
         } catch (\Throwable $e) {

@@ -55,6 +55,30 @@ class ExcludeInactiveSellerProducts implements ObserverInterface
          * and therefore silent for Algolia. Without this, 10 unapproved products
          * were live in hubmarket_*_products.
          */
+        /*
+         * Vnecoms "select and sell" copies: another seller's offer on an existing
+         * product (select_from_product_id = the original). The storefront never
+         * lists them — Vnecoms_VendorsPriceComparison's Layer plugin filters
+         * them out and the product page compares the sellers instead — but they
+         * were in Algolia, so category and search counts included products no
+         * listing shows ("5 results" over 4 cards on /ar/pharmacy.html, QA01
+         * 2026-09-25) and the autocomplete showed the same product twice.
+         */
+        $connection = $collection->getConnection();
+        $collection->getSelect()->where(
+            'NOT EXISTS (' . $connection->select()
+                ->from(['sfp' => $collection->getTable('catalog_product_entity_int')], [new \Zend_Db_Expr('1')])
+                ->join(
+                    ['sfa' => $collection->getTable('eav_attribute')],
+                    "sfa.attribute_id = sfp.attribute_id AND sfa.attribute_code = 'select_from_product_id'"
+                    . ' AND sfa.entity_type_id = 4',
+                    []
+                )
+                ->where('sfp.entity_id = e.entity_id')
+                ->where('sfp.store_id = 0')
+                ->where('sfp.value > 0') . ')'
+        );
+
         $approvalGate = $this->sellers->getApprovalGateSql();
 
         if ($approvalGate !== null) {
