@@ -20,7 +20,10 @@ $products   = $block->getProducts();
 $productN   = $block->getProductCount();
 $vendors    = $block->getVendors();
 $categories = $block->getCategories();
-$total      = $productN + count($vendors) + count($categories);
+// "N results" is the PRODUCT count, as on catalogsearch/result — adding the
+// vendor and category matches made it disagree with the Products tab next to
+// it (QA02 BUG-13). Those two are counted on their own tabs.
+$total      = $productN;
 $imageId    = 'category_page_grid';
 ?>
 <div class="hm-live" data-total="<?= (int) $total ?>">

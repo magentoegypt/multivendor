@@ -93,13 +93,4 @@ class ResultsHeader implements ArgumentInterface
     {
         return $this->facets->getCategories($this->getQueryText());
     }
-
-    /**
-     * Vendors + categories only. The product term is added in JS once the
-     * toolbar has published its count — see getProductCount().
-     */
-    public function getFacetTotal(): int
-    {
-        return count($this->getVendors()) + count($this->getCategories());
-    }
 }

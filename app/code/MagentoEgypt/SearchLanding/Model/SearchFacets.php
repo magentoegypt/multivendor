@@ -101,7 +101,14 @@ class SearchFacets
     }
 
     /**
-     * Categories whose name matches, restricted to ones a shopper can reach.
+     * Categories matching the query, restricted to ones a shopper can reach.
+     *
+     * Asks Algolia's categories index first — the same index, with the same
+     * include_in_menu rule, that the header autocomplete lists categories from.
+     * A name LIKE in SQL could never agree with it: Algolia matches prefixes,
+     * typos and the category path, so autocomplete offered categories for a
+     * query while this tab said "Categories (0)" (QA02 BUG-14). SQL is only the
+     * fallback for when Algolia is not serving this store or does not answer.
      *
      * @return array<int, array{id:int,name:string,url:string,count:int}>
      */
@@ -114,6 +121,11 @@ class SearchFacets
         $key = $query . '|' . $limit;
         if (isset($this->categoryCache[$key])) {
             return $this->categoryCache[$key];
+        }
+
+        $fromAlgolia = $this->getAlgoliaCategories($query, $limit);
+        if ($fromAlgolia !== null) {
+            return $this->categoryCache[$key] = $fromAlgolia;
         }
 
         try {
@@ -140,6 +152,71 @@ class SearchFacets
         } catch (\Throwable $e) {
             $this->logger->warning('SearchFacets categories: ' . $e->getMessage());
             return $this->categoryCache[$key] = [];
+        }
+    }
+
+    /**
+     * The autocomplete's own category search, or null when Algolia is not the
+     * frontend search for this store (or fails) and SQL has to answer.
+     *
+     * Resolved through the ObjectManager so this module keeps working, on the
+     * SQL path, on an install without the Algolia extension.
+     *
+     * @return array<int, array{id:int,name:string,url:string,count:int}>|null
+     */
+    private function getAlgoliaCategories(string $query, int $limit): ?array
+    {
+        if (!class_exists(\Algolia\AlgoliaSearch\Service\AlgoliaConnector::class)) {
+            return null;
+        }
+
+        try {
+            $storeId = (int) $this->storeManager->getStore()->getId();
+            $om = \Magento\Framework\App\ObjectManager::getInstance();
+            $config = $om->get(\Algolia\AlgoliaSearch\Helper\ConfigHelper::class);
+
+            if (!$config->credentialsAreConfigured($storeId) || !$config->isEnabledFrontEnd($storeId)) {
+                return null;
+            }
+
+            // What autocomplete sends for its categories source (autocomplete.js
+            // buildAutocompleteSourceDefault + buildAutocompleteSourceCategories),
+            // minus the analytics: this is not a shopper's query.
+            $params = [
+                'query'                => $query,
+                'hitsPerPage'          => $limit,
+                'distinct'             => true,
+                'analytics'            => false,
+                'clickAnalytics'       => false,
+                'attributesToRetrieve' => ['name', 'path', 'url', 'product_count'],
+                'attributesToHighlight' => [],
+            ];
+            if (!$config->showCatsNotIncludedInNavigation($storeId)) {
+                $params['numericFilters'] = 'include_in_menu=1';
+            }
+
+            $index = $om->get(\Algolia\AlgoliaSearch\Service\IndexNameFetcher::class)
+                ->getIndexName('_categories', $storeId);
+            $result = $om->get(\Algolia\AlgoliaSearch\Service\AlgoliaConnector::class)
+                ->getClient($storeId)
+                ->searchSingleIndex($index, $params);
+
+            $out = [];
+            foreach ((array) ($result['hits'] ?? []) as $hit) {
+                $out[] = [
+                    'id'    => (int) ($hit['objectID'] ?? 0),
+                    // The path, as autocomplete shows it: "حقيبة يد" alone is
+                    // ambiguous — there is one under women's and one under men's.
+                    'name'  => (string) ($hit['path'] ?? $hit['name'] ?? ''),
+                    'url'   => (string) ($hit['url'] ?? ''),
+                    'count' => (int) ($hit['product_count'] ?? 0),
+                ];
+            }
+
+            return $out;
+        } catch (\Throwable $e) {
+            $this->logger->warning('SearchFacets Algolia categories, using SQL: ' . $e->getMessage());
+            return null;
         }
     }
 

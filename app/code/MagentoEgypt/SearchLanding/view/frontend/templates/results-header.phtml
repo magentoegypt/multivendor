@@ -85,11 +85,14 @@ $categories = $viewModel->getCategories();
         </div>
     </div>
 
-    <?php /* data-facets is what this page CAN count; the JS adds the product
-             total to it once the toolbar has published one. */ ?>
+    <?php /* "N results" is the PRODUCT count — the same number as the Products
+             tab and the toolbar; the JS fills it from the toolbar's data-total.
+             It used to add the vendor and category matches (data-facets), so
+             "test" read 69 here against 63 on the tab and the toolbar (QA02
+             BUG-13). Vendors and categories are counted on their own tabs.
+             No data-facets attribute: results-tabs.js then adds nothing. */ ?>
     <p class="hm-live__summary"
-       data-label="<?= $escaper->escapeHtmlAttr(__('%1 results for "%2"', '%1', $query)) ?>"
-       data-facets="<?= (int) $viewModel->getFacetTotal() ?>"></p>
+       data-label="<?= $escaper->escapeHtmlAttr(__('%1 results for "%2"', '%1', $query)) ?>"></p>
 
     <div class="hm-srp__panel" data-panel="vendors" role="tabpanel" hidden>
         <?php if ($vendors): ?>

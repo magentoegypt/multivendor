@@ -5,4 +5,8 @@
         <plugin name="round_price_decimal_local_format" type="MagentoEgypt\SetExtend\Plugin\Price\Local\Format" disabled="false"/>
     </type>
     <preference for="Magento\Framework\NumberFormatter" type="MagentoEgypt\SetExtend\Plugin\Price\NumberFormatter" />
+    <!-- Counts, pager and window.LOCALE in Latin digits like the prices (QA02 BUG-04) -->
+    <type name="Magento\Framework\Locale\LocaleFormatter">
+        <plugin name="magentoegypt_latin_digits" type="MagentoEgypt\SetExtend\Plugin\Locale\LatinDigitsFormatter"/>
+    </type>
 </config>

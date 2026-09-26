@@ -32,18 +32,14 @@ class CartTitle implements ArgumentInterface
     }
 
     /**
-     * The count as digits in the store's own numbering system.
-     *
-     * ar_SA renders Arabic-Indic digits ("١"), which is what the rest of this
-     * storefront already shows — prices ("٣٤ ج.م.") and the minicart badge both
-     * do. Passing the raw PHP int into the phrase instead produced a Latin "1"
-     * sitting inside an otherwise Arabic heading.
+     * The count formatted for the store's locale, in Latin digits like every
+     * other number on the storefront (see \MagentoEgypt\SetExtend\Model\LatinDigits).
      */
     private function formatCount(int $count): string
     {
         $formatter = new \NumberFormatter($this->localeResolver->getLocale(), \NumberFormatter::DECIMAL);
 
-        return $formatter->format($count) ?: (string) $count;
+        return \MagentoEgypt\SetExtend\Model\LatinDigits::convert($formatter->format($count) ?: (string) $count);
     }
 
     /**
