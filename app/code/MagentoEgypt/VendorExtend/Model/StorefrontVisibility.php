@@ -108,6 +108,49 @@ class StorefrontVisibility
     }
 
     /**
+     * approvedIds() minus Vnecoms "select and sell" copies: the products the search index holds.
+     *
+     * A copy is another seller's offer on an existing product (select_from_product_id = the
+     * original). The storefront never lists one (Vnecoms_VendorsPriceComparison's Layer plugin
+     * filters them out, and the product page compares the sellers instead), and Algolia excludes
+     * them (AlgoliaVendor ExcludeInactiveSellerProducts). OpenSearch still held the 5 live ones, so
+     * once storefront GraphQL moved to OpenSearch it listed products no page shows (320 against
+     * Algolia's 315, 2026-09-26). The product page reads the copies from the database, not from search,
+     * so keeping them out of the index leaves the seller comparison as it was.
+     *
+     * @param int[] $productIds
+     * @return int[]
+     */
+    public function searchableIds(array $productIds): array
+    {
+        $ids = $this->approvedIds($productIds);
+        $selectFrom = $this->attributeId('select_from_product_id');
+        if (!$ids || $selectFrom === null) {
+            return $ids;
+        }
+
+        try {
+            $connection = $this->resource->getConnection();
+            $copies = $connection->fetchCol(
+                $connection->select()
+                    ->from($this->resource->getTableName('catalog_product_entity_int'), ['entity_id'])
+                    ->where('attribute_id = ?', $selectFrom)
+                    ->where('store_id = 0')
+                    ->where('value > 0')
+                    ->where('entity_id IN (?)', array_map('intval', $ids))
+            );
+        } catch (\Throwable $e) {
+            $this->logger->error('StorefrontVisibility::searchableIds failed, keeping copies: ' . $e->getMessage());
+
+            return $ids;
+        }
+
+        $copies = array_flip(array_map('intval', $copies));
+
+        return array_values(array_filter($ids, static fn ($id) => !isset($copies[(int) $id])));
+    }
+
+    /**
      * The subset of $productIds a customer could actually open on $storeId.
      *
      * approvedIds() plus enabled status and catalog visibility, both resolved

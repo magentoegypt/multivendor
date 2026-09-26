@@ -95,7 +95,8 @@ class ExcludeUnapprovedProducts
      */
     private function passing(array $buffer): array
     {
-        $allowed = array_flip($this->visibility->approvedIds(array_keys($buffer)));
+        /* Approved, active seller, and not a "select and sell" copy (see searchableIds()) */
+        $allowed = array_flip($this->visibility->searchableIds(array_keys($buffer)));
 
         return array_intersect_key($buffer, $allowed);
     }
