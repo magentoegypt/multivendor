@@ -182,6 +182,19 @@ class ProductRepository extends BaseProductRepository
         $vendor = $this->helper->getVendorByCustomerId($customerId);
         $vendorId = $vendor->getId();
 
+        /*
+         * A seller never sets `approval` or `vendor_id` (TC24-QA02). Vnecoms lists them as not
+         * vendor-editable, and _getChangedData() skips them, but the "save data which is not
+         * required for approval" loop below copied every listed attribute that was NOT held for
+         * review, i.e. exactly these. App builds that send the approval dropdown therefore left an
+         * edited, approved product at the app's value (Approved) instead of Pending Update, and
+         * the edit sat in the update queue unseen. Drop them from the list before anything runs.
+         */
+        $attributes = array_values(array_diff(
+            (array) $attributes,
+            $this->vendorProductHelper->getNotUsedVendorAttributes()
+        ));
+
         $om = $this->objectManager;
         if(in_array('sku', $attributes)){
             $existProduct = $this->getById($product->getId());
@@ -223,9 +236,10 @@ class ProductRepository extends BaseProductRepository
                     }
 
                     if (!$saveDraft) {
+                        /* $existProduct, not the request's $product: that one carries the app's value */
                         $existProduct->setApproval(Approval::STATUS_PENDING_UPDATE)
                             ->getResource()
-                            ->saveAttribute($product, 'approval');
+                            ->saveAttribute($existProduct, 'approval');
                         $this->vendorProductHelper->sendUpdateProductApprovalEmailToAdmin($existProduct, $vendor);
                     }
                     
