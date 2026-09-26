@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!--
+        `new_bundle` had no GraphQL concrete type, so any storefront query that returned one failed
+        with "Concrete type for ProductInterface not implemented". Registered in the same two
+        composites BundleGraphQl uses for `bundle`. See the class.
+    -->
+    <type name="Magento\CatalogGraphQl\Model\ProductInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="productTypeNameResolvers" xsi:type="array">
+                <item name="magentoegypt_new_bundle_type_resolver" xsi:type="object">MagentoEgypt\BundleExtend\Model\GraphQl\NewBundleTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\UrlRewriteGraphQl\Model\RoutableInterfaceTypeResolver">
+        <arguments>
+            <argument name="productTypeNameResolvers" xsi:type="array">
+                <item name="magentoegypt_new_bundle_type_resolver" xsi:type="object">MagentoEgypt\BundleExtend\Model\GraphQl\NewBundleTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

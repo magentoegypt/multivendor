@@ -63,7 +63,18 @@ class EngineResolverPlugin
         }
 
         try {
-            if ($this->appState->getAreaCode() !== Area::AREA_FRONTEND) {
+            $area = $this->appState->getAreaCode();
+            /*
+             * Storefront GraphQL (`products(filter:…)`) runs Magento's search request through
+             * the engine's adapter, and Algolia's SearchAdapter does not apply GraphQL filters:
+             * every filter-only query returned the whole catalogue (315 items), whatever the
+             * filter (2026-09-26). GraphQL is not what Algolia's storefront features run on,
+             * so it is answered by OpenSearch, which Magento keeps current for exactly this.
+             */
+            if ($area === Area::AREA_GRAPHQL) {
+                return self::OPENSEARCH;
+            }
+            if ($area !== Area::AREA_FRONTEND) {
                 return $result;
             }
 
