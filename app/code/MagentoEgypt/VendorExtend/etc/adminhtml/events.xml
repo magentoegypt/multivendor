@@ -5,6 +5,9 @@
     </event>
     <event name="controller_action_predispatch">
 		<observer name="vnecoms_core_action_predispatch"  disabled="true" />
+        <!-- Returns > New Request: "#000000097" (as admin prints it) finds the order. TC39-QA02 14zb93nuzv7 -->
+        <observer name="magentoegypt_vendorextend_rma_order_number"
+                  instance="MagentoEgypt\VendorExtend\Observer\Rma\NormalizeOrderNumber" />
 	</event>
     <event name="adminhtml_vendor_save_after">
         <observer name="magentoegypt_vendorextend_admin_clear_vendor_theme"
