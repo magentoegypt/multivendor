@@ -1,0 +1,311 @@
+<?php
+/**
+ * Config provider model
+ */
+namespace Tabby\Checkout\Model\Ui;
+
+use Magento\Catalog\Helper\Image;
+use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Locale\Resolver;
+use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\View\Asset\Repository;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Tabby\Checkout\Gateway\Config\Config;
+use Tabby\Checkout\Model\Checkout\Payment\BuyerHistory;
+use Tabby\Checkout\Model\Checkout\Payment\OrderHistory;
+
+/**
+ * Config Provider for checkout front-end
+ */
+class ConfigProvider implements ConfigProviderInterface
+{
+
+    public const CODE = 'tabby_checkout';
+
+    protected const KEY_PUBLIC_KEY = 'public_key';
+
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * @var SessionManagerInterface
+     */
+    protected $session;
+
+    /**
+     * @var Session
+     */
+    protected $checkoutSession;
+
+    /**
+     * @var Image
+     */
+    protected $imageHelper;
+
+    /**
+     * @var CollectionFactory
+     */
+    protected $orderCollectionFactory;
+
+    /**
+     * @var Repository
+     */
+    protected $assetRepo;
+
+    /**
+     * @var RequestInterface
+     */
+    protected $request;
+
+    /**
+     * @var Resolver
+     */
+    protected $resolver;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var UrlInterface
+     */
+    protected $urlInterface;
+
+    /**
+     * @var BuyerHistory
+     */
+    protected $buyerHistory;
+
+    /**
+     * @var OrderHistory
+     */
+    protected $orderHistory;
+
+    /**
+     * Constructor
+     *
+     * @param Config                  $config
+     * @param SessionManagerInterface $session
+     * @param Session                 $_checkoutSession
+     * @param BuyerHistory            $buyerHistory
+     * @param OrderHistory            $orderHistory
+     * @param Image                   $imageHelper
+     * @param CollectionFactory       $orderCollectionFactory
+     * @param Repository              $assetRepo
+     * @param RequestInterface        $request
+     * @param StoreManagerInterface   $storeManager
+     * @param Resolver                $resolver
+     * @param UrlInterface            $urlInterface
+     */
+    public function __construct(
+        Config $config,
+        SessionManagerInterface $session,
+        Session $_checkoutSession,
+        BuyerHistory $buyerHistory,
+        OrderHistory $orderHistory,
+        Image $imageHelper,
+        CollectionFactory $orderCollectionFactory,
+        Repository $assetRepo,
+        RequestInterface $request,
+        StoreManagerInterface $storeManager,
+        Resolver $resolver,
+        UrlInterface $urlInterface
+    ) {
+        $this->config = $config;
+        $this->session = $session;
+        $this->checkoutSession = $_checkoutSession;
+        $this->buyerHistory = $buyerHistory;
+        $this->orderHistory = $orderHistory;
+        $this->imageHelper = $imageHelper;
+        $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->assetRepo = $assetRepo;
+        $this->request = $request;
+        $this->resolver = $resolver;
+        $this->storeManager = $storeManager;
+        $this->urlInterface = $urlInterface;
+    }
+
+    /**
+     * Retrieve assoc array of checkout configuration
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        // bypass config for promotions only mode
+        if ($this->config->getValue('plugin_mode', $this->session->getStoreId()) == '1') {
+            return [];
+        }
+
+        return [
+            'payment' => [
+                self::CODE => [
+                    'config' => $this->getTabbyConfig(),
+                    'defaultRedirectUrl' => $this->urlInterface
+                        ->getUrl('tabby/redirect'),
+                    'payment' => $this->getPaymentObject(),
+                    'storeGroupCode' => $this->storeManager->getGroup()->getCode(),
+                    'lang' => $this->resolver->getLocale(),
+                    'urls' => $this->getQuoteItemsUrls(),
+                    'methods' => $this->_getMethodsAdditionalInfo(),
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Provides additional configuration for payment methods
+     *
+     * @param string $method
+     * @return bool
+     */
+    private function getShouldInheritBg($method)
+    {
+        return (bool)$this->config->getScopeConfig()->getValue(
+            'payment/' . $method . '/inherit_bg',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->session->getStoreId()
+        );
+    }
+    /**
+     * Provides additional configuration for payment methods
+     *
+     * @return array
+     */
+    private function _getMethodsAdditionalInfo()
+    {
+        $result = [];
+        foreach (\Tabby\Checkout\Gateway\Config\Config::ALLOWED_SERVICES as $method => $title) {
+            $description_type = (int)$this->config->getScopeConfig()->getValue(
+                'payment/' . $method . '/description_type',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $this->session->getStoreId()
+            );
+
+            if ($description_type == 0) {
+                $description_type = 1;
+            }
+
+            $result[$method] = [
+                'description_type' => $description_type,
+                'inherit_bg' => $this->getShouldInheritBg($method),
+                'card_direction' => (int)$this->config->getScopeConfig()->getValue(
+                    'payment/' . $method . '/description_type',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $this->session->getStoreId()
+                ) == 1 ? 'narrow' : 'wide',
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Payment fail page url
+     *
+     * @return string
+     */
+    private function getFailPageUrl()
+    {
+        return $this->urlInterface->getUrl('tabby/checkout/fail');
+    }
+
+    /**
+     * Provides array of Quote Items Image/Product urls and category
+     *
+     * @return array
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    private function getQuoteItemsUrls()
+    {
+        $result = [];
+
+        foreach ($this->checkoutSession->getQuote()->getAllVisibleItems() as $item) {
+            $product = $item->getProduct();
+            $image = $this->imageHelper->init($product, 'product_page_image_large');
+            $category_name = '';
+            if ($collection = $product->getCategoryCollection()->addNameToResult()) {
+                if ($collection->getSize()) {
+                    $category_name = $collection->getFirstItem()->getName();
+                }
+            }
+            $result[$item->getId()] = [
+                'image_url' => $image->getUrl(),
+                'product_url' => $product->getUrlInStore(),
+                'category' => $category_name,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * Provides Tabby Config for frontend
+     *
+     * @return array
+     */
+    private function getTabbyConfig()
+    {
+        $params = ['_secure' => $this->request->isSecure()];
+
+        $logo_image = 'logo_' . $this->config->getValue('logo_color', $this->session->getStoreId());
+
+        $config = [
+            'apiKey'            => $this->config->getValue(self::KEY_PUBLIC_KEY, $this->session->getStoreId()),
+            'hideMethods'       => (bool)$this->config->getValue('hide_methods', $this->session->getStoreId()),
+            'local_currency'    => (bool)$this->config->getValue('local_currency', $this->session->getStoreId()),
+            'checkout_remove_tax' => (bool)$this->config->getValue('checkout_remove_tax', $this->session->getStoreId()),
+            'showLogo'          => (bool)$this->config->getValue('show_logo', $this->session->getStoreId()),
+            'paymentLogoSrc'    => $this->assetRepo->getUrlWithParams(
+                'Tabby_Checkout::images/' . $logo_image . '.png',
+                $params
+            ),
+            'paymentInfoSrc'    => $this->assetRepo->getUrlWithParams('Tabby_Checkout::images/info.png', $params),
+            'paymentInfoHref'   => $this->assetRepo->getUrlWithParams(
+                'Tabby_Checkout::template/payment/info.html',
+                $params
+            ),
+            'merchantUrls'      => $this->getMerchantUrls(),
+            'useRedirect'       => 1,
+        ];
+
+        if ($this->config->getValue('use_history', $this->session->getStoreId()) === 'no') {
+            $config['use_history'] = false;
+        }
+
+        return $config;
+    }
+
+    /**
+     * Provides Merchant URLs for tabby create session request
+     *
+     * @return array
+     */
+    protected function getMerchantUrls()
+    {
+        return [
+            "success" => $this->urlInterface->getUrl('tabby/result/success'),
+            "cancel" => $this->urlInterface->getUrl('tabby/result/cancel'),
+            "failure" => $this->urlInterface->getUrl('tabby/result/failure'),
+        ];
+    }
+
+    /**
+     * Provides payment object for tabby create session request
+     *
+     * @return array
+     */
+    private function getPaymentObject()
+    {
+        $payment = [];
+        return $payment;
+    }
+}

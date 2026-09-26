@@ -8,7 +8,8 @@ class Format
      */
     private const ARABIC_CODES = [
         'SAR',
-        'EGP'
+        'EGP',
+        'AED'
     ];
 
     /**

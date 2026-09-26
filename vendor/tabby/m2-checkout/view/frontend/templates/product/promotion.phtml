@@ -1,0 +1,76 @@
+<?php
+if ($block->isPromotionsActiveForProduct()):
+    ?>
+    <script>
+        var tabbyConfig = <?= /* @noEscape */ $block->getJsonConfigTabby('#tabbyPromo'); ?>;
+
+        function updateTabbyPromotions(price) {
+            if ((price * tabbyConfig.currencyRate).toFixed(2) != tabbyConfig.price.toFixed(2)) {
+                //document.querySelector('#tabbyPromo').innerHTML = '';
+                tabbyConfig.price = price * tabbyConfig.currencyRate;
+                new window.TabbyPromo(tabbyConfig);
+            }
+        }
+
+        require(['jquery', 'https://<?php echo $block->getPromoScriptDomain(); ?>/tabby-promo.js'], function (jQuery, tPromo) {
+            var tabbyPromo = new TabbyPromo(tabbyConfig);
+            jQuery('.product-info-main .product-info-price .price-box.price-final_price').
+                on('reloadPrice', function (data) {
+                    let price = jQuery(this).find('[data-price-type=finalPrice]').attr('data-price-amount');
+                    try {
+                        price = Number.parseFloat(price);
+                    } catch (error) {
+                        return;
+                    }
+                    if (price) {
+                        updateTabbyPromotions(price);
+                    }
+                });
+
+            jQuery('.product-info-main .price-box.price-final_price').on('price-box-initialized', function (data) {
+                let price = jQuery(this).find('[data-price-type=finalPrice]').attr('data-price-amount');
+                try {
+                    price = Number.parseFloat(price);
+                } catch (error) {
+                    return;
+                }
+                if (price) {
+                    updateTabbyPromotions(price);
+                }
+            });
+            if (jQuery('#super-product-table').length) {
+                function TabbyPromoUpdateForGrouppedProducts() {
+                    let price = 0;
+                    let success = 1;
+                    jQuery('#super-product-table .price-box.price-final_price').each(function () {
+                        const localPrice = jQuery(this).find('[data-price-type=finalPrice]').attr('data-price-amount');
+                        const localId    = jQuery(this).attr('data-product-id');
+                        const localQty   = jQuery('#super-product-table [data-selector="super_group[' +
+                            localId + ']"]').val();
+                        try {
+                            const localTotalPrice = Number.parseFloat(localPrice) * Number.parseFloat(localQty);
+                            if (!isNaN(localTotalPrice)) {
+                                price += localTotalPrice;
+                            } else {
+                                success = 0;
+                            }
+                        } catch (error) {
+                            success = 0;
+                            return;
+                        }
+                    });
+                    if (success == 1) {
+                        updateTabbyPromotions(price);
+                    }
+                }
+                jQuery('#super-product-table [data-selector^=super_group]').on(
+                    'change',
+                    TabbyPromoUpdateForGrouppedProducts
+                );
+                TabbyPromoUpdateForGrouppedProducts();
+            }
+        });
+    </script>
+    <div id="tabbyPromo">
+    </div>
+<?php endif; ?>

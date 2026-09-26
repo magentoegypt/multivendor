@@ -1,0 +1,26 @@
+{
+  "name": "tamara-solution/magento",
+  "description": "A Magento 2 module that creates tamara payment methods",
+  "type": "magento2-module",
+  "version": "2.13.2",
+  "minimum-stability": "stable",
+  "license": "OSL-3.0",
+  "authors": [
+    {
+      "name": "tamara",
+      "email": "tech@tamara.co"
+    }
+  ],
+  "require": {
+    "php": "^7.1|^8.0",
+    "tamara-solution/php-sdk": "^2.0.11 || ^3.0.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Tamara\\Checkout\\": "."
+    },
+    "files": [
+      "registration.php"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+<?php
+if ($block->isPromotionsActiveForCart()):
+    ?>
+    <script>
+        var tabbyConfig = <?= /* @noEscape */ $block->getJsonConfigTabby('#tabbyPromo'); ?>;
+
+        function updateTabbyPromotions(price) {
+            if (price != tabbyConfig.price) {
+                tabbyConfig.price = price * tabbyConfig.currencyRate;
+                new window.TabbyPromo(tabbyConfig);
+            }
+        }
+
+        require(['https://<?php echo $block->getPromoScriptDomain(); ?>/tabby-promo.js', 'Magento_Checkout/js/model/quote'],
+            function (tPromo, quote) {
+                function updateTabbyTotal(totals) {
+                    let price = parseFloat(totals.grand_total);
+                    updateTabbyPromotions(price);
+                };
+                quote.getTotals().subscribe(updateTabbyTotal);
+                updateTabbyTotal(quote.getTotals()());
+            }
+        );
+    </script>
+    <div id="tabbyPromo">
+    </div>
+<?php endif; ?>

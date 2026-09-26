@@ -1,0 +1,71 @@
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked()),'rejected': isRejected()}">
+    <div class="payment-method-title field choice">
+        <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()">
+        <label class="label" data-bind="attr: {'for': getCode()}">
+            <!-- ko if: getShowLogo() -->
+            <img data-bind="attr: {src: getPaymentLogoSrc(), alt: $t('Tabby')}" class="payment-icon"
+                 style="width:55px" />
+            <!-- /ko -->
+            <span data-bind="text: $t(getTitle())"></span>
+        </label>
+    </div>
+
+    <div class="payment-method-content">
+        <div class="message error" data-bind="
+			visible: isRejected(),
+			text: $t('Sorry Tabby is unable to approve this purchase, please use an alternative payment method for your order.')
+		"></div>
+        <!-- ko foreach: getRegion('messages') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!--/ko-->
+
+        <div data-bind="text: getTextDescription(), attr: {id: getDescriptionDivId()}" afterRender="initTabbyCard"></div>
+
+        <div class="payment-method-billing-address">
+            <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="checkout-agreements-block">
+            <!-- ko foreach: $parent.getRegion('before-place-order') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+            <!--/ko-->
+        </div>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button class="action primary checkout tabby"
+                        type="submit"
+                        disabled="disabled"
+                        data-bind="
+                        click: placeOrder,
+						css: getCode(),
+                        attr: {title: $t('Place Order')},
+                        enable: isPlaceOrderActionAllowed()
+                        ">
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+            </div>
+            </div-->
+        </div>
+    </div>
+    <!-- ko if: getHideMethods() -->
+    <style>
+        .rejected {
+            display: none;
+        }
+    </style>
+    <!-- /ko -->
+    <style>
+        #tabbyDesc:not(:empty) {
+            margin-bottom: 20px;
+        }
+
+        .rejected #tabbyDesc, .rejected #tabbyCard {
+            display: none;
+        }
+    </style>

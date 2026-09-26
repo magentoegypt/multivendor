@@ -3491,6 +3491,79 @@
             "install-path": "../justinrainbow/json-schema"
         },
         {
+            "name": "kriswallsmith/buzz",
+            "version": "1.4.0",
+            "version_normalized": "1.4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kriswallsmith/Buzz.git",
+                "reference": "19d742cc36b7bc928ca88565ecb391c363fa46d3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kriswallsmith/Buzz/zipball/19d742cc36b7bc928ca88565ecb391c363fa46d3",
+                "reference": "19d742cc36b7bc928ca88565ecb391c363fa46d3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1 || ^8.0",
+                "php-http/httplug": "^1.1 || ^2.0",
+                "psr/http-client": "^1.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.1 || ^2.0",
+                "symfony/options-resolver": "^3.4 || ^4.0 || ^5.0 || ^6.0 || ^7.0 || ^8.0"
+            },
+            "provide": {
+                "php-http/client-implementation": "1.0",
+                "psr/http-client-implementation": "1.0"
+            },
+            "require-dev": {
+                "nyholm/psr7": "^1.0",
+                "php-http/client-integration-tests": "^3.0",
+                "phpunit/phpunit": "^7.5 || ^9.4",
+                "psr/log": "^1.0"
+            },
+            "suggest": {
+                "ext-curl": "To use our cUrl clients",
+                "nyholm/psr7": "For PSR-7 and PSR-17 implementation"
+            },
+            "time": "2026-05-15T12:02:31+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Buzz\\": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kris Wallsmith",
+                    "email": "kris.wallsmith@gmail.com",
+                    "homepage": "https://kriswallsmith.net/"
+                },
+                {
+                    "name": "Tobias Nyholm",
+                    "email": "tobias.nyholm@gmail.com",
+                    "homepage": "https://tnyholm.se/"
+                }
+            ],
+            "description": "Lightweight HTTP client",
+            "homepage": "https://github.com/kriswallsmith/Buzz",
+            "keywords": [
+                "curl",
+                "http client"
+            ],
+            "support": {
+                "issues": "https://github.com/kriswallsmith/Buzz/issues",
+                "source": "https://github.com/kriswallsmith/Buzz/tree/1.4.0"
+            },
+            "install-path": "../kriswallsmith/buzz"
+        },
+        {
             "name": "laminas/laminas-captcha",
             "version": "2.20.0",
             "version_normalized": "2.20.0.0",
@@ -22470,6 +22543,87 @@
             "install-path": "../nikic/php-parser"
         },
         {
+            "name": "nyholm/psr7",
+            "version": "1.8.2",
+            "version_normalized": "1.8.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Nyholm/psr7.git",
+                "reference": "a71f2b11690f4b24d099d6b16690a90ae14fc6f3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Nyholm/psr7/zipball/a71f2b11690f4b24d099d6b16690a90ae14fc6f3",
+                "reference": "a71f2b11690f4b24d099d6b16690a90ae14fc6f3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.1 || ^2.0"
+            },
+            "provide": {
+                "php-http/message-factory-implementation": "1.0",
+                "psr/http-factory-implementation": "1.0",
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "http-interop/http-factory-tests": "^0.9",
+                "php-http/message-factory": "^1.0",
+                "php-http/psr7-integration-tests": "^1.0",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.4",
+                "symfony/error-handler": "^4.4"
+            },
+            "time": "2024-09-09T07:06:30+00:00",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.8-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Nyholm\\Psr7\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tobias Nyholm",
+                    "email": "tobias.nyholm@gmail.com"
+                },
+                {
+                    "name": "Martijn van der Ven",
+                    "email": "martijn@vanderven.se"
+                }
+            ],
+            "description": "A fast PHP7 implementation of PSR-7",
+            "homepage": "https://tnyholm.se",
+            "keywords": [
+                "psr-17",
+                "psr-7"
+            ],
+            "support": {
+                "issues": "https://github.com/Nyholm/psr7/issues",
+                "source": "https://github.com/Nyholm/psr7/tree/1.8.2"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Zegnat",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nyholm",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../nyholm/psr7"
+        },
+        {
             "name": "open-telemetry/api",
             "version": "1.9.0",
             "version_normalized": "1.9.0.0",
@@ -26894,6 +27048,80 @@
             "install-path": "../symfony/mime"
         },
         {
+            "name": "symfony/options-resolver",
+            "version": "v8.1.0",
+            "version_normalized": "8.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/options-resolver.git",
+                "reference": "88f9c561f678a02d54b897014049fa839e33ff82"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/88f9c561f678a02d54b897014049fa839e33ff82",
+                "reference": "88f9c561f678a02d54b897014049fa839e33ff82",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.4.1",
+                "symfony/deprecation-contracts": "^2.5|^3"
+            },
+            "time": "2026-05-29T05:06:50+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\OptionsResolver\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides an improved replacement for the array_replace PHP function",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "config",
+                "configuration",
+                "options"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/options-resolver/tree/v8.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "install-path": "../symfony/options-resolver"
+        },
+        {
             "name": "symfony/polyfill-ctype",
             "version": "v1.37.0",
             "version_normalized": "1.37.0.0",
@@ -28509,6 +28737,153 @@
                 }
             ],
             "install-path": "../symfony/yaml"
+        },
+        {
+            "name": "tabby/m2-checkout",
+            "version": "6.5.0",
+            "version_normalized": "6.5.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tabby-ai/m2-checkout.git",
+                "reference": "4c36620c35d8ca21103b5fdd4a43268954fdb4ae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tabby-ai/m2-checkout/zipball/4c36620c35d8ca21103b5fdd4a43268954fdb4ae",
+                "reference": "4c36620c35d8ca21103b5fdd4a43268954fdb4ae",
+                "shasum": ""
+            },
+            "require": {
+                "magento/framework": "^103.0.0",
+                "php": ">=7.1"
+            },
+            "time": "2026-03-26T09:07:57+00:00",
+            "type": "magento2-module",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Tabby\\Checkout\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0",
+                "AFL-3.0"
+            ],
+            "description": "Tabby payment gateway",
+            "support": {
+                "issues": "https://github.com/tabby-ai/m2-checkout/issues",
+                "source": "https://github.com/tabby-ai/m2-checkout/tree/6.5.0"
+            },
+            "install-path": "../tabby/m2-checkout"
+        },
+        {
+            "name": "tamara-solution/magento",
+            "version": "2.13.2",
+            "version_normalized": "2.13.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Tamara-Technology/magento.git",
+                "reference": "d07666a73555b80f3272dcb7912786b7bf8ad83e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Tamara-Technology/magento/zipball/d07666a73555b80f3272dcb7912786b7bf8ad83e",
+                "reference": "d07666a73555b80f3272dcb7912786b7bf8ad83e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1|^8.0",
+                "tamara-solution/php-sdk": "^2.0.11 || ^3.0.3"
+            },
+            "time": "2026-09-14T13:18:47+00:00",
+            "type": "magento2-module",
+            "installation-source": "dist",
+            "autoload": {
+                "files": [
+                    "registration.php"
+                ],
+                "psr-4": {
+                    "Tamara\\Checkout\\": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "tamara",
+                    "email": "tech@tamara.co"
+                }
+            ],
+            "description": "A Magento 2 module that creates tamara payment methods",
+            "support": {
+                "issues": "https://github.com/Tamara-Technology/magento/issues",
+                "source": "https://github.com/Tamara-Technology/magento/tree/2.13.2"
+            },
+            "install-path": "../tamara-solution/magento"
+        },
+        {
+            "name": "tamara-solution/php-sdk",
+            "version": "3.0.3",
+            "version_normalized": "3.0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Tamara-Technology/php-sdk.git",
+                "reference": "03c3ed5f10f04a41f758e255f1e59bc515026aac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Tamara-Technology/php-sdk/zipball/03c3ed5f10f04a41f758e255f1e59bc515026aac",
+                "reference": "03c3ed5f10f04a41f758e255f1e59bc515026aac",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "firebase/php-jwt": "^7.0",
+                "guzzlehttp/guzzle": ">=6.0",
+                "kriswallsmith/buzz": "^1.2|^0.16",
+                "nyholm/psr7": "^1.3",
+                "php": ">=8.1",
+                "psr/http-client": "^1.0",
+                "psr/log": "^3.0.0",
+                "symfony/http-foundation": "^6.4||^7.0||^8.0"
+            },
+            "time": "2026-08-10T07:20:15+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Tamara\\": "src/Tamara"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tamara Team",
+                    "email": "tech@tamara.co"
+                }
+            ],
+            "description": "Tamara PHP Client Library",
+            "homepage": "https://github.com/tamara-solution/php-sdk",
+            "keywords": [
+                "buy now pay later",
+                "installment",
+                "tamara",
+                "tamara php sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/Tamara-Technology/php-sdk/issues",
+                "source": "https://github.com/Tamara-Technology/php-sdk/tree/3.0.3"
+            },
+            "install-path": "../tamara-solution/php-sdk"
         },
         {
             "name": "taqnyat/php",

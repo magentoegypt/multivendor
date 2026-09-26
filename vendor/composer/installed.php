@@ -580,6 +580,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'kriswallsmith/buzz' => array(
+            'pretty_version' => '1.4.0',
+            'version' => '1.4.0.0',
+            'reference' => '19d742cc36b7bc928ca88565ecb391c363fa46d3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../kriswallsmith/buzz',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'laminas/laminas-captcha' => array(
             'pretty_version' => '2.20.0',
             'version' => '2.20.0.0',
@@ -4738,6 +4747,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'nyholm/psr7' => array(
+            'pretty_version' => '1.8.2',
+            'version' => '1.8.2.0',
+            'reference' => 'a71f2b11690f4b24d099d6b16690a90ae14fc6f3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../nyholm/psr7',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'open-telemetry/api' => array(
             'pretty_version' => '1.9.0',
             'version' => '1.9.0.0',
@@ -4892,6 +4910,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '*',
+                1 => '1.0',
             ),
         ),
         'php-http/discovery' => array(
@@ -4911,6 +4930,12 @@
             'install_path' => __DIR__ . '/../php-http/httplug',
             'aliases' => array(),
             'dev_requirement' => false,
+        ),
+        'php-http/message-factory-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '1.0',
+            ),
         ),
         'php-http/promise' => array(
             'pretty_version' => '1.3.1',
@@ -5376,6 +5401,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'symfony/options-resolver' => array(
+            'pretty_version' => 'v8.1.0',
+            'version' => '8.1.0.0',
+            'reference' => '88f9c561f678a02d54b897014049fa839e33ff82',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../symfony/options-resolver',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'symfony/polyfill-ctype' => array(
             'pretty_version' => 'v1.37.0',
             'version' => '1.37.0.0',
@@ -5550,6 +5584,33 @@
             'reference' => 'a7ec3b1156faf8815db7683ec7c1e7338e6f977c',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/yaml',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'tabby/m2-checkout' => array(
+            'pretty_version' => '6.5.0',
+            'version' => '6.5.0.0',
+            'reference' => '4c36620c35d8ca21103b5fdd4a43268954fdb4ae',
+            'type' => 'magento2-module',
+            'install_path' => __DIR__ . '/../tabby/m2-checkout',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'tamara-solution/magento' => array(
+            'pretty_version' => '2.13.2',
+            'version' => '2.13.2.0',
+            'reference' => 'd07666a73555b80f3272dcb7912786b7bf8ad83e',
+            'type' => 'magento2-module',
+            'install_path' => __DIR__ . '/../tamara-solution/magento',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'tamara-solution/php-sdk' => array(
+            'pretty_version' => '3.0.3',
+            'version' => '3.0.3.0',
+            'reference' => '03c3ed5f10f04a41f758e255f1e59bc515026aac',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../tamara-solution/php-sdk',
             'aliases' => array(),
             'dev_requirement' => false,
         ),

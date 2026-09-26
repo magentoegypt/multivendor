@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @var $block \Tamara\Checkout\Block\PopulateTamara
+ */
+
+$widgetVersion = $block->getWidgetVersion();
+$isProductionEnvironment = $block->isProductionEnvironment();
+$scriptString = 'window.populateTamara = ';
+$scriptString .= \json_encode($block->getTamaraConfig());
+?>
+<?php if (class_exists('\Magento\Framework\View\Helper\SecureHtmlRenderer')): ?>
+    <?php /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */ ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php else: ?>
+    <script>
+        <?php echo $scriptString; ?>
+    </script>
+<?php endif; ?>
+<?php if ($widgetVersion == 'v1') : ?>
+    <?php if ($isProductionEnvironment): ?>
+        <script charset="utf-8" defer src="https://cdn.tamara.co/widget/installment-plan.min.js"></script>
+    <?php else: ?>
+        <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget/installment-plan.min.js"></script>
+    <?php endif; ?>
+<?php else: ?>
+    <?php if ($widgetVersion == 'v2') : ?>
+        <?php if ($isProductionEnvironment): ?>
+            <script charset="utf-8" defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+        <?php else: ?>
+            <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js"></script>
+        <?php endif; ?>
+    <?php else: ?>
+        <?php if ($isProductionEnvironment): ?>
+            <script charset="utf-8" defer src="https://cdn.tamara.co/widget-v2/tamara-widget.js"></script>
+            <script charset="utf-8" defer src="https://cdn.tamara.co/widget/installment-plan.min.js"></script>
+        <?php else: ?>
+            <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js"></script>
+            <script charset="utf-8" defer src="https://cdn-sandbox.tamara.co/widget/installment-plan.min.js"></script>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endif; ?>
+

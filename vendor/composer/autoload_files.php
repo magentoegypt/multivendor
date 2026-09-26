@@ -495,6 +495,8 @@ return array(
     'f3d4617c4b29f1082289d89745685dad' => $vendorDir . '/magento/module-widget-sample-data/registration.php',
     '759d958743dba8d926c9111b82afe3e9' => $vendorDir . '/magento/module-wishlist-sample-data/registration.php',
     '6b5b87bda6fedcf6ef8605219c8b67f2' => $vendorDir . '/mageplaza/module-core/registration.php',
+    '607e6291911d2f6991a0b5508eff6475' => $vendorDir . '/tabby/m2-checkout/registration.php',
+    'ebb4fc3dc8834ff63a5be23a1de98891' => $vendorDir . '/tamara-solution/magento/registration.php',
     '0e7f8f434591505339f2132e25888be3' => $vendorDir . '/vnecoms/module-master-password/registration.php',
     '81a20bb0e5626ad8d9ee804de43f4548' => $vendorDir . '/vnecoms/module-quotation/registration.php',
     'c242ad16a8a1eff52b4e347c0e984397' => $vendorDir . '/vnecoms/module-sms-4jawaly/registration.php',

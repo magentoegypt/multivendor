@@ -1,0 +1,50 @@
+<?php
+/**
+ * @var $block \Tamara\Checkout\Block\Product\Popup
+ */
+if (!$block->availableToShow()) {
+    goto end;
+}
+$productFinalPrice = $block->getCurrentProductPrice();
+$publicKey = $block->getPublicKey();
+?>
+<?php
+$lang = 'en';
+if ($block->isArabicLanguage()) {
+    $lang = 'ar';
+}
+$currencyCode = $block->getStoreCurrencyCode();
+$countryCode = "";
+if (!empty(\Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode])) {
+    $countryCode = \Tamara\Checkout\Gateway\Validator\CountryValidator::CURRENCIES_COUNTRIES_ALLOWED[$currencyCode];
+}
+?>
+<?php
+if ($block->isProductionApiEnvironment()) {
+    $widgetUrl = "https://cdn.tamara.co/widget-v2/tamara-widget.js";
+} else {
+    $widgetUrl = "https://cdn-sandbox.tamara.co/widget-v2/tamara-widget.js";
+}
+echo '<div class="tamara-promo-widget-wrapper tamara-product-page"><tamara-widget amount="' . $productFinalPrice . '" inline-type="' . $block->getInlineType() . '"></tamara-widget></div>';
+$scriptString = '
+        var tamaraWidgetConfig = {
+                                    lang: \''. $lang .'\',
+                                    country: \''. $countryCode .'\',
+                                    publicKey: \''. $publicKey .'\'
+                                }
+        ';
+?>
+<?php if (class_exists('\Magento\Framework\View\Helper\SecureHtmlRenderer')): ?>
+    <?php /** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */ ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php else: ?>
+    <script>
+        <?php echo $scriptString; ?>
+    </script>
+<?php endif; ?>
+<script charset="utf-8" defer src="<?= $widgetUrl ?>"></script>
+<div class="<?php echo 'tamara-page-type-' . $block->getPageType() ?>"></div>
+
+<?php
+end: //label go to end of file
+?>

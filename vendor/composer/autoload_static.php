@@ -496,6 +496,8 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         'f3d4617c4b29f1082289d89745685dad' => __DIR__ . '/..' . '/magento/module-widget-sample-data/registration.php',
         '759d958743dba8d926c9111b82afe3e9' => __DIR__ . '/..' . '/magento/module-wishlist-sample-data/registration.php',
         '6b5b87bda6fedcf6ef8605219c8b67f2' => __DIR__ . '/..' . '/mageplaza/module-core/registration.php',
+        '607e6291911d2f6991a0b5508eff6475' => __DIR__ . '/..' . '/tabby/m2-checkout/registration.php',
+        'ebb4fc3dc8834ff63a5be23a1de98891' => __DIR__ . '/..' . '/tamara-solution/magento/registration.php',
         '0e7f8f434591505339f2132e25888be3' => __DIR__ . '/..' . '/vnecoms/module-master-password/registration.php',
         '81a20bb0e5626ad8d9ee804de43f4548' => __DIR__ . '/..' . '/vnecoms/module-quotation/registration.php',
         'c242ad16a8a1eff52b4e347c0e984397' => __DIR__ . '/..' . '/vnecoms/module-sms-4jawaly/registration.php',
@@ -695,6 +697,9 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         'T' =>
         array (
             'Twilio\\' => 7,
+            'Tamara\\Checkout\\' => 16,
+            'Tamara\\' => 7,
+            'Tabby\\Checkout\\' => 15,
         ),
         'S' =>
         array (
@@ -719,6 +724,7 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
             'Symfony\\Component\\VarDumper\\' => 28,
             'Symfony\\Component\\String\\' => 25,
             'Symfony\\Component\\Process\\' => 26,
+            'Symfony\\Component\\OptionsResolver\\' => 34,
             'Symfony\\Component\\Mime\\' => 23,
             'Symfony\\Component\\Mailer\\' => 25,
             'Symfony\\Component\\Intl\\' => 23,
@@ -776,6 +782,10 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
             'OpenTelemetry\\API\\' => 18,
             'OpenSearch\\' => 11,
             'OTPHP\\' => 6,
+        ),
+        'N' =>
+        array (
+            'Nyholm\\Psr7\\' => 12,
         ),
         'M' =>
         array (
@@ -1278,6 +1288,7 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         ),
         'B' =>
         array (
+            'Buzz\\' => 5,
             'Brick\\VarExporter\\' => 18,
             'Brick\\Math\\' => 11,
             'Braintree\\' => 10,
@@ -1752,6 +1763,18 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         array (
             0 => __DIR__ . '/..' . '/twilio/sdk/src/Twilio',
         ),
+        'Tamara\\Checkout\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/tamara-solution/magento',
+        ),
+        'Tamara\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/tamara-solution/php-sdk/src/Tamara',
+        ),
+        'Tabby\\Checkout\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/tabby/m2-checkout',
+        ),
         'Symfony\\Polyfill\\Php85\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php85',
@@ -1835,6 +1858,10 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         'Symfony\\Component\\Process\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/process',
+        ),
+        'Symfony\\Component\\OptionsResolver\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/symfony/options-resolver',
         ),
         'Symfony\\Component\\Mime\\' =>
         array (
@@ -2029,6 +2056,10 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         'OTPHP\\' =>
         array (
             0 => __DIR__ . '/..' . '/spomky-labs/otphp/src',
+        ),
+        'Nyholm\\Psr7\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/nyholm/psr7/src',
         ),
         'Monolog\\' =>
         array (
@@ -3919,6 +3950,10 @@ class ComposerStaticInitf34ab8ee8d79739a086c6566ad009605
         array (
             0 => __DIR__ . '/..' . '/arcturial/clickatell/src',
             1 => __DIR__ . '/..' . '/arcturial/clickatell/test',
+        ),
+        'Buzz\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/kriswallsmith/buzz/lib',
         ),
         'Brick\\VarExporter\\' =>
         array (

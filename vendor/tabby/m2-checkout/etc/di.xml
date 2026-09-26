@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Tabby\Checkout\Api\MerchantCodeProviderInterface" type="Tabby\Checkout\Model\MerchantCodeProvider" />
+    <preference for="Tabby\Checkout\Api\WebhookProcessorInterface" type="Tabby\Checkout\Model\WebhookProcessor" />
+    <preference for="Tabby\Checkout\Api\GuestOrderHistoryInformationInterface" type="Tabby\Checkout\Model\GuestOrderHistoryInformation" />
+    <preference for="Tabby\Checkout\Api\QuoteItemDataInterface" type="Tabby\Checkout\Model\QuoteItemData" />
+    <preference for="Tabby\Checkout\Api\SessionDataInterface" type="Tabby\Checkout\Model\SessionData" />
+    <!-- Configuration reader -->
+    <type name="Tabby\Checkout\Model\Config\Source\Country">
+        <arguments>
+            <argument name="countryCodes" xsi:type="const">\Tabby\Checkout\Model\Method\Checkout::ALLOWED_COUNTRIES</argument>
+        </arguments>
+    </type>
+    <!-- Configuration reader -->
+    <type name="Tabby\Checkout\Gateway\Config\Config">
+        <arguments>
+            <argument name="serializer" xsi:type="object">Magento\Framework\Serialize\Serializer\Json</argument>
+        </arguments>
+    </type>
+    <type name="Tabby\Checkout\Model\Method\Checkout">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">\Tabby\Checkout\Model\Ui\ConfigProvider::CODE</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="TabbyPaymentDescriptionTypePL" type="Tabby\Checkout\Model\Config\Source\DescriptionType">
+        <arguments>
+            <argument name="allowed" xsi:type="array">
+                <item name="text" xsi:type="number">2</item>
+                <item name="none" xsi:type="number">3</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TabbyPaymentDescriptionTypeI" type="Tabby\Checkout\Model\Config\Source\DescriptionType">
+        <arguments>
+            <argument name="allowed" xsi:type="array">
+                <item name="narrow" xsi:type="number">1</item>
+                <item name="none" xsi:type="number">3</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TabbyPaymentDescriptionTypeCCI" type="Tabby\Checkout\Model\Config\Source\DescriptionType">
+        <arguments>
+            <argument name="allowed" xsi:type="array">
+                <item name="wide" xsi:type="number">0</item>
+                <item name="text" xsi:type="number">2</item>
+                <item name="none" xsi:type="number">3</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- Logger, initialized with Tabby\Checkout\Gateway\Config\Config -->
+    <virtualType name="TabbyCheckoutLogger" type="Magento\Payment\Model\Method\Logger">
+        <arguments>
+            <argument name="config" xsi:type="object">Tabby\Checkout\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+    <type name="Tabby\Checkout\Model\Method\Checkout">
+        <arguments>
+            <argument name="logger" xsi:type="object">TabbyCheckoutLogger</argument>
+        </arguments>
+    </type>
+    <type name="Tabby\Checkout\Model\Method\Installments">
+        <arguments>
+            <argument name="logger" xsi:type="object">TabbyCheckoutLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="Tabby\Checkout\Block\Info">
+        <arguments>
+            <argument name="config" xsi:type="object">Tabby\Checkout\Gateway\Config\Config</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand">
+        <plugin name="tabbyAuthorizeCommand" type="Tabby\Checkout\Plugin\Magento\Sales\Model\Order\Payment\State\AuthorizeCommand" sortOrder="1" disabled="false" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Payment\State\CaptureCommand">
+        <plugin name="tabbyCaptureCommand" type="Tabby\Checkout\Plugin\Magento\Sales\Model\Order\Payment\State\CaptureCommand" sortOrder="1" disabled="false" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Payment">
+        <plugin name="tabbyPaymentPrependMessage" type="Tabby\Checkout\Plugin\Magento\Sales\Model\Order\Payment" sortOrder="1" disabled="false" />
+    </type>
+    <type name="Magento\Sales\Model\Order\Payment\Transaction">
+        <plugin name="tabbyFixInfiniteLoopIssue" type="Tabby\Checkout\Plugin\Magento\Sales\Model\Order\Payment\Transaction" sortOrder="1" disabled="false" />
+    </type>
+    <type name="Tabby\Checkout\Model\Method\Checkout">
+        <plugin name="tabbyAddTrackingCookieVar" type="Tabby\Checkout\Plugin\Tabby\Checkout\Model\Method\Checkout" sortOrder="1" disabled="false" />
+    </type>
+</config>
