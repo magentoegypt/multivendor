@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Global on purpose: products are also saved from the vendor panel and the REST
+ * API, which never show the admin form's 0-100 validation.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_before">
+        <observer name="magentoegypt_bundle_special_price_percent"
+                  instance="MagentoEgypt\BundleExtend\Observer\BundleSpecialPricePercent"/>
+    </event>
+</config>

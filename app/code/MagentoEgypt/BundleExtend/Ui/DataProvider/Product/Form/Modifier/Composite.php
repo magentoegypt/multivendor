@@ -34,7 +34,40 @@ class Composite extends \Magento\Bundle\Ui\DataProvider\Product\Form\Modifier\Co
             $meta = $bundleModifier->modifyMeta($meta);
         }
 
-        return $this->stripPhantomTierPrice($meta);
+        return $this->limitSpecialPricePercent($this->stripPhantomTierPrice($meta));
+    }
+
+    /**
+     * A bundle's Special Price is a PERCENT of its regular price — core's
+     * BundleAdvancedPricing only puts "%" in front of the field and checks no
+     * range. "75000" on the Gaming Set (2026-09-25) multiplied every option by
+     * 750 on the storefront ("3,188 – 956,250"). Limit the field to 0–100 and
+     * say what it means. Every other save path: Observer\BundleSpecialPricePercent.
+     */
+    private function limitSpecialPricePercent(array $meta): array
+    {
+        /** @var ArrayManager $arrayManager */
+        $arrayManager = $this->objectManager->get(ArrayManager::class);
+        $path = $arrayManager->findPath(
+            ProductAttributeInterface::CODE_SPECIAL_PRICE,
+            $meta,
+            null,
+            'children'
+        );
+
+        if (!$path) {
+            return $meta;
+        }
+
+        $configPath = $path . '/arguments/data/config';
+        $config = (array) $arrayManager->get($configPath, $meta, []);
+        $config['validation'] = array_merge((array) ($config['validation'] ?? []), [
+            'validate-number' => true,
+            'validate-number-range' => '0-100',
+        ]);
+        $config['notice'] = (string) __('Percent of the regular price the customer pays (0–100). 80 = 20% off.');
+
+        return $arrayManager->set($configPath, $meta, $config);
     }
 
     /**
