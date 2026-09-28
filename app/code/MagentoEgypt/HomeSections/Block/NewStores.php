@@ -478,7 +478,9 @@ class NewStores extends Template
         foreach ($candidates as $candidate) {
             $value = trim((string) ($candidate ?? ''));
 
-            if ($value !== '') {
+            //  "0" is not a name: sellers V3S2 and V8S2 have the literal company "0", and the
+            //  card was titled "0". Vnecoms and the Algolia seller facet treat it as empty too.
+            if ($value !== '' && $value !== '0') {
                 return $value;
             }
         }

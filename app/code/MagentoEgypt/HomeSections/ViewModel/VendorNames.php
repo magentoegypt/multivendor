@@ -259,7 +259,8 @@ class VendorNames implements ArgumentInterface
                  * Mapping lives in the theme i18n CSVs; unmapped names pass through.
                  */
                 $this->map[(int) $row['entity_id']] = [
-                    'name' => (string) __($name !== '' ? $name : $this->publicName($key)),
+                    //  "0" is not a name (company "0" on V3S2/V8S2): same fallback as empty
+                    'name' => (string) __($name !== '' && $name !== '0' ? $name : $this->publicName($key)),
                     'key'  => $key,
                 ];
             }

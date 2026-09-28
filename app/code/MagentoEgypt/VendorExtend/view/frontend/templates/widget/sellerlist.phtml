@@ -72,7 +72,9 @@ $allStoresUrl = $block->getUrl('sellerlist');
         <?php foreach ($sellerCollection as $seller): ?>
             <?php
             $sellerName = $block->getSellerStoreName($seller);
-            $sellerName = $sellerName !== null && $sellerName !== '' ? $sellerName : (string) $seller->getVendorId();
+            /* "0" is not a name either (company "0" on V3S2/V8S2): show the seller code */
+            $sellerName = $sellerName !== null && trim((string) $sellerName) !== '' && trim((string) $sellerName) !== '0'
+                ? $sellerName : (string) $seller->getVendorId();
             $logo       = $block->getSellerImageUrl($seller);
 
             /*
