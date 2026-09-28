@@ -7,7 +7,10 @@ use Magento\Catalog\Api\CategoryManagementInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Directory\Model\RegionFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\App\ObjectManager;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -48,6 +51,7 @@ class VendorSelfService implements VendorSelfServiceInterface
     private StoreManagerInterface $storeManager;
     private ExtensionAttributesFactory $extensionAttributesFactory;
     private Otp $otp;
+    private RegionFactory $regionFactory;
 
     public function __construct(
         VendorAccessGuard $guard,
@@ -59,8 +63,11 @@ class VendorSelfService implements VendorSelfServiceInterface
         CategoryManagementInterface $categoryManagement,
         StoreManagerInterface $storeManager,
         ExtensionAttributesFactory $extensionAttributesFactory,
-        Otp $otp
+        Otp $otp,
+        ?RegionFactory $regionFactory = null
     ) {
+        /* Optional with a fallback so the compiled DI config keeps working until the next di:compile. */
+        $this->regionFactory = $regionFactory ?: ObjectManager::getInstance()->get(RegionFactory::class);
         $this->guard = $guard;
         $this->toModel = $toModel;
         $this->dataObjectProcessor = $dataObjectProcessor;
@@ -93,6 +100,7 @@ class VendorSelfService implements VendorSelfServiceInterface
         }
 
         if ($changes) {
+            $changes = $this->normalizeRegion($vendorModel, $changes);
             $vendorModel->addData($changes);
             $validation = $vendorModel->validate();
             if ($validation !== true) {
@@ -248,6 +256,48 @@ class VendorSelfService implements VendorSelfServiceInterface
 
         $this->otp->consumeRegistrationTicket((string) $registrationToken);
         return $result;
+    }
+
+    /**
+     * A region_id must be one of the address country's regions (TC73 14zb93nv6vw).
+     *
+     * The app sends region_id (with region) when the state comes from the country's list, and only region (free
+     * text) for countries without one.
+     * - A region_id sent for another country is refused (400): nothing is saved.
+     * - Otherwise a stored region_id that is not the resulting country's is cleared. That happens when the country
+     *   changes and no region_id is sent (an Albanian region must not stay on an Egyptian address), and also
+     *   repairs stale data on the next save.
+     *
+     * @param DataObject $vendorModel
+     * @param array $changes
+     * @return array
+     * @throws InputException
+     */
+    private function normalizeRegion(DataObject $vendorModel, array $changes): array
+    {
+        $country = (string) ($changes['country_id'] ?? $vendorModel->getData('country_id'));
+
+        if (array_key_exists('region_id', $changes) && (int) $changes['region_id']) {
+            $region = $this->regionFactory->create()->load((int) $changes['region_id']);
+            if (!$region->getId() || (string) $region->getCountryId() !== $country) {
+                throw new InputException(__(
+                    'Region %1 is not a region of country "%2". Choose the state again for the selected country.',
+                    (int) $changes['region_id'],
+                    $country
+                ));
+            }
+            return $changes;
+        }
+
+        $storedRegionId = (int) $vendorModel->getData('region_id');
+        if ($storedRegionId && !array_key_exists('region_id', $changes)) {
+            $region = $this->regionFactory->create()->load($storedRegionId);
+            if ((string) $region->getCountryId() !== $country) {
+                $changes['region_id'] = null;
+            }
+        }
+
+        return $changes;
     }
 
     private function updateCustomerName(int $customerId, VendorInterface $vendor): void

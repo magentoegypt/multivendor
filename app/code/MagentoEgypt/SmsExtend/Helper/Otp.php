@@ -220,6 +220,40 @@ class Otp extends AbstractHelper
     }
 
     /**
+     * Is this number held by ANOTHER account, in any stored spelling (+20…, 20…, 0…, bare, or the exact string)?
+     *
+     * The one definition behind "Mobile number already exists." (the customer save check, the WhatsApp OTP
+     * checks, vendor registration). The account the number is for never counts against itself: a seller saving
+     * their own unchanged number was told it was taken, because the format-tolerant match found their own
+     * account (TC73 14zb93nv6vw).
+     *
+     * @param string $mobile
+     * @param int|null $customerId the account the number is for (excluded); null for a new account
+     * @param int|null $websiteId only that website's accounts, when customer accounts are per website
+     * @return bool
+     */
+    public function isMobileUsedByAnotherAccount($mobile, $customerId = null, $websiteId = null)
+    {
+        $candidates = $this->normalizeMobileCandidates($mobile);
+        $raw = trim((string)$mobile);
+        if ($raw === '') {
+            return false;
+        }
+        $candidates[] = $raw;
+
+        $collection = $this->customerCollectionFactory->create();
+        $collection->addAttributeToFilter('mobilenumber', ['in' => array_values(array_unique($candidates))]);
+        if ($customerId) {
+            $collection->addAttributeToFilter('entity_id', ['neq' => (int)$customerId]);
+        }
+        if ($websiteId !== null) {
+            $collection->addAttributeToFilter('website_id', (int)$websiteId);
+        }
+
+        return (bool)$collection->getSize();
+    }
+
+    /**
      * A customer token from the CURRENT issuer (JWT on 2.4.4+), the same kind
      * POST /V1/integration/customer/token returns. It used to be minted by the legacy
      * Oauth TokenFactory, which writes an opaque row to oauth_token outside the

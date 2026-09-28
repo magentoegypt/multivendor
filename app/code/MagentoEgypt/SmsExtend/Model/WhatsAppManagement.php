@@ -7,6 +7,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\AuthenticationException;
 use Magento\Customer\Model\AuthenticationInterface;
+use Magento\Authorization\Model\UserContextInterface;
+use Magento\Framework\App\ObjectManager;
 
 class WhatsAppManagement implements WhatsAppInterface
 {
@@ -21,13 +23,32 @@ class WhatsAppManagement implements WhatsAppInterface
 
     protected $whatsAppHelper;
     private $authentication;
+    private $userContext;
 
     public function __construct(
         \MagentoEgypt\SmsExtend\Helper\Otp $whatsAppHelper,
-        AuthenticationInterface $authentication
+        AuthenticationInterface $authentication,
+        ?UserContextInterface $userContext = null
     ) {
         $this->whatsAppHelper = $whatsAppHelper;
         $this->authentication = $authentication;
+        /* Optional with a fallback so the compiled DI config keeps working until the next di:compile. */
+        $this->userContext = $userContext ?: ObjectManager::getInstance()->get(UserContextInterface::class);
+    }
+
+    /**
+     * The signed-in customer or seller sending the request (bearer token), if any. The OTP route is anonymous,
+     * but the app sends its token and Magento resolves it here.
+     *
+     * @return int|null
+     */
+    private function callerCustomerId()
+    {
+        if ((int)$this->userContext->getUserType() !== UserContextInterface::USER_TYPE_CUSTOMER) {
+            return null;
+        }
+        $customerId = (int)$this->userContext->getUserId();
+        return $customerId ?: null;
     }
 
     /**
@@ -63,8 +84,16 @@ class WhatsAppManagement implements WhatsAppInterface
             throw new InputException(__('Invalid input data.'));
         }
         try {
-            /* Any stored spelling of the number counts, not only the exact string sent. */
-            $numberInUse = (bool)$this->whatsAppHelper->getCustomersByMobile($mobile);
+            /*
+             * Any stored spelling of the number counts, not only the exact string sent. When a signed-in customer
+             * or seller changes their number (UPDATEMOB / VENDOR_UPDATEMOB), their own account does not count as
+             * "in use": a seller got "Mobile number already exists." for their own number (TC73 14zb93nv6vw).
+             */
+            $updatingOwnNumber = $type == self::UPDATEMOB || $type == self::VENDOR_UPDATEMOB;
+            $numberInUse = $this->whatsAppHelper->isMobileUsedByAnotherAccount(
+                $mobile,
+                $updatingOwnNumber ? $this->callerCustomerId() : null
+            );
             if($type == self::LOGIN || $type == self::FORGOTPASS || $type == self::VENDOR_LOGIN || $type == self::VENDOR_FORGOTPASS) {
                 if($numberInUse) {
                     $this->whatsAppHelper->sendOtp($mobile);
