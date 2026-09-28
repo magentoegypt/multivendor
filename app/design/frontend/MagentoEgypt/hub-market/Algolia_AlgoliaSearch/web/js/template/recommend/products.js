@@ -12,6 +12,17 @@
  * Every link carries data-objectid / data-position / data-queryid for the
  * "Recommended Product Clicked" event, and ?queryID= so an Add to Cart on the
  * product page is attributed to this recommendation (conversion).
+ *
+ * TC72 (QA 14zb93nv6rg, 2026-09-28):
+ *  - The image fills its card's square box. The theme makes .product-item-photo
+ *    1:1, but the two inner spans stayed inline, so they took the image's own
+ *    height (151-184px of a 327px box) and left grey under wide images, card
+ *    by card. The fill is written inline, not in LESS, so it ships with this
+ *    file and needs no CSS rebuild; it matches the theme cards (object-fit
+ *    cover, _hm-product-item.less).
+ *  - Every card has a seller line: store-owned products (vendor_id 0) carry no
+ *    seller in the record and read "Hub Market", as the PHP cards do
+ *    (HomeSections VendorNames), in both locales.
  */
 define(['algoliaCommon', 'algoliaBase64'], function (algoliaCommon, algoliaBase64) {
     'use strict';
@@ -54,15 +65,16 @@ define(['algoliaCommon', 'algoliaBase64'], function (algoliaCommon, algoliaBase6
                     <a class="product-item-photo hm-rec__link" href=${url}
                        data-objectid=${item.objectID} data-position=${item.position}
                        data-queryid=${item.__queryID || ''} data-index=${index}>
-                        <span class="product-image-container">
-                            <span class="product-image-wrapper">
-                                <img class="product-image-photo" src=${item.image_url} alt=${item.name} loading="lazy"/>
+                        <span class="product-image-container" style="display:block;width:100%;height:100%">
+                            <span class="product-image-wrapper" style="display:block;height:100%;padding:0">
+                                <img class="product-image-photo" src=${item.image_url} alt=${item.name} loading="lazy"
+                                     style="display:block;width:100%;height:100%;object-fit:cover"/>
                             </span>
                         </span>
                     </a>
                 </div>
                 <div class="product-item-details">
-                    ${item.seller ? html`<span class="hm-card__vendor">${item.seller}</span>` : ''}
+                    <span class="hm-card__vendor">${item.seller || 'Hub Market'}</span>
                     <strong class="product-item-name">
                         <a class="product-item-link hm-rec__link" href=${url} title=${item.name}
                            data-objectid=${item.objectID} data-position=${item.position}
