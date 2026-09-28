@@ -197,6 +197,22 @@ class InboundProcessor
         return $id ? (string)$id : null;
     }
 
+    /**
+     * Whether an Odoo value would change the Magento one: numbers by value (Odoo sends 100.0 for
+     * Magento's "100.000000"), everything else as trimmed text.
+     *
+     * @param mixed $current
+     * @param mixed $incoming
+     */
+    private function differs($current, $incoming): bool
+    {
+        if (is_numeric($current) && is_numeric($incoming)) {
+            return abs((float)$current - (float)$incoming) > 0.00001;
+        }
+
+        return trim((string)$current) !== trim((string)$incoming);
+    }
+
     private function odooModelFor(string $type): string
     {
         switch ($type) {
@@ -215,45 +231,78 @@ class InboundProcessor
     private function apply(string $type, EntityMap $map, array $payload): string
     {
         if ($type === self::ENTITY_PRODUCT) {
-            $product = $this->productRepository->getById((int)$map->getData('magento_id'));
+            /*
+             * Default scope (store 0), and only the fields whose value actually differs.
+             *
+             * Every Magento → Odoo push comes straight back as an Odoo → Magento update carrying all
+             * of these fields. This used to set every one of them unconditionally and save through
+             * the repository from cron, whose current store is the English view (3), so each echo
+             * wrote Odoo's (default) values as store-3 overrides on top of whatever a seller had just
+             * saved there. Seller V8S2's full product name was replaced twice within minutes this way
+             * (product 2406, 2026-09-27 17:10:53 and 17:15:18; TC66/67-QA01). Loaded and saved at
+             * store 0 and compared first, an echo of what Magento just sent is a no-op, and a real
+             * change made in Odoo still lands, at default scope.
+             */
+            $product = $this->productRepository->getById((int)$map->getData('magento_id'), true, 0, true);
+            $product->setStoreId(0);
             $changed = [];
-            if (isset($payload['name']) && (string)$payload['name'] !== '') {
+            if (isset($payload['name']) && (string)$payload['name'] !== ''
+                && $this->differs($product->getData('name'), $payload['name'])
+            ) {
                 $product->setName((string)$payload['name']);
                 $changed[] = 'name';
             }
-            if (isset($payload['price']) && is_numeric($payload['price'])) {
+            if (isset($payload['price']) && is_numeric($payload['price'])
+                && $this->differs($product->getData('price'), $payload['price'])
+            ) {
                 $product->setPrice((float)$payload['price']);
                 $changed[] = 'price';
             }
-            if (isset($payload['description']) && (string)$payload['description'] !== '') {
+            if (isset($payload['description']) && (string)$payload['description'] !== ''
+                && $this->differs($product->getData('description'), $payload['description'])
+            ) {
                 $product->setCustomAttribute('description', (string)$payload['description']);
                 $changed[] = 'description';
             }
-            if (isset($payload['status']) && in_array((int)$payload['status'], [1, 2], true)) {
+            if (isset($payload['status']) && in_array((int)$payload['status'], [1, 2], true)
+                && $this->differs($product->getData('status'), $payload['status'])
+            ) {
                 $product->setStatus((int)$payload['status']);
                 $changed[] = 'status';
             }
-            if (isset($payload['visibility']) && (int)$payload['visibility'] > 0) {
+            if (isset($payload['visibility']) && (int)$payload['visibility'] > 0
+                && $this->differs($product->getData('visibility'), $payload['visibility'])
+            ) {
                 $product->setVisibility((int)$payload['visibility']);
                 $changed[] = 'visibility';
             }
-            if (isset($payload['special_price']) && is_numeric($payload['special_price']) && (float)$payload['special_price'] > 0) {
+            if (isset($payload['special_price']) && is_numeric($payload['special_price']) && (float)$payload['special_price'] > 0
+                && $this->differs($product->getData('special_price'), $payload['special_price'])
+            ) {
                 $product->setCustomAttribute('special_price', (float)$payload['special_price']);
                 $changed[] = 'special_price';
             }
-            if (isset($payload['cost']) && is_numeric($payload['cost']) && (float)$payload['cost'] > 0) {
+            if (isset($payload['cost']) && is_numeric($payload['cost']) && (float)$payload['cost'] > 0
+                && $this->differs($product->getData('cost'), $payload['cost'])
+            ) {
                 $product->setCustomAttribute('cost', (float)$payload['cost']);
                 $changed[] = 'cost';
             }
-            if (isset($payload['weight']) && is_numeric($payload['weight']) && (float)$payload['weight'] > 0) {
+            if (isset($payload['weight']) && is_numeric($payload['weight']) && (float)$payload['weight'] > 0
+                && $this->differs($product->getData('weight'), $payload['weight'])
+            ) {
                 $product->setWeight((float)$payload['weight']);
                 $changed[] = 'weight';
             }
-            if (isset($payload['barcode']) && is_string($payload['barcode']) && $payload['barcode'] !== '') {
+            if (isset($payload['barcode']) && is_string($payload['barcode']) && $payload['barcode'] !== ''
+                && $this->differs($product->getData('barcode'), $payload['barcode'])
+            ) {
                 $product->setCustomAttribute('barcode', (string)$payload['barcode']);
                 $changed[] = 'barcode';
             }
-            if (isset($payload['short_description']) && (string)$payload['short_description'] !== '') {
+            if (isset($payload['short_description']) && (string)$payload['short_description'] !== ''
+                && $this->differs($product->getData('short_description'), $payload['short_description'])
+            ) {
                 $product->setCustomAttribute('short_description', (string)$payload['short_description']);
                 $changed[] = 'short_description';
             }
@@ -264,8 +313,15 @@ class InboundProcessor
             }
             if (isset($payload['categories']) && $payload['categories'] !== '' && $payload['categories'] !== []) {
                 $names = is_array($payload['categories']) ? $payload['categories'] : [$payload['categories']];
+                $before = array_map('intval', (array)$product->getCategoryIds());
+                sort($before);
                 if ($this->productMediaCategory->applyCategories($product, $names) !== []) {
-                    $changed[] = 'categories';
+                    $after = array_map('intval', (array)$product->getCategoryIds());
+                    sort($after);
+                    /* an echo of the categories Magento just sent is not a change */
+                    if ($after !== $before) {
+                        $changed[] = 'categories';
+                    }
                 }
             }
             if ($changed) {

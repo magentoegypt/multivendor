@@ -100,6 +100,24 @@
         that was placed. See the plugin. GLOBAL: checkout places orders in
         `webapi_rest`; invoices and shipments come from `adminhtml` and `vendors`.
     -->
+    <!-- Seller "Average Orders": divide by paid orders, the ones Lifetime Sales sums. See the plugin. -->
+    <type name="Vnecoms\VendorsSales\Model\ResourceModel\Order">
+        <plugin name="hm_average_orders_paid_only"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\AverageOrdersPaidOnly"/>
+    </type>
+    <!-- Seller "Total Products" leaves out configurable variants the catalog never lists (13, not 16). See the plugin. -->
+    <type name="Vnecoms\VendorsDashboard\Block\Dashboard">
+        <plugin name="hm_total_products_listable"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsDashboard\TotalProductsListable"/>
+    </type>
+    <type name="Vnecoms\VendorsDashboard\Block\Adminhtml\Vendor\Edit\Tab\Dashboard">
+        <plugin name="hm_total_products_listable"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsDashboard\TotalProductsListable"/>
+    </type>
+    <type name="Vnecoms\VendorsApi\Model\DashboardRepository">
+        <plugin name="hm_total_products_listable"
+                type="MagentoEgypt\VendorExtend\Plugin\VendorsDashboard\TotalProductsListable"/>
+    </type>
     <type name="Vnecoms\VendorsSales\Model\Order\Email\Sender\OrderSender">
         <plugin name="hm_vendor_email_cannot_fail_the_order"
                 type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>

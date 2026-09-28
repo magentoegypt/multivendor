@@ -108,6 +108,9 @@ class ProductRepository extends BaseProductRepository
         /* Exact SKU lookup — NOT $this->get(), which reads a numeric SKU as an entity id. */
         $productResource = $this->objectManager->get(\Magento\Catalog\Model\ResourceModel\Product::class);
         $skuOwnerId = (int) $productResource->getIdBySku($sku);
+        if (!$skuOwnerId) {
+            $this->assertSkuFormat($sku);
+        }
         if ($skuOwnerId && $this->getProductVendorId($skuOwnerId) !== $vendorId) {
             throw new LocalizedException(
                 __('The SKU "%1" is already used by another product. Please choose a different SKU.', $sku)
@@ -153,6 +156,23 @@ class ProductRepository extends BaseProductRepository
         }
 
         return parent::deleteById($sku);
+    }
+
+    /**
+     * New SKUs from the vendor API: Latin letters, digits, "-" and "_" only (TC67-QA01).
+     *
+     * The app enforces this since its latest build, but the endpoint accepted anything, so an older
+     * build or any other client could still create Arabic SKUs ("تتعوو"), which then travel into
+     * URLs, Odoo's default_code and the order exports. Existing SKUs are left alone: vendors already
+     * own products with Arabic SKUs, and saving those must keep working.
+     */
+    private function assertSkuFormat(string $sku): void
+    {
+        if (!preg_match('/^[A-Za-z0-9_-]+$/', $sku)) {
+            throw new \Magento\Framework\Exception\InputException(
+                __('SKU "%1" is not allowed. Use only English letters (A-Z, a-z), digits (0-9), "-" and "_".', $sku)
+            );
+        }
     }
 
     /**
@@ -204,7 +224,17 @@ class ProductRepository extends BaseProductRepository
         if($existProduct->getVendorId() != $vendorId){
             throw new LocalizedException(__('You are not permited to save product %1', $product->getSku()));
         }
-        $existProduct = $om->create('Magento\Catalog\Model\Product')->load($existProduct->getId());
+        /* Renaming the SKU through the app obeys the same rule as a new one */
+        if (in_array('sku', $attributes, true) && (string) $product->getSku() !== (string) $existProduct->getSku()) {
+            $this->assertSkuFormat(trim((string) $product->getSku()));
+        }
+        /*
+         * Default scope (store 0). A seller has one value per field, for every language, as in the
+         * seller panel. Loaded without a store, the product took the REST default store (English,
+         * 3), so an app edit changed only the English view and left Arabic on the old value
+         * (product 2406, TC66/67-QA01).
+         */
+        $existProduct = $om->create('Magento\Catalog\Model\Product')->setStoreId(0)->load($existProduct->getId());
 
         $saveProductFlag = false;
         $changedData = $this->_getChangedData($product, $existProduct, $attributes);
