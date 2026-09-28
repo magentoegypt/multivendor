@@ -1,0 +1,64 @@
+<?php
+/**
+ * Hub Market — the delivery estimate under the price (TC72-QA01 item 5, 14zb93nv6rg).
+ *
+ * Replaces the MGS demo CMS block `mpanel_product_detail_after_price`, which printed
+ * "توصيل بـ 26 جنيه يوليو 9 - 10" on every page using this layout: a fee in Egyptian pounds on an
+ * AED store and a date in July 2023, both typed into the block by hand.
+ *
+ * The fee is the store's own flat-rate shipping price, formatted in the store currency, so it
+ * always matches what checkout will charge. The dates are worked out IN THE BROWSER from today:
+ * the page is full-page cached for up to a day, so a date rendered on the server would go stale.
+ * Without JavaScript the server text still reads correctly ("… in 2–4 days").
+ *
+ * Days come from the layout arguments `min_days` / `max_days` (catalog_product_view_amazon_three.xml).
+ * Plain Template block + ObjectManager lookups, so no new class and no di:compile.
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$scopeConfig   = $objectManager->get(\Magento\Framework\App\Config\ScopeConfigInterface::class);
+$storeScope    = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+
+if (!$scopeConfig->isSetFlag('carriers/flatrate/active', $storeScope)) {
+    return;
+}
+
+$minDays = max(0, (int) ($block->getData('min_days') ?? 2));
+$maxDays = max($minDays, (int) ($block->getData('max_days') ?? 4));
+$fee     = (float) $scopeConfig->getValue('carriers/flatrate/price', $storeScope);
+$feeText = $objectManager->get(\Magento\Framework\Pricing\PriceCurrencyInterface::class)
+    ->convertAndFormat($fee, false);
+
+$localeCode = (string) $scopeConfig->getValue('general/locale/code', $storeScope);
+//  Gregorian calendar and Latin digits on the Arabic store: ar-SA alone defaults to the
+//  Hijri calendar, and this storefront shows Latin digits everywhere (see LatinDigits).
+$jsLocale = str_starts_with($localeCode, 'ar') ? 'ar-u-ca-gregory-nu-latn' : str_replace('_', '-', $localeCode);
+
+$serverText = __('Delivery %1 in %2–%3 days', $feeText, $minDays, $maxDays);
+$datedText  = __('Delivery %1, %2 – %3', $feeText, '{from}', '{to}');
+?>
+<p class="hm-pdp__delivery"
+   data-min-days="<?= (int) $minDays ?>"
+   data-max-days="<?= (int) $maxDays ?>"
+   data-locale="<?= $escaper->escapeHtmlAttr($jsLocale) ?>"
+   data-template="<?= $escaper->escapeHtmlAttr($datedText) ?>">
+    <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-delivery"/></svg>
+    <span class="hm-pdp__delivery-text"><?= $escaper->escapeHtml($serverText) ?></span>
+</p>
+<script>
+(function () {
+    var nodes = document.querySelectorAll('.hm-pdp__delivery[data-template]');
+    Array.prototype.forEach.call(nodes, function (node) {
+        try {
+            var add = function (days) { var d = new Date(); d.setDate(d.getDate() + days); return d; };
+            var fmt = new Intl.DateTimeFormat(node.getAttribute('data-locale') || undefined, {day: 'numeric', month: 'long'});
+            var text = node.getAttribute('data-template')
+                .replace('{from}', fmt.format(add(parseInt(node.getAttribute('data-min-days'), 10) || 0)))
+                .replace('{to}', fmt.format(add(parseInt(node.getAttribute('data-max-days'), 10) || 0)));
+            node.querySelector('.hm-pdp__delivery-text').textContent = text;
+        } catch (e) { /* keep the server text ("… in 2–4 days") */ }
+    });
+}());
+</script>

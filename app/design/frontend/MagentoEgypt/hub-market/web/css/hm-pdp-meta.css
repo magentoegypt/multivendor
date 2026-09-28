@@ -1,0 +1,45 @@
+/*
+ * Hub Market — product page meta line and quantity label (ClickUp TC72-QA01, 14zb93nv6rg).
+ *
+ * A standalone file (linked from Magento_Catalog/layout/catalog_product_view.xml), not the LESS
+ * pipeline: a new file name is a new URL, which the one-year immutable static cache cannot serve
+ * stale.
+ *
+ * 1 + 2  SKU. The SKU is moved under the title on EVERY product page (it used to be there only on
+ *        the "amazon_three" layout, and hidden with the stock row everywhere else, which left a gap
+ *        between title and rating). It sits in normal flow with its own top margin. On the Arabic
+ *        store the dots under letters such as "ي" hang below the title's 45px line box, and with no
+ *        gap they printed across the SKU line.
+ * 3      Quantity label. blank aligns it with the physical `text-align: left`, so on the Arabic
+ *        desktop page "الكمية" sat over the far (left) end of the quantity box instead of its start.
+ */
+
+.hm-pdp .page-title-wrapper .product.attribute.sku {
+    align-items: baseline;
+    color: var(--hm-foreground-muted, #6b6b6b);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 1.3rem;
+    gap: 0.4em;
+    line-height: 1.5;
+    margin: 8px 0 0;
+}
+
+.hm-pdp .page-title-wrapper .product.attribute.sku .type {
+    font-weight: 500;
+}
+
+.hm-pdp .page-title-wrapper .product.attribute.sku .value {
+    color: var(--hm-foreground, #111);
+    display: inline;
+}
+
+html:lang(ar) .hm-pdp .page-title-wrapper .page-title {
+    line-height: 1.4;
+}
+
+.hm-pdp .product-info-main .box-tocart .field.qty .label {
+    /* and no physical padding: VendorExtend's product.css (amazon_three layout) adds padding-right: 15px */
+    padding-inline: 0;
+    text-align: start;
+}

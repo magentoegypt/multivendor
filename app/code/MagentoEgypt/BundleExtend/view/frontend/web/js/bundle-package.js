@@ -29,7 +29,13 @@ define([
             this.isExpanded = ko.observable(true);
             this.disableAddToCart = ko.observable(false);
 
-            this.deliveryFee = ko.observable(5); // configurable
+            /*
+             * No delivery charge in the package total. This was a hard-coded 5 that never reached the
+             * cart: delivery is the store's shipping method, charged at checkout. The summary row now
+             * says so, and Total = Subtotal, the same figure the price under the title shows
+             * (TC72-QA01 item 6).
+             */
+            this.deliveryFee = ko.observable(0);
 
             this.regularPrice = ko.computed(() => {
                 return this.items().reduce((sum, item) => {
@@ -48,7 +54,7 @@ define([
             });
 
             this.total = ko.computed(() => {
-                return this.subtotal() + this.deliveryFee();
+                return this.subtotal();
             });
 
             this.formatted = {
@@ -72,7 +78,34 @@ define([
             this.collectSelectedItems();
             this.initModal();
 
+            /*
+             * The price under the title is the package being bought, not the bundle's full
+             * option range. Magento printed "From 4 (was 5) To 1,275 (was 1,500)" over a summary
+             * totalling 255 (TC72-QA01 item 6). Kept in step on every swap.
+             */
+            this.subtotal.subscribe(this.syncTitlePrice.bind(this));
+            this.syncTitlePrice();
+
             return this;
+        },
+
+        syncTitlePrice: function () {
+            var box = $('.product-info-main .price-box').first(),
+                format = this.bundleJson.priceFormat,
+                html;
+
+            if (!box.length || !this.items().length) {
+                return;
+            }
+            html = '<span class="price-container"><span class="price-wrapper">'
+                + '<span class="price">' + priceUtils.formatPrice(this.subtotal(), format) + '</span>'
+                + '</span></span>';
+            if (this.savings() > 0.005) {
+                html += ' <span class="old-price"><span class="price-container"><span class="price-wrapper">'
+                    + '<span class="price">' + priceUtils.formatPrice(this.regularPrice(), format) + '</span>'
+                    + '</span></span></span>';
+            }
+            box.addClass('hm-package-price').html(html);
         },
 
         toggleExpand: function() {

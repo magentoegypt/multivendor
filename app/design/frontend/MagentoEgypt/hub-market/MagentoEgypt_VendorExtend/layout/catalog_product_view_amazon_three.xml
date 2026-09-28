@@ -19,5 +19,24 @@
     <body>
         <move element="hm.pdp.seller"  destination="product.info.main.content" before="-"/>
         <move element="hm.pdp.summary" destination="product.info.main.content" after="product.info.price"/>
+
+        <!--
+            Delivery estimate (TC72-QA01 item 5). The MGS demo CMS block it replaces printed a
+            hand-typed "26 EGP, July 9 - 10" on every page of this layout. The fee now comes from
+            the flat-rate carrier in the store currency, and the dates are today + min/max days,
+            worked out in the browser (the page is cached). See the template.
+        -->
+        <referenceBlock name="custom.product.detail.after.price" remove="true"/>
+        <referenceContainer name="product.info.main.last">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="hm.pdp.delivery.estimate"
+                   template="Magento_Catalog::product/view/delivery-estimate.phtml"
+                   before="-">
+                <arguments>
+                    <argument name="min_days" xsi:type="number">2</argument>
+                    <argument name="max_days" xsi:type="number">4</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
     </body>
 </page>

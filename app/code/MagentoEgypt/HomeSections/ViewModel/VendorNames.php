@@ -61,7 +61,12 @@ class VendorNames implements ArgumentInterface
     {
         $id = (int) $vendorId;
         if ($id <= 0) {
-            return null;
+            /*
+             * vendor_id 0 = the store's own product, sold by the marketplace itself. The card used
+             * to drop its seller line, so a rail mixed cards with and without one (TC72-QA01 item
+             * 9, "test Add Bundle Product"). The brand stays Latin in both locales, as in the header.
+             */
+            return 'Hub Market';
         }
 
         return $this->load()[$id]['name'] ?? null;

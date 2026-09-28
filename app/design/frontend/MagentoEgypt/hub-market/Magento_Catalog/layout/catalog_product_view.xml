@@ -14,6 +14,10 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- SKU line, Arabic title line-height, quantity label alignment (TC72-QA01) -->
+        <css src="css/hm-pdp-meta.css"/>
+    </head>
     <body>
         <attribute name="class" value="hm-pdp"/>
 
@@ -24,6 +28,14 @@
             attached to it.
         -->
         <move element="page.main.title" destination="product.info.main" before="-"/>
+        <!--
+            SKU under the title on every product page (TC72-QA01 items 1-2). Only the
+            "amazon_three" layout did this; everywhere else the SKU stayed in the stock row, which
+            _hm-pdp.less hides, so pages showed an empty gap between title and rating instead.
+            page.main.title exists on every product page (it is moved just above), so this move
+            cannot drop the block. Spacing: css/hm-pdp-meta.css.
+        -->
+        <move element="product.info.sku" destination="page.main.title" after="-"/>
         <!-- CL036-DEV01.25 item 4: the heading is the product's name, untranslated.
              See Magento_Catalog/templates/product/view/title.phtml. -->
         <referenceBlock name="page.main.title" template="Magento_Catalog::product/view/title.phtml"/>

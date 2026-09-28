@@ -213,10 +213,11 @@
         display: block;
         width: 100%;
         float: none;
-        font-size: 1rem;
+        /* rem here is 10px (the theme sets html to 62.5%): 1rem gave 10px text on a 29px button (TC72 item 7) */
+        font-size: 1.6rem;
         font-weight: 700;
         letter-spacing: 0.075em;
-        height: 2.875rem;
+        height: 4.6rem;
         line-height: 1;
     }
     .hd-configurable-container .swatch-attribute-selected-option {
@@ -289,40 +290,42 @@
     }
 }
 </script>
+<?php /* Labels are rendered here with __(), not Knockout i18n bindings: js-translation.json is built only from
+   .js/.html files, so i18n phrases inside this .phtml could never be translated (TC72-QA01 item 4). */ ?>
 <script type="text/x-magento-template" id="hd-package-summary-template">
     <div class="hd-package-summary">
-        <h3 class="hd-summary-heading" data-bind="i18n: 'Package Summary'"></h3>
+        <h3 class="hd-summary-heading"><?= $block->escapeHtml(__('Package Summary')) ?></h3>
         <div class="hd-summary-row">
             <span>
-                <span data-bind="i18n: 'Regular Price'"></span>
-                (<span data-bind="text: itemsCount"></span> <span data-bind="i18n: 'items'"></span>)
+                <span><?= $block->escapeHtml(__('Regular Price')) ?></span>
+                (<span data-bind="text: itemsCount"></span> <span><?= $block->escapeHtml(__('items')) ?></span>)
             </span>
             <span data-bind="text: formatted.regular"></span>
         </div>
         <div class="hd-summary-row hd-savings">
-            <span data-bind="i18n: 'Bundle Saving'"></span>
+            <span><?= $block->escapeHtml(__('Bundle Saving')) ?></span>
             <span>-<span data-bind="text: formatted.savings"></span></span>
         </div>
         <div class="hd-summary-row">
-            <span data-bind="i18n: 'Subtotal'"></span>
+            <span><?= $block->escapeHtml(__('Subtotal')) ?></span>
             <span data-bind="text: formatted.subtotal"></span>
         </div>
         <hr/>
         <div class="hd-summary-row">
-            <span data-bind="i18n: 'Appliance Delivery'"></span>
-            <span data-bind="text: formatted.delivery"></span>
+            <span><?= $block->escapeHtml(__('Appliance Delivery')) ?></span>
+            <span><?= $block->escapeHtml(__('Calculated at checkout')) ?></span>
         </div>
         <div class="hd-summary-row hd-tax-note">
-            <span data-bind="i18n: 'Taxes calculated at checkout'"></span>
+            <span><?= $block->escapeHtml(__('Taxes calculated at checkout')) ?></span>
             <span>—</span>
         </div>
         <hr/>
         <div class="hd-summary-total">
-            <span data-bind="i18n: 'Total'"></span>
+            <span><?= $block->escapeHtml(__('Total')) ?></span>
             <span data-bind="text: formatted.total"></span>
         </div>
         <div class="hd-summary-save">
-            <span  data-bind="i18n: 'Save'"></span>
+            <span><?= $block->escapeHtml(__('You save')) ?></span>
             <strong data-bind="text: formatted.savings"></strong>
             (<span data-bind="text: Math.round((savings() / regularPrice()) * 100)"></span>%)
         </div>
@@ -347,10 +350,10 @@
             </div>
             <!-- /ko -->
             <button type="button" class="hd-swap-btn action primary" data-bind="click: $parent.openSwap.bind($parent, optionId)">
-                <span data-bind="i18n: 'Swap'"></span>
+                <span><?= $block->escapeHtml(__('Swap')) ?></span>
             </button>
             <button class="action primary hd-add-single-btn" data-bind="click: $parent.addSingleToCart.bind($parent, $data)">
-                <span data-bind="i18n: 'Add this item only'"></span>
+                <span><?= $block->escapeHtml(__('Add this item only')) ?></span>
             </button>
         </div>
         <div class="hd-item-price">
@@ -373,7 +376,7 @@
 
     <!-- SELECTED PRODUCT -->
     <div class="hd-swap-selected" data-bind="with: currentSelection">
-        <h3 class="hd-swap-heading" data-bind="i18n: 'Current Selection'"></h3>
+        <h3 class="hd-swap-heading"><?= $block->escapeHtml(__('Current Selection')) ?></h3>
 
         <div class="hd-swap-selected-item">
             <img data-bind="attr:{src:image}, click: $parent.openProduct.bind($parent, $data)" width="100px" />
@@ -401,7 +404,7 @@
     </div>
     <!-- OTHER OPTIONS -->
     <div class="hd-swap-list">
-        <h3 class="hd-swap-heading" data-bind="i18n: 'Select a Different Item'"></h3>
+        <h3 class="hd-swap-heading"><?= $block->escapeHtml(__('Select a Different Item')) ?></h3>
 
         <!-- ko foreach: swapSelections -->
         <div class="hd-swap-item">
@@ -426,7 +429,7 @@
                     <!-- /ko -->
                 </div>
                 <button class="hd-swap-btn action primary" data-bind="click: $parent.selectSwap.bind($parent, $data)">
-                    <span data-bind="i18n: 'Select'"></span>
+                    <span><?= $block->escapeHtml(__('Select')) ?></span>
                     <!-- ko ifnot: isSamePrice -->
                      (<span data-bind="text: signPlus +  priceDiff"></span>)
                     <!-- /ko -->
