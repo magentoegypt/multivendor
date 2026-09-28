@@ -13,6 +13,13 @@
  *     purchase conversions attributed to this search.
  * Events go through window.algoliaInsights, whose senders are consent-gated by
  * insights-hm-mixin.js; the search itself carries a userToken only with consent.
+ *
+ * With consent and a token the search is PERSONALIZED, as the page itself is
+ * (AlgoliaVendor\Plugin\ServerSearchNoAnalytics ranks it with the same token):
+ * the queryID and click positions then describe the order the shopper sees.
+ * (Formerly hm-results-insights.js; renamed 2026-09-28 because static files are
+ * served immutable from CloudFront, so an edited file under the old name would
+ * never reach browsers.)
  */
 define(['algoliaCommon'], function (algoliaCommon) {
     'use strict';
@@ -121,6 +128,7 @@ define(['algoliaCommon'], function (algoliaCommon) {
 
         if (token && hasConsent(cfg)) {
             params.userToken = token;
+            params.enablePersonalization = true;
         }
 
         fetch('https://' + cfg.applicationId + '-dsn.algolia.net/1/indexes/' +

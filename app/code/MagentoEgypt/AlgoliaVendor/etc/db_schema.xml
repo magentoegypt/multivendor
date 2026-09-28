@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * One Algolia Personalization token per customer (DEV05, 2026-09-28).
+ *
+ * Algolia Personalization keys profiles on the anonymous userToken only
+ * (`_ALGOLIA`), which upstream deletes on sign-out. This keeps the first one a
+ * consented, signed-in customer used, so it can be restored at every later
+ * sign-in and on other devices. See Observer\SetCustomerTokenWithConsent.
+ *
+ * Created live by DDL on 2026-09-28 (setup:upgrade would also have run other
+ * work in progress); this declaration matches it, so a later setup:upgrade is
+ * a no-op for this table. The module still declares no setup_version.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="magentoegypt_algolia_customer_token" resource="default" engine="innodb"
+           comment="Algolia Personalization userToken per customer">
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" identity="false"
+                comment="Customer ID"/>
+        <column xsi:type="varchar" name="user_token" nullable="false" length="129"
+                comment="Anonymous Algolia userToken (_ALGOLIA)"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Recorded at"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="customer_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="MAGENTOEGYPT_ALGOLIA_CSTR_TOKEN_CSTR_ID_CSTR_ENTT_ENTT_ID"
+                    table="magentoegypt_algolia_customer_token" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+</schema>

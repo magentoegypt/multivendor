@@ -17,6 +17,17 @@
  *
  * Runs only with cookie consent, a tracking token (_ALGOLIA cookie) and the
  * default sort. Never adds or removes products; pagination is unaffected.
+ *
+ * Runs again for every list Mageplaza's AJAX layer puts in #layer-product-list
+ * (filter, sort, page change): that replaces the list without a page load, and
+ * the new list was left in the shared, unpersonalized order. Each list is
+ * handled once (data-hm-p13n-seen), so the re-order's own DOM moves do not
+ * trigger it again.
+ *
+ * Search results are personalized on the server now and do not load this.
+ * (Formerly hm-personalized-order.js; renamed 2026-09-28 because static files
+ * are served immutable from CloudFront, so an edited file under the old name
+ * would never reach browsers.)
  */
 define(['algoliaCommon'], function (algoliaCommon) {
     'use strict';
@@ -52,7 +63,13 @@ define(['algoliaCommon'], function (algoliaCommon) {
         var list = document.querySelector(LIST);
         var token = algoliaCommon.getCookie('_ALGOLIA');
 
-        if (!list || !token || !hasConsent(cfg) || !defaultSort() || !cfg.applicationId || !cfg.apiKey) {
+        if (!list || list.hasAttribute('data-hm-p13n-seen')) {
+            return;
+        }
+
+        list.setAttribute('data-hm-p13n-seen', '1');
+
+        if (!token || !hasConsent(cfg) || !defaultSort() || !cfg.applicationId || !cfg.apiKey) {
             return;
         }
 
@@ -157,5 +174,23 @@ define(['algoliaCommon'], function (algoliaCommon) {
         }
 
         run(cfg);
+
+        // Mageplaza AJAX layer: a filter, sort or page change swaps the list in place.
+        var container = document.getElementById('layer-product-list');
+
+        if (container && window.MutationObserver) {
+            var pending = null;
+
+            new MutationObserver(function () {
+                if (pending) {
+                    clearTimeout(pending);
+                }
+
+                pending = setTimeout(function () {
+                    pending = null;
+                    run(cfg);
+                }, 100);
+            }).observe(container, {childList: true, subtree: true});
+        }
     };
 });

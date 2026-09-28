@@ -14,7 +14,7 @@ use MagentoEgypt\AlgoliaVendor\Model\IdRestriction;
  * shopper token and no queryID the shopper can use — Analytics would show
  * cache misses and "<empty search>" category browses, not what shoppers typed.
  * The search results page instead records the search from the browser
- * (Algolia_AlgoliaSearch/js/hm-results-insights.js, clickAnalytics on), which
+ * (Algolia_AlgoliaSearch/js/hm-search-results-insights.js, clickAnalytics on), which
  * also gives the queryID that click and conversion events need (DEV06).
  *
  * It also applies Model\IdRestriction: the product ids the non-attribute
