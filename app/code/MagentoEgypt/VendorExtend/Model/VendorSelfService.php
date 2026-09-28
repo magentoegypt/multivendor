@@ -178,30 +178,22 @@ class VendorSelfService implements VendorSelfServiceInterface
     /**
      * Sliding seller session for the app (TC70 14zb93nv65d).
      *
-     * Seller tokens are Magento JWTs that expire 60 minutes after issue
-     * (webapi/jwtauth/customer_expiration), and sellers sign in with a WhatsApp OTP, so the app
-     * cannot sign in again silently: sellers were logged out every hour mid-session. The app calls
-     * this with its current, still-valid token while in use and gets a fresh 60-minute token. An
-     * idle seller still expires. An expired or revoked token never gets here: Web API
-     * authentication answers 401 first.
+     * Seller tokens are Magento JWTs that expire a fixed time after issue
+     * (webapi/jwtauth/customer_expiration: 60 minutes until 2026-09-28, now 24 hours), and sellers
+     * sign in with a WhatsApp OTP, so the app cannot sign in again silently: sellers were logged out
+     * every hour mid-session. The app calls this with its current, still-valid token while in use
+     * and gets a fresh full-lifetime token. An idle seller still expires. An expired or revoked
+     * token never gets here: Web API authentication answers 401 first.
      *
-     * Magento revokes JWTs per user, not per token: it records a cut-off, and every token that
-     * user was issued at or before it is refused. The cut-off is written for one second ago, then
-     * the new token is issued, so the new token is newer than the cut-off and the old one is dead.
-     * Side effect by design: every other token of that seller (another phone) is revoked too.
+     * Nothing is revoked. Magento revokes JWTs per user, not per token (a cut-off timestamp), so
+     * revoking the old token would also sign the seller out on every other phone, and two devices
+     * refreshing in turn would keep logging each other out, which is the bug this fixes. The old
+     * token simply runs out at its own expiry. Signing out still revokes every token.
      */
     public function refreshToken($customerId)
     {
         $customerId = (int) $customerId;
         $this->guard->assertApprovedSeller($customerId);   // pending / disabled / expired: the usual 403
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $objectManager->get(\Magento\JwtUserToken\Api\RevokedRepositoryInterface::class)->saveRevoked(
-            new \Magento\JwtUserToken\Api\Data\Revoked(
-                \Magento\Authorization\Model\UserContextInterface::USER_TYPE_CUSTOMER,
-                $customerId,
-                time() - 1
-            )
-        );
 
         return $this->otp->generateToken($customerId);
     }
