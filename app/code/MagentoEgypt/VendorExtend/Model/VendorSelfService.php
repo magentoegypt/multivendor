@@ -142,6 +142,32 @@ class VendorSelfService implements VendorSelfServiceInterface
     }
 
     /**
+     * Seller product delete, scoped to the caller.
+     *
+     * Vnecoms routed DELETE /V1/vendors/product/:sku straight to core
+     * Magento\Catalog\Api\ProductRepositoryInterface::deleteById($sku) and forced a customerId
+     * the method does not take, so it answered 500 for every seller. Had that been "fixed" by
+     * dropping the parameter, any seller could have deleted any product. This route (redefined
+     * in etc/webapi.xml) deletes only a product the approved caller owns. Another seller's SKU
+     * answers exactly like a missing one.
+     */
+    public function deleteProduct($customerId, $sku)
+    {
+        $vendorId = (int) $this->guard->assertApprovedSeller((int) $customerId)->getId();
+        $notFound = new NoSuchEntityException(__('The product "%1" was not found among your products.', $sku));
+        try {
+            $product = $this->productRepository->get($sku);
+        } catch (NoSuchEntityException $e) {
+            throw $notFound;
+        }
+        if ((int) $product->getVendorId() !== $vendorId) {
+            throw $notFound;
+        }
+
+        return $this->productRepository->delete($product);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getCategories($customerId, $rootCategoryId = null, $depth = null)

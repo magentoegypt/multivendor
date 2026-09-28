@@ -38,6 +38,15 @@ interface VendorSelfServiceInterface
     public function getStockItem($customerId, $sku);
 
     /**
+     * DELETE /V1/vendors/product/:sku — delete one of the caller's own products.
+     *
+     * @param int $customerId
+     * @param string $sku
+     * @return bool
+     */
+    public function deleteProduct($customerId, $sku);
+
+    /**
      * GET /V1/vendors/me/categories — the category tree, for the product form.
      *
      * @param int $customerId

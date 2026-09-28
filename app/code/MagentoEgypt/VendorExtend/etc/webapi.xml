@@ -36,6 +36,18 @@
             <parameter name="customerId" force="true">%customer_id%</parameter>
         </data>
     </route>
+    <!-- Replaces Vnecoms' route of the same url + method (this module loads after Vnecoms_VendorsApi).
+         Theirs called core deleteById($sku) with a forced customerId it does not take: 500 for every
+         seller, and no ownership check at all. See VendorSelfService::deleteProduct(). -->
+    <route url="/V1/vendors/product/:sku" method="DELETE">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="deleteProduct"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
     <route url="/V1/vendors/me/stockItems/:sku" method="GET">
         <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="getStockItem"/>
         <resources>
