@@ -7,13 +7,12 @@ namespace MagentoEgypt\VendorExtend\Model\Layer\Filter;
  * "Vendors" — the prototype's list of seller names.
  *
  * `catalog_product_entity.vendor_id` is a STATIC column (not an EAV attribute)
- * holding `ves_vendor_entity.entity_id`, and the display name is
- * `ves_vendor_entity.company`, a plain column rather than one of the module's
- * EAV attributes. `ves_vendor_entity` has no url_key column to fall back to, so
- * the four rows of twenty-five that leave `company` empty are simply not offered
- * as a filter option. That mapping is the same one
- * `MagentoEgypt\HomeSections\ViewModel\VendorNames` documents and relies on for
- * the vendor line on every product card.
+ * holding `ves_vendor_entity.entity_id`. The option label is whatever
+ * `MagentoEgypt\HomeSections\ViewModel\VendorNames::getName()` returns: the same
+ * name the seller line on every product card and the "New Stores" card show
+ * (company, else the seller code, localised through the theme CSVs). This filter
+ * used to print `company` raw, so V8S2, whose company is the literal "0", was
+ * listed as "0", and sellers with no company were left out of the filter altogether.
  *
  * Products created in admin rather than by a seller carry vendor_id 0 and are
  * not offered as a vendor.
@@ -47,30 +46,31 @@ class Vendor extends AbstractIdFilter
         $conn = $this->hmResource->getConnection();
 
         try {
-            $rows = $conn->fetchAll(
-                $conn->select()
-                    ->from(['v' => $this->hmResource->getTableName('ves_vendor_entity')], ['entity_id', 'company'])
-                    ->order('company ASC')
+            $ids = $conn->fetchCol(
+                $conn->select()->from(['v' => $this->hmResource->getTableName('ves_vendor_entity')], ['entity_id'])
             );
+            $names = \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\MagentoEgypt\HomeSections\ViewModel\VendorNames::class);
         } catch (\Throwable $e) {
             return $this->hmVendors = [];
         }
 
         $out = [];
 
-        foreach ($rows as $row) {
-            $id = (int) $row['entity_id'];
+        foreach ($ids as $id) {
+            $id = (int) $id;
 
             if ($id < 1) {
                 continue;
             }
-            $name = trim((string) ($row['company'] ?? ''));
+            $name = trim((string) $names->getName($id));
 
             if ($name === '') {
                 continue;
             }
             $out[(string) $id] = $name;
         }
+        natcasesort($out);
 
         return $this->hmVendors = $out;
     }

@@ -81,7 +81,9 @@ class SearchFacets
             $out = [];
             foreach ($connection->fetchAll($select) as $row) {
                 $name = trim((string) $row['company']);
-                if ($name === '') {
+                //  "0" is not a name (V3S2/V8S2); the storefront shows them by seller code, so a
+                //  search for "0" must not offer a seller card titled "0"
+                if ($name === '' || $name === '0') {
                     continue;
                 }
                 $out[] = [
