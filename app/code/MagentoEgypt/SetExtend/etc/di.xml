@@ -4,4 +4,12 @@
 	<type name="Magento\Directory\Model\Currency">
         <plugin name="fix_zero_price_product_view" type="MagentoEgypt\SetExtend\Plugin\DirectoryCurrency"/>
     </type>
+    <!-- IR 2026-09-28: no log line may carry a runnable "<?" (see Logger\NeutralizePhpTags) -->
+    <type name="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="hm_neutralize_php_tags" xsi:type="object">MagentoEgypt\SetExtend\Logger\NeutralizePhpTags</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

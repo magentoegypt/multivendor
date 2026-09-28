@@ -1,16 +1,18 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Hub Market (DEV05): personalized order of the products on this cached page.
- * See Algolia_AlgoliaSearch::hm-personalized-order.phtml.
+ * Hub Market: click analytics for the results page (DEV06).
+ *
+ * No hm-personalized-order.js here any more (DEV05, 2026-09-28): the server
+ * now ranks this page with the shopper's own token (AlgoliaVendor
+ * Plugin\ServerSearchNoAnalytics, Varnish passes it for them), which lifts
+ * matches from ANY page, not just page 1 — and re-ordering the result again
+ * in the browser would apply the lift twice. Category pages keep the script.
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="before.body.end">
-            <block class="Magento\Framework\View\Element\Template"
-                   name="hm.algolia.personalized.order"
-                   template="Algolia_AlgoliaSearch::hm-personalized-order.phtml"/>
             <block class="Magento\Framework\View\Element\Template"
                    name="hm.algolia.results.insights"
                    template="Algolia_AlgoliaSearch::hm-results-insights.phtml"/>

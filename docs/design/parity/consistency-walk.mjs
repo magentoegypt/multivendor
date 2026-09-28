@@ -21,6 +21,11 @@
  *    read 0 while autocomplete listed categories). Both read Algolia's
  *    categories index; see MagentoEgypt\SearchLanding\Model\SearchFacets.
  *
+ * 4. PERSONALIZED SEARCH STAYS PRIVATE — a shopper with cookie consent and an
+ *    Algolia token gets search results ranked for them (DEV05; Varnish passes
+ *    the route for them). A personalized page must never reach the shared
+ *    cache: the anonymous page must read the same before and after one.
+ *
  * Serial, one tab: this host has two cores and five FPM children
  * (memory: host-cannot-take-agent-fanout). About two minutes.
  */
@@ -164,6 +169,26 @@ for (const path of FILTERED_LISTINGS) {
     else if (!r.paged && total !== r.cards) fail(path, `counter ${total} but ${r.cards} cards`);
     else pass(`counter ${total}, cards ${r.cards}${r.paged ? ' (paged)' : ''}`);
   } catch (e) { fail(path, e.message); }
+}
+
+console.log('4. Personalized search stays out of the shared cache');
+{
+  // A real profile (QA01 retest "Fashion" shopper); any consented token will do.
+  const personal = '_ALGOLIA=anonymous-c743b22d-2fcf-495f-ad5b-eaca726e2cca; user_allowed_save_cookie=%7B%221%22%3A1%7D';
+  const url = `${BASE}/en/catalogsearch/result/?q=women`;
+  const order = async (cookie) => {
+    const res = await fetch(url, { headers: { 'User-Agent': UA, ...(cookie ? { Cookie: cookie } : {}) } });
+    const html = await res.text();
+    return [...html.matchAll(/data-role="priceBox"\s+data-product-id="(\d+)"/g)].map((m) => m[1]).join(',');
+  };
+  try {
+    const before = await order(null);
+    const mine = await order(personal);
+    const after = await order(null);
+    if (!before) fail(url, 'no products parsed');
+    else if (before !== after) fail(url, 'anonymous order changed after a personalized request — personalized page leaked into the cache');
+    else pass(`anonymous order unchanged; personalized order ${mine === before ? 'same (profile may be empty)' : 'differs'}`);
+  } catch (e) { fail(url, e.message); }
 }
 
 await browser.close();
