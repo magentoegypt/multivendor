@@ -47,6 +47,14 @@ interface VendorSelfServiceInterface
     public function deleteProduct($customerId, $sku);
 
     /**
+     * POST /V1/vendors/me/token/refresh — trade the caller's still-valid seller token for a new one.
+     *
+     * @param int $customerId
+     * @return string
+     */
+    public function refreshToken($customerId);
+
+    /**
      * GET /V1/vendors/me/categories — the category tree, for the product form.
      *
      * @param int $customerId

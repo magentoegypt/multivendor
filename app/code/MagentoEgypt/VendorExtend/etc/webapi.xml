@@ -48,6 +48,16 @@
             <parameter name="customerId" force="true">%customer_id%</parameter>
         </data>
     </route>
+    <!-- Sliding seller session: a still-valid seller token buys a fresh one (TC70). -->
+    <route url="/V1/vendors/me/token/refresh" method="POST">
+        <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="refreshToken"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
     <route url="/V1/vendors/me/stockItems/:sku" method="GET">
         <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="getStockItem"/>
         <resources>

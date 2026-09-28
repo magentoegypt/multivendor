@@ -87,19 +87,36 @@ class NewStores extends Template
             ->where('v.status = ?', $approved)
             ->group('v.entity_id')
             ->having('COUNT(p.entity_id) > 0')
-            ->order('v.created_at DESC')
-            //  RATING MODE fetches a wider pool then re-sorts in PHP.
-            //  Ordering by rating in SQL is not possible here: the star value is
-            //  derived from review_entity_summary via a separate query (see
-            //  fetchRatings), so at this point the ranking column does not exist
-            //  yet. Taking the newest N and sorting those would rank within an
-            //  arbitrary slice, not across the catalogue — hence the wider pool.
-            ->limit($this->isRatingOrder() ? $limit * 6 : $limit);
+            ->order('v.created_at DESC');
+        //  RATING MODE takes a wider pool (limit x 6, applied below) then re-sorts in PHP.
+        //  Ordering by rating in SQL is not possible here: the star value is
+        //  derived from review_entity_summary via a separate query (see
+        //  fetchRatings), so at this point the ranking column does not exist
+        //  yet. Taking the newest N and sorting those would rank within an
+        //  arbitrary slice, not across the catalogue — hence the wider pool.
 
         $rows = $conn->fetchAll($select);
         if (!$rows) {
             return [];
         }
+
+        /*
+         * Count what the store's own page lists, not every row the seller owns. COUNT(p.entity_id)
+         * above includes pending and disabled products, configurable variants that are not
+         * visible individually and "select and sell" copies, so V8S2's card said 16 products
+         * while /shop/V8S2 listed 13 (TC71, 2026-09-28). A store whose products are all
+         * unlisted drops out of the rail. The limit is applied after this, not in SQL.
+         */
+        $listable = $this->listableCounts(array_column($rows, 'entity_id'));
+        $rows = array_values(array_filter($rows, static fn ($r) => ($listable[(int) $r['entity_id']] ?? 0) > 0));
+        $rows = array_slice($rows, 0, $this->isRatingOrder() ? $limit * 6 : $limit);
+        if (!$rows) {
+            return [];
+        }
+        foreach ($rows as &$row) {
+            $row['products'] = $listable[(int) $row['entity_id']];
+        }
+        unset($row);
 
         $names = $this->fetchAttribute(array_column($rows, 'entity_id'), 'store_name');
         /*
@@ -159,6 +176,47 @@ class NewStores extends Template
         }
 
         return $out;
+    }
+
+    /**
+     * Per vendor: products the storefront lists. Approved, active seller, enabled and visible in
+     * the catalog in the current store (StorefrontVisibility::sellableIds, the storefront's own
+     * rule), and not a "select and sell" copy (searchableIds), which listings also hide.
+     *
+     * The service comes from the ObjectManager rather than the constructor, so this block keeps
+     * its compiled constructor (no di:compile).
+     *
+     * @param array<int|string> $vendorIds
+     * @return array<int, int> vendor entity_id => count
+     */
+    private function listableCounts(array $vendorIds): array
+    {
+        $conn = $this->resource->getConnection();
+        $byProduct = $conn->fetchPairs(
+            $conn->select()
+                ->from($this->resource->getTableName('catalog_product_entity'), ['entity_id', 'vendor_id'])
+                ->where('vendor_id IN (?)', array_map('intval', $vendorIds))
+        );
+        if (!$byProduct) {
+            return [];
+        }
+
+        /** @var \MagentoEgypt\VendorExtend\Model\StorefrontVisibility $visibility */
+        $visibility = \Magento\Framework\App\ObjectManager::getInstance()
+            ->get(\MagentoEgypt\VendorExtend\Model\StorefrontVisibility::class);
+        $ids = array_map('intval', array_keys($byProduct));
+        $listed = array_intersect(
+            $visibility->sellableIds($ids, (int) $this->storeManager->getStore()->getId()),
+            $visibility->searchableIds($ids)
+        );
+
+        $counts = [];
+        foreach ($listed as $productId) {
+            $vendorId = (int) $byProduct[$productId];
+            $counts[$vendorId] = ($counts[$vendorId] ?? 0) + 1;
+        }
+
+        return $counts;
     }
 
     /**
