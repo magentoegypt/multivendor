@@ -36,7 +36,7 @@
                 <field id="algolia_enabled" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Give the App the Algolia Search Key</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Yes: the app searches Algolia directly with the same application, search-only key and indices as the storefront (Stores > Configuration > Algolia Search > Credentials). The admin API key is never sent. No: the app searches through GraphQL.</comment>
+                    <comment>Yes: the app searches Algolia directly, with the same application, indices and secured search key (valid 24 hours, reissued at least hourly) that the storefront gives browsers (Stores > Configuration > Algolia Search > Credentials). The admin API key is never sent. No: the app searches through GraphQL.</comment>
                 </field>
             </group>
 

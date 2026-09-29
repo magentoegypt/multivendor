@@ -4,7 +4,7 @@ query HmSmokeAppConfig($platform: HmPlatform) {
     store_code
     locale
     search { hint trending_terms }
-    algolia { application_id search_api_key index_prefix product_index category_index page_index }
+    algolia { application_id search_api_key valid_until index_prefix product_index category_index page_index }
     contact { whatsapp_number whatsapp_url phone email hours }
     version { platform min_version latest_version store_url message }
     maintenance { enabled message retry_after_minutes }

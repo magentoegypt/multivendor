@@ -114,7 +114,8 @@ type HmSearchConfig @doc(description: "Search settings.") {
 
 type HmAlgoliaConfig @doc(description: "Algolia as the storefront uses it for this store view. Search-only credentials: never the admin key.") {
     application_id: String! @doc(description: "Algolia application id.")
-    search_api_key: String! @doc(description: "Search-only public API key, the one the storefront gives browsers.")
+    search_api_key: String! @doc(description: "Secured search key exactly as the storefront gives a guest browser: derived from the search-only key, restricted, valid until valid_until. Never the admin key.")
+    valid_until: Int @doc(description: "Unix time in seconds when search_api_key expires; fetch hmAppConfig again before then. Responses carrying a key are cached for at most an hour.")
     index_prefix: String! @doc(description: "Index name prefix, e.g. hubmarket_.")
     product_index: String! @doc(description: "Products index of this store view, e.g. hubmarket_en_products.")
     category_index: String! @doc(description: "Categories index of this store view, e.g. hubmarket_en_categories.")

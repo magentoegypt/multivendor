@@ -9,6 +9,7 @@ namespace MagentoEgypt\HubApp\Model\Product;
 use Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\Product as ProductDataProvider;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
+use Magento\GraphQl\Model\Query\ContextInterface as QueryContextInterface;
 use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use MagentoEgypt\HubApp\Api\ProductListLoaderInterface;
 use MagentoEgypt\VendorExtend\Model\StorefrontVisibility;
@@ -93,7 +94,9 @@ class ProductListLoader implements ProductListLoaderInterface, ResetAfterRequest
                 array_values(array_unique(array_filter(array_map('strval', $fields)))),
                 false,
                 false,
-                $context
+                //  The data provider takes the GraphQl module's context (customer
+                //  group prices); every resolver context in the graphql area is one.
+                $context instanceof QueryContextInterface ? $context : null
             );
         } catch (\Throwable $e) {
             $this->logger->error('HubApp: product list load failed: ' . $e->getMessage());

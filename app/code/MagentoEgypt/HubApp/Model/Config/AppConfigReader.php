@@ -11,6 +11,7 @@ use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
+use MagentoEgypt\HubApp\Model\Cache\ResponseTtl;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -19,7 +20,8 @@ use Psr\Log\LoggerInterface;
  * Everything comes from Stores > Configuration > Hub Market App (hubapp/*),
  * read at store scope so store-view texts, website channels and global
  * switches each fall back the usual way; plus the storefront's own Algolia
- * credentials, read from the Algolia extension's config paths.
+ * application, index names and the secured search key the storefront gives
+ * guest browsers (AlgoliaKeyProvider).
  */
 class AppConfigReader
 {
@@ -39,10 +41,19 @@ class AppConfigReader
     private const ALGOLIA_ADMIN_KEY = 'algoliasearch_credentials/credentials/api_key';
     private const ALGOLIA_INDEX_PREFIX = 'algoliasearch_credentials/credentials/index_prefix';
 
+    /**
+     * How long the HTTP cache may keep a response that carries an Algolia key.
+     * The key is valid 24 hours from when it was issued; an hour of caching
+     * leaves the app a key with at least 23 hours to go.
+     */
+    public const ALGOLIA_KEY_CACHE_SECONDS = 3600;
+
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly ModuleManager $moduleManager,
         private readonly Json $json,
+        private readonly AlgoliaKeyProvider $algoliaKeys,
+        private readonly ResponseTtl $responseTtl,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -99,13 +110,21 @@ class AppConfigReader
     }
 
     /**
-     * The storefront's Algolia application and SEARCH-ONLY key, or null.
+     * The storefront's Algolia application, index names and search key, or null.
+     *
+     * The key is the SECURED key the storefront gives a guest browser (derived
+     * from the search-only key, tagFilters, validUntil = now + 24 h), issued
+     * through the extension's own code (AlgoliaKeyProvider) — never the raw
+     * search-only key and never the admin key. Because it expires, a response
+     * carrying it is kept in the HTTP cache for at most
+     * ALGOLIA_KEY_CACHE_SECONDS (ResponseTtl), so a cached copy always has
+     * about a day left; the app refreshes hmAppConfig before valid_until.
      *
      * Index names are built the way the extension builds them
      * (IndexNameFetcher: prefix + store code + suffix), so the app searches
      * exactly the indices the storefront does, e.g. hubmarket_ar_products.
      *
-     * @return array<string, string>|null
+     * @return array<string, string|int|null>|null
      */
     public function algolia(StoreInterface $store): ?array
     {
@@ -123,8 +142,8 @@ class AppConfigReader
             return null;
         }
 
-        //  A search-only key pasted into the admin key field (or the reverse) would
-        //  hand every app user write access to the indices. Refuse rather than leak.
+        //  A search-only key pasted into the admin key field (or the reverse): a
+        //  secured key derived from an admin key inherits its rights. Refuse.
         $adminKey = trim((string) $this->value(self::ALGOLIA_ADMIN_KEY, $storeId));
         if ($adminKey !== '' && hash_equals($adminKey, $searchKey)) {
             $this->logger->error(
@@ -134,12 +153,19 @@ class AppConfigReader
             return null;
         }
 
+        $secured = $this->algoliaKeys->guestKey($searchKey, $storeId);
+        if ($secured === null) {
+            return null;
+        }
+        $this->responseTtl->cap(self::ALGOLIA_KEY_CACHE_SECONDS);
+
         $prefix = trim((string) $this->value(self::ALGOLIA_INDEX_PREFIX, $storeId));
         $base = $prefix . (string) $store->getCode();
 
         return [
             'application_id' => $applicationId,
-            'search_api_key' => $searchKey,
+            'search_api_key' => $secured['key'],
+            'valid_until' => $secured['valid_until'],
             'index_prefix' => $prefix,
             'product_index' => $base . '_products',
             'category_index' => $base . '_categories',

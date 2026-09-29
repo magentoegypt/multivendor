@@ -28,6 +28,19 @@
     <type name="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation" shared="true"/>
 
     <!--
+        hmAppConfig.algolia issues the storefront's secured search key through the
+        Algolia extension's own classes. Proxies: nothing of the extension is
+        instantiated unless a key is actually issued (and never when the Algolia
+        module is disabled; AppConfigReader checks that first).
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Config\AlgoliaKeyProvider">
+        <arguments>
+            <argument name="algoliaConnector" xsi:type="object">Algolia\AlgoliaSearch\Service\AlgoliaConnector\Proxy</argument>
+            <argument name="algoliaConfig" xsi:type="object">Algolia\AlgoliaSearch\Helper\ConfigHelper\Proxy</argument>
+        </arguments>
+    </type>
+
+    <!--
         MGS brands carry no cache identities: purge hm_brand (hmBrands,
         TOP_BRANDS) after every brand save or delete, admin mass actions included.
     -->
