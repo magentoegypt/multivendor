@@ -6,30 +6,73 @@ declare(strict_types=1);
 
 namespace MagentoEgypt\HubApp\Model\Seller;
 
+use MagentoEgypt\HubApp\Api\LinkResolverInterface;
+use MagentoEgypt\HubApp\Api\MediaUrlInterface;
 use MagentoEgypt\HubApp\Api\SellerSummaryProviderInterface;
 
 /**
- * STUB — owned by HubAppVendors (owner B), who replaces this file.
+ * HmSellerSummary values ("sold by") for products, cart and order lines, bundles and returns.
  *
- * Until then it answers only for Hub Market itself (vendor 0) and leaves every
- * seller out, so `seller` / `hm_seller` fields are null for vendor products
- * instead of showing an unapproved or unnamed seller. The real implementation
- * (see the design, §3 "SellerSummaryProvider") batches VendorNames, VendorMeta,
- * ves_vendor_config logos and the listable counts, and requires status 2.
+ * Batched: a call covers every seller of a response with a fixed number of
+ * queries whatever the number of sellers —
+ *   - the seller table, once per request (SellerDirectory);
+ *   - names for all sellers in one storefront emulation (theme translations);
+ *   - ratings (SellerRatings, the website's VendorMeta query);
+ *   - logos (VendorConfigReader, ves_vendor_config);
+ *   - store-page product counts (ListableProducts, the storefront gate).
+ * Summaries are kept for the rest of the request, so a later call for the same
+ * sellers (cart items, then their products) costs nothing.
+ *
+ * Rules (design §3, §9.2): only APPROVED sellers (status 2) get a summary;
+ * missing or unapproved sellers are absent and the field is null. Vendor 0 —
+ * products created in admin — is Hub Market itself.
  */
 class SellerSummaryProvider implements SellerSummaryProviderInterface
 {
-    public const MARKETPLACE_NAME = 'Hub Market';
+    public const MARKETPLACE_NAME = SellerName::MARKETPLACE;
+
+    /** @var array<int, array<int, array<string, mixed>|null>> store id => vendor id => summary, null = none */
+    private array $built = [];
+
+    public function __construct(
+        private readonly SellerDirectory $directory,
+        private readonly SellerRatings $ratings,
+        private readonly ListableProducts $listableProducts,
+        private readonly VendorConfigReader $vendorConfig,
+        private readonly MediaUrlInterface $mediaUrl,
+        private readonly LinkResolverInterface $linkResolver
+    ) {
+    }
 
     /**
      * @inheritDoc
      */
     public function getByVendorIds(array $vendorIds, int $storeId): array
     {
-        $out = [];
+        $ids = [];
+        $marketplace = false;
         foreach ($vendorIds as $vendorId) {
-            if ((int) $vendorId === 0) {
-                $out[0] = $this->getMarketplace($storeId);
+            $vendorId = (int) $vendorId;
+            if ($vendorId === 0) {
+                $marketplace = true;
+            } elseif ($vendorId > 0) {
+                $ids[$vendorId] = $vendorId;
+            }
+        }
+
+        $missing = array_values(array_diff_key($ids, $this->built[$storeId] ?? []));
+        if ($missing) {
+            $this->build($missing, $storeId);
+        }
+
+        $out = [];
+        if ($marketplace) {
+            $out[0] = $this->getMarketplace($storeId);
+        }
+        foreach ($ids as $vendorId) {
+            $summary = $this->built[$storeId][$vendorId] ?? null;
+            if ($summary !== null) {
+                $out[$vendorId] = $summary;
             }
         }
 
@@ -45,7 +88,7 @@ class SellerSummaryProvider implements SellerSummaryProviderInterface
             'code' => null,
             'vendor_entity_id' => null,
             //  Latin in both locales, as in the storefront header and VendorNames::getName().
-            'name' => self::MARKETPLACE_NAME,
+            'name' => SellerName::MARKETPLACE,
             'logo_url' => null,
             'rating' => null,
             'review_count' => 0,
@@ -53,5 +96,43 @@ class SellerSummaryProvider implements SellerSummaryProviderInterface
             'is_marketplace' => true,
             'link' => null,
         ];
+    }
+
+    /**
+     * @param int[] $vendorIds
+     */
+    private function build(array $vendorIds, int $storeId): void
+    {
+        $approved = [];
+        foreach ($vendorIds as $vendorId) {
+            $this->built[$storeId][$vendorId] = null;
+            $vendor = $this->directory->getApproved($vendorId);
+            if ($vendor !== null) {
+                $approved[$vendorId] = $vendor;
+            }
+        }
+        if (!$approved) {
+            return;
+        }
+
+        $ids = array_keys($approved);
+        $names = $this->directory->names($ids, $storeId);
+        $ratings = $this->ratings->forVendors($ids);
+        $counts = $this->listableProducts->counts($ids, $storeId);
+        $logos = $this->vendorConfig->read($ids, [VendorConfigReader::LOGO], $storeId);
+
+        foreach ($approved as $vendorId => $vendor) {
+            $this->built[$storeId][$vendorId] = [
+                'code' => $vendor['code'],
+                'vendor_entity_id' => $vendorId,
+                'name' => $names[$vendorId] ?? SellerName::source($vendor['company'], $vendor['code']),
+                'logo_url' => $this->mediaUrl->sellerLogo($logos[$vendorId][VendorConfigReader::LOGO] ?? null, $storeId),
+                'rating' => $ratings[$vendorId]['rating'] ?? null,
+                'review_count' => (int) ($ratings[$vendorId]['review_count'] ?? 0),
+                'product_count' => (int) ($counts[$vendorId] ?? 0),
+                'is_marketplace' => false,
+                'link' => $this->linkResolver->store($vendor['code'], $storeId),
+            ];
+        }
     }
 }
