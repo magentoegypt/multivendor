@@ -1,0 +1,82 @@
+type Query {
+    hmStores(
+        filter: HmStoreFilterInput @doc(description: "Filters, combined with AND."),
+        sort: HmStoreSort @doc(description: "Order; FEATURED when omitted."),
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmStorePage! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Stores") @doc(description: "Approved sellers with at least one listable product. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreListIdentity")
+    hmStore(
+        code: String! @doc(description: "Seller code, case-insensitive.")
+    ): HmStore @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Store") @doc(description: "An approved seller's store page; null otherwise. For its products, filter products by vendor_id match card.vendor_entity_id (a match filter in the live schema, not eq).") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreIdentity")
+}
+
+input HmStoreFilterInput @doc(description: "Store filters.") {
+    featured: Boolean @doc(description: "Only sellers flagged Show on Home (is_home).")
+    category_id: Int @doc(description: "Sellers with a listable product in this category or its children.")
+    name: String @doc(description: "Substring of display name or code.")
+    codes: [String!] @doc(description: "Only these codes, in this order when sort is omitted.")
+}
+
+enum HmStoreSort @doc(description: "Store order.") {
+    FEATURED @doc(description: "Featured, then rating, then name.")
+    TOP_RATED @doc(description: "Rating, then reviews; unrated last.")
+    NEWEST @doc(description: "Newest first.")
+    NAME @doc(description: "Localised name A-Z.")
+    PRODUCT_COUNT @doc(description: "Most listable products first.")
+}
+
+enum HmDispatchSource @doc(description: "Dispatch time origin.") {
+    DECLARED @doc(description: "Seller's dispatch_time attribute.")
+    MEASURED @doc(description: "Mean order-to-shipment; >=2 shipments and <=7 days.")
+}
+
+type HmDispatchTime @doc(description: "Typical dispatch.") {
+    code: String! @doc(description: "same_day, next_day, days_2_3, days_3_5, days_5_7 or measured_<n>.")
+    label: String! @doc(description: "Short localised label.")
+    source: HmDispatchSource! @doc(description: "Declared or measured.")
+}
+
+type HmStoreCard @doc(description: "Seller card.") {
+    code: String! @doc(description: "Seller code.")
+    vendor_entity_id: Int! @doc(description: "Id for the products vendor_id filter.")
+    name: String! @doc(description: "Localised display name.")
+    logo_url: String @doc(description: "Absolute HTTPS logo or null.")
+    rating: Float @doc(description: "Out of 5; null when unrated.")
+    review_count: Int! @doc(description: "Approved reviews.")
+    product_count: Int! @doc(description: "Listable products.")
+    dispatch_time: HmDispatchTime @doc(description: "Typical dispatch or null.")
+    is_featured: Boolean! @doc(description: "Show on Home flag.")
+    joined_at: String! @doc(description: "Joined, ISO-8601 UTC.")
+    link: HmLink! @doc(description: "Store page link.")
+}
+
+type HmStore @doc(description: "Store page.") {
+    card: HmStoreCard! @doc(description: "Card fields.")
+    banner_url: String @doc(description: "Absolute HTTPS banner.")
+    short_description: String @doc(description: "Store Information short description.")
+    about_html: String @doc(description: "About HTML when shown.")
+    shipping_policy_html: String @doc(description: "Shipping policy HTML when enabled.")
+    refund_policy_html: String @doc(description: "Refund policy HTML when enabled.")
+}
+
+type HmStorePage @doc(description: "Seller cards page.") {
+    items: [HmStoreCard!]! @doc(description: "Cards.")
+    total_count: Int! @doc(description: "Sellers matching.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmHomeSection {
+    stores: [HmStoreCard!] @doc(description: "FEATURED_STORES, TOP_VENDORS, NEW_STORES: seller cards.")
+}
+
+interface ProductInterface {
+    hm_seller: HmSellerSummary @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\ProductSeller") @doc(description: "'Sold by'. Hub Market for admin products; null if the seller is not approved.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\SellerIdentity")
+}
+
+interface CartItemInterface {
+    hm_seller: HmSellerSummary @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\CartItemSeller") @doc(description: "Line seller; group lines by code.")
+}
+
+interface OrderItemInterface {
+    hm_seller: HmSellerSummary @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\OrderItemSeller") @doc(description: "Line seller (sales_order_item.vendor_id).")
+}
