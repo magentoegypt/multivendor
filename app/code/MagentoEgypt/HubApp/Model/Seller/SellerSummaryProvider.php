@@ -23,9 +23,13 @@ use MagentoEgypt\HubApp\Api\SellerSummaryProviderInterface;
  * Summaries are kept for the rest of the request, so a later call for the same
  * sellers (cart items, then their products) costs nothing.
  *
- * Rules (design §3, §9.2): only APPROVED sellers (status 2) get a summary;
- * missing or unapproved sellers are absent and the field is null. Vendor 0 —
- * products created in admin — is Hub Market itself.
+ * Rules (design §3, §9.2): only APPROVED sellers (status 2) get their own
+ * summary; pending, disabled and expired sellers are absent and the field is
+ * null (the storefront gate hides their products anyway). Vendor 0 — products
+ * created in admin — is Hub Market itself, and so is a DELETED seller: the
+ * website sells the leftover products of a seller with no row any more as Hub
+ * Market's (VendorNames::getName() falls back to the marketplace), and the app
+ * shows what the website shows.
  */
 class SellerSummaryProvider implements SellerSummaryProviderInterface
 {
@@ -73,10 +77,24 @@ class SellerSummaryProvider implements SellerSummaryProviderInterface
             $summary = $this->built[$storeId][$vendorId] ?? null;
             if ($summary !== null) {
                 $out[$vendorId] = $summary;
+            } elseif ($this->isDeleted($vendorId)) {
+                $out[$vendorId] = $this->getMarketplace($storeId);
             }
         }
 
         return $out;
+    }
+
+    /**
+     * A seller id with no row at all — the seller was deleted — as opposed to a
+     * pending or disabled seller. An unreadable seller table is not "deleted":
+     * every seller would turn into Hub Market.
+     */
+    private function isDeleted(int $vendorId): bool
+    {
+        $all = $this->directory->all();
+
+        return $all !== [] && !isset($all[$vendorId]);
     }
 
     /**

@@ -8,6 +8,8 @@ namespace MagentoEgypt\HubApp\Model\Seller;
 
 use Magento\Framework\App\ResourceConnection;
 use MagentoEgypt\HubApp\Api\ProductListLoaderInterface;
+use MagentoEgypt\HubApp\Model\Cache\AppCache;
+use MagentoEgypt\HubApp\Model\Cache\Tags;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,17 +22,25 @@ use Psr\Log\LoggerInterface;
  * catalog-visible in the store view, not a "select and sell" copy. So a card
  * never promises more products than /shop/<code> shows (TC71: 16 vs 13).
  *
- * One entity query plus the gate's queries per batch of sellers; kept for the
- * rest of the request.
+ * Computed for EVERY approved seller of a store view at once (one entity query
+ * plus the gate's queries) and kept in the `hubapp` app cache (up to
+ * AppCache::MAX_TTL, tagged hm_vendor): every "sold by" and store card needs
+ * the count, and the gate is the expensive part on a slow server. Like the
+ * rankings, a product saved by the Odoo sync shows up in the counts within the
+ * TTL rather than instantly (see Tags::forAppCache()).
  */
 class ListableProducts
 {
+    private const CACHE_KEY_PREFIX = 'seller_listable_';
+
     /** @var array<int, array<int, int[]>> store id => vendor id => listable product ids */
     private array $byStore = [];
 
     public function __construct(
         private readonly ResourceConnection $resource,
         private readonly ProductListLoaderInterface $productListLoader,
+        private readonly SellerDirectory $directory,
+        private readonly AppCache $appCache,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -49,12 +59,16 @@ class ListableProducts
             }
         }
 
-        $missing = array_values(array_diff_key($ids, $this->byStore[$storeId] ?? []));
-        if ($missing) {
-            $this->load($missing, $storeId);
+        if (!isset($this->byStore[$storeId])) {
+            $this->byStore[$storeId] = $this->loadStore($storeId);
         }
 
-        return array_intersect_key($this->byStore[$storeId] ?? [], $ids);
+        $out = [];
+        foreach ($ids as $vendorId) {
+            $out[$vendorId] = $this->byStore[$storeId][$vendorId] ?? [];
+        }
+
+        return $out;
     }
 
     /**
@@ -67,12 +81,43 @@ class ListableProducts
     }
 
     /**
-     * @param int[] $vendorIds
+     * @return array<int, int[]> vendor id => listable product ids, approved sellers only
      */
-    private function load(array $vendorIds, int $storeId): void
+    private function loadStore(int $storeId): array
     {
+        $key = self::CACHE_KEY_PREFIX . $storeId;
+        $cached = $this->appCache->load($key);
+        if ($cached !== null) {
+            $out = [];
+            foreach ($cached as $vendorId => $productIds) {
+                if (is_array($productIds)) {
+                    $out[(int) $vendorId] = array_map('intval', $productIds);
+                }
+            }
+
+            return $out;
+        }
+
+        $out = $this->query($this->directory->approvedIds(), $storeId);
+        if ($out !== null) {
+            $this->appCache->save($key, $out, [Tags::VENDOR], AppCache::MAX_TTL);
+        }
+
+        return $out ?? [];
+    }
+
+    /**
+     * @param int[] $vendorIds
+     * @return array<int, int[]>|null null when the seller products could not be read
+     */
+    private function query(array $vendorIds, int $storeId): ?array
+    {
+        $byVendor = [];
         foreach ($vendorIds as $vendorId) {
-            $this->byStore[$storeId][$vendorId] = [];
+            $byVendor[(int) $vendorId] = [];
+        }
+        if (!$byVendor) {
+            return [];
         }
 
         try {
@@ -80,23 +125,25 @@ class ListableProducts
             $owners = $connection->fetchPairs(
                 $connection->select()
                     ->from($this->resource->getTableName('catalog_product_entity'), ['entity_id', 'vendor_id'])
-                    ->where('vendor_id IN (?)', $vendorIds)
+                    ->where('vendor_id IN (?)', array_keys($byVendor))
                     ->order('entity_id DESC')
             );
         } catch (\Throwable $e) {
             $this->logger->warning('HubApp: seller products unavailable: ' . $e->getMessage());
 
-            return;
+            return null;
         }
         if (!$owners) {
-            return;
+            return $byVendor;
         }
 
         foreach ($this->productListLoader->sellable(array_map('intval', array_keys($owners)), $storeId) as $productId) {
             $vendorId = (int) ($owners[$productId] ?? 0);
-            if (isset($this->byStore[$storeId][$vendorId])) {
-                $this->byStore[$storeId][$vendorId][] = (int) $productId;
+            if (isset($byVendor[$vendorId])) {
+                $byVendor[$vendorId][] = (int) $productId;
             }
         }
+
+        return $byVendor;
     }
 }
