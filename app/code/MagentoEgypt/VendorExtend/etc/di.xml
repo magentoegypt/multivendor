@@ -134,4 +134,14 @@
         <plugin name="hm_vendor_email_cannot_fail_the_order"
                 type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
     </type>
+
+    <!-- Never an empty seller name; no seller card for a deleted seller (see the plugin) -->
+    <type name="Vnecoms\Vendors\Helper\Data">
+        <plugin name="hm_seller_name_fallback"
+                type="MagentoEgypt\VendorExtend\Plugin\Vendors\SellerNameFallback"/>
+    </type>
+    <type name="Vnecoms\Vendors\Block\Profile">
+        <plugin name="hm_no_card_for_missing_seller"
+                type="MagentoEgypt\VendorExtend\Plugin\Vendors\SellerNameFallback"/>
+    </type>
 </config>

@@ -478,9 +478,9 @@ class NewStores extends Template
         foreach ($candidates as $candidate) {
             $value = trim((string) ($candidate ?? ''));
 
-            //  "0" is not a name: sellers V3S2 and V8S2 have the literal company "0", and the
-            //  card was titled "0". Vnecoms and the Algolia seller facet treat it as empty too.
-            if ($value !== '' && $value !== '0') {
+            //  "0" or "." is not a name: V3S2/V8S2 have the literal company "0" (the card was
+            //  titled "0") and V2S2 has ".". One rule for every seller name: VendorNames::isName().
+            if (\MagentoEgypt\HomeSections\ViewModel\VendorNames::isName($value)) {
                 return $value;
             }
         }

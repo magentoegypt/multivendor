@@ -72,8 +72,8 @@ $allStoresUrl = $block->getUrl('sellerlist');
         <?php foreach ($sellerCollection as $seller): ?>
             <?php
             $sellerName = $block->getSellerStoreName($seller);
-            /* "0" is not a name either (company "0" on V3S2/V8S2): show the seller code */
-            $sellerName = $sellerName !== null && trim((string) $sellerName) !== '' && trim((string) $sellerName) !== '0'
+            /* "0" or "." is not a name (V3S2/V8S2, V2S2): show the seller code. See VendorNames::isName() */
+            $sellerName = \MagentoEgypt\HomeSections\ViewModel\VendorNames::isName(trim((string) $sellerName))
                 ? $sellerName : (string) $seller->getVendorId();
             $logo       = $block->getSellerImageUrl($seller);
 

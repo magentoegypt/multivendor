@@ -73,10 +73,13 @@ $hmPublicName = static function (string $key): string {
 };
 
 $storeName = trim((string) $block->getStoreName());
-if ($storeName === '') {
+if (!\MagentoEgypt\HomeSections\ViewModel\VendorNames::isName($storeName)) {
+    //  "0" or "." is not a name (V3S2/V8S2, V2S2): company, else the seller code
     $vendor = $block->getVendor();
-    $storeName = trim((string) $vendor->getCompany())
-        ?: $hmPublicName(trim((string) $vendor->getVendorId()));
+    $company = trim((string) $vendor->getCompany());
+    $storeName = \MagentoEgypt\HomeSections\ViewModel\VendorNames::isName($company)
+        ? $company
+        : $hmPublicName(trim((string) $vendor->getVendorId()));
 }
 
 /*

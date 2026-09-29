@@ -56,11 +56,15 @@ class VendorNames implements ArgumentInterface
      * Products created in admin rather than by a vendor carry vendor_id 0 — 91 of
      * the 2304 products here. Those genuinely have no seller to name, so the card
      * omits the line rather than inventing one.
+     *
+     * (Superseded: vendor_id 0 now reads "Hub Market", see below.) Never returns null or ''
+     * for a product: an id with no vendor row (seller 18 was deleted and left 22 products
+     * behind) is treated like 0, so a card never prints an empty seller line.
      */
     public function getName(mixed $vendorId): ?string
     {
         $id = (int) $vendorId;
-        if ($id <= 0) {
+        if ($id <= 0 || !isset($this->load()[$id])) {
             /*
              * vendor_id 0 = the store's own product, sold by the marketplace itself. The card used
              * to drop its seller line, so a rail mixed cards with and without one (TC72-QA01 item
@@ -69,7 +73,7 @@ class VendorNames implements ArgumentInterface
             return 'Hub Market';
         }
 
-        return $this->load()[$id]['name'] ?? null;
+        return $this->load()[$id]['name'];
     }
 
     /**
@@ -187,6 +191,17 @@ class VendorNames implements ArgumentInterface
     }
 
     /**
+     * True when a seller-typed name can be shown as a name. The one rule for every seller-name
+     * surface (cards, filter, "New Stores", seller list, product-page seller card, search tab):
+     * it must contain a letter, or a digit other than 0. Rejects '', "0" (V3S2/V8S2) and "."
+     * (V2S2), which the storefront printed as the seller's name.
+     */
+    public static function isName(?string $name): bool
+    {
+        return (bool) preg_match('/[\p{L}1-9]/u', (string) $name);
+    }
+
+    /**
      * Storefront URL for the vendor's shop page, or null if it cannot be built.
      */
     public function getUrlKey(mixed $vendorId): ?string
@@ -264,8 +279,8 @@ class VendorNames implements ArgumentInterface
                  * Mapping lives in the theme i18n CSVs; unmapped names pass through.
                  */
                 $this->map[(int) $row['entity_id']] = [
-                    //  "0" is not a name (company "0" on V3S2/V8S2): same fallback as empty
-                    'name' => (string) __($name !== '' && $name !== '0' ? $name : $this->publicName($key)),
+                    //  "0" or "." is not a name (V3S2/V8S2, V2S2): same fallback as empty; see isName()
+                    'name' => (string) __(self::isName($name) ? $name : $this->publicName($key)),
                     'key'  => $key,
                 ];
             }
