@@ -13,6 +13,7 @@ use Magento\Store\Model\ScopeInterface;
 use MagentoEgypt\HubApp\Api\LinkResolverInterface;
 use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
 use MagentoEgypt\HubApp\Model\Cache\AppCache;
+use MagentoEgypt\HubApp\Model\Cache\ResponseTtl;
 use MagentoEgypt\HubApp\Model\Cache\Tags;
 use MagentoEgypt\HubApp\Model\Resolver\Home\SectionProducts;
 use MagentoEgypt\HubApp\Model\Source\SectionType;
@@ -32,6 +33,14 @@ use Psr\Log\LoggerInterface;
  *      until the next schedule boundary, local midnight when deals are on it,
  *      or 15 minutes, whichever comes first.
  *
+ * Failures are never cached as if they were the Home:
+ *   - the section rows cannot be read: build() throws (SectionRepository),
+ *     hmAppHome answers an error, and the app keeps its built-in Home;
+ *   - a provider throws: its section is left out of THIS response only; the
+ *     build is not saved in the app cache and the HTTP cache may keep the
+ *     response for DEGRADED_TTL seconds at most (ResponseTtl), so the section
+ *     is back as soon as its source is.
+ *
  * Product sections carry their ranked, gated ids under SectionProducts::IDS_KEY;
  * the products themselves are loaded per request by that batch resolver, never
  * cached here. Cache tags of the content travel under TAGS_KEY for HomeIdentity.
@@ -43,6 +52,9 @@ class HomeBuilder
 
     private const CACHE_PREFIX = 'home_';
 
+    /** Longest the HTTP cache may keep a Home a section failed in, seconds. */
+    public const DEGRADED_TTL = 120;
+
     /** Fields the builder owns; a provider cannot override them. */
     private const OWN_FIELDS = ['id', 'type', 'limit', 'personalizable'];
 
@@ -53,6 +65,7 @@ class HomeBuilder
         private readonly LinkResolverInterface $links,
         private readonly StorefrontEmulationInterface $emulation,
         private readonly AppCache $appCache,
+        private readonly ResponseTtl $responseTtl,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly TimezoneInterface $timezone,
         private readonly LoggerInterface $logger
@@ -96,14 +109,18 @@ class HomeBuilder
             self::TAGS_KEY => $built['tags'],
         ];
 
-        $this->appCache->save($cacheKey, $home, $built['tags'], $this->ttl($rows, $now, $timezone, $built['daily']));
+        if ($built['degraded']) {
+            $this->responseTtl->cap(self::DEGRADED_TTL);
+        } else {
+            $this->appCache->save($cacheKey, $home, $built['tags'], $this->ttl($rows, $now, $timezone, $built['daily']));
+        }
 
         return $home;
     }
 
     /**
      * @param array<int, array<string, mixed>> $rows visible rows, admin order
-     * @return array{sections: array<int, array<string, mixed>>, tags: string[], daily: bool}
+     * @return array{sections: array<int, array<string, mixed>>, tags: string[], daily: bool, degraded: bool}
      */
     private function buildSections(
         array $rows,
@@ -125,6 +142,7 @@ class HomeBuilder
         $sections = [];
         $tags = [Tags::APP_HOME];
         $daily = false;
+        $degraded = false;
 
         foreach ($rows as $row) {
             $id = (int) $row['section_id'];
@@ -157,6 +175,9 @@ class HomeBuilder
                     $type,
                     $e->getMessage()
                 ), ['exception' => $e]);
+                //  Not cached (see build()); saving the section still purges this response.
+                $degraded = true;
+                $tags[] = Tags::homeSection($id);
                 continue;
             }
             if ($result === null || $result->isEmpty()) {
@@ -192,6 +213,7 @@ class HomeBuilder
             'sections' => $sections,
             'tags' => array_values(array_unique($tags)),
             'daily' => $daily,
+            'degraded' => $degraded,
         ];
     }
 
