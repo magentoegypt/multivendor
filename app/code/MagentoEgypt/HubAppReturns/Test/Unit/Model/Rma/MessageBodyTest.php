@@ -71,6 +71,54 @@ class MessageBodyTest extends TestCase
         self::assertSame('<p>Hi <b>bold</b> <a>bad</a> <a href="https://hub.test/a">ok</a></p>', $html);
     }
 
+    public function testCdataIsWrittenAsEscapedText(): void
+    {
+        //  DOMCdataSection extends DOMText and saveHTML() writes its data unescaped. libxml2 makes CDATA
+        //  from raw-text content (2.14+: xmp, noembed, noframes, plaintext), so the tree is built by hand to
+        //  test the same thing whatever libxml2 this runs on.
+        $document = new \DOMDocument('1.0', 'UTF-8');
+        $root = $document->createElement('div');
+        $document->appendChild($root);
+        $paragraph = $document->createElement('p');
+        $paragraph->appendChild($document->createCDATASection('<img src=x onerror=alert(1)>'));
+        $root->appendChild($paragraph);
+        $unknown = $document->createElement('font');
+        $unknown->appendChild($document->createCDATASection('<script>alert(2)</script>'));
+        $root->appendChild($unknown);
+        $root->appendChild($document->createCDATASection('<b onclick="x()">3</b>'));
+
+        self::assertSame(
+            '<p>&lt;img src=x onerror=alert(1)&gt;</p>&lt;script&gt;alert(2)&lt;/script&gt;'
+            . '&lt;b onclick="x()"&gt;3&lt;/b&gt;',
+            MessageBody::sanitizeChildren($root)
+        );
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function rawTextElements(): array
+    {
+        return [
+            'xmp' => ['<xmp>raw <img src=x onerror=alert(1)></xmp>'],
+            'noembed' => ['<noembed>raw <img src=x onerror=alert(1)></noembed>'],
+            'noframes' => ['<noframes>raw <img src=x onerror=alert(1)></noframes>'],
+            'plaintext' => ['<plaintext>raw <img src=x onerror=alert(1)>'],
+            'listing' => ['<listing>raw <img src=x onerror=alert(1)></listing>'],
+            'noscript' => ['<noscript>raw <img src=x onerror=alert(1)></noscript>'],
+            'iframe' => ['<iframe>raw <img src=x onerror=alert(1)></iframe>'],
+        ];
+    }
+
+    #[DataProvider('rawTextElements')]
+    public function testRawTextElementsAreDroppedWithTheirContent(string $element): void
+    {
+        //  Dropped, not unwrapped: whether libxml2 parses the content as elements or (2.14+) as CDATA,
+        //  none of it reaches the output.
+        self::assertSame('<p>kept</p>', MessageBody::toHtml('<p>kept</p>' . $element));
+        self::assertSame('kept', MessageBody::toText('<p>kept</p>' . $element));
+    }
+
     public function testUnknownElementsAreUnwrappedAndArabicSurvives(): void
     {
         self::assertSame(

@@ -23,11 +23,16 @@ final class MessageBody
         'li', 'ol', 'p', 'pre', 's', 'span', 'strong', 'table', 'tbody', 'td', 'th', 'thead', 'tr', 'u', 'ul',
     ];
 
-    /** Elements removed together with everything inside them. Any other element is unwrapped. */
+    /**
+     * Elements removed together with everything inside them. Any other element is unwrapped. Among them
+     * every raw-text element (script, style, xmp, iframe, noembed, noframes, plaintext, noscript), whose
+     * content libxml2 2.14+ parses as CDATA and writes back unescaped, and the obsolete literal-text
+     * element listing.
+     */
     private const DROPPED = [
         'applet', 'audio', 'base', 'button', 'canvas', 'embed', 'form', 'frame', 'frameset', 'head', 'iframe',
-        'img', 'input', 'link', 'math', 'meta', 'noscript', 'object', 'option', 'script', 'select', 'style',
-        'svg', 'template', 'textarea', 'title', 'video',
+        'img', 'input', 'link', 'listing', 'math', 'meta', 'noembed', 'noframes', 'noscript', 'object',
+        'option', 'plaintext', 'script', 'select', 'style', 'svg', 'template', 'textarea', 'title', 'video', 'xmp',
     ];
 
     /**
@@ -96,11 +101,22 @@ final class MessageBody
         if (!$root instanceof \DOMElement) {
             return '';
         }
+
+        return self::sanitizeChildren($root);
+    }
+
+    /**
+     * The sanitised HTML of an element's content (the element itself is not written). sanitize() parses a
+     * stored message into such an element; which nodes that yields depends on the libxml2 version (CDATA
+     * sections among them), so an already parsed tree can be sanitised, and checked, directly.
+     */
+    public static function sanitizeChildren(\DOMElement $root): string
+    {
         self::clean($root);
 
         $out = '';
         foreach ($root->childNodes as $child) {
-            $out .= (string) $document->saveHTML($child);
+            $out .= (string) $root->ownerDocument->saveHTML($child);
         }
 
         return trim($out);
@@ -109,11 +125,17 @@ final class MessageBody
     private static function clean(\DOMNode $node): void
     {
         foreach (iterator_to_array($node->childNodes) as $child) {
+            if ($child instanceof \DOMCdataSection) {
+                //  A DOMCdataSection is a DOMText too, but saveHTML() writes its data unescaped: it becomes a
+                //  plain text node, which is escaped on output.
+                $node->replaceChild($node->ownerDocument->createTextNode($child->data), $child);
+                continue;
+            }
             if ($child instanceof \DOMText) {
                 continue;
             }
             if (!$child instanceof \DOMElement) {
-                //  Comments, processing instructions, CDATA.
+                //  Comments, processing instructions.
                 $node->removeChild($child);
                 continue;
             }
