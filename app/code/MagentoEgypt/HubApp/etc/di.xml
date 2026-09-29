@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+    Shared services of the HubApp family. The satellites depend on these
+    interfaces only (never on the classes), so an implementation can change
+    without touching them.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="MagentoEgypt\HubApp\Api\CacheTagCleanerInterface"
+                type="MagentoEgypt\HubApp\Model\Cache\TagCleaner"/>
+    <preference for="MagentoEgypt\HubApp\Api\LinkResolverInterface"
+                type="MagentoEgypt\HubApp\Model\Link\LinkResolver"/>
+    <preference for="MagentoEgypt\HubApp\Api\MediaUrlInterface"
+                type="MagentoEgypt\HubApp\Model\Media\MediaUrl"/>
+    <preference for="MagentoEgypt\HubApp\Api\ProductListLoaderInterface"
+                type="MagentoEgypt\HubApp\Model\Product\ProductListLoader"/>
+    <preference for="MagentoEgypt\HubApp\Api\StorefrontEmulationInterface"
+                type="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation"/>
+    <!-- Implemented by HubAppVendors (owner B); the class here is a stub until then. -->
+    <preference for="MagentoEgypt\HubApp\Api\SellerSummaryProviderInterface"
+                type="MagentoEgypt\HubApp\Model\Seller\SellerSummaryProvider"/>
+
+    <!--
+        One instance per request: StorefrontEmulation counts its own nesting
+        depth, which only works if every caller shares the same object.
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation" shared="true"/>
+</config>
