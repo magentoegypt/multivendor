@@ -1,0 +1,61 @@
+type Query {
+    hmStoreCredit(
+        pageSize: Int = 20 @doc(description: "Transactions per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmStoreCreditAccount! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\StoreCredit") @doc(description: "Balance and transactions. Token.") @cache(cacheable: false)
+}
+
+type Mutation {
+    hmApplyStoreCredit(
+        input: HmApplyStoreCreditInput! @doc(description: "Cart and amount.")
+    ): HmStoreCreditCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\ApplyStoreCredit") @doc(description: "Use credit on the cart: group allowed, amount <= balance, capped at order total. Token.")
+    hmRemoveStoreCredit(
+        input: HmRemoveStoreCreditInput! @doc(description: "Cart.")
+    ): HmStoreCreditCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RemoveStoreCredit") @doc(description: "Stop using credit on the cart. Token.")
+}
+
+type Cart {
+    hm_store_credit: HmCartStoreCredit @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\CartStoreCredit") @doc(description: "Store credit on this cart; null for guests.")
+}
+
+type OrderTotal {
+    hm_store_credit: Money @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\OrderStoreCredit") @doc(description: "Credit used (sales_order.credit_amount); null when none.")
+}
+
+type HmStoreCreditAccount @doc(description: "Credit account.") {
+    balance: Money! @doc(description: "Balance.")
+    can_use_at_checkout: Boolean! @doc(description: "Customer group allowed (credit/general/credit_group).")
+    transactions: [HmStoreCreditTransaction!]! @doc(description: "Newest first.")
+    total_count: Int! @doc(description: "Transactions.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmStoreCreditTransaction @doc(description: "Transaction.") {
+    id: Int! @doc(description: "Id.")
+    type: String! @doc(description: "Processor code, e.g. spend_credit.")
+    type_label: String! @doc(description: "Localised processor title.")
+    amount: Money! @doc(description: "Signed amount.")
+    balance_after: Money! @doc(description: "Balance after.")
+    description: String @doc(description: "Plain-text description.")
+    created_at: String! @doc(description: "When, UTC.")
+}
+
+input HmApplyStoreCreditInput @doc(description: "Apply credit.") {
+    cart_id: String! @doc(description: "Masked cart id.")
+    amount: Float! @doc(description: "Amount in store currency, > 0.")
+}
+
+input HmRemoveStoreCreditInput @doc(description: "Remove credit.") {
+    cart_id: String! @doc(description: "Masked cart id.")
+}
+
+type HmStoreCreditCartOutput @doc(description: "Result.") {
+    cart: Cart! @doc(description: "Recollected cart.")
+}
+
+type HmCartStoreCredit @doc(description: "Cart credit.") {
+    applied: Money! @doc(description: "Applied now.")
+    balance: Money! @doc(description: "Account balance.")
+    max_applicable: Money! @doc(description: "min(balance, subtotal after discount + shipping + tax).")
+    can_use: Boolean! @doc(description: "Group allowed.")
+}
