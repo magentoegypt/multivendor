@@ -147,6 +147,14 @@
     <preference for="Vnecoms\VendorsApi\Api\Data\Credit\WithdrawalSearchResultInterface"
                 type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\WithdrawalSearchResult"/>
 
+    <!-- Seller API shipments / credit memos: address as the text their interfaces declare (was a 500) -->
+    <type name="Vnecoms\VendorsApi\Model\Data\Sale\Shipment">
+        <plugin name="hm_address_as_text" type="MagentoEgypt\VendorExtend\Plugin\VendorsApi\AddressAsText"/>
+    </type>
+    <type name="Vnecoms\VendorsApi\Model\Data\Sale\Memo">
+        <plugin name="hm_address_as_text" type="MagentoEgypt\VendorExtend\Plugin\VendorsApi\AddressAsText"/>
+    </type>
+
     <!-- Never an empty seller name; no seller card for a deleted seller (see the plugin) -->
     <type name="Vnecoms\Vendors\Helper\Data">
         <plugin name="hm_seller_name_fallback"
