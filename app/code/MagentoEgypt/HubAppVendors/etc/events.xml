@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+    Seller data purges for the app's HTTP cache (hm_vendor, hm_vendor_<id>).
+    Global: sellers change from admin, the seller panel (vendors area) and the
+    seller app (webapi_rest); reviews from the storefront and admin.
+    Event names come from the models' _eventPrefix: Vnecoms Vendor "vendor",
+    VendorsConfig Config "vendor_config", core Review "review".
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="vendor_save_after">
+        <observer name="magentoegypt_hubappvendors_clean_cache"
+                  instance="MagentoEgypt\HubAppVendors\Observer\CleanVendorCache"/>
+    </event>
+    <event name="vendor_delete_after">
+        <observer name="magentoegypt_hubappvendors_clean_cache"
+                  instance="MagentoEgypt\HubAppVendors\Observer\CleanVendorCache"/>
+    </event>
+    <event name="vendor_config_save_after">
+        <observer name="magentoegypt_hubappvendors_clean_cache"
+                  instance="MagentoEgypt\HubAppVendors\Observer\CleanVendorCache"/>
+    </event>
+    <event name="vendor_config_delete_after">
+        <observer name="magentoegypt_hubappvendors_clean_cache"
+                  instance="MagentoEgypt\HubAppVendors\Observer\CleanVendorCache"/>
+    </event>
+    <event name="review_save_after">
+        <observer name="magentoegypt_hubappvendors_clean_cache"
+                  instance="MagentoEgypt\HubAppVendors\Observer\CleanVendorCache"/>
+    </event>
+    <event name="review_delete_after">
+        <observer name="magentoegypt_hubappvendors_clean_cache"
+                  instance="MagentoEgypt\HubAppVendors\Observer\CleanVendorCache"/>
+    </event>
+</config>
