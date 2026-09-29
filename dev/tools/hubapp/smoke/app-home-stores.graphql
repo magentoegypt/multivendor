@@ -1,0 +1,13 @@
+# requires: HubAppVendors
+# S2b app Home with the seller parts (HubAppVendors): store sections and the
+# "sold by" line of each product card.
+query HmSmokeAppHomeStores($audience: HmAudience) {
+  hmAppHome(audience: $audience) {
+    sections {
+      id
+      type
+      stores { code vendor_entity_id name logo_url rating review_count product_count is_featured joined_at link { type code url } }
+      products { sku hm_seller { code name is_marketplace link { code } } }
+    }
+  }
+}

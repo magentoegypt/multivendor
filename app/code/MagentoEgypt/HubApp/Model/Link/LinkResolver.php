@@ -11,6 +11,7 @@ use Magento\Eav\Model\Config as EavConfig;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\GraphQl\Query\Uid;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -24,7 +25,7 @@ use Psr\Log\LoggerInterface;
  * keys, one for CMS identifiers and one for bare brand keys, each only when
  * needed), so a whole Home's worth of links costs a handful of queries.
  */
-class LinkResolver implements LinkResolverInterface
+class LinkResolver implements LinkResolverInterface, ResetAfterRequestInterface
 {
     private const SELLER_ROUTE_PATH = 'vendors/vendorspage/url_key';
     private const BRAND_ROUTE_PATH = 'brand/general_settings/route';
@@ -488,5 +489,14 @@ class LinkResolver implements LinkResolverInterface
     private function config(string $path, int $storeId): string
     {
         return trim((string) $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId), '/ ');
+    }
+
+    /**
+     * Per-request memo only; nothing survives a request in a long-running process.
+     */
+    public function _resetState(): void
+    {
+        $this->classifiers = [];
+        $this->linkBase = [];
     }
 }

@@ -1,0 +1,8 @@
+# S3 best sellers page (public, GET).
+query HmSmokeBestSellers($pageSize: Int = 20, $currentPage: Int = 1) {
+  hmBestSellers(pageSize: $pageSize, currentPage: $currentPage) {
+    total_count
+    page_info { current_page page_size total_pages }
+    items { sku name url_key small_image { url } }
+  }
+}

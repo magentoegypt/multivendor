@@ -1,0 +1,31 @@
+# S3 bundles page (public, GET). Variables: {"category_id":140} optional.
+query HmSmokeBundleDeals($category_id: Int, $pageSize: Int = 20, $currentPage: Int = 1) {
+  hmBundleDeals(category_id: $category_id, pageSize: $pageSize, currentPage: $currentPage) {
+    total_count
+    max_discount_percent
+    seller_count
+    page_info { current_page page_size total_pages }
+    categories { id uid name count }
+    items {
+      uid
+      sku
+      name
+      url_key
+      image_url
+      seller { code name is_marketplace }
+      description
+      is_kit
+      item_count
+      thumbnails
+      more_thumbnails
+      price { value currency }
+      price_is_from
+      regular_total { value currency }
+      saving { value currency }
+      discount_percent
+      rating_percent
+      review_count
+      category_ids
+    }
+  }
+}

@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace MagentoEgypt\HubApp\Model\Localization;
 
 use Magento\Framework\App\Area;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Magento\Store\Model\App\Emulation;
 use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
 use Psr\Log\LoggerInterface;
@@ -25,7 +26,7 @@ use Psr\Log\LoggerInterface;
  *
  * Shared (the default for DI), so the depth counter is per request.
  */
-class StorefrontEmulation implements StorefrontEmulationInterface
+class StorefrontEmulation implements StorefrontEmulationInterface, ResetAfterRequestInterface
 {
     private int $depth = 0;
 
@@ -94,5 +95,14 @@ class StorefrontEmulation implements StorefrontEmulationInterface
     public function isActive(): bool
     {
         return $this->depth > 0;
+    }
+
+    /**
+     * Per-request memo only; nothing survives a request in a long-running process.
+     */
+    public function _resetState(): void
+    {
+        $this->depth = 0;
+        $this->storeId = null;
     }
 }

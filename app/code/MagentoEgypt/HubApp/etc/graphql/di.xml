@@ -4,14 +4,30 @@
 
     SectionProviderPool maps each HmSectionType value to the provider that
     builds it. Satellites add their own types from their own graphql/di.xml
-    (DI merges the "providers" array), e.g. HubAppVendors registers
-    FEATURED_STORES, TOP_VENDORS and NEW_STORES.
+    (DI merges the "providers" array): HubAppVendors registers
+    FEATURED_STORES, TOP_VENDORS and NEW_STORES. A type with no provider is
+    left out of the Home with a log line, never an error.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="MagentoEgypt\HubApp\Model\Home\SectionProviderPool">
         <arguments>
-            <argument name="providers" xsi:type="array"/>
+            <argument name="providers" xsi:type="array">
+                <item name="DELIVERY_STRIP" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\CmsBlockProvider</item>
+                <item name="CMS_PROMOS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\CmsBlockProvider</item>
+                <item name="TRUST_ROW" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\CmsBlockProvider</item>
+                <item name="CMS_BLOCK" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\CmsBlockProvider</item>
+                <item name="HERO_BANNERS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\HeroBannerProvider</item>
+                <item name="CATEGORY_CHIPS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\CategoryChipsProvider</item>
+                <item name="TODAYS_DEALS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\DealsProvider</item>
+                <item name="PICKED_FOR_YOU" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\ProductRailProvider</item>
+                <item name="CATEGORY_RAIL" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\ProductRailProvider</item>
+                <item name="BEST_SELLERS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\ProductRailProvider</item>
+                <item name="POPULAR_PRODUCTS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\ProductRailProvider</item>
+                <item name="PRODUCT_LIST" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\ProductRailProvider</item>
+                <item name="BUNDLE_DEALS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\BundleDealsProvider</item>
+                <item name="TOP_BRANDS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\BrandsProvider</item>
+            </argument>
         </arguments>
     </type>
 </config>

@@ -8,6 +8,7 @@ namespace MagentoEgypt\HubApp\Model\Media;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Helper\ImageFactory;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use MagentoEgypt\HubApp\Api\MediaUrlInterface;
@@ -22,7 +23,7 @@ use Psr\Log\LoggerInterface;
  * puts the SECURE media base in front, because the app is on HTTPS-only
  * transports (iOS ATS) and the unsecure base is http here.
  */
-class MediaUrl implements MediaUrlInterface
+class MediaUrl implements MediaUrlInterface, ResetAfterRequestInterface
 {
     /** @var array<int, array<string, string>> store id => url type => [unsecure, secure] bases */
     private array $bases = [];
@@ -178,5 +179,13 @@ class MediaUrl implements MediaUrlInterface
         }
 
         return $this->bases[$storeId][$key];
+    }
+
+    /**
+     * Per-request memo only; nothing survives a request in a long-running process.
+     */
+    public function _resetState(): void
+    {
+        $this->bases = [];
     }
 }

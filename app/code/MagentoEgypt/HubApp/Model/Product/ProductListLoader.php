@@ -9,6 +9,7 @@ namespace MagentoEgypt\HubApp\Model\Product;
 use Magento\CatalogGraphQl\Model\Resolver\Products\DataProvider\Product as ProductDataProvider;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use MagentoEgypt\HubApp\Api\ProductListLoaderInterface;
 use MagentoEgypt\VendorExtend\Model\StorefrontVisibility;
 use Psr\Log\LoggerInterface;
@@ -22,10 +23,19 @@ use Psr\Log\LoggerInterface;
  * customer group of the request, then back into rank order — IN() does not keep
  * the order of its list.
  */
-class ProductListLoader implements ProductListLoaderInterface
+class ProductListLoader implements ProductListLoaderInterface, ResetAfterRequestInterface
 {
     /** One query can never ask for more than this many products. */
     private const MAX_IDS = 500;
+
+    /**
+     * Gate answers already known in this request: store id => product id => allowed.
+     * A Home build gates each section's ranking and the products field gates the
+     * same ids again at load time; the second pass costs no query.
+     *
+     * @var array<int, array<int, bool>>
+     */
+    private array $gate = [];
 
     public function __construct(
         private readonly ProductDataProvider $productDataProvider,
@@ -45,10 +55,18 @@ class ProductListLoader implements ProductListLoaderInterface
             return [];
         }
 
-        //  Approved, active seller, enabled and catalog-visible in this store …
-        $ids = $this->visibility->sellableIds($ids, $storeId);
-        //  … and not another seller's "select and sell" copy of it.
-        return array_values(array_map('intval', $this->visibility->searchableIds($ids)));
+        $unknown = array_values(array_filter($ids, fn (int $id): bool => !isset($this->gate[$storeId][$id])));
+        if ($unknown) {
+            //  Approved, active seller, enabled and catalog-visible in this store …
+            $allowed = $this->visibility->sellableIds($unknown, $storeId);
+            //  … and not another seller's "select and sell" copy of it.
+            $allowed = array_flip(array_map('intval', $this->visibility->searchableIds($allowed)));
+            foreach ($unknown as $id) {
+                $this->gate[$storeId][$id] = isset($allowed[$id]);
+            }
+        }
+
+        return array_values(array_filter($ids, fn (int $id): bool => $this->gate[$storeId][$id]));
     }
 
     /**
@@ -121,5 +139,13 @@ class ProductListLoader implements ProductListLoaderInterface
         }
 
         return $out;
+    }
+
+    /**
+     * Per-request memo only; nothing survives a request in a long-running process.
+     */
+    public function _resetState(): void
+    {
+        $this->gate = [];
     }
 }

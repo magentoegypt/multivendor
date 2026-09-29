@@ -4,6 +4,27 @@ type Query {
     hmAppConfig(
         platform: HmPlatform @doc(description: "Only this platform's version policy and flags; omit for all.")
     ): HmAppConfig! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig") @doc(description: "App settings for the store view in the Store header. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\AppConfigIdentity")
+    hmAppHome(
+        audience: HmAudience @doc(description: "GUEST (default) or CUSTOMER. Marketing targeting only, not authorisation.")
+    ): HmHome! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Home") @doc(description: "Active, in-schedule Home sections in admin order with their content; empty sections are omitted. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\HomeIdentity")
+    hmDeals(
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmProductPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Deals") @doc(description: "Products whose special price is live today (store timezone), deepest percentage discount first.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\ProductPageIdentity")
+    hmBestSellers(
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmProductPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BestSellers") @doc(description: "Products by units ordered (top-level order lines, cancelled orders excluded).") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\ProductPageIdentity")
+    hmBundleDeals(
+        category_id: Int @doc(description: "Only bundles under this top-level category (ids from `categories`)."),
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmBundleDealPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BundleDeals") @doc(description: "bundle and new_bundle products with their real saving (the website's bundle rail rules).") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\BundleDealIdentity")
+    hmBrands(
+        featured_only: Boolean @doc(description: "Only brands flagged Featured."),
+        pageSize: Int = 100 @doc(description: "Items per page, 1-200."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmBrandPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Brands") @doc(description: "Enabled MGS brands assigned to this store view, in admin order.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\BrandIdentity")
 }
 
 enum HmPlatform @doc(description: "Mobile platform.") {

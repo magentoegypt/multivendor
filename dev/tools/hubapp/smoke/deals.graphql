@@ -1,0 +1,14 @@
+# S3 deals page (public, GET). Variables: {"pageSize":20,"currentPage":1} optional.
+query HmSmokeDeals($pageSize: Int = 20, $currentPage: Int = 1) {
+  hmDeals(pageSize: $pageSize, currentPage: $currentPage) {
+    total_count
+    countdown_ends_at
+    page_info { current_page page_size total_pages }
+    items {
+      sku
+      name
+      url_key
+      price_range { minimum_price { regular_price { value currency } final_price { value currency } discount { percent_off } } }
+    }
+  }
+}
