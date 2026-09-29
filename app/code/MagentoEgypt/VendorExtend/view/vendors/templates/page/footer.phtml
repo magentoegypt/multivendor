@@ -1,0 +1,14 @@
+<?php
+/**
+ * Seller panel footer without Vnecoms' "Version x.y.z" (it advertised the marketplace extension's
+ * version to every seller). The copyright line is the vendors/design/footer_text setting, as in
+ * Vnecoms_Vendors::page/footer.phtml; the fallback is Hub Market's, not Vnecoms'.
+ *
+ * @var \Vnecoms\Vendors\Block\Vendors\Page\Footer $block
+ */
+?>
+<?php if ($block->getFooterText()): ?>
+<?= /* @noEscape admin-entered HTML */ $block->getFooterText() ?>
+<?php else: ?>
+<strong><?= $block->escapeHtml(__('Copyright')) ?> &copy; <?= (int) date('Y') ?> Hub Market.</strong> <?= $block->escapeHtml(__('All rights reserved.')) ?>
+<?php endif; ?>
