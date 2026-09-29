@@ -49,11 +49,11 @@ $columns = ['hm_footer_customer', 'hm_footer_sellers', 'hm_footer_categories', '
             <a class="hm-footer__logo hm-logo--lockup" dir="ltr"
                href="<?= $escaper->escapeUrl($block->getBaseUrl()) ?>"
                aria-label="<?= $escaper->escapeHtmlAttr(__('Go to Home page')) ?>">
-                <span class="hm-logo__word" aria-hidden="true">
-                    <span class="hm-logo__word-lead">Hub</span><span
-                          class="hm-logo__word-rest">Market</span>
-                </span>
-                <span class="hm-sr-only">Hub Market</span>
+                <?php /* The client's logo artwork (CL036-DEV14), white-ink version for the navy
+                         footer; see header/logo.phtml and css/hm-brand.css. */ ?>
+                <img class="hm-logo__art hm-logo__art--on-dark"
+                     src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-2026-on-dark.png')) ?>"
+                     alt="Hub Market" width="347" height="132" decoding="async" loading="lazy"/>
             </a>
 
             <?= /* @noEscape */ $layout->createBlock(\Magento\Cms\Block\Block::class)

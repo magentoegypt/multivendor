@@ -1,0 +1,64 @@
+/*
+ * Hub Market — the client's logo artwork (CL036-DEV14, 14zb93nv70a).
+ *
+ * A standalone file (linked from Magento_Theme/layout/default_head_blocks.xml), not the LESS
+ * pipeline: a new file name is a new URL, which the one-year immutable static cache cannot serve
+ * stale.
+ *
+ * header/logo.phtml renders two cuts of the one supplied file: white ink for the navy header and
+ * footer (--on-dark) and the original navy + orange for paper (--on-light). Only one shows.
+ * Bound by HEIGHT: 44px matches the 44px search row beside it and lands at the width the old text
+ * wordmark took (~115px), so nothing else in the header row moves.
+ */
+
+.hm-logo .hm-logo__art {
+    block-size: 4.4rem;
+    display: block;
+    inline-size: auto;
+    max-inline-size: none;
+}
+
+.hm-logo .hm-logo__art--on-light {
+    display: none;
+}
+
+.hm-footer__logo .hm-logo__art {
+    block-size: 4.4rem;
+    display: block;
+    inline-size: auto;
+}
+
+@media screen and (max-width: 767px) {
+    .hm-logo .hm-logo__art {
+        block-size: 3.6rem;
+    }
+}
+
+/* Paper: the print controllers render the header logo on white (see _hm-qa03.less), and any page
+   printed from the browser drops the navy band. Show the original colours there. */
+.sales-order-print .hm-logo__art--on-dark,
+.sales-order-printinvoice .hm-logo__art--on-dark,
+.sales-order-printshipment .hm-logo__art--on-dark,
+.sales-order-printcreditmemo .hm-logo__art--on-dark,
+.sales-guest-print .hm-logo__art--on-dark,
+.sales-guest-printinvoice .hm-logo__art--on-dark,
+.sales-guest-printshipment .hm-logo__art--on-dark,
+.sales-guest-printcreditmemo .hm-logo__art--on-dark {
+    display: none;
+}
+
+.sales-order-print .hm-logo .hm-logo__art--on-light,
+.sales-order-printinvoice .hm-logo .hm-logo__art--on-light,
+.sales-order-printshipment .hm-logo .hm-logo__art--on-light,
+.sales-order-printcreditmemo .hm-logo .hm-logo__art--on-light,
+.sales-guest-print .hm-logo .hm-logo__art--on-light,
+.sales-guest-printinvoice .hm-logo .hm-logo__art--on-light,
+.sales-guest-printshipment .hm-logo .hm-logo__art--on-light,
+.sales-guest-printcreditmemo .hm-logo .hm-logo__art--on-light {
+    display: block;
+}
+
+@media print {
+    .hm-logo__art--on-dark { display: none !important; }
+    .hm-logo .hm-logo__art--on-light { display: block !important; }
+}

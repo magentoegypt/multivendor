@@ -69,6 +69,15 @@ $useLockup = true;
  * reference splits its own two-part mark. The bidi and transliteration
  * reasoning above is unchanged. Do not change it again without a ticket.
  */
+/*
+ * THE CLIENT'S LOGO ARTWORK (CL036-DEV14, 14zb93nv70a) replaces the text wordmark.
+ * The supplied file is navy + orange ink on an opaque white ground, and this header
+ * is navy, so it ships as two knocked-out PNGs cut from that one file:
+ *   hm-logo-2026-on-dark.png  navy ink turned white, orange kept: header and footer
+ *   hm-logo-2026.png          the original colours on transparency: paper (print)
+ * css/hm-brand.css sizes them and swaps to the paper version on the print pages.
+ * The brand text above stays as the image's alt, so the name is still in the page.
+ */
 $brandLead = 'Hub';
 $brandRest = 'Market';
 ?>
@@ -81,10 +90,13 @@ $brandRest = 'Market';
                  cycle 2): the reference header is the text wordmark alone, and
                  the cropped MAGENTO EGYPT mark contradicted the wordmark it
                  sat beside. hm-logo-mark.png stays on disk, unreferenced. */ ?>
-        <span class="hm-logo__word" aria-hidden="true">
-            <span class="hm-logo__word-lead"><?= $escaper->escapeHtml($brandLead) ?></span><span
-                  class="hm-logo__word-rest"><?= $escaper->escapeHtml($brandRest) ?></span>
-        </span>
+        <img class="hm-logo__art hm-logo__art--on-dark"
+             src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-2026-on-dark.png')) ?>"
+             alt="<?= $escaper->escapeHtmlAttr($brandLead . ' ' . $brandRest) ?>"
+             width="347" height="132" decoding="async" fetchpriority="high"/>
+        <img class="hm-logo__art hm-logo__art--on-light"
+             src="<?= $escaper->escapeUrl($block->getViewFileUrl('images/hm-logo-2026.png')) ?>"
+             alt="" width="347" height="132" decoding="async" loading="lazy"/>
     <?php else: ?>
         <img class="hm-logo__img"
              src="<?= $escaper->escapeUrl($block->getLogoSrc()) ?>"
