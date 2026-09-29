@@ -12,6 +12,12 @@ type Mutation {
     hmRemoveStoreCredit(
         input: HmRemoveStoreCreditInput! @doc(description: "Cart.")
     ): HmStoreCreditCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RemoveStoreCredit") @doc(description: "Stop using credit on the cart. Token.")
+    hmRegisterDevice(
+        input: HmRegisterDeviceInput! @doc(description: "Device.")
+    ): HmDeviceOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RegisterDevice") @doc(description: "Upsert FCM token; bound to the customer when a token is sent, guest otherwise. Idempotent.")
+    hmUnregisterDevice(
+        input: HmUnregisterDeviceInput! @doc(description: "Device.")
+    ): HmDeviceOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\UnregisterDevice") @doc(description: "Deactivate the token for this caller. Idempotent.")
 }
 
 type Cart {
@@ -58,4 +64,18 @@ type HmCartStoreCredit @doc(description: "Cart credit.") {
     balance: Money! @doc(description: "Account balance.")
     max_applicable: Money! @doc(description: "min(balance, subtotal after discount + shipping + tax).")
     can_use: Boolean! @doc(description: "Group allowed.")
+}
+
+input HmRegisterDeviceInput @doc(description: "Device registration.") {
+    token: String! @doc(description: "FCM registration token (<=500 chars).")
+    platform: HmPlatform! @doc(description: "Platform.")
+    app_version: String @doc(description: "App semver.")
+}
+
+input HmUnregisterDeviceInput @doc(description: "Device removal.") {
+    token: String! @doc(description: "FCM token.")
+}
+
+type HmDeviceOutput @doc(description: "Result.") {
+    success: Boolean! @doc(description: "Always true unless input is invalid.")
 }
