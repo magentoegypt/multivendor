@@ -7,25 +7,40 @@ declare(strict_types=1);
 namespace MagentoEgypt\HubAppVendors\Model\Store;
 
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\ObjectManager\ResetAfterRequestInterface;
 use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
+use MagentoEgypt\HubApp\Model\Cache\AppCache;
+use MagentoEgypt\HubApp\Model\Cache\Tags;
 use Psr\Log\LoggerInterface;
 
 /**
  * HmDispatchTime for many sellers: declared first, measured for the rest (rules in DispatchTime).
  *
- * The measured figure is HomeSections VendorMeta's query restricted to the
- * sellers asked for: order created -> shipment created over the seller's
- * products. Labels are translated in ONE storefront emulation per call (theme
- * CSVs). Two queries per batch at most.
+ * The measured figure is HomeSections VendorMeta's query: order created ->
+ * shipment created over the seller's products. It joins sales_order_item on
+ * product_id, which has no index (Vnecoms' sales_order_item.vendor_id has none
+ * either, and holds the seller at order time rather than the product's current
+ * one, so it would change the figures), i.e. it reads the whole order-item
+ * table. So it runs for EVERY seller at once, grouped by seller exactly as
+ * before, and the result is kept in the `hubapp` app cache for
+ * AppCache::MAX_TTL, tagged hm_vendor (seller saves and the catalogue cron
+ * purge it), like SellerRatings. Labels are translated in ONE storefront
+ * emulation per call (theme CSVs).
  */
-class DispatchTimeReader
+class DispatchTimeReader implements ResetAfterRequestInterface
 {
     public const ATTRIBUTE = 'dispatch_time';
+
+    private const CACHE_KEY = 'seller_dispatch_measured';
+
+    /** @var array<int, int>|null vendor id => credible measured days, every seller */
+    private ?array $measured = null;
 
     public function __construct(
         private readonly ResourceConnection $resource,
         private readonly VendorAttributeReader $attributes,
         private readonly StorefrontEmulationInterface $emulation,
+        private readonly AppCache $appCache,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -91,6 +106,35 @@ class DispatchTimeReader
         if (!$vendorIds) {
             return [];
         }
+        $all = $this->allMeasuredDays();
+        $out = [];
+        foreach ($vendorIds as $vendorId) {
+            if (isset($all[$vendorId])) {
+                $out[$vendorId] = $all[$vendorId];
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @return array<int, int> vendor id => credible measured days, for every seller that has one
+     */
+    private function allMeasuredDays(): array
+    {
+        if ($this->measured !== null) {
+            return $this->measured;
+        }
+
+        $cached = $this->appCache->load(self::CACHE_KEY);
+        if ($cached !== null) {
+            $this->measured = [];
+            foreach ($cached as $vendorId => $days) {
+                $this->measured[(int) $vendorId] = (int) $days;
+            }
+
+            return $this->measured;
+        }
 
         try {
             $connection = $this->resource->getConnection();
@@ -107,13 +151,14 @@ class DispatchTimeReader
                             'avg_hours' => 'AVG(TIMESTAMPDIFF(HOUR, o.created_at, sh.created_at))',
                         ]
                     )
-                    ->where('pe.vendor_id IN (?)', $vendorIds)
+                    ->where('pe.vendor_id > ?', 0)
                     ->group('pe.vendor_id')
             );
         } catch (\Throwable $e) {
+            //  Not cached: the next request tries again.
             $this->logger->warning('HubApp: seller dispatch times unavailable: ' . $e->getMessage());
 
-            return [];
+            return $this->measured = [];
         }
 
         $out = [];
@@ -123,7 +168,16 @@ class DispatchTimeReader
                 $out[(int) $row['vendor_id']] = $days;
             }
         }
+        $this->appCache->save(self::CACHE_KEY, $out, [Tags::VENDOR], AppCache::MAX_TTL);
 
-        return $out;
+        return $this->measured = $out;
+    }
+
+    /**
+     * Per-request memo only; the shared copy lives in the app cache.
+     */
+    public function _resetState(): void
+    {
+        $this->measured = null;
     }
 }
