@@ -135,6 +135,18 @@
                 type="MagentoEgypt\VendorExtend\Plugin\VendorsSales\VendorEmailCannotFailTheOrder"/>
     </type>
 
+    <!-- Seller API lists report the real total_count, not the page size (see KeepsTotalCount) -->
+    <preference for="Vnecoms\VendorsApi\Api\Data\Sale\OrderSearchResultInterface"
+                type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\OrderSearchResult"/>
+    <preference for="Vnecoms\VendorsApi\Api\Data\Sale\InvoiceSearchResultInterface"
+                type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\InvoiceSearchResult"/>
+    <preference for="Vnecoms\VendorsApi\Api\Data\Sale\MemoSearchResultInterface"
+                type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\MemoSearchResult"/>
+    <preference for="Vnecoms\VendorsApi\Api\Data\Sale\ShipmentSearchResultInterface"
+                type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\ShipmentSearchResult"/>
+    <preference for="Vnecoms\VendorsApi\Api\Data\Credit\WithdrawalSearchResultInterface"
+                type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\WithdrawalSearchResult"/>
+
     <!-- Never an empty seller name; no seller card for a deleted seller (see the plugin) -->
     <type name="Vnecoms\Vendors\Helper\Data">
         <plugin name="hm_seller_name_fallback"
