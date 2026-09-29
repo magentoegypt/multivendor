@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+    HubAppAccount limits that are not admin settings.
+
+    newTokensPerIpHour: how many unknown FCM tokens one client address may register per hour
+    (refreshing a known token is not limited). 0 switches the limit off, e.g. while the server still
+    sees a CDN's addresses instead of the visitors'.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="MagentoEgypt\HubAppAccount\Model\Device\DeviceRegistry">
+        <arguments>
+            <argument name="newTokensPerIpHour" xsi:type="number">30</argument>
+        </arguments>
+    </type>
+</config>
