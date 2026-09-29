@@ -34,6 +34,12 @@ class ReturnableQtyTest extends TestCase
             'floored at 0'                         => ['complete',   2.0,    2.0,     1.0,     5.0,       0],
             'fraction cut to a whole unit'         => ['complete',   2.5,    2.5,     0.0,     0.0,       2],
             'all returned already'                 => ['complete',   2.0,    2.0,     0.0,     2.0,       0],
+            //  A bundle is returned through its child lines, each with its own quantities (bundle.phtml
+            //  calls getRmaItem() on the child line): a child line with no shipped quantity of its own
+            //  takes the invoiced branch, one shipped separately the shipped branch.
+            'bundle child, nothing shipped on it'  => ['complete',   0.0,    2.0,     0.0,     0.0,       2],
+            'bundle child, shipped, one returned'  => ['complete',   2.0,    2.0,     0.0,     1.0,       1],
+            'bundle child, processing order'       => ['processing', 0.0,    4.0,     0.0,     1.0,       3],
         ];
     }
 

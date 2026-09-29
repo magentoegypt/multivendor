@@ -17,8 +17,10 @@ use Vnecoms\RMA\Helper\Config as RmaConfig;
  *
  *  - the customer's own orders in state processing or complete (Vnecoms\RMA\Controller\Customer\
  *    Ajaxproduct, which loads the item list only for those states);
- *  - top-level lines only (the website's item list skips child lines);
- *  - how many units: ReturnableQty, the website's formula;
+ *  - the lines the website's form offers (ReturnableLines): top-level lines, except that a core
+ *    bundle is returned through its child lines, never through the bundle line itself;
+ *  - how many units: ReturnableQty, the website's formula, on the line picked (for a bundle's child,
+ *    the child line's own shipped, invoiced and refunded quantities, as bundle.phtml reads them);
  *  - partial quantities when rma/general/allow_per_order is on (it is by default), otherwise the whole
  *    remaining quantity;
  *  - one seller per return (Vnecoms\VendorsRMA\Observer\RequestValidateItem; Hub Market's own lines
@@ -82,12 +84,13 @@ class EligibilityService
         foreach ($orders as $order) {
             $ordersById[(int) $order['entity_id']] = $order;
         }
-        $lines = $this->lines->topLevelLinesOfOrders(array_keys($ordersById));
-        $held = $this->heldInReturns(array_keys($lines));
+        $lines = $this->lines->linesOfOrders(array_keys($ordersById));
+        $offered = ReturnableLines::offered($lines);
+        $held = $this->heldInReturns(array_keys($offered));
 
         $returnable = [];
         $linesByOrder = [];
-        foreach ($lines as $itemId => $line) {
+        foreach ($offered as $itemId => $line) {
             $orderId = (int) $line['order_id'];
             $returnable[$itemId] = $this->returnableQty->calculate(
                 (string) $ordersById[$orderId]['status'],
@@ -126,12 +129,19 @@ class EligibilityService
             $orderId = (int) $order['entity_id'];
             $rows = [];
             foreach ($linesByOrder[$orderId] ?? [] as $itemId => $line) {
+                $options = $shown[$itemId]['options'] ?? [];
+                $bundle = ReturnableLines::bundleOf($lines, $itemId);
+                $bundleName = trim((string) ($bundle['name'] ?? ''));
+                if ($bundleName !== '') {
+                    //  The website lists a bundle's items under the bundle's name; the app's list is flat.
+                    array_unshift($options, ['label' => (string) __('Part of bundle'), 'value' => $bundleName]);
+                }
                 $rows[] = [
                     'order_item_id' => $itemId,
                     'sku' => $shown[$itemId]['sku'] ?? (string) $line['sku'],
                     'name' => $shown[$itemId]['name'] ?? (string) $line['name'],
                     'image_url' => $shown[$itemId]['image_url'] ?? null,
-                    'options' => $shown[$itemId]['options'] ?? [],
+                    'options' => $options,
                     'qty_ordered' => (float) $line['qty_ordered'],
                     'qty_returnable' => (float) $returnable[$itemId],
                     'open_return_numbers' => $held[$itemId]['numbers'] ?? [],
@@ -218,10 +228,23 @@ class EligibilityService
         }
 
         $requested = $this->requestedQuantities($input['items'] ?? null);
-        $lines = $this->lines->topLevelLinesOfOrders([(int) $order['entity_id']]);
+        $lines = $this->lines->linesOfOrders([(int) $order['entity_id']]);
         foreach (array_keys($requested) as $itemId) {
-            if (!isset($lines[$itemId])) {
-                throw new GraphQlInputException(__('Item %1 is not a line of order %2.', $itemId, $number));
+            switch (ReturnableLines::classify($lines, $itemId)) {
+                case ReturnableLines::OFFERED:
+                    break;
+                case ReturnableLines::BUNDLE:
+                    //  Filed on the bundle line, the return would list no items in the admin and seller panels.
+                    throw new GraphQlInputException(__(
+                        '"%1" is a bundle: choose the items inside it that you want to return.',
+                        (string) $lines[$itemId]['name']
+                    ));
+                case ReturnableLines::PART:
+                    throw new GraphQlInputException(
+                        __('Item %1 can\'t be returned on its own: choose the line it belongs to.', $itemId)
+                    );
+                default:
+                    throw new GraphQlInputException(__('Item %1 is not a line of order %2.', $itemId, $number));
             }
         }
         $held = $this->heldInReturns(array_keys($requested));

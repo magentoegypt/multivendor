@@ -42,12 +42,13 @@ class OrderLineReader
     }
 
     /**
-     * Top-level lines (parent_item_id IS NULL, as the website lists them) of these orders.
+     * Every line of these orders, child lines included: ReturnableLines picks the ones a customer can
+     * return (a bundle's child lines stand in for the bundle line, as on the website).
      *
      * @param int[] $orderIds
-     * @return array<int, array<string, mixed>> item id => sales_order_item row
+     * @return array<int, array<string, mixed>> item id => sales_order_item row, by item id
      */
-    public function topLevelLinesOfOrders(array $orderIds): array
+    public function linesOfOrders(array $orderIds): array
     {
         $orderIds = $this->ids($orderIds);
         if (!$orderIds) {
@@ -59,7 +60,6 @@ class OrderLineReader
             $connection->select()
                 ->from($this->resource->getTableName('sales_order_item'), self::COLUMNS)
                 ->where('order_id IN (?)', $orderIds)
-                ->where('parent_item_id IS NULL')
                 ->order('item_id ASC')
         ));
     }

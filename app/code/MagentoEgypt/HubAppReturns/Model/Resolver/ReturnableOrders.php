@@ -14,7 +14,8 @@ use MagentoEgypt\HubAppReturns\Model\Rma\Paging;
 
 /**
  * Query.hmReturnableOrders — the signed-in customer's orders with at least one returnable line, newest
- * first, each with all its top-level lines and how many units of each can be returned now.
+ * first, each with the lines the website's return form offers (a bundle's child lines in place of the
+ * bundle, ReturnableLines) and how many units of each can be returned now.
  */
 class ReturnableOrders implements ResolverInterface
 {

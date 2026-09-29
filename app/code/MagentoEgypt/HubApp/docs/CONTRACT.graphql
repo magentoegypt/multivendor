@@ -489,15 +489,15 @@ type HmReturnableOrder @doc(description: "Eligible order.") {
     order_number: String! @doc(description: "Increment id.")
     created_at: String! @doc(description: "Placed, ISO-8601 UTC.")
     status_label: String! @doc(description: "Localised status.")
-    items: [HmReturnableItem!]! @doc(description: "Top-level items.")
+    items: [HmReturnableItem!]! @doc(description: "Lines to pick: each top-level line, but a bundle through its child lines.")
 }
 
 type HmReturnableItem @doc(description: "Order line.") {
-    order_item_id: Int! @doc(description: "sales_order_item id.")
+    order_item_id: Int! @doc(description: "sales_order_item id: a top-level line, or a bundle's child line.")
     sku: String! @doc(description: "SKU.")
     name: String! @doc(description: "Name.")
     image_url: String @doc(description: "Thumbnail, absolute HTTPS.")
-    options: [HmLabelValue!]! @doc(description: "Chosen options.")
+    options: [HmLabelValue!]! @doc(description: "Chosen options; a bundle's child line starts with the bundle it belongs to.")
     qty_ordered: Float! @doc(description: "Ordered.")
     qty_returnable: Float! @doc(description: "Returnable now (website formula).")
     open_return_numbers: [String!]! @doc(description: "Non-cancelled returns already holding this line.")
@@ -518,7 +518,7 @@ input HmCreateReturnInput @doc(description: "Return request.") {
 }
 
 input HmReturnItemInput @doc(description: "Line to return.") {
-    order_item_id: Int! @doc(description: "Top-level sales_order_item id.")
+    order_item_id: Int! @doc(description: "HmReturnableItem.order_item_id: a top-level line, or a bundle's child line; never the bundle's own line.")
     quantity: Float! @doc(description: "Qty, 1..qty_returnable.")
 }
 
