@@ -23,6 +23,8 @@
  *      full schema validation;
  *   4. validates every smoke document (dev/tools/hubapp/smoke/*.graphql) and
  *      every Flutter operation (<app>/lib/**\/*.graphql) against the result;
+ *      an app file with no operation or fragment (type-system SDL, such as the
+ *      app's copy of the contract, lib/core/graphql/hubapp.graphql) is skipped;
  *   5. builds live + HubApp/docs/CONTRACT.graphql, validates ALL smoke
  *      documents against the full contract, and reports drift between each
  *      contract section and the module file it describes.
@@ -39,6 +41,7 @@ use GraphQL\Language\AST\DirectiveNode;
 use GraphQL\Language\AST\DocumentNode;
 use GraphQL\Language\AST\EnumTypeDefinitionNode;
 use GraphQL\Language\AST\EnumTypeExtensionNode;
+use GraphQL\Language\AST\ExecutableDefinitionNode;
 use GraphQL\Language\AST\FieldDefinitionNode;
 use GraphQL\Language\AST\FragmentDefinitionNode;
 use GraphQL\Language\AST\FragmentSpreadNode;
@@ -178,6 +181,9 @@ if (is_dir($appPath . '/lib')) {
         }
     }
     ksort($appDocs);
+    //  Type-system SDL (the app's copy of the contract): nothing to execute, so not an operations document.
+    $schemaOnlyAppDocs = array_keys(array_filter($appDocs, 'isSchemaOnlyDocument'));
+    $appDocs = array_diff_key($appDocs, array_flip($schemaOnlyAppDocs));
 } else {
     $report->warn("Flutter repo not found at {$appPath}; app operations not checked (use --app=…)");
 }
@@ -195,6 +201,9 @@ if ($schema !== null) {
     }
     foreach ($appDocs as $file => $source) {
         validateDocument($report, $schema, 'app:' . rel($file, $appPath), $source, $appDocs);
+    }
+    foreach ($schemaOnlyAppDocs ?? [] as $file) {
+        $report->ok('app:' . rel($file, $appPath) . ': schema definitions only, not an operations document (skipped)');
     }
 }
 
@@ -522,6 +531,28 @@ function buildMerged(Report $report, DocumentNode $liveDoc, array $modules, stri
     $report->ok("{$label}: schema builds and validates (" . count($schema->getTypeMap()) . ' types, ' . count($extensions) . ' extensions)');
 
     return $schema;
+}
+
+/**
+ * True when $source parses and defines no operation and no fragment: type-system SDL
+ * (type / input / enum / scalar / interface / union / directive / schema definitions
+ * and extensions). A document that does not parse is not schema-only: validateDocument()
+ * reports it.
+ */
+function isSchemaOnlyDocument(string $source): bool
+{
+    try {
+        $doc = Parser::parse($source, ['noLocation' => true]);
+    } catch (\Throwable $e) {
+        return false;
+    }
+    foreach ($doc->definitions as $definition) {
+        if ($definition instanceof ExecutableDefinitionNode) {
+            return false;
+        }
+    }
+
+    return count($doc->definitions) > 0;
 }
 
 /**
