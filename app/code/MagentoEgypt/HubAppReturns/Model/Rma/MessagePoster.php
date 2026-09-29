@@ -24,7 +24,8 @@ use Vnecoms\RMA\Helper\Config as RmaConfig;
  * customer's (RmaViewAuthorization::canView) and still open (View::isReplyRma: open, awaiting,
  * being). The text is plain, at most 5000 characters, stored HTML-escaped (MessageBody::fromPlainText):
  * the admin and seller panels print messages unescaped, so nothing typed can become markup there, and
- * escaping rather than stripping tags keeps "a < b" or "<3" as the customer wrote it.
+ * escaping rather than stripping tags keeps "a < b" or "<3" as the customer wrote it. It is dated when
+ * posted (Observer\DateAppMessage), not with the return's filing time as Vnecoms dates messages.
  */
 class MessagePoster
 {
