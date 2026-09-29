@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+    Defaults of the app settings. Everything text-like starts empty: the app
+    hides what is not configured rather than showing invented copy.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <hubapp>
+            <search>
+                <algolia_enabled>1</algolia_enabled>
+            </search>
+            <maintenance>
+                <enabled>0</enabled>
+                <retry_after_minutes>15</retry_after_minutes>
+            </maintenance>
+        </hubapp>
+    </default>
+</config>

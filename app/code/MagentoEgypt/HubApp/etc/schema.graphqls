@@ -1,5 +1,11 @@
 # Copyright (c) MagentoEgypt. All rights reserved.
 
+type Query {
+    hmAppConfig(
+        platform: HmPlatform @doc(description: "Only this platform's version policy and flags; omit for all.")
+    ): HmAppConfig! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig") @doc(description: "App settings for the store view in the Store header. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\AppConfigIdentity")
+}
+
 enum HmPlatform @doc(description: "Mobile platform.") {
     ANDROID @doc(description: "Android.")
     IOS @doc(description: "iOS.")
