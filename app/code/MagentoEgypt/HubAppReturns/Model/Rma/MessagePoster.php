@@ -22,7 +22,9 @@ use Vnecoms\RMA\Helper\Config as RmaConfig;
  *
  * Checks the website makes only in its templates are enforced here: the return must be the
  * customer's (RmaViewAuthorization::canView) and still open (View::isReplyRma: open, awaiting,
- * being). The text is plain, at most 5000 characters, stored escaped.
+ * being). The text is plain, at most 5000 characters, stored HTML-escaped (MessageBody::fromPlainText):
+ * the admin and seller panels print messages unescaped, so nothing typed can become markup there, and
+ * escaping rather than stripping tags keeps "a < b" or "<3" as the customer wrote it.
  */
 class MessagePoster
 {

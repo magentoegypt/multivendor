@@ -319,6 +319,12 @@ class EligibilityService
         if (mb_strlen($tracking) > self::MAX_TRACKING_LENGTH) {
             throw new GraphQlInputException(__('The tracking number is too long.'));
         }
+        if ($tracking !== '' && !ReturnInput::isTrackingCode($tracking)) {
+            //  The panels print the tracking code unescaped, as text and inside value="...".
+            throw new GraphQlInputException(
+                __('Use only letters, digits, spaces and . _ / # - in the tracking number.')
+            );
+        }
 
         return [
             'order' => $order,
@@ -409,6 +415,10 @@ class EligibilityService
                 throw new GraphQlInputException(
                     __('Keep the reason under %1 characters.', self::MAX_OTHER_REASON_LENGTH)
                 );
+            }
+            if (!ReturnInput::isSafeReason($other)) {
+                //  Request::getReasonTitle() hands it to the panels, which print it unescaped.
+                throw new GraphQlInputException(__('The reason can\'t contain < > or ".'));
             }
 
             return [0, $other];

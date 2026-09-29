@@ -12,6 +12,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Psr\Log\LoggerInterface;
 use Vnecoms\RMA\Helper\Config as RmaConfig;
 use Vnecoms\VendorsRMA\Model\RequestFactory;
@@ -31,7 +32,9 @@ use Vnecoms\VendorsRMA\Model\RequestFactory;
  *  - is_admin_read / is_vendor_read = 0 are set here because the observer that sets them on the website
  *    (Vnecoms\RMA\Observer\SetIsReadCustomer) is registered for the frontend area only, and
  *    is_customer_read = 1, as the customer has obviously seen what they just filed;
- *  - the message is the app's plain text, stored escaped (MessageBody).
+ *  - the message is the app's plain text, stored HTML-escaped (MessageBody::fromPlainText), and the
+ *    client address keeps only valid addresses (ReturnInput::clientIp): Vnecoms stores X-Forwarded-For
+ *    as sent, and the admin and seller panels print both unescaped.
  */
 class ReturnCreator
 {
@@ -51,6 +54,7 @@ class ReturnCreator
         private readonly ResourceConnection $resource,
         private readonly EventManager $eventManager,
         private readonly RequestInterface $httpRequest,
+        private readonly RemoteAddress $remoteAddress,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -79,7 +83,10 @@ class ReturnCreator
             'customer_id' => $customerId,
             'customer_name' => $customerName,
             'customer_email' => (string) $order['customer_email'],
-            'ip_address' => (string) $this->rmaConfig->getClientIP(),
+            'ip_address' => ReturnInput::clientIp(
+                (string) $this->rmaConfig->getClientIP(),
+                (string) $this->remoteAddress->getRemoteAddress()
+            ),
             'status' => $this->labels->statusIdByCode(self::STATUS_PENDING, 1),
             'attachment' => null,
         ];

@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace MagentoEgypt\HubAppReturns\Test\Unit\Model\Rma;
 
 use MagentoEgypt\HubAppReturns\Model\Rma\MessageBody;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class MessageBodyTest extends TestCase
@@ -16,6 +17,46 @@ class MessageBodyTest extends TestCase
         self::assertSame(
             '<p>a &lt;b&gt; &amp; &quot;c&quot;<br>' . "\n" . 'd</p>',
             MessageBody::fromPlainText("  a <b> & \"c\"\r\nd  ")
+        );
+    }
+
+    /**
+     * Texts the app may send as a return's first message or a reply.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function hostileTexts(): array
+    {
+        return [
+            'script' => ['<script>alert(document.cookie)</script>'],
+            'image handler' => ['<img src=x onerror=alert(1)>'],
+            'attribute break-out' => ['"><svg onload=alert(1)>'],
+            'single quotes' => ["' onfocus='alert(1)' autofocus='"],
+            'entity-encoded tag' => ['&lt;script&gt;alert(1)&lt;/script&gt;'],
+            'CDATA' => ['<![CDATA[<img src=x onerror=alert(1)>]]>'],
+            'comment' => ['<!--<script>alert(1)</script>-->'],
+            'lines' => ["line one\r\n<b>line two</b>\nline three"],
+        ];
+    }
+
+    #[DataProvider('hostileTexts')]
+    public function testStoredMessageCarriesNoMarkupOfItsOwn(string $text): void
+    {
+        //  The admin and seller panels print a stored message unescaped (request/message/list.phtml). The
+        //  only tags in what the app stores are its own <p> wrapper and <br> line breaks; everything the
+        //  customer typed is text.
+        $stored = MessageBody::fromPlainText($text);
+
+        self::assertStringStartsWith('<p>', $stored);
+        self::assertSame('</p>', substr($stored, -4));
+        $inner = str_replace('<br>', '', substr($stored, 3, -4));
+        foreach (['<', '>', '"', "'"] as $character) {
+            self::assertStringNotContainsString($character, $inner);
+        }
+        //  Shown as HTML, it is exactly what the customer typed.
+        self::assertSame(
+            trim(str_replace(["\r\n", "\r"], "\n", $text)),
+            html_entity_decode($inner, ENT_QUOTES | ENT_HTML5, 'UTF-8')
         );
     }
 

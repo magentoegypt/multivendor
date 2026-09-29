@@ -89,12 +89,12 @@ input HmCreateReturnInput @doc(description: "Return request.") {
     items: [HmReturnItemInput!]! @doc(description: "Lines and quantities, one seller.")
     type: HmReturnType! @doc(description: "Refund or replace.")
     reason_id: Int @doc(description: "Reason; required when reasons are enabled and other_reason is empty.")
-    other_reason: String @doc(description: "Free-text reason when allowed.")
+    other_reason: String @doc(description: "Free-text reason when allowed, max 255 characters; angle brackets and double quotes are refused.")
     package_opened: Boolean! @doc(description: "Package opened.")
     comment: String! @doc(description: "First message.")
     refund_amount_type: HmRefundAmountType @doc(description: "REFUND only; FULL when omitted.")
     refund_custom_amount: Float @doc(description: "CUSTOM amount.")
-    tracking_code: String @doc(description: "Return shipment tracking.")
+    tracking_code: String @doc(description: "Return shipment tracking, max 255 characters: letters, digits, spaces, dot, underscore, slash, hash and hyphen only.")
 }
 
 input HmReturnItemInput @doc(description: "Line to return.") {
