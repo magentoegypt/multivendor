@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!--
+    GraphQL-area wiring: `new_bundle` answers wherever BundleGraphQl answers for
+    `bundle` (Magento_BundleGraphQl etc/graphql/di.xml is the checklist).
+    BundleExtend already maps the product itself to BundleProduct; the cart line
+    type is mapped in this module's global di.xml.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- BundleProduct fields that return null unless type_id is exactly "bundle". -->
+    <type name="Magento\BundleGraphQl\Model\Resolver\BundleItems">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\TreatNewBundleAsBundle"/>
+    </type>
+    <type name="Magento\BundleGraphQl\Model\Resolver\Product\Fields\DynamicPrice">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\TreatNewBundleAsBundle"/>
+    </type>
+    <type name="Magento\BundleGraphQl\Model\Resolver\Product\Fields\DynamicSku">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\TreatNewBundleAsBundle"/>
+    </type>
+    <type name="Magento\BundleGraphQl\Model\Resolver\Product\Fields\DynamicWeight">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\TreatNewBundleAsBundle"/>
+    </type>
+    <type name="Magento\BundleGraphQl\Model\Resolver\Product\Fields\PriceView">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\TreatNewBundleAsBundle"/>
+    </type>
+    <type name="Magento\BundleGraphQl\Model\Resolver\Product\Fields\ShipBundleItems">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\TreatNewBundleAsBundle"/>
+    </type>
+
+    <!-- bundle_options of order / invoice / shipment / credit memo lines. -->
+    <type name="Magento\BundleGraphQl\Model\Resolver\Order\Item\BundleOptions">
+        <plugin name="magentoegypt_hubappbundle_new_bundle" type="MagentoEgypt\HubAppBundle\Plugin\BundleGraphQl\NewBundleOrderItemOptions"/>
+    </type>
+
+    <!-- Bundle price provider (min/max over selections) for price_range. -->
+    <type name="Magento\CatalogGraphQl\Model\Resolver\Product\Price\ProviderPool">
+        <arguments>
+            <argument name="providers" xsi:type="array">
+                <item name="new_bundle" xsi:type="object">Magento\BundleGraphQl\Model\Resolver\Product\Price\Provider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Sales lines: the Bundle* types that carry bundle_options. -->
+    <type name="Magento\SalesGraphQl\Model\TypeResolver\OrderItem">
+        <arguments>
+            <argument name="productTypeMap" xsi:type="array">
+                <item name="new_bundle" xsi:type="string">BundleOrderItem</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\SalesGraphQl\Model\TypeResolver\InvoiceItem">
+        <arguments>
+            <argument name="productTypeMap" xsi:type="array">
+                <item name="new_bundle" xsi:type="string">BundleInvoiceItem</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\SalesGraphQl\Model\TypeResolver\ShipmentItem">
+        <arguments>
+            <argument name="productTypeMap" xsi:type="array">
+                <item name="new_bundle" xsi:type="string">BundleShipmentItem</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\SalesGraphQl\Model\TypeResolver\CreditMemoItem">
+        <arguments>
+            <argument name="productTypeMap" xsi:type="array">
+                <item name="new_bundle" xsi:type="string">BundleCreditMemoItem</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\SalesGraphQl\Model\Shipment\ItemProvider">
+        <arguments>
+            <argument name="formatters" xsi:type="array">
+                <item name="new_bundle" xsi:type="object">Magento\BundleGraphQl\Model\Order\Shipment\BundleShipmentItemFormatter\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Wishlist: without this, a wishlist holding a new_bundle fails as a whole. -->
+    <type name="Magento\WishlistGraphQl\Model\Resolver\Type\WishlistItemType">
+        <arguments>
+            <argument name="supportedTypes" xsi:type="array">
+                <item name="new_bundle" xsi:type="string">BundleWishlistItem</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- hmAddBundleToCart: every configurable child keeps its own choice (see SuperAttributeKeeper). -->
+    <type name="Magento\ConfigurableProduct\Model\Product\Type\Configurable">
+        <plugin name="magentoegypt_hubappbundle_keep_super_attributes"
+                type="MagentoEgypt\HubAppBundle\Plugin\ConfigurableProduct\KeepPerChildSuperAttributes"/>
+    </type>
+</config>

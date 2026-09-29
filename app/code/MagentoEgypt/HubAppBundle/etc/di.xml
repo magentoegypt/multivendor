@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+    Global scope, where BundleGraphQl registers `bundle` for the same resolver.
+
+    Without this entry `cart { items }` fails as a whole with
+    'Product "new_bundle" type is not supported' as soon as the cart holds a
+    new_bundle line (CartItemTypeResolver throws for unmapped types).
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\QuoteGraphQl\Model\Resolver\CartItemTypeResolver">
+        <arguments>
+            <argument name="supportedTypes" xsi:type="array">
+                <item name="new_bundle" xsi:type="string">BundleCartItem</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

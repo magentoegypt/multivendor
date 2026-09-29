@@ -1,0 +1,18 @@
+type Mutation {
+    hmAddBundleToCart(
+        input: HmAddBundleToCartInput! @doc(description: "Cart, bundle and selections.")
+    ): AddProductsToCartOutput! @resolver(class: "MagentoEgypt\\HubAppBundle\\Model\\Resolver\\AddBundleToCart") @doc(description: "Add a bundle or new_bundle, including per-selection configurable choices. Cart owner's token for customer carts.")
+}
+
+input HmAddBundleToCartInput @doc(description: "Bundle line.") {
+    cart_id: String! @doc(description: "Masked cart id.")
+    sku: String! @doc(description: "Bundle or new_bundle SKU.")
+    quantity: Float @doc(description: "Bundle quantity; 1 when omitted.")
+    selections: [HmBundleSelectionInput!]! @doc(description: "One per chosen option.")
+}
+
+input HmBundleSelectionInput @doc(description: "Chosen selection.") {
+    selection_uid: ID! @doc(description: "BundleItemOption.uid.")
+    quantity: Float @doc(description: "Selection qty when user-definable.")
+    configurable_option_uids: [ID!] @doc(description: "For configurable selections: ConfigurableProductOptionsValues.uid per attribute.")
+}

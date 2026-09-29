@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market customer app: new_bundle parity and hmAddBundleToCart (MagentoEgypt_HubAppBundle).
+ *
+ * setup_version is deliberately ABSENT (no tables, no patches).
+ *
+ * Sequenced after BundleExtend (the new_bundle product type) and after every
+ * module whose type maps and resolvers it extends; NOT on MagentoEgypt_HubApp,
+ * so it can be deployed or disabled independently of the app core.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HubAppBundle">
+        <sequence>
+            <module name="Magento_Bundle"/>
+            <module name="Magento_ConfigurableProduct"/>
+            <module name="Magento_Quote"/>
+            <module name="Magento_GraphQl"/>
+            <module name="Magento_CatalogGraphQl"/>
+            <module name="Magento_BundleGraphQl"/>
+            <module name="Magento_QuoteGraphQl"/>
+            <module name="Magento_SalesGraphQl"/>
+            <module name="Magento_WishlistGraphQl"/>
+            <module name="MagentoEgypt_BundleExtend"/>
+        </sequence>
+    </module>
+</config>
