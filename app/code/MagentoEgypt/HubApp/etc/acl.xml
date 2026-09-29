@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+    Content > Hub Market App > App Home Sections, and the settings section under
+    Stores > Configuration. Both parents are core ids that exist in 2.4.8
+    (Magento_Backend::content, Magento_Config::config).
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::content">
+                    <resource id="MagentoEgypt_HubApp::app" title="Hub Market App" translate="title" sortOrder="85">
+                        <resource id="MagentoEgypt_HubApp::home_sections" title="App Home Sections" translate="title" sortOrder="10"/>
+                    </resource>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="MagentoEgypt_HubApp::config" title="Hub Market App Settings" translate="title" sortOrder="95"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * The app Home, one row per section, in admin order.
+ *
+ * Content > Elements > App Home Sections. The app reads it through
+ * hmAppHome; nothing here is rendered by the website.
+ *
+ * No foreign keys, like magentoegypt_hero_banner: category_id, store_id and the
+ * seller codes point at things that can be deleted independently, and a
+ * dangling reference only means the section comes back empty and is omitted.
+ * store_id 0 means every store view.
+ *
+ * starts_at / ends_at are UTC. The admin form shows and takes them in the
+ * store's timezone (Asia/Riyadh) and the UI date field converts both ways;
+ * the app gets ends_at back as ISO-8601 UTC.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="magentoegypt_hubapp_home_section" resource="default" engine="innodb"
+           comment="Hub Market customer app Home sections">
+
+        <column xsi:type="int" name="section_id" unsigned="true" nullable="false" identity="true"
+                comment="Section ID"/>
+        <column xsi:type="varchar" name="type" nullable="false" length="32"
+                comment="HmSectionType value, e.g. TODAYS_DEALS"/>
+
+        <column xsi:type="varchar" name="title_en" nullable="true" length="255" comment="Title, English"/>
+        <column xsi:type="varchar" name="title_ar" nullable="true" length="255" comment="Title, Arabic"/>
+        <column xsi:type="varchar" name="subtitle_en" nullable="true" length="255" comment="Subtitle, English"/>
+        <column xsi:type="varchar" name="subtitle_ar" nullable="true" length="255" comment="Subtitle, Arabic"/>
+
+        <column xsi:type="int" name="category_id" unsigned="true" nullable="true"
+                comment="Category for CATEGORY_RAIL / POPULAR_PRODUCTS / BUNDLE_DEALS"/>
+        <column xsi:type="varchar" name="vendor_codes" nullable="true" length="512"
+                comment="Comma-separated seller codes (ves_vendor_entity.vendor_id)"/>
+        <column xsi:type="text" name="product_skus" nullable="true"
+                comment="PRODUCT_LIST SKUs, one per line or comma-separated"/>
+        <column xsi:type="varchar" name="cms_identifier" nullable="true" length="255"
+                comment="CMS block identifier for CMS-backed types"/>
+
+        <column xsi:type="smallint" name="item_limit" unsigned="true" nullable="false" default="8"
+                comment="Maximum items"/>
+        <column xsi:type="varchar" name="sort_by" nullable="true" length="32"
+                comment="Sort code (Model\Source\ProductSort)"/>
+        <column xsi:type="varchar" name="more_url" nullable="true" length="512"
+                comment="View-all destination, store-relative or absolute"/>
+        <column xsi:type="text" name="options" nullable="true"
+                comment="JSON: chip order/icons/tints, hero tile_limit, brand featured_only"/>
+
+        <column xsi:type="datetime" name="starts_at" nullable="true" comment="Show from, UTC"/>
+        <column xsi:type="datetime" name="ends_at" nullable="true" comment="Show until, UTC"/>
+        <column xsi:type="varchar" name="audience" nullable="false" length="16" default="all"
+                comment="all, guest or customer"/>
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="false" default="0"
+                comment="Store view, 0 = all"/>
+        <column xsi:type="int" name="position" unsigned="false" nullable="false" default="0"
+                comment="Order on the Home, ascending"/>
+        <column xsi:type="smallint" name="is_active" unsigned="true" nullable="false" default="1"
+                comment="Enabled"/>
+
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Created"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Updated"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="section_id"/>
+        </constraint>
+
+        <!-- The Home query: active rows of (0, store) in position order. -->
+        <index referenceId="MAGENTOEGYPT_HUBAPP_HOME_SECTION_IS_ACTIVE_STORE_ID_POSITION" indexType="btree">
+            <column name="is_active"/>
+            <column name="store_id"/>
+            <column name="position"/>
+        </index>
+        <!-- The cron's "did a schedule boundary pass since the last run" checks. -->
+        <index referenceId="MAGENTOEGYPT_HUBAPP_HOME_SECTION_STARTS_AT" indexType="btree">
+            <column name="starts_at"/>
+        </index>
+        <index referenceId="MAGENTOEGYPT_HUBAPP_HOME_SECTION_ENDS_AT" indexType="btree">
+            <column name="ends_at"/>
+        </index>
+    </table>
+</schema>

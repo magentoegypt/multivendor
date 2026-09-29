@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+    Content > Elements > App Home Sections, right after Hero Banner (45).
+
+    THE PARENT IS Magento_Backend::content_elements AND NOTHING ELSE. An
+    unknown parent makes the menu builder throw OutOfRangeException, which
+    Menu\Config does not catch, and EVERY logged-in admin page dies (the
+    HeroBanner incident of 2026-09-06; see its menu.xml). The merged-menu
+    cache hides the breakage until the first admin hit after a cache flush.
+    The core Content nodes in 2.4.8 are Magento_Backend::content and
+    Magento_Backend::content_elements (module-cms menu.xml).
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/menu.xsd">
+    <menu>
+        <add id="MagentoEgypt_HubApp::home_sections"
+             title="App Home Sections"
+             translate="title"
+             module="MagentoEgypt_HubApp"
+             sortOrder="46"
+             parent="Magento_Backend::content_elements"
+             action="magentoegypt_hubapp/section/index"
+             resource="MagentoEgypt_HubApp::home_sections"/>
+    </menu>
+</config>

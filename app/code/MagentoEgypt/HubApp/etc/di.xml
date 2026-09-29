@@ -26,4 +26,23 @@
         depth, which only works if every caller shares the same object.
     -->
     <type name="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation" shared="true"/>
+
+    <!--
+        App Home Sections grid: a plain SearchResult over the one flat table,
+        the HeroBanner pattern.
+    -->
+    <virtualType name="MagentoEgypt\HubApp\Model\ResourceModel\Section\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_hubapp_home_section</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\HubApp\Model\ResourceModel\Section</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="magentoegypt_hubapp_section_listing_data_source" xsi:type="string">MagentoEgypt\HubApp\Model\ResourceModel\Section\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
