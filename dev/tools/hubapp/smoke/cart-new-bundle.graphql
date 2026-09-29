@@ -1,0 +1,9 @@
+# requires: HubAppBundle
+# S9 add a bundle / new_bundle with per-selection choices (staging only).
+# Variables: {"cart":"<id>","sku":"<bundle sku>","selections":[{"selection_uid":"...","configurable_option_uids":["..."]}]}
+mutation HmSmokeAddBundle($cart: String!, $sku: String!, $selections: [HmBundleSelectionInput!]!) {
+  hmAddBundleToCart(input: { cart_id: $cart, sku: $sku, quantity: 1, selections: $selections }) {
+    cart { id total_quantity }
+    user_errors { code message }
+  }
+}

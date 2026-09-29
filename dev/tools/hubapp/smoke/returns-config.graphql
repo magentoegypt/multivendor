@@ -1,0 +1,13 @@
+# requires: HubAppReturns
+# S13 return form settings (public).
+query HmSmokeReturnConfig {
+  hmReturnConfig {
+    enabled
+    reasons_enabled
+    other_reason_allowed
+    partial_quantity_allowed
+    window_days
+    policy_html
+    reasons { id label }
+  }
+}

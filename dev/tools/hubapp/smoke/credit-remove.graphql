@@ -1,0 +1,5 @@
+# requires: HubAppAccount
+# S12 stop using credit on the cart (staging only).
+mutation HmSmokeRemoveCredit($cart: String!) {
+  hmRemoveStoreCredit(input: { cart_id: $cart }) { cart { id } }
+}

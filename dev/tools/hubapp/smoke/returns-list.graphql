@@ -1,0 +1,8 @@
+# requires: HubAppReturns
+# S13 the customer's returns (POST with the token).
+query HmSmokeReturns {
+  hmReturns(pageSize: 5) {
+    total_count
+    items { id number order_number created_at updated_at state status_label type item_count has_unread_reply seller { code name } }
+  }
+}

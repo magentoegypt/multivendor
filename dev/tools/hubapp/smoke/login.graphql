@@ -1,0 +1,4 @@
+# Staging only: a mutation. smoke.sh never sends it to the live store.
+mutation HmSmokeLogin($email: String!, $password: String!) {
+  generateCustomerToken(email: $email, password: $password) { token }
+}

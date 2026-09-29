@@ -28,6 +28,14 @@
     <type name="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation" shared="true"/>
 
     <!--
+        MGS brands carry no cache identities: purge hm_brand (hmBrands,
+        TOP_BRANDS) after every brand save or delete, admin mass actions included.
+    -->
+    <type name="MGS\Brand\Model\Resource\Brand">
+        <plugin name="magentoegypt_hubapp_clean_brand_cache" type="MagentoEgypt\HubApp\Plugin\MgsBrand\CleanBrandCache"/>
+    </type>
+
+    <!--
         App Home Sections grid: a plain SearchResult over the one flat table,
         the HeroBanner pattern.
     -->

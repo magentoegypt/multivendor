@@ -28,6 +28,9 @@
 #   - HmLinkType adds BRANDS (all brands page) and STORES (seller list page);
 #   - HmAppConfig adds algolia: HmAlgoliaConfig (search-only credentials and
 #     index names of the store view; null when search is not on Algolia).
+#   - vendor_id is a MATCH filter in the live ProductAttributeFilterInput
+#     (FilterMatchTypeInput), so a seller's products are
+#     products(filter: vendor_id match <id>, match_type FULL), not eq.
 # =============================================================================
 
 
@@ -314,7 +317,7 @@ type Query {
     ): HmStorePage! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Stores") @doc(description: "Approved sellers with at least one listable product. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreListIdentity")
     hmStore(
         code: String! @doc(description: "Seller code, case-insensitive.")
-    ): HmStore @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Store") @doc(description: "An approved seller's store page; null otherwise. For its products, filter products by vendor_id eq card.vendor_entity_id.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreIdentity")
+    ): HmStore @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Store") @doc(description: "An approved seller's store page; null otherwise. For its products, filter products by vendor_id match card.vendor_entity_id (a match filter in the live schema, not eq).") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreIdentity")
 }
 
 input HmStoreFilterInput @doc(description: "Store filters.") {

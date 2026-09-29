@@ -1,0 +1,9 @@
+# requires: HubAppVendors, HubAppAccount
+# S9 the cart grouped by seller, with store credit (POST with the token).
+query HmSmokeCartItems($cart: String!) {
+  cart(cart_id: $cart) {
+    id
+    items { uid quantity product { sku name } hm_seller { code name is_marketplace link { code } } }
+    hm_store_credit { applied { value currency } balance { value currency } max_applicable { value currency } can_use }
+  }
+}

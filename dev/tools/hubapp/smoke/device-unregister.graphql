@@ -1,0 +1,5 @@
+# requires: HubAppAccount
+# S11 unregister the same token (staging only).
+mutation HmSmokeUnregisterDevice($token: String!) {
+  hmUnregisterDevice(input: { token: $token }) { success }
+}
