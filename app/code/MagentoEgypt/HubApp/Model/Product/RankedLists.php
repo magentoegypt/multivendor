@@ -39,9 +39,10 @@ class RankedLists
     }
 
     /**
-     * Live deals of the store view, gated, deepest discount first.
+     * Live deals of the store view, gated, deepest discount first (DealRanker rows:
+     * a bundle's `special` is the percent paid, `percent_off` is right for every type).
      *
-     * @return array<int, array{id: int, price: float, special: float, to_date: string|null}>
+     * @return array<int, array{id: int, type_id?: string, price: float, special: float, percent_off?: float, to_date: string|null}>
      */
     public function deals(int $storeId): array
     {
