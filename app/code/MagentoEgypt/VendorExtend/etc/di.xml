@@ -147,6 +147,10 @@
     <preference for="Vnecoms\VendorsApi\Api\Data\Credit\WithdrawalSearchResultInterface"
                 type="MagentoEgypt\VendorExtend\Model\Data\VendorsApi\WithdrawalSearchResult"/>
 
+    <!-- Seller dashboard / report charts bucketed by the store's local day, not UTC (TC66-QA02) -->
+    <preference for="Vnecoms\VendorsDashboard\Model\Graph"
+                type="MagentoEgypt\VendorExtend\Model\Dashboard\StoreTimeGraph"/>
+
     <!-- Seller API shipments / credit memos: address as the text their interfaces declare (was a 500) -->
     <type name="Vnecoms\VendorsApi\Model\Data\Sale\Shipment">
         <plugin name="hm_address_as_text" type="MagentoEgypt\VendorExtend\Plugin\VendorsApi\AddressAsText"/>
