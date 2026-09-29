@@ -13,6 +13,7 @@ use Magento\Framework\GraphQl\Exception\GraphQlAuthenticationException;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use MagentoEgypt\SmsExtend\Api\WhatsAppInterface;
 use MagentoEgypt\SmsExtend\Helper\Otp;
+use MagentoEgypt\SmsExtend\Model\Otp\OtpGuard;
 use MagentoEgypt\SmsExtend\Model\WhatsAppManagement;
 use Psr\Log\LoggerInterface;
 use Vnecoms\Sms\Helper\Data as SmsHelper;
@@ -22,7 +23,8 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
  *
  * sendCode():
  *  1. per-address and per-number hourly limits (hubapp/otp/send_limit_*), counted for every request,
- *     so a limit answers alike for numbers with and without an account;
+ *     so a limit answers alike for numbers with and without an account. SmsExtend's OtpGuard applies
+ *     them, on the same counters as the REST service the seller app uses (/V1/whatsapp/otp/send);
  *  2. the account(s) the number matches (Otp::getCustomersByMobile, the match verifyOtp signs in with);
  *  3. the code goes only to the number stored on the one matching account, canonical form
  *     (DeliveryNumber), through Otp::sendOtp (its own resend cooldown, OTP keyed per number);
@@ -31,8 +33,10 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
  *     sent true, one neutral message, the resend cooldown.
  *
  * signIn(): WhatsAppManagement::verifyOtp($mobile, $code, LOGIN) does the work the website's REST
- * sign-in does: the account's lock (failed codes count toward it), five wrong codes burn the code,
- * ambiguous numbers refused, a JWT from the current token issuer. Every failure answers the same.
+ * sign-in does: the codes' own lock (OtpGuard: five wrong codes lock code sign-in for the number for 15
+ * minutes, never the account; a per-address budget of wrong codes), five wrong codes burn the code,
+ * ambiguous numbers refused, a JWT from the current token issuer. Every failure answers the same, apart
+ * from the lock, which answers alike for every number and says when to try again.
  *
  * The code's cache key is the canonical stored number's digits on send and the typed number's on
  * verify; they are the same digits for every account that can get a code at all (the spelling that
@@ -41,17 +45,14 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
 class WhatsAppSignIn
 {
     public const XML_REVEAL_UNKNOWN = 'hubapp/otp/reveal_unknown_number';
-    public const XML_LIMIT_IP = 'hubapp/otp/send_limit_ip_hour';
-    public const XML_LIMIT_NUMBER = 'hubapp/otp/send_limit_number_hour';
 
-    private const HOUR = 3600;
     private const MIN_DIGITS = 7;
     private const MAX_DIGITS = 15;
 
     public function __construct(
         private readonly Otp $otp,
         private readonly DeliveryNumber $deliveryNumber,
-        private readonly SendThrottle $throttle,
+        private readonly OtpGuard $guard,
         private readonly WhatsAppInterface $whatsApp,
         private readonly SmsHelper $smsHelper,
         private readonly ScopeConfigInterface $scopeConfig,
@@ -72,15 +73,7 @@ class WhatsAppSignIn
             );
         }
 
-        $wait = $this->throttle->consume('otp_ip', $clientIp, $this->limit(self::XML_LIMIT_IP), self::HOUR);
-        if ($wait === 0) {
-            $wait = $this->throttle->consume(
-                'otp_number',
-                $this->deliveryNumber->numberKey($mobile),
-                $this->limit(self::XML_LIMIT_NUMBER),
-                self::HOUR
-            );
-        }
+        $wait = $this->guard->sendWait($mobile, $clientIp);
         if ($wait > 0) {
             return [
                 'sent' => false,
@@ -171,6 +164,13 @@ class WhatsAppSignIn
         if ($result instanceof DataObject) {
             //  The reason stays in the log; the caller cannot tell "no account" from "wrong code".
             $this->logger->info('HubAppAccount: WhatsApp sign-in refused: ' . (string) $result->getData('message'));
+            $retryAfter = (int) $result->getData(WhatsAppManagement::RETRY_AFTER);
+            if ($retryAfter > 0) {
+                //  The number's code lock: the same for every number, with or without an account.
+                throw new GraphQlAuthenticationException(
+                    __('Too many incorrect codes. Please try again in %1 minutes.', (int) ceil($retryAfter / 60))
+                );
+            }
         }
 
         throw new GraphQlAuthenticationException(
@@ -189,11 +189,6 @@ class WhatsAppSignIn
         $digits = strlen((string) preg_replace('/\D+/', '', $mobile));
 
         return $digits >= self::MIN_DIGITS && $digits <= self::MAX_DIGITS;
-    }
-
-    private function limit(string $path): int
-    {
-        return max(0, (int) $this->scopeConfig->getValue($path));
     }
 
     /**

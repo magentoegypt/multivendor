@@ -319,8 +319,8 @@ class Otp extends AbstractHelper
         /*
          * A 6-digit code with unlimited guesses for 15 minutes could be brute-forced —
          * and FORGOTPASS sets a new password on success. Each wrong code counts; the
-         * MAX_VERIFY_ATTEMPTS-th burns the code. AuthenticationException lets the caller
-         * also count it toward the customer's account lockout.
+         * MAX_VERIFY_ATTEMPTS-th burns the code. Callers count wrong codes toward the codes'
+         * own lock (Model\Otp\OtpGuard), never toward the customer's account lock.
          */
         if (!hash_equals((string)$cachedOtp, trim((string)$otp))) {
             $attempts = (int)$this->cache->load($attemptsKey) + 1;

@@ -6,9 +6,8 @@ declare(strict_types=1);
 
 namespace MagentoEgypt\SmsExtend\Test\Unit\Model\Otp;
 
-use Magento\Framework\Cache\FrontendInterface;
-use MagentoEgypt\SmsExtend\Helper\Otp;
 use MagentoEgypt\SmsExtend\Model\Otp\MobileNumber;
+use MagentoEgypt\SmsExtend\Test\Unit\OtpWithMemoryCache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -203,66 +202,5 @@ class MobileNumberTest extends TestCase
         }
         //  Still there for its own number, in any spelling.
         self::assertTrue($otp->verifyOtp('050 841 2345', $code));
-    }
-}
-
-/**
- * The OTP helper with an in-memory cache (its constructor needs the whole application).
- */
-class OtpWithMemoryCache extends Otp
-{
-    public function __construct()
-    {
-        $this->cache = new MemoryCacheFrontend();
-    }
-}
-
-/**
- * In-memory cache frontend.
- */
-class MemoryCacheFrontend implements FrontendInterface
-{
-    /** @var array<string, string> */
-    public array $entries = [];
-
-    public function test($identifier)
-    {
-        return isset($this->entries[$identifier]);
-    }
-
-    public function load($identifier)
-    {
-        return $this->entries[$identifier] ?? false;
-    }
-
-    public function save($data, $identifier, array $tags = [], $lifeTime = null)
-    {
-        $this->entries[$identifier] = (string) $data;
-
-        return true;
-    }
-
-    public function remove($identifier)
-    {
-        unset($this->entries[$identifier]);
-
-        return true;
-    }
-
-    public function clean($mode = 'all', array $tags = [])
-    {
-        $this->entries = [];
-
-        return true;
-    }
-
-    public function getBackend()
-    {
-        return null;
-    }
-
-    public function getLowLevelFrontend()
-    {
-        return null;
     }
 }

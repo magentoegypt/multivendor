@@ -13,8 +13,9 @@ use MagentoEgypt\HubAppAccount\Model\Otp\WhatsAppSignIn;
 
 /**
  * Mutation.hmSignInWithWhatsAppCode — exchange the WhatsApp code for a customer token (the same kind
- * generateCustomerToken returns). Anonymous; wrong codes count toward the account's lockout; every
- * failure gives the same error. The app then calls mergeCarts as after any sign-in.
+ * generateCustomerToken returns). Anonymous; five wrong codes lock code sign-in for the number for 15
+ * minutes (the codes' own lock, never the account's); every other failure gives the same error. The app
+ * then calls mergeCarts as after any sign-in.
  */
 class SignInWithWhatsAppCode implements ResolverInterface
 {

@@ -58,15 +58,4 @@ class DeliveryNumber
 
         return ['reason' => self::OK, 'number' => $number, 'customer_id' => $customerId];
     }
-
-    /**
-     * One throttle key per number whatever its spelling: the digits the OTP helper files the number's
-     * code, attempts and cooldown under (canonical form when there is one, else the typed digits).
-     */
-    public function numberKey(string $typed): string
-    {
-        $canonical = $this->otp->canonicalizeMobileForDelivery($typed);
-
-        return (string) preg_replace('/\D+/', '', $canonical ?? $typed);
-    }
 }

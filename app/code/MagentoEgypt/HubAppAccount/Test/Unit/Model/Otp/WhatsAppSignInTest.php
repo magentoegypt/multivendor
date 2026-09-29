@@ -12,17 +12,20 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthenticationException;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use MagentoEgypt\HubAppAccount\Model\Otp\DeliveryNumber;
-use MagentoEgypt\HubAppAccount\Model\Otp\SendThrottle;
 use MagentoEgypt\HubAppAccount\Model\Otp\WhatsAppSignIn;
 use MagentoEgypt\SmsExtend\Api\WhatsAppInterface;
 use MagentoEgypt\SmsExtend\Helper\Otp;
+use MagentoEgypt\SmsExtend\Model\Otp\OtpGuard;
+use MagentoEgypt\SmsExtend\Model\Throttle;
+use MagentoEgypt\SmsExtend\Model\WhatsAppManagement;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Vnecoms\Sms\Helper\Data as SmsHelper;
 
 /**
  * hmSendWhatsAppCode / hmSignInWithWhatsAppCode with fakes for the OTP helper, the WhatsApp service,
- * the SMS settings and the config. Nothing is ever sent.
+ * the SMS settings and the config, and SmsExtend's real OtpGuard (the limits the REST service shares).
+ * Nothing is ever sent.
  */
 class WhatsAppSignInTest extends TestCase
 {
@@ -41,8 +44,8 @@ class WhatsAppSignInTest extends TestCase
         $this->whatsApp = new FakeWhatsApp();
         $this->config = [
             WhatsAppSignIn::XML_REVEAL_UNKNOWN => '0',
-            WhatsAppSignIn::XML_LIMIT_IP => '10',
-            WhatsAppSignIn::XML_LIMIT_NUMBER => '5',
+            OtpGuard::XML_SEND_LIMIT_IP => '10',
+            OtpGuard::XML_SEND_LIMIT_NUMBER => '5',
         ];
     }
 
@@ -76,10 +79,12 @@ class WhatsAppSignInTest extends TestCase
             }
         };
 
+        $cache = new MemoryCache();
+
         return new WhatsAppSignIn(
             $this->otp,
             new DeliveryNumber($this->otp),
-            new SendThrottle(new MemoryCache()),
+            new OtpGuard(new Throttle($cache), $cache, $scopeConfig),
             $this->whatsApp,
             $sms,
             $scopeConfig,
@@ -164,7 +169,7 @@ class WhatsAppSignInTest extends TestCase
 
     public function testPerNumberLimitCountsEverySpellingAndUnknownNumbersToo(): void
     {
-        $this->config[WhatsAppSignIn::XML_LIMIT_NUMBER] = '2';
+        $this->config[OtpGuard::XML_SEND_LIMIT_NUMBER] = '2';
         $signIn = $this->signIn();
 
         self::assertTrue($signIn->sendCode('01001234567', '10.0.0.1')['sent']);
@@ -177,7 +182,7 @@ class WhatsAppSignInTest extends TestCase
 
     public function testPerAddressLimit(): void
     {
-        $this->config[WhatsAppSignIn::XML_LIMIT_IP] = '1';
+        $this->config[OtpGuard::XML_SEND_LIMIT_IP] = '1';
         $signIn = $this->signIn();
 
         self::assertTrue($signIn->sendCode('+971501111111', '10.0.0.9')['sent']);
@@ -209,6 +214,24 @@ class WhatsAppSignInTest extends TestCase
             } catch (GraphQlAuthenticationException $e) {
                 self::assertSame('That code is incorrect or has expired. Check it, or ask for a new code.', $e->getMessage());
             }
+        }
+    }
+
+    public function testALockedNumberSaysWhenToTryAgain(): void
+    {
+        //  WhatsAppManagement::verifyOtp answers a lock alike for every number, with or without an account.
+        $this->whatsApp->result = new DataObject([
+            'status' => 'error',
+            'message' => 'Too many incorrect codes. Please try again in 15 minutes.',
+            'token' => '',
+            WhatsAppManagement::RETRY_AFTER => 890,
+        ]);
+
+        try {
+            $this->signIn()->signIn('+971501234567', '123456');
+            self::fail('no exception');
+        } catch (GraphQlAuthenticationException $e) {
+            self::assertSame('Too many incorrect codes. Please try again in 15 minutes.', $e->getMessage());
         }
     }
 

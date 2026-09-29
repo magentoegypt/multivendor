@@ -8,7 +8,7 @@ namespace MagentoEgypt\HubAppAccount\Model\Device;
 
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Sql\Expression;
-use MagentoEgypt\HubAppAccount\Model\Otp\SendThrottle;
+use MagentoEgypt\SmsExtend\Model\Throttle;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -38,7 +38,7 @@ class DeviceRegistry
 
     public function __construct(
         private readonly ResourceConnection $resource,
-        private readonly SendThrottle $throttle,
+        private readonly Throttle $throttle,
         private readonly LoggerInterface $logger,
         private readonly int $newTokensPerIpHour = 30
     ) {

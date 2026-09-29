@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <!--
-    Defaults of Stores > Configuration > Magento Egypt > Hub Market App > WhatsApp Sign-in (App).
+    Defaults of Stores > Configuration > Magento Egypt > Hub Market App > WhatsApp Codes.
     Answers do not reveal whether a number has an account; every code sent is a paid message.
+    The limits apply to the seller app's REST codes too (MagentoEgypt_SmsExtend OtpGuard, which has the
+    same defaults built in for when this module is not installed).
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
@@ -11,6 +13,7 @@
                 <reveal_unknown_number>0</reveal_unknown_number>
                 <send_limit_ip_hour>10</send_limit_ip_hour>
                 <send_limit_number_hour>5</send_limit_number_hour>
+                <wrong_codes_ip_hour>30</wrong_codes_ip_hour>
             </otp>
         </hubapp>
     </default>

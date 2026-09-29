@@ -4,12 +4,17 @@
  */
 declare(strict_types=1);
 
-namespace MagentoEgypt\HubAppAccount\Test\Unit\Model\Otp;
+namespace MagentoEgypt\SmsExtend\Test\Unit\Model;
 
-use MagentoEgypt\HubAppAccount\Model\Otp\SendThrottle;
+use MagentoEgypt\SmsExtend\Model\Throttle;
+use MagentoEgypt\SmsExtend\Test\Unit\MemoryCache;
 use PHPUnit\Framework\TestCase;
 
-class SendThrottleTest extends TestCase
+/**
+ * The fixed-window counters (moved here from MagentoEgypt_HubAppAccount's SendThrottle, which the app's
+ * device registration used; SmsExtend's OTP limits need them too, and SmsExtend depends on no HubApp module).
+ */
+class ThrottleTest extends TestCase
 {
     private const HOUR = 3600;
 
@@ -18,12 +23,12 @@ class SendThrottleTest extends TestCase
 
     private MemoryCache $cache;
 
-    private SendThrottle $throttle;
+    private Throttle $throttle;
 
     protected function setUp(): void
     {
         $this->cache = new MemoryCache();
-        $this->throttle = new SendThrottle($this->cache);
+        $this->throttle = new Throttle($this->cache);
     }
 
     public function testAllowsUpToTheLimitThenSaysHowLongToWait(): void
@@ -63,6 +68,24 @@ class SendThrottleTest extends TestCase
         $this->throttle->consume('otp_number', '+971501234567', 5, self::HOUR, self::NOON);
         $key = (string) array_key_first($this->cache->entries);
         self::assertStringNotContainsString('971501234567', $key);
-        self::assertSame([SendThrottle::CACHE_TAG], $this->cache->tags[$key]);
+        self::assertSame([Throttle::CACHE_TAG], $this->cache->tags[$key]);
+    }
+
+    public function testPeekNeverCountsAndHitAlwaysCounts(): void
+    {
+        for ($i = 0; $i < 10; $i++) {
+            self::assertSame(0, $this->throttle->peek('otp_wrong_ip', '10.0.0.1', 3, self::HOUR, self::NOON));
+        }
+        self::assertSame([], $this->cache->entries);
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->throttle->hit('otp_wrong_ip', '10.0.0.1', self::HOUR, self::NOON);
+        }
+        self::assertSame(
+            self::HOUR - (self::NOON % self::HOUR),
+            $this->throttle->peek('otp_wrong_ip', '10.0.0.1', 3, self::HOUR, self::NOON)
+        );
+        self::assertSame(0, $this->throttle->peek('otp_wrong_ip', '10.0.0.1', 4, self::HOUR, self::NOON));
+        self::assertSame(0, $this->throttle->peek('otp_wrong_ip', '10.0.0.1', 3, self::HOUR, self::NOON + self::HOUR));
     }
 }

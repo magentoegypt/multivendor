@@ -1,6 +1,10 @@
 <?xml version="1.0"?>
 <!--
-    Stores > Configuration > Magento Egypt > Hub Market App > WhatsApp Sign-in (App).
+    Stores > Configuration > Magento Egypt > Hub Market App > WhatsApp Codes.
+
+    The limits are read by MagentoEgypt_SmsExtend (Model\Otp\OtpGuard) for every WhatsApp code: the app's
+    GraphQL sign-in and the REST service the seller app uses (/V1/whatsapp/otp/send and /verify), on shared
+    counters. SmsExtend reads them by path; with this module disabled it applies the same defaults, built in.
 
     The tab and the section are MagentoEgypt_HubApp's (and the tab OdooConnector's too); they are
     declared again with the same values so this group has a home whichever system.xml loads first.
@@ -18,7 +22,7 @@
             <tab>magentoegypt</tab>
             <resource>MagentoEgypt_HubApp::config</resource>
             <group id="otp" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
-                <label>WhatsApp Sign-in (App)</label>
+                <label>WhatsApp Codes</label>
                 <field id="reveal_unknown_number" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Tell the App When a Number Has No Account</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -27,12 +31,17 @@
                 <field id="send_limit_ip_hour" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Code Requests per Address per Hour</label>
                     <validate>validate-digits</validate>
-                    <comment>0 = no limit. Every request counts, sent or not. Behind a CDN the server must see the visitor's address, or all visitors share one limit.</comment>
+                    <comment>App and seller app alike. 0 = no limit. Every request counts, sent or not. Behind a CDN the server must see the visitor's address, or all visitors share one limit.</comment>
                 </field>
                 <field id="send_limit_number_hour" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Code Requests per Mobile Number per Hour</label>
                     <validate>validate-digits</validate>
-                    <comment>0 = no limit. Every spelling of a number counts as that number. The resend cooldown of the SMS settings applies as well.</comment>
+                    <comment>App and seller app alike. 0 = no limit. Every spelling of a number counts as that number. The resend cooldown of the SMS settings applies as well.</comment>
+                </field>
+                <field id="wrong_codes_ip_hour" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Wrong Codes per Address per Hour</label>
+                    <validate>validate-digits</validate>
+                    <comment>App and seller app alike. 0 = no limit. A number without an account counts as a wrong code. Separately, 5 wrong codes for one number lock code sign-in for that number for 15 minutes; the customer's account and password sign-in are never locked by codes.</comment>
                 </field>
             </group>
         </section>

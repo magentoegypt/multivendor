@@ -626,7 +626,7 @@ type Mutation {
     ): HmSendWhatsAppCodeOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SendWhatsAppCode") @doc(description: "Send a LOGIN code to the matching account's stored number. Anonymous.")
     hmSignInWithWhatsAppCode(
         input: HmSignInWithWhatsAppCodeInput! @doc(description: "Number and code.")
-    ): CustomerToken! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SignInWithWhatsAppCode") @doc(description: "Exchange a code for a customer token; failures count toward lockout. Anonymous.")
+    ): CustomerToken! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SignInWithWhatsAppCode") @doc(description: "Exchange a code for a customer token. Five wrong codes for a number lock code sign-in for that number for 15 minutes, never the account. Anonymous.")
 }
 
 type Cart {

@@ -8,6 +8,7 @@ namespace MagentoEgypt\HubAppAccount\Test\Unit\Model\Otp;
 
 use MagentoEgypt\HubAppAccount\Model\Otp\DeliveryNumber;
 use MagentoEgypt\SmsExtend\Helper\Otp;
+use MagentoEgypt\SmsExtend\Model\Otp\MobileNumber;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -103,21 +104,24 @@ class DeliveryNumberTest extends TestCase
     #[DataProvider('matchingSpellings')]
     public function testCodeIsFiledUnderTheKeyTheTypedNumberVerifiesWith(string $typed, string $stored): void
     {
-        //  Otp::sendOtp(<delivery>) files the code under the delivery number's digits; verifyOtp(<typed>)
-        //  looks under the typed number's. They must agree, or nobody could sign in.
+        //  Otp::sendOtp(<delivery>) files the code under the delivery number's key; verifyOtp(<typed>)
+        //  looks under the typed number's (MobileNumber::key, the helper's cache key). They must agree, or
+        //  nobody could sign in. SmsExtend's MobileNumberTest proves it for every matching spelling.
         $delivery = $this->delivery->resolve([1 => $stored])['number'];
         self::assertNotNull($delivery);
-        self::assertSame($this->delivery->numberKey($typed), $this->delivery->numberKey((string) $delivery));
+        self::assertContains($stored, MobileNumber::candidates($typed), 'the typed number finds the account');
+        self::assertSame(MobileNumber::key($typed), MobileNumber::key((string) $delivery));
     }
 
-    public function testThrottleKeyIsOnePerNumberWhateverTheSpelling(): void
+    public function testLimitsCountEverySpellingAsOneNumber(): void
     {
-        self::assertSame('201001234567', $this->delivery->numberKey('01001234567'));
-        self::assertSame('201001234567', $this->delivery->numberKey('+20 100 123 4567'));
-        self::assertSame('971501234567', $this->delivery->numberKey('+971501234567'));
-        self::assertSame('971501234567', $this->delivery->numberKey('971501234567'));
-        self::assertSame('971501234567', $this->delivery->numberKey('0501234567'));
-        self::assertSame('971501234567', $this->delivery->numberKey('501234567'));
-        self::assertSame('501234567', $this->delivery->numberKey('+501234567'));
+        //  SmsExtend's OtpGuard counts sends and wrong codes per MobileNumber::key.
+        self::assertSame('201001234567', MobileNumber::key('01001234567'));
+        self::assertSame('201001234567', MobileNumber::key('+20 100 123 4567'));
+        self::assertSame('971501234567', MobileNumber::key('+971501234567'));
+        self::assertSame('971501234567', MobileNumber::key('971501234567'));
+        self::assertSame('971501234567', MobileNumber::key('0501234567'));
+        self::assertSame('971501234567', MobileNumber::key('501234567'));
+        self::assertSame('501234567', MobileNumber::key('+501234567'));
     }
 }
