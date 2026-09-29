@@ -92,8 +92,19 @@ class SellerResolver
          * the product card and the seller's own page for the same seller.
          *
          * A facet label has to be the name the shopper has already been shown.
+         *
+         * 2026-09-29: the storefront now decides "is this a name" in one place,
+         * VendorNames::isName() (a letter or a digit 1-9), which also rejects
+         * junk such as V2S2's company "." — use it, so a record never carries a
+         * seller name the storefront would not show. The old ''/'0' test stays
+         * only as the fallback for an install without that module.
          */
-        return (trim($row['company']) ?: $this->publicName($row['key'])) ?: null;
+        $company = trim((string) $row['company']);
+        $isName = method_exists(\MagentoEgypt\HomeSections\ViewModel\VendorNames::class, 'isName')
+            ? \MagentoEgypt\HomeSections\ViewModel\VendorNames::isName($company)
+            : ($company !== '' && $company !== '0');
+
+        return ($isName ? $company : $this->publicName($row['key'])) ?: null;
     }
 
     /**
