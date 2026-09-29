@@ -22,6 +22,7 @@ use Magento\Quote\Model\QuoteMutexInterface;
 use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
 use MagentoEgypt\HubAppBundle\Model\Cart\BundleBuyRequestBuilder;
 use MagentoEgypt\HubAppBundle\Model\Cart\BundleSelectionReader;
+use MagentoEgypt\HubAppBundle\Model\Cart\MarketplaceGate;
 use MagentoEgypt\HubAppBundle\Model\Cart\SuperAttributeKeeper;
 use Psr\Log\LoggerInterface;
 
@@ -38,6 +39,11 @@ use Psr\Log\LoggerInterface;
  *     and a guest reaching a customer cart; the cart is locked (QuoteMutex)
  *     while the line is added;
  *   - the product must be a bundle or new_bundle of this website, saleable;
+ *   - the marketplace's add-to-cart rule, which the website applies in an
+ *     observer of checkout_cart_product_add_before that Quote::addProduct()
+ *     never triggers (MarketplaceGate): the bundle approved, of an active
+ *     seller and shown in the store view (else "not found"), every selected
+ *     product approved and of an active seller;
  *   - product-level problems come back in user_errors with core's error codes
  *     and the cart unchanged; cart-level ones (unknown cart, not yours) throw.
  *
@@ -58,6 +64,7 @@ class AddBundleToCart implements ResolverInterface
         private readonly BundleSelectionReader $selectionReader,
         private readonly BundleBuyRequestBuilder $buyRequestBuilder,
         private readonly SuperAttributeKeeper $superAttributeKeeper,
+        private readonly MarketplaceGate $marketplaceGate,
         private readonly AddProductsToCartError $errorFactory,
         private readonly DataObjectFactory $dataObjectFactory,
         private readonly LoggerInterface $logger
@@ -102,7 +109,8 @@ class AddBundleToCart implements ResolverInterface
         $quantity = isset($input['quantity']) ? (float) $input['quantity'] : 1.0;
 
         $product = $this->loadBundle($sku, $cart);
-        if ($product === null) {
+        //  Unapproved, or its seller inactive: as unknown as on the website.
+        if ($product === null || !$this->marketplaceGate->allowsBundle((int) $product->getId(), $storeId)) {
             return $this->output($cart, [
                 $this->error(
                     self::ERROR_PRODUCT_NOT_FOUND,
@@ -116,15 +124,21 @@ class AddBundleToCart implements ResolverInterface
             ]);
         }
 
+        $bundleSelections = $this->selectionReader->forBundle($product);
         try {
             $request = $this->buyRequestBuilder->build(
                 (int) $product->getId(),
                 $quantity,
                 array_values((array) ($input['selections'] ?? [])),
-                $this->selectionReader->forBundle($product)
+                $bundleSelections
             );
         } catch (LocalizedException $e) {
             return $this->output($cart, [$this->error(self::ERROR_INVALID_VALUE, $e->getMessage())]);
+        }
+        if (!$this->marketplaceGate->allowsSelections(MarketplaceGate::selectedProductIds($request, $bundleSelections))) {
+            return $this->output($cart, [
+                $this->error(self::ERROR_INVALID_VALUE, (string) __('The options you selected are not available.')),
+            ]);
         }
 
         $buyRequest = $this->dataObjectFactory->create(['data' => $request]);
