@@ -44,12 +44,11 @@ class SearchFacets
     }
 
     /**
-     * Vendors whose company name matches.
+     * Approved vendors whose displayed name or seller code matches.
      *
      * Read straight off ves_vendor_entity rather than through the Vnecoms vendor
      * collection: that collection loads the full EAV row set per vendor, and this
-     * can run on keystrokes. There are 25 vendor rows on this install, so a LIKE
-     * against a plain column is the cheapest correct answer.
+     * can run on keystrokes.
      *
      * @return array<int, array{id:int,name:string,url:string,city:?string}>
      */
@@ -71,29 +70,48 @@ class SearchFacets
              * STATUS_APPROVED is 2, not 1. Vnecoms numbers these pending=1,
              * approved=2, disabled=3, expired=4 — filtering on 1 offers vendors
              * who have not been approved and hides every real one.
+             *
+             * Matched on the name the storefront SHOWS (VendorNames: company, else the
+             * seller code, localised) and on the seller code, not on the raw company
+             * column: a seller shown as "V8S2" or "Test 1" (company "0" or blank) could
+             * never be found by that name, and "Test 1" is the biggest seller here.
+             * All approved rows are read (25 on this install) and matched in PHP.
              */
             $select = $connection->select()
-                ->from($this->resource->getTableName('ves_vendor_entity'), ['vendor_id', 'company', 'city'])
-                ->where('company LIKE ?', '%' . $this->escapeLike($query) . '%')
-                ->where('status = ?', \Vnecoms\Vendors\Model\Vendor::STATUS_APPROVED)
-                ->limit($limit);
+                ->from($this->resource->getTableName('ves_vendor_entity'), ['entity_id', 'vendor_id', 'company', 'city'])
+                ->where('status = ?', \Vnecoms\Vendors\Model\Vendor::STATUS_APPROVED);
+
+            $names = \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\MagentoEgypt\HomeSections\ViewModel\VendorNames::class);
+            $needle = mb_strtolower($query, 'UTF-8');
 
             $out = [];
             foreach ($connection->fetchAll($select) as $row) {
-                $name = trim((string) $row['company']);
-                //  "0" or "." is not a name (V3S2/V8S2, V2S2); the storefront shows them by seller
-                //  code, so a search must not offer a seller card titled "0" or "."
-                if (!\MagentoEgypt\HomeSections\ViewModel\VendorNames::isName($name)) {
+                $name = trim((string) $names->getName((int) $row['entity_id']));
+                if ($name === '') {
+                    continue;
+                }
+                $haystacks = [$name, (string) $row['vendor_id'], (string) $row['company']];
+                $hit = false;
+                foreach ($haystacks as $haystack) {
+                    if ($haystack !== '' && mb_strpos(mb_strtolower($haystack, 'UTF-8'), $needle) !== false) {
+                        $hit = true;
+                        break;
+                    }
+                }
+                if (!$hit) {
                     continue;
                 }
                 $out[] = [
-                    'id'   => (int) $row['vendor_id'],
+                    'id'   => (int) $row['entity_id'],
                     'name' => $name,
                     // /shop/<vendor_id>, the pattern the homepage store cards use.
                     'url'  => $this->url->getUrl('shop/' . $row['vendor_id']),
                     'city' => ($row['city'] ?? '') !== '' ? (string) $row['city'] : null,
                 ];
             }
+            usort($out, static fn (array $a, array $b): int => strnatcasecmp($a['name'], $b['name']));
+            $out = array_slice($out, 0, $limit);
 
             return $this->vendorCache[$key] = $out;
         } catch (\Throwable $e) {

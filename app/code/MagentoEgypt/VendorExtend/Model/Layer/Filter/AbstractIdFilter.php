@@ -36,6 +36,9 @@ abstract class AbstractIdFilter extends AbstractFilter
     /** @var int[]|null Product ids in the CURRENT result set, memoised per request. */
     private ?array $hmScope = null;
 
+    /** @var array<int, int[]> The same list, shared by the filters that read one collection. */
+    private static array $hmScopeByCollection = [];
+
     public function __construct(
         ItemFactory $filterItemFactory,
         StoreManagerInterface $storeManager,
@@ -157,22 +160,48 @@ abstract class AbstractIdFilter extends AbstractFilter
     }
 
     /**
-     * The ids the shopper is currently looking at, so counts describe THIS page
-     * rather than the whole catalogue.
+     * The ids of the WHOLE current result (every page), so counts describe what the shopper
+     * is filtering rather than the whole catalogue.
+     *
+     * Not getAllIds() on the page's own collection: the search engine (Algolia here, OpenSearch
+     * before it) returns one page of hits, so that list held only the products on screen. On
+     * /en/clothes.html the Vendors filter said "V8S2 1 item" on page 1 and the filtered result
+     * then showed 2. A copy of the collection with Mageplaza's get-all-data switch asks the
+     * engine for every hit (up to Mageplaza's 1000), the way its own price slider does; the result
+     * is shared by the three filters on the page, so it is one extra search, not three.
      *
      * @return int[]
      */
     protected function hmScopeIds(): array
     {
-        if ($this->hmScope === null) {
+        if ($this->hmScope !== null) {
+            return $this->hmScope;
+        }
+        $collection = $this->getLayer()->getProductCollection();
+        $key = spl_object_id($collection);
+        if (isset(self::$hmScopeByCollection[$key])) {
+            return $this->hmScope = self::$hmScopeByCollection[$key];
+        }
+
+        $ids = null;
+        if (method_exists($collection, 'getCollectionClone')) {
             try {
-                $this->hmScope = array_map('intval', $this->getLayer()->getProductCollection()->getAllIds());
+                $all = $collection->getCollectionClone()->setGetAllData(true);
+                $all->getSize();    // runs the engine search and applies its ids to the SELECT
+                $ids = array_map('intval', $all->getAllIds());
             } catch (\Throwable $e) {
-                $this->hmScope = [];
+                $ids = null;
+            }
+        }
+        if ($ids === null) {
+            try {
+                $ids = array_map('intval', $collection->getAllIds());
+            } catch (\Throwable $e) {
+                $ids = [];
             }
         }
 
-        return $this->hmScope;
+        return $this->hmScope = self::$hmScopeByCollection[$key] = $ids;
     }
 
     protected function hmStoreId(): int
