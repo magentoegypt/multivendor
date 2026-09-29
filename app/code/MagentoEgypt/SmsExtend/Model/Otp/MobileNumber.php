@@ -14,7 +14,7 @@ namespace MagentoEgypt\SmsExtend\Model\Otp;
  *
  * canonical() understands:
  *  - Egypt (+20, 10-digit national numbers starting with 1): 1XXXXXXXXX, 01XXXXXXXXX, 201XXXXXXXXX,
- *    0201XXXXXXXXX, with or without "+" (unchanged);
+ *    0201XXXXXXXXX, with or without "+" (unchanged), and 00201XXXXXXXXX ("00" international prefix);
  *  - UAE mobiles (+971, 9-digit national numbers starting with 5): 5XXXXXXXX, 05XXXXXXXX,
  *    9715XXXXXXXX, 009715XXXXXXXX, all to +9715XXXXXXXX. With a "+" only after a "0" ("+05...",
  *    "+009715..."): no country code starts with 0, so such a "+" never dials anything else;
@@ -113,6 +113,8 @@ final class MobileNumber
             $national = substr($digits, 2);            // 20XXXXXXXXXX
         } elseif (strlen($digits) === 13 && str_starts_with($digits, '0' . self::EGYPT)) {
             $national = substr($digits, 3);            // 020XXXXXXXXXX
+        } elseif (strlen($digits) === 14 && str_starts_with($digits, '00' . self::EGYPT)) {
+            $national = substr($digits, 4);            // 0020XXXXXXXXXX
         } elseif (strlen($digits) === 11 && $digits[0] === '0') {
             $national = substr($digits, 1);            // 0XXXXXXXXXX
         }
@@ -153,8 +155,11 @@ final class MobileNumber
         $digits = self::digits((string) $canonical);
         if (strlen($digits) === 12 && str_starts_with($digits, self::EGYPT . '1')) {
             $n = substr($digits, 2);
-            //  "020...", "+020...", "+0..." and "+1..." were matched before only as MySQL numbers.
-            return ['+20' . $n, '20' . $n, '0' . $n, $n, '020' . $n, '+020' . $n, '+0' . $n, '+' . $n];
+            //  "020...", "0020...", "+0..." and "+1..." were matched before only as MySQL numbers.
+            return [
+                '+20' . $n, '20' . $n, '0' . $n, $n,
+                '020' . $n, '+020' . $n, '0020' . $n, '+0020' . $n, '+0' . $n, '+' . $n,
+            ];
         }
         if (strlen($digits) === 12 && str_starts_with($digits, self::UAE . '5')) {
             $n = substr($digits, 3);
