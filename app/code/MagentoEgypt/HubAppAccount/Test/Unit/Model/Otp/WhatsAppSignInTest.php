@@ -107,12 +107,14 @@ class WhatsAppSignInTest extends TestCase
 
     public function testTypedSpellingNeverReceivesTheCode(): void
     {
-        //  The Belize case: "+501234567" matches an account stored bare as "501234567".
+        //  The Belize case: an account found for the typed "+501234567" (the fake lookup forces the match
+        //  the real one no longer makes) stores the bare UAE mobile "501234567". The code goes to that
+        //  account's own number, +971501234567, never to the typed +501 (Belize) spelling.
         $this->otp->accounts = ['+501234567' => [8 => '501234567']];
 
         $answer = $this->signIn()->sendCode('+501234567', '10.0.0.1');
 
-        self::assertSame([], $this->otp->sent);
+        self::assertSame(['+971501234567'], $this->otp->sent);
         self::assertSame(self::UNIFORM, $answer['message']);
         self::assertTrue($answer['sent']);
     }
@@ -141,7 +143,7 @@ class WhatsAppSignInTest extends TestCase
         $this->config[WhatsAppSignIn::XML_REVEAL_UNKNOWN] = '1';
         $this->otp->accounts = [
             '+971501234567' => [31 => '+971501234567'],
-            '+501234567' => [8 => '501234567'],
+            '+447911123456' => [8 => '447911123456'],
         ];
         $signIn = $this->signIn();
 
@@ -153,7 +155,8 @@ class WhatsAppSignInTest extends TestCase
         self::assertFalse($unknown['sent']);
         self::assertSame('No account uses this mobile number.', $unknown['message']);
 
-        $undeliverable = $signIn->sendCode('+501234567', '10.0.0.3');
+        //  A bare foreign number has no canonical form: nothing is sent, never guessed.
+        $undeliverable = $signIn->sendCode('+447911123456', '10.0.0.3');
         self::assertFalse($undeliverable['sent']);
         self::assertStringContainsString('sign in with your email address', $undeliverable['message']);
         self::assertSame(['+971501234567'], $this->otp->sent);

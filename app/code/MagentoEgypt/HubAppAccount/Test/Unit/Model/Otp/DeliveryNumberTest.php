@@ -27,10 +27,10 @@ class DeliveryNumberTest extends TestCase
 
     public function testBareStoredNumberIsNeverDeliveredToTheBelizeSpelling(): void
     {
-        //  "+501234567" matches an account stored as bare "501234567" (explicit-foreign candidates),
-        //  but the code must not go to +501 (Belize): the stored number has no canonical form.
+        //  A bare "501234567" is a UAE mobile: its code goes to +971501234567, never to +501 (Belize).
+        //  (The typed "+501234567" no longer even matches it: SmsExtend's MobileNumberTest.)
         self::assertSame(
-            ['reason' => DeliveryNumber::UNDELIVERABLE, 'number' => null, 'customer_id' => 7],
+            ['reason' => DeliveryNumber::OK, 'number' => '+971501234567', 'customer_id' => 7],
             $this->delivery->resolve([7 => '501234567'])
         );
     }
@@ -43,8 +43,12 @@ class DeliveryNumberTest extends TestCase
         return [
             'UAE, international' => ['+971501234567', '+971501234567'],
             'UAE, international with spaces' => ['+971 50 123 4567', '+971501234567'],
-            'UAE without "+": refused, never guessed' => ['971501234567', null],
-            'UAE national: refused' => ['0501234567', null],
+            'UAE without "+"' => ['971501234567', '+971501234567'],
+            'UAE national' => ['0501234567', '+971501234567'],
+            'UAE national with separators' => ['050-123-4567', '+971501234567'],
+            'UAE 00' => ['00971501234567', '+971501234567'],
+            'UAE 9 digits' => ['501234567', '+971501234567'],
+            'bare foreign number: refused, never guessed' => ['447911123456', null],
             'Egypt national' => ['01001234567', '+201001234567'],
             'Egypt bare' => ['1001234567', '+201001234567'],
             'Egypt 20...' => ['201001234567', '+201001234567'],
@@ -88,6 +92,11 @@ class DeliveryNumberTest extends TestCase
             'UAE without "+" typed' => ['971501234567', '+971501234567'],
             'UAE with spaces typed' => ['+971 50 123 4567', '+971501234567'],
             '"+0..." typed, national stored' => ['+01001234567', '01001234567'],
+            'UAE national typed, E.164 stored' => ['0501234567', '+971501234567'],
+            'UAE E.164 typed, national stored' => ['+971501234567', '0501234567'],
+            'UAE 9 digits typed, 00971 stored' => ['501234567', '00971501234567'],
+            'UAE 971 typed, 9 digits stored' => ['971501234567', '501234567'],
+            'UAE "+0..." typed, national stored' => ['+0501234567', '0501234567'],
         ];
     }
 
@@ -107,5 +116,8 @@ class DeliveryNumberTest extends TestCase
         self::assertSame('201001234567', $this->delivery->numberKey('+20 100 123 4567'));
         self::assertSame('971501234567', $this->delivery->numberKey('+971501234567'));
         self::assertSame('971501234567', $this->delivery->numberKey('971501234567'));
+        self::assertSame('971501234567', $this->delivery->numberKey('0501234567'));
+        self::assertSame('971501234567', $this->delivery->numberKey('501234567'));
+        self::assertSame('501234567', $this->delivery->numberKey('+501234567'));
     }
 }

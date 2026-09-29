@@ -79,15 +79,17 @@ class WhatsAppManagement implements WhatsAppInterface
      *
      * The typed number only FINDS the account (getCustomersByMobile(), the same match verifyOtp() uses, accepts any
      * stored spelling). The code used to be sent to the typed string itself, so a spelling that matched an account
-     * without being that account's number received the account's code: a number stored bare as "501234567" matches
+     * without being that account's number received the account's code: a number stored bare as "501234567" matched
      * "+501234567" (explicit-foreign branch of Otp::normalizeMobileCandidates), and the code went to +501 (Belize).
      * Whoever held that number could sign in as the customer, or set a new password through FORGOTPASS.
      *
-     * Now it goes only to Otp::canonicalizeMobileForDelivery(<number stored on the account>). Nothing is sent when no
-     * account or several accounts match (verifyOtp never signs anyone in on an ambiguous number), or when the stored
-     * number has no canonical form (neither Egyptian nor "+<country code>..."): refused, never guessed; that customer
-     * signs in by e-mail until the stored number is corrected. The OTP cache key is unchanged for every account that
-     * does get a code: the canonical stored number and the typed spelling that matched it reduce to the same digits.
+     * Now it goes only to Otp::canonicalizeMobileForDelivery(<number stored on the account>): Egyptian and UAE
+     * spellings in international form ("0501234567" -> +971501234567), "+<country code>..." as dialled
+     * (MobileNumber::canonical). Nothing is sent when no account or several accounts match (verifyOtp never signs
+     * anyone in on an ambiguous number), or when the stored number has no canonical form: refused, never guessed;
+     * that customer signs in by e-mail until the stored number is corrected. The OTP cache key is the same for the
+     * account's canonical number and for every typed spelling that matches it (MobileNumber::candidates only returns
+     * spellings with the typed number's key), so verifyOtp() with the typed number finds the code.
      *
      * The caller gets the same success answer in every case, including the resend cooldown (which only accounts can
      * hit): "Mobile number not found." told anyone which numbers belong to an account.
