@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace MagentoEgypt\HubAppAccount\Test\Unit\Model\Otp;
 
-use Magento\Framework\App\CacheInterface;
 use MagentoEgypt\HubAppAccount\Model\Otp\SendThrottle;
 use PHPUnit\Framework\TestCase;
 
@@ -65,50 +64,5 @@ class SendThrottleTest extends TestCase
         $key = (string) array_key_first($this->cache->entries);
         self::assertStringNotContainsString('971501234567', $key);
         self::assertSame([SendThrottle::CACHE_TAG], $this->cache->tags[$key]);
-    }
-}
-
-/**
- * In-memory CacheInterface for the test.
- */
-class MemoryCache implements CacheInterface
-{
-    /** @var array<string, string> */
-    public array $entries = [];
-
-    /** @var array<string, string[]> */
-    public array $tags = [];
-
-    public function getFrontend()
-    {
-        return null;
-    }
-
-    public function load($identifier)
-    {
-        return $this->entries[$identifier] ?? false;
-    }
-
-    public function save($data, $identifier, $tags = [], $lifeTime = null)
-    {
-        $this->entries[$identifier] = (string) $data;
-        $this->tags[$identifier] = $tags;
-
-        return true;
-    }
-
-    public function remove($identifier)
-    {
-        unset($this->entries[$identifier], $this->tags[$identifier]);
-
-        return true;
-    }
-
-    public function clean($tags = [])
-    {
-        $this->entries = [];
-        $this->tags = [];
-
-        return true;
     }
 }

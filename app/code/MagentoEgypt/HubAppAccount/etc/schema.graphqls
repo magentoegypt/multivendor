@@ -18,6 +18,12 @@ type Mutation {
     hmUnregisterDevice(
         input: HmUnregisterDeviceInput! @doc(description: "Device.")
     ): HmDeviceOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\UnregisterDevice") @doc(description: "Deactivate the token for this caller. Idempotent.")
+    hmSendWhatsAppCode(
+        input: HmSendWhatsAppCodeInput! @doc(description: "Number.")
+    ): HmSendWhatsAppCodeOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SendWhatsAppCode") @doc(description: "Send a LOGIN code to the matching account's stored number. Anonymous.")
+    hmSignInWithWhatsAppCode(
+        input: HmSignInWithWhatsAppCodeInput! @doc(description: "Number and code.")
+    ): CustomerToken! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SignInWithWhatsAppCode") @doc(description: "Exchange a code for a customer token; failures count toward lockout. Anonymous.")
 }
 
 type Cart {
@@ -78,4 +84,19 @@ input HmUnregisterDeviceInput @doc(description: "Device removal.") {
 
 type HmDeviceOutput @doc(description: "Result.") {
     success: Boolean! @doc(description: "Always true unless input is invalid.")
+}
+
+input HmSendWhatsAppCodeInput @doc(description: "Send code.") {
+    mobile: String! @doc(description: "E.164 number, e.g. +9715XXXXXXXX.")
+}
+
+type HmSendWhatsAppCodeOutput @doc(description: "Send result.") {
+    sent: Boolean! @doc(description: "True; also for unknown numbers unless hubapp/otp/reveal_unknown_number.")
+    message: String! @doc(description: "Localised message to show.")
+    resend_after_seconds: Int! @doc(description: "Cooldown before the next request.")
+}
+
+input HmSignInWithWhatsAppCodeInput @doc(description: "Sign-in.") {
+    mobile: String! @doc(description: "Same number as sent.")
+    code: String! @doc(description: "6-digit code.")
 }
