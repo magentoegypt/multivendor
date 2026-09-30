@@ -123,6 +123,7 @@ for s in en ar; do
   get "$s" app-home '{"audience":"CUSTOMER"}'
   get "$s" app-home-stores '{"audience":"GUEST"}'
   get "$s" deals
+  get "$s" deals '{"sort":"PRICE_ASC","min_discount_percent":10}'
   get "$s" best-sellers
   get "$s" bundle-deals
   get "$s" brands

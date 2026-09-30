@@ -47,7 +47,10 @@ type Query {
     ): HmHome! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Home") @doc(description: "Active, in-schedule Home sections in admin order with their content; empty sections are omitted. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\HomeIdentity")
     hmDeals(
         pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
-        currentPage: Int = 1 @doc(description: "Page number from 1.")
+        currentPage: Int = 1 @doc(description: "Page number from 1."),
+        category_id: Int @doc(description: "Only deals in this category or below it, e.g. a department id from categories."),
+        min_discount_percent: Int @doc(description: "Only offers of at least this percentage off, 0-100; 0 keeps every offer."),
+        sort: HmDealSort @doc(description: "Order; DISCOUNT when omitted. Write it inline.")
     ): HmProductPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Deals") @doc(description: "Products whose special price is live today (store timezone), deepest percentage discount first.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\ProductPageIdentity")
     hmBestSellers(
         pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
@@ -73,6 +76,14 @@ enum HmPlatform @doc(description: "Mobile platform.") {
 enum HmAudience @doc(description: "Who the Home is for.") {
     GUEST @doc(description: "Not signed in.")
     CUSTOMER @doc(description: "Signed-in customer.")
+}
+
+enum HmDealSort @doc(description: "Order of hmDeals, applied to the whole day's ranking.") {
+    DISCOUNT @doc(description: "Deepest percentage discount first, a bundle by its percent special price: the ranking itself.")
+    PRICE_ASC @doc(description: "Lowest indexed guest price first.")
+    PRICE_DESC @doc(description: "Highest indexed guest price first.")
+    ENDING_SOON @doc(description: "Soonest special_to_date first; offers without an end last.")
+    NEWEST @doc(description: "Newest products first, as the storefront's Newest sort: created_at, then id.")
 }
 
 enum HmSectionType @doc(description: "Home section kind (admin Type field).") {
@@ -268,6 +279,7 @@ type HmProductPage @doc(description: "Ranked products page.") {
     total_count: Int! @doc(description: "Ranked products available (capped at 200).")
     page_info: SearchResultPageInfo! @doc(description: "Paging.")
     countdown_ends_at: String @doc(description: "hmDeals: soonest offer end on this page.")
+    categories: [HmCategoryCount!] @doc(description: "hmDeals: departments, the active top-level categories, of the deals matching every filter but category_id, catalogue order, with counts; empty when fewer than two. Null for other lists.")
 }
 
 type HmBundleDeal @doc(description: "Bundle card.") {
