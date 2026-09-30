@@ -12,6 +12,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthenticationException;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use MagentoEgypt\HubAppAccount\Model\Otp\DeliveryNumber;
+use MagentoEgypt\HubAppAccount\Model\Otp\OtpSendStatus;
 use MagentoEgypt\HubAppAccount\Model\Otp\WhatsAppSignIn;
 use MagentoEgypt\SmsExtend\Api\WhatsAppInterface;
 use MagentoEgypt\SmsExtend\Helper\Otp;
@@ -30,6 +31,14 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
 class WhatsAppSignInTest extends TestCase
 {
     private const UNIFORM = 'If this number belongs to an account, we have sent a sign-in code to it on WhatsApp.';
+
+    /** The one answer while hubapp/otp/reveal_unknown_number is off. */
+    private const MASKED_ANSWER = [
+        'sent' => true,
+        'status' => OtpSendStatus::MASKED,
+        'message' => self::UNIFORM,
+        'resend_after_seconds' => 45,
+    ];
 
     private FakeOtp $otp;
 
@@ -99,7 +108,7 @@ class WhatsAppSignInTest extends TestCase
         $answer = $this->signIn()->sendCode('971501234567', '10.0.0.1');
 
         self::assertSame(['+971501234567'], $this->otp->sent);
-        self::assertSame(['sent' => true, 'message' => self::UNIFORM, 'resend_after_seconds' => 45], $answer);
+        self::assertSame(self::MASKED_ANSWER, $answer);
     }
 
     public function testUnknownNumberGetsTheSameAnswerAndNothingIsSent(): void
@@ -107,7 +116,7 @@ class WhatsAppSignInTest extends TestCase
         $answer = $this->signIn()->sendCode('+971509999999', '10.0.0.1');
 
         self::assertSame([], $this->otp->sent);
-        self::assertSame(['sent' => true, 'message' => self::UNIFORM, 'resend_after_seconds' => 45], $answer);
+        self::assertSame(self::MASKED_ANSWER, $answer);
     }
 
     public function testTypedSpellingNeverReceivesTheCode(): void
@@ -137,10 +146,35 @@ class WhatsAppSignInTest extends TestCase
         $this->otp->accounts = ['+971501234567' => [31 => '+971501234567']];
         $this->otp->cooldown = true;
 
-        self::assertSame(
-            ['sent' => true, 'message' => self::UNIFORM, 'resend_after_seconds' => 45],
-            $this->signIn()->sendCode('+971501234567', '10.0.0.1')
-        );
+        self::assertSame(self::MASKED_ANSWER, $this->signIn()->sendCode('+971501234567', '10.0.0.1'));
+    }
+
+    public function testWithoutTheRevealSettingNoStatusTellsWhetherTheNumberHasAnAccount(): void
+    {
+        //  Known, unknown, shared, undeliverable, inside the cooldown, a gateway error: one answer.
+        $this->otp->accounts = [
+            '+971501234567' => [31 => '+971501234567'],
+            '+971502222222' => [1 => '+971502222222', 2 => '971502222222'],
+            '+447911123456' => [8 => '447911123456'],
+            '+971503333333' => [40 => '+971503333333'],
+        ];
+        $signIn = $this->signIn();
+        $answers = [
+            $signIn->sendCode('+971501234567', '10.0.0.1'),
+            $signIn->sendCode('+971509999999', '10.0.0.2'),
+            $signIn->sendCode('+971502222222', '10.0.0.3'),
+            $signIn->sendCode('+447911123456', '10.0.0.4'),
+        ];
+        $this->otp->cooldown = true;
+        $answers[] = $signIn->sendCode('+971501234567', '10.0.0.5');
+        $this->otp->cooldown = false;
+        $this->otp->failure = true;
+        $answers[] = $signIn->sendCode('+971503333333', '10.0.0.6');
+
+        foreach ($answers as $answer) {
+            self::assertSame(self::MASKED_ANSWER, $answer);
+        }
+        self::assertSame(OtpSendStatus::WITHOUT_REVEAL, [OtpSendStatus::THROTTLED, OtpSendStatus::MASKED]);
     }
 
     public function testRevealModeNamesTheReason(): void
@@ -149,22 +183,59 @@ class WhatsAppSignInTest extends TestCase
         $this->otp->accounts = [
             '+971501234567' => [31 => '+971501234567'],
             '+447911123456' => [8 => '447911123456'],
+            '+971502222222' => [1 => '+971502222222', 2 => '971502222222'],
         ];
         $signIn = $this->signIn();
 
         $known = $signIn->sendCode('+971501234567', '10.0.0.1');
         self::assertTrue($known['sent']);
+        self::assertSame(OtpSendStatus::SENT, $known['status']);
         self::assertSame('We have sent a sign-in code to your WhatsApp.', $known['message']);
 
         $unknown = $signIn->sendCode('+971509999999', '10.0.0.2');
         self::assertFalse($unknown['sent']);
+        self::assertSame(OtpSendStatus::NO_ACCOUNT, $unknown['status']);
         self::assertSame('No account uses this mobile number.', $unknown['message']);
 
         //  A bare foreign number has no canonical form: nothing is sent, never guessed.
         $undeliverable = $signIn->sendCode('+447911123456', '10.0.0.3');
         self::assertFalse($undeliverable['sent']);
+        self::assertSame(OtpSendStatus::UNDELIVERABLE, $undeliverable['status']);
         self::assertStringContainsString('sign in with your email address', $undeliverable['message']);
+
+        $shared = $signIn->sendCode('+971502222222', '10.0.0.4');
+        self::assertFalse($shared['sent']);
+        self::assertSame(OtpSendStatus::MULTIPLE, $shared['status']);
+        self::assertStringContainsString('more than one account', $shared['message']);
+
         self::assertSame(['+971501234567'], $this->otp->sent);
+    }
+
+    public function testRevealModeTellsTheCooldownAndAFailedSendApart(): void
+    {
+        $this->config[WhatsAppSignIn::XML_REVEAL_UNKNOWN] = '1';
+        $this->otp->accounts = ['+971501234567' => [31 => '+971501234567']];
+        $this->otp->cooldown = true;
+
+        //  The code sent within the resend period still works: sent, but no new one.
+        $cooling = $this->signIn()->sendCode('+971501234567', '10.0.0.1');
+        self::assertSame(
+            [
+                'sent' => true,
+                'status' => OtpSendStatus::COOLDOWN,
+                'message' => 'We have already sent a sign-in code to your WhatsApp. Use that code, or ask for another in a moment.',
+                'resend_after_seconds' => 45,
+            ],
+            $cooling
+        );
+        self::assertSame([], $this->otp->sent);
+
+        $this->otp->cooldown = false;
+        $this->otp->failure = true;
+        $failed = $this->signIn()->sendCode('+971501234567', '10.0.0.2');
+        self::assertFalse($failed['sent']);
+        self::assertSame(OtpSendStatus::FAILED, $failed['status']);
+        self::assertSame('We couldn\'t send the code. Please try again in a few minutes.', $failed['message']);
     }
 
     public function testPerNumberLimitCountsEverySpellingAndUnknownNumbersToo(): void
@@ -177,7 +248,32 @@ class WhatsAppSignInTest extends TestCase
         $limited = $signIn->sendCode('201001234567', '10.0.0.3');
 
         self::assertFalse($limited['sent']);
+        self::assertSame(OtpSendStatus::THROTTLED, $limited['status']);
         self::assertGreaterThan(0, $limited['resend_after_seconds']);
+    }
+
+    public function testALimitIsThrottledWhateverTheRevealSettingAndTheNumber(): void
+    {
+        foreach (['0', '1'] as $reveal) {
+            $this->config[WhatsAppSignIn::XML_REVEAL_UNKNOWN] = $reveal;
+            $this->config[OtpGuard::XML_SEND_LIMIT_NUMBER] = '1';
+            $this->otp->accounts = ['+971501234567' => [31 => '+971501234567']];
+            //  A fresh guard (fresh counters) per setting.
+            $signIn = $this->signIn();
+            $signIn->sendCode('+971501234567', '10.0.0.1');
+            $signIn->sendCode('+971509999999', '10.0.0.1');
+
+            foreach (['+971501234567', '+971509999999'] as $number) {
+                $limited = $signIn->sendCode($number, '10.0.0.2');
+                self::assertFalse($limited['sent']);
+                self::assertSame(OtpSendStatus::THROTTLED, $limited['status']);
+                self::assertMatchesRegularExpression(
+                    '/^Too many code requests\. Please try again in \d+ minutes\.$/',
+                    $limited['message']
+                );
+                self::assertGreaterThan(0, $limited['resend_after_seconds']);
+            }
+        }
     }
 
     public function testPerAddressLimit(): void
@@ -186,7 +282,9 @@ class WhatsAppSignInTest extends TestCase
         $signIn = $this->signIn();
 
         self::assertTrue($signIn->sendCode('+971501111111', '10.0.0.9')['sent']);
-        self::assertFalse($signIn->sendCode('+971502222222', '10.0.0.9')['sent']);
+        $limited = $signIn->sendCode('+971502222222', '10.0.0.9');
+        self::assertFalse($limited['sent']);
+        self::assertSame(OtpSendStatus::THROTTLED, $limited['status']);
         self::assertTrue($signIn->sendCode('+971502222222', '10.0.0.10')['sent']);
     }
 
@@ -259,6 +357,9 @@ class FakeOtp extends Otp
 
     public bool $cooldown = false;
 
+    /** The send breaks for another reason than the cooldown. */
+    public bool $failure = false;
+
     public function __construct()
     {
     }
@@ -277,6 +378,9 @@ class FakeOtp extends Otp
     {
         if ($this->cooldown) {
             throw new LocalizedException(__('Please wait %1 seconds before requesting another code.', 30));
+        }
+        if ($this->failure) {
+            throw new \RuntimeException('WhatsApp gateway unreachable');
         }
         $this->sent[] = $mobileNum;
     }

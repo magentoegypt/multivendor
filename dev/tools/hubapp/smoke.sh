@@ -19,7 +19,7 @@
 #   HM_STORE=en                            Store header of the POST steps
 #
 # WhatsApp sign-in (S10) is run by hand with QA's own number: every send is a
-# real, paid WhatsApp message.
+# real, paid WhatsApp message (smoke/whatsapp-send.graphql).
 #
 # Needs bash, curl and jq (1.6+).
 set -euo pipefail
