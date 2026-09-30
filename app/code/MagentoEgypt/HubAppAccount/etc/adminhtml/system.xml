@@ -31,7 +31,7 @@
                 <field id="send_limit_ip_hour" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Code Requests per Address per Hour</label>
                     <validate>validate-digits</validate>
-                    <comment>App and seller app alike. 0 = no limit. Every request counts, sent or not. Behind a CDN the server must see the visitor's address, or all visitors share one limit.</comment>
+                    <comment>App and seller app alike. 0 (the default) = off. Turn it on only after checking that the server sees each visitor's own address, not the CDN's; otherwise all visitors share one limit. Suggested value once on: 10. Every request counts, sent or not.</comment>
                 </field>
                 <field id="send_limit_number_hour" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Code Requests per Mobile Number per Hour</label>
@@ -41,7 +41,7 @@
                 <field id="wrong_codes_ip_hour" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Wrong Codes per Address per Hour</label>
                     <validate>validate-digits</validate>
-                    <comment>App and seller app alike. 0 = no limit. A number without an account counts as a wrong code. Separately, 5 wrong codes for one number lock code sign-in for that number for 15 minutes; the customer's account and password sign-in are never locked by codes.</comment>
+                    <comment>App and seller app alike. 0 (the default) = off. Turn it on only after checking that the server sees each visitor's own address, not the CDN's; otherwise all visitors share one limit. Suggested value once on: 30. A number without an account counts as a wrong code. Separately, and always on, 5 wrong codes for one number lock code sign-in for that number for 15 minutes; the customer's account and password sign-in are never locked by codes.</comment>
                 </field>
             </group>
         </section>

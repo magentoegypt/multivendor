@@ -135,10 +135,11 @@ class WhatsAppManagement implements WhatsAppInterface
     /**
      * @inheritDoc
      *
-     * Every request of a known type first passes the hourly limits per client address and per number (OtpGuard, the
-     * same counters as the app's GraphQL): every code is a paid message, and the anonymous route used to have only
-     * the helper's 30-second cooldown per number. The limits count every request, with or without an account, so a
-     * limit answers alike for all numbers.
+     * Every request of a known type first passes the hourly limit per number, and per client address when that one
+     * is switched on (OtpGuard, the same counters as the app's GraphQL; the per-address limit is off by default,
+     * since behind a CDN every visitor can share one address): every code is a paid message, and the anonymous route
+     * used to have only the helper's 30-second cooldown per number. The limits count every request, with or without
+     * an account, so a limit answers alike for all numbers.
      */
     public function sendOtp($mobile, $type)
     {
@@ -200,7 +201,8 @@ class WhatsAppManagement implements WhatsAppInterface
      *
      * Checking a code:
      *  - codes have their own lock (OtpGuard): five wrong codes for a number within 15 minutes lock checks for that
-     *    number for 15 minutes, and each client address has an hourly budget of wrong codes. Wrong codes no longer
+     *    number for 15 minutes, and each client address can have an hourly budget of wrong codes (off by default,
+     *    like the per-address send limit). Wrong codes no longer
      *    count toward the customer's account lock: anyone could request codes for a victim and send ten wrong ones,
      *    which locked the account, password sign-in included, again every 30 seconds. A right code still clears
      *    that lock (LOGIN, FORGOTPASS), as before: it proves the caller holds the account's number;

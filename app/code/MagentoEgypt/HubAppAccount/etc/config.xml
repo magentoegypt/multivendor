@@ -4,6 +4,9 @@
     Answers do not reveal whether a number has an account; every code sent is a paid message.
     The limits apply to the seller app's REST codes too (MagentoEgypt_SmsExtend OtpGuard, which has the
     same defaults built in for when this module is not installed).
+    Per-address limits (send_limit_ip_hour, wrong_codes_ip_hour): 0 (the default) = off. Turn them on only
+    after checking that the server sees each visitor's own address, not the CDN's; otherwise all visitors
+    share one limit. Suggested values once on: 10 and 30. The per-number limits stay on.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
@@ -11,9 +14,9 @@
         <hubapp>
             <otp>
                 <reveal_unknown_number>0</reveal_unknown_number>
-                <send_limit_ip_hour>10</send_limit_ip_hour>
+                <send_limit_ip_hour>0</send_limit_ip_hour>
                 <send_limit_number_hour>5</send_limit_number_hour>
-                <wrong_codes_ip_hour>30</wrong_codes_ip_hour>
+                <wrong_codes_ip_hour>0</wrong_codes_ip_hour>
             </otp>
         </hubapp>
     </default>

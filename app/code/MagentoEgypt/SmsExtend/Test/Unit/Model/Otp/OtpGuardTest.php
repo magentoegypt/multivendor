@@ -35,7 +35,7 @@ class OtpGuardTest extends TestCase
         return new OtpGuard(new Throttle($this->cache), $this->cache, $this->config);
     }
 
-    public function testSendLimitsDefaultToTenPerAddressAndFivePerNumberWhenNothingIsStored(): void
+    public function testWithNothingStoredTheNumberLimitIsFiveAndTheAddressLimitIsOff(): void
     {
         $guard = $this->guard();
         for ($i = 0; $i < 5; $i++) {
@@ -43,11 +43,24 @@ class OtpGuardTest extends TestCase
         }
         self::assertGreaterThan(0, $guard->sendWait('+971501234567', '10.0.0.9', self::NOON), 'sixth for the number');
 
+        //  Off by default: behind a CDN every visitor can share one address.
+        self::assertSame(0, OtpGuard::DEFAULT_SEND_LIMIT_IP);
+        self::assertSame(0, OtpGuard::DEFAULT_WRONG_CODES_IP);
+        for ($i = 0; $i < 30; $i++) {
+            self::assertSame(0, $guard->sendWait(self::number($i), '10.0.1.1', self::NOON));
+        }
+    }
+
+    public function testTheAddressLimitAppliesOnceSwitchedOn(): void
+    {
+        $this->config->values = [OtpGuard::XML_SEND_LIMIT_IP => '10'];
+        $guard = $this->guard();
         for ($i = 0; $i < 10; $i++) {
             self::assertSame(0, $guard->sendWait('+97150000000' . $i, '10.0.1.1', self::NOON));
         }
         $eleventh = $guard->sendWait('+971509999999', '10.0.1.1', self::NOON);
         self::assertGreaterThan(0, $eleventh, 'eleventh for the address');
+        self::assertSame(0, $guard->sendWait('+971509999999', '10.0.1.2', self::NOON), 'another address');
     }
 
     public function testEverySpellingOfANumberIsOneNumber(): void
@@ -132,17 +145,33 @@ class OtpGuardTest extends TestCase
         self::assertSame(0, $guard->verifyWait('+971504444444', '10.0.0.1', self::NOON + 1800), 'next hour');
     }
 
-    public function testTheWrongCodeBudgetDefaultsToThirty(): void
+    public function testTheWrongCodeBudgetIsOffByDefaultAndCountsNothing(): void
     {
         $guard = $this->guard();
-        for ($i = 0; $i < 30; $i++) {
-            $guard->verifyFailed('+9715010000' . str_pad((string) $i, 2, '0', STR_PAD_LEFT), '10.0.0.7', self::NOON);
+        for ($i = 0; $i < 40; $i++) {
+            $guard->verifyFailed(self::number($i), '10.0.0.7', self::NOON);
         }
+
+        self::assertSame(0, $guard->verifyWait('+971509999999', '10.0.0.7', self::NOON));
+        //  One entry per number (its wrong codes), none for the address.
+        self::assertCount(40, $this->cache->entries);
+    }
+
+    public function testTheWrongCodeBudgetAppliesOnceSwitchedOn(): void
+    {
+        $this->config->values = [OtpGuard::XML_WRONG_CODES_IP => '30'];
+        $guard = $this->guard();
+        for ($i = 0; $i < 30; $i++) {
+            $guard->verifyFailed(self::number($i), '10.0.0.7', self::NOON);
+        }
+
         self::assertGreaterThan(0, $guard->verifyWait('+971509999999', '10.0.0.7', self::NOON));
     }
 
     public function testNoNumberInAnyCacheKey(): void
     {
+        //  The address limits are switched on so their counters exist too.
+        $this->config->values = [OtpGuard::XML_SEND_LIMIT_IP => '10', OtpGuard::XML_WRONG_CODES_IP => '30'];
         $guard = $this->guard();
         $guard->sendWait('+971501234567', '10.0.0.1', self::NOON);
         $guard->verifyFailed('+971501234567', '10.0.0.1', self::NOON);
@@ -152,5 +181,13 @@ class OtpGuardTest extends TestCase
             self::assertSame([Throttle::CACHE_TAG], $this->cache->tags[$key]);
         }
         self::assertCount(4, $this->cache->entries);
+    }
+
+    /**
+     * A distinct UAE mobile number for each $i below 100.
+     */
+    private static function number(int $i): string
+    {
+        return '+9715010000' . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
     }
 }

@@ -15,21 +15,28 @@ use MagentoEgypt\SmsExtend\Model\Throttle;
  * service /V1/whatsapp/otp/* (the seller app, WhatsAppManagement) and the app's GraphQL
  * (MagentoEgypt_HubAppAccount's WhatsAppSignIn). Both count on the same counters.
  *
- * Sending (every code is a paid message): an hourly limit per client address and per number, counted
- * for every request, so a limit answers alike for numbers with and without an account.
+ * Sending (every code is a paid message): an hourly limit per number, and optionally per client address,
+ * counted for every request, so a limit answers alike for numbers with and without an account.
  *
  * Checking: five wrong codes for a number within 15 minutes of each other lock code checks for that
- * number for 15 minutes (whatever the account, and whether or not it has one), and each address has an
- * hourly budget of wrong codes. This lock is the codes' own: it never touches the customer's account
+ * number for 15 minutes (whatever the account, and whether or not it has one), and each address can have
+ * an hourly budget of wrong codes. This lock is the codes' own: it never touches the customer's account
  * lock, so nobody can lock a customer out of password sign-in by sending wrong codes. A number with no
  * account, or with several, counts like a wrong code.
  *
  * The limits are the Hub Market App settings (Stores > Configuration > Magento Egypt > Hub Market App >
  * WhatsApp Codes), which MagentoEgypt_HubAppAccount declares; they are read here by path, so this module
- * needs no HubApp module, and when nothing is stored the defaults below apply. 0 switches a limit off
- * (e.g. while the server sees a CDN's addresses instead of the visitors'). Numbers are counted by their
- * OTP key (MobileNumber::key: every spelling of a number is that number); numbers and addresses are
- * hashed, never stored in a cache key.
+ * needs no HubApp module, and when nothing is stored the defaults below apply. 0 switches a limit off.
+ *
+ * The two per-address limits are 0 (the default) = off. Turn them on only after checking that the server
+ * sees each visitor's own address, not the CDN's; otherwise all visitors share one limit. The address is
+ * Magento's RemoteAddress (REMOTE_ADDR unless alternative headers are configured): behind a CDN that is
+ * the edge's address, so one busy hour would stop the codes of every seller and customer at once.
+ * Suggested values once on: 10 code requests and 30 wrong codes per address per hour. The per-number
+ * limits do not depend on the address and are on by default.
+ *
+ * Numbers are counted by their OTP key (MobileNumber::key: every spelling of a number is that number);
+ * numbers and addresses are hashed, never stored in a cache key.
  */
 class OtpGuard
 {
@@ -37,9 +44,11 @@ class OtpGuard
     public const XML_SEND_LIMIT_NUMBER = 'hubapp/otp/send_limit_number_hour';
     public const XML_WRONG_CODES_IP = 'hubapp/otp/wrong_codes_ip_hour';
 
-    public const DEFAULT_SEND_LIMIT_IP = 10;
+    /** Off until the server is known to see each visitor's own address (suggested once on: 10). */
+    public const DEFAULT_SEND_LIMIT_IP = 0;
     public const DEFAULT_SEND_LIMIT_NUMBER = 5;
-    public const DEFAULT_WRONG_CODES_IP = 30;
+    /** Off until the server is known to see each visitor's own address (suggested once on: 30). */
+    public const DEFAULT_WRONG_CODES_IP = 0;
 
     /** Wrong codes for one number that lock code checks for it. */
     public const NUMBER_FAILURES = 5;
@@ -113,7 +122,10 @@ class OtpGuard
     public function verifyFailed(string $mobile, string $clientIp, ?int $now = null): int
     {
         $now ??= time();
-        $this->throttle->hit('otp_wrong_ip', $clientIp, self::HOUR, $now);
+        if ($this->limit(self::XML_WRONG_CODES_IP, self::DEFAULT_WRONG_CODES_IP) > 0) {
+            //  Counted only while the budget is on, as the send limits are (Throttle::consume).
+            $this->throttle->hit('otp_wrong_ip', $clientIp, self::HOUR, $now);
+        }
 
         $state = $this->state($mobile);
         $failures = $now - $state['at'] > self::NUMBER_LOCK_SECONDS ? 1 : $state['n'] + 1;

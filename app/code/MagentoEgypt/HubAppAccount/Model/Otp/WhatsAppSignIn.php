@@ -22,9 +22,10 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
  * Signing in to the app with a code sent on WhatsApp (P2 design 9.5).
  *
  * sendCode():
- *  1. per-address and per-number hourly limits (hubapp/otp/send_limit_*), counted for every request,
- *     so a limit answers alike for numbers with and without an account. SmsExtend's OtpGuard applies
- *     them, on the same counters as the REST service the seller app uses (/V1/whatsapp/otp/send);
+ *  1. per-number and (when switched on; off by default) per-address hourly limits
+ *     (hubapp/otp/send_limit_*), counted for every request, so a limit answers alike for numbers with and
+ *     without an account. SmsExtend's OtpGuard applies them, on the same counters as the REST service
+ *     the seller app uses (/V1/whatsapp/otp/send);
  *  2. the account(s) the number matches (Otp::getCustomersByMobile, the match verifyOtp signs in with);
  *  3. the code goes only to the number stored on the one matching account, canonical form
  *     (DeliveryNumber), through Otp::sendOtp (its own resend cooldown, OTP keyed per number);
@@ -34,7 +35,7 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
  *
  * signIn(): WhatsAppManagement::verifyOtp($mobile, $code, LOGIN) does the work the website's REST
  * sign-in does: the codes' own lock (OtpGuard: five wrong codes lock code sign-in for the number for 15
- * minutes, never the account; a per-address budget of wrong codes), five wrong codes burn the code,
+ * minutes, never the account; an optional per-address budget of wrong codes), five wrong codes burn the code,
  * ambiguous numbers refused, a JWT from the current token issuer. Every failure answers the same, apart
  * from the lock, which answers alike for every number and says when to try again.
  *

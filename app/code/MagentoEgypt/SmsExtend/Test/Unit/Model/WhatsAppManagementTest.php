@@ -210,6 +210,23 @@ class WhatsAppManagementTest extends TestCase
         self::assertSame(['+971501234567', '+971501234567', '+971507777777', '+971507777777'], $this->otp->sendLog);
     }
 
+    public function testWithNothingConfiguredTwentyNumbersFromOneAddressAllGetTheirCodes(): void
+    {
+        //  Behind a CDN every seller can share one address: with nothing configured, the address is not limited.
+        $numbers = [];
+        for ($i = 0; $i < 20; $i++) {
+            $number = '+9715060000' . str_pad((string) $i, 2, '0', STR_PAD_LEFT);
+            $this->otp->accounts[100 + $i] = $number;
+            $numbers[] = $number;
+        }
+
+        foreach ($numbers as $number) {
+            $answer = $this->send($number, WhatsAppManagement::VENDOR_LOGIN);
+            self::assertSame('success', $answer->getData('status'), $number);
+        }
+        self::assertSame($numbers, $this->otp->sendLog, 'every code was sent, each to its own number');
+    }
+
     public function testThePerAddressSendLimit(): void
     {
         $this->config->values = [OtpGuard::XML_SEND_LIMIT_IP => '2'];
