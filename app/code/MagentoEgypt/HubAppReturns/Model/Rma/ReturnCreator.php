@@ -147,8 +147,9 @@ class ReturnCreator
                 $this->eventManager->dispatch('vnecoms_vendors_push_notification', [
                     'vendor_id' => $vendor->getId(),
                     'type' => 'rma',
+                    //  The website's message (Vnecoms VendorsRMA Customer\Save), spelling corrected.
                     'message' => __(
-                        'A new RMA #%1 has been submited',
+                        'A new RMA #%1 has been submitted',
                         '<strong>' . $request->getIncrementId() . '</strong>'
                     ),
                     'additional_info' => ['id' => $request->getId()],
