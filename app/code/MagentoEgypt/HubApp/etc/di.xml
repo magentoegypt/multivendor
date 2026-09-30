@@ -28,6 +28,23 @@
     <type name="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation" shared="true"/>
 
     <!--
+        hmAppConfig.capabilities: capability code => satellite module. The app
+        sends a satellite's fields only when its code is listed, and a code is
+        listed only while its module is enabled. A new satellite adds its own
+        item to this argument from its etc/di.xml.
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Config\Capabilities">
+        <arguments>
+            <argument name="modules" xsi:type="array">
+                <item name="vendors" xsi:type="string">MagentoEgypt_HubAppVendors</item>
+                <item name="bundle" xsi:type="string">MagentoEgypt_HubAppBundle</item>
+                <item name="returns" xsi:type="string">MagentoEgypt_HubAppReturns</item>
+                <item name="account" xsi:type="string">MagentoEgypt_HubAppAccount</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
         hmAppConfig.algolia issues the storefront's secured search key through the
         Algolia extension's own classes. Proxies: nothing of the extension is
         instantiated unless a key is actually issued (and never when the Algolia

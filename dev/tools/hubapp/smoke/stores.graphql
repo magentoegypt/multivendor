@@ -1,7 +1,7 @@
 # requires: HubAppVendors
-# S4 seller list (public, GET). Variables: {"sort":"TOP_RATED"} optional.
-query HmSmokeStores($sort: HmStoreSort, $pageSize: Int = 20, $currentPage: Int = 1) {
-  hmStores(sort: $sort, pageSize: $pageSize, currentPage: $currentPage) {
+# S4 seller list (public, GET). Variables: {"sort":"TOP_RATED"} optional, {"categoryId":34} optional.
+query HmSmokeStores($sort: HmStoreSort, $categoryId: Int, $pageSize: Int = 20, $currentPage: Int = 1) {
+  hmStores(filter: {category_id: $categoryId}, sort: $sort, pageSize: $pageSize, currentPage: $currentPage) {
     total_count
     page_info { current_page page_size total_pages }
     items {
@@ -16,6 +16,8 @@ query HmSmokeStores($sort: HmStoreSort, $pageSize: Int = 20, $currentPage: Int =
       is_featured
       joined_at
       link { type url code }
+      primary_category { id uid name count }
+      facet_value
     }
   }
 }

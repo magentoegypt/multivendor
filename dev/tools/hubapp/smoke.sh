@@ -118,9 +118,25 @@ check_features() {
   fi
 }
 
+# check_capabilities <store>: hmAppConfig.capabilities of the app-config body in $T/b.
+# The app asks for a satellite's fields (hm_seller on listing cards, the store page's
+# reviews, contact and chips) only when its code is listed here.
+check_capabilities() {
+  local store=$1 list
+  if skipped app-config; then return 0; fi
+  if ! jq -e '.data.hmAppConfig' "$T/b" >/dev/null 2>&1; then return 0; fi
+  list=$(jq -r '[.data.hmAppConfig.capabilities[]?] | join(" ")' "$T/b" 2>/dev/null || true)
+  if [[ -n $list ]]; then
+    echo "ok   S1 capabilities/$store: $list"
+  else
+    echo "WARN S1 capabilities/$store: none listed, the app sends no satellite fields"
+  fi
+}
+
 for s in en ar; do
   get "$s" app-config
   check_features "$s"
+  check_capabilities "$s"
   get "$s" app-config '{"platform":"ANDROID"}'
   get "$s" app-home '{"audience":"GUEST"}'
   get "$s" app-home '{"audience":"CUSTOMER"}'
@@ -130,6 +146,25 @@ for s in en ar; do
   get "$s" bundle-deals
   get "$s" brands
   get "$s" stores '{"sort":"TOP_RATED"}'
+
+  # S4b: the Stores chips. A chip's count is the number of sellers its list shows.
+  if ! skipped store-categories; then
+    get "$s" store-categories
+    chip=$(jq -r '.data.hmStoreCategories.items[0] | "\(.id) \(.count)"' "$T/b" 2>/dev/null || true)
+    if [[ -n $chip && $chip != "null null" ]]; then
+      read -r cid ccount <<<"$chip"
+      get "$s" stores "{\"categoryId\":$cid}"
+      listed=$(jq -r '.data.hmStores.total_count // empty' "$T/b" 2>/dev/null || true)
+      if [[ $listed == "$ccount" ]]; then
+        echo "ok   S4b chips/$s: category $cid holds $ccount sellers = its hmStores total"
+      else
+        echo "FAIL S4b chips/$s: category $cid chip says $ccount, hmStores category_id total $listed"
+        FAILS=$((FAILS + 1))
+      fi
+    else
+      echo "WARN S4b chips/$s: no category holds a seller"
+    fi
+  fi
 done
 
 # S5: a store page, and its products through the vendor_id (match) filter
@@ -137,6 +172,7 @@ if ! skipped store; then
   get en store "{\"code\":\"${HM_STORE_CODE:-loly}\"}"
   count=$(jq -r '.data.hmStore.card.product_count // empty' "$T/b" 2>/dev/null || true)
   id=$(jq -r '.data.hmStore.card.vendor_entity_id // empty' "$T/b" 2>/dev/null || true)
+  reviews=$(jq -r '.data.hmStore.card.review_count // empty' "$T/b" 2>/dev/null || true)
   if [[ -n $id ]]; then
     get en vendor-products "{\"id\":\"$id\"}"
     total=$(jq -r '.data.products.total_count // empty' "$T/b" 2>/dev/null || true)
@@ -146,6 +182,22 @@ if ! skipped store; then
       echo "FAIL S5 vendor_id filter: products total_count $total, card product_count $count"
       FAILS=$((FAILS + 1))
     fi
+  fi
+
+  # S5b: the store page's Reviews tab. Its summary is the card's rating (the same rule);
+  # the list holds only the reviews written in this store view, so it may be shorter.
+  if [[ -n $id ]] && ! skipped store-reviews; then
+    for s in en ar; do
+      get "$s" store-reviews "{\"code\":\"${HM_STORE_CODE:-loly}\"}"
+      summary=$(jq -r '.data.hmStoreReviews.summary.review_count // empty' "$T/b" 2>/dev/null || true)
+      listed=$(jq -r '.data.hmStoreReviews.total_count // empty' "$T/b" 2>/dev/null || true)
+      if [[ -n $summary && $summary == "$reviews" ]]; then
+        echo "ok   S5b reviews/$s: summary $summary = card review_count, $listed shown in this store view"
+      else
+        echo "FAIL S5b reviews/$s: summary review_count '$summary', card review_count '$reviews'"
+        FAILS=$((FAILS + 1))
+      fi
+    done
   fi
 fi
 
