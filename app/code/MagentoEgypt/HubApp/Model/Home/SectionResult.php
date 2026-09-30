@@ -23,6 +23,9 @@ namespace MagentoEgypt\HubApp\Model\Home;
  *                are added by the builder from productIds.
  * - defaultTitle / defaultMoreLink: used when the admin left title / more URL empty
  *                (e.g. a category rail falls back to the category's name and page).
+ * - placement:   a section with no content of its own (SectionType::PLACEMENT_TYPES):
+ *                it only says where the app draws the viewer's own data, so it is
+ *                never "empty" and is sent as it is.
  */
 final class SectionResult
 {
@@ -37,7 +40,8 @@ final class SectionResult
         private readonly array $productIds = [],
         private readonly array $tags = [],
         private readonly ?string $defaultTitle = null,
-        private readonly ?array $defaultMoreLink = null
+        private readonly ?array $defaultMoreLink = null,
+        private readonly bool $placement = false
     ) {
     }
 
@@ -46,12 +50,20 @@ final class SectionResult
         return new self();
     }
 
+    /**
+     * A placement-only section: no content, never omitted as empty.
+     */
+    public static function placement(): self
+    {
+        return new self([], [], [], null, null, true);
+    }
+
     public function withField(string $name, mixed $value): self
     {
         $fields = $this->fields;
         $fields[$name] = $value;
 
-        return new self($fields, $this->productIds, $this->tags, $this->defaultTitle, $this->defaultMoreLink);
+        return new self($fields, $this->productIds, $this->tags, $this->defaultTitle, $this->defaultMoreLink, $this->placement);
     }
 
     /**
@@ -67,7 +79,7 @@ final class SectionResult
             }
         }
 
-        return new self($this->fields, $ids, $this->tags, $this->defaultTitle, $this->defaultMoreLink);
+        return new self($this->fields, $ids, $this->tags, $this->defaultTitle, $this->defaultMoreLink, $this->placement);
     }
 
     /**
@@ -80,7 +92,7 @@ final class SectionResult
             array_values(array_filter(array_map('strval', $tags), static fn (string $t): bool => $t !== ''))
         )));
 
-        return new self($this->fields, $this->productIds, $merged, $this->defaultTitle, $this->defaultMoreLink);
+        return new self($this->fields, $this->productIds, $merged, $this->defaultTitle, $this->defaultMoreLink, $this->placement);
     }
 
     public function withDefaultTitle(?string $title): self
@@ -92,7 +104,8 @@ final class SectionResult
             $this->productIds,
             $this->tags,
             $title !== '' ? $title : null,
-            $this->defaultMoreLink
+            $this->defaultMoreLink,
+            $this->placement
         );
     }
 
@@ -101,7 +114,7 @@ final class SectionResult
      */
     public function withDefaultMoreLink(?array $link): self
     {
-        return new self($this->fields, $this->productIds, $this->tags, $this->defaultTitle, $link);
+        return new self($this->fields, $this->productIds, $this->tags, $this->defaultTitle, $link, $this->placement);
     }
 
     /**
@@ -141,13 +154,18 @@ final class SectionResult
         return $this->defaultMoreLink;
     }
 
+    public function isPlacement(): bool
+    {
+        return $this->placement;
+    }
+
     /**
      * True when there is nothing to show: no products and every content field
-     * empty. Such a section is omitted from the Home.
+     * empty. Such a section is omitted from the Home. A placement never is.
      */
     public function isEmpty(): bool
     {
-        if ($this->productIds !== []) {
+        if ($this->placement || $this->productIds !== []) {
             return false;
         }
         foreach ($this->fields as $name => $value) {

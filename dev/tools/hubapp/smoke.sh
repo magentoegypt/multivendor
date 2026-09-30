@@ -162,6 +162,36 @@ else
   echo "WARN S6: no brand with an option_id to test"
 fi
 
+# S7: other sellers of a product (Vnecoms "select and sell") and an offer's own page,
+# which the app reads with route because offers are left out of product search.
+# HM_OFFER_KEY: a main product with at least one copy (default joust-duffle-bag).
+if ! skipped product-offers; then
+  key=${HM_OFFER_KEY:-joust-duffle-bag}
+  get en product-offers "{\"key\":\"$key\"}"
+  n=$(jq -r '.data.products.items[0].hm_offer_count // empty' "$T/b" 2>/dev/null || true)
+  listed=$(jq -r '.data.products.items[0].hm_other_offers | length' "$T/b" 2>/dev/null || true)
+  main=$(jq -r '.data.products.items[0].sku // empty' "$T/b" 2>/dev/null || true)
+  offer=$(jq -r '.data.products.items[0].hm_other_offers[0].url_key // empty' "$T/b" 2>/dev/null || true)
+  if [[ -n $n && $n == "$listed" && $n != 0 ]]; then
+    echo "ok   S7 $key: hm_offer_count $n = offers listed"
+  elif [[ -n $n && $n == "$listed" ]]; then
+    echo "WARN S7 $key: no other sellers (set HM_OFFER_KEY to a product with a select-and-sell copy)"
+  else
+    echo "FAIL S7 $key: hm_offer_count ${n:-none}, offers listed ${listed:-none}"
+    FAILS=$((FAILS + 1))
+  fi
+  if [[ -n $offer ]]; then
+    get en product-offer-page "{\"url\":\"$offer.html\"}"
+    back=$(jq -r --arg s "$main" '[.data.route.hm_other_offers[]?.sku] | index($s) != null' "$T/b" 2>/dev/null || true)
+    if [[ $back == "true" ]]; then
+      echo "ok   S7 $offer.html: route reads the offer, and $key ($main) is among its other sellers"
+    else
+      echo "FAIL S7 $offer.html: route found no product, or $main is not among its other sellers"
+      FAILS=$((FAILS + 1))
+    fi
+  fi
+fi
+
 if (( LIVE )); then
   echo
   echo "== live store: login, cart, device, credit and return steps are not run here"

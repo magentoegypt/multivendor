@@ -1,0 +1,25 @@
+# requires: HubAppVendors
+# S7 other sellers of a product (public, GET), the website's "Sold by N other
+# sellers". Variables: {"key":"joust-duffle-bag"} (live 30 Sep 2026: copies
+# 2150 Hassan Store AED 40 and 2287 ENARA AED 34, cheapest first).
+# hm_offer_count must equal the number of hm_other_offers (pageSize 50).
+query HmSmokeProductOffers($key: String!) {
+  products(filter: { url_key: { eq: $key } }, pageSize: 1) {
+    items {
+      sku
+      hm_seller { code name }
+      hm_offer_count
+      hm_other_offers(pageSize: 50) {
+        uid
+        sku
+        url_key
+        type_id
+        seller { code vendor_entity_id name logo_url rating review_count is_marketplace link { type url code } }
+        price { value currency }
+        regular_price { value currency }
+        stock_status
+        dispatch_time { code label source }
+      }
+    }
+  }
+}

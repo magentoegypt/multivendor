@@ -988,6 +988,60 @@
                                     </action>
                                 </actions>
                             </rule>
+                            <!-- Placement only: nothing to choose, the app fills it with the signed-in customer's open order. -->
+                            <rule name="17">
+                                <value>ACTIVE_ORDER</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
                         </rules>
                         <enabled>true</enabled>
                     </switcherConfig>
