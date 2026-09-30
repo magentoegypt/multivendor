@@ -204,8 +204,8 @@ else
       post credit-remove "{\"cart\":\"$CART\"}"
     fi
 
-    # S13: returns (creating one, messaging, escalating and cancelling it are done on a QA
-    # order by hand)
+    # S13: returns (creating one, replying with a photo, escalating and cancelling it are done
+    # on a QA order by hand: smoke/return-reply, return-escalate, return-cancel)
     post returns-config
     post returnable-orders
     post returns-list

@@ -23,6 +23,12 @@ type Mutation {
     hmAddReturnMessage(
         input: HmAddReturnMessageInput! @doc(description: "Message.")
     ): HmReturnOutput! @resolver(class: "MagentoEgypt\\HubAppReturns\\Model\\Resolver\\AddReturnMessage") @doc(description: "Customer reply; notifies seller and admin like the website. Token.")
+    hmEscalateReturn(
+        input: HmEscalateReturnInput! @doc(description: "Escalation.")
+    ): HmReturnOutput! @resolver(class: "MagentoEgypt\\HubAppReturns\\Model\\Resolver\\EscalateReturn") @doc(description: "Ask Hub Market to step in, as the website's Escalate form does; only while HmReturn.can_escalate. Token.")
+    hmCancelReturn(
+        input: HmCancelReturnInput! @doc(description: "Return to cancel.")
+    ): HmReturnOutput! @resolver(class: "MagentoEgypt\\HubAppReturns\\Model\\Resolver\\CancelReturn") @doc(description: "Cancel one of the customer's returns, as the website's Cancel button does; only while HmReturn.can_cancel. Token.")
 }
 
 enum HmReturnType @doc(description: "Requested outcome.") {
@@ -124,6 +130,16 @@ input HmReturnAttachmentInput @doc(description: "A file sent with a message, che
     content_base64: String! @doc(description: "The file, base64-encoded.")
 }
 
+input HmEscalateReturnInput @doc(description: "Escalation to Hub Market.") {
+    return_id: Int! @doc(description: "Return id.")
+    message: String! @doc(description: "What Hub Market should know, plain text, max 5000 chars.")
+    attachments: [HmReturnAttachmentInput!] @doc(description: "Files with it, e.g. photos; the same rules as on hmCreateReturn.")
+}
+
+input HmCancelReturnInput @doc(description: "Cancellation.") {
+    return_id: Int! @doc(description: "Return id.")
+}
+
 type HmReturnOutput @doc(description: "Mutation result.") {
     rma: HmReturn! @doc(description: "The return after the change.")
 }
@@ -176,6 +192,17 @@ type HmReturn @doc(description: "Return detail.") {
     items: [HmReturnItem!]! @doc(description: "Lines.")
     history: [HmReturnHistoryEntry!]! @doc(description: "Status history, oldest first.")
     messages: [HmReturnMessage!]! @doc(description: "Thread, oldest first.")
+    can_reply: Boolean! @doc(description: "hmAddReturnMessage is taken: state open, awaiting or being reviewed, when the website shows its reply form.")
+    can_cancel: Boolean! @doc(description: "hmCancelReturn is taken: status pending or approval, when the website shows Cancel.")
+    can_escalate: Boolean! @doc(description: "hmEscalateReturn is taken: not cancelled and never escalated, when the website shows Escalate RMA.")
+    escalation: HmReturnEscalation @doc(description: "The customer's escalation to Hub Market, as the website's RMA Escalate tab shows it; null before one.")
+}
+
+type HmReturnEscalation @doc(description: "The customer's escalation to Hub Market.") {
+    body_html: String! @doc(description: "Sanitised HTML.")
+    body_text: String! @doc(description: "Plain text.")
+    attachments: [HmReturnAttachment!]! @doc(description: "Files sent with it.")
+    created_at: String! @doc(description: "When, UTC.")
 }
 
 type HmReturnItem @doc(description: "Returned line.") {

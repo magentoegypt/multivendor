@@ -213,6 +213,8 @@ class ReturnReader
         $trackingCode = trim((string) $request->getData('tracking_code'));
         $refundAmount = $request->getData('refund_amount');
         $refund = $this->refund($type, $refundAmount, $fullRefund, $customerId, (string) $request->getData('order_incremental_id'));
+        $state = (string) $request->getData('state');
+        $escalations = $this->escalations($requestId);
 
         return [
             'id' => (int) $request->getId(),
@@ -220,7 +222,7 @@ class ReturnReader
             'order_number' => (string) $request->getData('order_incremental_id'),
             'created_at' => Vocabulary::utc((string) $request->getData('created_at')),
             'updated_at' => Vocabulary::utc((string) $request->getData('updated_at')),
-            'state' => Vocabulary::state((string) $request->getData('state'), $status['code']),
+            'state' => Vocabulary::state($state, $status['code']),
             'status_code' => $status['code'],
             'status_label' => $status['label'],
             'type' => Vocabulary::type($type),
@@ -236,7 +238,59 @@ class ReturnReader
             'items' => $items,
             'history' => $this->history($requestId, $statuses),
             'messages' => $this->messages($requestId, $storeId, (string) $request->getData('customer_name'), $seller),
+            //  What the website's return page offers (CustomerActions); the mutations apply the same rules.
+            'can_reply' => CustomerActions::canReply($state),
+            'can_cancel' => CustomerActions::canCancel($status['code']),
+            'can_escalate' => CustomerActions::canEscalate($state, $escalations !== []),
+            'escalation' => $this->escalation($escalations, $storeId),
         ];
+    }
+
+    /**
+     * The return's escalations (ves_rma_request_escalate), oldest first: the customer's, and a note the
+     * seller may add from their panel. Any row means the return was escalated (Request::canEscalate).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function escalations(int $requestId): array
+    {
+        $connection = $this->resource->getConnection();
+
+        return $connection->fetchAll(
+            $connection->select()
+                ->from(
+                    $this->resource->getTableName('ves_rma_request_escalate'),
+                    ['escalate_id', 'message', 'attachment', 'type', 'created_at']
+                )
+                ->where('request_id = ?', $requestId)
+                ->order('escalate_id ASC')
+        );
+    }
+
+    /**
+     * The customer's escalation as the website's "RMA Escalate" tab shows it to them
+     * (Vnecoms\VendorsRMA\Block\Frontend\View\Escalate::getEscalateRma: the first of type CUSTOMER REPLY),
+     * sanitised like a message; null before one.
+     *
+     * @param array<int, array<string, mixed>> $escalations escalations()
+     * @return array<string, mixed>|null HmReturnEscalation
+     */
+    private function escalation(array $escalations, int $storeId): ?array
+    {
+        foreach ($escalations as $row) {
+            if (Vocabulary::messageActor((string) $row['type']) !== 'CUSTOMER') {
+                continue;
+            }
+
+            return [
+                'body_html' => MessageBody::toHtml((string) $row['message']),
+                'body_text' => MessageBody::toText((string) $row['message']),
+                'attachments' => $this->attachments((string) $row['attachment'], $storeId),
+                'created_at' => Vocabulary::utc((string) $row['created_at']),
+            ];
+        }
+
+        return null;
     }
 
     /**

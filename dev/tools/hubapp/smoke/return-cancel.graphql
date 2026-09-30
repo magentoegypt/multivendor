@@ -1,0 +1,16 @@
+# requires: HubAppReturns
+# S13 by hand, on a QA return that is pending or accepted (staging only): cancel it. Variables: {"id":31}
+mutation HmSmokeReturnCancel($id: Int!) {
+  hmCancelReturn(input: { return_id: $id }) {
+    rma {
+      id
+      state
+      status_code
+      status_label
+      can_reply
+      can_cancel
+      can_escalate
+      history { status_code status_label changed_by created_at }
+    }
+  }
+}

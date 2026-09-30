@@ -6,6 +6,7 @@ mutation HmSmokeReturnReply($id: Int!, $message: String!, $files: [HmReturnAttac
     rma {
       id
       state
+      can_reply
       messages { id author body_text attachments { name url } created_at }
     }
   }
