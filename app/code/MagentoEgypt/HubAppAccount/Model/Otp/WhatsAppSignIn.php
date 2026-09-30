@@ -31,7 +31,8 @@ use Vnecoms\Sms\Helper\Data as SmsHelper;
  *     (DeliveryNumber), through Otp::sendOtp (its own resend cooldown, OTP keyed per number);
  *  4. unless hubapp/otp/reveal_unknown_number is on, the answer is the same whatever happened (no
  *     account, several, a stored number that cannot be delivered to, the cooldown, a gateway error):
- *     sent true, one neutral message, the resend cooldown.
+ *     sent true, status MASKED, one neutral message, the resend cooldown. A request over the limits is
+ *     THROTTLED either way. With the setting on, the status says what happened (OtpSendStatus).
  *
  * signIn(): WhatsAppManagement::verifyOtp($mobile, $code, LOGIN) does the work the website's REST
  * sign-in does: the codes' own lock (OtpGuard: five wrong codes lock code sign-in for the number for 15
@@ -62,7 +63,8 @@ class WhatsAppSignIn
     }
 
     /**
-     * @return array{sent: bool, message: string, resend_after_seconds: int} HmSendWhatsAppCodeOutput
+     * @return array{sent: bool, status: string, message: string, resend_after_seconds: int}
+     *     HmSendWhatsAppCodeOutput; status is an OtpSendStatus value
      * @throws GraphQlInputException for a value that is not a phone number at all
      */
     public function sendCode(string $mobile, string $clientIp): array
@@ -76,8 +78,10 @@ class WhatsAppSignIn
 
         $wait = $this->guard->sendWait($mobile, $clientIp);
         if ($wait > 0) {
+            //  Counted before any account is looked up: the same for every number.
             return [
                 'sent' => false,
+                'status' => OtpSendStatus::THROTTLED,
                 'message' => (string) __('Too many code requests. Please try again in %1 minutes.', (int) ceil($wait / 60)),
                 'resend_after_seconds' => $wait,
             ];
@@ -89,11 +93,13 @@ class WhatsAppSignIn
         }
         $delivery = $this->deliveryNumber->resolve($stored);
         $failed = false;
+        $coolingDown = false;
         if ($delivery['number'] !== null) {
             try {
                 $this->otp->sendOtp($delivery['number']);
             } catch (LocalizedException $e) {
                 //  Otp::sendOtp refuses only inside its resend cooldown; the code sent then is still valid.
+                $coolingDown = true;
                 $this->logger->info('HubAppAccount: WhatsApp code not re-sent: ' . $e->getMessage());
             } catch (\Throwable $e) {
                 $failed = true;
@@ -115,25 +121,33 @@ class WhatsAppSignIn
         if (!$this->scopeConfig->isSetFlag(self::XML_REVEAL_UNKNOWN)) {
             return [
                 'sent' => true,
+                'status' => OtpSendStatus::MASKED,
                 'message' => (string) __('If this number belongs to an account, we have sent a sign-in code to it on WhatsApp.'),
                 'resend_after_seconds' => $cooldown,
             ];
         }
 
-        [$sent, $message] = match (true) {
-            $delivery['reason'] === DeliveryNumber::OK && !$failed
-                => [true, __('We have sent a sign-in code to your WhatsApp.')],
+        [$sent, $status, $message] = match (true) {
+            $delivery['reason'] === DeliveryNumber::OK && $failed
+                => [false, OtpSendStatus::FAILED, __('We couldn\'t send the code. Please try again in a few minutes.')],
+            $delivery['reason'] === DeliveryNumber::OK && $coolingDown
+                => [true, OtpSendStatus::COOLDOWN, __('We have already sent a sign-in code to your WhatsApp. Use that code, or ask for another in a moment.')],
             $delivery['reason'] === DeliveryNumber::OK
-                => [false, __('We couldn\'t send the code. Please try again in a few minutes.')],
+                => [true, OtpSendStatus::SENT, __('We have sent a sign-in code to your WhatsApp.')],
             $delivery['reason'] === DeliveryNumber::AMBIGUOUS
-                => [false, __('This mobile number is linked to more than one account. Please sign in with your email address.')],
+                => [false, OtpSendStatus::MULTIPLE, __('This mobile number is linked to more than one account. Please sign in with your email address.')],
             $delivery['reason'] === DeliveryNumber::UNDELIVERABLE
-                => [false, __('We can\'t send a code to the mobile number on this account. Please sign in with your email address.')],
+                => [false, OtpSendStatus::UNDELIVERABLE, __('We can\'t send a code to the mobile number on this account. Please sign in with your email address.')],
             default
-                => [false, __('No account uses this mobile number.')],
+                => [false, OtpSendStatus::NO_ACCOUNT, __('No account uses this mobile number.')],
         };
 
-        return ['sent' => $sent, 'message' => (string) $message, 'resend_after_seconds' => $cooldown];
+        return [
+            'sent' => $sent,
+            'status' => $status,
+            'message' => (string) $message,
+            'resend_after_seconds' => $cooldown,
+        ];
     }
 
     /**

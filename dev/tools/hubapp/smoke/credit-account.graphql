@@ -1,11 +1,20 @@
 # requires: HubAppAccount
-# S12 store credit balance and transactions (POST with the token).
+# S12 store credit balance and transactions (POST with the token), with each
+# transaction's order and how credit is bought here (null while the store sells
+# no store credit product).
 query HmSmokeStoreCredit {
   hmStoreCredit(pageSize: 5) {
     balance { value currency }
     can_use_at_checkout
     total_count
     page_info { current_page page_size total_pages }
-    transactions { id type type_label amount { value currency } balance_after { value currency } description created_at }
+    transactions { id type type_label amount { value currency } balance_after { value currency } description created_at order_number }
+    top_up {
+      sku
+      min { value currency }
+      max { value currency }
+      credit_rate
+      presets { sku credit { value currency } price { value currency } }
+    }
   }
 }

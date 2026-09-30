@@ -1,0 +1,13 @@
+# requires: HubAppAccount
+# S10 WhatsApp sign-in code, RUN BY HAND with QA's own number (every send is a
+# real, paid WhatsApp message; smoke.sh never sends it). Variables:
+# {"mobile":"+9715XXXXXXXX"}. status is MASKED or THROTTLED unless
+# hubapp/otp/reveal_unknown_number is on.
+mutation HmSmokeWhatsAppCode($mobile: String!) {
+  hmSendWhatsAppCode(input: { mobile: $mobile }) {
+    sent
+    status
+    message
+    resend_after_seconds
+  }
+}

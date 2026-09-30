@@ -1,0 +1,9 @@
+# requires: HubAppAccount
+# S12 buy store credit (staging only). Variables: {"cart":"<id>","amount":100},
+# an amount from hmStoreCredit.top_up (a preset, or a whole number from min to max).
+mutation HmSmokeAddCredit($cart: String!, $amount: Float!) {
+  hmAddCreditToCart(input: { cart_id: $cart, amount: $amount }) {
+    cart { id items { uid quantity product { sku } prices { price { value currency } } } }
+    user_errors { code message }
+  }
+}

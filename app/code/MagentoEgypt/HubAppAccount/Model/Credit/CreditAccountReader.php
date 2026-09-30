@@ -41,7 +41,8 @@ class CreditAccountReader
         private readonly Processor $processor,
         private readonly StorefrontEmulationInterface $emulation,
         private readonly StoreManagerInterface $storeManager,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly TransactionOrders $orders
     ) {
     }
 
@@ -94,12 +95,20 @@ class CreditAccountReader
         );
         $rows = $total === 0 ? [] : $connection->fetchAll(
             $connection->select()
-                ->from($table, ['transaction_id', 'type', 'amount', 'balance', 'description', 'created_at'])
+                ->from(
+                    $table,
+                    ['transaction_id', 'type', 'amount', 'balance', 'description', 'additional_info', 'created_at']
+                )
                 ->where('customer_id = ?', $customerId)
                 ->order(['created_at DESC', 'transaction_id DESC'])
                 ->limit($paging->pageSize, $paging->offset())
         );
         $labels = $this->typeLabels(array_column($rows, 'type'), $storeId);
+        //  The customer's own orders the transactions record (TransactionOrders); none for a seller's sales.
+        $orderNumbers = $this->orders->numbers(
+            array_column($rows, 'additional_info', 'transaction_id'),
+            $customerId
+        );
 
         $transactions = [];
         foreach ($rows as $row) {
@@ -112,6 +121,7 @@ class CreditAccountReader
                 'amount' => $this->money((float) $row['amount'], $currency),
                 'balance_after' => $this->money((float) $row['balance'], $currency),
                 'description' => $description !== '' ? $description : null,
+                'order_number' => $orderNumbers[(int) $row['transaction_id']] ?? null,
                 'created_at' => $this->utc((string) $row['created_at']),
             ];
         }
