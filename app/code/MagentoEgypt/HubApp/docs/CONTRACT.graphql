@@ -376,6 +376,13 @@ type HmStore @doc(description: "Store page.") {
     about_html: String @doc(description: "About HTML when shown.")
     shipping_policy_html: String @doc(description: "Shipping policy HTML when enabled.")
     refund_policy_html: String @doc(description: "Refund policy HTML when enabled.")
+    contact: HmStoreContact @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreContact") @doc(description: "Ways to reach the seller that the store page publishes; null when it publishes none.")
+    location: String @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreLocation") @doc(description: "The store page's location line: the admin's address template in this store view's language, city and region translated as the website shows them; null when empty.")
+    sales_count: Int @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreSalesCount") @doc(description: "The store page's sales count, the seller's orders with a paid amount; null while the admin hides sales counts.")
+}
+
+type HmStoreContact @doc(description: "Seller contact the store page publishes.") {
+    phone: String @doc(description: "Telephone as the seller typed it; the page's Contact Vendor button dials it. Null while the admin hides seller phones.")
 }
 
 type HmStorePage @doc(description: "Seller cards page.") {
