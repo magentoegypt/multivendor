@@ -33,6 +33,17 @@
 #   - vendor_id is a MATCH filter in the live ProductAttributeFilterInput
 #     (FilterMatchTypeInput), so a seller's products are
 #     products(filter: vendor_id match <id>, match_type FULL), not eq.
+#
+# P3.1, store pages (additions only):
+#   - HmAppConfig.capabilities lists the enabled satellites (vendors, bundle,
+#     returns, account). A server with HubApp but without a satellite rejects
+#     a whole document naming one of its fields, so the app adds a satellite's
+#     fields to shared documents (hm_seller on listing cards) only when its
+#     code is listed;
+#   - HubAppVendors: hmStoreReviews (the Reviews tab), hmStoreCategories (the
+#     Stores chips), HmStore contact / location / sales_count (only what the
+#     website's store page publishes), HmStoreCard primary_category and
+#     facet_value (the Algolia seller facet's value).
 # =============================================================================
 
 
