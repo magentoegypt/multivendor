@@ -97,8 +97,27 @@ else
 fi
 
 # S1-S4: public reads, both store views
+# check_features <store>: hmAppConfig.features of the app-config body in $T/b is not empty.
+# The app treats a flag it is not sent as off, so an empty list hides returns, store
+# credit, WhatsApp sign-in and push (HubApp etc/config.xml ships the four on).
+check_features() {
+  local store=$1 list
+  if skipped app-config; then return 0; fi
+  # No hmAppConfig at all: get has already reported the failure.
+  if ! jq -e '.data.hmAppConfig' "$T/b" >/dev/null 2>&1; then return 0; fi
+  list=$(jq -r '[.data.hmAppConfig.features[]? | "\(.code)=\(if .enabled then "on" else "off" end)"] | join(" ")' \
+    "$T/b" 2>/dev/null || true)
+  if [[ -n $list ]]; then
+    echo "ok   S1 features/$store: $list"
+  else
+    echo "FAIL S1 features/$store: hmAppConfig.features is empty, the app would hide every flagged feature"
+    FAILS=$((FAILS + 1))
+  fi
+}
+
 for s in en ar; do
   get "$s" app-config
+  check_features "$s"
   get "$s" app-config '{"platform":"ANDROID"}'
   get "$s" app-home '{"audience":"GUEST"}'
   get "$s" app-home '{"audience":"CUSTOMER"}'

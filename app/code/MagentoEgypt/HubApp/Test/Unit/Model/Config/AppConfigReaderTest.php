@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace MagentoEgypt\HubApp\Test\Unit\Model\Config;
 
+use Magento\Framework\App\Config\Initial\Converter;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -45,6 +46,58 @@ final class AppConfigReaderTest extends TestCase
         ], null);
 
         self::assertSame([['code' => 'returns', 'enabled' => true]], $flags);
+    }
+
+    /**
+     * The defaults of etc/config.xml, read as Magento reads config.xml, turn the four agreed
+     * features on for every platform (the app treats a code it is not sent as off).
+     */
+    public function testShippedDefaultsTurnTheFourAgreedFeaturesOn(): void
+    {
+        $rows = $this->shippedFlagRows();
+
+        //  Rows of the admin grid: a row id usable as an element id, and the grid's three columns.
+        self::assertCount(4, $rows);
+        foreach ($rows as $rowId => $row) {
+            self::assertMatchesRegularExpression('/^[a-z_][a-z0-9_]*$/', (string) $rowId);
+            self::assertSame(['code', 'enabled', 'platform'], array_keys($row));
+        }
+
+        $expected = [
+            ['code' => 'push', 'enabled' => true],
+            ['code' => 'returns', 'enabled' => true],
+            ['code' => 'store_credit', 'enabled' => true],
+            ['code' => 'whatsapp_login', 'enabled' => true],
+        ];
+        $reader = $this->reader(
+            ['hubapp/features/flags' => $rows],
+            true,
+            $this->createMock(AlgoliaKeyProvider::class),
+            new ResponseTtl()
+        );
+        foreach ([null, 'ANDROID', 'IOS'] as $platform) {
+            self::assertSame($expected, $reader->features(1, $platform), (string) $platform);
+        }
+    }
+
+    public function testFlagsSavedInTheAdminReplaceTheDefaults(): void
+    {
+        //  What ArraySerialized stores once the grid is saved: JSON keyed by the grid's row ids.
+        $saved = '{"returns_all":{"code":"returns","enabled":"0","platform":"all"},'
+            . '"_1727700000000_123":{"code":"push","enabled":"1","platform":"ios"}}';
+        $keys = $this->createMock(AlgoliaKeyProvider::class);
+        $reader = $this->reader(['hubapp/features/flags' => $saved], true, $keys, new ResponseTtl());
+
+        self::assertSame(
+            [['code' => 'push', 'enabled' => true], ['code' => 'returns', 'enabled' => false]],
+            $reader->features(1, 'IOS')
+        );
+        self::assertSame([['code' => 'returns', 'enabled' => false]], $reader->features(1, 'ANDROID'));
+        //  A grid saved with every row deleted: nothing is on.
+        self::assertSame(
+            [],
+            $this->reader(['hubapp/features/flags' => '[]'], true, $keys, new ResponseTtl())->features(1, null)
+        );
     }
 
     public function testE164(): void
@@ -131,7 +184,22 @@ final class AppConfigReaderTest extends TestCase
     }
 
     /**
-     * @param array<string, string> $values
+     * hubapp/features/flags of this module's etc/config.xml, converted the way Magento converts
+     * config.xml defaults (Initial\Converter with Magento_Store's /config/default node map).
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function shippedFlagRows(): array
+    {
+        $dom = new \DOMDocument();
+        self::assertTrue($dom->load(dirname(__DIR__, 4) . '/etc/config.xml'));
+        $converted = (new Converter(['default' => '/config/default']))->convert($dom);
+
+        return $converted['data']['default']['hubapp']['features']['flags'];
+    }
+
+    /**
+     * @param array<string, mixed> $values
      */
     private function reader(array $values, bool $moduleEnabled, AlgoliaKeyProvider $keys, ResponseTtl $ttl): AppConfigReader
     {
