@@ -1,0 +1,18 @@
+# requires: HubAppReturns
+# S13 by hand, on a QA return (staging only): escalate it to Hub Market. Variables:
+# {"id":31,"message":"The seller stopped answering.","files":null}
+mutation HmSmokeReturnEscalate($id: Int!, $message: String!, $files: [HmReturnAttachmentInput!]) {
+  hmEscalateReturn(input: { return_id: $id, message: $message, attachments: $files }) {
+    rma {
+      id
+      state
+      status_code
+      status_label
+      can_reply
+      can_cancel
+      can_escalate
+      escalation { body_text attachments { name url } created_at }
+      history { status_code status_label changed_by created_at }
+    }
+  }
+}

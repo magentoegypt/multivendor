@@ -22,6 +22,9 @@ use Vnecoms\RMA\Helper\Config as RmaConfig;
  *    rma/policy/enable_policy is on.
  *  - window_days: always null. The website applies rma/general/order_expiry_day to guests only;
  *    signed-in customers have no window (design 9.3, kept by decision).
+ *  - attachment_*: the files a message may carry, by the website's upload rules (AttachmentRules):
+ *    the RMA "Allowed file extensions" less the protected ones, the store's upload limit (at most
+ *    10 MB), and at most 5 files a message.
  */
 class ConfigReader
 {
@@ -30,7 +33,8 @@ class ConfigReader
         private readonly LabelReader $labels,
         private readonly BlockProvider $blocks,
         private readonly StorefrontEmulationInterface $emulation,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Attachments $attachments
     ) {
     }
 
@@ -45,6 +49,7 @@ class ConfigReader
                 $reasons[] = ['id' => $reason['id'], 'label' => $reason['label']];
             }
         }
+        $attachments = $this->attachments->rules();
 
         return [
             'enabled' => true,
@@ -54,6 +59,9 @@ class ConfigReader
             'reasons' => $reasons,
             'policy_html' => $this->policy($storeId),
             'window_days' => null,
+            'attachment_extensions' => $attachments->extensions,
+            'attachment_max_bytes' => $attachments->maxBytes,
+            'attachment_max_files' => $attachments->maxFiles,
         ];
     }
 

@@ -1,0 +1,14 @@
+# requires: HubAppReturns
+# S13 one order's returnable lines (POST with the token). Variables: {"number":"000000150"}.
+query HmSmokeReturnableOrder($number: String!) {
+  hmReturnableOrder(order_number: $number) {
+    order_number
+    created_at
+    status_label
+    items {
+      order_item_id sku name qty_ordered qty_returnable open_return_numbers
+      unit_price { value currency }
+      max_refund { value currency }
+    }
+  }
+}

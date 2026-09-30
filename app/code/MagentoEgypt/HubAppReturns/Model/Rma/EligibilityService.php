@@ -40,6 +40,9 @@ class EligibilityService
     /** Newest orders scanned for hmReturnableOrders: a safety cap, since customers have no window. */
     public const MAX_ORDERS_SCANNED = 1000;
 
+    /** sales_order columns an HmReturnableOrder is built from. */
+    private const ORDER_COLUMNS = ['entity_id', 'increment_id', 'created_at', 'status', 'state', 'order_currency_code'];
+
     public const MAX_LINES_PER_RETURN = 100;
     public const MAX_COMMENT_LENGTH = 5000;
     public const MAX_OTHER_REASON_LENGTH = 255;
@@ -67,10 +70,7 @@ class EligibilityService
         $connection = $this->resource->getConnection();
         $orders = $connection->fetchAll(
             $connection->select()
-                ->from(
-                    $this->resource->getTableName('sales_order'),
-                    ['entity_id', 'increment_id', 'created_at', 'status', 'state']
-                )
+                ->from($this->resource->getTableName('sales_order'), self::ORDER_COLUMNS)
                 ->where('customer_id = ?', $customerId)
                 ->where('state IN (?)', self::ELIGIBLE_STATES)
                 ->order(['created_at DESC', 'entity_id DESC'])
@@ -84,12 +84,74 @@ class EligibilityService
         foreach ($orders as $order) {
             $ordersById[(int) $order['entity_id']] = $order;
         }
+        $candidates = $this->candidates($ordersById);
+
+        $eligible = [];
+        foreach ($ordersById as $orderId => $order) {
+            if (self::hasReturnableLine($candidates, $orderId)) {
+                $eligible[] = $order;
+            }
+        }
+
+        $page = array_slice($eligible, $paging->offset(), $paging->pageSize);
+
+        return [
+            'total' => count($eligible),
+            'items' => $page ? $this->orderRows($page, $candidates, $storeId) : [],
+        ];
+    }
+
+    /**
+     * One of the customer's orders as hmReturnableOrders lists it; null when the number is not one of
+     * the customer's orders, the order is not processing or complete, or nothing is left to return.
+     * The same answer for "someone else's order" and "no such order".
+     *
+     * @return array<string, mixed>|null HmReturnableOrder
+     * @throws GraphQlInputException without a number
+     */
+    public function returnableOrder(int $customerId, int $storeId, string $orderNumber): ?array
+    {
+        $number = self::orderNumber($orderNumber);
+        if ($number === '') {
+            throw new GraphQlInputException(__('Enter the order number.'));
+        }
+        $order = $this->customerOrder($customerId, $number);
+        if ($order === null || !in_array((string) $order['state'], self::ELIGIBLE_STATES, true)) {
+            return null;
+        }
+        $orderId = (int) $order['entity_id'];
+        $candidates = $this->candidates([$orderId => $order]);
+        if (!self::hasReturnableLine($candidates, $orderId)) {
+            return null;
+        }
+
+        return $this->orderRows([$order], $candidates, $storeId)[0];
+    }
+
+    /**
+     * An order number as the customer may type it ("#000000012", spaces), as stored.
+     */
+    private static function orderNumber(string $value): string
+    {
+        return trim(ltrim(trim($value), '#'));
+    }
+
+    /**
+     * The lines a customer can pick in these orders (ReturnableLines) and how many units of each can be
+     * returned now (ReturnableQty, less what non-cancelled returns hold).
+     *
+     * @param array<int, array<string, mixed>> $ordersById sales_order rows by entity id
+     * @return array{lines: array<int, array<string, mixed>>, byOrder: array<int, array<int, array<string, mixed>>>,
+     *     returnable: array<int, int>, held: array<int, array{qty: float, numbers: string[]}>}
+     */
+    private function candidates(array $ordersById): array
+    {
         $lines = $this->lines->linesOfOrders(array_keys($ordersById));
         $offered = ReturnableLines::offered($lines);
         $held = $this->heldInReturns(array_keys($offered));
 
         $returnable = [];
-        $linesByOrder = [];
+        $byOrder = [];
         foreach ($offered as $itemId => $line) {
             $orderId = (int) $line['order_id'];
             $returnable[$itemId] = $this->returnableQty->calculate(
@@ -99,43 +161,60 @@ class EligibilityService
                 (float) $line['qty_refunded'],
                 $held[$itemId]['qty'] ?? 0.0
             );
-            $linesByOrder[$orderId][$itemId] = $line;
+            $byOrder[$orderId][$itemId] = $line;
         }
 
-        $eligible = [];
-        foreach ($ordersById as $orderId => $order) {
-            foreach (array_keys($linesByOrder[$orderId] ?? []) as $itemId) {
-                if ($returnable[$itemId] >= 1) {
-                    $eligible[] = $order;
-                    break;
-                }
+        return ['lines' => $lines, 'byOrder' => $byOrder, 'returnable' => $returnable, 'held' => $held];
+    }
+
+    /**
+     * @param array{byOrder: array<int, array<int, array<string, mixed>>>, returnable: array<int, int>} $candidates
+     */
+    private static function hasReturnableLine(array $candidates, int $orderId): bool
+    {
+        foreach (array_keys($candidates['byOrder'][$orderId] ?? []) as $itemId) {
+            if ($candidates['returnable'][$itemId] >= 1) {
+                return true;
             }
         }
 
-        $page = array_slice($eligible, $paging->offset(), $paging->pageSize);
-        if (!$page) {
-            return ['total' => count($eligible), 'items' => []];
-        }
+        return false;
+    }
 
+    /**
+     * HmReturnableOrder rows for these orders, in the order given: every line the website's form offers
+     * with what is returnable of it and what it was paid, in the order currency. The prices are the
+     * refund cap's own figures (OrderLineReader::refundPerUnit, the formula prepare() checks a custom
+     * refund with and Vnecoms stores as the full amount), a bundle's child line with its own.
+     *
+     * @param array<int, array<string, mixed>> $orders sales_order rows (ORDER_COLUMNS)
+     * @param array<string, mixed> $candidates candidates() of these orders
+     * @return array<int, array<string, mixed>>
+     */
+    private function orderRows(array $orders, array $candidates, int $storeId): array
+    {
         $pageLines = [];
-        foreach ($page as $order) {
-            $pageLines += $linesByOrder[(int) $order['entity_id']] ?? [];
+        foreach ($orders as $order) {
+            $pageLines += $candidates['byOrder'][(int) $order['entity_id']] ?? [];
         }
         $shown = $this->lines->present($pageLines, $storeId);
-        $statusLabels = $this->labels->orderStatusLabels(array_column($page, 'status'), $storeId);
+        $statusLabels = $this->labels->orderStatusLabels(array_column($orders, 'status'), $storeId);
 
         $items = [];
-        foreach ($page as $order) {
+        foreach ($orders as $order) {
             $orderId = (int) $order['entity_id'];
+            $currency = (string) ($order['order_currency_code'] ?? '');
             $rows = [];
-            foreach ($linesByOrder[$orderId] ?? [] as $itemId => $line) {
+            foreach ($candidates['byOrder'][$orderId] ?? [] as $itemId => $line) {
                 $options = $shown[$itemId]['options'] ?? [];
-                $bundle = ReturnableLines::bundleOf($lines, $itemId);
+                $bundle = ReturnableLines::bundleOf($candidates['lines'], $itemId);
                 $bundleName = trim((string) ($bundle['name'] ?? ''));
                 if ($bundleName !== '') {
                     //  The website lists a bundle's items under the bundle's name; the app's list is flat.
                     array_unshift($options, ['label' => (string) __('Part of bundle'), 'value' => $bundleName]);
                 }
+                $returnable = $candidates['returnable'][$itemId];
+                $unit = $this->lines->refundPerUnit($line);
                 $rows[] = [
                     'order_item_id' => $itemId,
                     'sku' => $shown[$itemId]['sku'] ?? (string) $line['sku'],
@@ -143,9 +222,12 @@ class EligibilityService
                     'image_url' => $shown[$itemId]['image_url'] ?? null,
                     'options' => $options,
                     'qty_ordered' => (float) $line['qty_ordered'],
-                    'qty_returnable' => (float) $returnable[$itemId],
-                    'open_return_numbers' => $held[$itemId]['numbers'] ?? [],
+                    'qty_returnable' => (float) $returnable,
+                    'open_return_numbers' => $candidates['held'][$itemId]['numbers'] ?? [],
                     'seller' => $shown[$itemId]['seller'] ?? null,
+                    'unit_price' => Vocabulary::money($unit, $currency),
+                    'row_total' => Vocabulary::money($this->lines->refundBase($line), $currency),
+                    'max_refund' => Vocabulary::money($unit * $returnable, $currency),
                 ];
             }
             $items[] = [
@@ -156,7 +238,7 @@ class EligibilityService
             ];
         }
 
-        return ['total' => count($eligible), 'items' => $items];
+        return $items;
     }
 
     /**
@@ -212,7 +294,7 @@ class EligibilityService
      */
     public function prepare(int $customerId, int $storeId, array $input): array
     {
-        $number = trim(ltrim(trim((string) ($input['order_number'] ?? '')), '#'));
+        $number = self::orderNumber((string) ($input['order_number'] ?? ''));
         if ($number === '') {
             throw new GraphQlInputException(__('Enter the order number.'));
         }
@@ -352,7 +434,7 @@ class EligibilityService
             $connection->select()
                 ->from(
                     $this->resource->getTableName('sales_order'),
-                    ['entity_id', 'increment_id', 'status', 'state', 'customer_email', 'order_currency_code', 'store_id']
+                    array_merge(self::ORDER_COLUMNS, ['customer_email', 'store_id'])
                 )
                 ->where('increment_id = ?', $incrementId)
                 ->where('customer_id = ?', $customerId)

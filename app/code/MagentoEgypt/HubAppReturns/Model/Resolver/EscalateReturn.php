@@ -11,17 +11,18 @@ use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
-use MagentoEgypt\HubAppReturns\Model\Rma\MessagePoster;
+use MagentoEgypt\HubAppReturns\Model\Rma\ReturnActions;
 use MagentoEgypt\HubAppReturns\Model\Rma\ReturnReader;
 
 /**
- * Mutation.hmAddReturnMessage — the customer's reply on one of their open returns, with files if
- * any; notifies the seller and admin the way the website's reply form does (MessagePoster).
+ * Mutation.hmEscalateReturn — the customer asks Hub Market to step in on one of their returns, with a
+ * message and files if any, as the website's Escalate form does (ReturnActions::escalate); once a
+ * return, never when it is cancelled.
  */
-class AddReturnMessage implements ResolverInterface
+class EscalateReturn implements ResolverInterface
 {
     public function __construct(
-        private readonly MessagePoster $poster,
+        private readonly ReturnActions $actions,
         private readonly ReturnReader $reader
     ) {
     }
@@ -43,7 +44,7 @@ class AddReturnMessage implements ResolverInterface
         }
         $requestId = (int) ($input['return_id'] ?? 0);
 
-        $this->poster->post(
+        $this->actions->escalate(
             $customerId,
             $requestId,
             (string) ($input['message'] ?? ''),

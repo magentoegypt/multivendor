@@ -20,6 +20,7 @@
 #                                          the line is taken out of the cart again
 #   HM_STORE=en                            Store header of the POST steps
 #   HM_GUEST_NUMBER=.. HM_GUEST_EMAIL=.. HM_GUEST_LASTNAME=..   a guest order for S14's guestOrder step
+#   HM_RETURN_ORDER=000000150              S13 one order's returnable lines (hmReturnableOrder)
 #
 # WhatsApp sign-in (S10) is run by hand with QA's own number: every send is a
 # real, paid WhatsApp message (smoke/whatsapp-send.graphql).
@@ -342,10 +343,16 @@ else
       echo "skip credit-add (HM_CREDIT_AMOUNT not set, or no cart or top-up)"
     fi
 
-    # S13: returns (creating one and messaging it are done on a QA order by hand)
+    # S13: returns (creating one, replying with a photo, escalating and cancelling it are done
+    # on a QA order by hand: smoke/return-reply, return-escalate, return-cancel)
     post returns-config
     post returnable-orders
     post returns-list
+    if [[ -n ${HM_RETURN_ORDER:-} ]]; then
+      post returnable-order "$(jq -n --arg n "$HM_RETURN_ORDER" '{number: $n}')"
+    else
+      echo "skip returnable-order (HM_RETURN_ORDER not set)"
+    fi
 
     # S14: orders split by store; every top-level line sits in exactly one package
     post order-packages

@@ -17,7 +17,8 @@ use Vnecoms\VendorsRMA\Model\RequestFactory;
  * "My Returns" pages read them:
  *
  *  - the list is the customer's requests in the store view's website, newest first
- *    (Vnecoms\RMA\Block\Frontend\Customer\ListRma);
+ *    (Vnecoms\RMA\Block\Frontend\Customer\ListRma), each with its status code (to colour it), its
+ *    refund amount and its first line (to picture it), batched for the page;
  *  - a return is shown only to the customer it belongs to (RmaViewAuthorization::canView), and opening
  *    it marks it read for the customer (Controller\Customer\View sets is_customer_read = 1), which is
  *    what HmReturnSummary.has_unread_reply reports;
@@ -55,7 +56,7 @@ class ReturnReader
         $rows = $connection->fetchAll(
             $where($connection->select()->from($table, [
                 'entity_id', 'increment_id', 'order_incremental_id', 'created_at', 'updated_at', 'state', 'status',
-                'type', 'vendor_id', 'is_customer_read',
+                'type', 'vendor_id', 'is_customer_read', 'refund_amount',
             ]))
                 ->order(['created_at DESC', 'entity_id DESC'])
                 ->limit($paging->pageSize, $paging->offset())
@@ -64,35 +65,82 @@ class ReturnReader
             return ['total' => $total, 'items' => []];
         }
 
+        //  Every line of the page's returns, in the order filed: the count, and the first to show.
         $ids = array_map('intval', array_column($rows, 'entity_id'));
-        $itemCounts = array_map('intval', $connection->fetchPairs(
+        $itemCounts = [];
+        $firstLines = [];
+        foreach ($connection->fetchAll(
             $connection->select()
-                ->from($this->resource->getTableName('ves_rma_request_item'), ['request_id', 'COUNT(*)'])
+                ->from($this->resource->getTableName('ves_rma_request_item'), ['request_id', 'order_item_id'])
                 ->where('request_id IN (?)', $ids)
-                ->group('request_id')
-        ));
+                ->order(['request_id ASC', 'item_id ASC'])
+        ) as $item) {
+            $requestId = (int) $item['request_id'];
+            $itemCounts[$requestId] = ($itemCounts[$requestId] ?? 0) + 1;
+            $firstLines[$requestId] ??= (int) $item['order_item_id'];
+        }
+        $lines = $this->lines->linesById(array_values($firstLines));
+        $shown = $this->lines->present($lines, $storeId);
         $statuses = $this->labels->statuses($storeId);
         $sellers = $this->lines->sellerSummaries(array_column($rows, 'vendor_id'), $storeId);
+        $currencies = $this->orderCurrencies($customerId, array_column($rows, 'order_incremental_id'));
 
         $items = [];
         foreach ($rows as $row) {
+            $requestId = (int) $row['entity_id'];
             $status = $statuses[(int) $row['status']] ?? ['code' => '', 'label' => 'N/A'];
+            $type = (string) $row['type'];
+            $firstLine = $lines[$firstLines[$requestId] ?? 0] ?? null;
+            $refundAmount = $row['refund_amount'] ?? null;
             $items[] = [
-                'id' => (int) $row['entity_id'],
+                'id' => $requestId,
                 'number' => (string) $row['increment_id'],
                 'order_number' => (string) $row['order_incremental_id'],
                 'created_at' => Vocabulary::utc((string) $row['created_at']),
                 'updated_at' => Vocabulary::utc((string) $row['updated_at']),
                 'state' => Vocabulary::state((string) $row['state'], $status['code']),
+                'status_code' => $status['code'],
                 'status_label' => $status['label'],
-                'type' => Vocabulary::type((string) $row['type']),
-                'item_count' => $itemCounts[(int) $row['entity_id']] ?? 0,
+                'type' => Vocabulary::type($type),
+                'item_count' => $itemCounts[$requestId] ?? 0,
                 'seller' => $sellers[(int) $row['vendor_id']] ?? null,
                 'has_unread_reply' => (int) $row['is_customer_read'] === 0,
+                //  As HmReturn.refund_amount: refunds only, once an amount is stored.
+                'refund_amount' => $type === Vocabulary::TYPE_REFUND && $refundAmount !== null && $refundAmount !== ''
+                    ? Vocabulary::money((float) $refundAmount, $currencies[(string) $row['order_incremental_id']] ?? '')
+                    : null,
+                'first_item' => $firstLine === null ? null : [
+                    'name' => $shown[(int) $firstLine['item_id']]['name'] ?? (string) $firstLine['name'],
+                    'thumbnail' => $shown[(int) $firstLine['item_id']]['image_url'] ?? null,
+                ],
             ];
         }
 
         return ['total' => $total, 'items' => $items];
+    }
+
+    /**
+     * The order currency of each of the customer's orders among these numbers (the newest order,
+     * should two store views share a number, as EligibilityService::customerOrder picks it).
+     *
+     * @param array<int, string> $orderNumbers
+     * @return array<string, string> order number => currency code
+     */
+    private function orderCurrencies(int $customerId, array $orderNumbers): array
+    {
+        $orderNumbers = array_values(array_unique(array_filter(array_map('strval', $orderNumbers))));
+        if (!$orderNumbers) {
+            return [];
+        }
+        $connection = $this->resource->getConnection();
+
+        return array_map('strval', $connection->fetchPairs(
+            $connection->select()
+                ->from($this->resource->getTableName('sales_order'), ['increment_id', 'order_currency_code'])
+                ->where('customer_id = ?', $customerId)
+                ->where('increment_id IN (?)', $orderNumbers)
+                ->order('entity_id ASC')
+        ));
     }
 
     /**
@@ -165,6 +213,8 @@ class ReturnReader
         $trackingCode = trim((string) $request->getData('tracking_code'));
         $refundAmount = $request->getData('refund_amount');
         $refund = $this->refund($type, $refundAmount, $fullRefund, $customerId, (string) $request->getData('order_incremental_id'));
+        $state = (string) $request->getData('state');
+        $escalations = $this->escalations($requestId);
 
         return [
             'id' => (int) $request->getId(),
@@ -172,7 +222,7 @@ class ReturnReader
             'order_number' => (string) $request->getData('order_incremental_id'),
             'created_at' => Vocabulary::utc((string) $request->getData('created_at')),
             'updated_at' => Vocabulary::utc((string) $request->getData('updated_at')),
-            'state' => Vocabulary::state((string) $request->getData('state'), $status['code']),
+            'state' => Vocabulary::state($state, $status['code']),
             'status_code' => $status['code'],
             'status_label' => $status['label'],
             'type' => Vocabulary::type($type),
@@ -188,7 +238,59 @@ class ReturnReader
             'items' => $items,
             'history' => $this->history($requestId, $statuses),
             'messages' => $this->messages($requestId, $storeId, (string) $request->getData('customer_name'), $seller),
+            //  What the website's return page offers (CustomerActions); the mutations apply the same rules.
+            'can_reply' => CustomerActions::canReply($state),
+            'can_cancel' => CustomerActions::canCancel($status['code']),
+            'can_escalate' => CustomerActions::canEscalate($state, $escalations !== []),
+            'escalation' => $this->escalation($escalations, $storeId),
         ];
+    }
+
+    /**
+     * The return's escalations (ves_rma_request_escalate), oldest first: the customer's, and a note the
+     * seller may add from their panel. Any row means the return was escalated (Request::canEscalate).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function escalations(int $requestId): array
+    {
+        $connection = $this->resource->getConnection();
+
+        return $connection->fetchAll(
+            $connection->select()
+                ->from(
+                    $this->resource->getTableName('ves_rma_request_escalate'),
+                    ['escalate_id', 'message', 'attachment', 'type', 'created_at']
+                )
+                ->where('request_id = ?', $requestId)
+                ->order('escalate_id ASC')
+        );
+    }
+
+    /**
+     * The customer's escalation as the website's "RMA Escalate" tab shows it to them
+     * (Vnecoms\VendorsRMA\Block\Frontend\View\Escalate::getEscalateRma: the first of type CUSTOMER REPLY),
+     * sanitised like a message; null before one.
+     *
+     * @param array<int, array<string, mixed>> $escalations escalations()
+     * @return array<string, mixed>|null HmReturnEscalation
+     */
+    private function escalation(array $escalations, int $storeId): ?array
+    {
+        foreach ($escalations as $row) {
+            if (Vocabulary::messageActor((string) $row['type']) !== 'CUSTOMER') {
+                continue;
+            }
+
+            return [
+                'body_html' => MessageBody::toHtml((string) $row['message']),
+                'body_text' => MessageBody::toText((string) $row['message']),
+                'attachments' => $this->attachments((string) $row['attachment'], $storeId),
+                'created_at' => Vocabulary::utc((string) $row['created_at']),
+            ];
+        }
+
+        return null;
     }
 
     /**
@@ -249,13 +351,15 @@ class ReturnReader
             } else {
                 $name = self::STAFF_NAME;
             }
+            $attachments = $this->attachments((string) $row['attachment'], $storeId);
             $out[] = [
                 'id' => (int) $row['message_id'],
                 'author' => $author,
                 'author_name' => $name !== '' ? $name : self::STAFF_NAME,
                 'body_html' => MessageBody::toHtml((string) $row['message']),
                 'body_text' => MessageBody::toText((string) $row['message']),
-                'attachment_urls' => $this->attachmentUrls((string) $row['attachment'], $storeId),
+                'attachment_urls' => array_column($attachments, 'url'),
+                'attachments' => $attachments,
                 'created_at' => Vocabulary::utc((string) $row['created_at']),
             ];
         }
@@ -264,11 +368,12 @@ class ReturnReader
     }
 
     /**
-     * Attachment files live in pub/media/rma/request (Vnecoms\RMA\Model\Message::getAttachmentUrls).
+     * A message's (or an escalation's) files, in the order stored: name and URL. They live in
+     * pub/media/rma/request (Vnecoms\RMA\Model\Message::getAttachmentUrls).
      *
-     * @return string[]
+     * @return array<int, array{name: string, url: string}>
      */
-    private function attachmentUrls(string $attachment, int $storeId): array
+    private function attachments(string $attachment, int $storeId): array
     {
         $out = [];
         foreach (explode(',', $attachment) as $file) {
@@ -277,9 +382,9 @@ class ReturnReader
                 continue;
             }
             $path = implode('/', array_map('rawurlencode', explode('/', ltrim($file, '/'))));
-            $url = $this->mediaUrl->media('rma/request/' . $path, $storeId);
+            $url = $this->mediaUrl->media(Attachments::DIR . '/' . $path, $storeId);
             if ($url !== null) {
-                $out[] = $url;
+                $out[] = ['name' => basename(str_replace('\\', '/', $file)), 'url' => $url];
             }
         }
 

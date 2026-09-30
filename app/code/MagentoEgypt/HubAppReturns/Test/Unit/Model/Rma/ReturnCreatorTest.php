@@ -16,6 +16,7 @@ use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
+use MagentoEgypt\HubAppReturns\Model\Rma\Attachments;
 use MagentoEgypt\HubAppReturns\Model\Rma\EligibilityService;
 use MagentoEgypt\HubAppReturns\Model\Rma\LabelReader;
 use MagentoEgypt\HubAppReturns\Model\Rma\ReturnCreator;
@@ -28,7 +29,8 @@ use Vnecoms\VendorsRMA\Model\RequestFactory;
 
 /**
  * hmCreateReturn files only what EligibilityService passed (the caller's order, its lines, one seller,
- * the refund cap), as the caller, in one transaction; Vnecoms' own item check still runs first.
+ * the refund cap), as the caller, in one transaction; Vnecoms' own item check still runs first. Its
+ * photos, checked first, go with the first message, and a failed save removes them.
  */
 final class ReturnCreatorTest extends TestCase
 {
@@ -49,11 +51,17 @@ final class ReturnCreatorTest extends TestCase
     /** @var array<int, array<int, mixed>> setData() calls on the request */
     private array $written = [];
 
+    /** @var Attachments&MockObject */
+    private Attachments $attachments;
+
     protected function setUp(): void
     {
         $this->eligibility = $this->createMock(EligibilityService::class);
         $this->requestFactory = $this->createMock(RequestFactory::class);
         $this->connection = $this->createMock(AdapterInterface::class);
+        $this->attachments = $this->createMock(Attachments::class);
+        $this->attachments->method('check')->willReturn([]);
+        $this->attachments->method('stage')->willReturn([]);
         $this->request = $this->createMock(Request::class);
         $this->request->method('setData')->willReturnCallback(function (...$args) {
             $this->written[] = $args;
@@ -137,6 +145,42 @@ final class ReturnCreatorTest extends TestCase
         $this->creator()->create(self::CUSTOMER, 1, ['order_number' => '000000012']);
     }
 
+    public function testPhotosGoWithTheFirstMessageAndAFailedWriteRemovesThem(): void
+    {
+        $photo = ['name' => 'crack.png', 'extension' => 'png', 'content' => 'PNG'];
+        $input = ['order_number' => '000000012', 'attachments' => [['name' => 'crack.png']]];
+        $this->attachments = $this->createMock(Attachments::class);
+        $this->attachments->expects(self::once())->method('check')->with([['name' => 'crack.png']])->willReturn([$photo]);
+        $this->attachments->expects(self::once())->method('stage')->with([$photo])->willReturn(['crack_x1.png']);
+        $this->eligibility->method('prepare')->willReturn($this->prepared());
+        $this->requestFactory->method('create')->willReturn($this->request);
+        $this->request->method('validateItems')->willReturn(true);
+        $this->request->method('validate')->willReturn(true);
+        //  Vnecoms moves the staged file when it saves the message.
+        $this->request->expects(self::once())->method('saveMessageObject')
+            ->with(self::callback(static fn (array $message): bool => $message['attachment'] === 'crack_x1.png'));
+        $this->request->method('saveItemsObject')->willThrowException(new \RuntimeException('deadlock'));
+        $this->attachments->expects(self::once())->method('discard')->with(['crack_x1.png']);
+        $this->attachments->expects(self::never())->method('sweep');
+
+        $this->expectException(GraphQlInputException::class);
+        $this->creator()->create(self::CUSTOMER, 1, $input);
+    }
+
+    public function testAPhotoTheRulesRefuseFilesNothing(): void
+    {
+        $this->attachments = $this->createMock(Attachments::class);
+        $this->attachments->method('check')
+            ->willThrowException(new GraphQlInputException(__('Attach at most %1 files.', 5)));
+        $this->attachments->expects(self::never())->method('stage');
+        $this->eligibility->method('prepare')->willReturn($this->prepared());
+        $this->requestFactory->expects(self::never())->method('create');
+
+        $this->expectException(GraphQlInputException::class);
+        $this->expectExceptionMessage('Attach at most 5 files.');
+        $this->creator()->create(self::CUSTOMER, 1, ['order_number' => '000000012', 'attachments' => []]);
+    }
+
     private function creator(): ReturnCreator
     {
         $labels = $this->createMock(LabelReader::class);
@@ -165,7 +209,8 @@ final class ReturnCreatorTest extends TestCase
             $this->createMock(EventManager::class),
             $this->createMock(RequestInterface::class),
             $remote,
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->attachments
         );
     }
 
