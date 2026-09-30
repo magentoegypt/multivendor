@@ -1,8 +1,8 @@
-# S4 brands (public, GET). Variables: {"featured_only":true} optional.
-query HmSmokeBrands($featured_only: Boolean, $pageSize: Int = 100, $currentPage: Int = 1) {
-  hmBrands(featured_only: $featured_only, pageSize: $pageSize, currentPage: $currentPage) {
+# S4 brands (public, GET). Variables: {"featured_only":true} and {"with_products":true} optional.
+query HmSmokeBrands($featured_only: Boolean, $with_products: Boolean, $pageSize: Int = 100, $currentPage: Int = 1) {
+  hmBrands(featured_only: $featured_only, with_products: $with_products, pageSize: $pageSize, currentPage: $currentPage) {
     total_count
     page_info { current_page page_size total_pages }
-    items { id option_id name url_key logo_url image_url is_featured link { type url path code } }
+    items { id option_id name url_key logo_url image_url is_featured link { type url path code } product_count seller_count }
   }
 }

@@ -1,9 +1,23 @@
-# S3 deals page (public, GET). Variables: {"pageSize":20,"currentPage":1} optional.
-query HmSmokeDeals($pageSize: Int = 20, $currentPage: Int = 1) {
-  hmDeals(pageSize: $pageSize, currentPage: $currentPage) {
+# S3 deals page (public, GET). Variables: {"pageSize":20,"currentPage":1} optional;
+# filters {"category_id":10,"min_discount_percent":20,"sort":"PRICE_ASC"} optional.
+query HmSmokeDeals(
+  $pageSize: Int = 20
+  $currentPage: Int = 1
+  $category_id: Int
+  $min_discount_percent: Int
+  $sort: HmDealSort
+) {
+  hmDeals(
+    pageSize: $pageSize
+    currentPage: $currentPage
+    category_id: $category_id
+    min_discount_percent: $min_discount_percent
+    sort: $sort
+  ) {
     total_count
     countdown_ends_at
     page_info { current_page page_size total_pages }
+    categories { id uid name count }
     items {
       sku
       name

@@ -4,11 +4,18 @@ query HmSmokeAppConfig($platform: HmPlatform) {
     store_code
     locale
     search { hint trending_terms }
-    algolia { application_id search_api_key valid_until index_prefix product_index category_index page_index }
+    algolia {
+      application_id search_api_key valid_until index_prefix product_index category_index page_index
+      facets { attribute type label }
+      sorts { index attribute direction label }
+      suggestion_index suggestion_count currency_code price_group max_values_per_facet
+      product_suggestions category_suggestions page_suggestions category_separator categories_outside_menu
+    }
     contact { whatsapp_number whatsapp_url phone email hours }
     version { platform min_version latest_version store_url message }
     maintenance { enabled message retry_after_minutes }
     features { code enabled }
     capabilities
+    shipping { free_over { value currency } }
   }
 }

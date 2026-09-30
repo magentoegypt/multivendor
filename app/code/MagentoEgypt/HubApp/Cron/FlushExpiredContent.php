@@ -24,7 +24,8 @@ use Psr\Log\LoggerInterface;
  *
  *   1. a section's starts_at or ends_at fell in (last run, now]  -> hm_app_home
  *   2. the store's local date changed (Asia/Riyadh midnight): deals start and
- *      end by date                                               -> hm_app_home, hm_app_catalog
+ *      end by date, and so do the cart price rules behind hmAppConfig's
+ *      free-shipping threshold          -> hm_app_home, hm_app_catalog, hm_app_config
  *   3. at most every 30 minutes, the newest order id or the newest product
  *      updated_at moved: best sellers, rankings and seller stats may have
  *      changed. Batched on purpose — the Odoo sync saves products all day and
@@ -81,6 +82,7 @@ class FlushExpiredContent
         if (isset($state['day']) && $state['day'] !== $today) {
             $tags[] = Tags::APP_HOME;
             $tags[] = Tags::APP_CATALOG;
+            $tags[] = Tags::APP_CONFIG;
         }
         $state['day'] = $today;
 

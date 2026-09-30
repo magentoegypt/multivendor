@@ -15,7 +15,7 @@
 # Optional:
 #   HM_SKIP=stores,store,app-home-stores   leave out steps whose module is not deployed
 #   HM_STORE_CODE=loly                     seller for S5 (default loly)
-#   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9 add-to-cart
+#   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9a quote (GET) and S9 add-to-cart
 #   HM_CREDIT_AMOUNT=100                   S12 buy credit: an amount hmStoreCredit.top_up offers;
 #                                          the line is taken out of the cart again
 #   HM_STORE=en                            Store header of the POST steps
@@ -133,15 +133,29 @@ check_capabilities() {
   fi
 }
 
+# report_config <store>: the free-shipping threshold and the Algolia search layout of the
+# app-config body in $T/b (informational: either may be absent on purpose).
+report_config() {
+  local store=$1 line
+  if skipped app-config; then return 0; fi
+  if ! jq -e '.data.hmAppConfig' "$T/b" >/dev/null 2>&1; then return 0; fi
+  line=$(jq -r '.data.hmAppConfig | "free shipping over \(.shipping.free_over // {} | if .value then "\(.value) \(.currency)" else "none" end)"
+    + "; algolia " + (if .algolia then "\(.algolia.facets | length) facets, \(.algolia.sorts | length) sorts, suggestions \(.algolia.suggestion_index // "off")" else "off" end)' \
+    "$T/b" 2>/dev/null || true)
+  echo "     S1 config/$store: ${line:-unreadable}"
+}
+
 for s in en ar; do
   get "$s" app-config
   check_features "$s"
   check_capabilities "$s"
+  report_config "$s"
   get "$s" app-config '{"platform":"ANDROID"}'
   get "$s" app-home '{"audience":"GUEST"}'
   get "$s" app-home '{"audience":"CUSTOMER"}'
   get "$s" app-home-stores '{"audience":"GUEST"}'
   get "$s" deals
+  get "$s" deals '{"sort":"PRICE_ASC","min_discount_percent":10}'
   get "$s" best-sellers
   get "$s" bundle-deals
   get "$s" brands
@@ -201,19 +215,34 @@ if ! skipped store; then
   fi
 fi
 
-# S6: a brand's products through the mgs_brand filter
-get en brands '{"pageSize":50}'
+# S6: a brand's products through the mgs_brand filter, against its product_count
+get en brands '{"pageSize":50,"with_products":true}'
 option=$(jq -r '[.data.hmBrands.items[]? | select(.option_id > 0)][0].option_id // empty' "$T/b" 2>/dev/null || true)
+counted=$(jq -r "[.data.hmBrands.items[]? | select(.option_id == ${option:-0})][0].product_count // empty" "$T/b" 2>/dev/null || true)
 if [[ -n $option ]]; then
   get en brand-products "{\"option\":\"$option\"}"
   total=$(jq -r '.data.products.total_count // 0' "$T/b" 2>/dev/null || echo 0)
   if (( total > 0 )); then
-    echo "ok   S6 mgs_brand filter: option $option has $total products"
+    echo "ok   S6 mgs_brand filter: option $option has $total products (product_count ${counted:-?})"
+    if [[ -n $counted && $counted != "$total" ]]; then
+      echo "WARN S6 product_count $counted differs from the brand page's $total (search visibility or stock)"
+    fi
   else
     echo "WARN S6 mgs_brand filter: option $option returned no products (check the brand has products)"
   fi
 else
-  echo "WARN S6: no brand with an option_id to test"
+  echo "WARN S6: no brand with products to test"
+fi
+
+# S9a: a bundle package priced the way the cart prices it (public GET), for the S9 bundle
+if [[ -n ${HM_BUNDLE_SKU:-} && -n ${HM_BUNDLE_SELECTIONS:-} ]]; then
+  get en bundle-quote "$(jq -cn --arg s "$HM_BUNDLE_SKU" --argjson sel "$HM_BUNDLE_SELECTIONS" \
+    '{sku: $s, quantity: 1, selections: $sel}')"
+  quoted=$(jq -r '.data.hmBundleQuote | if .available then "\(.price.value) \(.price.currency)" else "unavailable: \(.message)" end' \
+    "$T/b" 2>/dev/null || true)
+  echo "     S9a quote: ${quoted:-none}"
+else
+  echo "skip bundle-quote (HM_BUNDLE_SKU / HM_BUNDLE_SELECTIONS not set)"
 fi
 
 # S7: other sellers of a product (Vnecoms "select and sell") and an offer's own page,

@@ -12,9 +12,9 @@ use MagentoEgypt\HubApp\Api\CacheTagCleanerInterface;
 use MagentoEgypt\HubApp\Model\Cache\Tags;
 
 /**
- * admin_system_config_changed_section_hubapp (and the Algolia credentials,
- * autocomplete and instant search sections, which decide hmAppConfig.algolia):
- * purge hm_app_config.
+ * admin_system_config_changed_section_hubapp (and the Algolia sections that
+ * decide hmAppConfig.algolia), and the save or delete of a cart price rule
+ * (hmAppConfig.shipping.free_over): purge hm_app_config.
  *
  * Core only marks the full-page cache "invalidated" after a config save; a
  * cached hmAppConfig GET would keep serving the old maintenance switch or

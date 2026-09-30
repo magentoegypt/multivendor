@@ -15,9 +15,11 @@ namespace MagentoEgypt\HubApp\Model\Cache;
  *
  * | Tag                      | Carried by                        | Purged by                                   |
  * |--------------------------|-----------------------------------|---------------------------------------------|
- * | hm_app_config            | hmAppConfig                       | config save (sections hubapp, algolia)      |
+ * | hm_app_config            | hmAppConfig                       | config save (sections hubapp, algolia),     |
+ * |                          |                                   | cart price rule save/delete, cron midnight  |
  * | hm_app_home, _<id>       | hmAppHome                         | section save/delete, hero banner save, cron |
- * | hm_app_catalog           | deals, best sellers, bundles      | cron (midnight, catalogue/order movement)   |
+ * | hm_app_catalog           | deals, best sellers, bundles,     | cron (midnight, catalogue/order movement)   |
+ * |                          | brand counts                      |                                             |
  * | hm_brand                 | hmBrands, TOP_BRANDS              | MGS brand save/delete                       |
  * | hm_vendor, hm_vendor_<id>| stores, hm_seller (HubAppVendors) | vendor/config/review saves (HubAppVendors)  |
  * | cat_p, cat_p_<id>        | products in any list              | core product save                           |
