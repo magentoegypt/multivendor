@@ -30,7 +30,9 @@ use Psr\Log\LoggerInterface;
  *      by the provider registered for its type;
  *   3. a missing provider or a provider that throws drops that section with a
  *      log line; the rest of the Home still renders (house rule);
- *   4. empty results are omitted — nothing is invented;
+ *   4. empty results are omitted — nothing is invented; a placement
+ *      (SectionType::PLACEMENT_TYPES, ACTIVE_ORDER) has no content and is sent
+ *      as it is, the app drawing the viewer's own data there;
  *   5. the result is cached in the `hubapp` cache type per (store, audience)
  *      until the next schedule boundary, local midnight when deals are on it,
  *      or 15 minutes, whichever comes first.

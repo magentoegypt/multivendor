@@ -27,6 +27,8 @@
                 <item name="PRODUCT_LIST" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\ProductRailProvider</item>
                 <item name="BUNDLE_DEALS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\BundleDealsProvider</item>
                 <item name="TOP_BRANDS" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\BrandsProvider</item>
+                <!-- Placement only: no content, the app draws the customer's own open order there. -->
+                <item name="ACTIVE_ORDER" xsi:type="object">MagentoEgypt\HubApp\Model\Home\Provider\PlacementProvider</item>
             </argument>
         </arguments>
     </type>

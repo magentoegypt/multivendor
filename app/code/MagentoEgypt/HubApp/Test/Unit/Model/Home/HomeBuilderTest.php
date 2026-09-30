@@ -16,6 +16,7 @@ use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
 use MagentoEgypt\HubApp\Model\Cache\AppCache;
 use MagentoEgypt\HubApp\Model\Cache\ResponseTtl;
 use MagentoEgypt\HubApp\Model\Home\HomeBuilder;
+use MagentoEgypt\HubApp\Model\Home\Provider\PlacementProvider;
 use MagentoEgypt\HubApp\Model\Home\SectionProviderPool;
 use MagentoEgypt\HubApp\Model\Home\SectionRepository;
 use MagentoEgypt\HubApp\Model\Home\SectionResult;
@@ -63,6 +64,56 @@ final class HomeBuilderTest extends TestCase
         self::assertSame(HomeBuilder::DEGRADED_TTL, $ttl->getCap());
         self::assertContains('hm_app_home_2', $home[HomeBuilder::TAGS_KEY], 'saving the failed section purges this response');
         self::assertContains('hm_app_home_1', $home[HomeBuilder::TAGS_KEY]);
+    }
+
+    /**
+     * ACTIVE_ORDER has no content (the app reads the customer's order itself), yet
+     * it is sent in its admin position; its title is optional and has no default.
+     */
+    public function testAnActiveOrderPlacementIsSentWithoutContentInAdminOrder(): void
+    {
+        $rows = [
+            self::ROWS[0],
+            ['section_id' => 3, 'type' => 'ACTIVE_ORDER', 'is_active' => 1, 'store_id' => 0, 'audience' => 'customer'],
+            self::ROWS[1],
+            [
+                'section_id' => 4, 'type' => 'ACTIVE_ORDER', 'is_active' => 1, 'store_id' => 0, 'audience' => 'all',
+                'title_en' => 'Your order', 'subtitle_en' => 'On its way',
+            ],
+        ];
+        $cache = $this->createMock(AppCache::class);
+        $cache->method('load')->willReturn(null);
+        $cache->expects(self::once())->method('save');
+
+        $home = $this->builder($rows, $this->brands(), $cache, new ResponseTtl())->build($this->store(), 'CUSTOMER');
+
+        self::assertSame([1, 3, 2, 4], array_column($home['sections'], 'id'));
+        $placement = $home['sections'][1];
+        self::assertSame('ACTIVE_ORDER', $placement['type']);
+        self::assertNull($placement['title'], 'no default title: the card has no header unless the admin gives one');
+        self::assertNull($placement['subtitle']);
+        self::assertFalse($placement['personalizable']);
+        self::assertNull($placement['more_link']);
+        foreach (['banners', 'categories', 'cms_block', 'brands', 'bundles', 'stores', SectionProducts::IDS_KEY] as $content) {
+            self::assertArrayNotHasKey($content, $placement, "no {$content}: placement only");
+        }
+        self::assertSame('Your order', $home['sections'][3]['title']);
+        self::assertSame('On its way', $home['sections'][3]['subtitle']);
+        self::assertContains('hm_app_home_3', $home[HomeBuilder::TAGS_KEY], 'saving the section purges the Home');
+    }
+
+    public function testTheGuestHomeLeavesOutAnActiveOrderMeantForCustomers(): void
+    {
+        $rows = [
+            self::ROWS[0],
+            ['section_id' => 3, 'type' => 'ACTIVE_ORDER', 'is_active' => 1, 'store_id' => 0, 'audience' => 'customer'],
+        ];
+        $cache = $this->createMock(AppCache::class);
+        $cache->method('load')->willReturn(null);
+
+        $home = $this->builder($rows, $this->brands(), $cache, new ResponseTtl())->build($this->store(), 'GUEST');
+
+        self::assertSame([1], array_column($home['sections'], 'id'));
     }
 
     public function testUnreadableSectionRowsAreAnErrorNotAnEmptyHome(): void
@@ -147,7 +198,7 @@ final class HomeBuilderTest extends TestCase
 
         return new HomeBuilder(
             $repository,
-            new SectionProviderPool(['TRUST_ROW' => $trust, 'TOP_BRANDS' => $brands]),
+            new SectionProviderPool(['TRUST_ROW' => $trust, 'TOP_BRANDS' => $brands, 'ACTIVE_ORDER' => new PlacementProvider()]),
             new TitleResolver(),
             $links,
             $emulation,

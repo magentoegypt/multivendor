@@ -90,6 +90,24 @@ final class FormDataMapperTest extends TestCase
         $this->mapper->toRow(['type' => 'NOPE']);
     }
 
+    /**
+     * The active-order card is placement only: it saves with no content fields and
+     * no title (the title is optional; empty means no header).
+     */
+    public function testActiveOrderNeedsNoContentAndNoTitle(): void
+    {
+        $row = $this->mapper->toRow(['type' => 'active_order', 'audience' => 'customer', 'position' => '5']);
+
+        self::assertSame('ACTIVE_ORDER', $row['type']);
+        self::assertNull($row['title_en']);
+        self::assertNull($row['title_ar']);
+        self::assertNull($row['category_id']);
+        self::assertNull($row['cms_identifier']);
+        self::assertNull($row['product_skus']);
+        self::assertSame('customer', $row['audience']);
+        self::assertSame(5, $row['position']);
+    }
+
     public function testRailNeedsACategory(): void
     {
         $this->expectException(LocalizedException::class);

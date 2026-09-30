@@ -34,10 +34,15 @@ class SectionType implements OptionSourceInterface
     public const TRUST_ROW = 'TRUST_ROW';
     public const CMS_BLOCK = 'CMS_BLOCK';
     public const PRODUCT_LIST = 'PRODUCT_LIST';
+    public const ACTIVE_ORDER = 'ACTIVE_ORDER';
 
-    /** In the order the admin select shows them (the website's Home order). */
+    /**
+     * In the order the admin select shows them (the website's Home order; the
+     * active-order card, which the website does not have, where Figma 07 puts it).
+     */
     public const ALL = [
         self::DELIVERY_STRIP,
+        self::ACTIVE_ORDER,
         self::HERO_BANNERS,
         self::CATEGORY_CHIPS,
         self::TODAYS_DEALS,
@@ -81,6 +86,16 @@ class SectionType implements OptionSourceInterface
         self::NEW_STORES,
     ];
 
+    /**
+     * Placement-only types: the admin chooses WHERE the app draws something of
+     * the viewer's own, and the section carries no content. The built Home is
+     * shared by every viewer of a store view and audience, so what goes there
+     * (the signed-in customer's open order) is read by the app itself.
+     */
+    public const PLACEMENT_TYPES = [
+        self::ACTIVE_ORDER,
+    ];
+
     public static function isKnown(string $type): bool
     {
         return in_array(strtoupper($type), self::ALL, true);
@@ -109,6 +124,7 @@ class SectionType implements OptionSourceInterface
             self::TRUST_ROW => __('Trust row (CMS block)'),
             self::CMS_BLOCK => __('Any CMS block'),
             self::PRODUCT_LIST => __('Hand-picked products (SKUs)'),
+            self::ACTIVE_ORDER => __("Active order card (the signed-in customer's open order)"),
         ];
 
         $options = [];

@@ -93,6 +93,7 @@ enum HmSectionType @doc(description: "Home section kind (admin Type field).") {
     TRUST_ROW @doc(description: "Trust items; cms_block hm_home_trust.")
     CMS_BLOCK @doc(description: "Any CMS block by identifier; cms_block.")
     PRODUCT_LIST @doc(description: "Hand-picked SKUs; products.")
+    ACTIVE_ORDER @doc(description: "Where the app draws the signed-in customer's open order; no content, the app reads the order itself and draws nothing for a guest or without one.")
 }
 
 enum HmLinkType @doc(description: "What a link points at, so the app can route natively.") {
