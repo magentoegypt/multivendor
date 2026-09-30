@@ -1,0 +1,15 @@
+# requires: HubAppVendors
+# S5 one store page (public, GET). Variables: {"code":"loly"}.
+query HmSmokeStore($code: String!) {
+  hmStore(code: $code) {
+    card { code vendor_entity_id name logo_url rating review_count product_count is_featured joined_at link { type url code } }
+    banner_url
+    short_description
+    about_html
+    shipping_policy_html
+    refund_policy_html
+    contact { phone }
+    location
+    sales_count
+  }
+}

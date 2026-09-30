@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+    GraphQL-area wiring: Vnecoms' `store_credit` product type (the credit top-up
+    the website sells; its type model extends Magento's virtual type) answers as
+    a virtual product wherever GraphQL resolves a product type. Without it a
+    product list, a cart or a wishlist holding one fails as a whole. The cart
+    line type is mapped in this module's global di.xml, where QuoteGraphQl maps
+    `virtual`.
+
+    The sales line resolvers (OrderItem, InvoiceItem, CreditMemoItem,
+    ShipmentItem) need no entry: `virtual` has none either, and an unmapped type
+    falls back to their `default` type.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\CatalogGraphQl\Model\ProductInterfaceTypeResolverComposite">
+        <arguments>
+            <argument name="productTypeNameResolvers" xsi:type="array">
+                <item name="magentoegypt_store_credit_type_resolver" xsi:type="object">MagentoEgypt\HubAppAccount\Model\GraphQl\StoreCreditTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\UrlRewriteGraphQl\Model\RoutableInterfaceTypeResolver">
+        <arguments>
+            <argument name="productTypeNameResolvers" xsi:type="array">
+                <item name="magentoegypt_store_credit_type_resolver" xsi:type="object">MagentoEgypt\HubAppAccount\Model\GraphQl\StoreCreditTypeResolver</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\WishlistGraphQl\Model\Resolver\Type\WishlistItemType">
+        <arguments>
+            <argument name="supportedTypes" xsi:type="array">
+                <item name="store_credit" xsi:type="string">VirtualWishlistItem</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market customer app: returns (MagentoEgypt_HubAppReturns), a satellite of MagentoEgypt_HubApp.
+ *
+ * No setup_version: the module has no tables, and a setup_version without a matching
+ * setup_module row makes DbStatusValidator answer 500 for the whole storefront.
+ *
+ * Its schema only references HubApp core types (HmSellerSummary, HmLabelValue) and core Magento
+ * types, so disabling it never breaks /graphql.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HubAppReturns">
+        <sequence>
+            <module name="MagentoEgypt_HubApp"/>
+            <module name="Magento_Sales"/>
+            <module name="Magento_SalesGraphQl"/>
+            <module name="Magento_CmsGraphQl"/>
+            <module name="Vnecoms_RMA"/>
+            <module name="Vnecoms_VendorsRMA"/>
+        </sequence>
+    </module>
+</config>

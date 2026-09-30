@@ -1,0 +1,7 @@
+# S12 take the smoke's credit line out of the cart again (staging only).
+# Variables: {"cart":"<id>","uid":"<cart item uid>"}.
+mutation HmSmokeRemoveItem($cart: String!, $uid: ID!) {
+  removeItemFromCart(input: { cart_id: $cart, cart_item_uid: $uid }) {
+    cart { id total_quantity }
+  }
+}

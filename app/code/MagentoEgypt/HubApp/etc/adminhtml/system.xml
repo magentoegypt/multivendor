@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!--
+    Stores > Configuration > Magento Egypt > Hub Market App.
+
+    What the app reads at launch through hmAppConfig (Figma section G). Text
+    the customer reads is store-view scoped (English and Arabic); channels are
+    website scoped; version policy and maintenance switches are global.
+    Saving this section purges hm_app_config, so the app gets the new values
+    on its next launch (Observer\CleanConfigCache).
+
+    The tab id is shared with OdooConnector's system.xml ("Magento Egypt");
+    Magento merges the two declarations.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magentoegypt" translate="label" sortOrder="400">
+            <label>Magento Egypt</label>
+        </tab>
+        <section id="hubapp" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Hub Market App</label>
+            <tab>magentoegypt</tab>
+            <resource>MagentoEgypt_HubApp::config</resource>
+
+            <group id="search" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Search</label>
+                <field id="hint" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Search Hint</label>
+                    <comment>Placeholder of the app's search field. Set it per store view for English and Arabic.</comment>
+                </field>
+                <field id="trending_terms" translate="label comment" type="textarea" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Trending Searches</label>
+                    <comment>One search per line, in the order to show; the first 10 are used.</comment>
+                </field>
+                <field id="algolia_enabled" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Give the App the Algolia Search Key</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Yes: the app searches Algolia directly, with the same application, indices and secured search key (valid 24 hours, reissued at least hourly) that the storefront gives browsers (Stores > Configuration > Algolia Search > Credentials). The admin API key is never sent. No: the app searches through GraphQL.</comment>
+                </field>
+            </group>
+
+            <group id="contact" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer Service</label>
+                <field id="whatsapp" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>WhatsApp Number</label>
+                    <comment>International format, e.g. +9715XXXXXXXX. The app opens wa.me with it.</comment>
+                </field>
+                <field id="phone" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Phone</label>
+                    <comment>International format, e.g. +9714XXXXXXX.</comment>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Support E-mail</label>
+                    <validate>validate-email</validate>
+                </field>
+                <field id="hours" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Service Hours</label>
+                    <comment>Shown as typed, per store view, e.g. "Daily 9:00-21:00".</comment>
+                </field>
+            </group>
+
+            <group id="version" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="1">
+                <label>App Versions</label>
+                <field id="android_min" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Android Minimum Version</label>
+                    <comment>Semver, e.g. 1.4.0. Older Android builds must update before they can be used.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
+                </field>
+                <field id="android_latest" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Android Latest Version</label>
+                    <comment>Newest version on Google Play; older builds may suggest an update.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
+                </field>
+                <field id="android_store_url" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Google Play URL</label>
+                </field>
+                <field id="ios_min" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>iOS Minimum Version</label>
+                    <comment>Semver. Older iOS builds must update before they can be used.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
+                </field>
+                <field id="ios_latest" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>iOS Latest Version</label>
+                    <comment>Newest version on the App Store; older builds may suggest an update.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
+                </field>
+                <field id="ios_store_url" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>App Store URL</label>
+                </field>
+                <field id="message" translate="label comment" type="textarea" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Update Message</label>
+                    <comment>Text of the update prompt, per store view.</comment>
+                </field>
+            </group>
+
+            <group id="maintenance" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="1">
+                <label>Maintenance</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>App Maintenance Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Yes: the app shows the message below instead of the store. The website is not affected.</comment>
+                </field>
+                <field id="retry_after_minutes" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Retry After (minutes)</label>
+                    <validate>validate-digits</validate>
+                    <comment>How long the app waits before checking again.</comment>
+                </field>
+                <field id="message" translate="label comment" type="textarea" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Maintenance Message</label>
+                    <comment>Per store view.</comment>
+                </field>
+            </group>
+
+            <group id="features" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Feature Flags</label>
+                <field id="flags" translate="label comment" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Flags</label>
+                    <frontend_model>MagentoEgypt\HubApp\Block\Adminhtml\Form\Field\FeatureFlags</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <comment>Codes agreed with the app (store_credit, returns, whatsapp_login, push); all four ship enabled for all platforms. A code the app does not know, or that is not listed, is off. A platform row overrides an "All platforms" row with the same code.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

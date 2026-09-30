@@ -1,0 +1,37 @@
+type Mutation {
+    hmAddBundleToCart(
+        input: HmAddBundleToCartInput! @doc(description: "Cart, bundle and selections.")
+    ): AddProductsToCartOutput! @resolver(class: "MagentoEgypt\\HubAppBundle\\Model\\Resolver\\AddBundleToCart") @doc(description: "Add a bundle or new_bundle, including per-selection configurable choices. Cart owner's token for customer carts.")
+}
+
+input HmAddBundleToCartInput @doc(description: "Bundle line.") {
+    cart_id: String! @doc(description: "Masked cart id.")
+    sku: String! @doc(description: "Bundle or new_bundle SKU.")
+    quantity: Float @doc(description: "Bundle quantity; 1 when omitted.")
+    selections: [HmBundleSelectionInput!]! @doc(description: "One per chosen option.")
+}
+
+input HmBundleSelectionInput @doc(description: "Chosen selection.") {
+    selection_uid: ID! @doc(description: "BundleItemOption.uid.")
+    quantity: Float @doc(description: "Selection qty when user-definable.")
+    configurable_option_uids: [ID!] @doc(description: "For configurable selections: ConfigurableProductOptionsValues.uid per attribute.")
+}
+
+type Query {
+    hmBundleQuote(
+        sku: String! @doc(description: "Bundle or new_bundle SKU."),
+        quantity: Float @doc(description: "Packages; 1 when omitted."),
+        selections: [HmBundleSelectionInput!]! @doc(description: "The package as for hmAddBundleToCart, one entry per chosen selection. Write the list inline; scalar variables may fill it.")
+    ): HmBundleQuote! @resolver(class: "MagentoEgypt\\HubAppBundle\\Model\\Resolver\\BundleQuote") @doc(description: "One package priced the way the cart will charge it: the buy request hmAddBundleToCart would add, priced by the bundle price model for the caller's customer group, before cart price rules, tax and shipping. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppBundle\\Model\\Resolver\\Identity\\BundleQuoteIdentity")
+}
+
+type HmBundleQuote @doc(description: "A priced package.") {
+    available: Boolean! @doc(description: "True when the cart would take this package: a saleable bundle and a complete choice of saleable selections. Stock quantities are checked when it is added.")
+    message: String @doc(description: "Why not, in the store view's language; null when available.")
+    quantity: Float! @doc(description: "Packages priced.")
+    price: Money @doc(description: "One package: the cart line's unit price. Null when not available.")
+    row_total: Money @doc(description: "price times quantity: the cart line before cart price rules, tax and shipping. Null when not available.")
+    regular_total: Money @doc(description: "One package's items bought separately at their regular prices; null without a real saving.")
+    saving: Money @doc(description: "regular_total minus price; null when none.")
+    discount_percent: Int! @doc(description: "saving as a rounded percent of regular_total; 0 when none.")
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Three nullable columns on MagentoEgypt_PushNotification's device table, written by the customer
+ * app's hmRegisterDevice. Nullable and without defaults, so existing rows (and the seller app, which
+ * never sends them) are unaffected; disabling this module leaves them in place and unused.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="magentoegypt_push_notification_device">
+        <column xsi:type="smallint" name="store_id" unsigned="true" nullable="true"
+                comment="Store view the app registered from (HubAppAccount)"/>
+        <column xsi:type="varchar" name="app_version" nullable="true" length="32"
+                comment="App version at the last registration (HubAppAccount)"/>
+        <column xsi:type="timestamp" name="last_seen_at" on_update="false" nullable="true"
+                comment="Last registration from the app, UTC (HubAppAccount)"/>
+    </table>
+</schema>

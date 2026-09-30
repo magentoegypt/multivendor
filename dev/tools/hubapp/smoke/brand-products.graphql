@@ -1,0 +1,8 @@
+# S6 a brand's products through core products() and the mgs_brand filter.
+# Variables: {"option":"222"} (HmBrand.option_id).
+query HmSmokeBrandProducts($option: String!) {
+  products(filter: { mgs_brand: { eq: $option } }, pageSize: 5) {
+    total_count
+    items { sku name }
+  }
+}

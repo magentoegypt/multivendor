@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!--
+    Shared services of the HubApp family. The satellites depend on these
+    interfaces only (never on the classes), so an implementation can change
+    without touching them.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="MagentoEgypt\HubApp\Api\CacheTagCleanerInterface"
+                type="MagentoEgypt\HubApp\Model\Cache\TagCleaner"/>
+    <preference for="MagentoEgypt\HubApp\Api\LinkResolverInterface"
+                type="MagentoEgypt\HubApp\Model\Link\LinkResolver"/>
+    <preference for="MagentoEgypt\HubApp\Api\MediaUrlInterface"
+                type="MagentoEgypt\HubApp\Model\Media\MediaUrl"/>
+    <preference for="MagentoEgypt\HubApp\Api\ProductListLoaderInterface"
+                type="MagentoEgypt\HubApp\Model\Product\ProductListLoader"/>
+    <preference for="MagentoEgypt\HubApp\Api\StorefrontEmulationInterface"
+                type="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation"/>
+    <!-- Implemented by HubAppVendors (owner B); the class here is a stub until then. -->
+    <preference for="MagentoEgypt\HubApp\Api\SellerSummaryProviderInterface"
+                type="MagentoEgypt\HubApp\Model\Seller\SellerSummaryProvider"/>
+
+    <!--
+        One instance per request: StorefrontEmulation counts its own nesting
+        depth, which only works if every caller shares the same object.
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Localization\StorefrontEmulation" shared="true"/>
+
+    <!--
+        hmAppConfig.capabilities: capability code => satellite module. The app
+        sends a satellite's fields only when its code is listed, and a code is
+        listed only while its module is enabled. A new satellite adds its own
+        item to this argument from its etc/di.xml.
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Config\Capabilities">
+        <arguments>
+            <argument name="modules" xsi:type="array">
+                <item name="vendors" xsi:type="string">MagentoEgypt_HubAppVendors</item>
+                <item name="bundle" xsi:type="string">MagentoEgypt_HubAppBundle</item>
+                <item name="returns" xsi:type="string">MagentoEgypt_HubAppReturns</item>
+                <item name="account" xsi:type="string">MagentoEgypt_HubAppAccount</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!--
+        hmAppConfig.algolia issues the storefront's secured search key through the
+        Algolia extension's own classes. Proxies: nothing of the extension is
+        instantiated unless a key is actually issued (and never when the Algolia
+        module is disabled; AppConfigReader checks that first).
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Config\AlgoliaKeyProvider">
+        <arguments>
+            <argument name="algoliaConnector" xsi:type="object">Algolia\AlgoliaSearch\Service\AlgoliaConnector\Proxy</argument>
+            <argument name="algoliaConfig" xsi:type="object">Algolia\AlgoliaSearch\Helper\ConfigHelper\Proxy</argument>
+        </arguments>
+    </type>
+
+    <!--
+        hmAppConfig.algolia's search layout (facets, sorts, suggestions, ...) through the
+        extension's own helpers, as window.algoliaConfig is built. Proxies for the same
+        reason: read only when a query asks for a layout field of a published algolia block.
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Config\AlgoliaLayout">
+        <arguments>
+            <argument name="instantSearch" xsi:type="object">Algolia\AlgoliaSearch\Helper\Configuration\InstantSearchHelper\Proxy</argument>
+            <argument name="autocomplete" xsi:type="object">Algolia\AlgoliaSearch\Helper\Configuration\AutocompleteHelper\Proxy</argument>
+            <argument name="sortingTransformer" xsi:type="object">Algolia\AlgoliaSearch\Service\Product\SortingTransformer\Proxy</argument>
+            <argument name="algoliaConfig" xsi:type="object">Algolia\AlgoliaSearch\Helper\ConfigHelper\Proxy</argument>
+        </arguments>
+    </type>
+
+    <!--
+        MGS brands carry no cache identities: purge hm_brand (hmBrands,
+        TOP_BRANDS) after every brand save or delete, admin mass actions included.
+    -->
+    <type name="MGS\Brand\Model\Resource\Brand">
+        <plugin name="magentoegypt_hubapp_clean_brand_cache" type="MagentoEgypt\HubApp\Plugin\MgsBrand\CleanBrandCache"/>
+    </type>
+
+    <!--
+        App Home Sections grid: a plain SearchResult over the one flat table,
+        the HeroBanner pattern.
+    -->
+    <virtualType name="MagentoEgypt\HubApp\Model\ResourceModel\Section\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">magentoegypt_hubapp_home_section</argument>
+            <argument name="resourceModel" xsi:type="string">MagentoEgypt\HubApp\Model\ResourceModel\Section</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="magentoegypt_hubapp_section_listing_data_source" xsi:type="string">MagentoEgypt\HubApp\Model\ResourceModel\Section\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,138 @@
+type Query {
+    hmStoreCredit(
+        pageSize: Int = 20 @doc(description: "Transactions per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmStoreCreditAccount! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\StoreCredit") @doc(description: "Balance and transactions. Token.") @cache(cacheable: false)
+}
+
+type Mutation {
+    hmApplyStoreCredit(
+        input: HmApplyStoreCreditInput! @doc(description: "Cart and amount.")
+    ): HmStoreCreditCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\ApplyStoreCredit") @doc(description: "Use credit on the cart: group allowed, amount <= balance, capped at order total. Token.")
+    hmRemoveStoreCredit(
+        input: HmRemoveStoreCreditInput! @doc(description: "Cart.")
+    ): HmStoreCreditCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RemoveStoreCredit") @doc(description: "Stop using credit on the cart. Token.")
+    hmAddCreditToCart(
+        input: HmAddCreditToCartInput! @doc(description: "Cart and amount.")
+    ): AddProductsToCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\AddCreditToCart") @doc(description: "Buy store credit: adds the website's credit product for this amount, as its Buy Credit page sells it. Paid into the balance when the order's invoice is paid. The customer's own cart. Token.")
+    hmRegisterDevice(
+        input: HmRegisterDeviceInput! @doc(description: "Device.")
+    ): HmDeviceOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RegisterDevice") @doc(description: "Upsert FCM token; bound to the customer when a token is sent, guest otherwise. Idempotent.")
+    hmUnregisterDevice(
+        input: HmUnregisterDeviceInput! @doc(description: "Device.")
+    ): HmDeviceOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\UnregisterDevice") @doc(description: "Deactivate the token for this caller. Idempotent.")
+    hmSendWhatsAppCode(
+        input: HmSendWhatsAppCodeInput! @doc(description: "Number.")
+    ): HmSendWhatsAppCodeOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SendWhatsAppCode") @doc(description: "Send a LOGIN code to the matching account's stored number. Anonymous.")
+    hmSignInWithWhatsAppCode(
+        input: HmSignInWithWhatsAppCodeInput! @doc(description: "Number and code.")
+    ): CustomerToken! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\SignInWithWhatsAppCode") @doc(description: "Exchange a code for a customer token. Five wrong codes for a number lock code sign-in for that number for 15 minutes, never the account. Anonymous.")
+}
+
+type Cart {
+    hm_store_credit: HmCartStoreCredit @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\CartStoreCredit") @doc(description: "Store credit on this cart; null for guests.")
+}
+
+type OrderTotal {
+    hm_store_credit: Money @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\OrderStoreCredit") @doc(description: "Credit used (sales_order.credit_amount); null when none.")
+}
+
+type HmStoreCreditAccount @doc(description: "Credit account.") {
+    balance: Money! @doc(description: "Balance.")
+    can_use_at_checkout: Boolean! @doc(description: "Customer group allowed (credit/general/credit_group).")
+    transactions: [HmStoreCreditTransaction!]! @doc(description: "Newest first.")
+    total_count: Int! @doc(description: "Transactions.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+    top_up: HmStoreCreditTopUp @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\StoreCreditTopUp") @doc(description: "How credit is bought here: the store credit products the website's Buy Credit page sells; null when it sells none.")
+}
+
+type HmStoreCreditTransaction @doc(description: "Transaction.") {
+    id: Int! @doc(description: "Id.")
+    type: String! @doc(description: "Processor code, e.g. spend_credit.")
+    type_label: String! @doc(description: "Localised processor title.")
+    amount: Money! @doc(description: "Signed amount.")
+    balance_after: Money! @doc(description: "Balance after.")
+    description: String @doc(description: "Plain-text description.")
+    created_at: String! @doc(description: "When, UTC.")
+    order_number: String @doc(description: "The customer's own order this transaction records: spent on, refunded, cancelled or credit bought. Null otherwise.")
+}
+
+type HmStoreCreditTopUp @doc(description: "Buying credit.") {
+    sku: String! @doc(description: "Credit product a custom amount buys; the first preset's when there is none.")
+    min: Money @doc(description: "Smallest custom amount, whole units; null when only presets can be bought.")
+    max: Money @doc(description: "Largest custom amount; null when only presets can be bought.")
+    credit_rate: Float @doc(description: "Credit per 1 paid for a custom amount: the price is the amount divided by it. Null without a custom amount.")
+    presets: [HmStoreCreditPreset!]! @doc(description: "Fixed amounts on sale, smallest first.")
+}
+
+type HmStoreCreditPreset @doc(description: "A credit amount on sale.") {
+    sku: String! @doc(description: "Its credit product.")
+    credit: Money! @doc(description: "Credit added to the balance.")
+    price: Money! @doc(description: "Price of the cart line.")
+}
+
+input HmAddCreditToCartInput @doc(description: "Credit top-up.") {
+    cart_id: String! @doc(description: "Masked id of the customer's cart.")
+    amount: Float! @doc(description: "Credit to buy: a preset's credit, or a whole amount from min to max.")
+}
+
+input HmApplyStoreCreditInput @doc(description: "Apply credit.") {
+    cart_id: String! @doc(description: "Masked cart id.")
+    amount: Float! @doc(description: "Amount in store currency, > 0.")
+}
+
+input HmRemoveStoreCreditInput @doc(description: "Remove credit.") {
+    cart_id: String! @doc(description: "Masked cart id.")
+}
+
+type HmStoreCreditCartOutput @doc(description: "Result.") {
+    cart: Cart! @doc(description: "Recollected cart.")
+}
+
+type HmCartStoreCredit @doc(description: "Cart credit.") {
+    applied: Money! @doc(description: "Applied now.")
+    balance: Money! @doc(description: "Account balance.")
+    max_applicable: Money! @doc(description: "min(balance, subtotal after discount + shipping + tax).")
+    can_use: Boolean! @doc(description: "Group allowed.")
+}
+
+input HmRegisterDeviceInput @doc(description: "Device registration.") {
+    token: String! @doc(description: "FCM registration token (<=500 chars).")
+    platform: HmPlatform! @doc(description: "Platform.")
+    app_version: String @doc(description: "App semver.")
+}
+
+input HmUnregisterDeviceInput @doc(description: "Device removal.") {
+    token: String! @doc(description: "FCM token.")
+}
+
+type HmDeviceOutput @doc(description: "Result.") {
+    success: Boolean! @doc(description: "Always true unless input is invalid.")
+}
+
+input HmSendWhatsAppCodeInput @doc(description: "Send code.") {
+    mobile: String! @doc(description: "E.164 number, e.g. +9715XXXXXXXX.")
+}
+
+type HmSendWhatsAppCodeOutput @doc(description: "Send result.") {
+    sent: Boolean! @doc(description: "True; also for unknown numbers unless hubapp/otp/reveal_unknown_number.")
+    message: String! @doc(description: "Localised message to show.")
+    resend_after_seconds: Int! @doc(description: "Cooldown before the next request.")
+    status: HmOtpSendStatus! @doc(description: "What happened. Only THROTTLED or MASKED unless hubapp/otp/reveal_unknown_number.")
+}
+
+enum HmOtpSendStatus @doc(description: "Outcome of a code request.") {
+    SENT @doc(description: "A code went to the account's number. Reveal setting on.")
+    COOLDOWN @doc(description: "A code went to this number moments ago and still works; none sent within the resend period. Reveal setting on.")
+    THROTTLED @doc(description: "Too many requests for this number or address; see resend_after_seconds. Any setting.")
+    MASKED @doc(description: "The one answer for every number, with or without an account. Reveal setting off.")
+    NO_ACCOUNT @doc(description: "No account uses this number. Reveal setting on.")
+    MULTIPLE @doc(description: "Several accounts use this number; sign in by email. Reveal setting on.")
+    UNDELIVERABLE @doc(description: "The account's stored number cannot get codes; sign in by email. Reveal setting on.")
+    FAILED @doc(description: "The code could not be sent; try again later. Reveal setting on.")
+}
+
+input HmSignInWithWhatsAppCodeInput @doc(description: "Sign-in.") {
+    mobile: String! @doc(description: "Same number as sent.")
+    code: String! @doc(description: "6-digit code.")
+}

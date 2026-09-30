@@ -1,0 +1,5 @@
+# requires: HubAppAccount
+# S11 register a push token (staging only). Variables: {"token":"<fcm token>"}.
+mutation HmSmokeRegisterDevice($token: String!) {
+  hmRegisterDevice(input: { token: $token, platform: ANDROID, app_version: "0.0.0-smoke" }) { success }
+}

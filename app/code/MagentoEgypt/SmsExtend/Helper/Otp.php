@@ -17,6 +17,7 @@ use Magento\Framework\Exception\AuthenticationException;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Vnecoms\Sms\Helper\Data as SmsHelper;
+use MagentoEgypt\SmsExtend\Model\Otp\MobileNumber;
 
 class Otp extends AbstractHelper
 {
@@ -75,13 +76,13 @@ class Otp extends AbstractHelper
 
     /**
      * One cache key per NUMBER, not per spelling of it: "01001234567", "+201001234567"
-     * and "201001234567" share the OTP, its attempt counter and its resend cooldown.
+     * and "201001234567" share the OTP, its attempt counter and its resend cooldown, and so do
+     * "0501234567" and "+971501234567" (MobileNumber::key).
      * (Keyed on the raw string, a new spelling was a fresh counter.)
      */
     private function cacheKey($prefix, $mobile)
     {
-        $canonical = $this->canonicalizeMobileForDelivery($mobile);
-        return $prefix . preg_replace('/\D+/', '', (string)($canonical ?? $mobile));
+        return $prefix . MobileNumber::key((string)$mobile);
     }
 
     public function getCustomerId($mobile)
@@ -101,95 +102,39 @@ class Otp extends AbstractHelper
      */
     public function normalizeEgyptianMobile($raw)
     {
-        $digits = preg_replace('/\D+/', '', (string)$raw);
-        if ($digits === '') {
-            return null;
-        }
-
-        $national = $digits;
-        if (strlen($digits) === 12 && strpos($digits, '20') === 0) {
-            $national = substr($digits, 2);            // 20XXXXXXXXXX
-        } elseif (strlen($digits) === 13 && strpos($digits, '020') === 0) {
-            $national = substr($digits, 3);            // 020XXXXXXXXXX
-        } elseif (strlen($digits) === 11 && $digits[0] === '0') {
-            $national = substr($digits, 1);            // 0XXXXXXXXXX
-        }
-
-        if (strlen($national) === 10 && $national[0] === '1') {
-            return '+20' . $national;
-        }
-
-        return null;
+        return MobileNumber::egyptian((string)$raw);
     }
 
     /**
-     * Build the set of stored mobilenumber strings considered equivalent to the
-     * supplied number, to cope with the inconsistent formats in
-     * customer_entity.mobilenumber (+20XXXXXXXXXX / 20XXXXXXXXXX / 0XXXXXXXXXX / XXXXXXXXXX).
+     * The stored mobilenumber strings that are the supplied number, to cope with the inconsistent formats
+     * in customer_entity.mobilenumber: Egyptian (+20XXXXXXXXXX / 20XXXXXXXXXX / 0XXXXXXXXXX / XXXXXXXXXX)
+     * and UAE (+9715XXXXXXXX / 9715XXXXXXXX / 009715XXXXXXXX / 05XXXXXXXX / 5XXXXXXXX) spellings.
      *
-     * Country-aware: a value given in explicit international form for a NON-Egyptian
-     * country (leading "+" and not +20) is matched exactly only — it is never folded
-     * into an Egyptian national number, so e.g. "+1001234567" cannot resolve an
-     * Egyptian "+201001234567" account.
+     * Every candidate has the supplied number's OTP key (MobileNumber::candidates), so a code sent to
+     * the matched account's stored number is the code this number verifies with. A number given as
+     * "+<country code>..." for another country matches only itself, and a bare spelling that means a
+     * different number (the stored UAE "501234567" for the typed "+501234567") never matches. Strings
+     * only: an int is compared by MySQL as a number and matched other spellings.
      *
      * @param string $input
      * @return string[]
      */
     public function normalizeMobileCandidates($input)
     {
-        $input  = trim((string)$input);
-        $digits = preg_replace('/\D+/', '', $input);
-        if ($digits === '') {
-            return [];
-        }
-
-        // Explicit foreign E.164 (+, but not Egypt): exact match only.
-        if (isset($input[0]) && $input[0] === '+' && strpos($digits, '20') !== 0) {
-            return ['+' . $digits, $digits];
-        }
-
-        $candidates = [];
-        $eg = $this->normalizeEgyptianMobile($input);
-        if ($eg !== null) {
-            $national = substr($eg, 3); // drop the leading "+20"
-            $candidates['+20' . $national] = true;
-            $candidates['20' . $national]  = true;
-            $candidates['0' . $national]   = true;
-            $candidates[$national]         = true;
-        } else {
-            $candidates[$digits]       = true;
-            $candidates['+' . $digits] = true;
-        }
-
-        return array_keys($candidates);
+        return MobileNumber::candidates((string)$input);
     }
 
     /**
-     * Canonical, deliverable number for sending an OTP to a resolved customer.
-     * Returns Egyptian E.164 when derivable, an already-international number as-is,
-     * otherwise null (the caller must refuse to send rather than guess a destination).
+     * Canonical, deliverable number for sending an OTP to a resolved customer: Egyptian or UAE E.164
+     * when derivable, an already-international number as dialled, otherwise null (the caller must
+     * refuse to send rather than guess a destination). See MobileNumber::canonical().
      *
      * @param string $stored
      * @return string|null
      */
     public function canonicalizeMobileForDelivery($stored)
     {
-        $stored = trim((string)$stored);
-        if ($stored === '') {
-            return null;
-        }
-
-        $eg = $this->normalizeEgyptianMobile($stored);
-        if ($eg !== null) {
-            return $eg;
-        }
-
-        if ($stored[0] === '+') {
-            $digits = preg_replace('/\D+/', '', $stored);
-            return $digits !== '' ? '+' . $digits : null;
-        }
-
-        return null;
+        return MobileNumber::canonical((string)$stored);
     }
 
     /**
@@ -374,8 +319,8 @@ class Otp extends AbstractHelper
         /*
          * A 6-digit code with unlimited guesses for 15 minutes could be brute-forced —
          * and FORGOTPASS sets a new password on success. Each wrong code counts; the
-         * MAX_VERIFY_ATTEMPTS-th burns the code. AuthenticationException lets the caller
-         * also count it toward the customer's account lockout.
+         * MAX_VERIFY_ATTEMPTS-th burns the code. Callers count wrong codes toward the codes'
+         * own lock (Model\Otp\OtpGuard), never toward the customer's account lock.
          */
         if (!hash_equals((string)$cachedOtp, trim((string)$otp))) {
             $attempts = (int)$this->cache->load($attemptsKey) + 1;

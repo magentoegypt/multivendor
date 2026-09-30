@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!--
+    GraphQL area only: a message the app posts on a return (hmCreateReturn, hmAddReturnMessage) is
+    dated when it is posted, not with the return's filing time as Vnecoms dates every message. The
+    website's own forms and panels (frontend, adminhtml, vendors areas) are untouched.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="request_before_save_message">
+        <observer name="magentoegypt_hubappreturns_date_app_message" instance="MagentoEgypt\HubAppReturns\Observer\DateAppMessage"/>
+    </event>
+</config>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+    The app's own cache type. See Model\Cache\Type for what it holds and
+    Model\Cache\Tags for how it is purged. Enable after deploy:
+    bin/magento cache:enable hubapp
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Cache/etc/cache.xsd">
+    <type name="hubapp" translate="label,description" instance="MagentoEgypt\HubApp\Model\Cache\Type">
+        <label>Hub Market App</label>
+        <description>Customer app GraphQL: built Home sections, ranked product lists, bundle cards and brand lists.</description>
+    </type>
+</config>

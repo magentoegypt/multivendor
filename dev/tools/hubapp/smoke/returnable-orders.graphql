@@ -1,0 +1,21 @@
+# requires: HubAppReturns
+# S13 orders with something returnable (POST with the token).
+query HmSmokeReturnableOrders {
+  hmReturnableOrders(pageSize: 5) {
+    total_count
+    page_info { total_pages }
+    items {
+      order_number
+      created_at
+      status_label
+      items {
+        order_item_id sku name image_url qty_ordered qty_returnable open_return_numbers
+        options { label value }
+        seller { code name }
+        unit_price { value currency }
+        row_total { value currency }
+        max_refund { value currency }
+      }
+    }
+  }
+}

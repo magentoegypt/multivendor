@@ -1,0 +1,37 @@
+# S2 app Home (public, GET). Variables: {"audience":"GUEST"}. Keep the app's
+# real Home document compact: nginx refuses GET request lines over 8 KB.
+query HmSmokeAppHome($audience: HmAudience) {
+  hmAppHome(audience: $audience) {
+    store_code
+    generated_at
+    sections {
+      id
+      type
+      title
+      subtitle
+      limit
+      ends_at
+      countdown_ends_at
+      personalizable
+      more_link { ...HmSmokeLink }
+      banners { id slot title kicker subtitle cta_label image_url tone accent link { ...HmSmokeLink } }
+      categories { id uid name url_key product_count icon tint link { ...HmSmokeLink } }
+      cms_block { identifier title content }
+      brands { id option_id name url_key logo_url image_url is_featured link { ...HmSmokeLink } }
+      bundles { uid sku name url_key image_url is_kit item_count thumbnails more_thumbnails price { value currency } price_is_from saving { value currency } discount_percent }
+      products { ...HmSmokeCard }
+    }
+  }
+}
+
+fragment HmSmokeLink on HmLink { type url path uid code }
+
+fragment HmSmokeCard on ProductInterface {
+  uid
+  sku
+  name
+  url_key
+  stock_status
+  small_image { url }
+  price_range { minimum_price { regular_price { value currency } final_price { value currency } } }
+}

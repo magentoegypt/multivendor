@@ -1,0 +1,7 @@
+# requires: HubAppAccount
+# S12 use credit on the cart (staging only). Variables: {"cart":"<id>","amount":1}.
+mutation HmSmokeApplyCredit($cart: String!, $amount: Float!) {
+  hmApplyStoreCredit(input: { cart_id: $cart, amount: $amount }) {
+    cart { id hm_store_credit { applied { value currency } can_use } }
+  }
+}

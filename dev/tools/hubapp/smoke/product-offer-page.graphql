@@ -1,0 +1,19 @@
+# requires: HubAppVendors
+# S7 an offer's own product page (public, GET). Offers are left out of product
+# search, so the app reads the page with route, url = the offer's url_key plus
+# the product URL suffix. Variables: {"url":"joust-duffle-bag-1702962941.html"}.
+# Its other sellers are the product it was copied from and the other copies.
+query HmSmokeProductOfferPage($url: String!) {
+  route(url: $url) {
+    __typename
+    ... on ProductInterface {
+      sku
+      url_key
+      stock_status
+      price_range { minimum_price { regular_price { value currency } final_price { value currency } } }
+      hm_seller { code name }
+      hm_offer_count
+      hm_other_offers(pageSize: 50) { sku url_key seller { code name } price { value currency } }
+    }
+  }
+}

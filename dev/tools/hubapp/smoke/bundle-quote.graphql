@@ -1,0 +1,14 @@
+# S9a a bundle package priced the way the cart prices it (public, GET).
+# Variables: {"sku":"..","quantity":1,"selections":[{"selection_uid":".."}]} (HM_BUNDLE_SKU / HM_BUNDLE_SELECTIONS).
+query HmSmokeBundleQuote($sku: String!, $quantity: Float, $selections: [HmBundleSelectionInput!]!) {
+  hmBundleQuote(sku: $sku, quantity: $quantity, selections: $selections) {
+    available
+    message
+    quantity
+    price { value currency }
+    row_total { value currency }
+    regular_total { value currency }
+    saving { value currency }
+    discount_percent
+  }
+}

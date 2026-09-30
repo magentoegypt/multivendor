@@ -1,0 +1,146 @@
+type Query {
+    hmStores(
+        filter: HmStoreFilterInput @doc(description: "Filters, combined with AND."),
+        sort: HmStoreSort @doc(description: "Order; FEATURED when omitted."),
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmStorePage! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Stores") @doc(description: "Approved sellers with at least one listable product. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreListIdentity")
+    hmStore(
+        code: String! @doc(description: "Seller code, case-insensitive.")
+    ): HmStore @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Store") @doc(description: "An approved seller's store page; null otherwise. For its products, filter products by vendor_id match card.vendor_entity_id (a match filter in the live schema, not eq).") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreIdentity")
+    hmStoreReviews(
+        code: String! @doc(description: "Seller code, case-insensitive."),
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmStoreReviewPage @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreReviews") @doc(description: "A store page's Reviews tab: approved reviews of the seller's products that this store view shows, newest first, with the seller's rating as the card counts it; null for a code that is not an approved seller. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreReviewsIdentity")
+    hmStoreCategories: HmStoreCategories! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreCategories") @doc(description: "The Stores chips: top-level menu categories in menu order with how many sellers each holds, as the hmStores category_id filter counts them; categories with none are left out. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreCategoriesIdentity")
+}
+
+input HmStoreFilterInput @doc(description: "Store filters.") {
+    featured: Boolean @doc(description: "Only sellers flagged Show on Home (is_home).")
+    category_id: Int @doc(description: "Sellers with a listable product in this category or its children.")
+    name: String @doc(description: "Substring of display name or code.")
+    codes: [String!] @doc(description: "Only these codes, in this order when sort is omitted.")
+}
+
+enum HmStoreSort @doc(description: "Store order.") {
+    FEATURED @doc(description: "Featured, then rating, then name.")
+    TOP_RATED @doc(description: "Rating, then reviews; unrated last.")
+    NEWEST @doc(description: "Newest first.")
+    NAME @doc(description: "Localised name A-Z.")
+    PRODUCT_COUNT @doc(description: "Most listable products first.")
+}
+
+enum HmDispatchSource @doc(description: "Dispatch time origin.") {
+    DECLARED @doc(description: "Seller's dispatch_time attribute.")
+    MEASURED @doc(description: "Mean order-to-shipment; >=2 shipments and <=7 days.")
+}
+
+type HmDispatchTime @doc(description: "Typical dispatch.") {
+    code: String! @doc(description: "same_day, next_day, days_2_3, days_3_5, days_5_7 or measured_<n>.")
+    label: String! @doc(description: "Short localised label.")
+    source: HmDispatchSource! @doc(description: "Declared or measured.")
+}
+
+type HmStoreCard @doc(description: "Seller card.") {
+    code: String! @doc(description: "Seller code.")
+    vendor_entity_id: Int! @doc(description: "Id for the products vendor_id filter.")
+    name: String! @doc(description: "Localised display name.")
+    logo_url: String @doc(description: "Absolute HTTPS logo or null.")
+    rating: Float @doc(description: "Out of 5; null when unrated.")
+    review_count: Int! @doc(description: "Approved reviews.")
+    product_count: Int! @doc(description: "Listable products.")
+    dispatch_time: HmDispatchTime @doc(description: "Typical dispatch or null.")
+    is_featured: Boolean! @doc(description: "Show on Home flag.")
+    joined_at: String! @doc(description: "Joined, ISO-8601 UTC.")
+    link: HmLink! @doc(description: "Store page link.")
+    primary_category: HmCategoryCount @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreCardCategory") @doc(description: "Top-level menu category holding most of the seller's listable products, count being how many are in it; null when none is filed in one.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\CategoryCountIdentity")
+    facet_value: String @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreCardFacetValue") @doc(description: "The seller's value in the storefront's Algolia seller facet, the product records' seller attribute, in this store view: match facet counts to stores on it, not on name. Null when records carry no seller.")
+}
+
+type HmStore @doc(description: "Store page.") {
+    card: HmStoreCard! @doc(description: "Card fields.")
+    banner_url: String @doc(description: "Absolute HTTPS banner.")
+    short_description: String @doc(description: "Store Information short description.")
+    about_html: String @doc(description: "About HTML when shown.")
+    shipping_policy_html: String @doc(description: "Shipping policy HTML when enabled.")
+    refund_policy_html: String @doc(description: "Refund policy HTML when enabled.")
+    contact: HmStoreContact @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreContact") @doc(description: "Ways to reach the seller that the store page publishes; null when it publishes none.")
+    location: String @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreLocation") @doc(description: "The store page's location line: the admin's address template in this store view's language, city and region translated as the website shows them; null when empty.")
+    sales_count: Int @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreSalesCount") @doc(description: "The store page's sales count, the seller's orders with a paid amount; null while the admin hides sales counts.")
+}
+
+type HmStoreContact @doc(description: "Seller contact the store page publishes.") {
+    phone: String @doc(description: "Telephone as the seller typed it; the page's Contact Vendor button dials it. Null while the admin hides seller phones.")
+}
+
+type HmStorePage @doc(description: "Seller cards page.") {
+    items: [HmStoreCard!]! @doc(description: "Cards.")
+    total_count: Int! @doc(description: "Sellers matching.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmProductOffer @doc(description: "Another seller's offer on the same product: a Vnecoms select-and-sell copy, a product of its own with its own SKU, price and stock, or on a copy's page the product it was copied from. Only what the website's price comparison lists: an approved seller of its own, sellable in the store view and in stock.") {
+    uid: ID! @doc(description: "Product uid of the offer.")
+    sku: String! @doc(description: "SKU to add to the cart, as for any product.")
+    url_key: String! @doc(description: "URL key of the offer's own product page. Offers are left out of product search, so products filtered by url_key does not find one: read it with route, url being url_key plus the product URL suffix.")
+    type_id: String! @doc(description: "Product type, e.g. simple or configurable. A configurable offer is bought with its options, chosen on its own page.")
+    seller: HmSellerSummary! @doc(description: "The seller; never Hub Market itself.")
+    price: Money! @doc(description: "Final price for the customer group, the lowest one for a configurable offer: what price_range.minimum_price.final_price says on the offer's page.")
+    regular_price: Money! @doc(description: "Price before discounts; equal to price when there is none.")
+    stock_status: ProductStockStatus! @doc(description: "Stock status. The website lists only offers in stock, so every listed offer is IN_STOCK.")
+    dispatch_time: HmDispatchTime @doc(description: "The seller's typical dispatch time, or null.")
+}
+
+type HmStoreCategories @doc(description: "Seller counts for the Stores chips.") {
+    total_count: Int! @doc(description: "Sellers with a listable product, the All chip: hmStores total_count without filters.")
+    items: [HmCategoryCount!]! @doc(description: "Categories in menu order; count is the number of sellers in each.")
+}
+
+type HmStoreReviewSummary @doc(description: "The seller's rating, the figures of HmStoreCard.") {
+    rating: Float @doc(description: "Out of 5, one decimal; null when unrated.")
+    review_count: Int! @doc(description: "Approved reviews in every store view.")
+}
+
+type HmStoreReviewProduct @doc(description: "The product a review is about.") {
+    name: String! @doc(description: "Name in this store view.")
+    url_key: String @doc(description: "URL key; null when the storefront does not list the product.")
+    thumbnail_url: String @doc(description: "Absolute HTTPS thumbnail or null.")
+}
+
+type HmStoreReview @doc(description: "A review of one of the seller's products.") {
+    id: Int! @doc(description: "Review id.")
+    nickname: String! @doc(description: "Reviewer's nickname.")
+    title: String @doc(description: "Title, plain text.")
+    text: String @doc(description: "Review text, plain text.")
+    rating: Float @doc(description: "Average of the review's votes out of 5, one decimal; null without votes.")
+    created_at: String! @doc(description: "Written, ISO-8601 UTC.")
+    product: HmStoreReviewProduct @doc(description: "Reviewed product.")
+}
+
+type HmStoreReviewPage @doc(description: "A seller's reviews.") {
+    summary: HmStoreReviewSummary! @doc(description: "The seller's rating.")
+    items: [HmStoreReview!]! @doc(description: "Reviews, newest first.")
+    total_count: Int! @doc(description: "Reviews this store view shows.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmHomeSection {
+    stores: [HmStoreCard!] @doc(description: "FEATURED_STORES, TOP_VENDORS, NEW_STORES: seller cards.")
+}
+
+interface ProductInterface {
+    hm_seller: HmSellerSummary @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\ProductSeller") @doc(description: "'Sold by'. Hub Market for admin products; null if the seller is not approved.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\SellerIdentity")
+    hm_offer_count: Int! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\ProductOfferCount") @doc(description: "How many other sellers offer this product, the website's Sold by N other sellers; 0 when none. Public; ask with the product as GET.")
+    hm_other_offers(
+        pageSize: Int = 10 @doc(description: "Most offers to return, 1-50.")
+    ): [HmProductOffer!]! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\ProductOtherOffers") @doc(description: "The other sellers' offers on this product, cheapest first, as the website's price comparison lists them; on a copy's page, the product it was copied from and the other copies. Public; ask with the product as GET.")
+}
+
+interface CartItemInterface {
+    hm_seller: HmSellerSummary @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\CartItemSeller") @doc(description: "Line seller; group lines by code.")
+}
+
+interface OrderItemInterface {
+    hm_seller: HmSellerSummary @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\OrderItemSeller") @doc(description: "Line seller (sales_order_item.vendor_id).")
+}

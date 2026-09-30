@@ -1,0 +1,23 @@
+# requires: HubAppVendors
+# S4 seller list (public, GET). Variables: {"sort":"TOP_RATED"} optional, {"categoryId":34} optional.
+query HmSmokeStores($sort: HmStoreSort, $categoryId: Int, $pageSize: Int = 20, $currentPage: Int = 1) {
+  hmStores(filter: {category_id: $categoryId}, sort: $sort, pageSize: $pageSize, currentPage: $currentPage) {
+    total_count
+    page_info { current_page page_size total_pages }
+    items {
+      code
+      vendor_entity_id
+      name
+      logo_url
+      rating
+      review_count
+      product_count
+      dispatch_time { code label source }
+      is_featured
+      joined_at
+      link { type url code }
+      primary_category { id uid name count }
+      facet_value
+    }
+  }
+}

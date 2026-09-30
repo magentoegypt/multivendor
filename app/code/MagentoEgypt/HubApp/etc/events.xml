@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+    Hero banners are part of the app Home (HERO_BANNERS). Global scope, not
+    adminhtml: banners are also written by data patches during setup:upgrade.
+
+    Cart price rules decide hmAppConfig.shipping.free_over (the free-shipping
+    threshold): saving or deleting one purges the cached hmAppConfig. Global
+    too, as rules are also saved through the REST API.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="magentoegypt_hero_banner_save_after">
+        <observer name="magentoegypt_hubapp_clean_home" instance="MagentoEgypt\HubApp\Observer\CleanHomeOnHeroBannerChange"/>
+    </event>
+    <event name="magentoegypt_hero_banner_delete_after">
+        <observer name="magentoegypt_hubapp_clean_home" instance="MagentoEgypt\HubApp\Observer\CleanHomeOnHeroBannerChange"/>
+    </event>
+    <event name="salesrule_rule_save_after">
+        <observer name="magentoegypt_hubapp_clean_config" instance="MagentoEgypt\HubApp\Observer\CleanConfigCache"/>
+    </event>
+    <event name="salesrule_rule_delete_after">
+        <observer name="magentoegypt_hubapp_clean_config" instance="MagentoEgypt\HubApp\Observer\CleanConfigCache"/>
+    </event>
+</config>

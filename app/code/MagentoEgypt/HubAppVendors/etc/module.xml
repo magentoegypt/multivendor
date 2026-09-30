@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market customer app: sellers (MagentoEgypt_HubAppVendors).
+ *
+ * setup_version is deliberately ABSENT (no tables, no patches); a declared
+ * version with no setup_module row makes DbStatusValidator 500 the storefront.
+ *
+ * Sequenced after the core module (its types, its seller summary provider and
+ * its Home section pool) and after every module whose types or tables it reads:
+ * the GraphQL interfaces it extends (ProductInterface, CartItemInterface,
+ * OrderItemInterface), the Vnecoms seller tables and settings, and the review
+ * events it listens to. Other sellers' offers (hm_other_offers) use the
+ * storefront gate of MagentoEgypt_VendorExtend and GraphQlCache's response
+ * tags; the Vnecoms price comparison attribute they read is optional (no
+ * attribute, no offers), so that module is not required.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HubAppVendors">
+        <sequence>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_Review"/>
+            <module name="Magento_GraphQl"/>
+            <module name="Magento_CatalogGraphQl"/>
+            <module name="Magento_QuoteGraphQl"/>
+            <module name="Magento_SalesGraphQl"/>
+            <module name="Magento_GraphQlCache"/>
+            <module name="Vnecoms_Vendors"/>
+            <module name="Vnecoms_VendorsConfig"/>
+            <module name="Vnecoms_VendorsPage"/>
+            <module name="MagentoEgypt_VendorExtend"/>
+            <module name="MagentoEgypt_HubApp"/>
+        </sequence>
+    </module>
+</config>

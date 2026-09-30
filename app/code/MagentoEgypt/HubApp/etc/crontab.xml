@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- Purges app content that time made stale; see Cron\FlushExpiredContent. -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="magentoegypt_hubapp_flush_expired_content" instance="MagentoEgypt\HubApp\Cron\FlushExpiredContent" method="execute">
+            <schedule>*/10 * * * *</schedule>
+        </job>
+    </group>
+</config>

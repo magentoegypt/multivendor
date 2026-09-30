@@ -1,0 +1,316 @@
+type Query {
+    hmAppConfig(
+        platform: HmPlatform @doc(description: "Only this platform's version policy and flags; omit for all.")
+    ): HmAppConfig! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig") @doc(description: "App settings for the store view in the Store header. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\AppConfigIdentity")
+    hmAppHome(
+        audience: HmAudience @doc(description: "GUEST (default) or CUSTOMER. Marketing targeting only, not authorisation.")
+    ): HmHome! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Home") @doc(description: "Active, in-schedule Home sections in admin order with their content; empty sections are omitted. Public; send as GET.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\HomeIdentity")
+    hmDeals(
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1."),
+        category_id: Int @doc(description: "Only deals in this category or below it, e.g. a department id from categories."),
+        min_discount_percent: Int @doc(description: "Only offers of at least this percentage off, 0-100; 0 keeps every offer."),
+        sort: HmDealSort @doc(description: "Order; DISCOUNT when omitted. Write it inline.")
+    ): HmProductPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Deals") @doc(description: "Products whose special price is live today (store timezone), deepest percentage discount first.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\ProductPageIdentity")
+    hmBestSellers(
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmProductPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BestSellers") @doc(description: "Products by units ordered (top-level order lines, cancelled orders excluded).") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\ProductPageIdentity")
+    hmBundleDeals(
+        category_id: Int @doc(description: "Only bundles under this top-level category (ids from `categories`)."),
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmBundleDealPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BundleDeals") @doc(description: "bundle and new_bundle products with their real saving (the website's bundle rail rules).") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\BundleDealIdentity")
+    hmBrands(
+        featured_only: Boolean @doc(description: "Only brands flagged Featured."),
+        pageSize: Int = 100 @doc(description: "Items per page, 1-200."),
+        currentPage: Int = 1 @doc(description: "Page number from 1."),
+        with_products: Boolean @doc(description: "Only brands whose page lists at least one product.")
+    ): HmBrandPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Brands") @doc(description: "Enabled MGS brands assigned to this store view, in admin order.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\BrandIdentity")
+}
+
+enum HmPlatform @doc(description: "Mobile platform.") {
+    ANDROID @doc(description: "Android.")
+    IOS @doc(description: "iOS.")
+}
+
+enum HmAudience @doc(description: "Who the Home is for.") {
+    GUEST @doc(description: "Not signed in.")
+    CUSTOMER @doc(description: "Signed-in customer.")
+}
+
+enum HmDealSort @doc(description: "Order of hmDeals, applied to the whole day's ranking.") {
+    DISCOUNT @doc(description: "Deepest percentage discount first, a bundle by its percent special price: the ranking itself.")
+    PRICE_ASC @doc(description: "Lowest indexed guest price first.")
+    PRICE_DESC @doc(description: "Highest indexed guest price first.")
+    ENDING_SOON @doc(description: "Soonest special_to_date first; offers without an end last.")
+    NEWEST @doc(description: "Newest products first, as the storefront's Newest sort: created_at, then id.")
+}
+
+enum HmSectionType @doc(description: "Home section kind (admin Type field).") {
+    DELIVERY_STRIP @doc(description: "Delivery promise line; cms_block hm_delivery_promise.")
+    HERO_BANNERS @doc(description: "Carousel slides and side tiles; banners.")
+    CATEGORY_CHIPS @doc(description: "Top-level categories with live counts; categories.")
+    TODAYS_DEALS @doc(description: "Live special prices; products + countdown_ends_at.")
+    PICKED_FOR_YOU @doc(description: "Top-rated products; the app may substitute local recently viewed; products.")
+    FEATURED_STORES @doc(description: "Chosen sellers; stores (HubAppVendors).")
+    CATEGORY_RAIL @doc(description: "Products of one category; products.")
+    BUNDLE_DEALS @doc(description: "Bundles with savings; bundles.")
+    CMS_PROMOS @doc(description: "Promo cards; cms_block hm_home_promos.")
+    BEST_SELLERS @doc(description: "Best sellers; products.")
+    POPULAR_PRODUCTS @doc(description: "Catalogue rail, newest first by default; products.")
+    TOP_BRANDS @doc(description: "Brands; brands.")
+    TOP_VENDORS @doc(description: "Highest-rated sellers; stores.")
+    NEW_STORES @doc(description: "Recently joined sellers; stores.")
+    TRUST_ROW @doc(description: "Trust items; cms_block hm_home_trust.")
+    CMS_BLOCK @doc(description: "Any CMS block by identifier; cms_block.")
+    PRODUCT_LIST @doc(description: "Hand-picked SKUs; products.")
+    ACTIVE_ORDER @doc(description: "Where the app draws the signed-in customer's open order; no content, the app reads the order itself and draws nothing for a guest or without one.")
+}
+
+enum HmLinkType @doc(description: "What a link points at, so the app can route natively.") {
+    CATEGORY @doc(description: "Category; use uid.")
+    PRODUCT @doc(description: "Product; uid, url_key in code.")
+    CMS_PAGE @doc(description: "CMS page; identifier in code.")
+    STORE @doc(description: "Seller store; seller code in code.")
+    STORES @doc(description: "Seller list page (hmStores).")
+    BRAND @doc(description: "Brand; url_key in code.")
+    BRANDS @doc(description: "All brands page (hmBrands).")
+    BUNDLES @doc(description: "Bundles page (hmBundleDeals).")
+    DEALS @doc(description: "Deals page (hmDeals).")
+    SEARCH @doc(description: "Search; query text in code.")
+    EXTERNAL @doc(description: "Anything else; open url.")
+}
+
+type HmLink @doc(description: "A destination classified server-side.") {
+    type: HmLinkType! @doc(description: "Kind of destination.")
+    url: String! @doc(description: "Absolute storefront URL, always present as a fallback.")
+    path: String @doc(description: "Store-relative path as configured, e.g. clothes.html.")
+    uid: ID @doc(description: "Entity uid for CATEGORY and PRODUCT.")
+    code: String @doc(description: "Seller code, brand url_key, CMS identifier, product url_key or search text.")
+}
+
+type HmLabelValue @doc(description: "A label and its value.") {
+    label: String! @doc(description: "Label in the store view's language.")
+    value: String! @doc(description: "Value.")
+}
+
+type HmSellerSummary @doc(description: "Who sells an item. Shared by products, cart and order items, bundles and returns.") {
+    code: String @doc(description: "Seller code for hmStore; null when Hub Market sells the item.")
+    vendor_entity_id: Int @doc(description: "Numeric seller id for the products vendor_id filter; null for Hub Market.")
+    name: String! @doc(description: "Display name in the store view's language (company, else humanised code; 'Hub Market' for vendor 0).")
+    logo_url: String @doc(description: "Absolute HTTPS logo, or null.")
+    rating: Float @doc(description: "Average of approved product reviews out of 5, one decimal; null when unrated.")
+    review_count: Int! @doc(description: "Approved reviews across the seller's products.")
+    product_count: Int! @doc(description: "Products the seller's store page lists.")
+    is_marketplace: Boolean! @doc(description: "True when Hub Market itself sells the item.")
+    link: HmLink @doc(description: "Seller store page; null for Hub Market.")
+}
+
+type HmAppConfig @doc(description: "App settings for one store view.") {
+    store_code: String! @doc(description: "Store view code (en or ar).")
+    locale: String! @doc(description: "Store view locale, e.g. ar_SA.")
+    search: HmSearchConfig! @doc(description: "Search screen settings.")
+    algolia: HmAlgoliaConfig @doc(description: "Algolia search credentials and index names for this store view; null when search is not on Algolia or the storefront publishes no search key for it.")
+    contact: HmContactConfig! @doc(description: "Customer-service channels.")
+    version: [HmVersionPolicy!]! @doc(description: "Version policy per platform.")
+    maintenance: HmMaintenance! @doc(description: "Maintenance mode.")
+    features: [HmFeatureFlag!]! @doc(description: "Feature flags; codes unknown to the app mean off.")
+    capabilities: [String!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Capabilities") @doc(description: "HubApp satellites enabled on this server, A-Z: vendors (HubAppVendors), bundle (HubAppBundle), returns (HubAppReturns), account (HubAppAccount). Ask for a satellite's fields only when its code is listed.")
+    shipping: HmShippingConfig! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\Shipping") @doc(description: "Shipping promises of the store view.")
+}
+
+type HmShippingConfig @doc(description: "Shipping promises.") {
+    free_over: Money @doc(description: "Cart subtotal that earns free shipping, the figure the storefront's mini-cart counts down to: the lowest base_subtotal threshold of the active, coupon-free cart price rules granting free shipping to the caller's customer group, guests without a token. Null when there is none.")
+}
+
+type HmSearchConfig @doc(description: "Search settings.") {
+    hint: String @doc(description: "Search field placeholder.")
+    trending_terms: [String!]! @doc(description: "Trending searches in admin order, at most 10.")
+}
+
+type HmAlgoliaConfig @doc(description: "Algolia as the storefront uses it for this store view. Search-only credentials: never the admin key.") {
+    application_id: String! @doc(description: "Algolia application id.")
+    search_api_key: String! @doc(description: "Secured search key with the restrictions the storefront gives a guest browser, derived from the search-only key and further limited to this store view's indices; valid until valid_until. Never the admin key.")
+    valid_until: Int @doc(description: "Unix time in seconds when search_api_key expires; fetch hmAppConfig again before then. Responses carrying a key are cached for at most an hour.")
+    index_prefix: String! @doc(description: "Index name prefix, e.g. hubmarket_.")
+    product_index: String! @doc(description: "Products index of this store view, e.g. hubmarket_en_products.")
+    category_index: String! @doc(description: "Categories index of this store view, e.g. hubmarket_en_categories.")
+    page_index: String! @doc(description: "CMS pages index of this store view, e.g. hubmarket_en_pages.")
+    facets: [HmAlgoliaFacet!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Search facets in admin order with this store view's labels, as the storefront's algoliaConfig.facets.")
+    sorts: [HmAlgoliaSort!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Sort replicas of product_index in admin order, for guests, as algoliaConfig.sortingIndices. Relevance is product_index itself.")
+    suggestion_index: String @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Query suggestions index the storefront's autocomplete reads; null when its suggestions are off.")
+    suggestion_count: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Suggestions the autocomplete shows; 0 when off.")
+    currency_code: String! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Currency of the records' prices, e.g. AED.")
+    price_group: String! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Price group of guest records: default, or group_0 with customer group pricing. The numeric price attribute is price.<currency_code>.<price_group>.")
+    max_values_per_facet: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Facet values the storefront asks for.")
+    product_suggestions: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Products the autocomplete shows.")
+    category_suggestions: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Categories the autocomplete shows.")
+    page_suggestions: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "CMS pages the autocomplete shows; 0 without a pages section.")
+    category_separator: String! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Between the levels of a categories.levelN value, as indexed, spaces included.")
+    categories_outside_menu: Boolean! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "True when categories left out of the menu are searchable too.")
+}
+
+type HmAlgoliaFacet @doc(description: "A facet of the storefront's search.") {
+    attribute: String! @doc(description: "Record attribute, e.g. price, categories, mgs_brand.")
+    type: String! @doc(description: "slider, conjunctive, disjunctive or priceRanges.")
+    label: String! @doc(description: "Label in the store view's language; may be empty.")
+}
+
+type HmAlgoliaSort @doc(description: "A sort replica of the products index.") {
+    index: String! @doc(description: "Replica index, e.g. hubmarket_en_products_price_default_asc.")
+    attribute: String! @doc(description: "Sorted attribute, e.g. price or created_at.")
+    direction: SortEnum! @doc(description: "ASC or DESC.")
+    label: String! @doc(description: "Label in the store view's language.")
+}
+
+type HmContactConfig @doc(description: "Contact channels.") {
+    whatsapp_number: String @doc(description: "WhatsApp number, E.164.")
+    whatsapp_url: String @doc(description: "https://wa.me/<digits>.")
+    phone: String @doc(description: "Phone, E.164.")
+    email: String @doc(description: "Support e-mail.")
+    hours: String @doc(description: "Service hours text.")
+}
+
+type HmVersionPolicy @doc(description: "Version policy for one platform.") {
+    platform: HmPlatform! @doc(description: "Platform.")
+    min_version: String @doc(description: "Lowest supported semver; older builds must update.")
+    latest_version: String @doc(description: "Newest published semver; older builds may prompt.")
+    store_url: String @doc(description: "Store listing URL.")
+    message: String @doc(description: "Update prompt text.")
+}
+
+type HmMaintenance @doc(description: "Maintenance mode.") {
+    enabled: Boolean! @doc(description: "True: show message instead of the storefront.")
+    message: String @doc(description: "Message in the store view's language.")
+    retry_after_minutes: Int @doc(description: "Suggested wait before retrying.")
+}
+
+type HmFeatureFlag @doc(description: "A remote switch.") {
+    code: String! @doc(description: "Agreed code, e.g. store_credit, returns, whatsapp_login, push.")
+    enabled: Boolean! @doc(description: "On or off.")
+}
+
+type HmHome @doc(description: "The app Home.") {
+    store_code: String! @doc(description: "Store view it was built for.")
+    generated_at: String! @doc(description: "Build time, ISO-8601 UTC (cached copies keep it).")
+    sections: [HmHomeSection!]! @doc(description: "Sections in admin order.")
+}
+
+type HmHomeSection @doc(description: "One Home section; only the content field matching type is set.") {
+    id: Int! @doc(description: "Section id.")
+    type: HmSectionType! @doc(description: "Kind; selects the widget and content field.")
+    title: String @doc(description: "Title in the store view's language; null hides the header.")
+    subtitle: String @doc(description: "Subtitle in the store view's language.")
+    limit: Int! @doc(description: "Configured maximum items.")
+    ends_at: String @doc(description: "Scheduled end, ISO-8601 UTC; hide after it.")
+    countdown_ends_at: String @doc(description: "TODAYS_DEALS: end-of-day (store timezone, ISO-8601 with offset) of the soonest-ending shown offer.")
+    personalizable: Boolean! @doc(description: "True: the app may replace products with local recently viewed.")
+    more_link: HmLink @doc(description: "'View all' destination.")
+    banners: [HmHeroBanner!] @doc(description: "HERO_BANNERS: slides then tiles.")
+    categories: [HmCategoryChip!] @doc(description: "CATEGORY_CHIPS: chips in configured order.")
+    cms_block: HmCmsBlock @doc(description: "CMS-backed types: the block for this store view.")
+    brands: [HmBrand!] @doc(description: "TOP_BRANDS: brands.")
+    bundles: [HmBundleDeal!] @doc(description: "BUNDLE_DEALS: bundle cards.")
+    products: [ProductInterface!] @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Home\\SectionProducts") @doc(description: "Product sections: sellable products in rank order, batch-loaded for all sections in one collection.")
+}
+
+enum HmBannerSlot @doc(description: "Hero band position.") {
+    SLIDE @doc(description: "Carousel slide.")
+    TILE @doc(description: "Side tile.")
+}
+
+type HmHeroBanner @doc(description: "Hero band item (Content > Elements > Hero Banner).") {
+    id: Int! @doc(description: "Banner id.")
+    slot: HmBannerSlot! @doc(description: "Slide or tile.")
+    title: String! @doc(description: "Headline.")
+    kicker: String @doc(description: "Pill above the headline.")
+    subtitle: String @doc(description: "Supporting line.")
+    cta_label: String @doc(description: "Button label.")
+    image_url: String @doc(description: "Absolute HTTPS image.")
+    tone: String @doc(description: "Scrim colour, hex.")
+    accent: String @doc(description: "Pill/button colour, hex; label is white.")
+    link: HmLink! @doc(description: "Destination.")
+}
+
+type HmCategoryChip @doc(description: "Category chip.") {
+    id: Int! @doc(description: "Category id.")
+    uid: ID! @doc(description: "Category uid.")
+    name: String! @doc(description: "Localised name.")
+    url_key: String! @doc(description: "URL key; keys icon and tint.")
+    product_count: Int! @doc(description: "Products in the category.")
+    icon: String @doc(description: "Configured glyph.")
+    tint: Int @doc(description: "Pastel slot 0-7.")
+    link: HmLink! @doc(description: "Category destination.")
+}
+
+type HmCmsBlock @doc(description: "CMS block, filtered like cmsBlocks.") {
+    identifier: String! @doc(description: "Identifier.")
+    title: String @doc(description: "Title.")
+    content: String! @doc(description: "Rendered HTML.")
+}
+
+type HmBrand @doc(description: "MGS brand.") {
+    id: Int! @doc(description: "Brand id.")
+    option_id: Int! @doc(description: "Option id for the products mgs_brand filter.")
+    name: String! @doc(description: "Localised name (theme translations applied).")
+    url_key: String! @doc(description: "URL key.")
+    logo_url: String @doc(description: "Small image, else large; absolute HTTPS.")
+    image_url: String @doc(description: "Large image; absolute HTTPS.")
+    is_featured: Boolean! @doc(description: "Featured flag.")
+    link: HmLink! @doc(description: "Brand destination.")
+    product_count: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BrandCount") @doc(description: "Products its brand page lists: the brand's products that pass the storefront gate in this store view.")
+    seller_count: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BrandCount") @doc(description: "Distinct sellers of those products; Hub Market itself counts as one.")
+}
+
+type HmBrandPage @doc(description: "Brands page.") {
+    items: [HmBrand!]! @doc(description: "Brands.")
+    total_count: Int! @doc(description: "Brands matching.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmProductPage @doc(description: "Ranked products page.") {
+    items: [ProductInterface!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\ProductPageItems") @doc(description: "Products in rank order.")
+    total_count: Int! @doc(description: "Ranked products available (capped at 200).")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+    countdown_ends_at: String @doc(description: "hmDeals: soonest offer end on this page.")
+    categories: [HmCategoryCount!] @doc(description: "hmDeals: departments, the active top-level categories, of the deals matching every filter but category_id, catalogue order, with counts; empty when fewer than two. Null for other lists.")
+}
+
+type HmBundleDeal @doc(description: "Bundle card.") {
+    uid: ID! @doc(description: "Product uid.")
+    sku: String! @doc(description: "SKU.")
+    name: String! @doc(description: "Localised name.")
+    url_key: String! @doc(description: "URL key.")
+    image_url: String @doc(description: "16:9 image, absolute HTTPS.")
+    seller: HmSellerSummary @doc(description: "Seller.")
+    description: String @doc(description: "Plain excerpt, else the included products.")
+    is_kit: Boolean! @doc(description: "True: several required options; false: choose one.")
+    item_count: Int! @doc(description: "Kit items or number of choices.")
+    thumbnails: [String!]! @doc(description: "Up to 4 child thumbnails.")
+    more_thumbnails: Int! @doc(description: "Children beyond the thumbnails.")
+    price: Money! @doc(description: "Indexed minimum price.")
+    price_is_from: Boolean! @doc(description: "True when max price is higher.")
+    regular_total: Money @doc(description: "Same items at regular prices; null without real saving.")
+    saving: Money @doc(description: "regular_total - price; null when zero.")
+    discount_percent: Int! @doc(description: "Rounded saving %; 0 when none.")
+    rating_percent: Int @doc(description: "Rating 0-100; null when unrated.")
+    review_count: Int! @doc(description: "Approved reviews.")
+    category_ids: [Int!]! @doc(description: "Active top-level categories.")
+}
+
+type HmCategoryCount @doc(description: "Category with a count.") {
+    id: Int! @doc(description: "Category id.")
+    uid: ID! @doc(description: "Category uid.")
+    name: String! @doc(description: "Localised name.")
+    count: Int! @doc(description: "Items in it.")
+}
+
+type HmBundleDealPage @doc(description: "Bundle cards page.") {
+    items: [HmBundleDeal!]! @doc(description: "Cards, newest first.")
+    categories: [HmCategoryCount!]! @doc(description: "Filter chips; empty when fewer than two.")
+    max_discount_percent: Int! @doc(description: "Largest discount; 0 hides the stat.")
+    seller_count: Int! @doc(description: "Distinct sellers.")
+    total_count: Int! @doc(description: "Bundles matching.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}

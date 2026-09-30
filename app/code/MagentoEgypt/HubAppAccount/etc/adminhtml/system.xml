@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!--
+    Stores > Configuration > Magento Egypt > Hub Market App > WhatsApp Codes.
+
+    The limits are read by MagentoEgypt_SmsExtend (Model\Otp\OtpGuard) for every WhatsApp code: the app's
+    GraphQL sign-in and the REST service the seller app uses (/V1/whatsapp/otp/send and /verify), on shared
+    counters. SmsExtend reads them by path; with this module disabled it applies the same defaults, built in.
+
+    The tab and the section are MagentoEgypt_HubApp's (and the tab OdooConnector's too); they are
+    declared again with the same values so this group has a home whichever system.xml loads first.
+    Global scope: these are abuse limits, not per-language text.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magentoegypt" translate="label" sortOrder="400">
+            <label>Magento Egypt</label>
+        </tab>
+        <section id="hubapp" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Hub Market App</label>
+            <tab>magentoegypt</tab>
+            <resource>MagentoEgypt_HubApp::config</resource>
+            <group id="otp" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>WhatsApp Codes</label>
+                <field id="reveal_unknown_number" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Tell the App When a Number Has No Account</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>No (recommended): every number gets the same "if this number has an account, we sent a code" answer, so nobody can find out which numbers are customers. Yes: the app is told when no account, several accounts or an unusable stored number stopped the code.</comment>
+                </field>
+                <field id="send_limit_ip_hour" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Code Requests per Address per Hour</label>
+                    <validate>validate-digits</validate>
+                    <comment>App and seller app alike. 0 (the default) = off. Turn it on only after checking that the server sees each visitor's own address, not the CDN's; otherwise all visitors share one limit. Suggested value once on: 10. Every request counts, sent or not.</comment>
+                </field>
+                <field id="send_limit_number_hour" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Code Requests per Mobile Number per Hour</label>
+                    <validate>validate-digits</validate>
+                    <comment>App and seller app alike. 0 = no limit. Every spelling of a number counts as that number. The resend cooldown of the SMS settings applies as well.</comment>
+                </field>
+                <field id="wrong_codes_ip_hour" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Wrong Codes per Address per Hour</label>
+                    <validate>validate-digits</validate>
+                    <comment>App and seller app alike. 0 (the default) = off. Turn it on only after checking that the server sees each visitor's own address, not the CDN's; otherwise all visitors share one limit. Suggested value once on: 30. A number without an account counts as a wrong code. Separately, and always on, 5 wrong codes for one number lock code sign-in for that number for 15 minutes; the customer's account and password sign-in are never locked by codes.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

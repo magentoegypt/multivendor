@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+    Defaults of the app settings. Everything text-like starts empty: the app
+    hides what is not configured rather than showing invented copy.
+
+    Feature flags: the app treats a code it is not sent as off, so the four
+    agreed codes ship enabled for all platforms. Each child of <flags> is one
+    row of the admin Flags grid (Block\Adminhtml\Form\Field\FeatureFlags),
+    keyed by its row id, with the grid's columns code / enabled / platform.
+    Saving the grid stores the rows as JSON (ArraySerialized), which replaces
+    these defaults at that scope; AppConfigReader::features() reads both forms.
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <hubapp>
+            <search>
+                <algolia_enabled>1</algolia_enabled>
+            </search>
+            <maintenance>
+                <enabled>0</enabled>
+                <retry_after_minutes>15</retry_after_minutes>
+            </maintenance>
+            <features>
+                <flags>
+                    <returns_all>
+                        <code>returns</code>
+                        <enabled>1</enabled>
+                        <platform>all</platform>
+                    </returns_all>
+                    <store_credit_all>
+                        <code>store_credit</code>
+                        <enabled>1</enabled>
+                        <platform>all</platform>
+                    </store_credit_all>
+                    <whatsapp_login_all>
+                        <code>whatsapp_login</code>
+                        <enabled>1</enabled>
+                        <platform>all</platform>
+                    </whatsapp_login_all>
+                    <push_all>
+                        <code>push</code>
+                        <enabled>1</enabled>
+                        <platform>all</platform>
+                    </push_all>
+                </flags>
+            </features>
+        </hubapp>
+    </default>
+</config>

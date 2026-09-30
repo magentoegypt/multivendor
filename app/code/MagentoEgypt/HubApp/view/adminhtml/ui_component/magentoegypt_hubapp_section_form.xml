@@ -1,0 +1,1364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    App Home section form (Figma G2b).
+
+    The Type select drives which content fields show (switcherConfig): a
+    category rail asks for a category, featured stores for sellers, the
+    CMS-backed types for a block, and so on. Hidden fields keep their values
+    and are ignored by the section type that does not read them.
+
+    Dates are entered in the store's timezone and stored in UTC; the date
+    component converts both ways (storeTimeZone from the Date data type).
+-->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">magentoegypt_hubapp_section_form.section_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Home Section</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="back" class="MagentoEgypt\HubApp\Block\Adminhtml\Section\Edit\BackButton"/>
+            <button name="delete" class="MagentoEgypt\HubApp\Block\Adminhtml\Section\Edit\DeleteButton"/>
+            <button name="save_and_continue" class="MagentoEgypt\HubApp\Block\Adminhtml\Section\Edit\SaveAndContinueButton"/>
+            <button name="save" class="MagentoEgypt\HubApp\Block\Adminhtml\Section\Edit\SaveButton"/>
+        </buttons>
+        <namespace>magentoegypt_hubapp_section_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>magentoegypt_hubapp_section_form.section_form_data_source</dep>
+        </deps>
+    </settings>
+
+    <dataSource name="section_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="magentoegypt_hubapp/section/save"/>
+        </settings>
+        <dataProvider class="MagentoEgypt\HubApp\Model\Section\DataProvider" name="section_form_data_source">
+            <settings>
+                <requestFieldName>section_id</requestFieldName>
+                <primaryFieldName>section_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+
+    <fieldset name="general" sortOrder="10">
+        <settings>
+            <label translate="true">Section</label>
+        </settings>
+
+        <field name="section_id" formElement="hidden">
+            <settings>
+                <dataType>number</dataType>
+            </settings>
+        </field>
+
+        <field name="is_active" formElement="checkbox" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Enabled</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+
+        <field name="type" formElement="select" sortOrder="20">
+            <settings>
+                    <switcherConfig>
+                        <rules>
+                            <rule name="0">
+                                <value>DELIVERY_STRIP</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="1">
+                                <value>HERO_BANNERS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="2">
+                                <value>CATEGORY_CHIPS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>show</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="3">
+                                <value>TODAYS_DEALS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="4">
+                                <value>PICKED_FOR_YOU</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="5">
+                                <value>FEATURED_STORES</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="6">
+                                <value>CATEGORY_RAIL</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="7">
+                                <value>BUNDLE_DEALS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="8">
+                                <value>CMS_PROMOS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="9">
+                                <value>BEST_SELLERS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="10">
+                                <value>POPULAR_PRODUCTS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="11">
+                                <value>TOP_BRANDS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="12">
+                                <value>TOP_VENDORS</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="13">
+                                <value>NEW_STORES</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="14">
+                                <value>TRUST_ROW</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="15">
+                                <value>CMS_BLOCK</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <rule name="16">
+                                <value>PRODUCT_LIST</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>show</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                            <!-- Placement only: nothing to choose, the app fills it with the signed-in customer's open order. -->
+                            <rule name="17">
+                                <value>ACTIVE_ORDER</value>
+                                <actions>
+                                    <action name="0">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.category_id</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="1">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.vendor_codes</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="2">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.product_skus</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="3">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.cms_identifier</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="4">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.item_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="5">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.sort_by</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="6">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.more_url</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="7">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.featured_only</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="8">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.tile_limit</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="9">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_order</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="10">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_icons</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                    <action name="11">
+                                        <target>magentoegypt_hubapp_section_form.magentoegypt_hubapp_section_form.source.chip_tints</target>
+                                        <callback>hide</callback>
+                                    </action>
+                                </actions>
+                            </rule>
+                        </rules>
+                        <enabled>true</enabled>
+                    </switcherConfig>
+                <dataType>text</dataType>
+                <label translate="true">Type</label>
+                <notice translate="true">What the section shows. Changing it shows the content fields that type reads.</notice>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MagentoEgypt\HubApp\Model\Source\SectionType"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="position" formElement="input" sortOrder="30">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Position</label>
+                <notice translate="true">Order on the app Home, smallest first. The seeded sections use steps of 10 so a new one fits in between.</notice>
+                <validation>
+                    <rule name="validate-number" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="audience" formElement="select" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="string">all</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Audience</label>
+                <notice translate="true">Targeting only: signed-in customers and guests can each get their own Home.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MagentoEgypt\HubApp\Model\Source\Audience"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="store_id" formElement="select" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Store View</label>
+                <notice translate="true">All Store Views shows the section in English and Arabic, with the matching title.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Store\Model\System\Store"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="starts_at" formElement="date" sortOrder="60">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Show From</label>
+                <notice translate="true">Store time. Empty: from now on.</notice>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+
+        <field name="ends_at" formElement="date" sortOrder="70">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Show Until</label>
+                <notice translate="true">Store time. Empty: no end. The app also hides the section by itself once this passes.</notice>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+    </fieldset>
+
+    <fieldset name="titles" sortOrder="20">
+        <settings>
+            <label translate="true">Titles</label>
+        </settings>
+
+        <field name="title_en" formElement="input" sortOrder="10">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Title (English)</label>
+                <notice translate="true">Empty: the default title of the type, if it has one. A single "-" hides the section header.</notice>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="title_ar" formElement="input" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Title (Arabic)</label>
+                <notice translate="true">Shown on the Arabic store view. Empty: the Arabic default title of the type.</notice>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="subtitle_en" formElement="input" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Subtitle (English)</label>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="subtitle_ar" formElement="input" sortOrder="40">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Subtitle (Arabic)</label>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">255</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+
+    <fieldset name="source" sortOrder="30">
+        <settings>
+            <label translate="true">Content</label>
+        </settings>
+
+        <field name="category_id" component="Magento_Catalog/js/components/new-category" formElement="select" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="multiple" xsi:type="boolean">false</item>
+                    <item name="showCheckbox" xsi:type="boolean">false</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="levelsVisibility" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <elementTmpl>ui/grid/filters/elements/ui-select</elementTmpl>
+                <dataType>text</dataType>
+                <label translate="true">Category</label>
+                <notice translate="true">Category rail: its products (children included). Popular products: optional, limits the rail to it. Bundle deals: optional, only bundles under this top-level category.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="Magento\Catalog\Ui\Component\Product\Form\Categories\Options"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="vendor_codes" formElement="multiselect" sortOrder="20">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Sellers</label>
+                <notice translate="true">Featured stores: these approved sellers, in this order unless a sort is chosen. Top vendors: optional, limits the ranking to them.</notice>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="MagentoEgypt\VendorExtend\Model\Source\SellerList"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+
+        <field name="product_skus" formElement="textarea" sortOrder="30">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Product SKUs</label>
+                <notice translate="true">One SKU per line, in the order to show. Products the storefront would not show (disabled, unapproved, inactive seller) are skipped.</notice>
+            </settings>
+        </field>
+
+        <field name="cms_identifier" formElement="select" sortOrder="40">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">CMS Block</label>
+                <notice translate="true">Default: hm_delivery_promise, hm_home_promos or hm_home_trust for the matching type. The store view's own copy of the block is used; a disabled block hides the section.</notice>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MagentoEgypt\HubApp\Model\Source\CmsBlock"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="item_limit" formElement="input" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="default" xsi:type="number">8</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Items</label>
+                <notice translate="true">Most items to show, 1 to 50. Hero banners: most carousel slides.</notice>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                    <rule name="validate-digits-range" xsi:type="string">1-50</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="sort_by" formElement="select" sortOrder="60">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Sort</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="MagentoEgypt\HubApp\Model\Source\ProductSort"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+
+        <field name="more_url" formElement="input" sortOrder="70">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">View All Link</label>
+                <notice translate="true">Store path (clothes.html, bundles, sellerlist, shop/loly, brand) or a full https:// address. The app opens categories, products, stores, brands, bundles, deals and searches natively.</notice>
+            </settings>
+        </field>
+
+        <field name="featured_only" formElement="checkbox" sortOrder="80">
+            <settings>
+                <dataType>boolean</dataType>
+                <label translate="true">Featured Brands Only</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+
+        <field name="tile_limit" formElement="input" sortOrder="90">
+            <settings>
+                <dataType>number</dataType>
+                <label translate="true">Side Tiles</label>
+                <notice translate="true">How many side tiles follow the slides (0 to 6). Empty: 3, as on the website.</notice>
+                <validation>
+                    <rule name="validate-digits" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="chip_order" formElement="textarea" sortOrder="100">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Chip Order</label>
+                <notice translate="true">Category URL keys, one per line: the chips shown, in this order. Empty: the top-level menu categories in catalogue order.</notice>
+            </settings>
+        </field>
+
+        <field name="chip_icons" formElement="textarea" sortOrder="110">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Chip Icons</label>
+                <notice translate="true">One per line: url_key=glyph, e.g. clothes=👗</notice>
+            </settings>
+        </field>
+
+        <field name="chip_tints" formElement="textarea" sortOrder="120">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Chip Tints</label>
+                <notice translate="true">One per line: url_key=slot, slot 0 to 7 (0 mint, 1 blue, 2 amber, 3 pink, 4 lavender, 5 cream, 6 rose, 7 indigo).</notice>
+            </settings>
+        </field>
+    </fieldset>
+</form>

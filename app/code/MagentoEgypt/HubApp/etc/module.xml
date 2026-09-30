@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market customer app: GraphQL core (MagentoEgypt_HubApp).
+ *
+ * setup_version is deliberately ABSENT. The table comes from db_schema.xml and
+ * the seed from a data patch, both of which setup:upgrade applies without a
+ * version. A setup_version with no matching setup_module row makes
+ * DbStatusValidator 500 the whole storefront; that has happened on this install.
+ *
+ * The satellites (HubAppVendors, HubAppBundle, HubAppReturns, HubAppAccount)
+ * sequence on this module, never the reverse, so any satellite can be disabled
+ * without breaking the GraphQL schema.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HubApp">
+        <sequence>
+            <module name="Magento_Backend"/>
+            <module name="Magento_Config"/>
+            <module name="Magento_Ui"/>
+            <module name="Magento_Store"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_CatalogInventory"/>
+            <module name="Magento_Cms"/>
+            <module name="Magento_SalesRule"/>
+            <module name="Magento_UrlRewrite"/>
+            <module name="Magento_GraphQl"/>
+            <module name="Magento_CatalogGraphQl"/>
+            <module name="Magento_CmsGraphQl"/>
+            <module name="Magento_GraphQlCache"/>
+            <module name="MagentoEgypt_HeroBanner"/>
+            <module name="MagentoEgypt_HomeSections"/>
+            <module name="MagentoEgypt_VendorExtend"/>
+        </sequence>
+    </module>
+</config>

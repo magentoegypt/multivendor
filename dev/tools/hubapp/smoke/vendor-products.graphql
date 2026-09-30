@@ -1,0 +1,10 @@
+# S5 a seller's products through core products() and the vendor_id filter.
+# vendor_id is a MATCH filter in the live schema (FilterMatchTypeInput), not eq.
+# Variables: {"id":"<hmStore.card.vendor_entity_id>"}; total_count must equal
+# the card's product_count (and must not pick up seller 12 for seller 1).
+query HmSmokeVendorProducts($id: String!) {
+  products(filter: { vendor_id: { match: $id, match_type: FULL } }, pageSize: 5) {
+    total_count
+    items { sku name }
+  }
+}
