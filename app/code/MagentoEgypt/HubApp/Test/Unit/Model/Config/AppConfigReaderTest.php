@@ -65,7 +65,9 @@ final class AppConfigReaderTest extends TestCase
             'algoliasearch_credentials/credentials/index_prefix' => 'hubmarket_',
         ];
         $keys = $this->createMock(AlgoliaKeyProvider::class);
-        $keys->expects(self::once())->method('guestKey')->with('search-only', 2)
+        $keys->method('isPublished')->with(2)->willReturn(true);
+        //  Only the store view's own indices (replicas and suggestions included).
+        $keys->expects(self::once())->method('guestKey')->with('search-only', 2, 'hubmarket_ar_*')
             ->willReturn(['key' => 'c2VjdXJlZA==', 'valid_until' => 1759300000]);
         $ttl = new ResponseTtl();
 
@@ -92,9 +94,27 @@ final class AppConfigReaderTest extends TestCase
             'algoliasearch_credentials/credentials/api_key' => 'same',
         ];
         $keys = $this->createMock(AlgoliaKeyProvider::class);
+        $keys->method('isPublished')->willReturn(true);
         $keys->expects(self::never())->method('guestKey');
 
         self::assertNull($this->reader($values, true, $keys, new ResponseTtl())->algolia($this->store(1, 'en')));
+    }
+
+    public function testNoAlgoliaWhenTheStorefrontPublishesNoKey(): void
+    {
+        $values = [
+            'hubapp/search/algolia_enabled' => '1',
+            'algoliasearch_credentials/credentials/application_id' => 'HL67ED06DQ',
+            'algoliasearch_credentials/credentials/search_only_api_key' => 'search-only',
+            'algoliasearch_credentials/credentials/api_key' => 'admin-key',
+        ];
+        $keys = $this->createMock(AlgoliaKeyProvider::class);
+        $keys->expects(self::once())->method('isPublished')->with(1)->willReturn(false);
+        $keys->expects(self::never())->method('guestKey');
+        $ttl = new ResponseTtl();
+
+        self::assertNull($this->reader($values, true, $keys, $ttl)->algolia($this->store(1, 'en')));
+        self::assertNull($ttl->getCap());
     }
 
     public function testAlgoliaOffWhenSwitchedOffOrModuleDisabled(): void

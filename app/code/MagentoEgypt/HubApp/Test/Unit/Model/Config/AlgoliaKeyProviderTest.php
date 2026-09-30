@@ -35,15 +35,19 @@ final class AlgoliaKeyProviderTest extends TestCase
 
     public function testGuestKeyUsesTheGuestGroupFiltersAndTheSearchOnlyKey(): void
     {
-        $key = self::securedKey('tagFilters=&validUntil=1759300000');
+        $key = self::securedKey('restrictIndices=hubmarket_ar_%2A&tagFilters=&validUntil=1759300000');
         $config = $this->createMock(ConfigHelper::class);
-        $config->expects(self::once())->method('getAttributesToFilter')->with(AlgoliaKeyProvider::GUEST_GROUP)->willReturn([]);
+        $config->expects(self::once())->method('getAttributesToFilter')->with(AlgoliaKeyProvider::GUEST_GROUP)
+            ->willReturn(['filters' => 'catalog_permissions.customer_group_0 != 0']);
         $connector = $this->createMock(AlgoliaConnector::class);
-        $connector->expects(self::once())->method('generateSearchSecuredApiKey')->with('search-only', [], 2)->willReturn($key);
+        //  The storefront's restrictions untouched (the connector adds tagFilters and validUntil), plus the indices.
+        $connector->expects(self::once())->method('generateSearchSecuredApiKey')
+            ->with('search-only', ['filters' => 'catalog_permissions.customer_group_0 != 0', 'restrictIndices' => 'hubmarket_ar_*'], 2)
+            ->willReturn($key);
 
         $provider = new AlgoliaKeyProvider($connector, $config, $this->createMock(LoggerInterface::class));
 
-        self::assertSame(['key' => $key, 'valid_until' => 1759300000], $provider->guestKey('search-only', 2));
+        self::assertSame(['key' => $key, 'valid_until' => 1759300000], $provider->guestKey('search-only', 2, 'hubmarket_ar_*'));
     }
 
     public function testNoKeyWhenTheExtensionFails(): void
@@ -55,6 +59,36 @@ final class AlgoliaKeyProviderTest extends TestCase
 
         $provider = new AlgoliaKeyProvider($connector, $config, $this->createMock(LoggerInterface::class));
 
-        self::assertNull($provider->guestKey('search-only', 1));
+        self::assertNull($provider->guestKey('search-only', 1, 'hubmarket_en_*'));
+    }
+
+    public function testPublishedOnlyWhereTheStorefrontRendersAlgolia(): void
+    {
+        //  [front end, application id, admin key, autocomplete, instant search, published?]
+        $cases = [
+            'all on' => [true, 'APP', 'admin', true, true, true],
+            'autocomplete only' => [true, 'APP', 'admin', true, false, true],
+            'instant search only' => [true, 'APP', 'admin', false, true, true],
+            'front end disabled' => [false, 'APP', 'admin', true, true, false],
+            'no application id' => [true, '', 'admin', true, true, false],
+            'no admin key' => [true, 'APP', null, true, true, false],
+            'no search interface' => [true, 'APP', 'admin', false, false, false],
+        ];
+        foreach ($cases as $label => [$frontEnd, $application, $adminKey, $autocomplete, $instant, $published]) {
+            $config = $this->createMock(ConfigHelper::class);
+            $config->method('isEnabledFrontEnd')->with(3)->willReturn($frontEnd);
+            $config->method('getApplicationID')->willReturn($application);
+            $config->method('getAPIKey')->willReturn($adminKey);
+            $config->method('isAutoCompleteEnabled')->willReturn($autocomplete);
+            $config->method('isInstantEnabled')->willReturn($instant);
+
+            $provider = new AlgoliaKeyProvider(
+                $this->createMock(AlgoliaConnector::class),
+                $config,
+                $this->createMock(LoggerInterface::class)
+            );
+
+            self::assertSame($published, $provider->isPublished(3), $label);
+        }
     }
 }

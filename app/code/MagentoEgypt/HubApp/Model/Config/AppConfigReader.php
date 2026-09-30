@@ -122,7 +122,14 @@ class AppConfigReader
      *
      * Index names are built the way the extension builds them
      * (IndexNameFetcher: prefix + store code + suffix), so the app searches
-     * exactly the indices the storefront does, e.g. hubmarket_ar_products.
+     * exactly the indices the storefront does, e.g. hubmarket_ar_products. The
+     * key only opens this store view's indices (restrictIndices
+     * `<prefix><store code>_*`, which also covers the sort replicas and the
+     * suggestions index).
+     *
+     * Null whenever the storefront itself publishes no key for the store view
+     * (AlgoliaKeyProvider::isPublished(): front end disabled, credentials
+     * missing, or neither autocomplete nor instant search on).
      *
      * @return array<string, string|int|null>|null
      */
@@ -133,6 +140,9 @@ class AppConfigReader
             return null;
         }
         if (!$this->moduleManager->isEnabled(self::ALGOLIA_MODULE)) {
+            return null;
+        }
+        if (!$this->algoliaKeys->isPublished($storeId)) {
             return null;
         }
 
@@ -153,14 +163,14 @@ class AppConfigReader
             return null;
         }
 
-        $secured = $this->algoliaKeys->guestKey($searchKey, $storeId);
+        $prefix = trim((string) $this->value(self::ALGOLIA_INDEX_PREFIX, $storeId));
+        $base = $prefix . (string) $store->getCode();
+
+        $secured = $this->algoliaKeys->guestKey($searchKey, $storeId, $base . '_*');
         if ($secured === null) {
             return null;
         }
         $this->responseTtl->cap(self::ALGOLIA_KEY_CACHE_SECONDS);
-
-        $prefix = trim((string) $this->value(self::ALGOLIA_INDEX_PREFIX, $storeId));
-        $base = $prefix . (string) $store->getCode();
 
         return [
             'application_id' => $applicationId,
