@@ -16,6 +16,8 @@
 #   HM_SKIP=stores,store,app-home-stores   leave out steps whose module is not deployed
 #   HM_STORE_CODE=loly                     seller for S5 (default loly)
 #   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9 add-to-cart
+#   HM_CREDIT_AMOUNT=100                   S12 buy credit: an amount hmStoreCredit.top_up offers;
+#                                          the line is taken out of the cart again
 #   HM_STORE=en                            Store header of the POST steps
 #
 # WhatsApp sign-in (S10) is run by hand with QA's own number: every send is a
@@ -198,9 +200,34 @@ else
 
     # S12: store credit
     post credit-account
+    CREDIT_SKUS=$(jq -r '[.data.hmStoreCredit.top_up // empty | (.sku, .presets[]?.sku)] | unique | join(",")' \
+      "$T/m" 2>/dev/null || true)
+    if [[ -n $CREDIT_SKUS ]]; then
+      echo "ok   S12 top_up: $(jq -c '.data.hmStoreCredit.top_up | {sku, min: .min.value, max: .max.value, presets: [.presets[].credit.value]}' "$T/m")"
+    else
+      echo "info S12 top_up is null: the store sells no store credit product (Buy Credit page empty)"
+    fi
     if [[ -n $CART ]]; then
       post credit-apply "{\"cart\":\"$CART\",\"amount\":1}"
       post credit-remove "{\"cart\":\"$CART\"}"
+    fi
+
+    # S12b: buy credit, then take the line out again
+    if [[ -n ${HM_CREDIT_AMOUNT:-} && -n $CART && -n $CREDIT_SKUS ]]; then
+      post credit-add "{\"cart\":\"$CART\",\"amount\":$HM_CREDIT_AMOUNT}"
+      errors=$(jq -r '[.data.hmAddCreditToCart.user_errors[]?.message] | join("; ")' "$T/m" 2>/dev/null || true)
+      line=$(jq -r --arg skus "$CREDIT_SKUS" \
+        '($skus | split(",")) as $s | [.data.hmAddCreditToCart.cart.items[]? | select(.product.sku as $k | $s | index($k))] | last | .uid // empty' \
+        "$T/m" 2>/dev/null || true)
+      if [[ -n $errors || -z $line ]]; then
+        echo "FAIL S12b credit-add: ${errors:-no credit line in the cart}"
+        FAILS=$((FAILS + 1))
+      else
+        echo "ok   S12b credit line $line"
+        post cart-remove-item "{\"cart\":\"$CART\",\"uid\":\"$line\"}"
+      fi
+    else
+      echo "skip credit-add (HM_CREDIT_AMOUNT not set, or no cart or top-up)"
     fi
 
     # S13: returns (creating one and messaging it are done on a QA order by hand)

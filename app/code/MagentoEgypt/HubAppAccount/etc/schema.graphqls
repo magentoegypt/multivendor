@@ -12,6 +12,9 @@ type Mutation {
     hmRemoveStoreCredit(
         input: HmRemoveStoreCreditInput! @doc(description: "Cart.")
     ): HmStoreCreditCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RemoveStoreCredit") @doc(description: "Stop using credit on the cart. Token.")
+    hmAddCreditToCart(
+        input: HmAddCreditToCartInput! @doc(description: "Cart and amount.")
+    ): AddProductsToCartOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\AddCreditToCart") @doc(description: "Buy store credit: adds the website's credit product for this amount, as its Buy Credit page sells it. Paid into the balance when the order's invoice is paid. The customer's own cart. Token.")
     hmRegisterDevice(
         input: HmRegisterDeviceInput! @doc(description: "Device.")
     ): HmDeviceOutput! @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\RegisterDevice") @doc(description: "Upsert FCM token; bound to the customer when a token is sent, guest otherwise. Idempotent.")
@@ -40,6 +43,7 @@ type HmStoreCreditAccount @doc(description: "Credit account.") {
     transactions: [HmStoreCreditTransaction!]! @doc(description: "Newest first.")
     total_count: Int! @doc(description: "Transactions.")
     page_info: SearchResultPageInfo! @doc(description: "Paging.")
+    top_up: HmStoreCreditTopUp @resolver(class: "MagentoEgypt\\HubAppAccount\\Model\\Resolver\\StoreCreditTopUp") @doc(description: "How credit is bought here: the store credit products the website's Buy Credit page sells; null when it sells none.")
 }
 
 type HmStoreCreditTransaction @doc(description: "Transaction.") {
@@ -51,6 +55,25 @@ type HmStoreCreditTransaction @doc(description: "Transaction.") {
     description: String @doc(description: "Plain-text description.")
     created_at: String! @doc(description: "When, UTC.")
     order_number: String @doc(description: "The customer's own order this transaction records: spent on, refunded, cancelled or credit bought. Null otherwise.")
+}
+
+type HmStoreCreditTopUp @doc(description: "Buying credit.") {
+    sku: String! @doc(description: "Credit product a custom amount buys; the first preset's when there is none.")
+    min: Money @doc(description: "Smallest custom amount, whole units; null when only presets can be bought.")
+    max: Money @doc(description: "Largest custom amount; null when only presets can be bought.")
+    credit_rate: Float @doc(description: "Credit per 1 paid for a custom amount: the price is the amount divided by it. Null without a custom amount.")
+    presets: [HmStoreCreditPreset!]! @doc(description: "Fixed amounts on sale, smallest first.")
+}
+
+type HmStoreCreditPreset @doc(description: "A credit amount on sale.") {
+    sku: String! @doc(description: "Its credit product.")
+    credit: Money! @doc(description: "Credit added to the balance.")
+    price: Money! @doc(description: "Price of the cart line.")
+}
+
+input HmAddCreditToCartInput @doc(description: "Credit top-up.") {
+    cart_id: String! @doc(description: "Masked id of the customer's cart.")
+    amount: Float! @doc(description: "Credit to buy: a preset's credit, or a whole amount from min to max.")
 }
 
 input HmApplyStoreCreditInput @doc(description: "Apply credit.") {
