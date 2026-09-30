@@ -63,6 +63,34 @@
                 <width>400</width>
                 <height>400</height>
             </image>
+            <!--
+                Sharper product images. Blank asks for 240x300 sources for the
+                category grid/list and the home rails, but the Hub Market cards
+                are square (aspect-ratio 1/1) and ~300-400px wide, so a 240px
+                file was upscaled on every screen and twice over on retina.
+                600 square covers the card at 1.5-2x density; with
+                product_image_white_borders 0 the resize keeps the source
+                aspect, so nothing is letter-boxed. The main gallery image is
+                raised from 700 to 1000 for the same reason. Cache entries
+                regenerate on demand through pub/get.php (see the note above),
+                no mass resize.
+            -->
+            <image id="category_page_grid" type="small_image">
+                <width>600</width>
+                <height>600</height>
+            </image>
+            <image id="category_page_list" type="small_image">
+                <width>600</width>
+                <height>600</height>
+            </image>
+            <image id="new_products_content_widget_grid" type="small_image">
+                <width>600</width>
+                <height>600</height>
+            </image>
+            <image id="product_page_image_medium" type="image">
+                <width>1000</width>
+                <height>1000</height>
+            </image>
         </images>
     </media>
     <vars module="Magento_Catalog">
