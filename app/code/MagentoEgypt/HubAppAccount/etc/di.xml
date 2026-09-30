@@ -5,12 +5,23 @@
     newTokensPerIpHour: how many unknown FCM tokens one client address may register per hour
     (refreshing a known token is not limited). 0 switches the limit off, e.g. while the server still
     sees a CDN's addresses instead of the visitors'.
+
+    CartItemTypeResolver: global scope, where QuoteGraphQl maps `virtual`. Without the store_credit
+    entry `cart { items }` fails as a whole with 'Product "store_credit" type is not supported' as
+    soon as the cart holds a credit top-up bought on the website (see etc/graphql/di.xml).
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="MagentoEgypt\HubAppAccount\Model\Device\DeviceRegistry">
         <arguments>
             <argument name="newTokensPerIpHour" xsi:type="number">30</argument>
+        </arguments>
+    </type>
+    <type name="Magento\QuoteGraphQl\Model\Resolver\CartItemTypeResolver">
+        <arguments>
+            <argument name="supportedTypes" xsi:type="array">
+                <item name="store_credit" xsi:type="string">VirtualCartItem</item>
+            </argument>
         </arguments>
     </type>
 </config>
