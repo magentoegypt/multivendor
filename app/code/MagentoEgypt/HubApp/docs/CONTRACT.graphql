@@ -654,6 +654,7 @@ type HmStoreCreditTransaction @doc(description: "Transaction.") {
     balance_after: Money! @doc(description: "Balance after.")
     description: String @doc(description: "Plain-text description.")
     created_at: String! @doc(description: "When, UTC.")
+    order_number: String @doc(description: "The customer's own order this transaction records: spent on, refunded, cancelled or credit bought. Null otherwise.")
 }
 
 input HmApplyStoreCreditInput @doc(description: "Apply credit.") {
