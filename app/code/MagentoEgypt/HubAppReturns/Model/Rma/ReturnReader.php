@@ -17,7 +17,8 @@ use Vnecoms\VendorsRMA\Model\RequestFactory;
  * "My Returns" pages read them:
  *
  *  - the list is the customer's requests in the store view's website, newest first
- *    (Vnecoms\RMA\Block\Frontend\Customer\ListRma);
+ *    (Vnecoms\RMA\Block\Frontend\Customer\ListRma), each with its status code (to colour it), its
+ *    refund amount and its first line (to picture it), batched for the page;
  *  - a return is shown only to the customer it belongs to (RmaViewAuthorization::canView), and opening
  *    it marks it read for the customer (Controller\Customer\View sets is_customer_read = 1), which is
  *    what HmReturnSummary.has_unread_reply reports;
@@ -55,7 +56,7 @@ class ReturnReader
         $rows = $connection->fetchAll(
             $where($connection->select()->from($table, [
                 'entity_id', 'increment_id', 'order_incremental_id', 'created_at', 'updated_at', 'state', 'status',
-                'type', 'vendor_id', 'is_customer_read',
+                'type', 'vendor_id', 'is_customer_read', 'refund_amount',
             ]))
                 ->order(['created_at DESC', 'entity_id DESC'])
                 ->limit($paging->pageSize, $paging->offset())
@@ -64,35 +65,82 @@ class ReturnReader
             return ['total' => $total, 'items' => []];
         }
 
+        //  Every line of the page's returns, in the order filed: the count, and the first to show.
         $ids = array_map('intval', array_column($rows, 'entity_id'));
-        $itemCounts = array_map('intval', $connection->fetchPairs(
+        $itemCounts = [];
+        $firstLines = [];
+        foreach ($connection->fetchAll(
             $connection->select()
-                ->from($this->resource->getTableName('ves_rma_request_item'), ['request_id', 'COUNT(*)'])
+                ->from($this->resource->getTableName('ves_rma_request_item'), ['request_id', 'order_item_id'])
                 ->where('request_id IN (?)', $ids)
-                ->group('request_id')
-        ));
+                ->order(['request_id ASC', 'item_id ASC'])
+        ) as $item) {
+            $requestId = (int) $item['request_id'];
+            $itemCounts[$requestId] = ($itemCounts[$requestId] ?? 0) + 1;
+            $firstLines[$requestId] ??= (int) $item['order_item_id'];
+        }
+        $lines = $this->lines->linesById(array_values($firstLines));
+        $shown = $this->lines->present($lines, $storeId);
         $statuses = $this->labels->statuses($storeId);
         $sellers = $this->lines->sellerSummaries(array_column($rows, 'vendor_id'), $storeId);
+        $currencies = $this->orderCurrencies($customerId, array_column($rows, 'order_incremental_id'));
 
         $items = [];
         foreach ($rows as $row) {
+            $requestId = (int) $row['entity_id'];
             $status = $statuses[(int) $row['status']] ?? ['code' => '', 'label' => 'N/A'];
+            $type = (string) $row['type'];
+            $firstLine = $lines[$firstLines[$requestId] ?? 0] ?? null;
+            $refundAmount = $row['refund_amount'] ?? null;
             $items[] = [
-                'id' => (int) $row['entity_id'],
+                'id' => $requestId,
                 'number' => (string) $row['increment_id'],
                 'order_number' => (string) $row['order_incremental_id'],
                 'created_at' => Vocabulary::utc((string) $row['created_at']),
                 'updated_at' => Vocabulary::utc((string) $row['updated_at']),
                 'state' => Vocabulary::state((string) $row['state'], $status['code']),
+                'status_code' => $status['code'],
                 'status_label' => $status['label'],
-                'type' => Vocabulary::type((string) $row['type']),
-                'item_count' => $itemCounts[(int) $row['entity_id']] ?? 0,
+                'type' => Vocabulary::type($type),
+                'item_count' => $itemCounts[$requestId] ?? 0,
                 'seller' => $sellers[(int) $row['vendor_id']] ?? null,
                 'has_unread_reply' => (int) $row['is_customer_read'] === 0,
+                //  As HmReturn.refund_amount: refunds only, once an amount is stored.
+                'refund_amount' => $type === Vocabulary::TYPE_REFUND && $refundAmount !== null && $refundAmount !== ''
+                    ? Vocabulary::money((float) $refundAmount, $currencies[(string) $row['order_incremental_id']] ?? '')
+                    : null,
+                'first_item' => $firstLine === null ? null : [
+                    'name' => $shown[(int) $firstLine['item_id']]['name'] ?? (string) $firstLine['name'],
+                    'thumbnail' => $shown[(int) $firstLine['item_id']]['image_url'] ?? null,
+                ],
             ];
         }
 
         return ['total' => $total, 'items' => $items];
+    }
+
+    /**
+     * The order currency of each of the customer's orders among these numbers (the newest order,
+     * should two store views share a number, as EligibilityService::customerOrder picks it).
+     *
+     * @param array<int, string> $orderNumbers
+     * @return array<string, string> order number => currency code
+     */
+    private function orderCurrencies(int $customerId, array $orderNumbers): array
+    {
+        $orderNumbers = array_values(array_unique(array_filter(array_map('strval', $orderNumbers))));
+        if (!$orderNumbers) {
+            return [];
+        }
+        $connection = $this->resource->getConnection();
+
+        return array_map('strval', $connection->fetchPairs(
+            $connection->select()
+                ->from($this->resource->getTableName('sales_order'), ['increment_id', 'order_currency_code'])
+                ->where('customer_id = ?', $customerId)
+                ->where('increment_id IN (?)', $orderNumbers)
+                ->order('entity_id ASC')
+        ));
     }
 
     /**

@@ -556,6 +556,14 @@ type HmReturnSummary @doc(description: "Return row.") {
     item_count: Int! @doc(description: "Lines.")
     seller: HmSellerSummary @doc(description: "Seller.")
     has_unread_reply: Boolean! @doc(description: "is_customer_read = 0.")
+    status_code: String! @doc(description: "ves_rma_status code, as HmReturn.status_code: pending, approval, resolved, canceled, awaiting ...")
+    refund_amount: Money @doc(description: "Refund amount when set, refunds only, in the order currency; as HmReturn.refund_amount.")
+    first_item: HmReturnSummaryItem @doc(description: "The first line of the return, to picture it; null when its order line is gone.")
+}
+
+type HmReturnSummaryItem @doc(description: "A line shown on a return's card.") {
+    name: String! @doc(description: "Name as ordered.")
+    thumbnail: String @doc(description: "Thumbnail, absolute HTTPS.")
 }
 
 type HmReturn @doc(description: "Return detail.") {
