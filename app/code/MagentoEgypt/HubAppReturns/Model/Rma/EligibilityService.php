@@ -102,6 +102,41 @@ class EligibilityService
     }
 
     /**
+     * One of the customer's orders as hmReturnableOrders lists it; null when the number is not one of
+     * the customer's orders, the order is not processing or complete, or nothing is left to return.
+     * The same answer for "someone else's order" and "no such order".
+     *
+     * @return array<string, mixed>|null HmReturnableOrder
+     * @throws GraphQlInputException without a number
+     */
+    public function returnableOrder(int $customerId, int $storeId, string $orderNumber): ?array
+    {
+        $number = self::orderNumber($orderNumber);
+        if ($number === '') {
+            throw new GraphQlInputException(__('Enter the order number.'));
+        }
+        $order = $this->customerOrder($customerId, $number);
+        if ($order === null || !in_array((string) $order['state'], self::ELIGIBLE_STATES, true)) {
+            return null;
+        }
+        $orderId = (int) $order['entity_id'];
+        $candidates = $this->candidates([$orderId => $order]);
+        if (!self::hasReturnableLine($candidates, $orderId)) {
+            return null;
+        }
+
+        return $this->orderRows([$order], $candidates, $storeId)[0];
+    }
+
+    /**
+     * An order number as the customer may type it ("#000000012", spaces), as stored.
+     */
+    private static function orderNumber(string $value): string
+    {
+        return trim(ltrim(trim($value), '#'));
+    }
+
+    /**
      * The lines a customer can pick in these orders (ReturnableLines) and how many units of each can be
      * returned now (ReturnableQty, less what non-cancelled returns hold).
      *
@@ -259,7 +294,7 @@ class EligibilityService
      */
     public function prepare(int $customerId, int $storeId, array $input): array
     {
-        $number = trim(ltrim(trim((string) ($input['order_number'] ?? '')), '#'));
+        $number = self::orderNumber((string) ($input['order_number'] ?? ''));
         if ($number === '') {
             throw new GraphQlInputException(__('Enter the order number.'));
         }
@@ -399,7 +434,7 @@ class EligibilityService
             $connection->select()
                 ->from(
                     $this->resource->getTableName('sales_order'),
-                    ['entity_id', 'increment_id', 'status', 'state', 'customer_email', 'order_currency_code', 'store_id']
+                    array_merge(self::ORDER_COLUMNS, ['customer_email', 'store_id'])
                 )
                 ->where('increment_id = ?', $incrementId)
                 ->where('customer_id = ?', $customerId)

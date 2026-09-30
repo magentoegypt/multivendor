@@ -4,6 +4,9 @@ type Query {
         pageSize: Int = 10 @doc(description: "Orders per page, 1-20."),
         currentPage: Int = 1 @doc(description: "Page number from 1.")
     ): HmReturnableOrderPage! @resolver(class: "MagentoEgypt\\HubAppReturns\\Model\\Resolver\\ReturnableOrders") @doc(description: "Customer's orders with a returnable item, newest first. Token.") @cache(cacheable: false)
+    hmReturnableOrder(
+        order_number: String! @doc(description: "Order increment id.")
+    ): HmReturnableOrder @resolver(class: "MagentoEgypt\\HubAppReturns\\Model\\Resolver\\ReturnableOrder") @doc(description: "One of the customer's orders with its lines as hmReturnableOrders lists them; null when it is not theirs, not processing or complete, or has nothing left to return. Token.") @cache(cacheable: false)
     hmReturns(
         pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
         currentPage: Int = 1 @doc(description: "Page number from 1.")

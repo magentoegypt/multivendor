@@ -17,6 +17,7 @@
 #   HM_STORE_CODE=loly                     seller for S5 (default loly)
 #   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9 add-to-cart
 #   HM_STORE=en                            Store header of the POST steps
+#   HM_RETURN_ORDER=000000150              S13 one order's returnable lines (hmReturnableOrder)
 #
 # WhatsApp sign-in (S10) is run by hand with QA's own number: every send is a
 # real, paid WhatsApp message.
@@ -203,10 +204,16 @@ else
       post credit-remove "{\"cart\":\"$CART\"}"
     fi
 
-    # S13: returns (creating one and messaging it are done on a QA order by hand)
+    # S13: returns (creating one, messaging, escalating and cancelling it are done on a QA
+    # order by hand)
     post returns-config
     post returnable-orders
     post returns-list
+    if [[ -n ${HM_RETURN_ORDER:-} ]]; then
+      post returnable-order "$(jq -n --arg n "$HM_RETURN_ORDER" '{number: $n}')"
+    else
+      echo "skip returnable-order (HM_RETURN_ORDER not set)"
+    fi
   fi
 fi
 

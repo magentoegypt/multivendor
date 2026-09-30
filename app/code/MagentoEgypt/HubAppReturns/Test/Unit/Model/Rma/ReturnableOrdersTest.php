@@ -9,6 +9,7 @@ namespace MagentoEgypt\HubAppReturns\Test\Unit\Model\Rma;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Select;
+use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use MagentoEgypt\HubAppReturns\Model\Rma\EligibilityService;
 use MagentoEgypt\HubAppReturns\Model\Rma\LabelReader;
 use MagentoEgypt\HubAppReturns\Model\Rma\OrderLineReader;
@@ -18,14 +19,18 @@ use PHPUnit\Framework\TestCase;
 use Vnecoms\RMA\Helper\Config as RmaConfig;
 
 /**
- * hmReturnableOrders: each line the website's form offers carries what it was paid, as the refund cap
- * computes it (row total incl. tax - discount) / qty ordered, a core bundle's child lines with their
- * own figures.
+ * hmReturnableOrders and hmReturnableOrder: each line the website's form offers carries what it was
+ * paid, as the refund cap computes it (row total incl. tax - discount) / qty ordered, a core bundle's
+ * child lines with their own figures; one order is looked up among the caller's own, and only offered
+ * with something left to return.
  */
 final class ReturnableOrdersTest extends TestCase
 {
     private const CUSTOMER = 5;
     private const ORDER_ID = 12;
+
+    /** @var array<int, array{0: string, 1: mixed}> where() calls of the queries */
+    private array $where = [];
 
     public function testEveryOfferedLineCarriesItsPriceAndTheMostItsRefundCanBe(): void
     {
@@ -91,20 +96,81 @@ final class ReturnableOrdersTest extends TestCase
         self::assertNull($row['max_refund']);
     }
 
+    public function testOneOrderIsLookedUpAmongTheSignedInCustomersOrdersOnly(): void
+    {
+        $service = $this->service([$this->order()], $this->lines(), [], single: true);
+
+        $order = $service->returnableOrder(self::CUSTOMER, 1, ' #000000012 ');
+
+        self::assertNotNull($order);
+        self::assertSame('000000012', $order['order_number']);
+        self::assertSame('Complete', $order['status_label']);
+        self::assertSame([101, 103, 104], array_column($order['items'], 'order_item_id'));
+        self::assertSame(['value' => 90.0, 'currency' => 'AED'], $order['items'][0]['unit_price']);
+        self::assertContains(['increment_id = ?', '000000012'], $this->where);
+        self::assertContains(['customer_id = ?', self::CUSTOMER], $this->where);
+    }
+
+    public function testNoOrderIsOfferedThatIsNotTheirsNotEligibleOrFullyReturned(): void
+    {
+        //  Not the customer's (or no such order): the same null.
+        self::assertNull($this->service([], $this->lines(), [], single: true, noLines: true)
+            ->returnableOrder(self::CUSTOMER, 1, '000000099'));
+
+        //  Still pending: returns open once it is processing or complete.
+        $pending = $this->order();
+        $pending['state'] = 'new';
+        $pending['status'] = 'pending';
+        self::assertNull($this->service([$pending], $this->lines(), [], single: true, noLines: true)
+            ->returnableOrder(self::CUSTOMER, 1, '000000012'));
+
+        //  Every unit already held by a return.
+        $held = [
+            ['order_item_id' => 101, 'qty' => 2, 'increment_id' => 'R1', 'state' => 'open'],
+            ['order_item_id' => 103, 'qty' => 1, 'increment_id' => 'R1', 'state' => 'open'],
+            ['order_item_id' => 104, 'qty' => 2, 'increment_id' => 'R2', 'state' => 'closed'],
+        ];
+        self::assertNull($this->service([$this->order()], $this->lines(), $held, single: true)
+            ->returnableOrder(self::CUSTOMER, 1, '000000012'));
+    }
+
+    public function testAnOrderNumberIsRequired(): void
+    {
+        $this->expectException(GraphQlInputException::class);
+        $this->expectExceptionMessage('Enter the order number.');
+        $this->service([], [], [], single: true, noLines: true)->returnableOrder(self::CUSTOMER, 1, ' # ');
+    }
+
     /**
      * @param array<int, array<string, mixed>> $orders sales_order rows the customer's query finds
      * @param array<int, array<string, mixed>> $lines every line of those orders
      * @param array<int, array<string, mixed>> $held ves_rma_request_item rows of those lines
+     * @param bool $single hmReturnableOrder: the order comes from fetchRow, fetchAll reads only returns
+     * @param bool $noLines the order's lines must not be read
      */
-    private function service(array $orders, array $lines, array $held = []): EligibilityService
-    {
+    private function service(
+        array $orders,
+        array $lines,
+        array $held = [],
+        bool $single = false,
+        bool $noLines = false
+    ): EligibilityService {
         $select = $this->createMock(Select::class);
-        foreach (['from', 'join', 'where', 'order', 'limit'] as $method) {
+        foreach (['from', 'join', 'order', 'limit'] as $method) {
             $select->method($method)->willReturnSelf();
         }
+        $select->method('where')->willReturnCallback(function (string $condition, $value = null) use ($select) {
+            $this->where[] = [$condition, $value];
+
+            return $select;
+        });
         $connection = $this->createMock(AdapterInterface::class);
         $connection->method('select')->willReturn($select);
-        $connection->method('fetchAll')->willReturnOnConsecutiveCalls($orders, $held);
+        if ($single) {
+            $connection->method('fetchAll')->willReturn($held);
+        } else {
+            $connection->method('fetchAll')->willReturnOnConsecutiveCalls($orders, $held);
+        }
         $connection->method('fetchRow')->willReturn($orders[0] ?? false);
         $resource = $this->createMock(ResourceConnection::class);
         $resource->method('getConnection')->willReturn($connection);
@@ -115,7 +181,12 @@ final class ReturnableOrdersTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['linesOfOrders', 'present'])
             ->getMock();
-        $reader->method('linesOfOrders')->with([self::ORDER_ID])->willReturn($lines);
+        if ($noLines) {
+            $reader->expects(self::never())->method('linesOfOrders');
+        } else {
+            //  Only the lines of the customer's own orders are read.
+            $reader->method('linesOfOrders')->with([self::ORDER_ID])->willReturn($lines);
+        }
         $reader->method('present')->willReturnCallback(static function (array $shown): array {
             $out = [];
             foreach ($shown as $itemId => $line) {
