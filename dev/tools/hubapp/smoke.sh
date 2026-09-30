@@ -147,19 +147,23 @@ if ! skipped store; then
   fi
 fi
 
-# S6: a brand's products through the mgs_brand filter
-get en brands '{"pageSize":50}'
+# S6: a brand's products through the mgs_brand filter, against its product_count
+get en brands '{"pageSize":50,"with_products":true}'
 option=$(jq -r '[.data.hmBrands.items[]? | select(.option_id > 0)][0].option_id // empty' "$T/b" 2>/dev/null || true)
+counted=$(jq -r "[.data.hmBrands.items[]? | select(.option_id == ${option:-0})][0].product_count // empty" "$T/b" 2>/dev/null || true)
 if [[ -n $option ]]; then
   get en brand-products "{\"option\":\"$option\"}"
   total=$(jq -r '.data.products.total_count // 0' "$T/b" 2>/dev/null || echo 0)
   if (( total > 0 )); then
-    echo "ok   S6 mgs_brand filter: option $option has $total products"
+    echo "ok   S6 mgs_brand filter: option $option has $total products (product_count ${counted:-?})"
+    if [[ -n $counted && $counted != "$total" ]]; then
+      echo "WARN S6 product_count $counted differs from the brand page's $total (search visibility or stock)"
+    fi
   else
     echo "WARN S6 mgs_brand filter: option $option returned no products (check the brand has products)"
   fi
 else
-  echo "WARN S6: no brand with an option_id to test"
+  echo "WARN S6: no brand with products to test"
 fi
 
 # S9a: a bundle package priced the way the cart prices it (public GET), for the S9 bundle

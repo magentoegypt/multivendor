@@ -43,13 +43,18 @@ class BrandReader
     /**
      * One page of brands.
      *
+     * @param int[]|null $onlyOptions keep only brands whose option id is listed (null: all)
      * @return array{items: array<int, array<string, mixed>>, total_count: int}
      */
-    public function page(int $storeId, bool $featuredOnly, int $pageSize, int $currentPage): array
+    public function page(int $storeId, bool $featuredOnly, int $pageSize, int $currentPage, ?array $onlyOptions = null): array
     {
         $brands = $this->getBrands($storeId);
         if ($featuredOnly) {
             $brands = array_values(array_filter($brands, static fn (array $b): bool => (bool) $b['is_featured']));
+        }
+        if ($onlyOptions !== null) {
+            $keep = array_flip(array_map('intval', $onlyOptions));
+            $brands = array_values(array_filter($brands, static fn (array $b): bool => isset($keep[(int) $b['option_id']])));
         }
 
         return [

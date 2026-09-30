@@ -9,17 +9,22 @@ namespace MagentoEgypt\HubApp\Model\Resolver;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use MagentoEgypt\HubApp\Model\Brand\BrandCounts;
 use MagentoEgypt\HubApp\Model\Brand\BrandReader;
 
 /**
- * hmBrands: enabled MGS brands of the store view, admin order, names through
- * the theme translations. Products of a brand: products(filter: mgs_brand eq
- * option_id).
+ * hmBrands(featured_only, with_products): enabled MGS brands of the store view,
+ * admin order, names through the theme translations. Products of a brand:
+ * products(filter: mgs_brand eq option_id); how many its page lists and from
+ * how many sellers: product_count / seller_count (BrandCounts, with_products
+ * keeps the brands that have any).
  */
 class Brands implements ResolverInterface
 {
-    public function __construct(private readonly BrandReader $brandReader)
-    {
+    public function __construct(
+        private readonly BrandReader $brandReader,
+        private readonly BrandCounts $brandCounts
+    ) {
     }
 
     /**
@@ -35,7 +40,13 @@ class Brands implements ResolverInterface
         [$pageSize, $currentPage] = Paging::args($args, 100, BrandReader::MAX);
         $storeId = (int) $context->getExtensionAttributes()->getStore()->getId();
 
-        $page = $this->brandReader->page($storeId, !empty($args['featured_only']), $pageSize, $currentPage);
+        $page = $this->brandReader->page(
+            $storeId,
+            !empty($args['featured_only']),
+            $pageSize,
+            $currentPage,
+            !empty($args['with_products']) ? array_keys($this->brandCounts->forStore($storeId)) : null
+        );
 
         return [
             'items' => $page['items'],

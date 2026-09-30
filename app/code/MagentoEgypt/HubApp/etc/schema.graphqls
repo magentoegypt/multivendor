@@ -24,7 +24,8 @@ type Query {
     hmBrands(
         featured_only: Boolean @doc(description: "Only brands flagged Featured."),
         pageSize: Int = 100 @doc(description: "Items per page, 1-200."),
-        currentPage: Int = 1 @doc(description: "Page number from 1.")
+        currentPage: Int = 1 @doc(description: "Page number from 1."),
+        with_products: Boolean @doc(description: "Only brands whose page lists at least one product.")
     ): HmBrandPage! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Brands") @doc(description: "Enabled MGS brands assigned to this store view, in admin order.") @cache(cacheIdentity: "MagentoEgypt\\HubApp\\Model\\Resolver\\Identity\\BrandIdentity")
 }
 
@@ -226,6 +227,8 @@ type HmBrand @doc(description: "MGS brand.") {
     image_url: String @doc(description: "Large image; absolute HTTPS.")
     is_featured: Boolean! @doc(description: "Featured flag.")
     link: HmLink! @doc(description: "Brand destination.")
+    product_count: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BrandCount") @doc(description: "Products its brand page lists: the brand's products that pass the storefront gate in this store view.")
+    seller_count: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\BrandCount") @doc(description: "Distinct sellers of those products; Hub Market itself counts as one.")
 }
 
 type HmBrandPage @doc(description: "Brands page.") {
