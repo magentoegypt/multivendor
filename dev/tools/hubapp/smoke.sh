@@ -15,7 +15,7 @@
 # Optional:
 #   HM_SKIP=stores,store,app-home-stores   leave out steps whose module is not deployed
 #   HM_STORE_CODE=loly                     seller for S5 (default loly)
-#   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9 add-to-cart
+#   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9a quote (GET) and S9 add-to-cart
 #   HM_STORE=en                            Store header of the POST steps
 #
 # WhatsApp sign-in (S10) is run by hand with QA's own number: every send is a
@@ -159,6 +159,17 @@ if [[ -n $option ]]; then
   fi
 else
   echo "WARN S6: no brand with an option_id to test"
+fi
+
+# S9a: a bundle package priced the way the cart prices it (public GET), for the S9 bundle
+if [[ -n ${HM_BUNDLE_SKU:-} && -n ${HM_BUNDLE_SELECTIONS:-} ]]; then
+  get en bundle-quote "$(jq -cn --arg s "$HM_BUNDLE_SKU" --argjson sel "$HM_BUNDLE_SELECTIONS" \
+    '{sku: $s, quantity: 1, selections: $sel}')"
+  quoted=$(jq -r '.data.hmBundleQuote | if .available then "\(.price.value) \(.price.currency)" else "unavailable: \(.message)" end' \
+    "$T/b" 2>/dev/null || true)
+  echo "     S9a quote: ${quoted:-none}"
+else
+  echo "skip bundle-quote (HM_BUNDLE_SKU / HM_BUNDLE_SELECTIONS not set)"
 fi
 
 if (( LIVE )); then
