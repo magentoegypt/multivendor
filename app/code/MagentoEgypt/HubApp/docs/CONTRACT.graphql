@@ -503,6 +503,9 @@ type HmReturnableItem @doc(description: "Order line.") {
     qty_returnable: Float! @doc(description: "Returnable now (website formula).")
     open_return_numbers: [String!]! @doc(description: "Non-cancelled returns already holding this line.")
     seller: HmSellerSummary @doc(description: "Seller; one seller per return.")
+    unit_price: Money @doc(description: "Paid per unit, the refund cap's base: (row total incl. tax - discount) / qty ordered, in the order currency. A bundle's child line has its own figures, as on the website.")
+    row_total: Money @doc(description: "Paid for the whole line: row total incl. tax - discount, in the order currency.")
+    max_refund: Money @doc(description: "Most a custom refund may ask for this line: unit_price x qty_returnable, the cap hmCreateReturn applies.")
 }
 
 input HmCreateReturnInput @doc(description: "Return request.") {

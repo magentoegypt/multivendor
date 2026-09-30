@@ -85,6 +85,21 @@ final class Vocabulary
     }
 
     /**
+     * Money (value, currency) of an amount in the order currency; null when the currency is unknown.
+     *
+     * @return array{value: float, currency: string}|null
+     */
+    public static function money(float $value, string $currency): ?array
+    {
+        $currency = trim($currency);
+        if ($currency === '') {
+            return null;
+        }
+
+        return ['value' => round($value, 4), 'currency' => $currency];
+    }
+
+    /**
      * A UTC MySQL datetime/timestamp (Magento's connections run in UTC) as ISO-8601 with "Z";
      * '' when the value is empty or not a date.
      */

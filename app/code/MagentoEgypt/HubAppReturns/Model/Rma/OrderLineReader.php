@@ -128,7 +128,19 @@ class OrderLineReader
             return 0.0;
         }
 
-        return ((float) $line['row_total_incl_tax'] - (float) $line['discount_amount']) / $qtyOrdered;
+        return $this->refundBase($line) / $qtyOrdered;
+    }
+
+    /**
+     * What the whole line was paid, the base refundPerUnit() divides: row total incl. tax - discount,
+     * in the order currency. A bundle's child line carries its own figures (nothing under a
+     * fixed-price bundle, whose price sits on the bundle line), and the website reads them as they are.
+     *
+     * @param array<string, mixed> $line
+     */
+    public function refundBase(array $line): float
+    {
+        return (float) $line['row_total_incl_tax'] - (float) $line['discount_amount'];
     }
 
     /**
