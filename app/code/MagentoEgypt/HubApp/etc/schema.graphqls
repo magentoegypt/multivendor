@@ -115,6 +115,11 @@ type HmAppConfig @doc(description: "App settings for one store view.") {
     version: [HmVersionPolicy!]! @doc(description: "Version policy per platform.")
     maintenance: HmMaintenance! @doc(description: "Maintenance mode.")
     features: [HmFeatureFlag!]! @doc(description: "Feature flags; codes unknown to the app mean off.")
+    shipping: HmShippingConfig! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\Shipping") @doc(description: "Shipping promises of the store view.")
+}
+
+type HmShippingConfig @doc(description: "Shipping promises.") {
+    free_over: Money @doc(description: "Cart subtotal that earns free shipping, the figure the storefront's mini-cart counts down to: the lowest base_subtotal threshold of the active, coupon-free cart price rules granting free shipping to the caller's customer group, guests without a token. Null when there is none.")
 }
 
 type HmSearchConfig @doc(description: "Search settings.") {
