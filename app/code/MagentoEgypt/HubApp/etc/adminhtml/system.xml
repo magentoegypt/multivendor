@@ -65,10 +65,12 @@
                 <field id="android_min" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Android Minimum Version</label>
                     <comment>Semver, e.g. 1.4.0. Older Android builds must update before they can be used.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
                 </field>
                 <field id="android_latest" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Android Latest Version</label>
                     <comment>Newest version on Google Play; older builds may suggest an update.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
                 </field>
                 <field id="android_store_url" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Google Play URL</label>
@@ -76,10 +78,12 @@
                 <field id="ios_min" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>iOS Minimum Version</label>
                     <comment>Semver. Older iOS builds must update before they can be used.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
                 </field>
                 <field id="ios_latest" translate="label comment" type="text" sortOrder="50" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>iOS Latest Version</label>
                     <comment>Newest version on the App Store; older builds may suggest an update.</comment>
+                    <backend_model>MagentoEgypt\HubApp\Model\Config\Backend\Semver</backend_model>
                 </field>
                 <field id="ios_store_url" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>App Store URL</label>
