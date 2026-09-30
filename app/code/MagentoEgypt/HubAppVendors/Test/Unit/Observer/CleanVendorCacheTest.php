@@ -19,21 +19,23 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * A review purges the seller caches only when its approval changes.
+ * A review purges the seller caches when it is or was approved: its approval
+ * moves the seller's rating, its text is on the seller's Reviews tab.
  */
 final class CleanVendorCacheTest extends TestCase
 {
     private const PENDING = 2;
     private const NOT_APPROVED = 3;
 
-    public function testOnlyAChangeOfApprovalPurges(): void
+    public function testOnlyAReviewThatIsOrWasApprovedPurges(): void
     {
         //  [event, status before (null: new), status after, purges?]
         $cases = [
             'guest review submitted' => ['review_save_after', null, self::PENDING, false],
             'review approved' => ['review_save_after', self::PENDING, Review::STATUS_APPROVED, true],
             'created approved in admin' => ['review_save_after', null, Review::STATUS_APPROVED, true],
-            'approved review edited' => ['review_save_after', Review::STATUS_APPROVED, Review::STATUS_APPROVED, false],
+            'approved review edited' => ['review_save_after', Review::STATUS_APPROVED, Review::STATUS_APPROVED, true],
+            'pending review edited' => ['review_save_after', self::PENDING, self::PENDING, false],
             'approval withdrawn' => ['review_save_after', Review::STATUS_APPROVED, self::NOT_APPROVED, true],
             'pending review rejected' => ['review_save_after', self::PENDING, self::NOT_APPROVED, false],
             'approved review deleted' => ['review_delete_after', Review::STATUS_APPROVED, Review::STATUS_APPROVED, true],

@@ -150,6 +150,7 @@ if ! skipped store; then
   get en store "{\"code\":\"${HM_STORE_CODE:-loly}\"}"
   count=$(jq -r '.data.hmStore.card.product_count // empty' "$T/b" 2>/dev/null || true)
   id=$(jq -r '.data.hmStore.card.vendor_entity_id // empty' "$T/b" 2>/dev/null || true)
+  reviews=$(jq -r '.data.hmStore.card.review_count // empty' "$T/b" 2>/dev/null || true)
   if [[ -n $id ]]; then
     get en vendor-products "{\"id\":\"$id\"}"
     total=$(jq -r '.data.products.total_count // empty' "$T/b" 2>/dev/null || true)
@@ -159,6 +160,22 @@ if ! skipped store; then
       echo "FAIL S5 vendor_id filter: products total_count $total, card product_count $count"
       FAILS=$((FAILS + 1))
     fi
+  fi
+
+  # S5b: the store page's Reviews tab. Its summary is the card's rating (the same rule);
+  # the list holds only the reviews written in this store view, so it may be shorter.
+  if [[ -n $id ]] && ! skipped store-reviews; then
+    for s in en ar; do
+      get "$s" store-reviews "{\"code\":\"${HM_STORE_CODE:-loly}\"}"
+      summary=$(jq -r '.data.hmStoreReviews.summary.review_count // empty' "$T/b" 2>/dev/null || true)
+      listed=$(jq -r '.data.hmStoreReviews.total_count // empty' "$T/b" 2>/dev/null || true)
+      if [[ -n $summary && $summary == "$reviews" ]]; then
+        echo "ok   S5b reviews/$s: summary $summary = card review_count, $listed shown in this store view"
+      else
+        echo "FAIL S5b reviews/$s: summary review_count '$summary', card review_count '$reviews'"
+        FAILS=$((FAILS + 1))
+      fi
+    done
   fi
 fi
 

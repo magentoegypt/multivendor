@@ -8,6 +8,11 @@ type Query {
     hmStore(
         code: String! @doc(description: "Seller code, case-insensitive.")
     ): HmStore @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Store") @doc(description: "An approved seller's store page; null otherwise. For its products, filter products by vendor_id match card.vendor_entity_id (a match filter in the live schema, not eq).") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreIdentity")
+    hmStoreReviews(
+        code: String! @doc(description: "Seller code, case-insensitive."),
+        pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
+        currentPage: Int = 1 @doc(description: "Page number from 1.")
+    ): HmStoreReviewPage @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreReviews") @doc(description: "A store page's Reviews tab: approved reviews of the seller's products that this store view shows, newest first, with the seller's rating as the card counts it; null for a code that is not an approved seller. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreReviewsIdentity")
 }
 
 input HmStoreFilterInput @doc(description: "Store filters.") {
@@ -62,6 +67,34 @@ type HmStore @doc(description: "Store page.") {
 type HmStorePage @doc(description: "Seller cards page.") {
     items: [HmStoreCard!]! @doc(description: "Cards.")
     total_count: Int! @doc(description: "Sellers matching.")
+    page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmStoreReviewSummary @doc(description: "The seller's rating, the figures of HmStoreCard.") {
+    rating: Float @doc(description: "Out of 5, one decimal; null when unrated.")
+    review_count: Int! @doc(description: "Approved reviews in every store view.")
+}
+
+type HmStoreReviewProduct @doc(description: "The product a review is about.") {
+    name: String! @doc(description: "Name in this store view.")
+    url_key: String @doc(description: "URL key; null when the storefront does not list the product.")
+    thumbnail_url: String @doc(description: "Absolute HTTPS thumbnail or null.")
+}
+
+type HmStoreReview @doc(description: "A review of one of the seller's products.") {
+    id: Int! @doc(description: "Review id.")
+    nickname: String! @doc(description: "Reviewer's nickname.")
+    title: String @doc(description: "Title, plain text.")
+    text: String @doc(description: "Review text, plain text.")
+    rating: Float @doc(description: "Average of the review's votes out of 5, one decimal; null without votes.")
+    created_at: String! @doc(description: "Written, ISO-8601 UTC.")
+    product: HmStoreReviewProduct @doc(description: "Reviewed product.")
+}
+
+type HmStoreReviewPage @doc(description: "A seller's reviews.") {
+    summary: HmStoreReviewSummary! @doc(description: "The seller's rating.")
+    items: [HmStoreReview!]! @doc(description: "Reviews, newest first.")
+    total_count: Int! @doc(description: "Reviews this store view shows.")
     page_info: SearchResultPageInfo! @doc(description: "Paging.")
 }
 
