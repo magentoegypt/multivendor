@@ -103,6 +103,7 @@ type HmAppConfig @doc(description: "App settings for one store view.") {
     version: [HmVersionPolicy!]! @doc(description: "Version policy per platform.")
     maintenance: HmMaintenance! @doc(description: "Maintenance mode.")
     features: [HmFeatureFlag!]! @doc(description: "Feature flags; codes unknown to the app mean off.")
+    capabilities: [String!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\Capabilities") @doc(description: "HubApp satellites enabled on this server, A-Z: vendors (HubAppVendors), bundle (HubAppBundle), returns (HubAppReturns), account (HubAppAccount). Ask for a satellite's fields only when its code is listed.")
 }
 
 type HmSearchConfig @doc(description: "Search settings.") {

@@ -9,5 +9,6 @@ query HmSmokeAppConfig($platform: HmPlatform) {
     version { platform min_version latest_version store_url message }
     maintenance { enabled message retry_after_minutes }
     features { code enabled }
+    capabilities
   }
 }

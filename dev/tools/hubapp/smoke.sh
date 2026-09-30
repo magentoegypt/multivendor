@@ -115,9 +115,25 @@ check_features() {
   fi
 }
 
+# check_capabilities <store>: hmAppConfig.capabilities of the app-config body in $T/b.
+# The app asks for a satellite's fields (hm_seller on listing cards, the store page's
+# reviews, contact and chips) only when its code is listed here.
+check_capabilities() {
+  local store=$1 list
+  if skipped app-config; then return 0; fi
+  if ! jq -e '.data.hmAppConfig' "$T/b" >/dev/null 2>&1; then return 0; fi
+  list=$(jq -r '[.data.hmAppConfig.capabilities[]?] | join(" ")' "$T/b" 2>/dev/null || true)
+  if [[ -n $list ]]; then
+    echo "ok   S1 capabilities/$store: $list"
+  else
+    echo "WARN S1 capabilities/$store: none listed, the app sends no satellite fields"
+  fi
+}
+
 for s in en ar; do
   get "$s" app-config
   check_features "$s"
+  check_capabilities "$s"
   get "$s" app-config '{"platform":"ANDROID"}'
   get "$s" app-home '{"audience":"GUEST"}'
   get "$s" app-home '{"audience":"CUSTOMER"}'
