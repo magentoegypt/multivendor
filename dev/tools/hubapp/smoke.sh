@@ -17,6 +17,7 @@
 #   HM_STORE_CODE=loly                     seller for S5 (default loly)
 #   HM_BUNDLE_SKU=.. HM_BUNDLE_SELECTIONS='[{"selection_uid":"..."}]'   S9 add-to-cart
 #   HM_STORE=en                            Store header of the POST steps
+#   HM_GUEST_NUMBER=.. HM_GUEST_EMAIL=.. HM_GUEST_LASTNAME=..   a guest order for S14's guestOrder step
 #
 # WhatsApp sign-in (S10) is run by hand with QA's own number: every send is a
 # real, paid WhatsApp message.
@@ -207,7 +208,28 @@ else
     post returns-config
     post returnable-orders
     post returns-list
+
+    # S14: orders split by store; every top-level line sits in exactly one package
+    post order-packages
+    if ! skipped order-packages && jq -e '.data.customer.orders.items' "$T/m" >/dev/null 2>&1; then
+      split=$(jq -r '[.data.customer.orders.items[]
+        | select(([.items[]?.id] | sort) != ([.hm_packages[]?.item_uids[]] | sort)) | .number] | join(" ")' "$T/m")
+      if [[ -z $split ]]; then
+        echo "ok   S14 packages hold every line of every order once"
+      else
+        echo "FAIL S14 packages do not hold the lines of order(s): $split"
+        FAILS=$((FAILS + 1))
+      fi
+    fi
   fi
+fi
+
+# S14 guest: a guest order split by store, asked without a customer token (staging only)
+if [[ -n ${HM_GUEST_NUMBER:-} && -n ${HM_GUEST_EMAIL:-} && -n ${HM_GUEST_LASTNAME:-} ]]; then
+  TOKEN='' post guest-order-packages "$(jq -n --arg n "$HM_GUEST_NUMBER" --arg e "$HM_GUEST_EMAIL" \
+    --arg l "$HM_GUEST_LASTNAME" '{number: $n, email: $e, lastname: $l}')"
+else
+  echo "skip guest-order-packages (HM_GUEST_NUMBER / HM_GUEST_EMAIL / HM_GUEST_LASTNAME not set)"
 fi
 
 echo

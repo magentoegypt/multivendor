@@ -1,0 +1,28 @@
+# requires: HubAppOrders
+# S14 the customer's newest orders split by store (POST with the token).
+query HmSmokeOrderPackages {
+  customer {
+    orders(pageSize: 5, scope: WEBSITE, sort: { sort_field: CREATED_AT, sort_direction: DESC }) {
+      items {
+        number
+        status
+        items { id product_name }
+        hm_packages {
+          seller { code name is_marketplace }
+          status_code
+          status_label
+          state
+          item_uids
+          subtotal { value currency }
+          discount { value currency }
+          tax { value currency }
+          shipping_amount { value currency }
+          shipping_method
+          grand_total { value currency }
+          shipments { id number created_at tracks { carrier_code carrier_title number tracking_url } }
+          comments { message created_at }
+        }
+      }
+    }
+  }
+}
