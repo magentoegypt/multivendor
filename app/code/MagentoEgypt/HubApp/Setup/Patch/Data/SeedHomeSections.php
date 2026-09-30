@@ -24,6 +24,15 @@ use MagentoEgypt\HubApp\Model\Source\SectionType as T;
  * are copied from that layout; the Arabic titles from the theme's ar_SA.csv.
  * Positions step by 10 so new sections fit in between.
  *
+ * Two subtitles say what the app actually shows instead of the website's
+ * copy: Picked For You is the top-rated rail (nothing is personalised), and
+ * Best Selling Items ranks units ordered over all time, not this month.
+ *
+ * The category ids and seller codes are this store's. Where one does not
+ * exist (another environment, a deleted category, an unapproved seller) its
+ * section finds nothing and is left out of the Home, without an error; a
+ * seller list keeps the codes that do exist.
+ *
  * `hm_home_app` (the app-download promo) is deliberately not seeded: the app
  * does not advertise itself.
  *
@@ -121,8 +130,8 @@ class SeedHomeSections implements DataPatchInterface
                 'type' => T::PICKED_FOR_YOU,
                 'title_en' => 'Picked For You',
                 'title_ar' => 'مختارة لك',
-                'subtitle_en' => 'Personalised recommendations based on your search history & behaviour',
-                'subtitle_ar' => 'توصيات مخصّصة بناءً على سجل بحثك وسلوكك',
+                'subtitle_en' => 'Top-rated products across Hub Market',
+                'subtitle_ar' => 'المنتجات الأعلى تقييمًا على Hub Market',
                 'item_limit' => 4,
                 'more_url' => 'all.html',
             ],
@@ -199,8 +208,8 @@ class SeedHomeSections implements DataPatchInterface
                 'type' => T::BEST_SELLERS,
                 'title_en' => 'Best Selling Items',
                 'title_ar' => 'الأكثر مبيعًا',
-                'subtitle_en' => 'Top-rated across all categories this month',
-                'subtitle_ar' => 'الأعلى تقييمًا في كل الأقسام هذا الشهر',
+                'subtitle_en' => 'Most ordered across all categories',
+                'subtitle_ar' => 'الأكثر طلبًا في كل الأقسام',
                 'item_limit' => 6,
                 'more_url' => 'all.html',
             ],

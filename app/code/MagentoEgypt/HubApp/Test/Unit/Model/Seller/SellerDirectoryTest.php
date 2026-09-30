@@ -47,6 +47,22 @@ final class SellerDirectoryTest extends TestCase
         self::assertSame([3 => 'إنارة'], $this->directory($cache, $emulation, false)->names([3], 1));
     }
 
+    /**
+     * Seller codes chosen for a section (the seeded Featured Stores among them) that match no seller
+     * are dropped; the others match in any case and keep their order.
+     */
+    public function testCodesOfSellersThatDoNotExistAreDropped(): void
+    {
+        $directory = $this->directory(
+            $this->createMock(AppCache::class),
+            $this->createMock(StorefrontEmulationInterface::class),
+            true
+        );
+
+        self::assertSame([4, 3], $directory->approvedIdsForCodes(['RONZA', 'loly', 'enara', 'MIA', 'ronza']));
+        self::assertSame([], $directory->approvedIdsForCodes(['loly', 'MIA', '']));
+    }
+
     private function directory(AppCache $cache, StorefrontEmulationInterface $emulation, bool $queried): SellerDirectory
     {
         $select = $this->createMock(Select::class);
