@@ -42,6 +42,7 @@ class ProductListLoader implements ProductListLoaderInterface, ResetAfterRequest
         private readonly ProductDataProvider $productDataProvider,
         private readonly SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         private readonly StorefrontVisibility $visibility,
+        private readonly StockFilter $stockFilter,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -60,8 +61,10 @@ class ProductListLoader implements ProductListLoaderInterface, ResetAfterRequest
         if ($unknown) {
             //  Approved, active seller, enabled and catalog-visible in this store …
             $allowed = $this->visibility->sellableIds($unknown, $storeId);
-            //  … and not another seller's "select and sell" copy of it.
-            $allowed = array_flip(array_map('intval', $this->visibility->searchableIds($allowed)));
+            //  … not another seller's "select and sell" copy of it …
+            $allowed = $this->visibility->searchableIds($allowed);
+            //  … and in stock when the store hides out-of-stock products (getList() filters them too).
+            $allowed = array_flip($this->stockFilter->inStock($allowed, $storeId));
             foreach ($unknown as $id) {
                 $this->gate[$storeId][$id] = isset($allowed[$id]);
             }

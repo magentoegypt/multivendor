@@ -10,9 +10,12 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\ScopeInterface;
+use MagentoEgypt\HomeSections\Model\Ranking\DealRanker;
 use MagentoEgypt\HubApp\Api\LinkResolverInterface;
+use MagentoEgypt\HubApp\Api\ProductListLoaderInterface;
 use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
 use MagentoEgypt\HubApp\Model\Cache\AppCache;
+use MagentoEgypt\HubApp\Model\Cache\ResponseTtl;
 use MagentoEgypt\HubApp\Model\Cache\Tags;
 use MagentoEgypt\HubApp\Model\Resolver\Home\SectionProducts;
 use MagentoEgypt\HubApp\Model\Source\SectionType;
@@ -32,9 +35,24 @@ use Psr\Log\LoggerInterface;
  *      until the next schedule boundary, local midnight when deals are on it,
  *      or 15 minutes, whichever comes first.
  *
+ * Failures are never cached as if they were the Home:
+ *   - the section rows cannot be read: build() throws (SectionRepository),
+ *     hmAppHome answers an error, and the app keeps its built-in Home;
+ *   - a provider throws: its section is left out of THIS response only; the
+ *     build is not saved in the app cache and the HTTP cache may keep the
+ *     response for DEGRADED_TTL seconds at most (ResponseTtl), so the section
+ *     is back as soon as its source is.
+ *
  * Product sections carry their ranked, gated ids under SectionProducts::IDS_KEY;
  * the products themselves are loaded per request by that batch resolver, never
  * cached here. Cache tags of the content travel under TAGS_KEY for HomeIdentity.
+ *
+ * Every Home returned, cached or new, passes the storefront gate again
+ * (shown()): a product that sold out or was disabled since the build leaves
+ * its section, a product section left with nothing is omitted as the contract
+ * says, and a deals countdown follows the offers still shown. The gate
+ * remembers its answers for the request, so HmHomeSection.products and a
+ * fresh build check nothing twice.
  */
 class HomeBuilder
 {
@@ -42,6 +60,9 @@ class HomeBuilder
     public const TAGS_KEY = '_tags';
 
     private const CACHE_PREFIX = 'home_';
+
+    /** Longest the HTTP cache may keep a Home a section failed in, seconds. */
+    public const DEGRADED_TTL = 120;
 
     /** Fields the builder owns; a provider cannot override them. */
     private const OWN_FIELDS = ['id', 'type', 'limit', 'personalizable'];
@@ -52,7 +73,9 @@ class HomeBuilder
         private readonly TitleResolver $titles,
         private readonly LinkResolverInterface $links,
         private readonly StorefrontEmulationInterface $emulation,
+        private readonly ProductListLoaderInterface $loader,
         private readonly AppCache $appCache,
+        private readonly ResponseTtl $responseTtl,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly TimezoneInterface $timezone,
         private readonly LoggerInterface $logger
@@ -67,10 +90,11 @@ class HomeBuilder
         $storeId = (int) $store->getId();
         $audience = Schedule::normaliseAudience($audience);
         $cacheKey = self::CACHE_PREFIX . $storeId . '_' . strtolower($audience);
+        $timezone = (string) $this->timezone->getConfigTimezone(ScopeInterface::SCOPE_STORE, $storeId) ?: 'UTC';
 
         $cached = $this->appCache->load($cacheKey);
         if ($cached !== null && isset($cached['sections'])) {
-            return $cached;
+            return $this->shown($cached, $storeId, $timezone);
         }
 
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
@@ -82,7 +106,6 @@ class HomeBuilder
         ));
 
         $locale = (string) $this->scopeConfig->getValue('general/locale/code', ScopeInterface::SCOPE_STORE, $storeId);
-        $timezone = (string) $this->timezone->getConfigTimezone(ScopeInterface::SCOPE_STORE, $storeId) ?: 'UTC';
 
         $built = $this->emulation->run(
             $storeId,
@@ -96,14 +119,49 @@ class HomeBuilder
             self::TAGS_KEY => $built['tags'],
         ];
 
-        $this->appCache->save($cacheKey, $home, $built['tags'], $this->ttl($rows, $now, $timezone, $built['daily']));
+        if ($built['degraded']) {
+            $this->responseTtl->cap(self::DEGRADED_TTL);
+        } else {
+            $this->appCache->save($cacheKey, $home, $built['tags'], $this->ttl($rows, $now, $timezone, $built['daily']));
+        }
+
+        return $this->shown($home, $storeId, $timezone);
+    }
+
+    /**
+     * The Home as the storefront gate passes it now (see the class note).
+     *
+     * @param array<string, mixed> $home
+     * @return array<string, mixed>
+     */
+    private function shown(array $home, int $storeId, string $timezone): array
+    {
+        $sections = [];
+        foreach ((array) $home['sections'] as $section) {
+            if (is_array($section) && array_key_exists(SectionProducts::IDS_KEY, $section)) {
+                $ids = $this->loader->sellable(array_map('intval', (array) $section[SectionProducts::IDS_KEY]), $storeId);
+                if (!$ids && in_array((string) ($section['type'] ?? ''), SectionType::PRODUCT_TYPES, true)) {
+                    continue;
+                }
+                $section[SectionProducts::IDS_KEY] = $ids;
+                if (isset($section[SectionProducts::ENDS_KEY]) && is_array($section[SectionProducts::ENDS_KEY])) {
+                    $ends = $section[SectionProducts::ENDS_KEY];
+                    $section['countdown_ends_at'] = DealRanker::soonestEnd(
+                        array_map(static fn (int $id): ?string => isset($ends[$id]) ? (string) $ends[$id] : null, $ids),
+                        $timezone
+                    );
+                }
+            }
+            $sections[] = $section;
+        }
+        $home['sections'] = $sections;
 
         return $home;
     }
 
     /**
      * @param array<int, array<string, mixed>> $rows visible rows, admin order
-     * @return array{sections: array<int, array<string, mixed>>, tags: string[], daily: bool}
+     * @return array{sections: array<int, array<string, mixed>>, tags: string[], daily: bool, degraded: bool}
      */
     private function buildSections(
         array $rows,
@@ -125,6 +183,7 @@ class HomeBuilder
         $sections = [];
         $tags = [Tags::APP_HOME];
         $daily = false;
+        $degraded = false;
 
         foreach ($rows as $row) {
             $id = (int) $row['section_id'];
@@ -157,6 +216,9 @@ class HomeBuilder
                     $type,
                     $e->getMessage()
                 ), ['exception' => $e]);
+                //  Not cached (see build()); saving the section still purges this response.
+                $degraded = true;
+                $tags[] = Tags::homeSection($id);
                 continue;
             }
             if ($result === null || $result->isEmpty()) {
@@ -192,6 +254,7 @@ class HomeBuilder
             'sections' => $sections,
             'tags' => array_values(array_unique($tags)),
             'daily' => $daily,
+            'degraded' => $degraded,
         ];
     }
 

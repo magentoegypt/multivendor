@@ -8,7 +8,6 @@ namespace MagentoEgypt\HubApp\Model\Home;
 
 use Magento\Framework\App\ResourceConnection;
 use MagentoEgypt\HubApp\Model\ResourceModel\Section as SectionResource;
-use Psr\Log\LoggerInterface;
 
 /**
  * Active section rows of a store view (its own and the all-stores ones), in
@@ -17,34 +16,28 @@ use Psr\Log\LoggerInterface;
  */
 class SectionRepository
 {
-    public function __construct(
-        private readonly ResourceConnection $resource,
-        private readonly LoggerInterface $logger
-    ) {
+    public function __construct(private readonly ResourceConnection $resource)
+    {
     }
 
     /**
      * @return array<int, array<string, mixed>>
+     * @throws \Throwable when the rows cannot be read (table missing before
+     *         setup:upgrade, database unreachable). Never an empty list instead:
+     *         an empty Home would be cached and served as if it were meant, while
+     *         an error lets the app keep its built-in Home and ask again.
      */
     public function getActiveRows(int $storeId): array
     {
-        try {
-            $connection = $this->resource->getConnection();
+        $connection = $this->resource->getConnection();
 
-            return $connection->fetchAll(
-                $connection->select()
-                    ->from($this->resource->getTableName(SectionResource::TABLE))
-                    ->where('is_active = ?', 1)
-                    ->where('store_id IN (?)', [0, $storeId])
-                    ->order('position ASC')
-                    ->order('section_id ASC')
-            );
-        } catch (\Throwable $e) {
-            //  Table missing (module enabled before setup:upgrade): an empty Home,
-            //  and the app keeps its built-in fallback.
-            $this->logger->error('HubApp: Home sections unavailable: ' . $e->getMessage());
-
-            return [];
-        }
+        return $connection->fetchAll(
+            $connection->select()
+                ->from($this->resource->getTableName(SectionResource::TABLE))
+                ->where('is_active = ?', 1)
+                ->where('store_id IN (?)', [0, $storeId])
+                ->order('position ASC')
+                ->order('section_id ASC')
+        );
     }
 }

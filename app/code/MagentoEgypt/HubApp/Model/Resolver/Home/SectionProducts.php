@@ -28,6 +28,12 @@ class SectionProducts implements BatchResolverInterface
     /** Where the Home resolver puts a section's ranked, gated product ids. */
     public const IDS_KEY = '_product_ids';
 
+    /**
+     * Optional, next to IDS_KEY: product id => offer end date (special_to_date),
+     * for a section whose countdown_ends_at follows the products shown.
+     */
+    public const ENDS_KEY = '_product_ends';
+
     private const NODE = 'products';
 
     public function __construct(

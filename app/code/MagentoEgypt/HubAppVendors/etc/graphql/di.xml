@@ -14,12 +14,15 @@
             <argument name="defaultSort" xsi:type="string">FEATURED</argument>
             <argument name="chosenSellers" xsi:type="boolean">true</argument>
             <argument name="featuredFallback" xsi:type="boolean">true</argument>
+            <argument name="keepChosenOrder" xsi:type="boolean">true</argument>
         </arguments>
     </virtualType>
     <virtualType name="MagentoEgypt\HubAppVendors\Model\Home\Provider\TopVendorsProvider"
                  type="MagentoEgypt\HubAppVendors\Model\Home\Provider\StoresProvider">
         <arguments>
             <argument name="defaultSort" xsi:type="string">TOP_RATED</argument>
+            <!-- The admin's "Sellers" choice, when made, limits the ranking to them. -->
+            <argument name="chosenSellers" xsi:type="boolean">true</argument>
         </arguments>
     </virtualType>
     <virtualType name="MagentoEgypt\HubAppVendors\Model\Home\Provider\NewStoresProvider"

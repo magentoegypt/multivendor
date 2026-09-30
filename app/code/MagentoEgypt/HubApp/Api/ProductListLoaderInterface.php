@@ -16,15 +16,19 @@ use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
  * catalog-visible in the store (VendorExtend StorefrontVisibility::sellableIds),
  * and not a Vnecoms "select and sell" copy (::searchableIds). That is the same
  * gate the website's rails, the search index and the seller pages use, so the
- * app can never link to a product the website would 404.
+ * app can never link to a product the website would 404. When the store view
+ * hides out-of-stock products, the gate also asks for stock
+ * (Model\Product\StockFilter, core's own stock filter), so a ranking holds
+ * exactly what load() will return.
  */
 interface ProductListLoaderInterface
 {
     /**
      * The subset of $productIds the storefront would show on $storeId, rank order kept.
      *
-     * One or two queries for the whole list. Fails open (returns the input) if the
-     * marketplace tables are missing, like the website's gate.
+     * Two or three queries for the whole list, remembered for the request. Fails
+     * open (returns the input) if the marketplace tables are missing, like the
+     * website's gate.
      *
      * @param int[] $productIds
      * @return int[]

@@ -8,6 +8,8 @@ namespace MagentoEgypt\HubApp\Model\Seller;
 
 use Magento\Framework\App\ResourceConnection;
 use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
+use MagentoEgypt\HubApp\Model\Cache\AppCache;
+use MagentoEgypt\HubApp\Model\Cache\Tags;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -17,7 +19,10 @@ use Psr\Log\LoggerInterface;
  * VendorNames and SellerResolver read the whole table for the same reason), so
  * one query answers every "who is seller N" of a response. Names for ALL sellers
  * are built in ONE storefront emulation per store view: the theme CSVs that map
- * an Arabic company to its English name only load there.
+ * an Arabic company to its English name only load there. Emulation reloads the
+ * translations, so each store view's name map is kept in the `hubapp` app cache
+ * (AppCache::MAX_TTL, tagged hm_vendor: a seller save purges it) and the
+ * emulation runs only on a miss.
  *
  * Approval is Vnecoms\Vendors\Model\Vendor::STATUS_APPROVED = 2 (1 is pending,
  * 3 disabled, 4 expired). Duplicated as a constant, as AlgoliaVendor does, so
@@ -26,6 +31,8 @@ use Psr\Log\LoggerInterface;
 class SellerDirectory
 {
     public const STATUS_APPROVED = 2;
+
+    private const NAMES_CACHE_PREFIX = 'seller_names_';
 
     /** @var array<int, array{id: int, code: string, company: string, status: int, created_at: string}>|null */
     private ?array $vendors = null;
@@ -39,6 +46,7 @@ class SellerDirectory
     public function __construct(
         private readonly ResourceConnection $resource,
         private readonly StorefrontEmulationInterface $emulation,
+        private readonly AppCache $appCache,
         private readonly LoggerInterface $logger
     ) {
     }
@@ -166,17 +174,7 @@ class SellerDirectory
     public function names(array $vendorIds, int $storeId): array
     {
         if (!isset($this->names[$storeId])) {
-            $vendors = $this->all();
-            $this->names[$storeId] = $vendors
-                ? $this->emulation->run($storeId, static function () use ($vendors): array {
-                    $out = [];
-                    foreach ($vendors as $id => $vendor) {
-                        $out[$id] = (string) __(SellerName::source($vendor['company'], $vendor['code']));
-                    }
-
-                    return $out;
-                })
-                : [];
+            $this->names[$storeId] = $this->nameMap($storeId);
         }
 
         $out = [];
@@ -186,6 +184,41 @@ class SellerDirectory
                 $out[$vendorId] = $this->names[$storeId][$vendorId];
             }
         }
+
+        return $out;
+    }
+
+    /**
+     * Every seller's localised name for one store view: app cache, else one emulation.
+     *
+     * @return array<int, string>
+     */
+    private function nameMap(int $storeId): array
+    {
+        $key = self::NAMES_CACHE_PREFIX . $storeId;
+        $cached = $this->appCache->load($key);
+        if ($cached !== null) {
+            $out = [];
+            foreach ($cached as $id => $name) {
+                $out[(int) $id] = (string) $name;
+            }
+
+            return $out;
+        }
+
+        $vendors = $this->all();
+        if (!$vendors) {
+            return [];     // no table or no seller: nothing worth keeping
+        }
+        $out = $this->emulation->run($storeId, static function () use ($vendors): array {
+            $names = [];
+            foreach ($vendors as $id => $vendor) {
+                $names[$id] = (string) __(SellerName::source($vendor['company'], $vendor['code']));
+            }
+
+            return $names;
+        });
+        $this->appCache->save($key, $out, [Tags::VENDOR], AppCache::MAX_TTL);
 
         return $out;
     }

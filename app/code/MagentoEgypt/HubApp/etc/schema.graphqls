@@ -1,5 +1,3 @@
-# Copyright (c) MagentoEgypt. All rights reserved.
-
 type Query {
     hmAppConfig(
         platform: HmPlatform @doc(description: "Only this platform's version policy and flags; omit for all.")
@@ -100,7 +98,7 @@ type HmAppConfig @doc(description: "App settings for one store view.") {
     store_code: String! @doc(description: "Store view code (en or ar).")
     locale: String! @doc(description: "Store view locale, e.g. ar_SA.")
     search: HmSearchConfig! @doc(description: "Search screen settings.")
-    algolia: HmAlgoliaConfig @doc(description: "Algolia search credentials and index names for this store view; null when search is not on Algolia.")
+    algolia: HmAlgoliaConfig @doc(description: "Algolia search credentials and index names for this store view; null when search is not on Algolia or the storefront publishes no search key for it.")
     contact: HmContactConfig! @doc(description: "Customer-service channels.")
     version: [HmVersionPolicy!]! @doc(description: "Version policy per platform.")
     maintenance: HmMaintenance! @doc(description: "Maintenance mode.")
@@ -114,7 +112,7 @@ type HmSearchConfig @doc(description: "Search settings.") {
 
 type HmAlgoliaConfig @doc(description: "Algolia as the storefront uses it for this store view. Search-only credentials: never the admin key.") {
     application_id: String! @doc(description: "Algolia application id.")
-    search_api_key: String! @doc(description: "Secured search key exactly as the storefront gives a guest browser: derived from the search-only key, restricted, valid until valid_until. Never the admin key.")
+    search_api_key: String! @doc(description: "Secured search key with the restrictions the storefront gives a guest browser, derived from the search-only key and further limited to this store view's indices; valid until valid_until. Never the admin key.")
     valid_until: Int @doc(description: "Unix time in seconds when search_api_key expires; fetch hmAppConfig again before then. Responses carrying a key are cached for at most an hour.")
     index_prefix: String! @doc(description: "Index name prefix, e.g. hubmarket_.")
     product_index: String! @doc(description: "Products index of this store view, e.g. hubmarket_en_products.")

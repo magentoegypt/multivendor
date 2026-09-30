@@ -87,4 +87,36 @@ class RankedIds
 
         return array_slice($out, 0, $limit);
     }
+
+    /**
+     * The ids of a stored ranking that the gate still passes, order kept.
+     *
+     * A cached ranking was gated when it was computed; stock, approval or status
+     * may have moved since. The gate remembers its answers for the request, so
+     * loading the products afterwards checks nothing twice.
+     *
+     * @param int[] $ids
+     * @return int[]
+     */
+    public function shownIds(array $ids, int $storeId): array
+    {
+        return $this->loader->sellable($ids, $storeId);
+    }
+
+    /**
+     * Same, for rows with an 'id' key.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    public function shownRows(array $rows, int $storeId): array
+    {
+        $ids = array_map(static fn ($row): int => (int) (is_array($row) ? ($row['id'] ?? 0) : 0), $rows);
+        $allowed = array_flip($this->loader->sellable($ids, $storeId));
+
+        return array_values(array_filter(
+            $rows,
+            static fn ($row): bool => is_array($row) && isset($allowed[(int) ($row['id'] ?? 0)])
+        ));
+    }
 }
