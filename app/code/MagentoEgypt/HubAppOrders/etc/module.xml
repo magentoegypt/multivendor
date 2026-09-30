@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Hub Market customer app: per-store packages of an order (MagentoEgypt_HubAppOrders), a satellite
+ * of MagentoEgypt_HubApp.
+ *
+ * No setup_version: the module has no tables, and a setup_version without a matching
+ * setup_module row makes DbStatusValidator answer 500 for the whole storefront.
+ *
+ * Its schema only references HubApp core types (HmSellerSummary) and core Magento types
+ * (CustomerOrder, Money), so disabling it never breaks /graphql. Vnecoms_VendorsSales owns the
+ * tables it reads: ves_vendor_sales_order and the vendor columns of sales_order_item,
+ * sales_shipment and sales_order_status_history.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_HubAppOrders">
+        <sequence>
+            <module name="MagentoEgypt_HubApp"/>
+            <module name="Magento_Sales"/>
+            <module name="Magento_SalesGraphQl"/>
+            <module name="Vnecoms_VendorsSales"/>
+        </sequence>
+    </module>
+</config>
