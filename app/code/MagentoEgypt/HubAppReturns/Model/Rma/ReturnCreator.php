@@ -34,7 +34,10 @@ use Vnecoms\VendorsRMA\Model\RequestFactory;
  *    is_customer_read = 1, as the customer has obviously seen what they just filed;
  *  - the message is the app's plain text, stored HTML-escaped (MessageBody::fromPlainText), and the
  *    client address keeps only valid addresses (ReturnInput::clientIp): Vnecoms stores X-Forwarded-For
- *    as sent, and the admin and seller panels print both unescaped.
+ *    as sent, and the admin and seller panels print both unescaped;
+ *  - the first message's files come with the mutation rather than from separate uploads; they are
+ *    checked by the upload's rules and staged where it puts them (Attachments), so Vnecoms' save moves
+ *    them as it moves uploaded ones, and a failed save removes them.
  */
 class ReturnCreator
 {
@@ -55,7 +58,8 @@ class ReturnCreator
         private readonly EventManager $eventManager,
         private readonly RequestInterface $httpRequest,
         private readonly RemoteAddress $remoteAddress,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Attachments $attachments
     ) {
     }
 
@@ -67,6 +71,8 @@ class ReturnCreator
     public function create(int $customerId, int $storeId, array $input): int
     {
         $prepared = $this->eligibility->prepare($customerId, $storeId, $input);
+        //  The first message's files, as the form uploads them before it is posted.
+        $files = $this->attachments->check($input['attachments'] ?? null);
         $order = $prepared['order'];
         $customerName = $this->customerName($customerId, (string) $order['customer_email']);
 
@@ -104,9 +110,11 @@ class ReturnCreator
             }
         }
 
+        //  Written where the website's upload puts them; saving the message moves them (Attachments).
+        $staged = $this->attachments->stage($files);
         $message = [
             'message' => $this->rmaConfig->converText(MessageBody::fromPlainText($prepared['comment'])),
-            'attachment' => null,
+            'attachment' => $staged ? implode(',', $staged) : null,
             'type_reply' => self::CUSTOMER_REPLY,
             'type_send_mail' => self::CUSTOMER_REPLY,
             'from' => $customerName,
@@ -127,6 +135,7 @@ class ReturnCreator
             $connection->commit();
         } catch (\Throwable $e) {
             $connection->rollBack();
+            $this->attachments->discard($staged);
             $this->logger->error(sprintf(
                 'HubAppReturns: return for order %s (customer %d) not filed: %s',
                 (string) $order['increment_id'],
@@ -135,6 +144,7 @@ class ReturnCreator
             ));
             throw new GraphQlInputException(__('We couldn\'t file the return. Please try again.'));
         }
+        $this->attachments->sweep($staged);
 
         //  The return exists from here on; a failing notification must not report it as not filed.
         try {

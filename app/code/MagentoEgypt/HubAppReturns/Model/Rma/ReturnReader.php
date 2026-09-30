@@ -297,13 +297,15 @@ class ReturnReader
             } else {
                 $name = self::STAFF_NAME;
             }
+            $attachments = $this->attachments((string) $row['attachment'], $storeId);
             $out[] = [
                 'id' => (int) $row['message_id'],
                 'author' => $author,
                 'author_name' => $name !== '' ? $name : self::STAFF_NAME,
                 'body_html' => MessageBody::toHtml((string) $row['message']),
                 'body_text' => MessageBody::toText((string) $row['message']),
-                'attachment_urls' => $this->attachmentUrls((string) $row['attachment'], $storeId),
+                'attachment_urls' => array_column($attachments, 'url'),
+                'attachments' => $attachments,
                 'created_at' => Vocabulary::utc((string) $row['created_at']),
             ];
         }
@@ -312,11 +314,12 @@ class ReturnReader
     }
 
     /**
-     * Attachment files live in pub/media/rma/request (Vnecoms\RMA\Model\Message::getAttachmentUrls).
+     * A message's (or an escalation's) files, in the order stored: name and URL. They live in
+     * pub/media/rma/request (Vnecoms\RMA\Model\Message::getAttachmentUrls).
      *
-     * @return string[]
+     * @return array<int, array{name: string, url: string}>
      */
-    private function attachmentUrls(string $attachment, int $storeId): array
+    private function attachments(string $attachment, int $storeId): array
     {
         $out = [];
         foreach (explode(',', $attachment) as $file) {
@@ -325,9 +328,9 @@ class ReturnReader
                 continue;
             }
             $path = implode('/', array_map('rawurlencode', explode('/', ltrim($file, '/'))));
-            $url = $this->mediaUrl->media('rma/request/' . $path, $storeId);
+            $url = $this->mediaUrl->media(Attachments::DIR . '/' . $path, $storeId);
             if ($url !== null) {
-                $out[] = $url;
+                $out[] = ['name' => basename(str_replace('\\', '/', $file)), 'url' => $url];
             }
         }
 

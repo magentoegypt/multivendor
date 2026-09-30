@@ -26,6 +26,10 @@ use Vnecoms\RMA\Helper\Config as RmaConfig;
  * the admin and seller panels print messages unescaped, so nothing typed can become markup there, and
  * escaping rather than stripping tags keeps "a < b" or "<3" as the customer wrote it. It is dated when
  * posted (Observer\DateAppMessage), not with the return's filing time as Vnecoms dates messages.
+ *
+ * Files come with the reply (the website's form uploads them first): checked by the upload's rules and
+ * staged where it puts them, then moved by Vnecoms' save (Attachments). The text stays required, as the
+ * website's form requires it.
  */
 class MessagePoster
 {
@@ -37,14 +41,16 @@ class MessagePoster
         private readonly ResourceConnection $resource,
         private readonly EventManager $eventManager,
         private readonly RequestInterface $httpRequest,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly Attachments $attachments
     ) {
     }
 
     /**
+     * @param mixed $attachments [HmReturnAttachmentInput] or null
      * @throws GraphQlInputException|GraphQlNoSuchEntityException
      */
-    public function post(int $customerId, int $requestId, string $text): void
+    public function post(int $customerId, int $requestId, string $text, mixed $attachments = null): void
     {
         $text = trim($text);
         if ($text === '') {
@@ -60,17 +66,7 @@ class MessagePoster
         if (!Vocabulary::acceptsReplies((string) $request->getState())) {
             throw new GraphQlInputException(__('This return is closed, so it can\'t take new messages.'));
         }
-
-        $vendor = $request->getVendorObject();
-        $message = [
-            'message' => $this->rmaConfig->converText(MessageBody::fromPlainText($text)),
-            'attachment' => null,
-            'type_reply' => ReturnCreator::CUSTOMER_REPLY,
-            'type_send_mail' => ReturnCreator::CUSTOMER_REPLY,
-            'from' => (string) $request->getData('customer_name'),
-            'to' => (string) ($vendor->getName() ?: $this->rmaConfig->contactsName()),
-            'isEdit' => false,
-        ];
+        $files = $this->attachments->check($attachments);
 
         $this->eventManager->dispatch('rma_request_prepare_save', ['rma' => $request, 'request' => $this->httpRequest]);
         //  The website's frontend-only observer (Vnecoms\RMA\Observer\SetIsReadCustomer, VendorsRMA
@@ -78,6 +74,18 @@ class MessagePoster
         $request->setData('is_admin_read', 0);
         $request->setData('is_vendor_read', 0);
         $request->setData('is_customer_read', 1);
+
+        $vendor = $request->getVendorObject();
+        $staged = $this->attachments->stage($files);
+        $message = [
+            'message' => $this->rmaConfig->converText(MessageBody::fromPlainText($text)),
+            'attachment' => $staged ? implode(',', $staged) : null,
+            'type_reply' => ReturnCreator::CUSTOMER_REPLY,
+            'type_send_mail' => ReturnCreator::CUSTOMER_REPLY,
+            'from' => (string) $request->getData('customer_name'),
+            'to' => (string) ($vendor->getName() ?: $this->rmaConfig->contactsName()),
+            'isEdit' => false,
+        ];
 
         $connection = $this->resource->getConnection();
         $connection->beginTransaction();
@@ -87,6 +95,7 @@ class MessagePoster
             $connection->commit();
         } catch (\Throwable $e) {
             $connection->rollBack();
+            $this->attachments->discard($staged);
             $this->logger->error(sprintf(
                 'HubAppReturns: reply on return %d (customer %d) not saved: %s',
                 $requestId,
@@ -95,6 +104,7 @@ class MessagePoster
             ));
             throw new GraphQlInputException(__('We couldn\'t send the message. Please try again.'));
         }
+        $this->attachments->sweep($staged);
 
         try {
             $this->eventManager->dispatch(

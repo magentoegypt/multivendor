@@ -476,6 +476,9 @@ type HmReturnConfig @doc(description: "Return form settings.") {
     reasons: [HmReturnReason!]! @doc(description: "Active reasons, sorted.")
     policy_html: String @doc(description: "Policy CMS block HTML.")
     window_days: Int @doc(description: "Days after order creation; null = no window (website rule for customers).")
+    attachment_extensions: [String!]! @doc(description: "File extensions a message may carry, lower case: the RMA Allowed file extensions setting the website's upload uses, less the store's protected extensions.")
+    attachment_max_bytes: Int! @doc(description: "Largest file in bytes: the store's upload limit, as on the website, at most 10 MB.")
+    attachment_max_files: Int! @doc(description: "Most files one message may carry.")
 }
 
 type HmReturnReason @doc(description: "Reason.") {
@@ -522,6 +525,7 @@ input HmCreateReturnInput @doc(description: "Return request.") {
     refund_amount_type: HmRefundAmountType @doc(description: "REFUND only; FULL when omitted.")
     refund_custom_amount: Float @doc(description: "CUSTOM amount.")
     tracking_code: String @doc(description: "Return shipment tracking, max 255 characters: letters, digits, spaces, dot, underscore, slash, hash and hyphen only.")
+    attachments: [HmReturnAttachmentInput!] @doc(description: "Files with the first message, e.g. photos: HmReturnConfig.attachment_extensions, at most attachment_max_bytes each and attachment_max_files in all.")
 }
 
 input HmReturnItemInput @doc(description: "Line to return.") {
@@ -532,6 +536,13 @@ input HmReturnItemInput @doc(description: "Line to return.") {
 input HmAddReturnMessageInput @doc(description: "Reply.") {
     return_id: Int! @doc(description: "Return id.")
     message: String! @doc(description: "Plain text, max 5000 chars.")
+    attachments: [HmReturnAttachmentInput!] @doc(description: "Files with the reply, e.g. photos; the same rules as on hmCreateReturn.")
+}
+
+input HmReturnAttachmentInput @doc(description: "A file sent with a message, checked by the website's upload rules.") {
+    name: String! @doc(description: "File name with its extension, e.g. photo-1.jpg; stored cleaned and made unique.")
+    mime_type: String! @doc(description: "MIME type matching the extension, e.g. image/jpeg.")
+    content_base64: String! @doc(description: "The file, base64-encoded.")
 }
 
 type HmReturnOutput @doc(description: "Mutation result.") {
@@ -611,6 +622,12 @@ type HmReturnMessage @doc(description: "Message.") {
     body_text: String! @doc(description: "Plain text.")
     attachment_urls: [String!]! @doc(description: "Attachment URLs (read-only in P2).")
     created_at: String! @doc(description: "When, UTC.")
+    attachments: [HmReturnAttachment!]! @doc(description: "Files on the message, in the order sent: name and URL.")
+}
+
+type HmReturnAttachment @doc(description: "A file on a message.") {
+    name: String! @doc(description: "File name as stored.")
+    url: String! @doc(description: "Absolute HTTPS URL.")
 }
 
 

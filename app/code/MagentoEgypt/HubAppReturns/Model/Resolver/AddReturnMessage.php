@@ -15,8 +15,8 @@ use MagentoEgypt\HubAppReturns\Model\Rma\MessagePoster;
 use MagentoEgypt\HubAppReturns\Model\Rma\ReturnReader;
 
 /**
- * Mutation.hmAddReturnMessage — the customer's reply on one of their open returns; notifies the
- * seller and admin the way the website's reply form does (MessagePoster).
+ * Mutation.hmAddReturnMessage — the customer's reply on one of their open returns, with files if
+ * any; notifies the seller and admin the way the website's reply form does (MessagePoster).
  */
 class AddReturnMessage implements ResolverInterface
 {
@@ -43,7 +43,12 @@ class AddReturnMessage implements ResolverInterface
         }
         $requestId = (int) ($input['return_id'] ?? 0);
 
-        $this->poster->post($customerId, $requestId, (string) ($input['message'] ?? ''));
+        $this->poster->post(
+            $customerId,
+            $requestId,
+            (string) ($input['message'] ?? ''),
+            $input['attachments'] ?? null
+        );
         $rma = $this->reader->detail($customerId, $requestId, Caller::storeId($context));
         if ($rma === null) {
             throw new GraphQlNoSuchEntityException(__('This return doesn\'t exist.'));

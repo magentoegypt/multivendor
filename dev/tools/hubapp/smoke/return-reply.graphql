@@ -1,0 +1,12 @@
+# requires: HubAppReturns
+# S13 by hand, on a QA return (staging only): a reply with a photo. Variables:
+# {"id":31,"message":"Photo of the damage.","files":[{"name":"crack.png","mime_type":"image/png","content_base64":"<base64>"}]}
+mutation HmSmokeReturnReply($id: Int!, $message: String!, $files: [HmReturnAttachmentInput!]) {
+  hmAddReturnMessage(input: { return_id: $id, message: $message, attachments: $files }) {
+    rma {
+      id
+      state
+      messages { id author body_text attachments { name url } created_at }
+    }
+  }
+}
