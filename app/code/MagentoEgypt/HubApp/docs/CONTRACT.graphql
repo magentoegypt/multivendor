@@ -175,6 +175,31 @@ type HmAlgoliaConfig @doc(description: "Algolia as the storefront uses it for th
     product_index: String! @doc(description: "Products index of this store view, e.g. hubmarket_en_products.")
     category_index: String! @doc(description: "Categories index of this store view, e.g. hubmarket_en_categories.")
     page_index: String! @doc(description: "CMS pages index of this store view, e.g. hubmarket_en_pages.")
+    facets: [HmAlgoliaFacet!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Search facets in admin order with this store view's labels, as the storefront's algoliaConfig.facets.")
+    sorts: [HmAlgoliaSort!]! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Sort replicas of product_index in admin order, for guests, as algoliaConfig.sortingIndices. Relevance is product_index itself.")
+    suggestion_index: String @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Query suggestions index the storefront's autocomplete reads; null when its suggestions are off.")
+    suggestion_count: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Suggestions the autocomplete shows; 0 when off.")
+    currency_code: String! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Currency of the records' prices, e.g. AED.")
+    price_group: String! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Price group of guest records: default, or group_0 with customer group pricing. The numeric price attribute is price.<currency_code>.<price_group>.")
+    max_values_per_facet: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Facet values the storefront asks for.")
+    product_suggestions: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Products the autocomplete shows.")
+    category_suggestions: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Categories the autocomplete shows.")
+    page_suggestions: Int! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "CMS pages the autocomplete shows; 0 without a pages section.")
+    category_separator: String! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "Between the levels of a categories.levelN value, as indexed, spaces included.")
+    categories_outside_menu: Boolean! @resolver(class: "MagentoEgypt\\HubApp\\Model\\Resolver\\AppConfig\\AlgoliaLayoutField") @doc(description: "True when categories left out of the menu are searchable too.")
+}
+
+type HmAlgoliaFacet @doc(description: "A facet of the storefront's search.") {
+    attribute: String! @doc(description: "Record attribute, e.g. price, categories, mgs_brand.")
+    type: String! @doc(description: "slider, conjunctive, disjunctive or priceRanges.")
+    label: String! @doc(description: "Label in the store view's language; may be empty.")
+}
+
+type HmAlgoliaSort @doc(description: "A sort replica of the products index.") {
+    index: String! @doc(description: "Replica index, e.g. hubmarket_en_products_price_default_asc.")
+    attribute: String! @doc(description: "Sorted attribute, e.g. price or created_at.")
+    direction: SortEnum! @doc(description: "ASC or DESC.")
+    label: String! @doc(description: "Label in the store view's language.")
 }
 
 type HmContactConfig @doc(description: "Contact channels.") {

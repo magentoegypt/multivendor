@@ -41,6 +41,20 @@
     </type>
 
     <!--
+        hmAppConfig.algolia's search layout (facets, sorts, suggestions, ...) through the
+        extension's own helpers, as window.algoliaConfig is built. Proxies for the same
+        reason: read only when a query asks for a layout field of a published algolia block.
+    -->
+    <type name="MagentoEgypt\HubApp\Model\Config\AlgoliaLayout">
+        <arguments>
+            <argument name="instantSearch" xsi:type="object">Algolia\AlgoliaSearch\Helper\Configuration\InstantSearchHelper\Proxy</argument>
+            <argument name="autocomplete" xsi:type="object">Algolia\AlgoliaSearch\Helper\Configuration\AutocompleteHelper\Proxy</argument>
+            <argument name="sortingTransformer" xsi:type="object">Algolia\AlgoliaSearch\Service\Product\SortingTransformer\Proxy</argument>
+            <argument name="algoliaConfig" xsi:type="object">Algolia\AlgoliaSearch\Helper\ConfigHelper\Proxy</argument>
+        </arguments>
+    </type>
+
+    <!--
         MGS brands carry no cache identities: purge hm_brand (hmBrands,
         TOP_BRANDS) after every brand save or delete, admin mass actions included.
     -->

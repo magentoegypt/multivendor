@@ -2,8 +2,10 @@
 <!--
     Saving the app settings, or the Algolia settings the app reads (credentials
     and front-end switch; autocomplete and instant search, which decide whether
-    the storefront publishes a key at all), purges the cached hmAppConfig so the
-    app sees the change on its next launch.
+    the storefront publishes a key at all and hold its facets, sorts and
+    suggestions; categories and advanced, which hold the category separator and
+    customer group pricing), purges the cached hmAppConfig so the app sees the
+    change on its next launch.
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
@@ -17,6 +19,12 @@
         <observer name="magentoegypt_hubapp_clean_config" instance="MagentoEgypt\HubApp\Observer\CleanConfigCache"/>
     </event>
     <event name="admin_system_config_changed_section_algoliasearch_instant">
+        <observer name="magentoegypt_hubapp_clean_config" instance="MagentoEgypt\HubApp\Observer\CleanConfigCache"/>
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_categories">
+        <observer name="magentoegypt_hubapp_clean_config" instance="MagentoEgypt\HubApp\Observer\CleanConfigCache"/>
+    </event>
+    <event name="admin_system_config_changed_section_algoliasearch_advanced">
         <observer name="magentoegypt_hubapp_clean_config" instance="MagentoEgypt\HubApp\Observer\CleanConfigCache"/>
     </event>
 </config>

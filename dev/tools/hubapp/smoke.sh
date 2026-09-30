@@ -115,9 +115,22 @@ check_features() {
   fi
 }
 
+# report_config <store>: the free-shipping threshold and the Algolia search layout of the
+# app-config body in $T/b (informational: either may be absent on purpose).
+report_config() {
+  local store=$1 line
+  if skipped app-config; then return 0; fi
+  if ! jq -e '.data.hmAppConfig' "$T/b" >/dev/null 2>&1; then return 0; fi
+  line=$(jq -r '.data.hmAppConfig | "free shipping over \(.shipping.free_over // {} | if .value then "\(.value) \(.currency)" else "none" end)"
+    + "; algolia " + (if .algolia then "\(.algolia.facets | length) facets, \(.algolia.sorts | length) sorts, suggestions \(.algolia.suggestion_index // "off")" else "off" end)' \
+    "$T/b" 2>/dev/null || true)
+  echo "     S1 config/$store: ${line:-unreadable}"
+}
+
 for s in en ar; do
   get "$s" app-config
   check_features "$s"
+  report_config "$s"
   get "$s" app-config '{"platform":"ANDROID"}'
   get "$s" app-home '{"audience":"GUEST"}'
   get "$s" app-home '{"audience":"CUSTOMER"}'
