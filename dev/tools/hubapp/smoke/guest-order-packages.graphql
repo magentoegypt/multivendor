@@ -1,0 +1,15 @@
+# requires: HubAppOrders
+# S14 a guest order split by store (POST; the number, e-mail and last name of a guest order).
+query HmSmokeGuestOrderPackages($number: String!, $email: String!, $lastname: String!) {
+  guestOrder(input: { number: $number, email: $email, lastname: $lastname }) {
+    number
+    items { id }
+    hm_packages {
+      seller { code name }
+      status_label
+      item_uids
+      grand_total { value currency }
+      shipments { number tracks { carrier_title number tracking_url } }
+    }
+  }
+}
