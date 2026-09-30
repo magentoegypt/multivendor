@@ -182,10 +182,25 @@ class DealRanker
      */
     public function countdown(array $rows, int $storeId): ?string
     {
+        return self::soonestEnd(
+            array_map(static fn (array $row): ?string => $row['to_date'] ?? null, $rows),
+            $this->storeTimezone($storeId)
+        );
+    }
+
+    /**
+     * End of the soonest of $toDates (special_to_date values; empty ones are
+     * offers without an end): 23:59:59 in $timezone, ISO-8601 with offset; null
+     * when none ends.
+     *
+     * @param array<int|string, string|null> $toDates
+     */
+    public static function soonestEnd(array $toDates, string $timezone): ?string
+    {
         $ends = [];
-        foreach ($rows as $row) {
-            if (!empty($row['to_date'])) {
-                $ends[] = (string) $row['to_date'];
+        foreach ($toDates as $toDate) {
+            if (!empty($toDate)) {
+                $ends[] = (string) $toDate;
             }
         }
         if (!$ends) {
@@ -193,7 +208,7 @@ class DealRanker
         }
         sort($ends);
 
-        return self::endOfDay($ends[0], $this->storeTimezone($storeId));
+        return self::endOfDay($ends[0], $timezone);
     }
 
     /**

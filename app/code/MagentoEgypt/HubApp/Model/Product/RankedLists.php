@@ -20,7 +20,10 @@ use MagentoEgypt\HubApp\Model\Cache\Tags;
  * deals() and bestSellers() back both the Home sections and the paged lists
  * (hmDeals, hmBestSellers); they are computed once up to MAX_RANKED and kept
  * in the `hubapp` cache (tag hm_app_catalog, purged by the cron when orders or
- * the catalogue move, and at local midnight for deals).
+ * the catalogue move, and at local midnight for deals). A cached list passes
+ * the gate again when read (RankedIds::shownRows(), remembered for the
+ * request), so total_count and the countdown only count products still shown,
+ * e.g. after one sold out.
  */
 class RankedLists
 {
@@ -51,7 +54,7 @@ class RankedLists
         $key = 'deals_' . $storeId . '_' . $today;
         $cached = $this->appCache->load($key);
         if ($cached !== null) {
-            return $cached;
+            return $this->rankedIds->shownRows($cached, $storeId);
         }
 
         $rows = $this->rankedIds->topRows(
@@ -82,7 +85,7 @@ class RankedLists
         $key = 'best_' . $storeId;
         $cached = $this->appCache->load($key);
         if ($cached !== null) {
-            return array_map('intval', $cached);
+            return $this->rankedIds->shownIds(array_map('intval', $cached), $storeId);
         }
 
         $ids = $this->rankedIds->top(

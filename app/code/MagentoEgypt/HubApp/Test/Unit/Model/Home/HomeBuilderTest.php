@@ -11,6 +11,7 @@ use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use MagentoEgypt\HubApp\Api\Home\SectionProviderInterface;
 use MagentoEgypt\HubApp\Api\LinkResolverInterface;
+use MagentoEgypt\HubApp\Api\ProductListLoaderInterface;
 use MagentoEgypt\HubApp\Api\StorefrontEmulationInterface;
 use MagentoEgypt\HubApp\Model\Cache\AppCache;
 use MagentoEgypt\HubApp\Model\Cache\ResponseTtl;
@@ -19,11 +20,13 @@ use MagentoEgypt\HubApp\Model\Home\SectionProviderPool;
 use MagentoEgypt\HubApp\Model\Home\SectionRepository;
 use MagentoEgypt\HubApp\Model\Home\SectionResult;
 use MagentoEgypt\HubApp\Model\Home\TitleResolver;
+use MagentoEgypt\HubApp\Model\Resolver\Home\SectionProducts;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * A failed build is never cached as if it were the Home.
+ * A failed build is never cached as if it were the Home; the Home returned is
+ * the one the storefront gate passes now.
  */
 final class HomeBuilderTest extends TestCase
 {
@@ -74,6 +77,40 @@ final class HomeBuilderTest extends TestCase
         $this->builder([], $this->brands(), $cache, new ResponseTtl(), $repository)->build($this->store(), null);
     }
 
+    public function testACachedHomeLosesWhatTheGateNoLongerPasses(): void
+    {
+        $cached = [
+            'store_code' => 'en',
+            'generated_at' => '2026-09-30T08:00:00Z',
+            'sections' => [
+                [
+                    'id' => 5,
+                    'type' => 'TODAYS_DEALS',
+                    'countdown_ends_at' => '2026-10-01T23:59:59+03:00',
+                    SectionProducts::IDS_KEY => [11, 12, 13],
+                    SectionProducts::ENDS_KEY => ['11' => '2026-10-01 00:00:00', '12' => null, '13' => '2026-10-04 00:00:00'],
+                ],
+                ['id' => 6, 'type' => 'BEST_SELLERS', 'countdown_ends_at' => null, SectionProducts::IDS_KEY => [21, 22]],
+                ['id' => 1, 'type' => 'TRUST_ROW', 'cms_block' => ['identifier' => 'hm_home_trust']],
+            ],
+            HomeBuilder::TAGS_KEY => ['hm_app_home', 'hm_app_catalog'],
+        ];
+        $cache = $this->createMock(AppCache::class);
+        $cache->method('load')->willReturn($cached);
+        $cache->expects(self::never())->method('save');
+        //  11 sold out, and both best sellers.
+        $loader = $this->createMock(ProductListLoaderInterface::class);
+        $loader->method('sellable')->willReturnCallback(
+            static fn (array $ids): array => array_values(array_diff($ids, [11, 21, 22]))
+        );
+
+        $home = $this->builder([], $this->brands(), $cache, new ResponseTtl(), null, $loader)->build($this->store(), null);
+
+        self::assertSame([5, 1], array_column($home['sections'], 'id'), 'a product section with nothing left is omitted');
+        self::assertSame([12, 13], $home['sections'][0][SectionProducts::IDS_KEY]);
+        self::assertSame('2026-10-04T23:59:59+03:00', $home['sections'][0]['countdown_ends_at'], 'from the offers still shown');
+    }
+
     /**
      * @param array<int, array<string, mixed>> $rows
      */
@@ -82,8 +119,13 @@ final class HomeBuilderTest extends TestCase
         SectionProviderInterface $brands,
         AppCache $cache,
         ResponseTtl $ttl,
-        ?SectionRepository $repository = null
+        ?SectionRepository $repository = null,
+        ?ProductListLoaderInterface $loader = null
     ): HomeBuilder {
+        if ($loader === null) {
+            $loader = $this->createMock(ProductListLoaderInterface::class);
+            $loader->method('sellable')->willReturnArgument(0);
+        }
         if ($repository === null) {
             $repository = $this->createMock(SectionRepository::class);
             $repository->method('getActiveRows')->willReturn($rows);
@@ -109,6 +151,7 @@ final class HomeBuilderTest extends TestCase
             new TitleResolver(),
             $links,
             $emulation,
+            $loader,
             $cache,
             $ttl,
             $config,
