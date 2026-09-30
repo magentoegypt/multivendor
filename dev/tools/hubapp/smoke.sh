@@ -143,6 +143,25 @@ for s in en ar; do
   get "$s" bundle-deals
   get "$s" brands
   get "$s" stores '{"sort":"TOP_RATED"}'
+
+  # S4b: the Stores chips. A chip's count is the number of sellers its list shows.
+  if ! skipped store-categories; then
+    get "$s" store-categories
+    chip=$(jq -r '.data.hmStoreCategories.items[0] | "\(.id) \(.count)"' "$T/b" 2>/dev/null || true)
+    if [[ -n $chip && $chip != "null null" ]]; then
+      read -r cid ccount <<<"$chip"
+      get "$s" stores "{\"categoryId\":$cid}"
+      listed=$(jq -r '.data.hmStores.total_count // empty' "$T/b" 2>/dev/null || true)
+      if [[ $listed == "$ccount" ]]; then
+        echo "ok   S4b chips/$s: category $cid holds $ccount sellers = its hmStores total"
+      else
+        echo "FAIL S4b chips/$s: category $cid chip says $ccount, hmStores category_id total $listed"
+        FAILS=$((FAILS + 1))
+      fi
+    else
+      echo "WARN S4b chips/$s: no category holds a seller"
+    fi
+  fi
 done
 
 # S5: a store page, and its products through the vendor_id (match) filter

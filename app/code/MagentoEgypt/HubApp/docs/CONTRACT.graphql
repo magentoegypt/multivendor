@@ -327,6 +327,7 @@ type Query {
         pageSize: Int = 20 @doc(description: "Items per page, 1-50."),
         currentPage: Int = 1 @doc(description: "Page number from 1.")
     ): HmStoreReviewPage @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreReviews") @doc(description: "A store page's Reviews tab: approved reviews of the seller's products that this store view shows, newest first, with the seller's rating as the card counts it; null for a code that is not an approved seller. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreReviewsIdentity")
+    hmStoreCategories: HmStoreCategories! @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreCategories") @doc(description: "The Stores chips: top-level menu categories in menu order with how many sellers each holds, as the hmStores category_id filter counts them; categories with none are left out. Public; GET.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\StoreCategoriesIdentity")
 }
 
 input HmStoreFilterInput @doc(description: "Store filters.") {
@@ -367,6 +368,8 @@ type HmStoreCard @doc(description: "Seller card.") {
     is_featured: Boolean! @doc(description: "Show on Home flag.")
     joined_at: String! @doc(description: "Joined, ISO-8601 UTC.")
     link: HmLink! @doc(description: "Store page link.")
+    primary_category: HmCategoryCount @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreCardCategory") @doc(description: "Top-level menu category holding most of the seller's listable products, count being how many are in it; null when none is filed in one.") @cache(cacheIdentity: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\Identity\\CategoryCountIdentity")
+    facet_value: String @resolver(class: "MagentoEgypt\\HubAppVendors\\Model\\Resolver\\StoreCardFacetValue") @doc(description: "The seller's value in the storefront's Algolia seller facet, the product records' seller attribute, in this store view: match facet counts to stores on it, not on name. Null when records carry no seller.")
 }
 
 type HmStore @doc(description: "Store page.") {
@@ -389,6 +392,11 @@ type HmStorePage @doc(description: "Seller cards page.") {
     items: [HmStoreCard!]! @doc(description: "Cards.")
     total_count: Int! @doc(description: "Sellers matching.")
     page_info: SearchResultPageInfo! @doc(description: "Paging.")
+}
+
+type HmStoreCategories @doc(description: "Seller counts for the Stores chips.") {
+    total_count: Int! @doc(description: "Sellers with a listable product, the All chip: hmStores total_count without filters.")
+    items: [HmCategoryCount!]! @doc(description: "Categories in menu order; count is the number of sellers in each.")
 }
 
 type HmStoreReviewSummary @doc(description: "The seller's rating, the figures of HmStoreCard.") {

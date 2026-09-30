@@ -1,0 +1,8 @@
+# requires: HubAppVendors
+# S4b the Stores chips (public, GET): sellers per top-level category.
+query HmSmokeStoreCategories {
+  hmStoreCategories {
+    total_count
+    items { id uid name count }
+  }
+}
