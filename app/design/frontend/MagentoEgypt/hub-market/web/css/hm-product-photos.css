@@ -1,0 +1,26 @@
+/*
+ * Hub Market — product photos whole and sharp in listings and product rails (CL036-DEV01.35).
+ * Replaces hm-plp-photos.css (renamed: the merged-CSS URL is derived from the file list and is cached immutably,
+ * so a content change needs a new file name).
+ *
+ * etc/view.xml makes category_page_grid/list and new_products_content_widget_grid 600x600, so the card's image
+ * box (Magento's inline aspect-ratio) is square and the file is sharp at 2x/3x. Here the photo is fitted, never
+ * cropped, on the card's own white, as already done for the phone rails (_hm-qa03.less 25.4).
+ */
+.catalog-category-view .products .product-item-photo,
+.catalog-category-view .products .product-image-container,
+.catalogsearch-result-index .products .product-item-photo,
+.catalogsearch-result-index .products .product-image-container,
+.hm-page .block.widget .product-item .product-item-photo,
+.hm-page .block.widget .product-item .product-image-container {
+    background: var(--hm-surface, #fff);
+}
+
+/* Five classes on purpose: the theme's ".products.list .product-item .product-image-photo" and
+   ".block.widget .product-item .product-image-photo" (both { cover }) are four, and styles-l.css loads after
+   the merged file, so an equal-weight rule lost on desktop. */
+.hm-page.catalog-category-view .products .product-item .product-image-photo,
+.hm-page.catalogsearch-result-index .products .product-item .product-image-photo,
+.hm-page .block.widget .product-item .product-image-photo {
+    object-fit: contain;
+}
