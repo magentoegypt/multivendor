@@ -180,6 +180,12 @@ Show the message and stop. It is not a network or generic error, and retrying wo
   an English store-view value, which only the admin can set today.
 - If `short_description` is empty, the page shows the first lines of `description` instead.
 
+## Image URLs: use the original path
+- Build image URLs from the API's original paths (`/media/catalog/product/<a>/<b>/<file>`), not from resized
+  `/cache/<hash>/` URLs. On 10-01 at 11:16 UTC an admin "Flush Catalog Images Cache" deleted every resized image,
+  and this server does not rebuild them on demand, so `/cache/` URLs answered 404 until they were regenerated
+  (about 60 minutes). Original paths were never affected.
+
 ## Deploys and outages
 - During a backend deploy, the API answers **503** (maintenance page) for a few minutes. Right at the
   end of a compile, a route can also answer a brief **404 HTML** page. The first call after a deploy
@@ -247,6 +253,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `812223da9` | Storefront WebP copies of new product images encoded from the original upload (q88); app API unchanged |
 | 10-01 | `c32acb439` | Listing and homepage cards: 600x600 square image, whole photo fitted (upload square, 600 px or more) |
 | 10-01 | `bf37d3676` | Product page shows `short_description` as entered, one line per item, on both stores |
+| 10-01 | `3a3516f07` | Admin App Home Section editor loads (customer app Home content); app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
@@ -257,3 +264,5 @@ store credit, push devices, order packages). Its contract is `app/code/MagentoEg
 For cached public reads, call it through `https://hub-market.magento2.click/graphql` (Varnish, varies on
 the `Store` header). `multi.magento2.click` goes straight to origin with no cache. The seller app keeps
 using REST on `multi.magento2.click`.
+The customer app's Home is managed in the admin under Content > Elements > App Home Sections. The section editor
+used to hang on its spinner and works since 10-01 (`3a3516f07`).
