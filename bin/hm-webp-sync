@@ -11,10 +11,40 @@
 # Usage: hm-webp-sync [recent|all]
 #   recent  images written in the last 20 minutes (crontab, every 10 minutes)
 #   all     every cached image without an up-to-date .webp (nightly, and the first run)
+#
+# Encoding (2026-10-01): the WebP is made from the ORIGINAL upload in pub/media/catalog/product/, resized to
+# the cached image's exact size (fit, then padded with white, or kept transparent for PNG, as Magento frames
+# it). Before, it was made from the cached JPEG, which Magento had already compressed at quality 80, so every
+# WebP was compressed twice. Settings: -q 88 -m 6 -sharp_yuv (sharper colour edges). On a 30-image sample the
+# error against the original halved. When the original is missing, the cached image is used as before.
+# A WebP is kept unless it is more than 10% larger than the cached JPEG/PNG; otherwise the ".nowebp" marker
+# makes Apache serve the cached file. Existing .webp files are never redone; only new or changed cache
+# images are encoded.
 set -euo pipefail
 
 CACHE=${HM_WEBP_CACHE:-/var/www/multi.magento2.click/pub/media/catalog/product/cache}
-QUALITY=80
+ORIGINALS=${CACHE%/cache}
+CWEBP=(cwebp -quiet -q 88 -m 6 -sharp_yuv -metadata none)
+TMPDIR_HM=$(mktemp -d /dev/shm/hm-webp.XXXXXX)
+trap 'rm -rf "$TMPDIR_HM"' EXIT
+
+# encode <cached image> <output.webp>: from the original when it exists, else from the cached image.
+encode() {
+    local src=$1 out=$2 rel orig w h ref
+    rel=${src#"$CACHE"/}; rel=${rel#*/}          # drop "<size hash>/"
+    orig="$ORIGINALS/$rel"
+    if [[ -f "$orig" ]] && read -r w h < <(identify -format '%w %h' "$src" 2>/dev/null); then
+        ref="$TMPDIR_HM/ref.png"
+        if [[ ${src,,} == *.png ]]; then
+            convert "$orig[0]" -filter Lanczos -resize "${w}x${h}" -background none -gravity center \
+                -extent "${w}x${h}" PNG32:"$ref" 2>/dev/null
+        else
+            convert "$orig[0]" -filter Lanczos -resize "${w}x${h}" -background white -gravity center \
+                -extent "${w}x${h}" -alpha remove PNG24:"$ref" 2>/dev/null
+        fi && [[ -s "$ref" ]] && "${CWEBP[@]}" "$ref" -o "$out" 2>/dev/null && return 0
+    fi
+    "${CWEBP[@]}" "$src" -o "$out" 2>/dev/null
+}
 
 mode=${1:-recent}
 case "$mode" in
@@ -30,8 +60,8 @@ while IFS= read -r -d '' src; do
     [[ -f "$out" && ! "$src" -nt "$out" ]] && continue
     [[ -f "$marker" && ! "$src" -nt "$marker" ]] && continue
     tmp="$out.tmp$$"
-    if cwebp -quiet -q "$QUALITY" -m 4 -metadata none "$src" -o "$tmp" 2>/dev/null; then
-        if (( $(stat -c %s "$tmp") < $(stat -c %s "$src") )); then
+    if encode "$src" "$tmp"; then
+        if (( $(stat -c %s "$tmp") * 10 <= $(stat -c %s "$src") * 11 )); then
             mv -f "$tmp" "$out"
             rm -f "$marker"
             made=$((made + 1))
