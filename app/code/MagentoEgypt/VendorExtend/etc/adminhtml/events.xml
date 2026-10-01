@@ -30,6 +30,20 @@
         <observer name="magentoegypt_vendorextend_approval_go_live"
                   instance="MagentoEgypt\VendorExtend\Observer\ProductApprovalGoLive" />
     </event>
+    <!--
+        A seller's edit of an approved product waits in ves_vendor_product_update. Catalog > Products now warns
+        about it on the edit page, and saving the product as Approved applies it, as Marketplace > Manage Pending
+        Products > Approve does. Before, Approval = Approved + Save kept the old values and stranded the queue
+        (ClickUp TC68-QA03 14zb93nvqy5).
+    -->
+    <event name="controller_action_predispatch_catalog_product_edit">
+        <observer name="magentoegypt_vendorextend_pending_update_warning"
+                  instance="MagentoEgypt\VendorExtend\Observer\PendingProductUpdate" />
+    </event>
+    <event name="controller_action_catalog_product_save_entity_after">
+        <observer name="magentoegypt_vendorextend_pending_update_apply"
+                  instance="MagentoEgypt\VendorExtend\Observer\PendingProductUpdate" />
+    </event>
     <event name="helpdesk_request_prepare_save">
         <observer name="magentoegypt_vendorextend_admin_rma_vendor"
                   instance="Vnecoms\VendorsRMA\Observer\SaveVendorId" />
