@@ -165,6 +165,20 @@ Show the message and stop. It is not a network or generic error, and retrying wo
   `/cache/`) have no `.webp` copy.
 - WebP copies appear within about 10 minutes of an upload (a background job). Until then, the hub-market
   host returns the JPEG.
+- **What sellers should upload:** square photos, at least 600x600 px (1000x1000 or more is best), product
+  centred, plain background. Since 10-01 category, search and homepage cards show a 600x600 square image
+  and fit the whole photo inside it on white (nothing is cropped), so a wide or tall photo shows with
+  white bands, and anything under 600 px looks soft on phones.
+
+## Short description on the website (2026-10-01, DEV01.36)
+- The product page now shows `short_description` **as entered**, under the price, **one line per item**
+  (for example "Brand: Fresh", "Colour: silver", "Drawers: 5"). Send it as plain lines separated by line
+  breaks (`\n`, `<br>` or one `<div>`/`<p>` per line). Formatting tags are removed, so only text and line
+  breaks matter. Up to 20 lines are shown.
+- One value serves both stores: app edits save at the default scope (see Products), so the English page shows
+  the same text as the Arabic one. The owner chose that over an empty English slot. English-only text needs
+  an English store-view value, which only the admin can set today.
+- If `short_description` is empty, the page shows the first lines of `description` instead.
 
 ## Deploys and outages
 - During a backend deploy, the API answers **503** (maintenance page) for a few minutes. Right at the
@@ -231,6 +245,8 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 09-29 | `ca119bba8` | TC66-QA02: dashboard charts in store time (Asia/Riyadh) |
 | 09-30 | `bb1ca0555` | PR #22: WhatsApp code limits and one-answer verify, UAE number spellings; customer-app GraphQL (HubApp) |
 | 10-01 | `812223da9` | Storefront WebP copies of new product images encoded from the original upload (q88); app API unchanged |
+| 10-01 | `c32acb439` | Listing and homepage cards: 600x600 square image, whole photo fitted (upload square, 600 px or more) |
+| 10-01 | `bf37d3676` | Product page shows `short_description` as entered, one line per item, on both stores |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
