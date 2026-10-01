@@ -276,8 +276,8 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `c32acb439` | Listing and homepage cards: 600x600 square image, whole photo fitted (upload square, 600 px or more) |
 | 10-01 | `bf37d3676` | Product page shows `short_description` as entered, one line per item, on both stores |
 | 10-01 | `3a3516f07` | Admin App Home Section editor loads (customer app Home content); app API unchanged |
-| 10-01 | `fc63a4189` | Product page: 1200 px photo, square frame, whole photo and thumbnails (never cropped); upload 1200 px+, no screenshots; app API unchanged |
 | 10-01 | `920da6428` | TC68-QA03: approving from Catalog > Products applies the seller's queued edits (and warns about them); app API unchanged |
+| 10-01 | `fc63a4189` | Product page: 1200 px photo, square frame, whole photo and thumbnails (never cropped); upload 1200 px+, no screenshots; app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
