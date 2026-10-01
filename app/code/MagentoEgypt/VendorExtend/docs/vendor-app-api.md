@@ -11,6 +11,8 @@ Use it as the contract. Don't work around the old behaviour.
 - Shipments: the shipment list works.
 - Dashboard: the charts are in store time (TC66).
 - Deploy windows: expect short 503s during deploys; keep the retry.
+- Edits waiting for approval: the admin can no longer approve a product without applying the seller's
+  queued changes (TC68-QA03, 10-01). No app change is needed.
 
 ## Host and auth
 - API host: `https://multi.magento2.click/rest/...`. Send a normal browser-like `User-Agent`, because
@@ -129,6 +131,15 @@ Show the message and stop. It is not a network or generic error, and retrying wo
     **Pending Update**. On this storefront a Pending Update product is **offline until the admin
     approves the edit**, so the app should say so after saving an edit to a live product.
   - When the admin approves, the product goes live immediately.
+  - Until then, `GET` returns the **current live values**, not the queued ones. So an edit form
+    reopened after saving shows the old name and price. Nothing has been lost: the change is waiting.
+    The app's "Waiting for admin approval: <fields>" message after saving is the right feedback.
+    Keep it.
+  - **QA03 "edits revert" (10-01):** the server did receive the app's name and price edits. They
+    were queued as expected. The admin then approved the product from Catalog > Products by setting
+    Approval = Approved and saving, which kept the old values and left the queue unapplied. Since
+    `920da6428`, that page warns about the queued change, and saving as Approved applies it, the same
+    as Marketplace > Manage Pending Products > Approve. The app API is unchanged.
 - **Enable / disable (TC68):** send `"status": 2` (disable) or `1` (enable) with `"attributes": ["status"]`.
   It applies immediately, with no admin review, even on an approved product, and the product leaves or
   returns to the storefront at once. Listing unchanged `media_gallery_entries` / `category_ids`
@@ -254,6 +265,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `c32acb439` | Listing and homepage cards: 600x600 square image, whole photo fitted (upload square, 600 px or more) |
 | 10-01 | `bf37d3676` | Product page shows `short_description` as entered, one line per item, on both stores |
 | 10-01 | `3a3516f07` | Admin App Home Section editor loads (customer app Home content); app API unchanged |
+| 10-01 | `920da6428` | TC68-QA03: approving from Catalog > Products applies the seller's queued edits (and warns about them); app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
