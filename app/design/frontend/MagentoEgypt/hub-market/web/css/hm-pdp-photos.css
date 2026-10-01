@@ -1,0 +1,44 @@
+/*
+ * Hub Market — the product page photo whole and sharp (CL036-QA01 REQ-14zb93nvpg6, 14zb93nvqyk).
+ *
+ * QA: "the products still appear in poor quality on the product page, and the images look cropped". Measured on
+ * 10-01: the stage was served product_page_image_medium at blank's 700px and painted at up to 895 css px (2.3x up
+ * on a 1920 desktop; a 2x laptop wants ~1310 px, a 3x phone ~1080), with object-fit: cover (_hm-qa02-recheck.less
+ * 3A) in a box fotorama sized from the image: 895x700 for a square photo (top and bottom cut off), 895x1244 for a
+ * portrait one. etc/view.xml now serves 1200px (never upscaled past the original), and here:
+ *   - the stage is a square the width of the media column, at every breakpoint (fotorama writes its height inline,
+ *     hence !important; the width it writes is kept, the slide transition reads it);
+ *   - the photo is fitted whole on white, never cropped: contain, not the listing's old cover. Still filling the
+ *     box edge to edge in one direction, so a small source no longer floats in white (the QA02 3A complaint);
+ *   - the thumbnails are fitted whole too, on white.
+ * Fullscreen keeps fotorama's own sizing and the full original. Seven classes on the stage image on purpose: the
+ * 3A rule is five and styles-l.css loads after this merged file.
+ */
+.hm-pdp .product.media .fotorama:not(.fotorama--fullscreen) .fotorama__stage {
+    aspect-ratio: 1;
+    background: var(--hm-surface, #fff);
+    height: auto !important;
+}
+
+.hm-pdp .product.media .fotorama:not(.fotorama--fullscreen) .fotorama__stage__frame .fotorama__img {
+    background: var(--hm-surface, #fff);
+    object-fit: contain;
+}
+
+/* Before the gallery starts: the same square, so the page does not jump when fotorama replaces it. */
+.hm-pdp .product.media .gallery-placeholder .gallery-placeholder__image {
+    aspect-ratio: 1;
+    background: var(--hm-surface, #fff);
+    height: auto;
+    object-fit: contain;
+    width: 100%;
+}
+
+.hm-pdp .product.media .fotorama__nav__frame--thumb .fotorama__thumb,
+.hm-pdp .product.media .fotorama__nav__frame--thumb .fotorama__img {
+    background: var(--hm-surface, #fff);
+}
+
+.hm-pdp .product.media .fotorama__nav__frame--thumb .fotorama__img {
+    object-fit: contain;
+}

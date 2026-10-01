@@ -81,6 +81,18 @@
                 <width>600</width>
                 <height>600</height>
             </image>
+            <!--
+                Product page stage (CL036-QA01 14zb93nvqyk, 10-01): blank's 700px was painted at up to 895 css px on a
+                1920 desktop, and a 2x laptop / 3x phone needs ~1310 / ~1080 px, so the main photo was 2-3x upscaled
+                and soft. 1200 covers them; constrain_only keeps a smaller original at its own size (never upscaled),
+                and product_image_white_borders 0 keeps its shape. Pre-generated for all 934 gallery images on 10-01
+                (cache/b14533089c89bfd4215f881206c5a114, both stores) BEFORE this switched: get.php resize is off.
+                The box it sits in (square, photo whole on white) is css/hm-pdp-photos.css.
+            -->
+            <image id="product_page_image_medium" type="image">
+                <width>1200</width>
+                <height>1200</height>
+            </image>
             <!-- Homepage rails and the other product-widget grids (Magento_CatalogWidget grid.phtml, list/items.phtml):
                  blank's 240x300 was shown at 453x566 on desktop. Same params as category_page_grid, so it shares
                  cache/c68e9bbb... (already generated) and needs no new resize. -->
