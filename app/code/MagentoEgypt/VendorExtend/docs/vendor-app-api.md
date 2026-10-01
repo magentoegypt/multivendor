@@ -13,6 +13,8 @@ Use it as the contract. Don't work around the old behaviour.
 - Deploy windows: expect short 503s during deploys; keep the retry.
 - Edits waiting for approval: the admin can no longer approve a product without applying the seller's
   queued changes (TC68-QA03, 10-01). No app change is needed.
+- Product page photos: 1200 px, shown whole in a square frame (QA01, 10-01). Upload guidance changed:
+  1200x1200 px or more, and never screenshots (see Product images).
 
 ## Host and auth
 - API host: `https://multi.magento2.click/rest/...`. Send a normal browser-like `User-Agent`, because
@@ -176,10 +178,19 @@ Show the message and stop. It is not a network or generic error, and retrying wo
   `/cache/`) have no `.webp` copy.
 - WebP copies appear within about 10 minutes of an upload (a background job). Until then, the hub-market
   host returns the JPEG.
-- **What sellers should upload:** square photos, at least 600x600 px (1000x1000 or more is best), product
-  centred, plain background. Since 10-01 category, search and homepage cards show a 600x600 square image
-  and fit the whole photo inside it on white (nothing is cropped), so a wide or tall photo shows with
-  white bands, and anything under 600 px looks soft on phones.
+- **What sellers should upload:** the original photo file, **1200x1200 px or more**, square, product centred,
+  plain background.
+  - Since 10-01, category, search and homepage cards show a 600x600 square image. The product page shows a
+    1200 px image in a square frame (up to ~900 px wide on desktop, so 2x and 3x screens use all 1200 px).
+  - Both fit the whole photo inside on white and never crop it, so a wide or tall photo shows with white bands.
+  - A smaller photo is never enlarged on the server. Under 600 px looks soft everywhere; under 1200 px looks
+    soft on the product page.
+  - **Do not upload screenshots** of a photo: they are only as big as the screen region captured (the ones
+    uploaded on 10-01 were ~350–590 px). On 10-01, 297 of the 624 live products had a main photo under 600 px;
+    only a re-upload fixes those.
+  - Every size, including the product page's 1200 px, is made automatically when the photo is saved through
+    the API or the admin. The app does not need to resize. Sending the full camera resolution is fine
+    (Magento keeps the original for fullscreen zoom), but keep files reasonable (under ~5 MB) for upload time.
 
 ## Short description on the website (2026-10-01, DEV01.36)
 - The product page now shows `short_description` **as entered**, under the price, **one line per item**
@@ -265,6 +276,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `c32acb439` | Listing and homepage cards: 600x600 square image, whole photo fitted (upload square, 600 px or more) |
 | 10-01 | `bf37d3676` | Product page shows `short_description` as entered, one line per item, on both stores |
 | 10-01 | `3a3516f07` | Admin App Home Section editor loads (customer app Home content); app API unchanged |
+| 10-01 | `fc63a4189` | Product page: 1200 px photo, square frame, whole photo and thumbnails (never cropped); upload 1200 px+, no screenshots; app API unchanged |
 | 10-01 | `920da6428` | TC68-QA03: approving from Catalog > Products applies the seller's queued edits (and warns about them); app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
