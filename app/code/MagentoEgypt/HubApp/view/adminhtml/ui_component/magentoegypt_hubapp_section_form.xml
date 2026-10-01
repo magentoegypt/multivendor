@@ -17,6 +17,12 @@
             <item name="provider" xsi:type="string">magentoegypt_hubapp_section_form.section_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">Home Section</item>
+        <!--
+            collapsible, as Magento's own single-page forms (cms_block_form). The default
+            templates/form/default ties its spinner to "<form>.areas", which only a tabbed layout creates,
+            so this form stayed on the spinner for ever with all its fields built but never shown.
+        -->
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     <settings>
         <buttons>
