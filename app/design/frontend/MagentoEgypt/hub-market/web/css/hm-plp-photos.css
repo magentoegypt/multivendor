@@ -1,0 +1,26 @@
+/*
+ * Hub Market — category and search listing photos, whole and sharp (CL036-DEV01.35).
+ *
+ * A standalone file (linked from Magento_Theme/layout/default_head_blocks.xml), not the LESS pipeline:
+ * a new file name is a new URL, which the one-year immutable static cache cannot serve stale.
+ *
+ * The card's image box was 4:5 (Magento writes the category_page_grid ratio, then 240x300, into an inline
+ * aspect-ratio) and the photo was object-fit: cover, so square product shots lost their sides (QA's
+ * thermometer and perfume bottle). etc/view.xml now makes that size 600x600, so the box is square and the
+ * file is sharp at 2x/3x. Here the photo is fitted, never cropped, on the card's own white, as already done
+ * for the phone rails (_hm-qa03.less 25.4). A grey band under a cut-out product reads as a broken image.
+ */
+.catalog-category-view .products .product-item-photo,
+.catalog-category-view .products .product-image-container,
+.catalogsearch-result-index .products .product-item-photo,
+.catalogsearch-result-index .products .product-image-container {
+    background: var(--hm-surface, #fff);
+}
+
+/* Five classes on purpose. The theme's ".products.list .product-item .product-image-photo { cover }" is four
+   (the grid's <ol> carries both "products" and "list") and styles-l.css loads after the merged file, so an
+   equal-weight rule here lost on desktop only. */
+.hm-page.catalog-category-view .products .product-item .product-image-photo,
+.hm-page.catalogsearch-result-index .products .product-item .product-image-photo {
+    object-fit: contain;
+}

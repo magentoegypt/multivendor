@@ -63,6 +63,24 @@
                 <width>400</width>
                 <height>400</height>
             </image>
+            <!--
+                Category and search listings (CL036-DEV01.35). blank's 240x300 was shown at 391x489 on a
+                1920 desktop and needs ~540px on 2x laptops and 3x phones, so every card was upscaled 2-3x
+                and soft. 600x600 covers all three. Square, because the 240/300 ratio is also what Magento
+                writes into each card's inline aspect-ratio: a 4:5 box with object-fit: cover cut the sides
+                off square product shots. NOTE: get.php on-demand resize is OFF here (zzz-hardening:
+                AllowOverride None under pub/media; the note above is out of date), so a new size must be
+                generated BEFORE it ships, or listing images 404. Generated on 10-01 for all 573 listing
+                images (cache/c68e9bbb..., stores ar/en). New uploads get it from Magento's resize on save.
+            -->
+            <image id="category_page_grid" type="small_image">
+                <width>600</width>
+                <height>600</height>
+            </image>
+            <image id="category_page_list" type="small_image">
+                <width>600</width>
+                <height>600</height>
+            </image>
         </images>
     </media>
     <vars module="Magento_Catalog">
