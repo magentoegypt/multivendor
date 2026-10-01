@@ -1,7 +1,7 @@
-# Hub Market vendor app: backend API context (as of 2026-09-30)
+# Hub Market vendor app: backend API context (as of 2026-10-01)
 
 You are working on the Hub Market **vendor (seller) mobile app**. The Magento 2.4.8 backend (Vnecoms
-marketplace) was changed between 2026-09-24 and 2026-09-30. Everything below is live on production.
+marketplace) was changed between 2026-09-24 and 2026-10-01. Everything below is live on production.
 Use it as the contract. Don't work around the old behaviour.
 
 **New since 2026-09-28** (details in the sections below and the change log at the end):
@@ -152,6 +152,20 @@ Show the message and stop. It is not a network or generic error, and retrying wo
     is needed. A product created with no image at all (for example "Test 90", "Test 91") still
     shows a placeholder until the seller uploads one.
 
+## Product images (2026-10-01)
+- Upload as before: the first gallery image gets all four roles (`image`, `small_image`, `thumbnail`,
+  `swatch_image`; see Products). The API returns paths such as `/2/f/name.jpg`. Show them from
+  `https://hub-market.magento2.click/media/catalog/product` + path.
+- The storefront also serves a WebP copy of every resized ("cache") image, at the same URL plus `.webp`
+  (`…/media/catalog/product/cache/<hash>/2/f/name.jpg.webp`). Since 10-01, new copies are encoded from the
+  original upload at high quality (q88), not from Magento's quality-80 JPEG, so newly uploaded photos look
+  sharper on the website. Existing images were not re-encoded.
+- If the app ever asks for those `.webp` URLs, use the **hub-market.magento2.click** host. A missing WebP
+  there returns the original JPEG/PNG; on multi.magento2.click it returns 404. Original upload paths (not
+  `/cache/`) have no `.webp` copy.
+- WebP copies appear within about 10 minutes of an upload (a background job). Until then, the hub-market
+  host returns the JPEG.
+
 ## Deploys and outages
 - During a backend deploy, the API answers **503** (maintenance page) for a few minutes. Right at the
   end of a compile, a route can also answer a brief **404 HTML** page. The first call after a deploy
@@ -216,6 +230,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 09-29 | `a5e5c2e02` | Shipment (and credit memo) list no longer 500s |
 | 09-29 | `ca119bba8` | TC66-QA02: dashboard charts in store time (Asia/Riyadh) |
 | 09-30 | `bb1ca0555` | PR #22: WhatsApp code limits and one-answer verify, UAE number spellings; customer-app GraphQL (HubApp) |
+| 10-01 | `812223da9` | Storefront WebP copies of new product images encoded from the original upload (q88); app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
