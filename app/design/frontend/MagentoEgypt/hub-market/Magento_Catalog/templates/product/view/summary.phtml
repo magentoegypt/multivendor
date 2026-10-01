@@ -142,10 +142,43 @@ $hmClean = static function (string $raw) use ($hmStoreArabic): string {
     return $out;
 };
 
-$hmSummary = $hmClean((string) $hmProduct->getShortDescription());
-if ($hmSummary === '') {
-    $hmSummary = $hmClean((string) $hmProduct->getDescription());
+/*
+ * SHORT DESCRIPTION FIRST, AS ENTERED (CL036-DEV01.36, 2026-10-01). The client fills short_description with the
+ * product's key points, one per line ("Brand: Fresh", "Colour: silver", "Drawers: 5"), and wants exactly that under
+ * the price, on both stores. The cleaner above hid it: a spec-shaped block was rejected as a "spec table", and on
+ * the English store Arabic copy was rejected too, so product 2119 showed a description excerpt in Arabic and
+ * nothing at all in English. Now:
+ *   - a non-empty short_description is shown line by line, in whichever language is stored for this store view.
+ *     The owner chose the Arabic default over an empty slot where no English override exists; entering English
+ *     text at the English store view replaces it;
+ *   - it still goes through the same markup clean-up (entities, <style>/<script>, widget directives, tags), only
+ *     not the spec-table and script tests;
+ *   - each line carries dir="auto", so an Arabic line reads right to left on the English page and vice versa.
+ * Only when short_description is empty does the page fall back to the trimmed lead of the full description below.
+ */
+$hmLines = (static function (string $raw): array {
+    $raw = html_entity_decode($raw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $raw = preg_replace('#<(style|script)\b[^>]*>.*?</\1>#is', ' ', $raw);
+    $raw = preg_replace('/\{\{[^}]*\}\}/', '', $raw);
+    $raw = preg_replace('#<(br|/p|/li|/h[1-6]|/div|/td|/tr)[^>]*>#i', "\n", $raw);
+    $lines = [];
+    foreach (preg_split('/\R/u', strip_tags($raw)) as $line) {
+        $line = trim(preg_replace('/[^\S\n]+/u', ' ', $line));
+        if ($line !== '' && preg_match('/[\p{L}\p{N}]/u', $line) && !preg_match('/[{}<>]|#html-body/', $line)) {
+            $lines[] = $line;
+        }
+    }
+    return array_slice($lines, 0, 20);
+})((string) $hmProduct->getShortDescription());
+
+if ($hmLines) {
+    ?>
+<p class="hm-pdp__summary hm-pdp__summary--lines"><?php foreach ($hmLines as $hmI => $hmLine): ?><?= $hmI ? '<br>' : '' ?><span dir="auto"><?= $escaper->escapeHtml($hmLine) ?></span><?php endforeach; ?></p>
+<?php
+    return;
 }
+
+$hmSummary = $hmClean((string) $hmProduct->getDescription());
 
 if ($hmSummary === '') {
     return;
