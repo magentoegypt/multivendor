@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace MagentoEgypt\Fulfillment\Controller\Quote;
 
-final class Index implements \Magento\Framework\App\Action\HttpGetActionInterface
+class Index implements \Magento\Framework\App\Action\HttpGetActionInterface
 {
     public function __construct(
         private \Magento\Framework\App\RequestInterface $request,
