@@ -10,7 +10,7 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
         function options(params) {
             var key = $.param(params);
             if (!cache[key]) {
-                cache[key] = $.ajax({url:config.endpoint,data:params,dataType:'json',timeout:15000}).then(function (r) { return r.items; });
+                cache[key] = $.ajax({url:config.endpoint,type:'GET',data:params,dataType:'json',timeout:15000}).then(function (r) { return r.items; });
                 cache[key].fail(function () { delete cache[key]; });
             }
             return cache[key];
@@ -38,6 +38,7 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
             var identifiers = {};
             ['cm_city_id','cm_locality_id'].forEach(function (key) {
                 identifiers[key] = field(scope,key);
+                if (identifiers[key].length) { wrapper(identifiers[key]).hide(); }
                 if (!identifiers[key].length) identifiers[key]=$('<input type="hidden"/>').attr('name',city.attr('name').replace(/city(\]?)$/,key+'$1')).insertAfter(city);
             });
             function writeIds(cityId,localityId) {
