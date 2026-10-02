@@ -1,4 +1,4 @@
-# Hub Market vendor app: backend API context (as of 2026-10-01)
+# Hub Market vendor app: backend API context (as of 2026-10-02)
 
 You are working on the Hub Market **vendor (seller) mobile app**. The Magento 2.4.8 backend (Vnecoms
 marketplace) was changed between 2026-09-24 and 2026-10-01. Everything below is live on production.
@@ -13,6 +13,8 @@ Use it as the contract. Don't work around the old behaviour.
 - Deploy windows: expect short 503s during deploys; keep the retry.
 - Edits waiting for approval: the admin can no longer approve a product without applying the seller's
   queued changes (TC68-QA03, 10-01). No app change is needed.
+- Homepage product rows now crop photos to fill a square (DEV01.38, 10-02). Upload square photos with the
+  product centred (see Product images).
 - Product page photos: 1200 px, shown whole in a square frame (QA01, 10-01). Upload guidance changed:
   1200x1200 px or more, and never screenshots (see Product images).
 
@@ -182,7 +184,11 @@ Show the message and stop. It is not a network or generic error, and retrying wo
   plain background.
   - Since 10-01, category, search and homepage cards show a 600x600 square image. The product page shows a
     1200 px image in a square frame (up to ~900 px wide on desktop, so 2x and 3x screens use all 1200 px).
-  - Both fit the whole photo inside on white and never crop it, so a wide or tall photo shows with white bands.
+  - Category pages, search results and the product page fit the **whole** photo inside the square on white and
+    never crop it, so a wide or tall photo shows with white bands there.
+  - **Homepage rows** (Today's Deals, Best Selling, Popular Products, the category rows) **crop** the photo to
+    fill the square, since 10-02 at the client's request (DEV01.38). A wide or tall photo loses its edges there.
+    This is why **square, product centred** matters: a square photo looks the same everywhere.
   - A smaller photo is never enlarged on the server. Under 600 px looks soft everywhere; under 1200 px looks
     soft on the product page.
   - **Do not upload screenshots** of a photo: they are only as big as the screen region captured (the ones
@@ -278,6 +284,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `3a3516f07` | Admin App Home Section editor loads (customer app Home content); app API unchanged |
 | 10-01 | `920da6428` | TC68-QA03: approving from Catalog > Products applies the seller's queued edits (and warns about them); app API unchanged |
 | 10-01 | `fc63a4189` | Product page: 1200 px photo, square frame, whole photo and thumbnails (never cropped); upload 1200 px+, no screenshots; app API unchanged |
+| 10-02 | `eb37ab82d` | Homepage product rows crop photos to fill the square (DEV01.38); category pages keep the store's product order with no personalized re-shuffle (DEV01.39); app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
