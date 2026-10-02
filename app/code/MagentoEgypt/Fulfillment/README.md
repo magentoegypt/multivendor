@@ -1,70 +1,41 @@
-# Hub Fulfillment — first implementation
+# Hub Market Fulfillment
 
-This is a **read-only planning foundation**, disabled by default. It does not replace Magento/Vnecoms shipping, reserve inventory, create shipments, post vendor credits or transfer funds. It is not a completed fulfillment release.
+Operational implementation for Magento 2.4.8-p5, MSI, Vnecoms, City Manager and Delivery Availability. Preview, checkout charging and catalog filtering are separate flags, disabled by default. Installing the module is not approval to activate delivery coverage or rates.
 
-## Implemented
+## Implemented code
 
-- Source ownership: vendor warehouses and marketplace hubs use existing Magento MSI source codes and City Manager IDs.
-- Vendor defaults and per-SKU overrides: `vendor`, `marketplace`, `hub`, or an empty list for no service. Product overrides intentionally replace the default, allowing a seller to ship selected products only. The product's real vendor ID must match the override.
-- Direct delivery: a vendor may ship, or the marketplace may collect from that vendor's source. Source ownership remains enforced in either mode.
-- Consolidation: every item must reach one common hub. Inbound legs are separate; the last-mile charge occurs once per hub group, including items already stocked there.
-- Quantity-aware allocation proposals: deterministic source priority then source code; partial allocations never produce a purchasable quote. These are proposals, **not inventory reservations**.
-- Coverage and rates: exact origin source, country/city/locality destination, direct/inbound/outbound leg, integer base fee, per-unit fee and per-started-kilogram fee. Locality specificity wins over city, then country. Missing rates never mean free shipping.
-- Settlement projection: net goods and actual commission amounts are supplied by the caller; shipping revenue recipient and cost bearer are separate. The balanced projection shows vendor payable, marketplace contribution and carrier payable. It does not guess commission percentages or call accounting APIs.
-- Magento preview adapter: validates current City Manager destination and delivery restrictions; derives vendor, weight, stock and website membership from Magento. MSI requested-quantity validation and aggregate salable quantity are checked; disabled/unlinked sources are excluded.
-- Admin ACL-protected policy configuration and GET preview controller. Public output omits internal source identifiers, warehouse locations, stock quantities and cost estimates.
+- Deterministic source allocation, vendor defaults, per-SKU mode and country/city/locality overrides, direct and common-hub plans. Empty modes/coverage mean unavailable. Missing rates never mean free shipping.
+- Integer minor-unit origin/destination rates: base, per unit and per started kilogram. Revenue recipient and carrier-cost bearer are independent. Hub inbound charges remain separate; consolidated last-mile charge occurs once.
+- Checkout carrier, actual-address/quantity/rate revalidation, serialized allocation through order placement, immutable order snapshots and source holds alongside core MSI reservations. Core MSI remains responsible for actual inventory deduction. Shipment, cancellation and unshipped-refund holds are reconciled without creating duplicate MSI reservations.
+- Shipping tax uses the policy's net-price basis and Magento's tax jurisdiction/class calculation. Invoice/refund adapters prevent marketplace shipping being omitted or duplicated by Vnecoms vendor shipping.
+- Paid invoice/refund shipping subledger, actual carrier bills, bank/COD receipt reconciliation and recording completed vendor shipping payouts. Replay-safe events and balances prevent duplicate entries and excessive payouts. These records do not transfer money.
+- Stock/coverage-aware catalog filtering before search counts and pagination. Area-specific app queries use POST and a separate cache. Storefront URLs carry destination parameters, so full-page cache varies by area; selected-area browsing uses OpenSearch instead of unfiltered Algolia. Product widgets receive the same eligibility set.
+- Vendor owner-only policy screen, per-product area dropdowns, existing vendor order-page responsibility and courier/tracking controls. Marketplace groups allow the vendor to report ready for pickup. Vendor shipping reports are separate from confirmed inventory shipments.
+- Admin order/group progress and shipping finance workspace, ACL-protected configuration, finance and fleet permissions.
+- Authenticated customer order progress and vendor REST endpoints. Fleet contract and responsibilities: see FLEET-CONTRACT.md. Legacy orders remain unclassified until an allowed explicit selection; no allocation, fee, weight or address pin is invented.
+- Customer Flutter branch: cart direct/hub previews, area-scoped catalog/search, order delivery progress. Vendor Flutter branch: fulfillment defaults and SKU coverage. App deployment is separate from Magento installation.
 
-## API contract
+## Configuration
 
-Once enabled in an isolated review environment, GET `/hubfulfillment/quote/index` takes:
+Existing MSI source codes must be mapped to real owners and active City Manager locations. Policy JSON is managed at Stores > Configuration > Hub Fulfillment; vendor owners can manage their own defaults and products from Fulfillment. Sources and rate configuration currently use the administrator policy editor, not a dedicated warehouse/rate grid.
 
-- `country`: EG, SA, AE or US; `region`, `city`, `locality`: City Manager IDs. Existing City Manager locality requirements apply, including locality optional where none is configured.
-- `strategy`: `direct` or `hub`.
-- `items`: JSON array of `{ "sku": "selected-simple-sku", "qty_milli": 1000 }`. Duplicate SKU lines are aggregated by the Magento adapter. At most 100 input lines; at most 1,000 units per SKU. One unit is 1,000 milli-units.
+Policy version 1: currency (actual base currency), minor_digits=2, sources[], vendors[], products[], rates[]. Sources contain code, vendor_id, kind=vendor|hub, priority, location={country,city_id,locality_id}. Vendors contain vendor_id and modes=[vendor|marketplace|hub]. Products contain sku, vendor_id, modes and optional coverage[]; omitted coverage inherits configured routes, an empty array disables delivery. Each rate identifies source, leg=direct|inbound|outbound, mode, destination, base_minor/per_unit_minor/per_kg_minor, cost_base_minor/cost_per_unit_minor/cost_per_kg_minor, revenue_owner and cost_owner. Inbound rates also identify the destination hub. Outbound hub revenue/cost belongs to the marketplace.
 
-Responses distinguish `disabled`, `unsupported_product_type`, `unavailable` and `proposed`. A proposal has `reservation: not_reserved`, `checkout_binding: preview_only`, `price_basis: base_currency_excluding_tax` and shipping amounts in integer minor units. It is **not a delivery promise or a checkout payment amount**. Responses are private/no-store.
+Test/fixtures.php is entirely synthetic. Never import it as real coverage. Existing Magento/Vnecoms table rates are preserved; they must not be converted from weight/postcode bands into this rate model without an explicit mapping.
 
-Only purchased physical simple SKUs are supported in this implementation. Configurable parent selection must be resolved to its child by the consumer; bundles, grouped items, virtual carts and mixed complex baskets need dedicated adapters. No frontend or app consumer has been wired yet.
+Preview GET /hubfulfillment/quote/index accepts country, region, city, locality, strategy and items JSON [{sku,qty_milli}]. Only purchased physical simple SKUs are supported; configurable checkout children are expanded. Bundles/grouped fulfillment and Magento multishipping are not enabled. A preview is not a reservation or final taxed checkout total.
 
-## Policy
+## Financial boundary
 
-Stores → Configuration → General → Hub Fulfillment. Preview is off unless enabled explicitly. Policy is a versioned JSON object containing:
+Vnecoms remains authoritative for merchandise and commission. This module accounts for shipping separately, preventing duplicate Vnecoms shipping credits. Vendor payable is not vendor profit: cost of goods, payment fees and operating costs are not known. Settlement::project is a pure estimate; Journal/Finance are actual shipping event records. Payout recording requires collected-shipping reconciliation and a completed bank reference. Carrier booking, automatic bank transfers, payment-provider reconciliation and Odoo posting require separate integrations and acceptance tests.
 
-- `version: 1`, `currency` equal to the store base currency, `minor_digits: 2`.
-- `sources`: `{code, vendor_id, kind: vendor|hub, priority, location: {country, city_id, locality_id}}`. Hubs have vendor ID zero. Lower priority numbers allocate first.
-- `vendors`: `{vendor_id, modes: [...]}`. Unconfigured vendors receive no fulfillment offer.
-- `products`: `{sku, vendor_id, modes: [...]}`.
-- `rates`: `{id, source, leg, mode, destination, base_minor, per_unit_minor, per_kg_minor, cost_base_minor, cost_per_unit_minor, cost_per_kg_minor, revenue_owner, cost_owner}`. Owners are `vendor` or `marketplace`. Inbound rates additionally specify `hub`, with destination exactly equal to that hub's location. Shared outbound charges/costs belong to the marketplace; no arbitrary allocation to one seller.
+## Verification and release gates
 
-See `Test/fixtures.php` for a complete, **fictional** policy. Its IDs, warehouse names and rates are test inputs and must not be imported as real business coverage. Save validation checks actual MSI source, vendor and active geographic references.
+- Test/run.php: 39 deterministic policy/allocation/rate/accounting cases.
+- Test/lifecycle.php: 28 isolated synthetic MySQL cases, including dispatch role isolation, optimistic versions, replay, invoice/refund, COD/bank receipt, payout, shipment and partial cancellation/refund holds.
+- Test/runtime.php: 24 read-only installed Magento compatibility checks, real MSI product eligibility, positive/negative OpenSearch pagination, XML and a real legacy order contract. Test scripts target the explicit Hub Market review environment; inspect paths before reuse elsewhere.
+- Separate app repositories contain service/widget tests; native device/store-release acceptance is a separate gate.
 
-Source priority drives direct allocation; this is not a cheapest-route optimizer. Equal-specificity direct services use ascending rate ID as a deterministic tie-breaker. For consolidation, feasible common-hub proposals are compared by total customer shipping fee, then hub code. Source stock is a live snapshot; concurrent checkouts can change it immediately.
+Full checkout and browser acceptance, native device acceptance, configured-source concurrency, real rate imports, labels/payment/Odoo/Fleet end-to-end checks are not implied by these suites. Never mark their ClickUp cases passed without evidence.
 
-## Accounting boundary
-
-`Settlement::project()` is a pure accrual model. `net_goods_minor` is goods revenue after discounts and excluding tax; `commission_minor` must come from the existing Vnecoms commission calculation. The model assumes the marketplace collects the sale and pays the carrier, deducting vendor-borne costs from vendor payable. It does not yet handle direct vendor collection or COD remittance.
-
-The conservation rule is:
-
-`customer_due = sum(vendor_payable) + marketplace_contribution + estimated_carrier_payable`
-
-Marketplace contribution excludes payment fees, tax and operating expenses. Vendor payable is **not vendor profit**; vendor cost of goods is unknown. Negative shipping margins remain visible. Vnecoms currently calculates commission at invoicing and processes vendor credits/refunds through its own observers; this module intentionally does not register duplicate accounting observers.
-
-## Verification
-
-`php Test/run.php`: 36 standalone deterministic contract cases, including the Alexandria/Aswan/Asyut → Giza direct and consolidated scenarios, cross-vendor stock isolation, product overrides, stock shortages, rate specificity, fractional rounding and settlement conservation.
-
-`php Test/runtime.php`: 7 read-only checks on the correct Hub Market Magento installation. It bootstraps `/var/www/multi.magento2.click`, resolves real dependencies, validates XML schemas and checks a real simple product against MSI using in-memory fictional policy values. No policy, inventory, order or settlement records are saved. Review this hardcoded environment path before using elsewhere.
-
-## Remaining release work
-
-1. Admin warehouse/rate grids and vendor ownership-enforced policy editor; JSON is only the initial administrator configuration interface.
-2. Location-filtered category/search pagination and facets, including Algolia indexing/filter semantics and cache variation; an availability preview is not a filtered catalog.
-3. Web, customer app and vendor app consumers, localized shipping breakdown and explicit direct/hub selection.
-4. Authoritative checkout shipping carrier/totals integration with existing Vnecoms quote splitting; revalidation on the actual checkout address, selected SKUs, quantity and currency. Complex products, multishipping and tax need separate acceptance cases.
-5. Durable versioned order/group snapshots, source allocation/reservation lifecycle, cancellation and race/concurrency handling. Recomputing later must not silently change an accepted order.
-6. Shipment routing, hub receipt/consolidation events, labels and carrier/Fleet acceptance tests.
-7. Idempotent persisted settlement ledger, invoice capture, partial/full refund reversal, COD reconciliation and integration with existing vendor credits and payouts.
-8. Isolated environment end-to-end verification before enabling checkout charging or accounting. External sandbox accounts are still unavailable.
-
-No schema changes or deployment commands are required to run the standalone tests. Do not use a blanket `setup:upgrade` on the current shared installation: unrelated schema drift already exists. This build has not been enabled or deployed into the live Magento module directory.
+Deployment must use a database/configuration backup and an allowlisted declarative schema diff: three me_fulfillment_* tables plus sales_order.hf_plan_json. Do not run blanket setup:upgrade on the current shared installation; unrelated schema drift exists. Compile dependencies and verify the disabled flags and legacy storefront before activating any live allocation or pricing.

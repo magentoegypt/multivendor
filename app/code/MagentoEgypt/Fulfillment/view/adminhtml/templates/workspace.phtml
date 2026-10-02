@@ -1,0 +1,35 @@
+<?php /** @var \MagentoEgypt\Fulfillment\Block\Adminhtml\Workspace $block */ ?>
+<p><a href="<?= $block->escapeUrl($block->getUrl('adminhtml/system_config/edit',['section'=>'hubfulfillment'])) ?>"><?= $block->escapeHtml(__('Configure warehouses, coverage and rates')) ?></a></p>
+<p><?= $block->escapeHtml(__('Shipping ledger only. Merchandise and commission remain in Vnecoms. Recording a payout records an already completed transfer; it does not send money.')) ?></p>
+<?php foreach ($block->orders() as $order): $plan=json_decode($order['hf_plan_json'],true,64,JSON_THROW_ON_ERROR); ?>
+<section style="margin:24px 0;border:1px solid #ddd;padding:16px">
+<h2><?= $block->escapeHtml(__('Order %1 — %2',$order['increment_id'],$order['base_currency_code'])) ?></h2>
+<table class="data-grid"><thead><tr><th><?= $block->escapeHtml(__('Group')) ?></th><th><?= $block->escapeHtml(__('Items')) ?></th><th><?= $block->escapeHtml(__('Progress')) ?></th></tr></thead><tbody>
+<?php foreach ($plan['groups'] as $group): $state=$block->state((int)$order['entity_id'],$group); ?>
+<tr><td><?= $block->escapeHtml($group['id']) ?><br><?= $block->escapeHtml($group['mode'].' / '.$group['leg']) ?></td>
+<td><?php foreach ($group['items'] as $item): ?><?= $block->escapeHtml($item['sku'].' × '.($item['qty_milli']/1000)) ?><br><?php endforeach ?></td>
+<td><?= $block->escapeHtml($state) ?>
+<?php if (in_array($state,['planned','dispatched'],true)): ?>
+<form method="post" action="<?= $block->escapeUrl($block->getUrl('*/*/save')) ?>">
+<?= /* @noEscape */ $block->formKeyHtml() ?>
+<input type="hidden" name="order_id" value="<?= (int)$order['entity_id'] ?>"><input type="hidden" name="group_id" value="<?= $block->escapeHtmlAttr($group['id']) ?>">
+<input type="hidden" name="action" value="progress"><input type="hidden" name="reference" value="<?= $block->escapeHtmlAttr(bin2hex(random_bytes(16))) ?>">
+<input type="hidden" name="state" value="<?= $block->escapeHtmlAttr($state==='planned'?'dispatched':($group['leg']==='inbound'?'received':'delivered')) ?>">
+<button type="submit"><?= $block->escapeHtml($state==='planned'?__('Confirm dispatch'):($group['leg']==='inbound'?__('Confirm hub receipt'):__('Confirm delivery'))) ?></button></form>
+<?php endif ?></td></tr>
+<?php endforeach ?></tbody></table>
+<?php if ($block->financeAllowed()): ?>
+<h3><?= $block->escapeHtml(__('Record carrier bill or completed shipping payout')) ?></h3>
+<form method="post" action="<?= $block->escapeUrl($block->getUrl('*/*/save')) ?>">
+<?= /* @noEscape */ $block->formKeyHtml() ?><input type="hidden" name="order_id" value="<?= (int)$order['entity_id'] ?>">
+<label><?= $block->escapeHtml(__('Operation')) ?><select name="action"><option value="receipt"><?= $block->escapeHtml(__('Collected bank / COD remittance')) ?></option><option value="cost"><?= $block->escapeHtml(__('Carrier bill')) ?></option><option value="payout"><?= $block->escapeHtml(__('Completed vendor shipping payout')) ?></option></select></label>
+<label><?= $block->escapeHtml(__('Group for carrier bill')) ?><select name="group_id"><?php foreach ($plan['groups'] as $g): ?><option value="<?= $block->escapeHtmlAttr($g['id']) ?>"><?= $block->escapeHtml($g['id']) ?></option><?php endforeach ?></select></label>
+<label><?= $block->escapeHtml(__('Vendor ID for payout')) ?><input type="number" name="vendor_id" min="1"></label>
+<label><?= $block->escapeHtml(__('Amount in minor units (100 = 1 currency unit)')) ?><input type="number" name="amount_minor" required min="1" step="1"></label>
+<label><?= $block->escapeHtml(__('Unique carrier bill / completed bank transfer reference')) ?><input name="reference" required pattern="[A-Za-z0-9._-]{4,80}"></label>
+<button type="submit"><?= $block->escapeHtml(__('Record operation')) ?></button></form>
+<?php endif ?>
+<h3><?= $block->escapeHtml(__('Shipping journal (minor units)')) ?></h3>
+<table class="data-grid"><thead><tr><th>Debit</th><th>Credit</th><th>Amount</th></tr></thead><tbody>
+<?php foreach ($block->journal((int)$order['entity_id']) as $entry): ?><tr><td><?= $block->escapeHtml($entry['debit_account']) ?></td><td><?= $block->escapeHtml($entry['credit_account']) ?></td><td><?= $block->escapeHtml($entry['amount_minor'].' '.$entry['currency']) ?></td></tr><?php endforeach ?>
+</tbody></table></section><?php endforeach ?>

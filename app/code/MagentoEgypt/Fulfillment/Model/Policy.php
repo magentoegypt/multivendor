@@ -44,6 +44,12 @@ final class Policy
             if (!isset($vendors[$v['vendor_id']]) || isset($products[$v['sku']])) {
                 throw new \InvalidArgumentException('Product policy requires one configured owner.');
             }
+            if (isset($v['coverage'])) {
+                if (!is_array($v['coverage']) || !array_is_list($v['coverage']) || count($v['coverage']) > 500) {
+                    throw new \InvalidArgumentException('Invalid product coverage list.');
+                }
+                foreach ($v['coverage'] as $destination) $this->destination($destination);
+            }
             $products[$v['sku']] = $v;
         }
         foreach ($p['rates'] as $r) {

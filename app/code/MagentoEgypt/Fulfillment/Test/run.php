@@ -139,6 +139,20 @@ check('All four countries preserve exact geography matching', function() {
         same('proposed',plan($p,d:['country'=>$country,'city_id'=>104,'locality_id'=>0])['status']);
     }
 });
+check('Product coverage rejects direct and hub routes outside its city', function() {
+    $p=fixturePolicy(); $p['products']=[['sku'=>'A','vendor_id'=>1,'modes'=>['vendor','marketplace','hub'],'coverage'=>[['country'=>'EG','city_id'=>999,'locality_id'=>0]]]];
+    foreach (['direct','hub'] as $strategy) { $r=plan($p,lines:[fixtureLines()[0]],strategy:$strategy); same('unavailable',$r['status']); same('outside_product_coverage',$r['issues'][0]['code']); }
+});
+check('Product coverage accepts matching city and rejects a different locality', function() {
+    $p=fixturePolicy(); $p['products']=[['sku'=>'A','vendor_id'=>1,'modes'=>['vendor'],'coverage'=>[['country'=>'EG','city_id'=>104,'locality_id'=>9]]]];
+    same('unavailable',plan($p,lines:[fixtureLines()[0]])['status']);
+    same('proposed',plan($p,lines:[fixtureLines()[0]],d:['country'=>'EG','city_id'=>104,'locality_id'=>9])['status']);
+});
+check('Explicit empty product coverage disables delivery; omitted coverage inherits routes', function() {
+    $p=fixturePolicy(); $p['products']=[['sku'=>'A','vendor_id'=>1,'modes'=>['vendor'],'coverage'=>[]]];
+    same('unavailable',plan($p,lines:[fixtureLines()[0]])['status']); unset($p['products'][0]['coverage']);
+    same('proposed',plan($p,lines:[fixtureLines()[0]])['status']);
+});
 $failed = count(array_filter($results,fn($r)=>$r['status']==='FAIL'));
 echo json_encode(['suite'=>'Hub Fulfillment deterministic contract tests','passed'=>count($results)-$failed,'failed'=>$failed,'cases'=>$results],JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES).PHP_EOL;
 exit($failed ? 1 : 0);

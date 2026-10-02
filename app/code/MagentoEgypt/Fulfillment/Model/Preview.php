@@ -6,6 +6,7 @@ final class Preview
 {
     public function __construct(
         private Configuration $configuration,
+        private Allocation $allocation,
         private Planner $planner,
         private \MagentoEgypt\DeliveryAvailability\Model\Availability $availability,
         private \Magento\Catalog\Api\ProductRepositoryInterface $products,
@@ -18,9 +19,9 @@ final class Preview
         private \Magento\Store\Model\StoreManagerInterface $stores
     ) {}
 
-    public function execute(array $input, string $country, int $region, int $city, int $locality, string $strategy): array
+    public function plan(array $input, string $country, int $region, int $city, int $locality, string $strategy): array
     {
-        if (!$this->configuration->enabled()) return ['status'=>'disabled', 'reservation'=>'not_reserved'];
+        if (!$this->configuration->enabled() && !$this->configuration->checkoutEnabled()) return ['status'=>'disabled', 'reservation'=>'not_reserved'];
         if (!$input || !array_is_list($input) || count($input) > 100) throw new \InvalidArgumentException('Provide 1–100 product lines.');
         $p = $this->configuration->get();
         $store = $this->stores->getStore();
@@ -61,15 +62,30 @@ final class Preview
             foreach ($this->sourceItems->execute((string)$sku) as $source) {
                 if ((int)$source->getStatus() !== 1 || !in_array($source->getSourceCode(), $linked, true)) continue;
                 $inventory[$sku][$source->getSourceCode()] = max(0, (int)floor((float)$source->getQuantity() * 1000 + 0.000001));
+                if ($this->configuration->checkoutEnabled()) {
+                    $inventory[$sku][$source->getSourceCode()] = max(0, $inventory[$sku][$source->getSourceCode()] - $this->allocation->outstanding((string)$sku, $source->getSourceCode()));
+                }
             }
         }
         $plan = $this->planner->plan($p, $destination, $lines, $inventory, $strategy);
+        $plan['policy_hash']=hash('sha256',json_encode($p,JSON_THROW_ON_ERROR));
+        return $plan;
+    }
+
+    public function execute(array $input, string $country, int $region, int $city, int $locality, string $strategy): array
+    {
+        return $this->publicPlan($this->plan($input,$country,$region,$city,$locality,$strategy));
+    }
+
+    public function publicPlan(array $plan): array
+    {
+        if (!isset($plan['groups'])) return $plan;
         // Public contract excludes stock levels, warehouse addresses, cost estimates and settlement data.
         foreach ($plan['groups'] as $index=>&$group) {
             $group['id'] = 'group-' . ($index + 1);
             unset($group['source'], $group['estimated_cost_minor'], $group['cost_owner'], $group['rate_id']);
         }
-        unset($group, $plan['hub']);
+        unset($group, $plan['hub'], $plan['policy_hash']);
         $plan['price_basis'] = 'base_currency_excluding_tax';
         $plan['checkout_binding'] = 'preview_only';
         return $plan;

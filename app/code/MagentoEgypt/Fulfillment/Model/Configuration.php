@@ -11,11 +11,20 @@ final class Configuration
     ) {}
 
     public function enabled(): bool { return $this->config->isSetFlag('hubfulfillment/general/preview_enabled'); }
+    public function checkoutEnabled(): bool { return $this->config->isSetFlag('hubfulfillment/general/checkout_enabled'); }
+
+    public function getJson(): string
+    {
+        $raw=(string)$this->config->getValue('hubfulfillment/general/policy');
+        if (trim($raw)!=='') return $raw;
+        return json_encode(['version'=>1,'currency'=>(string)$this->config->getValue('currency/options/base'),'minor_digits'=>2,
+            'sources'=>[],'vendors'=>[],'products'=>[],'rates'=>[]],JSON_THROW_ON_ERROR);
+    }
 
     public function get(): array
     {
         try {
-            return $this->validate((string)$this->config->getValue('hubfulfillment/general/policy'));
+            return $this->validate($this->getJson());
         } catch (\Throwable $e) {
             throw new \RuntimeException('Fulfillment policy is invalid.', 0, $e);
         }
@@ -40,6 +49,11 @@ final class Configuration
             $locations[] = $source['location'];
         }
         foreach ($p['rates'] as $r) $locations[] = $r['destination'];
+        foreach ($p['products'] as $product) {
+            $owner=$db->fetchOne($db->select()->from($this->resource->getTableName('catalog_product_entity'),'vendor_id')->where('sku = ?', $product['sku']));
+            if ($owner === false || (int)$owner !== $product['vendor_id']) throw new \InvalidArgumentException('Product ownership does not match the policy.');
+            foreach ($product['coverage'] ?? [] as $area) $locations[]=$area;
+        }
         foreach ($locations as $d) {
             foreach (['city_id'=>'city', 'locality_id'=>'locality'] as $key=>$level) {
                 if (!$d[$key]) continue;

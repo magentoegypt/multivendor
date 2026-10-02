@@ -51,6 +51,12 @@ final class Planner
                 continue;
             }
             $modes = $override['modes'] ?? $p['vendors'][$l['vendor_id']] ?? [];
+            if ($override && isset($override['coverage']) && !array_filter($override['coverage'], fn($area) =>
+                $area['country'] === $d['country'] && (!$area['city_id'] || $area['city_id'] === $d['city_id'])
+                && (!$area['locality_id'] || $area['locality_id'] === $d['locality_id']))) {
+                $plan['issues'][] = ['sku'=>$l['sku'], 'code'=>'outside_product_coverage'];
+                continue;
+            }
             $candidates = [];
             foreach ($p['sources'] as $code => $s) {
                 if (($strategy === 'hub' && !in_array('hub', $modes, true)) || ($s['kind'] === 'vendor' && $s['vendor_id'] !== $l['vendor_id'])

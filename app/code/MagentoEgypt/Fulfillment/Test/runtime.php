@@ -33,6 +33,9 @@ $assert('Preview dependencies resolve on installed Magento', function() use($om)
 });
 $assert('Admin backend model dependency injection', function() use($om): void { $om->create(MagentoEgypt\Fulfillment\Model\PolicyConfig::class); });
 $assert('Public controller dependency injection', function() use($om): void { $om->create(MagentoEgypt\Fulfillment\Controller\Quote\Index::class); });
+foreach (['Model\\VendorApi','Model\\FleetApi','Model\\Dispatch','Model\\CustomerApi','Model\\CatalogEligibility','Model\\QuotePlan','Model\\Finance','Plugin\\Shipping','Plugin\\Submit','Plugin\\CreditmemoShipping','Observer\\Shipment','Observer\\ShippingLedger','Controller\\Vendors\\Manage\\Index','Controller\\Vendors\\Manage\\Save','Block\\Vendors\\Order'] as $class) {
+    $assert('Dependency injection '.$class, function() use($om,$class): void { $om->create('MagentoEgypt\\Fulfillment\\'.$class); });
+}
 $assert('Empty policy validates against database without writes', function() use($om,$store): void {
     $om->create(MagentoEgypt\Fulfillment\Model\Configuration::class)->validate(json_encode([
         'version'=>1,'currency'=>$store->getBaseCurrencyCode(),'minor_digits'=>2,'sources'=>[],'vendors'=>[],'products'=>[],'rates'=>[]]));
@@ -68,7 +71,7 @@ $assert('Configured preview reads real product ownership and MSI stock without m
     $scope=new class(json_encode($p)) implements Magento\Framework\App\Config\ScopeConfigInterface {
         public function __construct(private string $policy) {}
         public function getValue($path=null,$scopeType=self::SCOPE_TYPE_DEFAULT,$scopeCode=null) { return $this->policy; }
-        public function isSetFlag($path,$scopeType=self::SCOPE_TYPE_DEFAULT,$scopeCode=null) { return true; }
+        public function isSetFlag($path,$scopeType=self::SCOPE_TYPE_DEFAULT,$scopeCode=null) { return $path==='hubfulfillment/general/preview_enabled'; }
     };
     $configuration=$om->create(MagentoEgypt\Fulfillment\Model\Configuration::class,['config'=>$scope]);
     $preview=$om->create(MagentoEgypt\Fulfillment\Model\Preview::class,['configuration'=>$configuration]);
@@ -78,14 +81,57 @@ $assert('Configured preview reads real product ownership and MSI stock without m
     }
     foreach (['source','estimated_cost_minor','cost_owner','rate_id'] as $key) if (isset($result['groups'][0][$key])) throw new RuntimeException('Private field leaked');
     if ($result['checkout_binding'] !== 'preview_only') throw new RuntimeException('Preview must not claim checkout binding');
+    $eligibility=$om->create(MagentoEgypt\Fulfillment\Model\CatalogEligibility::class,['configuration'=>$configuration]);
+    $ids=$eligibility->ids('EG',(int)$city['region_id'],(int)$city['location_id'],$locality);
+    if (!in_array((int)$product->getId(),$ids,true)) throw new RuntimeException('Serviceable product missing from catalog eligibility');
+});
+$assert('OpenSearch applies eligibility before counts and pagination', function() use($om,$store): void {
+    $term=Magento\Elasticsearch\SearchAdapter\Filter\Builder\Term::class;
+    $om->configure([$term=>['arguments'=>['integerTypeAttributes'=>['_id']]]]);
+    $name='catalog_view_container';
+    $base=$om->get(Magento\Framework\Search\Request\Config::class)->get($name);
+    $doc=new DOMDocument();$doc->load(dirname(__DIR__).'/etc/search_request.xml');
+    $extra=(new Magento\Framework\Search\Request\Config\Converter())->convert($doc)[$name];
+    $base['queries'][$name]['queryReference'][]=['clause'=>'must','ref'=>'hf_area'];
+    $base['queries']['hf_area']=$extra['queries']['hf_area'];
+    $base['filters']['hf_area_filter']=$extra['filters']['hf_area_filter'];
+    $cfg=new class($base) extends Magento\Framework\Search\Request\Config {
+        public function __construct(private array $fixture) {}
+        public function get($path=null,$default=null) { return $this->fixture; }
+    };
+    $builder=$om->create(Magento\Framework\Search\Request\Builder::class,['config'=>$cfg]);
+    $request=$builder->setRequestName($name)->setFrom(0)->setSize(5)->bindDimension('scope',(string)$store->getId())->bind('hf_entity_ids',[0])->create();
+    $response=$om->get(Magento\Search\Model\SearchEngine::class)->search($request);
+    if ((int)$response->getTotal()!==0 || count($response)>0) throw new RuntimeException('Empty eligibility filter leaked catalog results');
+    $run=function(?array $ids,int $from=0) use($om,$cfg,$name,$store) {
+        $b=$om->create(Magento\Framework\Search\Request\Builder::class,['config'=>$cfg]);
+        $b->setRequestName($name)->setFrom($from)->setSize(1)->bindDimension('scope',(string)$store->getId())->bind('visibility',[2,3,4]);
+        if ($ids!==null) $b->bind('hf_entity_ids',$ids);
+        return $om->get(Magento\Search\Model\SearchEngine::class)->search($b->create());
+    };
+    $baseline=$run(null);$id=null;foreach($baseline as $document){$id=(int)$document->getId();break;}
+    if (!$id) throw new RuntimeException('No indexed fixture for positive search test');
+    $one=$run([$id]);
+    if ((int)$one->getTotal()!==1 || count($one)!==1 || count($run([$id],1))!==0) throw new RuntimeException('Eligibility did not filter before pagination');
+});
+$assert('Actual legacy order can be read without dispatching or inventing allocations',function() use($om):void {
+    $criteria=$om->create(Magento\Framework\Api\SearchCriteriaBuilder::class)->addFilter('is_virtual',0)->setPageSize(1)->create();
+    $orders=$om->get(Magento\Sales\Api\OrderRepositoryInterface::class)->getList($criteria)->getItems();
+    if (!$orders) throw new RuntimeException('No physical order available for read-only verification.');
+    $order=reset($orders);$detail=$om->create(MagentoEgypt\Fulfillment\Model\Dispatch::class)->describe($order);
+    if ($detail['order_id']!==(int)$order->getId() || !$detail['groups']) throw new RuntimeException('Actual order contract is incomplete.');
+    foreach($detail['groups'] as $group) if($group['legacy'] && ($group['responsibility']!==null || $group['source']!==null)) throw new RuntimeException('Legacy responsibility/origin was inferred.');
+    file_put_contents('/home/ubuntu/hub-fulfillment-review/real-order-readback.json',json_encode(['order_id'=>$detail['order_id'],'order_number'=>$detail['order_number'],'state'=>$detail['order_state'],
+        'group_count'=>count($detail['groups']),'legacy'=>array_column($detail['groups'],'legacy'),'mutation_performed'=>false,'customer_data_omitted'=>true],JSON_PRETTY_PRINT));
 });
 $assert('All module XML validates against Magento schemas', function(): void {
-    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__).'/etc'));
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(dirname(__DIR__)));
     foreach ($iterator as $file) {
         if ($file->getExtension() !== 'xml') continue;
         $doc = new DOMDocument(); $doc->load($file->getPathname());
         $urn = $doc->documentElement->getAttributeNS('http://www.w3.org/2001/XMLSchema-instance','noNamespaceSchemaLocation');
         $resolver = new Magento\Framework\Config\Dom\UrnResolver();
+        libxml_set_external_entity_loader([$resolver,'registerEntityLoader']);
         if (!$doc->schemaValidate($resolver->getRealPath($urn))) throw new RuntimeException('Invalid XML '.$file->getFilename());
     }
 });
