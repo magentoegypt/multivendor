@@ -303,6 +303,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-02 | `eb37ab82d` | Homepage product rows crop photos to fill the square (DEV01.38); category pages keep the store's product order with no personalized re-shuffle (DEV01.39); app API unchanged |
 | 10-02 | `b185f083c` | Website: the new delivery-area picker is hidden until that feature is finished (see Customer app); seller app unaffected |
 | 10-02 | (data) | Today's Deals countdown back on web and app: the 7 live deals end 2026-10-31; deals need `special_to_date` to get a timer |
+| 10-02 | (data) | Customer-app Home: Deals "All Deals" opens hmDeals, Featured Stores subtitle, Bundle Deals tile (4 tiles), "Sell on Hub Market" card (see Customer app) |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
@@ -315,6 +316,22 @@ the `Store` header). `multi.magento2.click` goes straight to origin with no cach
 using REST on `multi.magento2.click`.
 The customer app's Home is managed in the admin under Content > Elements > App Home Sections. The section editor
 used to hang on its spinner and works since 10-01 (`3a3516f07`).
+
+**Home content filled in from the UI audit (10-02, admin data, no API change).** These were the four gaps in the
+customer app's audit doc, section 7, "Home on the live server". They can be dropped from that list.
+- **Today's Deals:** the More link is cleared, so `more_link` is `null` and the app opens its Deals page (hmDeals).
+- **Featured Stores:** `subtitle` is "Verified sellers on Hub Market" / "بائعون موثّقون على Hub Market".
+- **HERO_BANNERS** now returns **4 tiles**. The new last tile is Bundle Deals:
+  - kicker "🎁 This week only" / "🎁 هذا الأسبوع فقط";
+  - subtitle "Buy more, pay less";
+  - `tone` `#f26522` and `image_url` **null**, so draw a solid tile in the tone colour, as Figma does;
+  - link type `BUNDLES`.
+  The website still shows its 3 tiles.
+- **"Sell on Hub Market":** a new last section of type `CMS_BLOCK` with `cms_block.identifier` `hm_home_sell`. The
+  content is `<h3>` heading, `<p>` text, then a `<p>` holding only the "Start selling" / "ابدأ البيع" link to the
+  store's seller sign-up page (`…/marketplace/seller/register/`).
+- **Still app-side:** hero kickers in capitals. The admin text is mixed case and the website uppercases it in CSS;
+  the app should do the same.
 
 **Delivery areas (work in progress, 10-02):**
 - A new module, `MagentoEgypt_DeliveryAvailability`, was added on the server on 10-02 and is not in git yet. It adds:
