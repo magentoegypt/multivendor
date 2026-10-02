@@ -34,4 +34,6 @@ Backend custom payment integrations that bypass QuoteManagement must be audited 
 
 ## Release safety
 
+Tests: `php app/code/MagentoEgypt/DeliveryAvailability/Test/Unit/rules.php` runs standalone rule cases. `php app/code/MagentoEgypt/DeliveryAvailability/Test/Integration/verify-runtime.php` uses the installed City Manager Egyptian directory and in-memory quote fixtures; it writes no data and places no orders.
+
 Deployment adds only this module and enables it in app/etc/config.php. No blanket setup:upgrade: unrelated pending schema/patch changes must not be applied. Compile DI and deploy storefront assets under maintenance after other deployment processes have finished. Back up config and generated metadata. Roll back by disabling this module and restoring/recompiling DI metadata, then clean config/layout/block/full-page caches. Never change the separate legacy demo installation.
