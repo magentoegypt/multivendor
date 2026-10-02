@@ -1,0 +1,133 @@
+/*
+ * Hub Market — delivery-area picker in the header (MagentoEgypt_DeliveryAvailability, 2026-10-02).
+ *
+ * The module rendered a grey, inline-styled bar in `after.body.start`, above the whole header on every page.
+ * The theme moves the block into the utility bar (layout + template override) and styles it here:
+ *   - desktop: a compact "pin + Choose delivery area + chevron" control after the delivery promise, on the navy
+ *     bar; once an area is chosen the script's summary ("Dubai — Area covered ...") replaces the label;
+ *   - the picker is a white dropdown card under it;
+ *   - phones (< 992px): the utility bar is otherwise hidden (its promise and links move to the footer), so here
+ *     it stays visible as a slim strip carrying ONLY this control.
+ * `hidden` is restated for the picker and its rows: their display: grid/flex would otherwise beat the
+ * attribute the module's script toggles.
+ */
+.hm-deliver {
+    align-items: center;
+    border-inline-start: 1px solid rgba(255, 255, 255, .2);
+    display: inline-flex;
+    margin-inline-start: var(--hm-space-2, .8rem);
+    padding-inline-start: var(--hm-space-3, 1.2rem);
+    position: relative;
+}
+
+.hm-header .hm-deliver .hm-deliver__toggle {
+    align-items: center;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--hm-on-inverse, #fff);
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 600;
+    gap: .5rem;
+    line-height: 1.2;
+    margin: 0;
+    min-height: 0;
+    padding: .2rem 0;
+}
+
+.hm-header .hm-deliver .hm-deliver__toggle:hover .hm-deliver__choose,
+.hm-header .hm-deliver .hm-deliver__toggle:hover .hm-deliver__summary,
+.hm-header .hm-deliver .hm-deliver__toggle:focus-visible .hm-deliver__choose,
+.hm-header .hm-deliver .hm-deliver__toggle:focus-visible .hm-deliver__summary {
+    text-decoration: underline;
+}
+
+.hm-deliver__summary {
+    max-inline-size: 30rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hm-deliver__summary:empty { display: none; }
+
+.hm-deliver__summary:not(:empty) + .hm-deliver__choose { display: none; }
+
+.hm-deliver__chevron { opacity: .8; }
+
+.hm-deliver .hm-deliver__picker {
+    background: var(--hm-surface, #fff);
+    border: 1px solid var(--hm-border-subtle, #e5e7eb);
+    border-radius: var(--hm-radius, 8px);
+    box-shadow: 0 12px 32px rgba(15, 23, 42, .18);
+    color: var(--hm-text, #111827);
+    display: grid;
+    font-size: 1.4rem;
+    gap: 1.2rem;
+    inline-size: 32rem;
+    inset-block-start: calc(100% + .8rem);
+    inset-inline-start: 0;
+    padding: 1.6rem;
+    position: absolute;
+    z-index: 1000;
+}
+
+.hm-deliver .hm-deliver__field {
+    display: grid;
+    font-weight: 600;
+    gap: .4rem;
+}
+
+.hm-deliver .hm-deliver__field select {
+    font-weight: 400;
+    inline-size: 100%;
+}
+
+.hm-deliver .hm-deliver__picker[hidden],
+.hm-deliver .hm-deliver__field[hidden] { display: none; }
+
+.hm-deliver .hm-deliver__actions {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: space-between;
+}
+
+.hm-deliver .hm-deliver__save { margin: 0; }
+
+.hm-deliver .hm-deliver__clear {
+    background: none;
+    border: 0;
+    box-shadow: none;
+    color: var(--hm-text-muted, #4b5563);
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 991px) {
+    header.hm-header .hm-header__utility { display: block; }
+
+    header.hm-header .hm-header__utility-inner {
+        min-block-size: 0;
+        padding-block: .5rem;
+    }
+
+    header.hm-header .hm-header__utility-right,
+    header.hm-header .hm-header__promise > :not(.hm-deliver) { display: none; }
+
+    .hm-deliver {
+        border-inline-start: 0;
+        margin-inline-start: 0;
+        padding-inline-start: 0;
+    }
+
+    .hm-deliver__summary { max-inline-size: calc(100vw - 9rem); }
+
+    .hm-deliver .hm-deliver__picker { inline-size: min(32rem, calc(100vw - 3.2rem)); }
+}

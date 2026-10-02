@@ -45,6 +45,15 @@ $isLoggedIn = $authState !== false && $authState->isLoggedIn();
                 ->createBlock(\Magento\Cms\Block\Block::class)
                 ->setBlockId('hm_delivery_promise')
                 ->toHtml() ?>
+            <?php
+            /*
+             * Delivery-area picker (MagentoEgypt_DeliveryAvailability), moved here from `after.body.start` by
+             * MagentoEgypt_DeliveryAvailability/layout/default.xml in this theme. Inside the promise group so it
+             * reads "Free delivery ... | Choose delivery area"; on phones css/hm-deliver.css keeps only this
+             * control visible in the bar.
+             */
+            ?>
+            <?= $block->getChildHtml('deliveryArea') ?>
         </div>
 
         <div class="hm-header__utility-right">

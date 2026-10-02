@@ -1,0 +1,53 @@
+<?php
+/**
+ * Hub Market: the delivery-area picker as a header control (theme override of
+ * MagentoEgypt_DeliveryAvailability::location.phtml).
+ *
+ * Rendered inside the header utility bar (see layout/default.xml beside this folder). The module's script
+ * (MagentoEgypt_DeliveryAvailability/js/location) is untouched and finds everything by `data-role` inside
+ * #delivery-area, so every data-role and the init below are kept exactly; only the markup around them changed:
+ *   - the toggle is a compact "location pin + label + chevron" control;
+ *   - `summary` (the chosen area and its coverage message, written by the script) sits INSIDE the toggle and
+ *     BEFORE the "Choose delivery area" words, so `.hm-deliver__summary:not(:empty) + .hm-deliver__choose`
+ *     can swap the label for the chosen area without :has();
+ *   - `picker` is a dropdown card under the toggle (still toggled through its `hidden` attribute).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<div id="delivery-area" class="hm-deliver">
+    <button type="button" class="hm-deliver__toggle" data-role="toggle" aria-controls="hm-deliver-picker">
+        <svg class="hm-icon hm-icon--sm" aria-hidden="true" focusable="false"><use href="#hm-location"/></svg>
+        <span class="hm-deliver__summary" data-role="summary" aria-live="polite" dir="auto"></span>
+        <span class="hm-deliver__choose"><?= $block->escapeHtml(__('Choose delivery area')) ?></span>
+        <svg class="hm-icon hm-icon--sm hm-deliver__chevron" aria-hidden="true" focusable="false"><use href="#hm-chevron-down"/></svg>
+    </button>
+    <div class="hm-deliver__picker" id="hm-deliver-picker" data-role="picker" hidden>
+        <label class="hm-deliver__field">
+            <span><?= $block->escapeHtml(__('Country')) ?></span>
+            <select data-role="country">
+                <option value="AE">United Arab Emirates</option>
+                <option value="EG">Egypt</option>
+                <option value="SA">Saudi Arabia</option>
+                <option value="US">United States</option>
+            </select>
+        </label>
+        <label class="hm-deliver__field" data-role="region-label">
+            <span><?= $block->escapeHtml(__('Region')) ?></span>
+            <select data-role="region"></select>
+        </label>
+        <label class="hm-deliver__field">
+            <span><?= $block->escapeHtml(__('City')) ?></span>
+            <select data-role="city"></select>
+        </label>
+        <label class="hm-deliver__field" data-role="locality-label">
+            <span><?= $block->escapeHtml(__('Locality')) ?></span>
+            <select data-role="locality"></select>
+        </label>
+        <div class="hm-deliver__actions">
+            <button type="button" class="action primary hm-deliver__save" data-role="save" disabled><?= $block->escapeHtml(__('Use this area')) ?></button>
+            <button type="button" class="hm-deliver__clear" data-role="clear"><?= $block->escapeHtml(__('Browse all products')) ?></button>
+        </div>
+    </div>
+</div>
+<script type="text/x-magento-init">{"#delivery-area":{"MagentoEgypt_DeliveryAvailability/js/location":{}}}</script>

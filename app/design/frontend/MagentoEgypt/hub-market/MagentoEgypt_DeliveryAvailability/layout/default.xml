@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+    Hub Market: the delivery-area picker (MagentoEgypt_DeliveryAvailability) is HIDDEN on the storefront until the
+    feature is finished (owner's call, 2026-10-02). The module rendered it in `after.body.start` as an unstyled grey
+    bar above the whole header on every page.
+
+    The header version is ready in this theme: templates/location.phtml beside this folder (a compact
+    "pin + Choose delivery area" control with a dropdown picker; every data-role the module's script uses is kept),
+    css/hm-deliver.css, and the `deliveryArea` child slot in Magento_Theme/templates/html/header/utility.phtml.
+    To show it in the header, replace the referenceBlock line below with:
+        <move element="delivery.location" destination="hm.header.utility" as="deliveryArea"/>
+    The module's checkout guard (Plugin/PlaceOrder) is not affected by this file.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="delivery.location" remove="true"/>
+    </body>
+</page>
