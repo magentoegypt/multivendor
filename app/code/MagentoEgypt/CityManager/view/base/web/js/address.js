@@ -103,9 +103,10 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
                 areaField.toggle(c==='AE'); locality.prop('required',c==='AE');
                 if (supported) {
                     wrapper(region).attr('data-cm-hidden',c==='AE'?'true':'false').toggle(c!=='AE');
-                    wrapper(regionText).attr('data-cm-hidden','true').hide();
+                    regionText.attr('data-cm-hidden','true').hide();
+                    if (wrapper(regionText)[0] !== wrapper(region)[0]) { wrapper(regionText).attr('data-cm-hidden','true').hide(); }
                 }
-                if(!supported) { wrapper(region).attr('data-cm-hidden','false').show(); wrapper(regionText).attr('data-cm-hidden','false').show(); writeIds('',''); return; }
+                if(!supported) { wrapper(region).attr('data-cm-hidden','false').show(); wrapper(regionText).attr('data-cm-hidden','false').show(); regionText.attr('data-cm-hidden','false'); writeIds('',''); return; }
                 if(c!=='AE') label(region,{EG:'Governorate',SA:'Region',US:'State'}[c]);
                 records=[]; fill(select,[],'Select city'); select.prop('disabled',true);
                 if(!preserve) { writeIds('',''); value(city,''); }
