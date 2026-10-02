@@ -1,0 +1,6 @@
+<?xml version="1.0"?><config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+<event name="customer_address_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
+<event name="sales_quote_address_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
+<event name="sales_order_address_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
+<event name="vendor_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
+</config>
