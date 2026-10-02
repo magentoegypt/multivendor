@@ -304,6 +304,8 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-02 | `b185f083c` | Website: the new delivery-area picker is hidden until that feature is finished (see Customer app); seller app unaffected |
 | 10-02 | (data) | Today's Deals countdown back on web and app: the 7 live deals end 2026-10-31; deals need `special_to_date` to get a timer |
 | 10-02 | (data) | Customer-app Home: Deals "All Deals" opens hmDeals, Featured Stores subtitle, Bundle Deals tile (4 tiles), "Sell on Hub Market" card (see Customer app) |
+| 10-02 | `48c977b5d` | Customer app: admin-editable `badge` on every Home section (`HmHomeSection.badge`); Picked For You returns 16 (data) |
+| 10-02 | `cf29043f8` | Customer app: `hmPickedForYou(user_token)`, Picked For You personalised per shopper (see Customer app) |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
@@ -332,6 +334,29 @@ customer app's audit doc, section 7, "Home on the live server". They can be drop
   store's seller sign-up page (`…/marketplace/seller/register/`).
 - **Still app-side:** hero kickers in capitals. The admin text is mixed case and the website uppercases it in CSS;
   the app should do the same.
+
+**Picked For You, personal (10-02, `48c977b5d`, `cf29043f8`):**
+- **Refresh:** the Home section now returns **16** products, so the app can rotate them 4 at a time.
+- **Badge:** every Home section has an optional `badge: String` (admin fields Badge (English) / (Arabic)); null
+  means draw no pill. It is empty on purpose until the picks below reach the app; then the admin types "AI ENGINE" /
+  "محرك ذكي" on Picked For You.
+- **Per-shopper picks:** `hmPickedForYou(user_token: String!, pageSize: Int = 4, currentPage: Int = 1)` returns
+  `HmProductPage` with `items`, `total_count` (up to 16), `page_info` and the new `personalized: Boolean`.
+  - It is **not cached**; send it as POST.
+  - `personalized: true`: Algolia Personalization ranked the picks from this token's events.
+  - `personalized: false`: no profile yet (or Algolia trouble), so it returns the same top-rated list as the Home section.
+  - A malformed token returns a `graphql-input` error. Allowed characters: letters, digits and `_ = + / . -`, 1–129 characters.
+- **What the app must do,** or nothing is ever personal:
+  1. Send Algolia Insights events (product viewed, clicked, added to cart, purchased) under one stable `userToken`
+     per install: an anonymous id, switched to the customer's token after sign-in, as the website does.
+  2. Draw Home's cached Picked For You products first. Then call `hmPickedForYou` with that token and swap in its
+     items when `personalized` is true. Refresh = next page.
+  3. Show the badge and a "Personalised recommendations…" subtitle only when `personalized` is true; otherwise keep
+     the admin's subtitle.
+  - Algolia builds profiles in **batches, about an hour** after the first events, so a new shopper sees the top-rated
+    list until then.
+- **Test tokens with profiles:** `seed-en-000`…`seed-en-099` (store `en`) and `seed-ar-000`…`seed-ar-099` (store `ar`)
+  return `personalized: true`. Any new token returns `false`.
 
 **Delivery areas (work in progress, 10-02):**
 - A new module, `MagentoEgypt_DeliveryAvailability`, was added on the server on 10-02 and is not in git yet. It adds:
