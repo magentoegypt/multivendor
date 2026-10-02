@@ -3,6 +3,7 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
     return function (config) {
         if (window.meCityManagerStarted) { return; }
         window.meCityManagerStarted = true;
+        $('<style/>').text('[data-cm-hidden="true"]{display:none!important}').appendTo(document.head);
         var originalTranslate=$t, arabic=(document.documentElement.lang||'').indexOf('ar')===0;
         var translations={'City':'المدينة','Locality':'الحي','Governorate':'المحافظة','Region':'المنطقة','State':'الولاية','Select city':'اختر المدينة','Select locality':'اختر الحي','No localities configured':'الحي اختياري لهذه المدينة','Retry':'إعادة المحاولة','Locations could not load. Please retry.':'تعذر تحميل المواقع. يرجى إعادة المحاولة.','Select a valid city and locality where required.':'اختر مدينة صحيحة والحي عندما يكون مطلوباً.','Please select a city to update this saved address.':'اختر المدينة لتحديث هذا العنوان.'};
         $t=function(text){return arabic && translations[text] ? translations[text] : originalTranslate(text);};
@@ -38,7 +39,7 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
             var identifiers = {};
             ['cm_city_id','cm_locality_id'].forEach(function (key) {
                 identifiers[key] = field(scope,key);
-                if (identifiers[key].length) { wrapper(identifiers[key]).hide(); }
+                if (identifiers[key].length) { wrapper(identifiers[key]).attr('data-cm-hidden','true'); }
                 if (!identifiers[key].length) identifiers[key]=$('<input type="hidden"/>').attr('name',city.attr('name').replace(/city(\]?)$/,key+'$1')).insertAfter(city);
             });
             function writeIds(cityId,localityId) {
@@ -101,10 +102,10 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
                 error.hide(); retry.hide(); city.toggle(!supported); select.toggle(supported).prop('required',supported);
                 areaField.toggle(c==='AE'); locality.prop('required',c==='AE');
                 if (supported) {
-                    wrapper(region).toggle(c!=='AE');
-                    wrapper(regionText).hide();
+                    wrapper(region).attr('data-cm-hidden',c==='AE'?'true':'false').toggle(c!=='AE');
+                    wrapper(regionText).attr('data-cm-hidden','true').hide();
                 }
-                if(!supported) { wrapper(region).show(); wrapper(regionText).show(); writeIds('',''); return; }
+                if(!supported) { wrapper(region).attr('data-cm-hidden','false').show(); wrapper(regionText).attr('data-cm-hidden','false').show(); writeIds('',''); return; }
                 if(c!=='AE') label(region,{EG:'Governorate',SA:'Region',US:'State'}[c]);
                 records=[]; fill(select,[],'Select city'); select.prop('disabled',true);
                 if(!preserve) { writeIds('',''); value(city,''); }
