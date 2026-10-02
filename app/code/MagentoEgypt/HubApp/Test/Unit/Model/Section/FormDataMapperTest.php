@@ -143,4 +143,21 @@ final class FormDataMapperTest extends TestCase
         self::assertSame('3', $form['tile_limit']);
         self::assertSame('1', $form['featured_only']);
     }
+
+    public function testBadgeIsKeptInTheOptionsAndClearedWhenEmpty(): void
+    {
+        $row = $this->mapper->toRow(
+            ['type' => 'PICKED_FOR_YOU', 'badge_en' => ' AI ENGINE ', 'badge_ar' => 'محرك ذكي'],
+            ['kept' => 1]
+        );
+        $options = json_decode((string) $row['options'], true);
+        self::assertSame(['kept' => 1, 'badge_en' => 'AI ENGINE', 'badge_ar' => 'محرك ذكي'], $options);
+
+        $form = $this->mapper->toForm($row);
+        self::assertSame('AI ENGINE', $form['badge_en']);
+        self::assertSame('محرك ذكي', $form['badge_ar']);
+
+        $cleared = $this->mapper->toRow(['type' => 'PICKED_FOR_YOU', 'badge_en' => '', 'badge_ar' => ''], $options);
+        self::assertSame(['kept' => 1], json_decode((string) $cleared['options'], true));
+    }
 }

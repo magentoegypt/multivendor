@@ -253,6 +253,7 @@ type HmHomeSection @doc(description: "One Home section; only the content field m
     type: HmSectionType! @doc(description: "Kind; selects the widget and content field.")
     title: String @doc(description: "Title in the store view's language; null hides the header.")
     subtitle: String @doc(description: "Subtitle in the store view's language.")
+    badge: String @doc(description: "Small pill above the title in the store view's language (admin Badge field); null: no pill.")
     limit: Int! @doc(description: "Configured maximum items.")
     ends_at: String @doc(description: "Scheduled end, ISO-8601 UTC; hide after it.")
     countdown_ends_at: String @doc(description: "TODAYS_DEALS: end-of-day (store timezone, ISO-8601 with offset) of the soonest-ending shown offer.")

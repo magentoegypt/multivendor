@@ -62,6 +62,15 @@ final class TitleResolverTest extends TestCase
         self::assertNull($this->resolver->subtitle(['subtitle_en' => '-'], false));
     }
 
+    public function testBadgeComesFromTheOptionsInTheStoreLanguage(): void
+    {
+        $row = ['options' => json_encode(['badge_en' => 'AI ENGINE', 'badge_ar' => 'محرك ذكي'])];
+        self::assertSame('AI ENGINE', $this->resolver->badge($row, false));
+        self::assertSame('محرك ذكي', $this->resolver->badge($row, true));
+        self::assertNull($this->resolver->badge(['options' => json_encode(['badge_en' => 'AI ENGINE'])], true));
+        self::assertNull($this->resolver->badge(['options' => null], false));
+    }
+
     public function testArabicLocales(): void
     {
         self::assertTrue(TitleResolver::isArabic('ar_SA'));

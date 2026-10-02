@@ -16,8 +16,8 @@ use MagentoEgypt\HubApp\Model\Source\SectionType;
  * Admin form <-> table row, both directions, in one place.
  *
  * toRow() is the save WHITELIST (as HeroBanner's Save does): only the columns
- * below reach the model, whatever else the form posts. The option textareas
- * (chip order / icons / tints, tile limit, featured only) are folded into the
+ * below reach the model, whatever else the form posts. The option fields
+ * (chip order / icons / tints, tile limit, featured only, badge) are folded into the
  * `options` JSON, keeping any key this form does not edit, and the JSON is
  * written with escaped unicode so an emoji glyph survives a utf8 (3-byte)
  * column.
@@ -30,6 +30,7 @@ class FormDataMapper
     public const MAX_URL = 512;
     public const MAX_CODES = 512;
     public const DEFAULT_TILE_LIMIT = 3;
+    public const MAX_BADGE = 40;
 
     /**
      * Posted form values -> table row.
@@ -101,6 +102,8 @@ class FormDataMapper
         $row['chip_tints'] = $this->pairsToText((array) ($options['tints'] ?? []));
         $row['tile_limit'] = isset($options['tile_limit']) ? (string) (int) $options['tile_limit'] : '';
         $row['featured_only'] = !empty($options['featured_only']) ? '1' : '0';
+        $row['badge_en'] = (string) ($options['badge_en'] ?? '');
+        $row['badge_ar'] = (string) ($options['badge_ar'] ?? '');
 
         return $row;
     }
@@ -145,6 +148,16 @@ class FormDataMapper
                 unset($options['tile_limit']);
             } else {
                 $options['tile_limit'] = max(0, min(6, (int) $raw));
+            }
+        }
+        foreach (['badge_en', 'badge_ar'] as $key) {
+            if (array_key_exists($key, $post)) {
+                $badge = $this->text($post[$key], self::MAX_BADGE);
+                if ($badge === null) {
+                    unset($options[$key]);
+                } else {
+                    $options[$key] = $badge;
+                }
             }
         }
         if (array_key_exists('featured_only', $post)) {

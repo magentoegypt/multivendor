@@ -67,7 +67,7 @@ class HomeBuilder
     public const DEGRADED_TTL = 120;
 
     /** Fields the builder owns; a provider cannot override them. */
-    private const OWN_FIELDS = ['id', 'type', 'limit', 'personalizable'];
+    private const OWN_FIELDS = ['id', 'type', 'limit', 'personalizable', 'badge'];
 
     public function __construct(
         private readonly SectionRepository $repository,
@@ -232,6 +232,7 @@ class HomeBuilder
                 'type' => $type,
                 'title' => $this->titles->title($row, $arabic, $result->getDefaultTitle()),
                 'subtitle' => $this->titles->subtitle($row, $arabic),
+                'badge' => $this->titles->badge($row, $arabic),
                 'limit' => $context->getLimit(),
                 'ends_at' => Schedule::isoUtc($row['ends_at'] ?? null),
                 'countdown_ends_at' => null,

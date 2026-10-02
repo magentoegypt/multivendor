@@ -78,6 +78,20 @@ class TitleResolver
         return $value !== '' && $value !== self::HIDE ? $value : null;
     }
 
+    /**
+     * The small pill over the title (Figma's "AI ENGINE" on Picked For You), in the store view's language.
+     * Kept in the section's `options` JSON as badge_en / badge_ar. No fallback across languages, like the subtitle.
+     *
+     * @param array<string, mixed> $row table row
+     */
+    public function badge(array $row, bool $arabic): ?string
+    {
+        $options = SectionContext::decodeOptions($row['options'] ?? null);
+        $value = trim((string) ($options[$arabic ? 'badge_ar' : 'badge_en'] ?? ''));
+
+        return $value !== '' ? $value : null;
+    }
+
     public static function isArabic(string $locale): bool
     {
         return str_starts_with(strtolower(trim($locale)), 'ar');

@@ -1205,6 +1205,28 @@
                 </validation>
             </settings>
         </field>
+
+        <field name="badge_en" formElement="input" sortOrder="50">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Badge (English)</label>
+                <notice translate="true">Small pill above the title, e.g. "AI ENGINE". Empty: no pill. Only claim what the section really does.</notice>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">40</rule>
+                </validation>
+            </settings>
+        </field>
+
+        <field name="badge_ar" formElement="input" sortOrder="60">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Badge (Arabic)</label>
+                <notice translate="true">Shown on the Arabic store view. Empty: no pill there.</notice>
+                <validation>
+                    <rule name="max_text_length" xsi:type="number">40</rule>
+                </validation>
+            </settings>
+        </field>
     </fieldset>
 
     <fieldset name="source" sortOrder="30">
