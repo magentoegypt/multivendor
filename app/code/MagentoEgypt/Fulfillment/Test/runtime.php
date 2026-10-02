@@ -20,6 +20,13 @@ $assert = function(string $case, callable $test) use (&$results): void {
 };
 $resource = $om->get(Magento\Framework\App\ResourceConnection::class);
 $db = $resource->getConnection();
+$assert('Unconfigured policy inherits the store base currency', function() use($om,$db,$resource): void {
+    $saved=$db->fetchOne($db->select()->from($resource->getTableName('core_config_data'),'value')->where('path = ?','hubfulfillment/general/policy')->where('scope = ?','default'));
+    if ($saved) return;
+    $policy=json_decode($om->get(MagentoEgypt\Fulfillment\Model\Configuration::class)->getJson(),true,512,JSON_THROW_ON_ERROR);
+    $currency=(string)$om->get(Magento\Framework\App\Config\ScopeConfigInterface::class)->getValue('currency/options/base');
+    if ($policy['currency']!==$currency) throw new RuntimeException('Empty policy uses a different currency from Magento');
+});
 $assert('Existing MSI and vendor ownership schema', function() use($db,$resource): void {
     foreach (['inventory_source','inventory_source_stock_link','inventory_source_item','ves_vendor_entity','me_city_location'] as $table) {
         if (!$db->isTableExists($resource->getTableName($table))) throw new RuntimeException('Missing table '.$table);
@@ -87,14 +94,17 @@ $assert('Configured preview reads real product ownership and MSI stock without m
 });
 $assert('OpenSearch applies eligibility before counts and pagination', function() use($om,$store): void {
     $term=Magento\Elasticsearch\SearchAdapter\Filter\Builder\Term::class;
-    $om->configure([$term=>['arguments'=>['integerTypeAttributes'=>['_id']]]]);
+    $installed=$om->get(Magento\Framework\Module\Manager::class)->isEnabled('MagentoEgypt_Fulfillment');
+    if (!$installed) $om->configure([$term=>['arguments'=>['integerTypeAttributes'=>['_id']]]]);
     $name='catalog_view_container';
     $base=$om->get(Magento\Framework\Search\Request\Config::class)->get($name);
     $doc=new DOMDocument();$doc->load(dirname(__DIR__).'/etc/search_request.xml');
     $extra=(new Magento\Framework\Search\Request\Config\Converter())->convert($doc)[$name];
-    $base['queries'][$name]['queryReference'][]=['clause'=>'must','ref'=>'hf_area'];
-    $base['queries']['hf_area']=$extra['queries']['hf_area'];
-    $base['filters']['hf_area_filter']=$extra['filters']['hf_area_filter'];
+    if (!$installed) {
+        $base['queries'][$name]['queryReference'][]=['clause'=>'must','ref'=>'hf_area'];
+        $base['queries']['hf_area']=$extra['queries']['hf_area'];
+        $base['filters']['hf_area_filter']=$extra['filters']['hf_area_filter'];
+    }
     $cfg=new class($base) extends Magento\Framework\Search\Request\Config {
         public function __construct(private array $fixture) {}
         public function get($path=null,$default=null) { return $this->fixture; }
