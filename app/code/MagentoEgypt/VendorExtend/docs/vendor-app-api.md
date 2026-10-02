@@ -338,17 +338,25 @@ customer app's audit doc, section 7, "Home on the live server". They can be drop
 **Picked For You, personal (10-02, `48c977b5d`, `cf29043f8`):**
 - **Refresh:** the Home section now returns **16** products, so the app can rotate them 4 at a time.
 - **Badge:** every Home section has an optional `badge: String` (admin fields Badge (English) / (Arabic)); null
-  means draw no pill. It is empty on purpose until the picks below reach the app; then the admin types "AI ENGINE" /
-  "محرك ذكي" on Picked For You.
+  means draw no pill. **Picked For You's badge is set since 10-02:** "AI ENGINE" / "محرك ذكي". Older builds don't
+  query the field, so they show nothing. The new build must draw the pill **only when `hmPickedForYou` returned
+  `personalized: true`**; otherwise the badge would make a false claim over top-rated picks.
 - **Per-shopper picks:** `hmPickedForYou(user_token: String!, pageSize: Int = 4, currentPage: Int = 1)` returns
   `HmProductPage` with `items`, `total_count` (up to 16), `page_info` and the new `personalized: Boolean`.
   - It is **not cached**; send it as POST.
   - `personalized: true`: Algolia Personalization ranked the picks from this token's events.
   - `personalized: false`: no profile yet (or Algolia trouble), so it returns the same top-rated list as the Home section.
   - A malformed token returns a `graphql-input` error. Allowed characters: letters, digits and `_ = + / . -`, 1–129 characters.
+- **Consent: ask first, like the website (owner's decision, 10-02).** Do not turn personalised picks on by default.
+  Before the first behaviour event, ask the shopper with a short prompt such as "Personalise my picks?" (Allow /
+  Not now). Keep the Settings switch so they can change their mind.
+  - With no consent: send **no** Insights events and **don't** call `hmPickedForYou`; show Home's top-rated
+    products without the badge.
+  - Turning it off later: stop the events and drop the token.
+  - The website does the same: no cookie consent means no Algolia token and nothing personal.
 - **What the app must do,** or nothing is ever personal:
-  1. Send Algolia Insights events (product viewed, clicked, added to cart, purchased) under one stable `userToken`
-     per install: an anonymous id, switched to the customer's token after sign-in, as the website does.
+  1. Once the shopper has consented, send Algolia Insights events (product viewed, clicked, added to cart,
+     purchased) under one stable `userToken` per install: an anonymous id, switched to the customer's token after sign-in, as the website does.
   2. Draw Home's cached Picked For You products first. Then call `hmPickedForYou` with that token and swap in its
      items when `personalized` is true. Refresh = next page.
   3. Show the badge and a "Personalised recommendations…" subtitle only when `personalized` is true; otherwise keep
