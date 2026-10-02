@@ -1,0 +1,14 @@
+<?php /** @var \Magento\Framework\View\Element\Template $block */ ?>
+<div id="delivery-area" style="padding:10px 20px;background:#f8f8f8;border-bottom:1px solid #ddd">
+  <button type="button" data-role="toggle"><?= $block->escapeHtml(__('Choose delivery area')) ?></button>
+  <span data-role="summary" aria-live="polite"></span>
+  <div data-role="picker" hidden>
+    <label><?= $block->escapeHtml(__('Country')) ?> <select data-role="country"><option value="AE">United Arab Emirates</option><option value="EG">Egypt</option><option value="SA">Saudi Arabia</option><option value="US">United States</option></select></label>
+    <label data-role="region-label"><?= $block->escapeHtml(__('Region')) ?> <select data-role="region"></select></label>
+    <label><?= $block->escapeHtml(__('City')) ?> <select data-role="city"></select></label>
+    <label data-role="locality-label"><?= $block->escapeHtml(__('Locality')) ?> <select data-role="locality"></select></label>
+    <button type="button" data-role="save" disabled><?= $block->escapeHtml(__('Use this area')) ?></button>
+    <button type="button" data-role="clear"><?= $block->escapeHtml(__('Browse all products')) ?></button>
+  </div>
+</div>
+<script type="text/x-magento-init">{"#delivery-area":{"MagentoEgypt_DeliveryAvailability/js/location":{}}}</script>
