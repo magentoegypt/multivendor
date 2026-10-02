@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Hub Market (DEV05): personalized order of the products on this cached page.
- * See Algolia_AlgoliaSearch::hm-personalized-order.phtml.
+ * Hub Market: Algolia Recommend trends under the category listing (DEV07).
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
@@ -18,10 +17,12 @@
                 </arguments>
             </block>
         </referenceContainer>
-        <referenceContainer name="before.body.end">
-            <block class="Magento\Framework\View\Element\Template"
-                   name="hm.algolia.personalized.order"
-                   template="Algolia_AlgoliaSearch::hm-personalized-order.phtml"/>
-        </referenceContainer>
+        <!--
+            No personalized re-order of the listing any more (CL036-DEV01.39 14zb93nvr5r, 2026-10-02). DEV05's
+            hm-personalized-listing.js re-ordered the products ALREADY PAINTED 2-5 s after load (once RequireJS had
+            started), so shoppers with an Algolia token saw the grid jump; the client read it as "Arabic order, then
+            English order". Owner's call: category pages keep the store's order. Personalization stays in search
+            results (server-side) and in the homepage "Picked For You" rail.
+        -->
     </body>
 </page>

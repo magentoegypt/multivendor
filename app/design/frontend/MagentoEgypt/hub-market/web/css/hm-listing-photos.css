@@ -1,0 +1,36 @@
+/*
+ * Hub Market — product photos in listings and product rails.
+ * Replaces hm-product-photos.css (renamed: the merged-CSS URL is derived from the file list and is cached immutably,
+ * so a content change needs a new file name).
+ *
+ * etc/view.xml makes category_page_grid/list and new_products_content_widget_grid 600x600, so the card's image
+ * box (Magento's inline aspect-ratio) is square and the file is sharp at 2x/3x (CL036-DEV01.35).
+ *
+ * Category and search grids: the photo is fitted whole (contain) on the card's white. QA confirmed this
+ * (CL036-QA01 14zb93nvqyk).
+ *
+ * Product rails (.block.widget: homepage Today's Deals, Best Selling, Popular Products, category rails, Picked
+ * For You): the photo FILLS the square (cover), so every card in a row has the same picture height
+ * (CL036-DEV01.38 14zb93nvr4q, the client's call: a wide 600x338 photo letterboxed in white read as a smaller
+ * image). This reverses the rails part of DEV01.35.
+ */
+.catalog-category-view .products .product-item-photo,
+.catalog-category-view .products .product-image-container,
+.catalogsearch-result-index .products .product-item-photo,
+.catalogsearch-result-index .products .product-image-container,
+.hm-page .block.widget .product-item .product-item-photo,
+.hm-page .block.widget .product-item .product-image-container {
+    background: var(--hm-surface, #fff);
+}
+
+/* Five classes on purpose: the theme's ".products.list .product-item .product-image-photo" and
+   ".block.widget .product-item .product-image-photo" are four, and styles-l.css loads after the merged file, so
+   an equal-weight rule lost on desktop. */
+.hm-page.catalog-category-view .products .product-item .product-image-photo,
+.hm-page.catalogsearch-result-index .products .product-item .product-image-photo {
+    object-fit: contain;
+}
+
+.hm-page .block.widget .product-item .product-image-photo {
+    object-fit: cover;
+}
