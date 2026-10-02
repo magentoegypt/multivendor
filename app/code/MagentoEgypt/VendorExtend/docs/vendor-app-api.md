@@ -13,6 +13,8 @@ Use it as the contract. Don't work around the old behaviour.
 - Deploy windows: expect short 503s during deploys; keep the retry.
 - Edits waiting for approval: the admin can no longer approve a product without applying the seller's
   queued changes (TC68-QA03, 10-01). No app change is needed.
+- Deals need an end date to get a countdown: send `special_to_date` with `special_price` (see Deals and
+  countdown, 10-02).
 - Homepage product rows now crop photos to fill a square (DEV01.38, 10-02). Upload square photos with the
   product centred (see Product images).
 - Product page photos: 1200 px, shown whole in a square frame (QA01, 10-01). Upload guidance changed:
@@ -198,6 +200,20 @@ Show the message and stop. It is not a network or generic error, and retrying wo
     the API or the admin. The app does not need to resize. Sending the full camera resolution is fine
     (Magento keeps the original for fullscreen zoom), but keep files reasonable (under ~5 MB) for upload time.
 
+## Deals and countdown (2026-10-02)
+- Today's Deals on the website and in the customer app list products with a live special price. The countdown
+  shows only when a deal has a real end date, and it counts to the end of the soonest-ending deal's last day, in
+  store time (Asia/Riyadh). A deal with no end date is listed but gets **no timer**. On 10-02 the countdown had
+  vanished for exactly this reason: every timed offer had ended on 09-30, and the live ones had no end date.
+- When a seller sets a deal price from the app, send the end date with it, in the same PUT/POST `product`:
+  `"special_price": 450, "special_from_date": "2026-10-02", "special_to_date": "2026-10-31"`. List all three in
+  `attributes` when editing. The deal is charged up to and including `special_to_date`, so ask for a last day, not
+  a time.
+- `special_price` and its dates are price fields. On an approved product, edits to them go to admin review like
+  name and price (see Products).
+- Data fix on 10-02: the 7 live deals (SKUs 1223, 22228, test30, 1231, 1260, code 41, TEF-CLIPSO-8L) now end
+  2026-10-31, so the timer shows on web and app until then.
+
 ## Short description on the website (2026-10-01, DEV01.36)
 - The product page now shows `short_description` **as entered**, under the price, **one line per item**
   (for example "Brand: Fresh", "Colour: silver", "Drawers: 5"). Send it as plain lines separated by line
@@ -286,6 +302,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `fc63a4189` | Product page: 1200 px photo, square frame, whole photo and thumbnails (never cropped); upload 1200 px+, no screenshots; app API unchanged |
 | 10-02 | `eb37ab82d` | Homepage product rows crop photos to fill the square (DEV01.38); category pages keep the store's product order with no personalized re-shuffle (DEV01.39); app API unchanged |
 | 10-02 | `b185f083c` | Website: the new delivery-area picker is hidden until that feature is finished (see Customer app); seller app unaffected |
+| 10-02 | (data) | Today's Deals countdown back on web and app: the 7 live deals end 2026-10-31; deals need `special_to_date` to get a timer |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
