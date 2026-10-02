@@ -285,6 +285,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-01 | `920da6428` | TC68-QA03: approving from Catalog > Products applies the seller's queued edits (and warns about them); app API unchanged |
 | 10-01 | `fc63a4189` | Product page: 1200 px photo, square frame, whole photo and thumbnails (never cropped); upload 1200 px+, no screenshots; app API unchanged |
 | 10-02 | `eb37ab82d` | Homepage product rows crop photos to fill the square (DEV01.38); category pages keep the store's product order with no personalized re-shuffle (DEV01.39); app API unchanged |
+| 10-02 | `b185f083c` | Website: the new delivery-area picker is hidden until that feature is finished (see Customer app); seller app unaffected |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
@@ -297,3 +298,16 @@ the `Store` header). `multi.magento2.click` goes straight to origin with no cach
 using REST on `multi.magento2.click`.
 The customer app's Home is managed in the admin under Content > Elements > App Home Sections. The section editor
 used to hang on its spinner and works since 10-01 (`3a3516f07`).
+
+**Delivery areas (work in progress, 10-02):**
+- A new module, `MagentoEgypt_DeliveryAvailability`, was added on the server on 10-02 and is not in git yet. It adds:
+  - a delivery-area picker: country, region, city, area;
+  - `GET /deliveryavailability/check/index`;
+  - a check at order placement.
+- On the website the picker is **hidden** until the feature is finished (`b185f083c`). A header version is ready in the
+  theme for when it ships.
+- The order-placement check is a plugin on `QuoteManagement::placeOrder`, so it also covers orders placed from the
+  customer app. Once an admin configures area rules (Stores > Configuration > General > Delivery Availability), an
+  order whose shipping address is in a blocked ("red" or "blacklist") area fails with "Delivery is unavailable or requires
+  a quotation for <product> at this address. Please change the address or remove the item." Show that message as it is.
+- No rules are configured yet, so nothing is blocked today.
