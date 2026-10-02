@@ -1,5 +1,12 @@
 <?php $row=$block->record(); $e=fn($v)=>$block->escapeHtml((string)$v); ?>
 <p>Shared directory: Egypt Governorate → City; Saudi Arabia Region → City; USA State → City; UAE City → Locality. Deactivate locations instead of deleting them. Names on existing orders are preserved.</p>
+<h2>Import and export</h2>
+<p><a href="<?= $block->escapeUrl($block->getUrl('*/*/export',['country'=>$block->getRequest()->getParam('country','EG')])) ?>">Export selected country CSV</a>. Keep stable codes unchanged. Put parent rows before children. Imports are atomic: an invalid row cancels the entire file.</p>
+<form method="post" enctype="multipart/form-data" action="<?= $block->escapeUrl($block->getUrl('*/*/import')) ?>">
+<?= $block->getBlockHtml('formkey') ?>
+<label>Location CSV (maximum 5 MB) <input type="file" name="locations_csv" accept=".csv,text/csv" required></label>
+<button>Import locations</button>
+</form>
 <form method="get" action="<?= $block->escapeUrl($block->getUrl('*/*/index')) ?>">
 <label>Country <select name="country"><?php foreach(['EG','SA','AE','US'] as $c): ?><option <?= $block->getRequest()->getParam('country','EG')===$c?'selected':'' ?>><?= $e($c) ?></option><?php endforeach ?></select></label>
 <label>Level <select name="level"><?php foreach(['region','city','locality'] as $l): ?><option <?= $block->getRequest()->getParam('level','region')===$l?'selected':'' ?>><?= $e($l) ?></option><?php endforeach ?></select></label>

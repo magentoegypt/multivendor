@@ -71,6 +71,59 @@ class Directory
         }
         return true;
     }
+    public function exportCsv(string $country): string
+    {
+        if (!in_array($country,self::COUNTRIES,true)) throw new LocalizedException(__('Invalid country.'));
+        $db=$this->resource->getConnection();
+        $rows=$db->fetchAll($db->select()->from($this->table())->where('country_id = ?',$country)->order(new \Zend_Db_Expr("FIELD(level, 'region', 'city', 'locality')"))->order('location_id'));
+        $codes=array_column($rows,'code','location_id');
+        $stream=fopen('php://temp','w+');
+        fputcsv($stream,['code','country_id','level','parent_code','region_id','name_en','name_ar','is_active'],',','"','');
+        foreach($rows as $row) {
+            $values=[$row['code'],$row['country_id'],$row['level'],$codes[$row['parent_id']]??'',$row['region_id'],$row['name_en'],$row['name_ar']??'',$row['is_active']];
+            // Prevent spreadsheet formula execution, while allowing lossless reimport.
+            $values=array_map(fn($v)=>preg_match('/^[=+@\-\t\r]/',(string)$v)?"'".$v:$v,$values);
+            fputcsv($stream,$values,',','"','');
+        }
+        rewind($stream);$csv=stream_get_contents($stream);fclose($stream);return $csv;
+    }
+    public function importCsv(string $csv, int $actor): array
+    {
+        if(strlen($csv)>5*1024*1024) throw new LocalizedException(__('CSV must be at most 5 MB.'));
+        $stream=fopen('php://temp','w+');fwrite($stream,preg_replace('/^\xEF\xBB\xBF/','',$csv));rewind($stream);
+        $columns=['code','country_id','level','parent_code','region_id','name_en','name_ar','is_active'];
+        if(fgetcsv($stream,0,',','"','')!==$columns) {fclose($stream);throw new LocalizedException(__('Use the columns and order from the exported CSV.'));}
+        $db=$this->resource->getConnection();$db->beginTransaction();$line=1;$seen=[];$result=['created'=>0,'updated'=>0,'unchanged'=>0];
+        try {
+            while(($values=fgetcsv($stream,0,',','"',''))!==false) {
+                ++$line;if($values===[null])continue;
+                if($line>25001)throw new LocalizedException(__('Maximum 25000 rows.'));
+                if(count($values)!==count($columns))throw new LocalizedException(__('Incorrect number of columns.'));
+                $values=array_map(fn($v)=>preg_match("/^'[=+@\-\t\r]/",(string)$v)?substr($v,1):$v,$values);
+                $data=array_combine($columns,$values);
+                if(isset($seen[$data['code']]))throw new LocalizedException(__('Duplicate code in CSV.'));
+                $seen[$data['code']]=true;
+                if(!in_array($data['is_active'],['0','1'],true)||!ctype_digit($data['region_id']))throw new LocalizedException(__('Region ID must be numeric and Active must be 0 or 1.'));
+                $old=$db->fetchRow($db->select()->from($this->table())->where('code = ?',$data['code']));
+                $data['location_id']=$old['location_id']??0;$data['parent_id']=0;
+                if($data['parent_code']!=='') {
+                    $parent=$db->fetchRow($db->select()->from($this->table())->where('code = ?',$data['parent_code']));
+                    if(!$parent)throw new LocalizedException(__('Parent code not found. Put parents before children.'));
+                    $data['parent_id']=$parent['location_id'];
+                }
+                unset($data['parent_code']);
+                $unchanged=(bool)$old;
+                foreach($data as $key=>$value)if((string)($old[$key]??'')!==(string)$value)$unchanged=false;
+                if($unchanged){++$result['unchanged'];continue;}
+                $this->save($data,$actor);++$result[$old?'updated':'created'];
+            }
+            $db->commit();fclose($stream);return $result;
+        } catch(\Throwable $e) {
+            $db->rollBack();fclose($stream);
+            $message=$e instanceof LocalizedException?$e->getMessage():(string)__('Unable to import this row; check duplicate codes and values.');
+            throw new LocalizedException(__('CSV row %1: %2 No rows were imported.',$line,$message));
+        }
+    }
     public function save(array $input, int $actor): int
     {
         $id=(int)($input['location_id']??0); $old=$id?$this->get($id):[];

@@ -3,4 +3,5 @@
 <event name="sales_quote_address_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
 <event name="sales_order_address_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
 <event name="vendor_save_before"><observer name="me_city_validate" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
+<event name="model_save_before"><observer name="me_city_auxiliary_address" instance="MagentoEgypt\CityManager\Observer\ValidateAddress"/></event>
 </config>

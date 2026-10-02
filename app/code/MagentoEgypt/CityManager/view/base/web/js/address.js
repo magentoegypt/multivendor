@@ -27,14 +27,20 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
         }
         function wrapper(el) { return el.closest('.field,.admin__field'); }
         function label(select, title) {
+            select.attr('aria-label',$t(title));
             var parent = wrapper(select);
             parent.find('label').first().find('span').first().text($t(title));
         }
         function install(input) {
             var city = $(input), scope = city.closest('fieldset,.fieldset,.admin__fieldset');
-            if (!scope.length || !field(scope, 'country_id').length) { scope = city.closest('form'); }
+            if (!scope.length || (!field(scope, 'country_id').length && !field(scope,'country').length)) { scope = city.closest('form'); }
             if (!scope.length) { return; }
             var country = field(scope, 'country_id'), region = field(scope, 'region_id'), regionText = field(scope, 'region');
+            var locator = !country.length && field(scope,'country').length && field(scope,'street_address').length;
+            if (locator) {
+                country=field(scope,'country');regionText=field(scope,'state');
+                region=$('<select class="admin__control-select" data-cm-control="region" aria-label="State"/>').append($('<option/>').val('').text($t('Select region'))).insertAfter(regionText);
+            }
             if (!country.length) { return; }
             var identifiers = {};
             ['cm_city_id','cm_locality_id'].forEach(function (key) {
@@ -77,6 +83,7 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
                         region.append($('<option/>').val(chosen.region_id).text(chosen.name_en));
                     }
                     value(region,chosen.region_id);
+                    if(locator) value(regionText,chosen.name_en);
                 }
                 value(city,chosen.name_en + (country.val()==='AE' && local ? ' / '+local.name_en : ''));
             }
@@ -129,12 +136,13 @@ define(['jquery', 'mage/translate', 'ko'], function ($, $t, ko) {
                     if(currentTicket!==ticket) return;
                     // Core regionUpdater may not yet have refreshed a classic form.
                     rows.forEach(function(r){if(!region.find('option[value="'+r.region_id+'"]').length) region.append($('<option/>').val(r.region_id).text(r.name_en));});
+                    if(locator && preserve) { var selected=rows.find(function(r){return r.name_en===regionText.val() || r.name_ar===regionText.val();}); if(selected)region.val(selected.region_id); }
                     region.show(); wrapper(region).show();
                     if(region.val()) loadCities();
                 }).fail(function(){if(currentTicket===ticket){error.text($t('Locations could not load. Please retry.')).show();retry.show();}});
             }
-            country.on('change.cm',function(){refresh(false);});
-            region.on('change.cm',function(){if(country.val()!=='AE') refresh(false);});
+            country.on('change.cm',function(){if(locator){region.empty().append($('<option/>').val('').text($t('Select region')));value(regionText,'');}refresh(false);});
+            region.on('change.cm',function(){if(country.val()!=='AE') { if(locator)value(regionText,region.find('option:selected').text()); refresh(false); }});
             select.on('change',function(){error.hide();if(country.val()==='AE') loadLocality('');else changed();});
             locality.on('change',changed);
             city.closest('form').on('submit.cm'+sequence,function(event){

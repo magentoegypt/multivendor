@@ -5,4 +5,6 @@
 <type name="Magento\Quote\Model\ShippingAddressManagement"><plugin name="me_city_quote" type="MagentoEgypt\CityManager\Plugin\QuoteAddress"/></type>
 <type name="Magento\Quote\Model\Quote\Address\ToOrderAddress"><plugin name="me_city_order_snapshot" type="MagentoEgypt\CityManager\Plugin\OrderAddress"/></type>
 <type name="Mstore\Customer\Model\ResourceModel\AddressRepository"><plugin name="me_city_mobile_address" type="MagentoEgypt\CityManager\Plugin\MobileAddress"/></type>
-<preference for="MagentoEgypt\CityManager\Api\DirectoryInterface" type="MagentoEgypt\CityManager\Model\ApiDirectory"/></config>
+<preference for="MagentoEgypt\CityManager\Api\DirectoryInterface" type="MagentoEgypt\CityManager\Model\ApiDirectory"/>
+<type name="Vnecoms\VendorsShippingTableRate\Model\ResourceModel\Tablerate"><plugin name="me_city_rate_import_columns" type="MagentoEgypt\CityManager\Plugin\TableRateImport"/></type>
+</config>

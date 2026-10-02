@@ -26,3 +26,14 @@ Imported from [Countries States Cities Database](https://github.com/dr5hn/countr
 
 ## Verified scope
 See the Hub Market City Manager QA suite in ClickUp: https://app.clickup.com/t/14zb93nvrmu. Backend checks and real customer address saves passed for EG, SA, US and AE, including ZIP+4, UAE locality optionality, and network failure/retry. Do not infer full order, carrier, Odoo, invoice/PDF or installed iOS acceptance from those checks. These require separate recorded results.
+
+## CSV management
+The admin page exports one country with stable codes and parent codes. Imports upsert those codes atomically, preserve IDs, validate the hierarchy, and report the first invalid row. Use the exact exported column order; parents must exist before their children. Limits: 5 MB and 25,000 rows. An unchanged reimport writes no audit entries. CSV output protects spreadsheet formula prefixes.
+
+## Additional address surfaces
+RMA address model saves validate managed geography. MGS Store Locator uses its `country`, `state`, and `city` fields; the browser adapter supplies dependent selections and the save observer resolves canonical names. These integrations still need their complete browser workflows accepted.
+
+Vendor table-rate CSV continues to use the existing eight-column country/region/postcode format. City/locality-ID columns are explicitly rejected so they cannot silently widen coverage. This module does not add city-based shipping rates.
+
+## Retest evidence (2 October 2026)
+Admin CSV export/reimport preserved all 190 EG rows; invalid row 2 was rejected. Five CSV service checks passed, including transactional rollback and stable IDs. Seven additional service checks passed (Mstore ownership, RMA, store locator, exact/ambiguous mapping, Odoo text mapping, historical snapshot, invalid names). Table-rate imports and matching/nonmatching lookups passed with all writes rolled back. Six invoice/shipment/creditmemo PDFs rendered and were visually inspected for location text and readable Arabic names using unsaved synthetic objects. No orders, payments, emails, courier bookings or Odoo sync were created by these tests. Evidence and remaining acceptance work are recorded per case in the ClickUp suite above.
