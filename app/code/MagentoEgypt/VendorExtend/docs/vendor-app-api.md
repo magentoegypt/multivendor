@@ -1,10 +1,11 @@
-# Hub Market vendor app: backend API context (as of 2026-10-02)
+# Hub Market vendor app: backend API context (as of 2026-10-03)
 
 You are working on the Hub Market **vendor (seller) mobile app**. The Magento 2.4.8 backend (Vnecoms
 marketplace) was changed between 2026-09-24 and 2026-10-01. Everything below is live on production.
 Use it as the contract. Don't work around the old behaviour.
 
 **New since 2026-09-28** (details in the sections below and the change log at the end):
+- Product text per store view (English / Arabic): new translations API (10-03, see "Product text per store view").
 - WhatsApp codes: new limits and answers (PR #22, 09-30).
 - Products: enable/disable applies at once, and numeric SKUs are editable (TC68).
 - Lists: `total_count` is the real total.
@@ -128,6 +129,8 @@ Show the message and stop. It is not a network or generic error, and retrying wo
     ignored, so **stop sending the approval dropdown**; it does nothing.
   - Edits are saved at the default scope: **one value per field for both Arabic and English**,
     the same as the web seller panel. The old behaviour of changing only the English store is gone.
+    To edit a store view's own text (English or Arabic), use the translations API (see "Product text per
+    store view"), not this PUT.
   - Changing the SKU through `attributes: ["sku", ...]` follows the same SKU rule.
   - Existing products whose SKUs are Arabic can still be edited. The rule only applies to new SKUs.
 - **Approval flow**, which is expected behaviour, not a bug:
@@ -168,6 +171,54 @@ Show the message and stop. It is not a network or generic error, and retrying wo
   - Nine products created by earlier app builds were backfilled on 09-28, so no app-side migration
     is needed. A product created with no image at all (for example "Test 90", "Test 91") still
     shows a placeholder until the seller uploads one.
+
+## Product text per store view (2026-10-03)
+Built from the app team's spec (backend handoff of 10-03), with **one change: `stores` lists `en` as well
+as `ar`.** Seller token on every route; another seller's SKU returns 404 "The product "X" was not found among your
+products.", as DELETE does.
+- **Why `en` is listed:** the catalogue stores names in two opposite ways.
+  - About 300 products keep **English at the default (store 0)** and Arabic at `ar`. This is the spec's case, e.g.
+    FRS-STR-500.
+  - About **214** (the real Egyptian catalogue) keep **Arabic at the default** and their English name at `en`
+    (store 3).
+  - So "default = English" is wrong for those 214. Read each language from its own store; don't assume what the
+    default is.
+- **What the form shows:**
+  - English field = `en` value, else `default_values`.
+  - Arabic field = `ar` value, else `default_values`.
+  - Save each language to its own store with the PUT below. Use the product PUT (`/V1/vendors/product/save`)
+    only for the shared default, e.g. when creating a product.
+- `GET /V1/vendors/product/:sku/translations` returns `default_values`: `[{attribute_code, value}]` (store 0), and
+  `stores`: `[{store_id, store_code, store_name, locale, values: [{attribute_code, value}]}]`.
+  - The website's default store view comes first: `en` (3, en_US), then `ar` (1, ar_SA).
+  - `value: null` = the store has no value of its own and shows the default. A value can equal the default: many
+    older products have an `ar` row identical to it.
+- `GET /V1/vendors/product/translations` (no SKU) has the same shape for a product not created yet, every value
+  null. Ask for it when the seller starts a new product.
+- **Fields:** `name`, `short_description`, `description`, `meta_title`, `meta_keyword`, `meta_description`.
+  `url_key` is not translatable (it would change product links).
+- `PUT /V1/vendors/product/:sku/translations` body:
+  `{"translations":[{"store_code":"ar","values":[{"attribute_code":"name","value":"…"}]}]}`
+  - Several stores and fields can go in one call.
+  - `null` or `""` **removes** the store's own value, so that store shows the default again.
+  - Unchanged values are ignored; a PUT that changes nothing changes nothing.
+  - `name` is at most 255 characters.
+  - The response is the GET shape with the live values.
+  - Errors (400):
+    - `Unknown store view "fr". Use one of: en, ar.`
+    - `"url_key" cannot be translated. Translatable fields: …`
+- **Approval, the same rule as product edits:**
+  - **Pending New, Not Submitted or Unapproved** products are saved at once in that store.
+  - **Approved (or already Pending Update)** products: the change waits for admin review. The product becomes
+    **Pending Update (offline until approved)**, as after a name or price edit. The PUT response therefore still shows
+    the *live* values, not the queued ones. Tell the seller the change is waiting for approval.
+  - Several translation PUTs for the same store merge into one pending change.
+  - On approval it is applied to that store view only; the admin product page names the store view.
+- **New products:** POST the product (default text), then PUT the other language. A new product is Pending New, so
+  the PUT is saved at once.
+- **No cleanup of `en` values:** the spec suggested deleting a product's `en` value when the seller saves the default.
+  That would erase the English names of the 214 Arabic-default products, so it is not done. Edit English through
+  this API instead.
 
 ## Product images (2026-10-01)
 - Upload as before: the first gallery image gets all four roles (`image`, `small_image`, `thumbnail`,
@@ -306,6 +357,7 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 | 10-02 | (data) | Customer-app Home: Deals "All Deals" opens hmDeals, Featured Stores subtitle, Bundle Deals tile (4 tiles), "Sell on Hub Market" card (see Customer app) |
 | 10-02 | `48c977b5d` | Customer app: admin-editable `badge` on every Home section (`HmHomeSection.badge`); Picked For You returns 16 (data) |
 | 10-02 | `cf29043f8` | Customer app: `hmPickedForYou(user_token)`, Picked For You personalised per shopper (see Customer app) |
+| 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
