@@ -5,6 +5,8 @@ marketplace) was changed between 2026-09-24 and 2026-10-01. Everything below is 
 Use it as the contract. Don't work around the old behaviour.
 
 **New since 2026-09-28** (details in the sections below and the change log at the end):
+- Seller tokens still last **24 hours** (checked 10-03). Read the lifetime from the token's own `exp`, never
+  from GraphQL `storeConfig.customer_access_token_lifetime` (see Staying logged in).
 - Product text per store view (English / Arabic): new translations API (10-03, see "Product text per store view").
 - Login codes arrive by **WhatsApp, not SMS**: the code screen must say so (TC76, 10-03, see WhatsApp OTP).
 - WhatsApp codes: new limits and answers (PR #22, 09-30).
@@ -118,6 +120,31 @@ Show the message and stop. It is not a network or generic error, and retrying wo
   stored token.
 - On a 401 in the middle of a form, keep what the seller typed and return them to it after they
   sign in again.
+
+**Checked 10-03: the lifetime is 24 hours and nothing reset it.** The app's note "seller tokens last
+1 hour again" read the wrong setting:
+- GraphQL `storeConfig { customer_access_token_lifetime }` returned `1`. That field reports Magento's
+  older OAuth token setting (`oauth/access_token_lifetime/customer`, default 1 hour), which no seller
+  token uses.
+- Seller tokens (WhatsApp login, password login `/V1/integration/customer/token`, and
+  `/V1/vendors/me/token/refresh`) come from `webapi/jwtauth/customer_expiration`. It has been
+  **1440 minutes** since 09-28. A new token has `exp - iat = 86400`.
+- The backend is pinning both settings in `app/etc/config.php` on 10-03 (1440 minutes and 24 hours), so the
+  storeConfig field will also read `24`. That changes no token. Until then it still reads `1`; ignore it
+  either way.
+- **Use the token's own `iat` / `exp`** (`SessionToken.current()` already does) to decide when to refresh.
+
+**The 10-03 sign-out came from the app, not the server.** Server log for that phone on 10-03 (UTC):
+- 10:31:56 signed in with a **password** (`POST /V1/integration/customer/token`, 200), not a WhatsApp code.
+- Every call from 10:35 to 11:40:03 returned 200.
+- After the idle gap, its first request was `POST /V1/whatsapp/otp/send` at 12:17:11. The app showed the
+  login screen **without sending the stored token first**. No REST call from any address got a 401 or 403
+  between 11:00 and 13:00, and no seller token was revoked that day.
+- It never called `/V1/vendors/me/token/refresh`. With a 24-hour token that's expected (halfway is
+  12 hours).
+- So the app-side check decided the session was over. Look at what happens on app resume or cold start:
+  whether `SessionToken.current()` reads `exp` correctly (seconds, not milliseconds) and whether the token
+  is still in secure storage. A stored token should be sent until the server answers 401.
 
 ## Seller self-service (new endpoints)
 - `PUT /V1/vendors/me`: update the seller's own profile. Protected fields (vendor id, status, group,
@@ -376,6 +403,7 @@ products.", as DELETE does.
 | 10-02 | `48c977b5d` | Customer app: admin-editable `badge` on every Home section (`HmHomeSection.badge`); Picked For You returns 16 (data) |
 | 10-02 | `cf29043f8` | Customer app: `hmPickedForYou(user_token)`, Picked For You personalised per shopper (see Customer app) |
 | 10-03 | (docs) | TC76: login codes are WhatsApp-only; the code screen must say WhatsApp, not rely on SMS autofill (see WhatsApp OTP) |
+| 10-03 | (check) | Seller token lifetime confirmed at 24 hours (unchanged since 09-28); GraphQL `customer_access_token_lifetime` reports an unused OAuth setting; the 12:17 sign-out was app-side (see Staying logged in) |
 | 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
