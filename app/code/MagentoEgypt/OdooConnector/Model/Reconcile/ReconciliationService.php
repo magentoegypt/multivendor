@@ -105,9 +105,9 @@ class ReconciliationService
      * Delete in small primary-key-ordered batches so no single statement holds locks
      * for long while the every-minute consumer is writing to the same tables.
      *
-     * Kept: every pending/processing/failed queue row; `done` rows for 7 days; log rows
-     * for 30 days, and failed/retry log rows for 90 days (what someone debugging a
-     * sync problem actually reads).
+     * Kept: every pending/processing/failed queue row; `done` rows for 7 days; log rows,
+     * failed/retry included, for 30 days. TC80 (14zb93nvvh0): the 90 days that failed/retry
+     * rows used to get kept ~200 a day of reconcile errors and held the table above 20 MB.
      *
      * @param \Magento\Framework\DB\Adapter\AdapterInterface $connection
      * @return array{queue_done: int, log: int}
@@ -121,7 +121,6 @@ class ReconciliationService
             'queue_done' => "DELETE FROM {$queueTable} WHERE status = 'done'"
                 . " AND updated_at < NOW() - INTERVAL 7 DAY ORDER BY queue_id LIMIT {$batch}",
             'log' => "DELETE FROM {$logTable} WHERE created_at < NOW() - INTERVAL 30 DAY"
-                . " AND (result NOT IN ('failed', 'retry') OR created_at < NOW() - INTERVAL 90 DAY)"
                 . " ORDER BY log_id LIMIT {$batch}",
         ];
         $pruned = [];
