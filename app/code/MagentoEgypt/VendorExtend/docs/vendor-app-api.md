@@ -417,6 +417,7 @@ products.", as DELETE does.
 | 10-03 | (check) | Seller token lifetime confirmed at 24 hours (unchanged since 09-28); GraphQL `customer_access_token_lifetime` reports an unused OAuth setting; the 12:17 sign-out was app-side (see Staying logged in) |
 | 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
 | 10-03 | `161e17618` + (server) | TC79-82, TC88 server work: Odoo sync log trimmed (175 → 3.7 MB) and kept 30 days; MySQL statement digests on; OPcache needs an fpm reload per deploy; restart windows listed under Deploys and outages; TC81: translations PUT is fine (the logged errors predate the fix); app API unchanged |
+| 10-03 | (config/server) | TC79: MySQL slow log now readable by the SQL dashboard (all SQL checks ACTIVE). TC82: no scheduled cache flush ever existed; the nightly Redis dips came from the unused Mageplaza Search rebuild (switched off, `mpsearch/general/enabled=0`) and the daily cache cleanup (now hourly at :15). Search in both apps is unaffected: it is Algolia/OpenSearch, not Mageplaza. App API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
