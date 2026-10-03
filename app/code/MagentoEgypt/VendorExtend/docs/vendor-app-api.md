@@ -129,9 +129,8 @@ Show the message and stop. It is not a network or generic error, and retrying wo
 - Seller tokens (WhatsApp login, password login `/V1/integration/customer/token`, and
   `/V1/vendors/me/token/refresh`) come from `webapi/jwtauth/customer_expiration`. It has been
   **1440 minutes** since 09-28. A new token has `exp - iat = 86400`.
-- The backend is pinning both settings in `app/etc/config.php` on 10-03 (1440 minutes and 24 hours), so the
-  storeConfig field will also read `24`. That changes no token. Until then it still reads `1`; ignore it
-  either way.
+- Both settings are pinned in `app/etc/config.php` since 10-03 13:34 UTC (1440 minutes and 24 hours), so the
+  storeConfig field now reads `24` on both hosts and both stores. That changed no token; still ignore the field.
 - **Use the token's own `iat` / `exp`** (`SessionToken.current()` already does) to decide when to refresh.
 
 **The 10-03 sign-out came from the app, not the server.** Server log for that phone on 10-03 (UTC):
