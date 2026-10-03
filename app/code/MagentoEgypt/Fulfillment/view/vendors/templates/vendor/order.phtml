@@ -1,0 +1,24 @@
+<?php /** @var \MagentoEgypt\Fulfillment\Block\Vendors\Order $block */ $detail=$block->detail(); if(!$detail)return; ?>
+<section><h2><?= $block->escapeHtml(__('Delivery responsibility and tracking')) ?></h2>
+<?php foreach($detail['groups'] as $g): ?>
+<fieldset><legend><?= $block->escapeHtml($g['group_id']) ?></legend>
+<p><?= $block->escapeHtml(__('Responsible: %1 · Status: %2',$g['responsibility']??__('Not selected'),__($g['state']))) ?></p>
+<?php if($g['carrier']): ?><p><?= $block->escapeHtml($g['carrier'].' / '.$g['tracking']) ?></p><?php endif ?>
+<?php if($g['legacy']): ?><p><?= $block->escapeHtml(__('This existing order has no warehouse allocation. Selecting responsibility does not change its original shipping charge.')) ?></p><?php endif ?>
+<?php foreach($g['supported_actions'] as $action): ?>
+<form method="post" action="<?= $block->escapeUrl($block->getUrl('hubfulfillment/manage/save')) ?>">
+<?= $block->getBlockHtml('formkey') ?>
+<input type="hidden" name="action" value="dispatch"><input type="hidden" name="dispatch_action" value="<?= $block->escapeHtmlAttr($action) ?>">
+<input type="hidden" name="order_id" value="<?= (int)$detail['order_id'] ?>"><input type="hidden" name="vendor_order_id" value="<?= $block->vendorOrderId() ?>">
+<input type="hidden" name="group_id" value="<?= $block->escapeHtmlAttr($g['group_id']) ?>"><input type="hidden" name="expected_version" value="<?= (int)$g['version'] ?>">
+<input type="hidden" name="operation_key" value="<?= $block->escapeHtmlAttr(bin2hex(random_bytes(16))) ?>">
+<?php if($action==='classify'): ?><label><?= $block->escapeHtml(__('Who delivers?')) ?><select name="responsibility" required><option value=""><?= $block->escapeHtml(__('Select')) ?></option><option value="vendor"><?= $block->escapeHtml(__('I will deliver')) ?></option><option value="marketplace"><?= $block->escapeHtml(__('Marketplace delivers')) ?></option></select></label><?php endif ?>
+<?php if($action==='ship'): ?>
+<label><?= $block->escapeHtml(__('Delivery method')) ?><select name="execution" required><option value="own"><?= $block->escapeHtml(__('Own delivery team')) ?></option><option value="third_party"><?= $block->escapeHtml(__('Third-party courier')) ?></option></select></label>
+<label><?= $block->escapeHtml(__('Carrier — required for third-party delivery')) ?><input name="carrier" maxlength="150"></label>
+<label><?= $block->escapeHtml(__('Tracking / AWB — required for third-party delivery')) ?><input name="tracking" maxlength="150"></label>
+<p><?= $block->escapeHtml(__('Book the courier first. This records your shipping report; it does not book a courier or create a stock shipment.')) ?></p>
+<?php endif ?>
+<?php if($action==='issue'): ?><label><?= $block->escapeHtml(__('Delivery issue')) ?><input name="note" required maxlength="500"></label><?php endif ?>
+<button type="submit"><?= $block->escapeHtml(__((['classify'=>'Save responsibility','ready'=>'Ready for pickup','ship'=>'Mark as shipped','delivered'=>'Report delivered','received'=>'Report received','issue'=>'Report issue','resume'=>'Resume delivery'])[$action])) ?></button>
+</form><?php endforeach ?></fieldset><?php endforeach ?></section>

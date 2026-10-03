@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sales_order" resource="sales" engine="innodb">
+        <column xsi:type="mediumtext" name="hf_plan_json" nullable="true" comment="Immutable Fulfillment Plan"/>
+    </table>
+    <table name="me_fulfillment_allocation" resource="default" engine="innodb" comment="Order Source Allocations">
+        <column xsi:type="bigint" name="allocation_id" unsigned="true" identity="true" nullable="false" comment="ID"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order"/>
+        <column xsi:type="varchar" name="source_code" length="64" nullable="false" comment="Origin Source"/>
+        <column xsi:type="varchar" name="sku" length="64" nullable="false" comment="SKU"/>
+        <column xsi:type="bigint" name="qty_milli" unsigned="true" nullable="false" comment="Allocated Milli Units"/>
+        <column xsi:type="bigint" name="released_milli" unsigned="true" default="0" nullable="false" comment="Released Milli Units"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY"><column name="allocation_id"/></constraint>
+        <constraint xsi:type="unique" referenceId="ME_HF_ORDER_SOURCE_SKU"><column name="order_id"/><column name="source_code"/><column name="sku"/></constraint>
+        <index referenceId="ME_HF_SOURCE_SKU"><column name="source_code"/><column name="sku"/></index>
+    </table>
+    <table name="me_fulfillment_event" resource="default" engine="innodb" comment="Idempotent Fulfillment Events">
+        <column xsi:type="bigint" name="event_id" unsigned="true" identity="true" nullable="false" comment="ID"/>
+        <column xsi:type="varchar" name="event_key" length="190" nullable="false" comment="Unique Business Event"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order"/>
+        <column xsi:type="varchar" name="kind" length="32" nullable="false" comment="Kind"/>
+        <column xsi:type="mediumtext" name="payload_json" nullable="false" comment="Immutable Payload"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY"><column name="event_id"/></constraint>
+        <constraint xsi:type="unique" referenceId="ME_HF_EVENT_KEY"><column name="event_key"/></constraint>
+        <index referenceId="ME_HF_EVENT_ORDER"><column name="order_id"/><column name="kind"/></index>
+    </table>
+    <table name="me_fulfillment_journal" resource="default" engine="innodb" comment="Fulfillment Shipping Journal">
+        <column xsi:type="bigint" name="journal_id" unsigned="true" identity="true" nullable="false" comment="ID"/>
+        <column xsi:type="bigint" name="event_id" unsigned="true" nullable="false" comment="Event"/>
+        <column xsi:type="int" name="order_id" unsigned="true" nullable="false" comment="Order"/>
+        <column xsi:type="varchar" name="currency" length="3" nullable="false" comment="Base Currency"/>
+        <column xsi:type="varchar" name="debit_account" length="100" nullable="false" comment="Debit"/>
+        <column xsi:type="varchar" name="credit_account" length="100" nullable="false" comment="Credit"/>
+        <column xsi:type="bigint" name="amount_minor" unsigned="true" nullable="false" comment="Minor Units"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY"><column name="journal_id"/></constraint>
+        <index referenceId="ME_HF_JOURNAL_ORDER"><column name="order_id"/></index>
+    </table>
+</schema>

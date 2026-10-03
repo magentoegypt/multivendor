@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd"><system>
+    <section id="hubfulfillment" translate="label" sortOrder="945" showInDefault="1" showInWebsite="0" showInStore="0">
+        <label>Hub Fulfillment</label><tab>general</tab><resource>MagentoEgypt_Fulfillment::config</resource>
+        <group id="general" translate="label" sortOrder="10" showInDefault="1"><label>Read-only fulfillment preview</label>
+            <field id="catalog_enabled" type="select" translate="label comment" sortOrder="16" showInDefault="1"><label>Filter searches by selected delivery area</label><source_model>Magento\Config\Model\Config\Source\Yesno</source_model><comment>Uses X-Hub-Country, X-Hub-Region, X-Hub-City and X-Hub-Locality request headers. Apply only to uncached POST requests. Requires complete warehouse and coverage setup.</comment></field>
+            <field id="checkout_enabled" type="select" translate="label comment" sortOrder="15" showInDefault="1"><label>Use Hub fulfillment at checkout</label><source_model>Magento\Config\Model\Config\Source\Yesno</source_model><comment>Requires installed fulfillment tables, mapped sources, complete coverage/rates and verified shipping/accounting integration. Replaces existing shipping offers. Keep disabled until isolated acceptance passes.</comment></field>
+            <field id="preview_enabled" type="select" translate="label comment" sortOrder="10" showInDefault="1"><label>Enable preview API</label><source_model>Magento\Config\Model\Config\Source\Yesno</source_model><comment>Does not change checkout, reserve stock, book carriers or post settlements. Configure a valid policy first.</comment></field>
+            <field id="policy" type="textarea" translate="label comment" sortOrder="20" showInDefault="1"><label>Versioned fulfillment policy (JSON)</label><backend_model>MagentoEgypt\Fulfillment\Model\PolicyConfig</backend_model><comment>Administrator configuration of source ownership, vendor defaults, product overrides and origin/destination rates. See the module README and example policy. Monetary values are integer minor units, excluding tax. No real rates are supplied by default.</comment></field>
+        </group>
+    </section>
+</system></config>
