@@ -6,6 +6,7 @@ Use it as the contract. Don't work around the old behaviour.
 
 **New since 2026-09-28** (details in the sections below and the change log at the end):
 - Product text per store view (English / Arabic): new translations API (10-03, see "Product text per store view").
+- Login codes arrive by **WhatsApp, not SMS**: the code screen must say so (TC76, 10-03, see WhatsApp OTP).
 - WhatsApp codes: new limits and answers (PR #22, 09-30).
 - Products: enable/disable applies at once, and numeric SKUs are editable (TC68).
 - Lists: `total_count` is the real total.
@@ -45,6 +46,23 @@ Every seller-scoped call returns **HTTP 403** with a readable `message` when the
 Show the message and stop. It is not a network or generic error, and retrying won't help.
 
 ## WhatsApp OTP
+- **Codes are sent by WhatsApp only. There is no SMS gateway.** They arrive in the WhatsApp chat with the Hub
+  Market business account, using the `otp_new` template.
+- **TC76 (10-03) was this, not a delivery failure:**
+  - QA asked for a login code 3 times at 07:51–07:52 UTC. The server sent each one to the account's number, and
+    Meta's WhatsApp API answered `accepted`.
+  - No code was ever entered. On 10-01 the same number received codes and entered them 21 s and about 1.5 min
+    later.
+  - The app's dialog says only "Enter the code sent to +20…", and the keyboard offers "Autofill code from
+    messages", so the tester watched for an SMS.
+- **What the app should change:**
+  - Say WhatsApp in the code dialog, e.g. "We sent a 6-digit code to your WhatsApp at +20…" /
+    "أرسلنا رمزًا من 6 أرقام إلى واتساب على +20…".
+  - Show the `message` from `send` ("OTP sent successfully. Please check your WhatsApp.").
+  - Don't rely on SMS autofill (Android SMS Retriever / iOS one-time-code from Messages); it never fires for a
+    WhatsApp message. Optionally offer an "Open WhatsApp" button.
+- If the client ever wants SMS codes too, that needs an SMS provider account (sender ID and credit); the backend
+  has none today.
 - `POST /V1/whatsapp/otp/send` body `{"mobile": "...", "type": "..."}`
 - `POST /V1/whatsapp/otp/verify` body `{"mobile": "...", "otp": "...", "type": "...", "password": "..."}`
 - `type` values: `VENDOR_LOGIN`, `VENDOR_REGISTER`, `VENDOR_FORGOTPASS`, `VENDOR_UPDATEMOB`
@@ -357,6 +375,7 @@ products.", as DELETE does.
 | 10-02 | (data) | Customer-app Home: Deals "All Deals" opens hmDeals, Featured Stores subtitle, Bundle Deals tile (4 tiles), "Sell on Hub Market" card (see Customer app) |
 | 10-02 | `48c977b5d` | Customer app: admin-editable `badge` on every Home section (`HmHomeSection.badge`); Picked For You returns 16 (data) |
 | 10-02 | `cf29043f8` | Customer app: `hmPickedForYou(user_token)`, Picked For You personalised per shopper (see Customer app) |
+| 10-03 | (docs) | TC76: login codes are WhatsApp-only; the code screen must say WhatsApp, not rely on SMS autofill (see WhatsApp OTP) |
 | 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
