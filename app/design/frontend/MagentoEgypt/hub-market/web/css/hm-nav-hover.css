@@ -1,0 +1,49 @@
+/*
+ * Hub Market — the category mega menu stays open on the way to it (CL036-DEV01.42, 14zb93nvvrh).
+ *
+ * Client: "the menu isn't stable and it appears and disappears as soon as we move the mouse towards it".
+ * The panel is pure CSS (_hm-qa03.less): shown while its category item is :hover, positioned under the WHOLE
+ * navy bar (top: 100% of .hm-nav). The item is shorter than the bar: on desktop it ends at y 153 and the panel
+ * starts at 161, so moving down crossed an 8px strip that is neither item nor panel. :hover ended and the panel
+ * closed before the pointer reached it. Moving diagonally also crossed the neighbouring categories, each
+ * swapping the panel at once.
+ *
+ *   1. A bridge: an invisible strip on top of every panel, part of the panel (so of the item), covering the gap.
+ *   2. Hover intent: a panel opens after 80ms of hovering its item and stays 250ms after the pointer leaves, so
+ *      a diagonal pass neither flashes the neighbours' panels nor drops the one being reached. The open panel
+ *      sits above one still fading out.
+ *
+ * Same scope as the original reveal: hover-capable screens of 992px and wider. Touch and phones keep the
+ * hidden panels and the drawer. Keyboard :focus-within still opens a panel; it does so at once.
+ * One class more than _hm-qa03.less (body.hm-page .hm-nav ...): styles-l.css loads after this merged file.
+ */
+@media (min-width: 992px) and (any-hover: hover) {
+    body.hm-page .hm-nav .hm-nav__mega {
+        display: block;
+        opacity: 0;
+        transition: opacity 0.12s ease 0.13s, visibility 0s linear 0.25s;
+        visibility: hidden;
+    }
+
+    body.hm-page .hm-nav .hm-nav__inline-item--has-mega:hover .hm-nav__mega {
+        opacity: 1;
+        transition: opacity 0.12s ease 0.08s, visibility 0s linear 0.08s;
+        visibility: visible;
+        z-index: 101;
+    }
+
+    body.hm-page .hm-nav .hm-nav__inline-item--has-mega:focus-within .hm-nav__mega {
+        opacity: 1;
+        transition: none;
+        visibility: visible;
+        z-index: 101;
+    }
+
+    body.hm-page .hm-nav .hm-nav__mega::before {
+        block-size: 1.6rem;
+        content: "";
+        inset-block-end: 100%;
+        inset-inline: 0;
+        position: absolute;
+    }
+}

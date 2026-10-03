@@ -1,5 +1,16 @@
 /*
- * Hub Market — the product page photo whole and sharp (CL036-QA01 REQ-14zb93nvpg6, 14zb93nvqyk).
+ * Hub Market — the product page photo whole and sharp (CL036-QA01 REQ-14zb93nvpg6, 14zb93nvqyk), in a frame of
+ * the main photo's shape (CL036-DEV01.41, 14zb93nvvea). Replaces hm-pdp-photos.css (renamed: the merged-CSS URL
+ * comes from the file list and is cached immutably, so a content change needs a new file name).
+ *
+ * DEV01.41: the square stage below letterboxed every landscape photo, which read as an empty band above the
+ * gallery (test30: 150px on desktop, 60px on a phone). The gallery template (gallery.phtml) now puts the main
+ * photo's width / height on the placeholder as --hm-stage-ratio (at least 1, at most 2.5), and the stage and the
+ * pre-gallery image take that aspect ratio: a landscape photo fills the width with nothing above it, a portrait or
+ * square photo keeps the square. Without the variable (no cached main image) it is the square, as before. Other
+ * images in the gallery are fitted whole inside the main photo's frame, so the frame does not jump per slide.
+ *
+ * QA01 (10-01):
  *
  * QA: "the products still appear in poor quality on the product page, and the images look cropped". Measured on
  * 10-01: the stage was served product_page_image_medium at blank's 700px and painted at up to 895 css px (2.3x up
@@ -15,7 +26,7 @@
  * 3A rule is five and styles-l.css loads after this merged file.
  */
 .hm-pdp .product.media .fotorama:not(.fotorama--fullscreen) .fotorama__stage {
-    aspect-ratio: 1;
+    aspect-ratio: var(--hm-stage-ratio, 1);
     background: var(--hm-surface, #fff);
     height: auto !important;
 }
@@ -25,9 +36,9 @@
     object-fit: contain;
 }
 
-/* Before the gallery starts: the same square, so the page does not jump when fotorama replaces it. */
+/* Before the gallery starts: the same frame, so the page does not jump when fotorama replaces it. */
 .hm-pdp .product.media .gallery-placeholder .gallery-placeholder__image {
-    aspect-ratio: 1;
+    aspect-ratio: var(--hm-stage-ratio, 1);
     background: var(--hm-surface, #fff);
     height: auto;
     object-fit: contain;

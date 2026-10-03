@@ -38,9 +38,23 @@ $mainImageData = $mainImage ?
 // the main image is downloaded once. "full" (zoom / fullscreen) keeps the original file.
 $webpPattern = '#/media/catalog/product/cache/[^?\#]+\.(?:jpe?g|png)$#i';
 $mainWebp = preg_match($webpPattern, (string)$mainImageData) ? $mainImageData . '.webp' : '';
+
+// Hub Market (CL036-DEV01.41, 2026-10-03): the gallery frame takes the MAIN photo's shape. css/hm-pdp-gallery.css
+// makes the stage `aspect-ratio: var(--hm-stage-ratio, 1)`; a fixed square letterboxed every landscape photo,
+// which read as an empty band above the gallery (test30: 150px on desktop). Width / height of the cached main
+// image, at least 1 (portrait and square photos keep the square cap QA01 asked for) and at most 2.5. Read from
+// the file once per render; the page is full-page cached.
+$hmStageRatio = null;
+if (preg_match('#/media/(catalog/product/cache/[^?\#]+)$#', (string)$mainImageData, $hmMatch)) {
+    $hmFile = BP . '/pub/media/' . $hmMatch[1];
+    $hmSize = is_file($hmFile) ? @getimagesize($hmFile) : false;
+    if ($hmSize && $hmSize[0] > 0 && $hmSize[1] > 0) {
+        $hmStageRatio = round(max(1, min(2.5, $hmSize[0] / $hmSize[1])), 4);
+    }
+}
 ?>
 
-<div class="gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder">
+<div class="gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder"<?= $hmStageRatio !== null ? ' style="--hm-stage-ratio: ' . $escaper->escapeHtmlAttr((string) $hmStageRatio) . '"' : '' ?>>
     <?php if ($mainWebp !== ''): ?><picture><source type="image/webp" srcset="<?= $escaper->escapeUrl($mainWebp) ?>"><?php endif; ?><img
         alt="main product photo"
         class="gallery-placeholder__image"
