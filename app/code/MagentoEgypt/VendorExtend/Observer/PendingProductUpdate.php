@@ -68,11 +68,17 @@ class PendingProductUpdate implements ObserverInterface
             $sent = '';
             foreach ($updates as $update) {
                 $sent = (string) $update->getData('created_at');
+                $storeId = (int) $update->getData('store_id');
+                //  Store-view updates (the vendor app's translations) name their store view.
+                $where = $storeId > 0 ? ' [' . $this->storeName($storeId) . ']' : '';
                 foreach ($this->unserialize((string) $update->getData('product_data')) as $code => $value) {
                     if ($value === null) {
+                        if ($storeId > 0) {
+                            $lines[] = $this->label($code) . $where . ': ' . __('remove this store view\'s own text (use the default)');
+                        }
                         continue;
                     }
-                    $lines[] = $this->label($code) . ': ' . $this->display($product, $code, $value);
+                    $lines[] = $this->label($code) . $where . ': ' . $this->display($product, $code, $value);
                 }
             }
             if (!$lines) {
@@ -120,7 +126,9 @@ class PendingProductUpdate implements ObserverInterface
                 $hasCategories = false;
                 $changed = false;
                 foreach ($this->unserialize((string) $update->getData('product_data')) as $code => $value) {
-                    if ($value === null) {
+                    //  null at a store view = drop its own value (saved null there, Magento deletes the row,
+                    //  as Vnecoms Approve does). At store 0 a null only means "not sent" (stock_item).
+                    if ($value === null && $storeId === 0) {
                         continue;
                     }
                     if ($storeId === (int) $product->getStoreId() && $this->adminChanged($product, $code)) {
@@ -176,6 +184,16 @@ class PendingProductUpdate implements ObserverInterface
                     $e->getMessage()
                 )
             );
+        }
+    }
+
+    private function storeName(int $storeId): string
+    {
+        try {
+            return (string) ObjectManager::getInstance()->get(\Magento\Store\Model\StoreManagerInterface::class)
+                ->getStore($storeId)->getName();
+        } catch (\Throwable $e) {
+            return 'store ' . $storeId;
         }
     }
 

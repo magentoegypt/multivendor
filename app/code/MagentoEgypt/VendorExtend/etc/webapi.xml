@@ -48,6 +48,35 @@
             <parameter name="customerId" force="true">%customer_id%</parameter>
         </data>
     </route>
+    <!-- Store-view text (en / ar) of the caller's own products for the app's product form. Another
+         seller's SKU is a 404, as on DELETE. See Model\ProductTranslations. -->
+    <route url="/V1/vendors/product/translations" method="GET">
+        <service class="MagentoEgypt\VendorExtend\Api\ProductTranslationsInterface" method="getForNewProduct"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/vendors/product/:sku/translations" method="GET">
+        <service class="MagentoEgypt\VendorExtend\Api\ProductTranslationsInterface" method="get"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/vendors/product/:sku/translations" method="PUT">
+        <service class="MagentoEgypt\VendorExtend\Api\ProductTranslationsInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
     <!-- Sliding seller session: a still-valid seller token buys a fresh one (TC70). -->
     <route url="/V1/vendors/me/token/refresh" method="POST">
         <service class="MagentoEgypt\VendorExtend\Api\VendorSelfServiceInterface" method="refreshToken"/>

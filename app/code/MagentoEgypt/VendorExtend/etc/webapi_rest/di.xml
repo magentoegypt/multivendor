@@ -16,4 +16,9 @@
     <type name="Vnecoms\VendorsApi\Model\VendorRepository">
         <plugin name="magentoegypt_vendor_access_guard" type="MagentoEgypt\VendorExtend\Plugin\VendorsApi\VendorAccessGuard"/>
     </type>
+    <!-- PUT /V1/vendors/product/:sku/translations: skip core's path-param copy into an array body (500). -->
+    <type name="Magento\Webapi\Controller\Rest\ParamsOverrider">
+        <plugin name="magentoegypt_vendorextend_translations_path_param"
+                type="MagentoEgypt\VendorExtend\Plugin\Webapi\TranslationsPathParam"/>
+    </type>
 </config>
