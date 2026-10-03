@@ -217,6 +217,9 @@ Show the message and stop. It is not a network or generic error, and retrying wo
     shows a placeholder until the seller uploads one.
 
 ## Product text per store view (2026-10-03)
+**TC81 (10-03): the endpoint works; no app change.** The "StoreTranslationInterface[] does not exist" errors on QA's
+dashboard were 2 backend test calls (`PUT`, 10:13:42-43 UTC), made before the fix went live at 10:20. Since then every
+GET and PUT has answered 200 (or the intended 400/404), including the app's own PUT for QA-0924 at 11:13.
 Built from the app team's spec (backend handoff of 10-03), with **one change: `stores` lists `en` as well
 as `ar`.** Seller token on every route; another seller's SKU returns 404 "The product "X" was not found among your
 products.", as DELETE does.
@@ -334,6 +337,15 @@ products.", as DELETE does.
   503s during the PR #22 deploy; that was the deploy, not a bug.
 - `GET /V1/vendors/product?searchCriteria[pageSize]=100` normally answers in 0.5-2 s (TC74, 09-29). The
   26 s and the failed load QA saw were a compile window.
+- **Server maintenance on 10-03 (UTC), all planned:**
+  - 13:30:13-13:30:29: MySQL restart (TC83).
+  - 13:30:40 and 14:50:03: php-fpm restarts (TC86, TC87).
+  - 14:50: php-fpm reload (TC88).
+  - 15:05:02-15:05:17: MySQL restart (TC79).
+  - Each gave at most ~20 s of 503s or slow first answers. A 503 or timeout from the app in those windows is the
+    restart, not a bug; the retry covers it.
+- **Since 10-03 (TC88), backend PHP changes go live only with a php-fpm reload**, which the backend does as part of
+  each deploy. Nothing changes for the app: a reload is graceful and in-flight calls finish.
 
 ## Orders
 - `GET /V1/vendor/order/:orderId`: only the seller's own orders; others return 404.
@@ -404,6 +416,7 @@ products.", as DELETE does.
 | 10-03 | (docs) | TC76: login codes are WhatsApp-only; the code screen must say WhatsApp, not rely on SMS autofill (see WhatsApp OTP) |
 | 10-03 | (check) | Seller token lifetime confirmed at 24 hours (unchanged since 09-28); GraphQL `customer_access_token_lifetime` reports an unused OAuth setting; the 12:17 sign-out was app-side (see Staying logged in) |
 | 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
+| 10-03 | `161e17618` + (server) | TC79-82, TC88 server work: Odoo sync log trimmed (175 → 3.7 MB) and kept 30 days; MySQL statement digests on; OPcache needs an fpm reload per deploy; restart windows listed under Deploys and outages; TC81: translations PUT is fine (the logged errors predate the fix); app API unchanged |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.
