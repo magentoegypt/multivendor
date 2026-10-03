@@ -4,8 +4,9 @@
  *
  *   php8.4 dev/tools/hub-market/vendor-profile-check.php [customerId]
  *
- * Every write runs inside a database transaction that is rolled back, so nothing is saved, and no OTP is sent
- * (the checks call the shared matcher, not the WhatsApp send). Exit code 0 = all passed, 1 = a check failed.
+ * Every write runs inside a database transaction that is rolled back, so nothing is saved. No OTP is sent and no
+ * number's send limit is used: the send-OTP checks replace the WhatsApp send and the rate limit with stand-ins.
+ * Exit code 0 = all passed, 1 = a check failed.
  *
  * The default seller is customer 81 (vendor V8S2, QA's test seller). Any approved seller works.
  *
@@ -17,6 +18,10 @@
  *     - changing the country without a region_id clears the stored region_id;
  *     - a region_id of another country is refused;
  *     - a region_id from the chosen country's list is kept.
+ *  3. WhatsApp send-OTP (WhatsAppManagement::sendOtp) with a recording stand-in for the send and an open guard
+ *     (nothing is sent, no hourly budget is used):
+ *     - VENDOR_UPDATEMOB for the seller's own number with the seller's token goes ahead;
+ *     - another account's number, or no token, or VENDOR_REGISTER, is "Mobile number already exists.".
  */
 use Magento\Framework\App\Bootstrap;
 
@@ -116,6 +121,90 @@ if ($listRegion) {
 } else {
     echo "SKIP a region from the list is kept (neither $other nor {$current['country_id']} has a region list)\n";
 }
+
+// 3. WhatsApp send-OTP (POST /V1/whatsapp/otp/send), where QA's "Mobile number already exists." for the seller's own
+//    number came from. sendOtp() runs with a stand-in for the WhatsApp send (it only records the number) and a guard
+//    that allows every request, so no message goes out and no number's hourly send budget is used.
+$recorded = [];
+$recordingOtp = new class($otp, $recorded) extends \MagentoEgypt\SmsExtend\Helper\Otp {
+    private $real;
+    private $recorded;
+
+    public function __construct($real, array &$recorded)
+    {
+        $this->real = $real;
+        $this->recorded = &$recorded;
+    }
+
+    public function isMobileUsedByAnotherAccount($mobile, $customerId = null, $websiteId = null)
+    {
+        return $this->real->isMobileUsedByAnotherAccount($mobile, $customerId, $websiteId);
+    }
+
+    public function sendOtp($mobileNum)
+    {
+        $this->recorded[] = (string) $mobileNum;
+        return true;
+    }
+};
+$openGuard = new class extends \MagentoEgypt\SmsExtend\Model\Otp\OtpGuard {
+    public function __construct()
+    {
+    }
+
+    public function sendWait(string $mobile, string $clientIp, ?int $now = null): int
+    {
+        return 0;
+    }
+};
+$caller = new class implements \Magento\Authorization\Model\UserContextInterface {
+    public $customerId = null;
+
+    public function getUserId()
+    {
+        return $this->customerId;
+    }
+
+    public function getUserType()
+    {
+        return $this->customerId ? self::USER_TYPE_CUSTOMER : self::USER_TYPE_GUEST;
+    }
+};
+$whatsApp = $om->create(\MagentoEgypt\SmsExtend\Model\WhatsAppManagement::class, [
+    'whatsAppHelper' => $recordingOtp,
+    'userContext' => $caller,
+    'guard' => $openGuard,
+]);
+$sendOtp = function (?int $asCustomer, string $number, string $type) use ($whatsApp, $caller, &$recorded) {
+    $caller->customerId = $asCustomer;
+    $recorded = [];
+    $result = $whatsApp->sendOtp($number, $type);
+    return [(string) $result->getData('status'), (string) $result->getData('message'), $recorded];
+};
+$alreadyExists = (string) __('Mobile number already exists.');
+$ownNumber = '+20' . $national;
+
+[$status, $message, $sent] = $sendOtp($customerId, $ownNumber, 'VENDOR_UPDATEMOB');
+$check("send-OTP VENDOR_UPDATEMOB for the seller's own number, with the seller's token, is not \"already exists\"",
+    $status === 'success' && $sent === [$ownNumber], "$status: $message; only recorded by the stand-in, nothing was sent");
+
+$otherMobile = (string) $db->fetchOne(
+    "SELECT mobilenumber FROM customer_entity WHERE entity_id <> ? AND TRIM(COALESCE(mobilenumber, '')) <> '' ORDER BY entity_id LIMIT 1",
+    [$customerId]
+);
+if ($otherMobile !== '') {
+    [$status, $message, $sent] = $sendOtp($customerId, $otherMobile, 'VENDOR_UPDATEMOB');
+    $check("send-OTP VENDOR_UPDATEMOB for another account's number ($otherMobile) is refused",
+        $status === 'error' && $message === $alreadyExists && $sent === [], "$status: $message");
+}
+
+[$status, $message, $sent] = $sendOtp(null, $ownNumber, 'VENDOR_UPDATEMOB');
+$check('send-OTP VENDOR_UPDATEMOB for that number without a token is refused (no caller to exclude)',
+    $status === 'error' && $message === $alreadyExists && $sent === [], "$status: $message");
+
+[$status, $message, $sent] = $sendOtp($customerId, $ownNumber, 'VENDOR_REGISTER');
+$check('send-OTP VENDOR_REGISTER never excludes the caller',
+    $status === 'error' && $message === $alreadyExists && $sent === [], "$status: $message");
 
 $unchanged = $db->fetchRow('SELECT country_id, region_id FROM ves_vendor_entity WHERE entity_id = ?', [$vendorId]);
 $check('nothing was saved (rolled back)', $unchanged == $current, json_encode($unchanged));
