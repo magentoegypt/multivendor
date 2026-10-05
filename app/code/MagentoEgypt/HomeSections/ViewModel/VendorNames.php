@@ -115,47 +115,27 @@ class VendorNames implements ArgumentInterface
         try {
             $connection = $this->resource->getConnection();
             $product    = $this->resource->getTableName('catalog_product_entity');
-            $intTable   = $this->resource->getTableName('catalog_product_entity_int');
-            $attribute  = $this->resource->getTableName('eav_attribute');
-            $entityType = $this->resource->getTableName('eav_entity_type');
-
-            $attrId = static function (string $code) use ($connection, $attribute, $entityType) {
-                return $connection->select()
-                    ->from(['a' => $attribute], ['attribute_id'])
-                    ->join(['e' => $entityType], 'e.entity_type_id = a.entity_type_id', [])
-                    ->where('e.entity_type_code = ?', 'catalog_product')
-                    ->where('a.attribute_code = ?', $code);
-            };
 
             /*
-             * Counts only what a shopper can actually reach: enabled, and not
-             * "Not Visible Individually". Counting the raw vendor_id column would
-             * include disabled products and every configurable's hidden children,
-             * which is how a seller with 6 listings ends up advertising 40.
+             * Counts what the seller's shop page lists, by the one rule the shop
+             * grid and the New Stores rail share (StorefrontVisibility::listedIds):
+             * approved, enabled and catalog-visible at this store, not a "select
+             * and sell" copy, and in stock while out-of-stock products are hidden.
+             * Status and visibility alone said "6 Products listed" over a grid of
+             * five when the sixth went out of stock ([CL036-DEV01.43]).
              */
-            $counts = $connection->select()
-                ->from(['p' => $product], ['vendor_id', 'products' => 'COUNT(*)'])
-                ->joinInner(
-                    ['st' => $intTable],
-                    'st.entity_id = p.entity_id AND st.store_id = 0 AND st.attribute_id = (' . $attrId('status') . ')',
-                    []
-                )
-                ->joinInner(
-                    ['vis' => $intTable],
-                    'vis.entity_id = p.entity_id AND vis.store_id = 0 AND vis.attribute_id = (' . $attrId('visibility') . ')',
-                    []
-                )
-                ->where('p.vendor_id > 0')
-                ->where('st.value = ?', 1)
-                ->where('vis.value > ?', 1)
-                ->group('p.vendor_id');
-
-            foreach ($connection->fetchAll($counts) as $row) {
-                $this->stats[(int) $row['vendor_id']] = [
-                    'products' => (int) $row['products'],
-                    'stars'    => null,
-                    'reviews'  => 0,
-                ];
+            $byProduct = $connection->fetchPairs(
+                $connection->select()->from($product, ['entity_id', 'vendor_id'])->where('vendor_id > 0')
+            );
+            $om = \Magento\Framework\App\ObjectManager::getInstance();
+            $listed = $om->get(\MagentoEgypt\VendorExtend\Model\StorefrontVisibility::class)->listedIds(
+                array_map('intval', array_keys($byProduct)),
+                (int) $om->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore()->getId()
+            );
+            foreach ($listed as $productId) {
+                $vendorId = (int) $byProduct[$productId];
+                $this->stats[$vendorId] ??= ['products' => 0, 'stars' => null, 'reviews' => 0];
+                $this->stats[$vendorId]['products']++;
             }
 
             /*

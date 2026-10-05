@@ -205,10 +205,7 @@ class NewStores extends Template
         $visibility = \Magento\Framework\App\ObjectManager::getInstance()
             ->get(\MagentoEgypt\VendorExtend\Model\StorefrontVisibility::class);
         $ids = array_map('intval', array_keys($byProduct));
-        $listed = array_intersect(
-            $visibility->sellableIds($ids, (int) $this->storeManager->getStore()->getId()),
-            $visibility->searchableIds($ids)
-        );
+        $listed = $visibility->listedIds($ids, (int) $this->storeManager->getStore()->getId());
 
         $counts = [];
         foreach ($listed as $productId) {

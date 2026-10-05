@@ -220,6 +220,65 @@ class StorefrontVisibility
     }
 
     /**
+     * The subset of $productIds a seller's shop page lists on $storeId — the one
+     * rule behind every "N products" a seller is advertised with.
+     *
+     * sellableIds() and searchableIds(), and then STOCK: while the store hides
+     * out-of-stock products (Display Out of Stock Products = No) the shop grid
+     * drops them through Magento's stock filter, so a count that kept them
+     * promised a product the page did not show. That is [CL036-DEV01.43]: V11S2's
+     * profile said "6 Products listed" over a grid of five, the sixth being out of
+     * stock. The test is is_salable in the website's stock index — the same column
+     * the storefront's own stock filter reads.
+     *
+     * Fails open on stock, like the rest of this class.
+     *
+     * @param int[] $productIds
+     * @return int[] in the order given
+     */
+    public function listedIds(array $productIds, int $storeId): array
+    {
+        $ids = array_values(array_intersect(
+            $this->sellableIds($productIds, $storeId),
+            $this->searchableIds($productIds)
+        ));
+        if (!$ids) {
+            return [];
+        }
+
+        try {
+            $om = \Magento\Framework\App\ObjectManager::getInstance();
+            if ($om->get(\Magento\CatalogInventory\Api\StockConfigurationInterface::class)->isShowOutOfStock($storeId)) {
+                return $ids;
+            }
+
+            $website = $om->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore($storeId)->getWebsite();
+            $stockId = (int) $om->get(\Magento\InventorySalesApi\Api\StockResolverInterface::class)
+                ->execute(\Magento\InventorySalesApi\Api\Data\SalesChannelInterface::TYPE_WEBSITE, $website->getCode())
+                ->getStockId();
+            $stockTable = $om->get(\Magento\InventoryIndexer\Model\StockIndexTableNameResolverInterface::class)
+                ->execute($stockId);
+
+            $connection = $this->resource->getConnection();
+            $salable = array_map('intval', $connection->fetchCol(
+                $connection->select()
+                    ->from(['e' => $this->resource->getTableName('catalog_product_entity')], ['entity_id'])
+                    ->joinInner(['s' => $stockTable], 's.sku = e.sku', [])
+                    ->where('e.entity_id IN (?)', $ids)
+                    ->where('s.is_salable = 1')
+            ));
+        } catch (\Throwable $e) {
+            $this->logger->error('StorefrontVisibility::listedIds stock check failed, keeping all: ' . $e->getMessage());
+
+            return $ids;
+        }
+
+        $salable = array_flip($salable);
+
+        return array_values(array_filter($ids, static fn ($id) => isset($salable[(int) $id])));
+    }
+
+    /**
      * `SELECT entity_id` restricted to approved products of active vendors.
      *
      * Returns null when the vendor extension's own columns are not there, which
