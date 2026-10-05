@@ -9,7 +9,8 @@ $catalogDiscount = max(
     * (float) $_item->getQty()
 );
 $discountAmount = (float) $_item->getDiscountAmount() + $catalogDiscount;
-$displayOrder = $_item->getOrder();
+// Invoice\Item has no getOrder(); go through the order item (as the vendors-area copy does).
+$displayOrder = $_item->getOrderItem()->getOrder() ?: $block->getOrder();
 ?>
 <tr>
     <td class="col-product"><?= /* @noEscape */ $block->getColumnHtml($_item, 'name') ?></td>
