@@ -119,8 +119,9 @@ class VendorNames implements ArgumentInterface
             /*
              * Counts what the seller's shop page lists, by the one rule the shop
              * grid and the New Stores rail share (StorefrontVisibility::listedIds):
-             * approved, enabled and catalog-visible at this store, not a "select
-             * and sell" copy, and in stock while out-of-stock products are hidden.
+             * approved, enabled and catalog-visible at this store (the seller's
+             * "select and sell" offers included), and in stock while out-of-stock
+             * products are hidden.
              * Status and visibility alone said "6 Products listed" over a grid of
              * five when the sixth went out of stock ([CL036-DEV01.43]).
              */

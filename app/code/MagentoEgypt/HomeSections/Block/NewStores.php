@@ -179,9 +179,10 @@ class NewStores extends Template
     }
 
     /**
-     * Per vendor: products the storefront lists. Approved, active seller, enabled and visible in
-     * the catalog in the current store (StorefrontVisibility::sellableIds, the storefront's own
-     * rule), and not a "select and sell" copy (searchableIds), which listings also hide.
+     * Per vendor: products the seller's shop page lists (StorefrontVisibility::listedIds, the rule
+     * the profile's "Products listed" tile uses too): approved, active seller, enabled and visible
+     * in the catalog in the current store, the seller's "select and sell" offers included (the shop
+     * grid lists them), and in stock while out-of-stock products are hidden.
      *
      * The service comes from the ObjectManager rather than the constructor, so this block keeps
      * its compiled constructor (no di:compile).

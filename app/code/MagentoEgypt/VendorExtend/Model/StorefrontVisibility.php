@@ -223,13 +223,21 @@ class StorefrontVisibility
      * The subset of $productIds a seller's shop page lists on $storeId — the one
      * rule behind every "N products" a seller is advertised with.
      *
-     * sellableIds() and searchableIds(), and then STOCK: while the store hides
-     * out-of-stock products (Display Out of Stock Products = No) the shop grid
-     * drops them through Magento's stock filter, so a count that kept them
-     * promised a product the page did not show. That is [CL036-DEV01.43]: V11S2's
-     * profile said "6 Products listed" over a grid of five, the sixth being out of
-     * stock. The test is is_salable in the website's stock index — the same column
-     * the storefront's own stock filter reads.
+     * sellableIds(), and then STOCK: while the store hides out-of-stock products
+     * (Display Out of Stock Products = No) the shop grid drops them through
+     * Magento's stock filter, so a count that kept them promised a product the
+     * page did not show. That is [CL036-DEV01.43]: V11S2's profile said "6
+     * Products listed" over a grid of five, the sixth being out of stock. The test
+     * is is_salable in the website's stock index — the same column the
+     * storefront's own stock filter reads.
+     *
+     * Only sellers whose shop exists on this store's website (see below).
+     *
+     * NOT searchableIds(). "Select and sell" copies stay out of search and
+     * category listings, but the shop grid lists them — they are this seller's
+     * offers, and the card opens the original product's page with its seller
+     * comparison. Excluding them made ENARA's tile say 10 over a grid of 12
+     * (two copies), hassan1 and meramo_123 3 over 4 (2026-10-05 sweep).
      *
      * Fails open on stock, like the rest of this class.
      *
@@ -238,31 +246,73 @@ class StorefrontVisibility
      */
     public function listedIds(array $productIds, int $storeId): array
     {
-        $ids = array_values(array_intersect(
-            $this->sellableIds($productIds, $storeId),
-            $this->searchableIds($productIds)
-        ));
+        $ids = $this->sellableIds($productIds, $storeId);
         if (!$ids) {
             return [];
         }
 
+        $connection = $this->resource->getConnection();
+        $entity = $this->resource->getTableName('catalog_product_entity');
+
         try {
             $om = \Magento\Framework\App\ObjectManager::getInstance();
+            $website = $om->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore($storeId)->getWebsite();
+
+            /*
+             * A seller's shop exists only on the website of the seller's own
+             * account (Vnecoms takes the vendor's website from its super-user
+             * customer, and VendorsPage's router 404s the shop anywhere else).
+             * luma, seno and three more sellers have no account on Hub Market's
+             * website: their shops 404 here, so nothing of theirs is "listed".
+             * Products without a seller are not a shop's and pass untouched.
+             */
+            $onWebsite = array_flip(array_map('intval', $connection->fetchCol(
+                $connection->select()
+                    ->from(['e' => $entity], ['entity_id'])
+                    ->joinInner(
+                        ['u' => $this->resource->getTableName('ves_vendor_user')],
+                        'u.vendor_id = e.vendor_id AND u.is_super_user = 1',
+                        []
+                    )
+                    ->joinInner(
+                        ['c' => $this->resource->getTableName('customer_entity')],
+                        'c.entity_id = u.customer_id',
+                        []
+                    )
+                    ->where('e.entity_id IN (?)', $ids)
+                    ->where('c.website_id = ?', (int) $website->getId())
+            )));
+            $sellerless = array_flip(array_map('intval', $connection->fetchCol(
+                $connection->select()
+                    ->from($entity, ['entity_id'])
+                    ->where('entity_id IN (?)', $ids)
+                    ->where('vendor_id IS NULL OR vendor_id = 0')
+            )));
+            $ids = array_values(array_filter(
+                $ids,
+                static fn ($id) => isset($onWebsite[(int) $id]) || isset($sellerless[(int) $id])
+            ));
+            if (!$ids) {
+                return [];
+            }
+        } catch (\Throwable $e) {
+            $this->logger->error('StorefrontVisibility::listedIds website check failed, keeping all: ' . $e->getMessage());
+        }
+
+        try {
             if ($om->get(\Magento\CatalogInventory\Api\StockConfigurationInterface::class)->isShowOutOfStock($storeId)) {
                 return $ids;
             }
 
-            $website = $om->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore($storeId)->getWebsite();
             $stockId = (int) $om->get(\Magento\InventorySalesApi\Api\StockResolverInterface::class)
                 ->execute(\Magento\InventorySalesApi\Api\Data\SalesChannelInterface::TYPE_WEBSITE, $website->getCode())
                 ->getStockId();
             $stockTable = $om->get(\Magento\InventoryIndexer\Model\StockIndexTableNameResolverInterface::class)
                 ->execute($stockId);
 
-            $connection = $this->resource->getConnection();
             $salable = array_map('intval', $connection->fetchCol(
                 $connection->select()
-                    ->from(['e' => $this->resource->getTableName('catalog_product_entity')], ['entity_id'])
+                    ->from(['e' => $entity], ['entity_id'])
                     ->joinInner(['s' => $stockTable], 's.sku = e.sku', [])
                     ->where('e.entity_id IN (?)', $ids)
                     ->where('s.is_salable = 1')
