@@ -55,6 +55,19 @@ trait SellerShippingShare
             $ratio = $share['qty'][$vendorId] / $share['total'];
             $order = $share['order'];
 
+            /*
+             * The method too: the vendor order row has none (Vnecoms only fills it for
+             * seller methods), so the app's "Shipping & Handling Information" said
+             * "No shipping information available" beside AED 10.00 of shipping.
+             */
+            $current = $result->__toArray();
+            if (empty($current['shipping_description']) && !empty($order['shipping_description'])) {
+                $result->setData('shipping_description', (string) $order['shipping_description']);
+            }
+            if (empty($current['shipping_method']) && !empty($order['shipping_method'])) {
+                $result->setData('shipping_method', (string) $order['shipping_method']);
+            }
+
             foreach (['', 'base_'] as $p) {
                 $amount   = round((float) $order[$p . 'shipping_amount'] * $ratio, 4);
                 $tax      = round((float) $order[$p . 'shipping_tax_amount'] * $ratio, 4);
@@ -144,6 +157,7 @@ trait SellerShippingShare
                     'shipping_discount_amount', 'base_shipping_discount_amount',
                     'shipping_invoiced', 'base_shipping_invoiced',
                     'shipping_refunded', 'base_shipping_refunded',
+                    'shipping_description', 'shipping_method',
                 ])
                 ->where('entity_id = ?', $orderId)
         );
