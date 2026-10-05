@@ -14,6 +14,14 @@ use MagentoEgypt\SmsExtend\Helper\Otp as OtpHelper;
  * controller imposes no per-target attempt limit, so the code is brute-forceable
  * within its validity window. This caps verification attempts per target mobile
  * number (canonicalised, so format variants share one counter) within a window.
+ *
+ * A SUCCESSFUL verify clears the counter. It used to count successes too and
+ * never reset, so a seller who signed in correctly five times in fifteen minutes
+ * was refused with "Too many incorrect attempts" (2026-10-05, testdev8 during the
+ * DEV01.44 login tests). Wrong codes still count, and each attempt is still
+ * counted BEFORE the controller runs, so a burst of parallel guesses cannot slip
+ * past the limit. The app's REST verify (Model\Otp\OtpGuard) already counts only
+ * failures and resets on success; this matches it.
  */
 class OtpLoginVerifyRateLimit
 {
@@ -86,6 +94,39 @@ class OtpLoginVerifyRateLimit
         // Count this attempt before delegating so a flood cannot slip through.
         $this->cache->save((string)($attempts + 1), $key, [], self::WINDOW);
 
-        return $proceed();
+        $result = $proceed();
+
+        // A correct code is not an "incorrect attempt": start the number afresh.
+        if ($this->isSuccess($result)) {
+            $this->cache->remove($key);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Did the Vnecoms verify controller sign the visitor in?
+     *
+     * It answers with a Json result built from setJsonData(), which has no
+     * getter, so the body is read from the result's own property. Anything that
+     * cannot be read counts as a failure: the counter then stays, as before.
+     *
+     * @param mixed $result
+     */
+    private function isSuccess($result): bool
+    {
+        if (!$result instanceof \Magento\Framework\Controller\Result\Json) {
+            return false;
+        }
+
+        try {
+            $property = new \ReflectionProperty(\Magento\Framework\Controller\Result\Json::class, 'json');
+            $property->setAccessible(true);
+            $data = json_decode((string) $property->getValue($result), true);
+        } catch (\Throwable $e) {
+            return false;
+        }
+
+        return is_array($data) && !empty($data['success']);
     }
 }
