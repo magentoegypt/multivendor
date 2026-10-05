@@ -349,6 +349,15 @@ products.", as DELETE does.
 
 ## Orders
 - `GET /V1/vendor/order/:orderId`: only the seller's own orders; others return 404.
+- Shipping (10-05, TC90): `GET /V1/vendor/order/:orderId` and `GET /V1/vendors/order` now carry the seller's
+  share of the order's shipping in `shipping_amount`, `shipping_incl_tax`, `shipping_tax_amount` (and `base_*`),
+  and it is included in `grand_total`, `total_paid` and `total_due`. Before, every Flat Rate order said shipping
+  0 and a grand total short by the shipping (#3000000182: 3,740 instead of 3,750). A single-seller order gets
+  all of the shipping; on a multi-seller order each seller gets it in proportion to its shippable items (Flat
+  Rate is AED 10 per item, so the split is exact). Show `shipping_amount`/`shipping_incl_tax` as Shipping &
+  Handling. `shipping_and_handling` is still the WHOLE order's shipping; do not show it as the seller's.
+  `total_refunded` is now the seller's own refund, not the whole order's (on #3000000134 all three sellers
+  used to show 2,750).
 - `GET /V1/vendors/order` (and `/order/invoice`, `/order/memo`, `/credit/withdrawal`): `total_count` is
   now the seller's real total, not the page size (09-29). You can drop the "page until a short page"
   workaround.
@@ -418,6 +427,7 @@ products.", as DELETE does.
 | 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
 | 10-03 | `161e17618` + (server) | TC79-82, TC88 server work: Odoo sync log trimmed (175 → 3.7 MB) and kept 30 days; MySQL statement digests on; OPcache needs an fpm reload per deploy; restart windows listed under Deploys and outages; TC81: translations PUT is fine (the logged errors predate the fix); app API unchanged |
 | 10-03 | (config/server) | TC79: MySQL slow log now readable by the SQL dashboard (all SQL checks ACTIVE). TC82: no scheduled cache flush ever existed; the nightly Redis dips came from the unused Mageplaza Search rebuild (switched off, `mpsearch/general/enabled=0`) and the daily cache cleanup (now hourly at :15). Search in both apps is unaffected: it is Algolia/OpenSearch, not Mageplaza. App API unchanged |
+| 10-05 | (this commit) | Order detail and list carry the seller's shipping share in the shipping fields and totals (TC90); `total_refunded` is the seller's own (see Orders) |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
 published. The backend team does that on the product owner's go-ahead.

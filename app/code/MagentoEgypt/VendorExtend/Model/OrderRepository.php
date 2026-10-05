@@ -6,6 +6,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class OrderRepository extends BaseOrderRepository
 {
+    use SellerShippingShare;
+
     /**
      * @param int $customerId
      * @param int $orderId
@@ -48,6 +50,7 @@ class OrderRepository extends BaseOrderRepository
             'MagentoEgypt\VendorExtend\Api\Data\Sale\OrderInterface'
         );
         $this->addAdditionalInfoToOrderResult($result, $vendorOrder);
+        $this->hmApplySellerShippingShare($result);
         return $result;
     }
 
