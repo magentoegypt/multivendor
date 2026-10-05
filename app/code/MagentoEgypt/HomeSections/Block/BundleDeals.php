@@ -46,6 +46,7 @@ use Magento\Catalog\Model\Product;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DataObject\IdentityInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
@@ -54,7 +55,7 @@ use MagentoEgypt\HomeSections\ViewModel\ReviewStars;
 use MagentoEgypt\HomeSections\ViewModel\VendorNames;
 use Psr\Log\LoggerInterface;
 
-class BundleDeals extends Template
+class BundleDeals extends Template implements IdentityInterface
 {
     /** Product types whose options live in the core bundle tables. */
     private const TYPES = ['bundle', 'new_bundle'];
@@ -828,5 +829,20 @@ class BundleDeals extends Template
     protected function getCacheLifetime(): ?int
     {
         return 3600;
+    }
+
+    /**
+     * The bundles on the rail, as product cache tags. Without them a product save
+     * cleaned neither this block's HTML cache nor the homepage in Varnish, so a
+     * bundle disabled in the admin stayed on the rail (DEV01.45).
+     *
+     * @return string[]
+     */
+    public function getIdentities(): array
+    {
+        return array_map(
+            static fn (array $b): string => Product::CACHE_TAG . '_' . $b['id'],
+            $this->getBundles()
+        );
     }
 }
