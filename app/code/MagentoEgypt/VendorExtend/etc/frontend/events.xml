@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- A signed-in approved seller on the customer login page goes to the page that asked, else the seller dashboard (DEV01.44) -->
+    <event name="controller_action_predispatch_customer_account_login">
+        <observer name="megp_seller_login_landing" instance="MagentoEgypt\VendorExtend\Observer\SellerLoginLanding"/>
+    </event>
     <event name="ves_quotation_quote_submit_before">
         <observer name="created_at_while_submit" instance="MagentoEgypt\VendorExtend\Observer\VesQuoteCreatedAt" disabled="false" />
     </event>
