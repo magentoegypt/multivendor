@@ -21,4 +21,9 @@
         <plugin name="magentoegypt_vendorextend_translations_path_param"
                 type="MagentoEgypt\VendorExtend\Plugin\Webapi\TranslationsPathParam"/>
     </type>
+    <!-- Seller order endpoints: item row_total/base_row_total as stored, not core's discount-net REST value (TC90) -->
+    <type name="Magento\Sales\Model\Order\Webapi\ChangeOutputArray">
+        <plugin name="magentoegypt_seller_order_item_row_total"
+                type="MagentoEgypt\VendorExtend\Plugin\Webapi\SellerOrderItemRowTotal"/>
+    </type>
 </config>

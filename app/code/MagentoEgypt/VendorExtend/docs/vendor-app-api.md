@@ -361,10 +361,13 @@ products.", as DELETE does.
   Same endpoints, same condition: `shipping_description` / `shipping_method` now carry the order's method
   (e.g. "Flat Rate - Fixed" / `flatrate_flatrate`); they were null, so "Shipping & Handling Information" said
   "No shipping information available".
-- **App-side fix needed (10-05, TC90 app check):** on the order screen's item card, #3000000182 shows Subtotal
-  AED 3,400 and Row Total AED 3,640. The API sends `row_total` 3500, `tax_amount` 340, `discount_amount` 100:
-  the app subtracts the discount twice. Show item Subtotal = `row_total` (3,500) and Row Total =
-  `row_total` + `tax_amount` - `discount_amount` (3,740), as the web admin does.
+- Item `row_total` / `base_row_total` (10-05, TC90): the seller order endpoints now answer them as Magento
+  stores them (#3000000182 test24: 3500). Before, core Magento's REST output processor
+  (`Sales\Model\Order\Webapi\ChangeOutputArray`) sent them net of the discount (3400), and the app took the
+  discount off again (item card Subtotal 3,400 / Row Total 3,640 against the admin's 3,500 / 3,740). No app
+  change needed: Subtotal = `row_total`, Row Total = `row_total` + `tax_amount` - `discount_amount`.
+  `row_total_incl_tax` is unchanged (core's discounted figure, 3740). Other REST clients (`/V1/orders`) keep
+  core's values.
 - `GET /V1/vendors/order` (and `/order/invoice`, `/order/memo`, `/credit/withdrawal`): `total_count` is
   now the seller's real total, not the page size (09-29). You can drop the "page until a short page"
   workaround.
@@ -434,7 +437,8 @@ products.", as DELETE does.
 | 10-03 | `af8086986` | `GET/PUT /V1/vendors/product/:sku/translations`, `GET /V1/vendors/product/translations`: product text per store view, `en` and `ar` (see "Product text per store view") |
 | 10-03 | `161e17618` + (server) | TC79-82, TC88 server work: Odoo sync log trimmed (175 → 3.7 MB) and kept 30 days; MySQL statement digests on; OPcache needs an fpm reload per deploy; restart windows listed under Deploys and outages; TC81: translations PUT is fine (the logged errors predate the fix); app API unchanged |
 | 10-03 | (config/server) | TC79: MySQL slow log now readable by the SQL dashboard (all SQL checks ACTIVE). TC82: no scheduled cache flush ever existed; the nightly Redis dips came from the unused Mageplaza Search rebuild (switched off, `mpsearch/general/enabled=0`) and the daily cache cleanup (now hourly at :15). Search in both apps is unaffected: it is Algolia/OpenSearch, not Mageplaza. App API unchanged |
-| 10-05 | (this commit) | `shipping_description`/`shipping_method` filled from the order; app item Subtotal/Row Total double-count the discount (app fix, see Orders) |
+| 10-05 | (this commit) | Item `row_total`/`base_row_total` as stored on the seller order endpoints (TC90 item card); needed a di:compile |
+| 10-05 | `5ca19556f` | `shipping_description`/`shipping_method` filled from the order |
 | 10-05 | `2ae2a6c4d` | Order detail and list carry the seller's shipping share in the shipping fields and totals (TC90); `total_refunded` is the seller's own (see Orders) |
 
 Still pending on the backend side: revoking the old admin token (`qvy8`) once the new app build is
