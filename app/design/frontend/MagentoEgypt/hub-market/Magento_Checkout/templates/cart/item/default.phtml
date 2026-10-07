@@ -151,6 +151,16 @@ if ($product) {
             <?php endif; ?>
         </strong>
 
+        <?php /* CL036-DEV01.46: the line's SKU — the quote item's, so a configurable
+                 shows the chosen variant's SKU, the one the order will carry. */ ?>
+        <?php if ((string) $_item->getSku() !== ''): ?>
+            <?php /* Styled inline: one muted line, and the theme stylesheet is not rebuilt for it. */ ?>
+            <p class="hm-cart-line__sku" style="margin:.2rem 0 0;font-size:1.2rem;line-height:1.4;color:var(--hm-foreground-muted)">
+                <span class="hm-cart-line__sku-label"><?= $escaper->escapeHtml(__('SKU')) ?>:</span>
+                <span class="hm-cart-line__sku-value" dir="ltr"><?= $escaper->escapeHtml($_item->getSku()) ?></span>
+            </p>
+        <?php endif; ?>
+
         <?php /*
             `!== null` was not enough. The language guard above blanks an
             Arabic-dominant description on the English store by setting it to an
