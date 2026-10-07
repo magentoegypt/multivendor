@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- CL036-TC97: live email domain check and "Did you mean …?" on this page's email fields. -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="hm.email.check"
+                   template="MagentoEgypt_AccountExtend::email-check.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">MagentoEgypt\AccountExtend\ViewModel\EmailCheckConfig</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

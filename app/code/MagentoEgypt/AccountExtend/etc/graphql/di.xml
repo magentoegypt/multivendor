@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- CL036-TC97: no customer account created with, or changed to, an email whose domain cannot receive mail. -->
+    <type name="Magento\Customer\Api\CustomerRepositoryInterface">
+        <plugin name="magentoegypt_reject_undeliverable_email"
+                type="MagentoEgypt\AccountExtend\Plugin\Customer\RejectUndeliverableEmail"/>
+    </type>
+</config>

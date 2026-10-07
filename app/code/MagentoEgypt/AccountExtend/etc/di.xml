@@ -25,4 +25,10 @@
     -->
     <preference for="Magento\Customer\Model\Validator\City"
                 type="MagentoEgypt\AccountExtend\Model\Validator\City"/>
+
+    <!-- Email domain check (CL036-TC97): GET /V1/hm/email-check for the storefront hint. -->
+    <preference for="MagentoEgypt\AccountExtend\Api\EmailCheckInterface"
+                type="MagentoEgypt\AccountExtend\Model\EmailCheck"/>
+    <preference for="MagentoEgypt\AccountExtend\Api\Data\EmailCheckResultInterface"
+                type="MagentoEgypt\AccountExtend\Model\Data\EmailCheckResult"/>
 </config>

@@ -1,0 +1,13 @@
+<?php
+/**
+ * Live email domain check + "Did you mean …?" on this page's email fields (CL036-TC97).
+ *
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \MagentoEgypt\AccountExtend\ViewModel\EmailCheckConfig $viewModel
+ */
+$viewModel = $block->getData('view_model');
+if (!$viewModel) {
+    return;
+}
+?>
+<script type="text/x-magento-init">{"*": {"MagentoEgypt_AccountExtend/js/hm-email-check": <?= /* @noEscape */ $viewModel->getConfigJson() ?>}}</script>

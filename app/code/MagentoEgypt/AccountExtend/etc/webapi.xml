@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Storefront live email hint (CL036-TC97): can the domain receive mail, and did they mean another? -->
+    <route url="/V1/hm/email-check" method="GET">
+        <service class="MagentoEgypt\AccountExtend\Api\EmailCheckInterface" method="check"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+</routes>
