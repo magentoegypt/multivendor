@@ -1,6 +1,9 @@
 /**
  * Hub Market — live email domain check and "Did you mean …?" (CL036-TC97).
  *
+ * (Shipped as hm-email-domain-check.js: the first name, hm-email-check.js, was
+ * served `immutable` before this revision, so the fix needed a new URL.)
+ *
  * When the customer leaves an email field on sign-up, account edit or checkout,
  * GET /rest/<store>/V1/hm/email-check asks whether the domain can receive mail
  * (DNS: MX, or A/AAAA) and whether a near-miss was meant
@@ -52,23 +55,36 @@ define([
 
         function render(el, result) {
             var $hint = hintFor(el),
+                dead = !!(result && result.deliverable === false),
+                suggestion = result && result.suggestion && norm(result.suggestion) !== norm(el.value)
+                    ? result.suggestion : null,
                 parts;
 
-            $hint.empty();
-            if (!result || !result.suggestion || norm(result.suggestion) === norm(el.value)) {
+            $hint.empty().css('color', dead ? 'var(--hm-danger, #c0392b)' : 'var(--hm-foreground-muted)');
+            if (!result || (!dead && !suggestion)) {
                 return;
             }
 
-            //  "Did you mean %1?" around a link that applies the suggestion.
-            parts = String(config.msgSuggest).split('%1');
-            $hint.append(document.createTextNode(parts[0] || ''));
-            $('<a href="#"></a>')
-                .text(result.suggestion)
-                .attr('data-hm-email-suggest', result.suggestion)
-                .attr('data-for', el.id || '')
-                .css({fontWeight: 600, textDecoration: 'underline'})
-                .appendTo($hint);
-            $hint.append(document.createTextNode(parts[1] || ''));
+            //  The sentence lives here, not only in the validation label: the form
+            //  re-focuses an invalid field on submit, and focusing it clears the
+            //  label, which left the customer blocked with no reason given.
+            if (dead) {
+                $hint.append(document.createTextNode(
+                    String(config.msgUndeliverable).replace('%1', result.domain || '') + (suggestion ? ' ' : '')
+                ));
+            }
+            if (suggestion) {
+                //  "Did you mean %1?" around a link that applies the suggestion.
+                parts = String(config.msgSuggest).split('%1');
+                $hint.append(document.createTextNode(parts[0] || ''));
+                $('<a href="#"></a>')
+                    .text(suggestion)
+                    .attr('data-hm-email-suggest', suggestion)
+                    .attr('data-for', el.id || '')
+                    .css({fontWeight: 600, textDecoration: 'underline'})
+                    .appendTo($hint);
+                $hint.append(document.createTextNode(parts[1] || ''));
+            }
         }
 
         function apply(el, result) {
@@ -120,11 +136,10 @@ define([
 
                 return !(result && result.deliverable === false);
             },
-            function (params, element) {
-                var result = results[norm(element.value)] || {};
+            //  The visible sentence is the hint under the field (see render); the
+            //  rule only blocks, so its own label stays blank rather than repeat it.
+            ' '
 
-                return String(config.msgUndeliverable).replace('%1', result.domain || '');
-            }
         );
         $.validator.addClassRules('hm-email-deliverable', {'hm-email-deliverable': true});
 
