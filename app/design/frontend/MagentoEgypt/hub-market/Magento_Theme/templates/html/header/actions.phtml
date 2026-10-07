@@ -118,10 +118,20 @@ $isLoggedIn = $authState !== false && $authState->isLoggedIn();
         </div>
     </div>
 
-    <a class="hm-header__action" href="<?= $escaper->escapeUrl($wishlistUrl) ?>">
+    <?php /*
+        Wishlist count (CL036-TC96): the same accent disc as the mini-cart's
+        counter, on the icon's top-trailing corner. Filled and shown by
+        js/hm-wishlist-count from the `wishlist` customer-data section, so it is
+        correct on a cached header; hidden until there is something to count.
+        Styled inline so the theme stylesheet is not rebuilt for one badge.
+    */ ?>
+    <a class="hm-header__action" href="<?= $escaper->escapeUrl($wishlistUrl) ?>" style="position:relative">
         <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>
         <span class="hm-header__action-label"><?= $escaper->escapeHtml(__('Wishlist')) ?></span>
+        <span class="hm-header__count" data-hm-wishlist-count="flex" hidden
+              style="position:absolute;inset-block-start:-.4rem;inset-inline-end:.2rem;display:none;align-items:center;justify-content:center;min-inline-size:1.8rem;block-size:1.8rem;padding:0 .3rem;border-radius:var(--hm-radius-full);background:var(--hm-accent);color:var(--hm-on-accent);font-size:1.2rem;font-weight:700;line-height:1"></span>
     </a>
+    <script type="text/x-magento-init">{"*": {"js/hm-wishlist-count": {}}}</script>
 
     <div class="hm-header__action hm-header__action--cart">
         <?= $block->getChildHtml('minicart') ?>

@@ -298,6 +298,9 @@ foreach ($hmByKey as $hmKey => $hmChild) {
                             <a class="hm-nav__quick-link" href="<?= $escaper->escapeUrl($block->getUrl('wishlist')) ?>">
                                 <svg class="hm-icon" aria-hidden="true" focusable="false"><use href="#hm-wishlist"/></svg>
                                 <?= $escaper->escapeHtml(__('Wishlist')) ?>
+                                <?php /* Phone count (CL036-TC96), filled by js/hm-wishlist-count. */ ?>
+                                <span class="hm-nav__quick-count" data-hm-wishlist-count="inline-flex" hidden
+                                      style="display:none;align-items:center;justify-content:center;min-inline-size:1.8rem;block-size:1.8rem;padding:0 .4rem;margin-inline-start:.4rem;border-radius:var(--hm-radius-full);background:var(--hm-accent);color:var(--hm-on-accent);font-size:1.2rem;font-weight:700;line-height:1"></span>
                             </a>
                         </li>
                     </ul>
