@@ -19,4 +19,10 @@
                 type="MagentoEgypt\CheckoutExtend\Plugin\Checkout\Block\Checkout\RemoveBillingAddress"
                 sortOrder="10"/>
     </type>
+
+    <!-- TC95: a product whose last units are reserved by open orders shows Out of Stock (index ignores reservations) -->
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="magentoegypt_reserved_stock_availability"
+                type="MagentoEgypt\CheckoutExtend\Plugin\Catalog\ReservedStockAvailability"/>
+    </type>
 </config>

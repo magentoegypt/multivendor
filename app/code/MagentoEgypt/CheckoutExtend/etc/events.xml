@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- TC95: an order reserves / a cancel releases stock; refresh the pages that show those products -->
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="magentoegypt_clean_ordered_products_cache" instance="MagentoEgypt\CheckoutExtend\Observer\CleanOrderedProductsCache"/>
+    </event>
+    <event name="order_cancel_after">
+        <observer name="magentoegypt_clean_cancelled_products_cache" instance="MagentoEgypt\CheckoutExtend\Observer\CleanOrderedProductsCache"/>
+    </event>
+</config>
