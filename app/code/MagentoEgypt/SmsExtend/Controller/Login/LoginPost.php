@@ -223,10 +223,28 @@ class LoginPost extends \Vnecoms\Sms\Controller\Login\LoginPost
     }
 
     /**
-     * Verify e-mail + password (the optional 2FA-by-OTP path) without logging the
-     * customer in yet. Mirrors the stock behaviour; supro routes plain e-mail
-     * logins straight to core customer/account/loginPost, so this only runs when
-     * something posts to vsms/login/loginPost without type=mobile.
+     * E-mail + password.
+     *
+     * Stock Vnecoms behaviour: verify the password WITHOUT logging the customer
+     * in, and hand back a secure key so the form opens the "2-Step Verification"
+     * dialog and sends an OTP to the account's phone. That is what the storefront
+     * did on every e-mail login.
+     *
+     * CL036-DEV16 (14zb93nwtd5, client request): e-mail + password must log the
+     * customer in on its own, with no OTP and no extra step. The OTP stays its
+     * own flow, on the Verification code tab (loginByMobile()). The theme's login
+     * forms post `hm_password_login=1` from the e-mail tab
+     * (MagentoEgypt_SmsExtend/js/hm-login-validate.js), and then the customer is
+     * logged in here, exactly as Otp\Login\Verify logs them in once a code is
+     * confirmed: setCustomerDataAsLoggedIn(). The form then reloads, so both
+     * flows land the same way.
+     *
+     * Without the flag (a page still holding the stock validate-customer.js),
+     * the stock 2FA answer is kept, because that script would open the OTP
+     * dialog on any success.
+     *
+     * authenticate() still runs first, so lockout after failed attempts and the
+     * e-mail confirmation check apply to the direct login too.
      *
      * @return DataObject
      */
@@ -258,6 +276,13 @@ class LoginPost extends \Vnecoms\Sms\Controller\Login\LoginPost
                 )
             ) {
                 throw new EmailNotConfirmedException(__("This account isn't confirmed. Verify and try again."));
+            }
+
+            if ((string)$this->getRequest()->getPost('hm_password_login') === '1') {
+                $this->session->setCustomerDataAsLoggedIn($customer);
+                $this->clearPrivateContentMarker();
+                $response->setData(['success' => true, 'logged_in' => true]);
+                return $response;
             }
 
             $secureKey = md5($customerObj->getData('email') . md5(time() . rand(1, 1000)));
@@ -295,5 +320,34 @@ class LoginPost extends \Vnecoms\Sms\Controller\Login\LoginPost
         }
 
         return $response;
+    }
+
+    /**
+     * Drop the `mage-cache-sessid` cookie, as core's customer/account/loginPost
+     * does after a login, so customer-data reloads every private section (header
+     * name, cart, wishlist) instead of keeping the guest copies.
+     *
+     * Taken from the object manager, not the constructor: production runs with
+     * compiled DI, and a new constructor argument would need a di:compile.
+     *
+     * @return void
+     */
+    private function clearPrivateContentMarker()
+    {
+        try {
+            /** @var \Magento\Framework\Stdlib\CookieManagerInterface $cookieManager */
+            $cookieManager = $this->_objectManager->get(\Magento\Framework\Stdlib\CookieManagerInterface::class);
+            if ($cookieManager->getCookie('mage-cache-sessid')) {
+                /** @var \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory $metadataFactory */
+                $metadataFactory = $this->_objectManager->get(
+                    \Magento\Framework\Stdlib\Cookie\CookieMetadataFactory::class
+                );
+                $metadata = $metadataFactory->createCookieMetadata();
+                $metadata->setPath('/');
+                $cookieManager->deleteCookie('mage-cache-sessid', $metadata);
+            }
+        } catch (\Exception $e) {
+            $this->logger->warning('SmsExtend LoginPost: could not clear mage-cache-sessid: ' . $e->getMessage());
+        }
     }
 }

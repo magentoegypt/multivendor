@@ -69,10 +69,10 @@ if ($username) {
                     */ ?>
                     <div class="sms-login-switch" role="group" aria-label="<?= $escaper->escapeHtmlAttr(__('Sign in with')) ?>">
                         <a class="sms-login-field-ctrl<?= $isMobileLogin ? '' : ' selected' ?>"
-                           href="#<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_EMAIL ?>"><span><?= $escaper->escapeHtml(__('Email')) ?></span></a>
+                           href="#<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_EMAIL ?>"><span><?= $escaper->escapeHtml(__('Email and password')) ?></span></a>
                         <?= $escaper->escapeHtml(__('or')) ?>
                         <a class="sms-login-field-ctrl<?= $isMobileLogin ? ' selected' : '' ?>"
-                           href="#<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_MOBILE ?>"><span><?= $escaper->escapeHtml(__('Mobile')) ?></span></a>
+                           href="#<?= /* @noEscape */ \Vnecoms\Sms\Helper\Data::LOGIN_TYPE_MOBILE ?>"><span><?= $escaper->escapeHtml(__('Verification code')) ?></span></a>
                     </div>
 
                     <div id="by_mobile" class="control sms-login-field"<?= $isMobileLogin ? '' : ' style="display: none;"' ?>>
@@ -166,11 +166,16 @@ $smsHelper = \Magento\Framework\App\ObjectManager::getInstance()->get(\Vnecoms\S
         <script type="text/x-magento-init">
         {
             "#hm-login-form": {
-                "Vnecoms_Sms/js/validate-customer": {
+                "MagentoEgypt_SmsExtend/js/hm-login-validate": {
                     "sendOtpURL": "<?= $escaper->escapeUrl($block->getUrl('vsms/otp_login/send')) ?>",
                     "verifyOtpURL": "<?= $escaper->escapeUrl($block->getUrl('vsms/otp_login/verify')) ?>",
                     "login_type_config": "<?= $escaper->escapeJs($smsHelper->getConfigTypeLogin()) ?>",
-                    "loginButtonSelector": "#hm-login-form .action.login"
+                    "loginButtonSelector": "#hm-login-form .action.login",
+                    "dialogTitle": "<?= $escaper->escapeJs(__('Verification code')) ?>",
+                    "verifyErrorTitle": "<?= $escaper->escapeJs(__('Verify Error')) ?>",
+                    "requiredMessage": "<?= $escaper->escapeJs(__('This is a required field.')) ?>",
+                    "resendAfterText": "<?= $escaper->escapeJs(__('Resend after %1 seconds')) ?>",
+                    "resendText": "<?= $escaper->escapeJs(__('Resend OTP')) ?>"
                 }
             }
         }
