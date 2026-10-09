@@ -4,7 +4,7 @@
  *
  * Rewritten from the core table row to the Figma reference's card line:
  *
- *   96px thumb | name, 2-line description, price + struck compare-at
+ *   96px thumb | name, SKU, price + struck compare-at
  *              | trash / qty stepper / line total, stacked to the trailing edge
  *
  * The wrapper is a div, not a <tbody> — see the note at the top of
@@ -32,60 +32,12 @@ $canApplyMsrp = $helper->isShowBeforeOrderConfirm($product) && $helper->isMinima
 $hmItemId = (string) $_item->getId();
 
 /*
- * Two-line summary under the name, matching the reference's `line-clamp-2`
- * paragraph.
- *
- * Resolved here rather than through a ViewModel because this template is shared
- * by every product type: `default`, `simple`, `configurable`, `bundle`,
- * `downloadable` and `grouped` renderers are declared across seven different
- * modules, and layout arguments do not inherit to child blocks — wiring one
- * ViewModel into all of them would be more code than the four lines it saves,
- * and would silently miss any renderer a future module adds.
- *
- * `short_description` is not on a quote item's product by default — quote items
- * load a restricted attribute set — so MagentoEgypt_CheckoutExtend's
- * catalog_attributes.xml adds it to the `quote_item` group. Without that this is
- * silently null on every line.
- *
- * Merchant copy here carries hard line breaks and stray markup, and the clamp
- * needs one continuous run of text.
- *
- * `description` is the fallback because short_description is the exception on
- * this catalogue, not the rule: 158 products of 2304 have one, against 2075 with
- * a description. It is stripped and collapsed the same way and clamped to two
- * lines in CSS, so a long body copy still renders as the reference's blurb.
+ * No description on the cart line (CL036-DEV01.47, client request): the short
+ * description — or, on the 2,000+ products without one, the long description as
+ * a fallback — printed under the name on both stores, Arabic copy on every
+ * Arabic line. The client asked for it gone from the cart in both views. The
+ * name, SKU, options and prices stay; the description is the product page's.
  */
-$hmDesc = null;
-foreach (['short_description', 'description'] as $hmAttribute) {
-    $hmRaw = $product ? (string) $product->getData($hmAttribute) : '';
-    if ($hmRaw === '') {
-        continue;
-    }
-    $hmCandidate = trim(preg_replace('/\s+/u', ' ', strip_tags($hmRaw)) ?? '');
-    if ($hmCandidate !== '') {
-        $hmDesc = $hmCandidate;
-        break;
-    }
-}
-
-/*
- * QA cycle 2, item 4: the tester crossed out an ARABIC description rendering
- * under an item on the ENGLISH cart. Most of this catalogue's descriptions are
- * Arabic-only, so on a non-Arabic store an Arabic-dominant blurb is dropped
- * rather than shown as mojibake-adjacent noise; the English-labelled line
- * beside it in the same screenshot was left uncrossed, which is exactly this
- * rule. The Arabic store keeps everything (English fallback copy is normal
- * there). Same guard as list.phtml's listing description.
- */
-if ($hmDesc !== null && $product) {
-    $hmSample = mb_substr($hmDesc, 0, 120);
-    $hmArabic = (int) preg_match_all('/[\x{0600}-\x{06FF}]/u', $hmSample);
-    $hmLatin  = (int) preg_match_all('/[A-Za-z]/u', $hmSample);
-    $hmRtlView = str_starts_with((string) $product->getStore()->getConfig('general/locale/code'), 'ar');
-    if (!$hmRtlView && $hmArabic > $hmLatin) {
-        $hmDesc = null;
-    }
-}
 
 /*
  * Struck compare-at price, as the reference draws it beside the current one.
@@ -159,16 +111,6 @@ if ($product) {
                 <span class="hm-cart-line__sku-label"><?= $escaper->escapeHtml(__('SKU')) ?>:</span>
                 <span class="hm-cart-line__sku-value" dir="ltr"><?= $escaper->escapeHtml($_item->getSku()) ?></span>
             </p>
-        <?php endif; ?>
-
-        <?php /*
-            `!== null` was not enough. The language guard above blanks an
-            Arabic-dominant description on the English store by setting it to an
-            EMPTY STRING, not null, so the paragraph still rendered — an empty
-            <p> holding open a band of nothing between the name and the price.
-        */ ?>
-        <?php if ($hmDesc !== null && trim($hmDesc) !== ''): ?>
-            <p class="hm-cart-line__desc"><?= $escaper->escapeHtml($hmDesc) ?></p>
         <?php endif; ?>
 
         <?php if ($_options = $block->getOptionList()): ?>

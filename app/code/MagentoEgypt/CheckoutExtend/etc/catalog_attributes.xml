@@ -1,36 +1,26 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Adds short_description (and description as its fallback) to the attribute set
- * loaded for quote items.
+ * Adds `price` to the attribute set loaded for quote items.
  *
- * The cart line now carries the reference's two-line product summary, and
- * `$item->getProduct()->getData('short_description')` came back empty for every
- * line: quote item products are NOT loaded with the full attribute set, only
- * with the `quote_item` group declared here and in core's own
- * catalog_attributes.xml. The attribute existed on the product and was simply
- * not in the select.
+ * Quote item products are NOT loaded with the full attribute set, only with the
+ * `quote_item` group declared here and in core's own catalog_attributes.xml.
+ * Declaring an attribute here joins it into the load the cart already does,
+ * rather than costing a repository call per line from the template.
  *
- * Declaring it is the cheap fix — it joins into the load the cart already does,
- * rather than costing a repository call per line the way fetching it in the
- * template would.
+ * short_description and description used to be here too, for the cart line's
+ * product summary. That summary was removed at the client's request
+ * (CL036-DEV01.47), and the long description in particular is not worth
+ * selecting for every quote load with nothing reading it.
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Catalog/etc/catalog_attributes.xsd">
     <group name="quote_item">
-        <attribute name="short_description"/>
-        <!--
-            Only 158 of 2304 products carry a short_description, but 2075 carry
-            a description. Without this fallback nine cart lines in ten render
-            with no summary at all, and the reference's card is built around
-            having one.
-        -->
-        <attribute name="description"/>
         <!--
             The cart line strikes through the pre-discount price, which means
             comparing the item's unit price against the product's own `price`
-            attribute. That attribute is not in the quote_item load either.
+            attribute. That attribute is not in the quote_item load by default.
         -->
         <attribute name="price"/>
     </group>
