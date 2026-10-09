@@ -1,0 +1,29 @@
+/**
+ * Admin grids scroll sideways inside their own box (CL036-TC98, 14zb93nwpb7).
+ *
+ * QA: on Catalog > Products, a wide column set pushed the WHOLE admin page
+ * sideways, header and menu included, instead of only the table.
+ *
+ * Cause: Magento 2.4.8 changed the grid wrapper in
+ * Magento_Ui/web/css/source/module/_data-grid.less from `overflow-x: auto` to
+ * `overflow-x: visible`. A table wider than the content column now spills out
+ * of it and widens the document. Every UI-component grid is affected: products,
+ * orders, customers, CMS.
+ *
+ * Fix: restore `auto` on the wrapper so the table scrolls inside it, with its
+ * own scrollbar. Core's sticky header already supports this. It listens to the
+ * wrapper's own scroll event and offsets the cloned header by its scrollLeft
+ * (Magento_Ui/js/grid/sticky/sticky.js: initOnListingScroll, adjustOffset).
+ * That cloned header keeps `visible`, as core sets it, so it is not clipped.
+ *
+ * The `body` prefix outranks core's single-class rule whatever order the head
+ * assets load in. This is a new file, so it ships without a static-content
+ * deploy or a deployed_version bump.
+ */
+body .admin__data-grid-wrap {
+    overflow-x: auto;
+}
+
+body .sticky-header .admin__data-grid-wrap {
+    overflow-x: visible;
+}
