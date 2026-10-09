@@ -172,4 +172,9 @@
         <plugin name="hm_no_card_for_missing_seller"
                 type="MagentoEgypt\VendorExtend\Plugin\Vendors\SellerNameFallback"/>
     </type>
+    <!-- CL036-TC28 (86d4bjum9): "Discount Amount" on order item rows also shows the special/catalog price reduction
+         (admin order, admin Marketplace order, seller panel). Display only. -->
+    <type name="Magento\Sales\Block\Adminhtml\Items\AbstractItems">
+        <plugin name="magentoegypt_order_item_discount_column" type="MagentoEgypt\VendorExtend\Plugin\Sales\OrderItemDiscountColumn"/>
+    </type>
 </config>
