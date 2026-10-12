@@ -18,6 +18,13 @@
  * 6. Opened from a link that pre-selects both options (`#93=57&223=301`): that
  *    variant's SKU without a click.
  *
+ * And the product photo must not flicker for nothing (gallery-same-picture.phtml):
+ * 7. No pick redraws the pictures that are already on screen (same original
+ *    files; the .webp copy and the cache directory don't count as a change).
+ * 8. QA's product: Black XS → Black S carries byte-identical photo files under
+ *    other names, so that change must not redraw the gallery at all...
+ * 9. ...while switching to the other colour, a different photo, must.
+ *
  * Serial, one tab (memory: host-cannot-take-agent-fanout). About a minute.
  */
 import puppeteer from '/home/ubuntu/zoonze-uitests/node_modules/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js';
@@ -63,10 +70,42 @@ const sku = () => page.$eval('.product-info-main .product.attribute.sku .value',
 const chosen = () => page.$$eval('.swatch-attribute[data-option-selected]', (els) =>
   Object.fromEntries(els.map((e) => [e.dataset.attributeCode, e.dataset.optionSelected])));
 const settle = () => new Promise((r) => setTimeout(r, 400));
+// Variant photos can arrive over AJAX (swatches/ajax/media, debounced 500 ms), so wait for the network too.
+const quiet = () => page.waitForNetworkIdle({ idleTime: 700, timeout: 15000 }).catch(() => {});
+// Products whose data makes a stronger gallery promise than check 7 (see the header, 8 and 9).
+const TWIN_PHOTOS_ON_LAST_CHANGE = new Set(['test-config-pro']);
+// The original file behind a gallery URL: cache directory and .webp copy dropped.
+const original = (url) => {
+  const m = /\/catalog\/product(?:\/cache\/[^/]+)?(\/[^?#]+?)(?:\.webp)?(?:[?#].*)?$/.exec(url || '');
+  return m ? m[1] : String(url || '');
+};
+const photosKey = (list) => JSON.stringify((list || []).map((i) => original(i.img || i.full)));
+const onScreen = () => page.evaluate(() =>
+  window.jQuery('[data-gallery-role=gallery-placeholder]').data('gallery').returnCurrentImages().map((i) => ({ img: i.img })));
+// Records every gallery redraw (updateData) from now on.
+// HM_NOGUARD=1 takes the guard off the page first (core behaviour), to see these checks fail without it.
+const recordRedraws = () => page.evaluate((noGuard) => {
+  const widget = window.jQuery('[data-role=swatch-options]').data('mage-SwatchRenderer');
+  if (noGuard && widget) {
+    delete widget.updateBaseImage;
+    widget.hmSamePicture = true;
+  }
+  const gallery = window.jQuery('[data-gallery-role=gallery-placeholder]').data('gallery');
+  const draw = gallery.updateData;
+  window.__hmRedraws = [];
+  gallery.updateData = function (data) {
+    window.__hmRedraws.push((data || []).map((i) => ({ img: i.img })));
+    return draw.apply(this, arguments);
+  };
+}, process.env.HM_NOGUARD === '1');
+let lastPick = { redraws: [], repeated: 0 };
 const waitForSwatches = () => page.waitForSelector('.swatch-attribute', { timeout: 60000 });
 
 // Picks the n-th enabled option of an attribute, whichever kind of input it is.
+let repeatedTotal = 0;
+let picks = 0;
 async function pick(code, n) {
+  const before = await onScreen();
   const kind = await page.$eval(`.swatch-attribute[data-attribute-code="${code}"]`, (el) =>
     (el.querySelector('select.swatch-select') ? 'select' : 'swatch'));
   if (kind === 'select') {
@@ -80,7 +119,12 @@ async function pick(code, n) {
     const swatches = await page.$$(`.swatch-attribute[data-attribute-code="${code}"] .swatch-option:not(.disabled)`);
     await swatches[n].click();
   }
+  await quiet();
   await settle();
+  const redraws = await page.evaluate(() => window.__hmRedraws.splice(0));
+  lastPick = { redraws, repeated: redraws.filter((r) => photosKey(r) === photosKey(before)).length };
+  repeatedTotal += lastPick.repeated;
+  picks += 1;
 }
 
 for (const urlKey of URL_KEYS) {
@@ -90,7 +134,12 @@ for (const urlKey of URL_KEYS) {
     const data = await variantsOf(store, urlKey);
     await page.goto(`${BASE}/${store}/${urlKey}.html`, { waitUntil: 'networkidle2', timeout: 120000 });
     await waitForSwatches();
+    await page.waitForFunction(() => window.jQuery && window.jQuery('[data-gallery-role=gallery-placeholder]').data('gallery'), { timeout: 60000 });
+    await quiet();
     await settle();
+    await recordRedraws();
+    repeatedTotal = 0;
+    picks = 0;
     const codes = await page.$$eval('.swatch-attribute', (els) => els.map((e) => e.dataset.attributeCode));
 
     check(where, `on load: the product's own SKU "${data.sku}"`, (await sku()) === data.sku, await sku());
@@ -109,6 +158,19 @@ for (const urlKey of URL_KEYS) {
     await pick(last, 1);
     want = expectedSku(data, await chosen());
     check(where, `${last} changed ${JSON.stringify(await chosen())}: variant SKU "${want}"`, want !== null && (await sku()) === want, await sku());
+    if (TWIN_PHOTOS_ON_LAST_CHANGE.has(urlKey)) {
+      check(where, `${last} changed, same photos (byte-identical files): gallery not redrawn`, lastPick.redraws.length === 0,
+        `${lastPick.redraws.length} redraw(s)`);
+    }
+
+    if (codes.length > 1) {
+      await pick(codes[0], 1);
+      want = expectedSku(data, await chosen());
+      check(where, `${codes[0]} changed ${JSON.stringify(await chosen())}: variant SKU "${want}"`, want !== null && (await sku()) === want, await sku());
+      if (TWIN_PHOTOS_ON_LAST_CHANGE.has(urlKey)) {
+        check(where, `${codes[0]} changed to a different photo: gallery redrawn`, lastPick.redraws.length > 0, 'no redraw');
+      }
+    }
 
     const firstSelected = await page.$(`.swatch-attribute[data-attribute-code="${codes[0]}"] .swatch-option.selected`);
     if (firstSelected) {
@@ -116,6 +178,8 @@ for (const urlKey of URL_KEYS) {
       await settle();
       check(where, `${codes[0]} cleared: back to "${data.sku}"`, (await sku()) === data.sku, await sku());
     }
+    check(where, `gallery: none of ${picks} picks redrew the photos already on screen`, repeatedTotal === 0,
+      `${repeatedTotal} needless redraw(s)`);
 
     const ids = await page.$$eval('.swatch-attribute', (els) => els.map((e) => [e.dataset.attributeCode, e.dataset.attributeId]));
     const target = data.variants[data.variants.length - 1];

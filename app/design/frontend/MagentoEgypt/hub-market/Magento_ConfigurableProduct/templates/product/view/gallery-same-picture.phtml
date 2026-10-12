@@ -1,0 +1,123 @@
+<?php
+/**
+ * Hub Market — the product photo does not flicker when the chosen variant shows the same picture (CL036-TC104,
+ * 2026-10-12).
+ *
+ * Every option change made the swatch widget call `gallery.updateData()`, which tears the gallery down and draws it
+ * again, even when nothing on screen changes: picking XS after Black redrew exactly the same two files, and picking S
+ * redrew Black's photos again under other names. On this catalogue that second case is the common one: a product's
+ * variants carry byte-identical copies of the same photo (`c7e29af7…_1.jpg` for XS, `…_2.jpg` for S), because the
+ * same picture was uploaded to each of them and Magento renames the duplicates.
+ *
+ * So the widget's `updateBaseImage` is guarded on this page: when the pictures it is about to show are the ones
+ * already on screen, in the same order, it does nothing. "The same picture" means the same original file whether the
+ * URL is the cached .jpg or its .webp copy, or a file whose bytes are identical; the second is decided here, on the
+ * server, from size + the first 64 KB of each file, and sent as an alias map (only the files that have a twin). Any
+ * real change of picture still goes through the widget untouched, and so does a variant with no photos.
+ * Product data only, the same for every visitor: the page stays full-page cacheable.
+ *
+ * @var \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+$hmProduct = $block->getProduct();
+if (!$hmProduct || $hmProduct->getTypeId() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+    return;
+}
+
+$hmMediaDir = BP . '/pub/media/catalog/product';
+$hmFirstFile = [];
+$hmAlias = [];
+foreach (array_merge([$hmProduct], $block->getAllowProducts()) as $hmItem) {
+    $hmImages = $hmItem->getMediaGalleryImages();
+    if (!$hmImages) {
+        continue;
+    }
+    foreach ($hmImages as $hmImage) {
+        $hmFile = '/' . ltrim((string) $hmImage->getFile(), '/');
+        if ($hmFile === '/' || isset($hmAlias[$hmFile]) || in_array($hmFile, $hmFirstFile, true)) {
+            continue;
+        }
+        $hmPath = $hmMediaDir . $hmFile;
+        if (!is_file($hmPath)) {
+            continue;
+        }
+        $hmPrint = md5(filesize($hmPath) . ':' . (string) file_get_contents($hmPath, false, null, 0, 65536));
+        if (isset($hmFirstFile[$hmPrint])) {
+            $hmAlias[$hmFile] = $hmFirstFile[$hmPrint];
+        } else {
+            $hmFirstFile[$hmPrint] = $hmFile;
+        }
+    }
+}
+
+$hmScript = <<<'JS'
+require(['jquery'], function ($) {
+    'use strict';
+
+    var alias = __HM_ALIAS__;
+
+    // The original file behind a gallery URL: cache directory and .webp copy dropped, byte-identical twins merged.
+    function picture(url) {
+        var match = /\/catalog\/product(?:\/cache\/[^\/]+)?(\/[^?#]+?)(?:\.webp)?(?:[?#].*)?$/.exec(url || ''),
+            path = match ? match[1] : String(url || '');
+
+        return alias[path] || path;
+    }
+
+    function key(images) {
+        return JSON.stringify($.map(images || [], function (image) {
+            return [[picture(image.img || image.full), image.videoUrl || null]];
+        }));
+    }
+
+    function guard(widget) {
+        var update;
+
+        if (!widget || widget.hmSamePicture || typeof widget.updateBaseImage !== 'function') {
+            return;
+        }
+        widget.hmSamePicture = true;
+        update = widget.updateBaseImage;
+        widget.updateBaseImage = function (images, context, isInProductView) {
+            var gallery = isInProductView && context ? context.find(this.options.mediaGallerySelector).data('gallery') : null,
+                target = images;
+
+            if (gallery && typeof gallery.returnCurrentImages === 'function' && images && images.length) {
+                if (this.options.gallerySwitchStrategy === 'prepend' && key(images) !== key(this.options.mediaGalleryInitial)) {
+                    target = images.concat(this.options.mediaGalleryInitial);
+                }
+                if (key(target) === key(gallery.returnCurrentImages())) {
+                    return;
+                }
+            }
+
+            return update.apply(this, arguments);
+        };
+    }
+
+    function attach() {
+        $('[data-role=swatch-options]').each(function () {
+            guard($(this).data('mage-SwatchRenderer') || $(this).data('mageSwatchRenderer'));
+        });
+    }
+
+    $(document).on('swatch.initialized', attach);
+    //  Fallback, should the widget have started before this script: a press or focus on the options comes before
+    //  the click or change that loads the photos.
+    $(function () {
+        attach();
+        $('#product_addtocart_form').on('mousedown focusin', '[data-role=swatch-options]', attach);
+    });
+});
+JS;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag(
+    'script',
+    [],
+    str_replace(
+        '__HM_ALIAS__',
+        json_encode((object) $hmAlias, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES),
+        $hmScript
+    ),
+    false
+) ?>
