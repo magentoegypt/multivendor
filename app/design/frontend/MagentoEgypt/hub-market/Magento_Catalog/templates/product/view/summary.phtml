@@ -156,15 +156,130 @@ $hmClean = static function (string $raw) use ($hmStoreArabic): string {
  *   - each line carries dir="auto", so an Arabic line reads right to left on the English page and vice versa.
  * Only when short_description is empty does the page fall back to the trimmed lead of the full description below.
  */
-$hmLines = (static function (string $raw): array {
-    $raw = html_entity_decode($raw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+/*
+ * PICTURES AND VIDEOS STAY (CL036-TC103, 2026-10-12). The editor lets a merchant put an image or a video into
+ * short_description — QA's product 2546 ends with `<img src="{{media url=…}}">` — but the clean-up stripped every tag
+ * and dropped every `{{…}}` directive, so the picture vanished and only the two text lines showed. Now:
+ *   - `{{media url=…}}` is resolved to this store's media URL FIRST, while the quotes around the path are still
+ *     encoded. Decoded first, they nest inside src="…" and cut the attribute short;
+ *   - every <img>, <video>, <audio> and video-site <iframe> (YouTube, Vimeo) becomes a line of its own, REBUILT from
+ *     a few attributes (src, alt, poster, size, source type). The stored markup never reaches the page, and a src
+ *     that is not http(s) or site-relative is dropped (an inline data: picture is allowed on <img> only);
+ *   - everything else goes through the same text clean-up as before, line by line.
+ * The category list view and the cart stay text-only, by design: there the rows have to line up.
+ */
+$hmMediaBase = $hmStore ? (string) $hmStore->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA) : '';
+$hmMedia = [];
+
+$hmLines = (static function (string $raw) use ($hmMediaBase, &$hmMedia, $escaper): array {
+    $raw = preg_replace_callback(
+        '/\{\{media\s+url\s*=([^}]*)\}\}/i',
+        static function (array $m) use ($hmMediaBase): string {
+            //  Decoded until it stops changing: a value stored escaped carries `&amp;quot;` around the path.
+            for ($path = $m[1], $i = 0; $i < 3 && ($next = html_entity_decode($path, ENT_QUOTES | ENT_HTML5, 'UTF-8')) !== $path; $i++) {
+                $path = $next;
+            }
+            return $hmMediaBase . ltrim(trim($path, " \t\"'"), '/');
+        },
+        $raw
+    );
+    $raw = str_replace("\x1A", '', html_entity_decode($raw, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
     $raw = preg_replace('#<(style|script)\b[^>]*>.*?</\1>#is', ' ', $raw);
+
+    //  One attribute's value, quoted or not. The look-behind keeps `src` from matching inside `data-src`.
+    $attr = static function (string $tag, string $name): string {
+        return preg_match('/(?<![\w-])' . $name . '\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>]+))/i', $tag, $m)
+            ? trim(($m[1] ?? '') . ($m[2] ?? '') . ($m[3] ?? ''))
+            : '';
+    };
+    $url = static function (string $src, bool $image = false): string {
+        if (preg_match('#^(?:https?://|/(?!/))#i', $src)) {
+            return $src;
+        }
+        if (str_starts_with($src, '//')) {
+            return 'https:' . $src;
+        }
+        return $image && preg_match('#^data:image/(?:png|jpe?g|gif|webp);base64,[A-Za-z0-9+/=\s]+$#i', $src) ? $src : '';
+    };
+    $size = static function (string $tag) use ($attr): string {
+        $out = '';
+        foreach (['width', 'height'] as $dim) {
+            if (preg_match('/^\d{1,4}$/', $attr($tag, $dim))) {
+                $out .= sprintf(' %s="%d"', $dim, $attr($tag, $dim));
+            }
+        }
+        return $out;
+    };
+    //  Parks the rebuilt element and leaves a placeholder on a line of its own, which strip_tags does not touch.
+    $hold = static function (string $html) use (&$hmMedia): string {
+        $hmMedia[] = $html;
+        return "\n\x1A" . (count($hmMedia) - 1) . "\x1A\n";
+    };
+
+    $raw = preg_replace_callback(
+        '#<(video|audio)\b([^>]*)>(.*?)</\1\s*>#is',
+        static function (array $m) use ($attr, $url, $hold, $size, $escaper): string {
+            $kind = strtolower($m[1]);
+            $sources = '';
+            $tags = array_merge([$m[2]], preg_match_all('#<source\b[^>]*>#i', $m[3], $s) ? $s[0] : []);
+            foreach ($tags as $tag) {
+                $src = $url($attr($tag, 'src'));
+                if ($src !== '') {
+                    $type = $attr($tag, 'type');
+                    $sources .= '<source src="' . $escaper->escapeHtmlAttr($src) . '"'
+                        . (preg_match('#^(?:video|audio)/[\w.+-]+$#i', $type) ? ' type="' . $type . '"' : '') . '>';
+                }
+            }
+            if ($sources === '') {
+                return ' ';
+            }
+            if ($kind === 'audio') {
+                return $hold('<audio controls preload="metadata" style="display:block;width:100%">' . $sources . '</audio>');
+            }
+            $poster = $url($attr($m[2], 'poster'), true);
+            return $hold('<video controls playsinline preload="metadata"' . $size($m[2])
+                . ($poster !== '' ? ' poster="' . $escaper->escapeHtmlAttr($poster) . '"' : '')
+                . ' style="display:block;max-width:100%;height:auto">' . $sources . '</video>');
+        },
+        $raw
+    );
+    $raw = preg_replace_callback(
+        '#<iframe\b([^>]*)>(?:.*?</iframe\s*>)?#is',
+        static function (array $m) use ($attr, $url, $hold, $escaper): string {
+            $src = $url($attr($m[1], 'src'));
+            $host = strtolower((string) parse_url($src, PHP_URL_HOST));
+            if (!preg_match('/^(?:www\.)?(?:youtube(?:-nocookie)?\.com|player\.vimeo\.com)$/', $host)) {
+                return ' ';
+            }
+            return $hold('<iframe src="' . $escaper->escapeHtmlAttr($src) . '" title="' . $escaper->escapeHtmlAttr($attr($m[1], 'title') ?: 'Video') . '"'
+                . ' loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"'
+                . ' allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"'
+                . ' style="display:block;width:100%;max-width:560px;aspect-ratio:16/9;height:auto;border:0"></iframe>');
+        },
+        $raw
+    );
+    $raw = preg_replace_callback(
+        '#<img\b([^>]*)>#i',
+        static function (array $m) use ($attr, $url, $hold, $size, $escaper): string {
+            $src = $url($attr($m[1], 'src'), true);
+            if ($src === '') {
+                return ' ';
+            }
+            return $hold('<img src="' . $escaper->escapeHtmlAttr($src) . '" alt="' . $escaper->escapeHtmlAttr($attr($m[1], 'alt')) . '"'
+                . $size($m[1]) . ' loading="lazy" decoding="async" style="display:block;max-width:100%;height:auto">');
+        },
+        $raw
+    );
+
     $raw = preg_replace('/\{\{[^}]*\}\}/', '', $raw);
     $raw = preg_replace('#<(br|/p|/li|/h[1-6]|/div|/td|/tr)[^>]*>#i', "\n", $raw);
+    //  A line is either a string of text or the int index of a parked picture or video.
     $lines = [];
     foreach (preg_split('/\R/u', strip_tags($raw)) as $line) {
         $line = trim(preg_replace('/[^\S\n]+/u', ' ', $line));
-        if ($line !== '' && preg_match('/[\p{L}\p{N}]/u', $line) && !preg_match('/[{}<>]|#html-body/', $line)) {
+        if (preg_match('/^\x1A(\d+)\x1A$/', $line, $m) && isset($hmMedia[(int) $m[1]])) {
+            $lines[] = (int) $m[1];
+        } elseif ($line !== '' && preg_match('/[\p{L}\p{N}]/u', $line) && !preg_match('/[{}<>\x1A]|#html-body/', $line)) {
             $lines[] = $line;
         }
     }
@@ -172,8 +287,9 @@ $hmLines = (static function (string $raw): array {
 })((string) $hmProduct->getShortDescription());
 
 if ($hmLines) {
+    $hmAfterText = false;
     ?>
-<p class="hm-pdp__summary hm-pdp__summary--lines"><?php foreach ($hmLines as $hmI => $hmLine): ?><?= $hmI ? '<br>' : '' ?><span dir="auto"><?= $escaper->escapeHtml($hmLine) ?></span><?php endforeach; ?></p>
+<p class="hm-pdp__summary hm-pdp__summary--lines"><?php foreach ($hmLines as $hmLine): ?><?php if (is_int($hmLine)): $hmAfterText = false; ?><span class="hm-pdp__summary-media" style="display:block;margin:8px 0"><?= /* @noEscape */ $hmMedia[$hmLine] ?></span><?php else: ?><?= $hmAfterText ? '<br>' : '' ?><span dir="auto"><?= $escaper->escapeHtml($hmLine) ?></span><?php $hmAfterText = true; endif; ?><?php endforeach; ?></p>
 <?php
     return;
 }
