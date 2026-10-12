@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Delivery progress above the order's lines (CL036-DEV17), the same projection the app shows.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="MagentoEgypt\FulfillmentTracking\Block\Order\Delivery"
+                   name="hm.fulfillment.delivery"
+                   template="MagentoEgypt_FulfillmentTracking::order/delivery.phtml"
+                   before="sales.order.view"
+                   cacheable="false"/>
+        </referenceContainer>
+    </body>
+</page>

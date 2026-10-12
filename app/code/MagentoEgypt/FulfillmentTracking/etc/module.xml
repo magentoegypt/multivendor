@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Customer-facing delivery tracking for MagentoEgypt_Fulfillment (CL036-DEV17).
+ *
+ * One projection of an order's fulfillment groups, shown in two places that must agree:
+ *  - the customer app, as CustomerOrder.hm_fulfillment (GraphQL, capability `fulfillment`);
+ *  - the website's customer and guest order pages, as a "Delivery progress" section.
+ *
+ * Read-only. It never changes fulfillment state; sellers, the marketplace team and the fleet
+ * do that through MagentoEgypt_Fulfillment.
+ *
+ * No setup_version: the module has no tables, and a setup_version without a matching
+ * setup_module row makes DbStatusValidator answer 500 for the whole storefront.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="MagentoEgypt_FulfillmentTracking">
+        <sequence>
+            <module name="MagentoEgypt_Fulfillment"/>
+            <module name="MagentoEgypt_HubApp"/>
+            <module name="MagentoEgypt_HubAppOrders"/>
+            <module name="Magento_Sales"/>
+            <module name="Magento_SalesGraphQl"/>
+            <module name="Vnecoms_VendorsSales"/>
+        </sequence>
+    </module>
+</config>

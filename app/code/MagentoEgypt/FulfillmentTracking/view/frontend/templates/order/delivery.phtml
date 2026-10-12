@@ -1,0 +1,96 @@
+<?php
+/**
+ * Delivery progress on the order page (CL036-DEV17): the same deliveries, statuses, couriers and
+ * timeline the customer app shows from CustomerOrder.hm_fulfillment.
+ *
+ * Styled inline with the theme's tokens: the theme stylesheet is not rebuilt for it. Logical
+ * properties (inline-start/end) so the Arabic store mirrors it.
+ *
+ * @var \MagentoEgypt\FulfillmentTracking\Block\Order\Delivery $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+
+$fulfillment = $block->getFulfillment();
+$tone = static function (string $code): array {
+    return match ($code) {
+        'delivered', 'completed' => ['var(--hm-success-subtle)', 'var(--hm-success)'],
+        'delayed', 'on_hold' => ['var(--hm-warning-subtle)', 'var(--hm-warning)'],
+        'canceled', 'refunded' => ['var(--hm-danger-subtle)', 'var(--hm-danger)'],
+        default => ['var(--hm-info-subtle)', 'var(--hm-info)'],
+    };
+};
+$pill = static function (string $code, string $label) use ($tone, $escaper): string {
+    [$bg, $fg] = $tone($code);
+    return '<span class="hm-delivery__status" data-status="' . $escaper->escapeHtmlAttr($code) . '"'
+        . ' style="display:inline-block;padding:.2rem .8rem;border-radius:var(--hm-radius-full);'
+        . 'background:' . $bg . ';color:' . $fg . ';font-weight:600;font-size:1.3rem;line-height:1.6">'
+        . $escaper->escapeHtml($label) . '</span>';
+};
+?>
+<section class="hm-delivery" aria-labelledby="hm-delivery-heading"
+         style="margin:0 0 var(--hm-space-6);padding:var(--hm-space-5);border:1px solid var(--hm-border-subtle);border-radius:var(--hm-radius-lg);background:var(--hm-surface)">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--hm-space-3);margin-block-end:var(--hm-space-4)">
+        <h2 id="hm-delivery-heading" style="margin:0;font-size:1.8rem"><?= $escaper->escapeHtml(__('Delivery progress')) ?></h2>
+        <?= /* @noEscape */ $pill($fulfillment['status_code'], $fulfillment['status_label']) ?>
+    </div>
+
+    <?php foreach ($fulfillment['deliveries'] as $delivery): ?>
+        <?php $items = $block->getItemNames($delivery['item_uids']); ?>
+        <article class="hm-delivery__item" data-delivery="<?= $escaper->escapeHtmlAttr($delivery['id']) ?>"
+                 style="padding:var(--hm-space-4) 0;border-block-start:1px solid var(--hm-border-subtle)">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--hm-space-2)">
+                <div>
+                    <strong style="display:block"><?= $escaper->escapeHtml($delivery['route_label']) ?></strong>
+                    <?php /* Not on the leg out of the warehouse: it can carry several sellers' items. */ ?>
+                    <?php if ($delivery['route'] !== 'from_hub' && !empty($delivery['seller']['name'])): ?>
+                        <span style="color:var(--hm-foreground-muted);font-size:1.3rem">
+                            <?= $escaper->escapeHtml(__('Sold by %1', $delivery['seller']['name'])) ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+                <?= /* @noEscape */ $pill($delivery['status_code'], $delivery['status_label']) ?>
+            </div>
+
+            <?php if ($items): ?>
+                <p style="margin:var(--hm-space-2) 0 0;font-size:1.3rem;color:var(--hm-foreground-muted)">
+                    <?= $escaper->escapeHtml(implode(' · ', $items)) ?>
+                </p>
+            <?php endif; ?>
+
+            <?php if ($delivery['courier'] !== null || $delivery['expected_delivery'] !== null): ?>
+                <dl style="display:grid;grid-template-columns:max-content 1fr;gap:.2rem var(--hm-space-3);margin:var(--hm-space-3) 0 0;font-size:1.4rem">
+                    <?php if ($delivery['courier'] !== null): ?>
+                        <dt style="color:var(--hm-foreground-muted);font-weight:400"><?= $escaper->escapeHtml(__('Courier')) ?></dt>
+                        <dd style="margin:0">
+                            <?= $escaper->escapeHtml($delivery['courier']['type'] === 'third_party' && $delivery['courier']['name'] !== null
+                                ? $delivery['courier']['name']
+                                : $delivery['courier']['label']) ?>
+                            <?php if ($delivery['courier']['tracking_number'] !== null): ?>
+                                <span dir="ltr">· <?= $escaper->escapeHtml($delivery['courier']['tracking_number']) ?></span>
+                                <?php if ($delivery['courier']['tracking_url'] !== null): ?>
+                                    · <a href="<?= $escaper->escapeUrl($delivery['courier']['tracking_url']) ?>" target="_blank" rel="noopener noreferrer"><?= $escaper->escapeHtml(__('Track parcel')) ?></a>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </dd>
+                    <?php endif; ?>
+                    <?php if ($delivery['expected_delivery'] !== null): ?>
+                        <dt style="color:var(--hm-foreground-muted);font-weight:400"><?= $escaper->escapeHtml(__('Expected delivery')) ?></dt>
+                        <dd style="margin:0"><?= $escaper->escapeHtml($block->formatWhen($delivery['expected_delivery'], false)) ?></dd>
+                    <?php endif; ?>
+                </dl>
+            <?php endif; ?>
+
+            <ol class="hm-delivery__timeline" style="list-style:none;margin:var(--hm-space-3) 0 0;padding:0;font-size:1.3rem">
+                <?php foreach ($delivery['timeline'] as $step): ?>
+                    <li style="display:flex;gap:var(--hm-space-2);align-items:baseline;padding:.15rem 0">
+                        <span aria-hidden="true" style="flex:none;width:.8rem;height:.8rem;border-radius:50%;background:<?= /* @noEscape */ $tone($step['status_code'])[1] ?>"></span>
+                        <span><?= $escaper->escapeHtml($step['status_label']) ?></span>
+                        <?php if ($step['at'] !== null): ?>
+                            <span style="color:var(--hm-foreground-muted)"><?= $escaper->escapeHtml($block->formatWhen($step['at'])) ?></span>
+                        <?php endif; ?>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        </article>
+    <?php endforeach; ?>
+</section>
