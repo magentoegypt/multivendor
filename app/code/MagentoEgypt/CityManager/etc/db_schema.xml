@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+<table name="me_city_location" resource="default" engine="innodb" comment="City Manager Locations">
+<column xsi:type="int" name="location_id" unsigned="true" nullable="false" identity="true" comment="Location ID"/>
+<column xsi:type="varchar" name="country_id" length="2" nullable="false" comment="Country"/>
+<column xsi:type="varchar" name="code" length="80" nullable="false" comment="Stable Source Code"/>
+<column xsi:type="varchar" name="level" length="12" nullable="false" comment="region city locality"/>
+<column xsi:type="int" name="parent_id" unsigned="true" nullable="false" default="0" comment="Parent"/>
+<column xsi:type="int" name="region_id" unsigned="true" nullable="true" comment="Magento Region"/>
+<column xsi:type="varchar" name="name_en" length="255" nullable="false" comment="English Name"/>
+<column xsi:type="varchar" name="name_ar" length="255" nullable="true" comment="Arabic Name"/>
+<column xsi:type="smallint" name="is_active" nullable="false" default="1" comment="Active"/>
+<column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated"/>
+<constraint xsi:type="primary" referenceId="PRIMARY"><column name="location_id"/></constraint>
+<constraint xsi:type="unique" referenceId="ME_CITY_CODE"><column name="code"/></constraint>
+<index referenceId="ME_CITY_LOOKUP"><column name="country_id"/><column name="level"/><column name="parent_id"/><column name="is_active"/></index>
+</table>
+<table name="me_city_audit" resource="default" engine="innodb" comment="City Manager Audit">
+<column xsi:type="int" name="audit_id" unsigned="true" nullable="false" identity="true" comment="ID"/>
+<column xsi:type="int" name="admin_id" unsigned="true" nullable="true" comment="Actor"/>
+<column xsi:type="int" name="location_id" unsigned="true" nullable="false" comment="Location"/>
+<column xsi:type="text" name="before_json" nullable="true" comment="Before"/>
+<column xsi:type="text" name="after_json" nullable="false" comment="After"/>
+<column xsi:type="timestamp" name="created_at" default="CURRENT_TIMESTAMP" nullable="false" on_update="false" comment="Created"/>
+<constraint xsi:type="primary" referenceId="PRIMARY"><column name="audit_id"/></constraint>
+</table>
+<table name="customer_address_entity" resource="default" engine="innodb"><column xsi:type="int" name="cm_city_id" unsigned="true" nullable="true" comment="City Manager City ID"/><column xsi:type="int" name="cm_locality_id" unsigned="true" nullable="true" comment="City Manager Locality ID"/></table>
+<table name="quote_address" resource="default" engine="innodb"><column xsi:type="int" name="cm_city_id" unsigned="true" nullable="true" comment="City Manager City ID"/><column xsi:type="int" name="cm_locality_id" unsigned="true" nullable="true" comment="City Manager Locality ID"/></table>
+<table name="sales_order_address" resource="default" engine="innodb"><column xsi:type="int" name="cm_city_id" unsigned="true" nullable="true" comment="City Manager City ID"/><column xsi:type="int" name="cm_locality_id" unsigned="true" nullable="true" comment="City Manager Locality ID"/></table>
+<table name="ves_vendor_entity" resource="default" engine="innodb"><column xsi:type="int" name="cm_city_id" unsigned="true" nullable="true" comment="City Manager City ID"/><column xsi:type="int" name="cm_locality_id" unsigned="true" nullable="true" comment="City Manager Locality ID"/></table>
+</schema>
