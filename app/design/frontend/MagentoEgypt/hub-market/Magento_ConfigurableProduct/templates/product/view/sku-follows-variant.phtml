@@ -1,0 +1,122 @@
+<?php
+/**
+ * Hub Market — the SKU under the product title follows the chosen variant (CL036-TC104, 2026-10-12).
+ *
+ * A configurable product printed its own SKU ("test-config -pro") and kept it whatever colour and size the customer
+ * picked: core has nothing that changes that line. This prints each enabled variant's SKU with the option values that
+ * select it (the same products the option widget is built from, getAllowProducts) and a small script that rewrites
+ * the SKU line whenever a choice changes:
+ *   - every option chosen → that variant's SKU, the one the cart line and the order carry;
+ *   - fewer, or a choice cleared → the product's own SKU again, never a guess at one of its variants.
+ * It listens to the add-to-cart form's `super_attribute[…]` fields rather than to one widget, so colour swatches, the
+ * size dropdown the swatch widget draws, and the plain dropdown form all drive it; it also reads the form once the
+ * widgets are up, which covers options pre-selected from a link (`#93=57`).
+ * Everything here is the product's own data, the same for every visitor, so the page stays full-page cacheable.
+ * The mobile app reads the same thing from GraphQL: `variants { product { sku } attributes { code value_index } }`.
+ *
+ * @var \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+$hmProduct = $block->getProduct();
+if (!$hmProduct || $hmProduct->getTypeId() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+    return;
+}
+
+$hmAttributes = [];
+foreach ($block->getAllowAttributes() as $hmAttribute) {
+    $hmProductAttribute = $hmAttribute->getProductAttribute();
+    if ($hmProductAttribute) {
+        $hmAttributes[(string) $hmProductAttribute->getId()] = $hmProductAttribute->getAttributeCode();
+    }
+}
+$hmVariants = [];
+foreach ($block->getAllowProducts() as $hmChild) {
+    $hmOptions = [];
+    foreach ($hmAttributes as $hmId => $hmCode) {
+        $hmOptions[$hmId] = (string) $hmChild->getData($hmCode);
+    }
+    $hmVariants[] = ['sku' => (string) $hmChild->getSku(), 'options' => $hmOptions];
+}
+if (!$hmAttributes || !$hmVariants) {
+    return;
+}
+
+$hmConfig = json_encode(
+    ['sku' => (string) $hmProduct->getSku(), 'variants' => $hmVariants],
+    JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE
+);
+$hmScript = <<<'JS'
+require(['jquery'], function ($) {
+    'use strict';
+
+    var config = __HM_CONFIG__,
+        form = '#product_addtocart_form',
+        fields = '[name^="super_attribute["]';
+
+    function skuLine() {
+        var value = $('.product-info-main .product.attribute.sku .value').first();
+
+        return value.length ? value : $('.product.attribute.sku .value').first();
+    }
+
+    // The chosen variant's SKU when every option is set, the product's own otherwise.
+    function chosenSku() {
+        var chosen = {}, complete = true, inputs = $(form).find(fields), i, id, options, match;
+
+        inputs.each(function () {
+            var attributeId = (this.name.match(/^super_attribute\[(\d+)\]$/) || [])[1],
+                value = $(this).val();
+
+            if (attributeId) {
+                if (value) {
+                    chosen[attributeId] = String(value);
+                } else {
+                    complete = false;
+                }
+            }
+        });
+        if (!complete || !inputs.length) {
+            return config.sku;
+        }
+        for (i = 0; i < config.variants.length; i++) {
+            options = config.variants[i].options;
+            match = true;
+            for (id in options) {
+                if (options.hasOwnProperty(id) && chosen[id] !== options[id]) {
+                    match = false;
+                    break;
+                }
+            }
+            if (match) {
+                return config.variants[i].sku;
+            }
+        }
+
+        return config.sku;
+    }
+
+    function update() {
+        var line = skuLine(),
+            sku = chosenSku();
+
+        //  Left to right, as on the cart line (DEV01.46): a variant SKU mixes Latin and Arabic
+        //  ("test-config -pro-اسود-XS") and must read in the order it was typed, not be reordered by the Arabic page.
+        if (line.length) {
+            line.attr('dir', 'ltr');
+            if (line.text() !== sku) {
+                line.text(sku);
+            }
+        }
+    }
+
+    //  On the form itself, not on document: a body-level option handler returns false for `.super-attribute-select`
+    //  changes, so they never bubble past <body> and a document listener only ever saw the page load.
+    $(function () {
+        $(form).on('change', fields, update);
+        update();
+    });
+    $(document).on('swatch.initialized configurable.initialized', update);
+});
+JS;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], str_replace('__HM_CONFIG__', $hmConfig, $hmScript), false) ?>

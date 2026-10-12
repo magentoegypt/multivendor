@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+    CL036-TC104: the SKU under the product title follows the variant the customer picks.
+    Only configurable product pages load this handle. The template prints the variants' SKUs
+    and the script that rewrites the SKU line; see its header.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\ConfigurableProduct\Block\Product\View\Type\Configurable"
+                   name="hm.pdp.sku.variant"
+                   after="-"
+                   template="Magento_ConfigurableProduct::product/view/sku-follows-variant.phtml"/>
+        </referenceContainer>
+    </body>
+</page>
