@@ -1,0 +1,50 @@
+<?php $row=$block->record(); $e=fn($v)=>$block->escapeHtml((string)$v); ?>
+<p>Shared directory: Egypt Governorate → City; Saudi Arabia Region → City; USA State → City; UAE City → Locality. Deactivate locations instead of deleting them. Names on existing orders are preserved.</p>
+<h2>Import and export</h2>
+<p><a href="<?= $block->escapeUrl($block->getUrl('*/*/export',['country'=>$block->getRequest()->getParam('country','EG')])) ?>">Export selected country CSV</a>. Keep stable codes unchanged. Put parent rows before children. Imports are atomic: an invalid row cancels the entire file.</p>
+<form method="post" enctype="multipart/form-data" action="<?= $block->escapeUrl($block->getUrl('*/*/import')) ?>">
+<?= $block->getBlockHtml('formkey') ?>
+<label>Location CSV (maximum 5 MB) <input type="file" name="locations_csv" accept=".csv,text/csv" required></label>
+<button>Import locations</button>
+</form>
+<form method="get" action="<?= $block->escapeUrl($block->getUrl('*/*/index')) ?>">
+<label>Country <select name="country"><?php foreach(['EG','SA','AE','US'] as $c): ?><option <?= $block->getRequest()->getParam('country','EG')===$c?'selected':'' ?>><?= $e($c) ?></option><?php endforeach ?></select></label>
+<label>Level <select name="level"><?php foreach(['region','city','locality'] as $l): ?><option <?= $block->getRequest()->getParam('level','region')===$l?'selected':'' ?>><?= $e($l) ?></option><?php endforeach ?></select></label>
+<label>Search <input name="q" value="<?= $e($block->getRequest()->getParam('q','')) ?>"></label><button>Filter</button>
+</form>
+<h2><?= $row?'Edit location':'Add location' ?></h2>
+<form method="post" action="<?= $block->escapeUrl($block->getUrl('*/*/save')) ?>">
+<?= $block->getBlockHtml('formkey') ?>
+<input type="hidden" name="location_id" value="<?= (int)($row['location_id']??0) ?>">
+<?php
+$country=$row['country_id']??(string)$block->getRequest()->getParam('country','EG');
+$level=$row['level']??(string)$block->getRequest()->getParam('level','region');
+$needsParent=$level==='locality'||($level==='city'&&$country!=='AE');
+?>
+<p>Country: <strong><?= $e($country) ?></strong> · Location type: <strong><?= $e($level) ?></strong>. Use the filters above to choose where to add a location.</p>
+<input type="hidden" name="country_id" value="<?= $e($country) ?>">
+<input type="hidden" name="level" value="<?= $e($level) ?>">
+<input type="hidden" name="code" value="<?= $e($row['code']??('custom-'.bin2hex(random_bytes(12)))) ?>">
+<?php if($needsParent): ?>
+<label>Located in <select name="parent_id" required <?= $row?'disabled':'' ?>><option value="">Choose parent location</option>
+<?php foreach($block->choices($country,$level==='city'?'region':'city') as $parent): ?><option value="<?= (int)$parent['location_id'] ?>" <?= ($row['parent_id']??0)==$parent['location_id']?'selected':'' ?>><?= $e($parent['name_en']) ?></option><?php endforeach ?>
+</select></label>
+<?php if($row): ?><input type="hidden" name="parent_id" value="<?= (int)$row['parent_id'] ?>"><?php endif ?>
+<input type="hidden" name="region_id" value="<?= (int)($row['region_id']??0) ?>">
+<?php else: ?>
+<input type="hidden" name="parent_id" value="0">
+<label>Shipping/tax region mapping <select name="region_id" required <?= $row?'disabled':'' ?>><option value="">Choose region</option>
+<?php foreach($block->choices($country,'region') as $region): ?><option value="<?= (int)$region['region_id'] ?>" <?= ($row['region_id']??0)==$region['region_id']?'selected':'' ?>><?= $e($region['name_en']) ?></option><?php endforeach ?>
+</select></label>
+<?php if($row): ?><input type="hidden" name="region_id" value="<?= (int)$row['region_id'] ?>"><?php endif ?>
+<?php endif ?>
+<?php foreach(['name_en'=>'English name','name_ar'=>'Arabic name'] as $key=>$label): ?>
+<div style="margin:12px 0"><label><?= $e($label) ?> <input style="min-width:320px" name="<?= $e($key) ?>" value="<?= $e($row[$key]??'') ?>" <?= $key==='name_en'?'required':'' ?> maxlength="255"></label></div>
+<?php endforeach ?>
+<label>Active <select name="is_active"><option value="1">Yes</option><option value="0" <?= isset($row['is_active'])&&!$row['is_active']?'selected':'' ?>>No</option></select></label>
+<button class="action-primary">Save location</button> <a href="<?= $block->escapeUrl($block->getUrl('*/*/index')) ?>">New location</a>
+</form>
+<p>Showing up to 100 locations per page. <a href="<?= $block->escapeUrl($block->getUrl('*/*/index',['_current'=>true,'page'=>max(1,(int)$block->getRequest()->getParam('page',1)-1)])) ?>">Previous</a> · <a href="<?= $block->escapeUrl($block->getUrl('*/*/index',['_current'=>true,'page'=>(int)$block->getRequest()->getParam('page',1)+1])) ?>">Next</a></p><h2>Locations</h2><table class="data-grid"><thead><tr><?php foreach(['ID','Code','Country','Level','Parent','Region ID','English','Arabic','Active','Action'] as $h): ?><th class="data-grid-th"><?= $e($h) ?></th><?php endforeach ?></tr></thead><tbody>
+<?php foreach($block->rows() as $item): ?><tr><?php foreach(['location_id','code','country_id','level','parent_id','region_id','name_en','name_ar','is_active'] as $k): ?><td><?= $e($item[$k]) ?></td><?php endforeach ?><td><a href="<?= $block->escapeUrl($block->getUrl('*/*/index',['id'=>$item['location_id'],'country'=>$item['country_id'],'level'=>$item['level']])) ?>">Edit</a></td></tr><?php endforeach ?>
+</tbody></table>
+<p>Imported country/state/city data attribution: <a href="https://github.com/dr5hn/countries-states-cities-database">Countries States Cities Database</a>, ODbL 1.0. Dataset completeness and local delivery coverage require operational review.</p>
