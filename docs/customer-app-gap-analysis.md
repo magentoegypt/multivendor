@@ -109,6 +109,7 @@ Legend: ✅ done · 🟡 partial / gated · ❌ missing · ➖ not on the websit
 | 48 | Blog / store locator / lookbook | MGS (**decommissioned**) | — | ➖ (WebView for leftover links) | — |
 | 49 | Maintenance mode / forced update | HubApp config | `hmAppConfig` | ✅ | — |
 | 50 | Analytics / crash reporting | GA / Algolia Insights on the web | Algolia Insights | 🟡 Insights only; no Crashlytics/Analytics | App |
+| 51 | **Fulfillment** (delivery area, direct/hub delivery, allocation, delivery progress) | `MagentoEgypt_Fulfillment` + CityManager + DeliveryAvailability, branch `codex/fulfillment-planner` (**not merged**) | storefront GET preview, REST order progress, area headers on search; **no GraphQL** | 🟡 built on app branch `codex/fulfillment-integration` (**not merged**, 20 commits behind `main`) | Both, see §7 |
 
 ---
 
@@ -406,3 +407,68 @@ This is the pattern that made the existing parity possible. It also lets the app
   - SearchLanding (the app has its own search screen with history and trending terms)
   - minicart cross-sell
 - **Back office only:** OdooConnector, Bss Reindex, Commission / Withdrawal.
+
+---
+
+## 7. Fulfillment module (added 2026-10-12)
+
+### 7.1 Where things stand
+
+| Side | Branch | State |
+|---|---|---|
+| Magento | `codex/fulfillment-planner`: `MagentoEgypt_Fulfillment`, built on `MagentoEgypt_CityManager` and `MagentoEgypt_DeliveryAvailability` | **Not merged** into `figma-parity-home` (12 commits ahead, 38 behind). CityManager and DeliveryAvailability are not on the live branch either. All three switches ship **off**: `hubfulfillment/general/preview_enabled`, `catalog_enabled`, `checkout_enabled`. |
+| App | `codex/fulfillment-integration` (`c75cf7d`), stacked on `codex/delivery-availability` and `codex/city-manager` | **Not merged** into `main`. It branched before the last 20 commits on `main`, so it needs a merge and conflict resolution first. |
+
+The integration has been started on both sides. None of it is in the code that is live or that the app ships.
+
+**What the module does (Magento):**
+- Picks which warehouse (MSI source) ships each SKU to each area.
+- Offers two delivery methods: **direct** (from the seller) and **hub** (consolidated through a central hub).
+- Charges a delivery fee per destination from a policy JSON.
+- At checkout, replaces every other shipping rate with `hubfulfillment_direct` / `hubfulfillment_hub`, and re-checks the allocation and rate when the order is placed.
+- Saves the plan on the order (`sales_order.hf_plan_json`).
+- Hides products that cannot be delivered to the selected area.
+- Keeps a shipping ledger for finance.
+- Has vendor and fleet (delivery driver) REST APIs.
+
+**What the app branch already does:**
+
+| App feature | Backend endpoint it calls | File |
+|---|---|---|
+| Delivery-area picker (home delivery strip) | City Manager directory (storefront HTTP) | `lib/core/address/delivery_location.dart` |
+| Cart "Delivery options" card: direct vs hub, estimated fee | `GET /hubfulfillment/quote/index?country&region&city&locality&strategy&items` (storefront controller), called twice: once per strategy | `lib/core/address/fulfillment_preview.dart` |
+| Catalogue and search limited to the area | Headers `X-Hub-Country/Region/City/Locality` on a separate GraphQL client (POST, own cache); Algolia is switched off while an area is set | `graphql_client.dart`, `catalog_search.dart` |
+| Order detail "Delivery progress" card | `GET /rest/<store>/V1/hubfulfillment/order-number/:number` (customer token) | `lib/core/address/fulfillment_order.dart` |
+| Checkout delivery method | No dedicated code. It relies on `available_shipping_methods` returning `hubfulfillment_*` | — |
+
+### 7.2 Gaps and defects
+
+| # | Gap | Effect | Fix | Owner |
+|---|---|---|---|---|
+| F1 | Neither side is merged; the app branch is behind `main` | The live app and site have none of this | Merge the backend chain CityManager → DeliveryAvailability → Fulfillment into `figma-parity-home`. Use the allowlisted schema diff the module README requires (3 `me_fulfillment_*` tables + `sales_order.hf_plan_json`; **no blanket `setup:upgrade`**). Keep the switches off. Merge `main` into the app branches. | Both |
+| F2 | No capability or feature flag in `hmAppConfig` | The app can't tell whether fulfillment is on. It probes the preview URL (404 means off) and makes 2 requests on every cart change even when the feature is disabled. | Add `capabilities.fulfillment` and `features.{fulfillment_preview, fulfillment_catalog, fulfillment_checkout}` to the HubApp contract, mirroring the three Magento switches. Gate every app call on them. | Both |
+| F3 | **Configurable products always show "Check delivery options at checkout"** | The app sends `product.sku`, which is the **parent** SKU (`cart_repository.dart:363`). `Preview` accepts only simple SKUs (`Preview.php:51-52`), so it returns `unsupported_product_type`. | Send `configured_variant.sku` for configurable lines. Better: move the preview server-side so it reads the cart (F4). | App (or Both, with F4) |
+| F4 | The preview is a storefront controller, not GraphQL. The client sends SKUs and quantities in the query string. | It bypasses the `Store` header and the HubApp contract. It can drift from the real cart (bundles, configurables, quantities). | `query hmFulfillmentPreview(cart_id: String!, strategy: HmDeliveryStrategy): HmFulfillmentOffer`: read the quote server-side through `QuotePlan::items()` (the same expansion checkout uses). Return `status`, `reason`, `shipping { value currency }`, `groups { leg vendor_name items { name qty } }`. | Both |
+| F5 | **Home rails are not limited to the area** | The `Search` plugin only filters `products(search/filter)`. `hmAppHome`, `hmDeals`, `hmBestSellers`, `hmPickedForYou`, `hmBundleDeals` and `hmStore` products come from custom collections, are fetched through the public GET client **without** the `X-Hub-*` headers, and are cached. Shoppers will see items that can't be delivered to them. | Backend: apply `CatalogEligibility` inside the HubApp resolvers, keyed by the area, with the area added to the GraphQL cache identity. App: send the area to those queries too. | Both |
+| F6 | **Bundles and grouped products are not supported** by the fulfillment plan | Once `checkout_enabled=1`, carts holding Bundle Deals (`hmAddBundleToCart`) get no `hubfulfillment` rate, **so the order cannot be placed**. | Decide before switching checkout on: build the bundle expansion adapter (the README notes it is missing), or keep bundles on a fallback carrier. | Backend (decision) |
+| F7 | City/locality IDs don't reach the cart over GraphQL | CityManager's `QuoteAddress` plugin hooks REST `saveAddressInformation` / `assign` only. With GraphQL `setShippingAddressesOnCart`, `QuotePlan` falls back to matching the city **by name** (`Availability::location`). A text mismatch gives "unavailable" and no shipping methods. | Accept `cm_city_id` / `cm_locality_id` through `CartAddressInput.custom_attributes` with a GraphQL plugin calling `QuoteAddress::normalize()`. The app sends the IDs it already holds (`CitySelection`). | Both |
+| F8 | Checkout error handling | `Submit` throws "Delivery rates changed. Please refresh checkout.", "Delivery allocation is busy. Please retry." and "Please select a Hub Market delivery method." The app shows generic errors and doesn't re-fetch the shipping methods. | Map these to re-fetching `available_shipping_methods` (and a retry for the lock), with copy in the ARB files. Better: return error codes from the backend (`extensions.category`). | App (+ Backend codes) |
+| F9 | Order progress is REST-only and thin | The response is a JSON string encoded twice. It is customer-only, so guest orders (`guestOrderByToken`) show nothing. It lists **SKU × qty** rather than product names or images, with no carrier, tracking number or ETA. It is a second "package" view next to the existing `hm_packages`. | Expose `CustomerOrder.hm_fulfillment { status strategy groups { leg state vendor { name } items { name sku qty image } carrier tracking_number eta } }` in GraphQL, readable by guest-token lookup too. Merge it into the existing package cards. | Both |
+| F10 | No push notification on delivery state change | Customers aren't told about dispatched / received at hub / delivered. | Send FCM from `Workflow` state changes and fleet `event` calls (connects to **P0-3**). | Backend |
+| F11 | No real data | `Test/fixtures.php` is synthetic. Sources, rates and coverage are missing. **Enabling `checkout_enabled` with an empty policy means no delivery method anywhere, so nobody can check out.** | Map MSI sources to sellers and City Manager locations, load real rates, and test in staging. Enable in stages: preview → catalog → checkout. | Backend (ops) |
+| F12 | App code conventions | The branch hard-codes EN/AR strings inline instead of using the ARB files. Amounts are minor units divided by a hard-coded 100. | Move the strings to `l10n`. Use `minor_digits` from the response. | App |
+
+**Vendor and fleet side (not customer app):**
+- `/V1/hubfulfillment/vendor*` (seller defaults, per-SKU coverage, dispatch, progress) belongs in the vendor app.
+- `/V1/hubfulfillment/fleet/*` belongs to the delivery partner, per `FLEET-CONTRACT.md`.
+- Both need their own rollout; the customer progress card (F9) only advances once vendors and the fleet report events.
+
+### 7.3 Recommended order
+
+1. **Backend merge, switches off (F1).** Merge CityManager, DeliveryAvailability and Fulfillment into `figma-parity-home` with the allowlisted schema diff, and confirm the site behaves exactly as before.
+2. **Contract (F2, F4, F7, F9).** Add `hmFulfillmentPreview`, `CustomerOrder.hm_fulfillment`, the address IDs in `CartAddressInput`, and the flags to `HubApp/docs/CONTRACT.graphql`. Copy the contract to the app.
+3. **App (F3, F8, F12).** Merge `main` into `codex/fulfillment-integration`, switch it to the contract, gate it on the flags, then merge.
+4. **Data and decisions (F6, F11).** Load the real sources and rates in staging, and decide how bundles are delivered.
+5. **Switch on in stages.** `preview_enabled` → `catalog_enabled` (after F5) → `checkout_enabled` (after F6–F8 and a full device checkout test). Turn on push for state changes (F10).
+
+**Priority: P1.** The work is mostly built, but turning checkout on without F5–F8 and F11 would block orders.
