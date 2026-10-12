@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/hubfulfillment/fleet/orders" method="GET"><service class="MagentoEgypt\Fulfillment\Api\FleetInterface" method="orders"/><resources><resource ref="MagentoEgypt_Fulfillment::fleet"/></resources></route>
+    <route url="/V1/hubfulfillment/fleet/order/:orderId" method="GET"><service class="MagentoEgypt\Fulfillment\Api\FleetInterface" method="order"/><resources><resource ref="MagentoEgypt_Fulfillment::fleet"/></resources></route>
+    <route url="/V1/hubfulfillment/fleet/event" method="POST"><service class="MagentoEgypt\Fulfillment\Api\FleetInterface" method="event"/><resources><resource ref="MagentoEgypt_Fulfillment::fleet"/></resources></route>
+    <route url="/V1/hubfulfillment/vendor/order/:orderId" method="GET"><service class="MagentoEgypt\Fulfillment\Api\VendorInterface" method="order"/><resources><resource ref="self"/></resources></route>
+    <route url="/V1/hubfulfillment/vendor/dispatch" method="POST"><service class="MagentoEgypt\Fulfillment\Api\VendorInterface" method="dispatch"/><resources><resource ref="self"/></resources></route>
+    <route url="/V1/hubfulfillment/order-number/:number" method="GET"><service class="MagentoEgypt\Fulfillment\Api\CustomerInterface" method="byNumber"/><resources><resource ref="self"/></resources></route>
+    <route url="/V1/hubfulfillment/order/:orderId" method="GET"><service class="MagentoEgypt\Fulfillment\Api\CustomerInterface" method="order"/><resources><resource ref="self"/></resources></route>
+    <route url="/V1/hubfulfillment/vendor" method="GET"><service class="MagentoEgypt\Fulfillment\Api\VendorInterface" method="workspace"/><resources><resource ref="self"/></resources></route>
+    <route url="/V1/hubfulfillment/vendor/policy" method="PUT"><service class="MagentoEgypt\Fulfillment\Api\VendorInterface" method="savePolicy"/><resources><resource ref="self"/></resources></route>
+    <route url="/V1/hubfulfillment/vendor/progress" method="POST"><service class="MagentoEgypt\Fulfillment\Api\VendorInterface" method="progress"/><resources><resource ref="self"/></resources></route>
+</routes>

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<type name="Magento\Search\Model\EngineResolver"><plugin name="hub_fulfillment_scoped_engine" type="MagentoEgypt\Fulfillment\Plugin\Algolia" sortOrder="10000"/></type>
+<type name="Magento\Catalog\Model\ResourceModel\Product\Collection"><plugin name="hub_fulfillment_collection" type="MagentoEgypt\Fulfillment\Plugin\CatalogCollection"/></type>
+<type name="Algolia\AlgoliaSearch\Helper\ConfigHelper"><plugin name="hub_fulfillment_native_catalog" type="MagentoEgypt\Fulfillment\Plugin\Algolia"/></type>
+<type name="Algolia\AlgoliaSearch\Helper\Configuration\InstantSearchHelper"><plugin name="hub_fulfillment_native_instant" type="MagentoEgypt\Fulfillment\Plugin\Algolia"/></type>
+<type name="Algolia\AlgoliaSearch\Helper\Configuration\AutocompleteHelper"><plugin name="hub_fulfillment_native_autocomplete" type="MagentoEgypt\Fulfillment\Plugin\Algolia"/></type>
+</config>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="MagentoEgypt\Fulfillment\Api\FleetInterface" type="MagentoEgypt\Fulfillment\Model\FleetApi"/>
+    <type name="Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector"><plugin name="hub_fulfillment_net_shipping_tax" type="MagentoEgypt\Fulfillment\Plugin\ShippingTax"/></type>
+    <type name="Magento\Elasticsearch\SearchAdapter\Filter\Builder\Term"><arguments><argument name="integerTypeAttributes" xsi:type="array"><item name="hub_document_id" xsi:type="string">_id</item></argument></arguments></type>
+    <preference for="MagentoEgypt\Fulfillment\Api\VendorInterface" type="MagentoEgypt\Fulfillment\Model\VendorApi"/>
+    <preference for="MagentoEgypt\Fulfillment\Api\CustomerInterface" type="MagentoEgypt\Fulfillment\Model\CustomerApi"/>
+    <type name="Magento\Sales\Api\OrderManagementInterface"><plugin name="hub_fulfillment_placement_guard" type="MagentoEgypt\Fulfillment\Plugin\Place" sortOrder="-2000"/></type>
+    <type name="Magento\Search\Api\SearchInterface"><plugin name="hub_fulfillment_search" type="MagentoEgypt\Fulfillment\Plugin\Search"/></type>
+    <type name="Magento\Shipping\Model\Shipping"><plugin name="hub_fulfillment_shipping" type="MagentoEgypt\Fulfillment\Plugin\Shipping" sortOrder="-1000"/></type>
+    <type name="Magento\Quote\Model\QuoteManagement"><plugin name="hub_fulfillment_submit" type="MagentoEgypt\Fulfillment\Plugin\Submit" sortOrder="-1000"/></type>
+    <type name="Vnecoms\VendorsShipping\Model\Sales\Order\Invoice\Total\Shipping"><plugin name="hub_fulfillment_invoice_shipping" type="MagentoEgypt\Fulfillment\Plugin\InvoiceShipping"/></type>
+    <type name="Vnecoms\VendorsShipping\Model\Sales\Order\Creditmemo\Total\Shipping"><plugin name="hub_fulfillment_refund_shipping" type="MagentoEgypt\Fulfillment\Plugin\CreditmemoShipping"/></type>
+    <type name="Vnecoms\VendorsShipping\Observer\UpdateShippingInfo"><plugin name="hub_fulfillment_vendor_shipping" type="MagentoEgypt\Fulfillment\Plugin\VendorShipping"/></type>
+</config>

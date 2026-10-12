@@ -1,0 +1,33 @@
+<?php /** @var \Magento\Framework\View\Element\Template $block */
+$data=$block->getData('workspace');
+$labels=['vendor'=>__('I ship products'),'marketplace'=>__('Marketplace collects and delivers'),'hub'=>__('Delivery through the marketplace hub')]; ?>
+<div id="hub-vendor-fulfillment">
+<form method="post" action="<?= $block->escapeUrl($block->getUrl('hubfulfillment/manage/save')) ?>" data-role="policy">
+<?= $block->getBlockHtml('formkey') ?>
+<h2><?= $block->escapeHtml(__('Default delivery options')) ?></h2>
+<?php foreach ($labels as $mode=>$label): ?>
+<label><input type="checkbox" data-mode="<?= $block->escapeHtmlAttr($mode) ?>" <?= in_array($mode,$data['modes'],true)?'checked':'' ?>> <?= $block->escapeHtml($label) ?></label><br>
+<?php endforeach ?>
+<h2><?= $block->escapeHtml(__('Product overrides')) ?></h2>
+<p><?= $block->escapeHtml(__('Products without an override use your defaults. No selected delivery options means delivery is unavailable.')) ?></p>
+<div data-role="products"></div>
+<button type="button" data-role="add"><?= $block->escapeHtml(__('Add product override')) ?></button>
+<input type="hidden" name="policy_json">
+<button type="submit"><?= $block->escapeHtml(__('Save delivery settings')) ?></button>
+</form>
+<h2><?= $block->escapeHtml(__('Delivery groups')) ?></h2>
+<?php foreach ($data['groups'] as $row): $g=$row['group']; ?>
+<section><h3><?= $block->escapeHtml(__('Order %1',$row['order_number'])) ?></h3>
+<p><?= $block->escapeHtml(__($g['leg']).' — '.__($g['state'])) ?></p>
+<?php foreach ($g['items'] as $item): ?><p><?= $block->escapeHtml($item['sku'].' × '.($item['qty_milli']/1000)) ?></p><?php endforeach ?>
+<?php if ($g['can_manage'] && in_array($g['state'],['planned','dispatched'],true)): ?>
+<form method="post" action="<?= $block->escapeUrl($block->getUrl('hubfulfillment/manage/save')) ?>">
+<?= $block->getBlockHtml('formkey') ?>
+<input type="hidden" name="action" value="progress"><input type="hidden" name="order_id" value="<?= (int)$row['order_id'] ?>">
+<input type="hidden" name="group_id" value="<?= $block->escapeHtmlAttr($g['id']) ?>">
+<input type="hidden" name="operation_key" value="<?= $block->escapeHtmlAttr(bin2hex(random_bytes(16))) ?>">
+<input type="hidden" name="state" value="<?= $g['state']==='planned'?'dispatched':'delivered' ?>">
+<button><?= $block->escapeHtml($g['state']==='planned'?__('Mark dispatched'):__('Mark delivered')) ?></button>
+</form><?php endif ?></section><?php endforeach ?>
+</div>
+<script type="text/x-magento-init"><?= json_encode(['#hub-vendor-fulfillment'=>['MagentoEgypt_Fulfillment/js/vendor'=>['products'=>$data['products'],'directoryUrl'=>$block->getUrl('citymanager/directory/index')]]],JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?></script>
